@@ -276,7 +276,7 @@ export class CacheDecorator {
         this._log!.warn(
           `calling next from cacheMiddleware catch ${req.originalUrl}`,
         );
-        err instanceof Error && this._log!.warn(err.message, err);
+        err instanceof Error && this._log!.warn(err.message, { err });
         if (!isNextCalled) {
           return next();
         }

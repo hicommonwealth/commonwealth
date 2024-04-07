@@ -114,7 +114,7 @@ export class Daemons {
       try {
         clearInterval(jobId);
       } catch (err) {
-        log.warn('Error cancelling task', err as Error);
+        log.warn('Error cancelling task', { err });
         // remove from map
         return this.tasks.delete(label);
       }

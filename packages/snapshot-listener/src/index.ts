@@ -61,7 +61,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       res.status(400).send('Error sending snapshot event');
     }
 
-    log.debug('Snapshot received', undefined, { requestBody: req.body });
+    log.debug('Snapshot received', { requestBody: req.body });
 
     const parsedId = req.body.id?.replace(/.*\//, '');
     const eventType = req.body.event?.split('/')[1];

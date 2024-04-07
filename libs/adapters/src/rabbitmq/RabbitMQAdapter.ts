@@ -142,7 +142,7 @@ export class RabbitMQAdapter implements Broker {
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
-          this._log.debug('Message published', undefined, {
+          this._log.debug('Message published', {
             messageId,
             ...logContext,
           });
@@ -207,7 +207,7 @@ export class RabbitMQAdapter implements Broker {
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
           eventHandler(handler, content, true)
             .then(() => {
-              this._log.debug('Message Acked', undefined, {
+              this._log.debug('Message Acked', {
                 topic,
                 message: content,
               });

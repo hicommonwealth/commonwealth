@@ -58,7 +58,7 @@ export async function setupListener(): Promise<Client> {
   });
 
   client.on('notification', (payload) => {
-    log.info('Notification received', undefined, { payload });
+    log.info('Notification received', { payload });
     incrementNumUnrelayedEvents(1);
     stats().increment('messageRelayerNotificationReceived');
   });

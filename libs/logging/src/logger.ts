@@ -1,5 +1,5 @@
-import { getDefaultLogger } from './defaultLogger';
 import { GetLogger, ILogger, LoggerIds } from './interfaces';
+import { getDefaultLogger } from './util/getDefaultLogger';
 
 // Unified function implementation
 export function logger(

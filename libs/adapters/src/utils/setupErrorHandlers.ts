@@ -41,14 +41,20 @@ export const setupErrorHandlers = (app: Express) => {
         error: 'Server error, please try again later.',
       });
     } else if (error instanceof AppError) {
-      log.warn(error.message, error, reqContext); // just warn, to avoid overloading rollbar with bots and attacks
+      log.warn(error.message, {
+        error,
+        reqContext,
+      }); // just warn, to avoid overloading rollbar with bots and attacks
       res.status(error.status).send({
         status: error.status,
         error: error.message,
       });
     } else {
       if (error?.status < 500) {
-        log.warn(error.message || 'Unknown client error', error, reqContext);
+        log.warn(error.message || 'Unknown client error', {
+          error,
+          reqContext,
+        });
         res.status(error.status);
         res.json({
           status: error.status,

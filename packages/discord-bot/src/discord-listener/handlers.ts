@@ -68,7 +68,7 @@ export async function handleMessage(
     });
   }
 
-  log.info(`Event published`, undefined, {
+  log.info(`Event published`, {
     event,
   });
 }
@@ -137,7 +137,7 @@ export async function handleThreadChannel(
       });
     }
 
-    log.info(`Event published`, undefined, {
+    log.info(`Event published`, {
       event,
     });
   }

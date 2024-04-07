@@ -1,6 +1,6 @@
 import pino, { DestinationStream } from 'pino';
-import { GetLogger, LogContext, LoggerIds } from './interfaces';
-import { rollbar } from './rollbar';
+import { GetLogger, LogContext, LoggerIds } from '../interfaces';
+import { rollbar } from '../util/rollbar';
 
 let logLevel: 'info' | 'debug';
 let transport: DestinationStream;
@@ -43,7 +43,7 @@ export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
             pid: bindings.pid,
             filename: node_env === 'production' ? bindings.name : undefined,
             name: node_env !== 'production' ? bindings.name : undefined,
-            ids: ids.length > 0 ? ids : undefined,
+            ids: ids.length > 1 ? ids.slice(1) : undefined,
           };
         },
       },
@@ -57,17 +57,17 @@ export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
   );
 
   return {
-    trace(msg: string, error?: Error, context?: LogContext) {
-      logger.trace({ ...context, err: error || undefined }, msg);
+    trace(msg: string, context?: LogContext) {
+      logger.trace({ ...context }, msg);
     },
-    debug(msg: string, error?: Error, context?: LogContext) {
-      logger.debug({ ...context, err: error || undefined }, msg);
+    debug(msg: string, context?: LogContext) {
+      logger.debug({ ...context }, msg);
     },
-    info(msg: string, error?: Error, context?: LogContext) {
-      logger.info({ ...context, err: error || undefined }, msg);
+    info(msg: string, context?: LogContext) {
+      logger.info({ ...context }, msg);
     },
-    warn(msg: string, error?: Error, context?: LogContext) {
-      logger.warn({ ...context, err: error || undefined }, msg);
+    warn(msg: string, context?: LogContext) {
+      logger.warn({ ...context }, msg);
     },
     error(msg: string, error?: Error, context?: LogContext) {
       logger.error({ ...context, err: error || undefined }, msg);

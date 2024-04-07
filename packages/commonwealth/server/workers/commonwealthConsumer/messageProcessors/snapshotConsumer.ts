@@ -36,7 +36,7 @@ export const processSnapshotProposalCreated: EventHandler<
     expire,
   };
 
-  log.info(`Processing snapshot message`, undefined, payload);
+  log.info(`Processing snapshot message`, payload);
 
   let proposal;
 
