@@ -148,6 +148,8 @@ module.exports = {
           'Communities',
           {
             chain_node_id: sepoliaChainNodeId,
+            type: 'offchain',
+            network: 'ethereum',
           },
           {
             chain_node_id: goerliChainNodeId,
@@ -180,6 +182,8 @@ module.exports = {
           'Communities',
           {
             chain_node_id: amoyChainNodeId,
+            type: 'offchain',
+            network: 'ethereum',
           },
           {
             chain_node_id: mumbaiChainNodeId,
