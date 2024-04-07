@@ -1,7 +1,8 @@
-import { CacheNamespaces, logger } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { CacheDecorator, KeyFunction } from './redis';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export class Activity<T extends (...args: any[]) => any> {
   queryWithCache: T;

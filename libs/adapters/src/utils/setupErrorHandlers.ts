@@ -1,4 +1,5 @@
-import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { Express, NextFunction, Request, Response } from 'express';
 
 // Handle server and application errors.
@@ -6,7 +7,7 @@ import type { Express, NextFunction, Request, Response } from 'express';
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
 export const setupErrorHandlers = (app: Express) => {
-  const log = logger().getLogger(__filename);
+  const log = logger(__filename);
 
   // Handle 404 errors
   app.use((req: Request, res: Response) => {
