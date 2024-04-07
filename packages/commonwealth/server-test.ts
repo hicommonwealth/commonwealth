@@ -5,7 +5,7 @@ import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
 
-const TEST_WITH_LOGS = process.env.TEST_WITH_LOGS === 'true';
+const TEST_WITHOUT_LOGS = process.env.TEST_WITHOUT_LOGS === 'true';
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -42,7 +42,7 @@ export const testServer = async (): Promise<TestServer> => {
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
     port: 8081,
-    withLoggingMiddleware: TEST_WITH_LOGS,
+    withLoggingMiddleware: !TEST_WITHOUT_LOGS,
   });
   const seeder = modelSeeder(app, db);
   const e2eTestEntities = await tester.e2eTestEntities(db);
