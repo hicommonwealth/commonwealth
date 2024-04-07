@@ -1,5 +1,4 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
 import * as dotenv from 'dotenv';
@@ -10,7 +9,7 @@ import { createGzip } from 'zlib';
 // REQUIRED for S3 env var
 dotenv.config();
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 
 function dumpTablesSync(table: string, outputFile: string): boolean {

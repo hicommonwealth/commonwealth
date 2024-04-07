@@ -1,10 +1,6 @@
 /* eslint-disable dot-notation */
-import {
-  CacheDecorator,
-  PinoLogger,
-  RedisCache,
-} from '@hicommonwealth/adapters';
-import { cache, dispose, logger } from '@hicommonwealth/core';
+import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
+import { cache, dispose } from '@hicommonwealth/core';
 import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
@@ -37,7 +33,6 @@ export type TestServer = {
  */
 export const testServer = async (): Promise<TestServer> => {
   // bootstrap test adapters
-  logger(TEST_WITH_LOGS ? PinoLogger() : undefined);
   cache(new RedisCache('redis://localhost:6379'));
 
   const { tester } = await import('@hicommonwealth/model');

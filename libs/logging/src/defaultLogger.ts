@@ -14,8 +14,10 @@ const getTestLogger: GetLogger = () => ({
   },
 });
 
+const TEST_WITH_LOGS = process.env.TEST_WITH_LOGS === 'true';
+
 export const getDefaultLogger = (ids: LoggerIds): ILogger => {
-  if (process.env.NODE_ENV === 'test' && !process.env.TEST_WITH_LOGS)
+  if (process.env.NODE_ENV === 'test' && !TEST_WITH_LOGS)
     return getTestLogger(ids);
   else return getPinoLogger(ids);
 };

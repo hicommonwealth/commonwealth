@@ -1,10 +1,10 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { delay, logger, stats } from '@hicommonwealth/core';
+import { delay, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Client } from 'pg';
 import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 const OUTBOX_CHANNEL = 'outbox_channel';
 let retryCount = 0;
 const maxRetries = 5;

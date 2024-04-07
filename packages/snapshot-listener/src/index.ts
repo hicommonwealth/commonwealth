@@ -1,6 +1,5 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
@@ -12,9 +11,9 @@ import {
   BrokerTopics,
   EventContext,
   broker,
-  logger,
   stats,
 } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import v8 from 'v8';
@@ -27,7 +26,7 @@ import {
 
 let isServiceHealthy = false;
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 stats(HotShotsStats());
 
 startHealthCheckLoop({
@@ -119,7 +118,6 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
-  const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
   if (NODE_ENV !== 'test') {
