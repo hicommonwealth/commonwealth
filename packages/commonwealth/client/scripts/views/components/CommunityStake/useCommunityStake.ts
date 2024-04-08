@@ -16,6 +16,12 @@ interface UseCommunityStakeProps {
   walletAddress?: string;
 }
 
+const chainIds = {
+  1397: 'Blast',
+  1322: 'Base',
+  37: 'Ethereum',
+};
+
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
@@ -29,7 +35,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const ethChainId =
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
-  const activeChainId = app?.chain?.meta?.ChainNode?.name.split('-')[0];
+  const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
 
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
     useFetchCommunityStakeQuery({
