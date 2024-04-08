@@ -30,7 +30,8 @@ interface CWCommunitySelectorProps {
 }
 
 const BLAST_LOGO =
-  'https://assets-global.website-files.com/65a6baa1a3f8ed336f415cb4/65a6c39bae6093c6653dd016_Logo%20Yellow%20on%20Black%20Background%202x-p-500.png';
+  'https://assets-global.website-files.com/65a6baa1a3f8ed336f415cb4/65a6c39bae6093c6653dd016_' +
+  'Logo%20Yellow%20on%20Black%20Background%202x-p-500.png';
 
 const CWCommunitySelector = ({
   type,

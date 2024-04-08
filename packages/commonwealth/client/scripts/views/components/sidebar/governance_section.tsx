@@ -65,11 +65,6 @@ export const GovernanceSection = () => {
 
   const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
-  const showCompoundOptions =
-    isNotOffchain &&
-    app.user.activeAccount &&
-    app.chain?.network === ChainNetwork.Compound;
-
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
     !!app.chain?.meta.snapshot?.length;

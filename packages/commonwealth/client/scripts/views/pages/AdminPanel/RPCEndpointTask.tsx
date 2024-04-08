@@ -168,7 +168,7 @@ const RPCEndpointTask = () => {
         });
         nodeId = res.data.result.node_id;
       } else {
-        const res = await updateChainNode({
+        await updateChainNode({
           id: communityChainNode.id,
           url: rpcEndpoint,
           name: rpcName,

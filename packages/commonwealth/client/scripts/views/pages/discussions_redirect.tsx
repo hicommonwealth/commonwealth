@@ -41,7 +41,7 @@ export default function DiscussionsRedirect() {
       default:
         navigate('/discussions', dontAddHistory);
     }
-  }, [navigate]);
+  }, [navigate, communityHomepageEnabled]);
 
   return <PageLoading />;
 }
