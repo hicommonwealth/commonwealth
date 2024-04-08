@@ -1,11 +1,11 @@
 import { fromTimestamp } from '@hicommonwealth/chains';
+import { logger } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   NotificationCategories,
   SupportedNetwork,
-  logger,
-} from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';

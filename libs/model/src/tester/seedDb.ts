@@ -5,7 +5,7 @@ import {
   ChainType,
   CosmosGovernanceVersion,
   NotificationCategories,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import { bootstrap_testing } from './bootstrap';
 
 /**

@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { AuthSSOs, AuthWallets } from '../../components/AuthButton/types';
 
 export type AuthModalTabs = {

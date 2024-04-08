@@ -1,10 +1,6 @@
-import {
-  AppError,
-  DynamicTemplate,
-  WalletId,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
