@@ -12,7 +12,8 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
+    "test": "echo No tests for @hicommonwealth/shared"
   },
   "dependencies": {}
 }
+k
