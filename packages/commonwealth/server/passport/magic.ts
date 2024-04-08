@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import {
-  ChainBase,
-  NotificationCategories,
-  ServerError,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type {
   DB,
   ProfileAttributes,
@@ -22,6 +15,12 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
