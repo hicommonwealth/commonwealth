@@ -2,11 +2,18 @@ import { z } from 'zod';
 
 export const ThreadEvent = z.object({
   threadId: z.number(),
+  communityId: z.string(),
   userAddress: z.string(),
   chainNodeUrl: z.string(),
+  contestAddress: z
+    .string()
+    .optional()
+    .describe('the contest contract address'),
 });
 export const ThreadCreated = ThreadEvent.extend({});
-export const ThreadUpvoted = ThreadEvent.extend({});
+export const ThreadUpvoted = ThreadEvent.extend({
+  contentId: z.string().optional().describe('the onchain content ID'),
+});
 export const CommentCreated = z.object({ comment: z.string() });
 export const GroupCreated = z.object({
   groupId: z.string(),
