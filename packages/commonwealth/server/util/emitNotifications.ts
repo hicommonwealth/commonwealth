@@ -4,7 +4,8 @@ import type {
   IForumNotificationData,
   NotificationDataAndCategory,
 } from '@hicommonwealth/core';
-import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
+import { NotificationCategories, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB, NotificationInstance } from '@hicommonwealth/model';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
@@ -15,7 +16,7 @@ import {
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const { Op } = Sequelize;
 

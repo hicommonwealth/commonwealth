@@ -1,4 +1,5 @@
-import { NotificationCategories, logger } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   NotificationInstance,
   SubscriptionInstance,
@@ -9,7 +10,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 enum SupportedNotificationChains {
   dydx = 'dydx',
