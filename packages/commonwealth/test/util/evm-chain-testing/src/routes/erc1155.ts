@@ -31,7 +31,7 @@ export const deploy1155 = async (req: Request, res: Response) => {
     const account = (await provider.eth.getAccounts())[0];
     await contract
       .deploy({ data: testErc1155Bytecode })
-      .send({ from: account, gas: 5_000_000 })
+      .send({ from: account, gas: '5000000' })
       .on('receipt', function (receipt) {
         res
           .status(200)
@@ -62,7 +62,7 @@ export const mint1155 = async (req: Request, res: Response) => {
       Number(request.tokenId),
       request.amount,
     );
-    const txReceipt = await tx.send({ from: accounts[0], gas: 500000 });
+    const txReceipt = await tx.send({ from: accounts[0], gas: '500000' });
 
     res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {

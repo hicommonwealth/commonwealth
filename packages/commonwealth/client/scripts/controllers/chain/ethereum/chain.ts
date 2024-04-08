@@ -7,8 +7,8 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import Web3 from 'web3';
 import type ChainInfo from '../../../models/ChainInfo';
-import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type NodeInfo from '../../../models/NodeInfo';
+import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type EthereumAccount from './account';
 
 const ETHEREUM_BLOCK_TIME = 13;
@@ -18,7 +18,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     author: EthereumAccount,
     txFunc: any,
     txName: string,
-    objName: string
+    objName: string,
   ): ITXModalData {
     throw new Error('Method not implemented.');
   }
@@ -74,7 +74,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     await this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
-    const blockNumber = await this._api.eth.getBlockNumber();
+    const blockNumber = Number(await this._api.eth.getBlockNumber());
     console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
     if (
@@ -82,23 +82,23 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this.app.chain.meta.node &&
       this.app.chain.meta.node.ethChainId !== 1
     ) {
-      this.app.chain.block.height = headers.number;
-      this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
+      this.app.chain.block.height = Number(headers.number);
+      this.app.chain.block.lastTime = moment.unix(+Number(headers.timestamp));
 
       // TODO: @Timothee - delete all this and the dependencies on app.chain.block.duration
       // compute the average block time
       // TODO: cache the average blocktime on server rather than computing it here every time
       const nHeadersForBlocktime = 5;
       let totalDuration = 0;
-      let lastBlockTime = +headers.timestamp;
+      let lastBlockTime = +Number(headers.timestamp);
       for (let n = 0; n < nHeadersForBlocktime; n++) {
         const prevBlockNumber = blockNumber - 1 - n;
         if (prevBlockNumber > 0) {
           const prevHeader = await this._api.eth.getBlock(
-            `${blockNumber - 1 - n}`
+            `${blockNumber - 1 - n}`,
           );
-          const duration = lastBlockTime - +prevHeader.timestamp;
-          lastBlockTime = +prevHeader.timestamp;
+          const duration = lastBlockTime - +Number(prevHeader.timestamp);
+          lastBlockTime = +Number(prevHeader.timestamp);
           totalDuration += duration;
         } else {
           break;

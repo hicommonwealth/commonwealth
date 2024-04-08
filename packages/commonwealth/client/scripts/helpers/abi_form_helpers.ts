@@ -1,10 +1,9 @@
-import Web3 from 'web3';
-import type { AbiInput } from 'web3-utils';
+import Web3, { AbiInput } from 'web3';
 import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 export function validateAbiInput(
   val: string,
-  inputType: string
+  inputType: string,
 ): [ValidationStatus, string] {
   const coder = new Web3().eth.abi;
   try {
@@ -28,7 +27,7 @@ export function handleMappingAbiInputs(
   inputIndex: number,
   input: string,
   functionName: string,
-  inputMap: Map<string, Map<number, string>>
+  inputMap: Map<string, Map<number, string>>,
 ) {
   if (!inputMap.has(functionName)) {
     inputMap.set(functionName, new Map<number, string>());
@@ -44,14 +43,14 @@ export function handleMappingAbiInputs(
 
 export function processAbiInputsToDataTypes(
   functionInputs: AbiInput[],
-  inputsMap: string[]
+  inputsMap: string[],
 ): any[] {
   const processedArgs: any[] = functionInputs.map(
     (arg: AbiInput, index: number) => {
       const type = arg.type;
       if (type.slice(-2) === '[]') return JSON.parse(inputsMap[index]);
       return inputsMap[index];
-    }
+    },
   );
   return processedArgs;
 }

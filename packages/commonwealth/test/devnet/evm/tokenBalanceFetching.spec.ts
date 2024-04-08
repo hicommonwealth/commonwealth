@@ -117,7 +117,7 @@ describe('Token Balance Cache EVM Tests', function () {
       );
       await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
       await sdk.getErc20(chainLinkAddress, addressTwo, transferAmount);
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -301,11 +301,15 @@ describe('Token Balance Cache EVM Tests', function () {
       const web3 = new Web3(
         new Web3.providers.HttpProvider('http://localhost:8545'),
       );
-      originalAddressOneBalance = await web3.eth.getBalance(addressOne);
-      originalAddressTwoBalance = await web3.eth.getBalance(addressTwo);
+      originalAddressOneBalance = (
+        await web3.eth.getBalance(addressOne)
+      ).toString();
+      originalAddressTwoBalance = (
+        await web3.eth.getBalance(addressTwo)
+      ).toString();
       await sdk.getETH(addressOne, transferAmount);
       await sdk.getETH(addressTwo, transferAmount);
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -766,7 +770,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
       await delay(20000);
 
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       const finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
