@@ -7,7 +7,7 @@
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
-    "start": "ts-node-dev --max-old-space-size=4096 --respawn src/index.ts",
+    "start": "tsx watch --max-old-space-size=4096 src/index.ts",
     "test": "NODE_ENV=test ts-mocha './test/**/*.spec.ts'"
   },
   "engines": {

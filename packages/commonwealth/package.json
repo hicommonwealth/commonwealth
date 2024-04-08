@@ -36,7 +36,7 @@
     "send-notification-digest-emails": "SEND_EMAILS=true tsx -r tsconfig-paths/register server.ts",
     "send-cosmos-notifs": "tsx -r tsconfig-paths/register server/workers/cosmosGovNotifications/generateCosmosGovNotifications.ts",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
-    "start": "ts-node-dev -r tsconfig-paths/register --max-old-space-size=4096 --respawn -T server.ts",
+    "start": "tsx watch -r tsconfig-paths/register --max-old-space-size=4096 server.ts",
     "start-evm-ce": "tsx -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-ci": "FETCH_INTERVAL_MS=500 tsx -r tsconfig-paths/register server.ts",
