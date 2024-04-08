@@ -1,11 +1,10 @@
-import {
-  EventHandler,
-  NotificationCategories,
-  SnapshotEventType,
-  stats,
-} from '@hicommonwealth/core';
+import { EventHandler, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  SnapshotEventType,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';

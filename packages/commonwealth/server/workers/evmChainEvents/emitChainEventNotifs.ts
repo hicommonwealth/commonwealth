@@ -1,8 +1,3 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  SupportedNetwork,
-} from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
   CommunityAttributes,
@@ -10,6 +5,11 @@ import {
   NotificationInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  SupportedNetwork,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
 import { RawEvmEvent } from './types';

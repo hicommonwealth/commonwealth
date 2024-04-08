@@ -1,5 +1,6 @@
-import { NotificationCategories, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { tester, type DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';

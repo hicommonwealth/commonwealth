@@ -26,6 +26,7 @@
     { "path": "../../libs/chains" },
     { "path": "../../libs/core" },
     { "path": "../../libs/model" },
-    { "path": "../../libs/logging" }
+    { "path": "../../libs/logging" },
+    { "path": "../../libs/shared" }
   ]
 }

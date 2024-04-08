@@ -7,5 +7,5 @@
     "strict": true
   },
   "include": ["src"],
-  "references": [{ "path": "../logging" }]
+  "references": [{ "path": "../logging" }, { "path": "../shared" }]
 }

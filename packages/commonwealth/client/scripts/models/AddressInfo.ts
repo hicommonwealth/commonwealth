@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import moment from 'moment';
 import app from 'state';
 import Account from './Account';

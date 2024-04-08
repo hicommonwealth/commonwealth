@@ -5,16 +5,16 @@ import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
 
+import { logger } from '@hicommonwealth/logging';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
 
-import { logger } from '@hicommonwealth/logging';
 import type {
   AddressInstance,
   CommunityInstance,

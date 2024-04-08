@@ -1,5 +1,5 @@
-import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';

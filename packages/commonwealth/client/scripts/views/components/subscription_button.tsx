@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { isNotUndefined } from 'helpers/typeGuards';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 

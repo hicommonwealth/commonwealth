@@ -1,7 +1,3 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-} from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
   CommunityInstance,
@@ -9,6 +5,10 @@ import {
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { slugify } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';

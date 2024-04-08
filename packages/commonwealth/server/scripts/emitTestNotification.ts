@@ -1,10 +1,10 @@
-import { NotificationCategories } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
   NotificationInstance,
   SubscriptionInstance,
   models,
 } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';

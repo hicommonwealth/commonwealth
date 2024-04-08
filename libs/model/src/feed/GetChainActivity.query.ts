@@ -1,4 +1,5 @@
-import { NotificationCategories, Query, schemas } from '@hicommonwealth/core';
+import { Query, schemas } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { models } from '../database';
 
 export const GetChainActivity: Query<

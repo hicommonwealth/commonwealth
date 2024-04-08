@@ -1,12 +1,13 @@
 /* eslint-disable max-len */
-import type {
-  IChainEventNotificationData,
-  IForumNotificationData,
-  NotificationDataAndCategory,
-} from '@hicommonwealth/core';
-import { NotificationCategories, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB, NotificationInstance } from '@hicommonwealth/model';
+import {
+  IChainEventNotificationData,
+  IForumNotificationData,
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import {
