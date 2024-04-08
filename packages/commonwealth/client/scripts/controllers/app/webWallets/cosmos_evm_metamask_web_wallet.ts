@@ -84,6 +84,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   public async getSessionSigner() {
     const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
+      bech32Prefix: app.chain?.meta.bech32Prefix || 'inj',
       signer: {
         type: 'ethereum',
         signEthereum: (
@@ -109,9 +110,16 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
+      let ethereum = window.ethereum;
+      if (window.ethereum.providers?.length) {
+        window.ethereum.providers.forEach(async (p) => {
+          if (p.isMetaMask) ethereum = p;
+        });
+      }
+
       // (this needs to be called first, before other requests)
       const Web3 = (await import('web3')).default;
-      this._web3 = new Web3((window as any).ethereum);
+      this._web3 = new Web3(ethereum);
       await this._web3.givenProvider.enable();
 
       this._ethAccounts = await this._web3.eth.getAccounts();

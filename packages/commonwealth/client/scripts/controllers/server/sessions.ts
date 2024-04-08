@@ -2,7 +2,6 @@ import type { Action, Message, Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
-import { bech32 } from 'bech32';
 import app from 'client/scripts/state';
 import {
   chainBaseToCaip2,
@@ -116,13 +115,6 @@ async function sign(
           currentPrefix: 42,
         });
         lookupAddress = `polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
-      }
-
-      // if using cosmos, we need to convert the address so that it has the "cosmos" prefix
-      if (chainBaseFromAddress === 'cosmos') {
-        const { words } = bech32.decode(walletAddress);
-        const cosmosWalletAddress = bech32.encode('cosmos', words);
-        lookupAddress = `cosmos:${chainIdFromAddress}:${cosmosWalletAddress}`;
       }
 
       const { session } = signer.getCachedSession(CANVAS_TOPIC, lookupAddress);
