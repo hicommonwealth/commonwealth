@@ -1,10 +1,10 @@
 import { AccessLevel } from '@hicommonwealth/core';
-import axios from 'axios';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import updateRoles from 'client/scripts/state/api/members/updateRoles';
 import { formatAddressShort } from 'helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import app from 'state';
 import RoleInfo from '../../../../../models/RoleInfo';
+import { CWLabel } from '../../../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
@@ -12,14 +12,20 @@ import { MembersSearchBar } from '../../../../components/members_search_bar';
 import './UpgradeRolesForm.scss';
 
 type UpgradeRolesFormProps = {
-  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  label?: string;
+  onRoleUpdate: (oldRole, newRole) => void;
+  refetchMembers: () => any;
   roleData: RoleInfo[];
   searchTerm: string;
   setSearchTerm: (v: string) => void;
+  isLoadingProfiles: boolean;
 };
 
 export const UpgradeRolesForm = ({
   onRoleUpdate,
+  label,
+  isLoadingProfiles,
+  refetchMembers,
   roleData,
   searchTerm,
   setSearchTerm,
@@ -31,12 +37,48 @@ export const UpgradeRolesForm = ({
     { id: 2, checked: false },
   ]);
 
+  let upgradedUser;
+  let newRoleToBeUpgraded;
+  const membersRef = useRef();
+
+  const { useUpgradeRolesMutation } = updateRoles;
+  const { mutateAsync: upgradeRole } = useUpgradeRolesMutation({
+    onRoleUpdate,
+    newRoleToBeUpgraded,
+    upgradedUser,
+  });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !isLoadingProfiles) {
+        refetchMembers?.();
+      }
+    });
+
+    if (membersRef.current) {
+      observer.observe(membersRef.current);
+    }
+
+    return () => {
+      observer?.disconnect();
+    };
+  }, [isLoadingProfiles, membersRef, refetchMembers]);
+
   const zeroOutRadioButtons = () => {
     const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
       ...radioButton,
       checked: false,
     }));
     setRadioButtons(zeroedOutRadioButtons);
+  };
+
+  const handleUpgrade = async () => {
+    const indexOfName = nonAdminNames.indexOf(user);
+    upgradedUser = nonAdmins[indexOfName];
+    newRoleToBeUpgraded =
+      role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
+    await upgradeRole({ upgradedUser, onRoleUpdate, newRoleToBeUpgraded });
+    zeroOutRadioButtons();
   };
 
   const nonAdmins: RoleInfo[] = roleData.filter((_role) => {
@@ -71,46 +113,9 @@ export const UpgradeRolesForm = ({
     setRadioButtons(updatedRadioButtons);
   };
 
-  const handleUpgradeMember = async () => {
-    const indexOfName = nonAdminNames.indexOf(user);
-    const _user = nonAdmins[indexOfName];
-    const newRole =
-      role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
-
-    try {
-      const response = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-        new_role: newRole,
-        address: _user.Address.address,
-        community_id: app.activeChainId(),
-        jwt: app.user.jwt,
-      });
-
-      if (response.data.status === 'Success') {
-        notifySuccess('Member upgraded');
-        const createdRole = new RoleInfo({
-          id: response.data.result.id,
-          address_id: response.data.result.address_id,
-          address_chain: response.data.result.community_id,
-          address: response.data.result.address,
-          community_id: response.data.result.community_id,
-          permission: response.data.result.permission,
-          allow: response.data.result.allow,
-          deny: response.data.result.deny,
-          is_user_default: response.data.result.is_user_default,
-        });
-        onRoleUpdate(_user, createdRole);
-        zeroOutRadioButtons();
-      } else {
-        notifyError('Upgrade failed');
-      }
-    } catch (error) {
-      console.error('Error upgrading member:', error);
-      notifyError('Upgrade failed');
-    }
-  };
-
   return (
     <div className="UpgradeRolesForm">
+      <CWLabel label={label} />
       <MembersSearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -139,12 +144,13 @@ export const UpgradeRolesForm = ({
               }}
               value={o.value}
             />
+            <div ref={membersRef} style={{ height: '1px' }}></div>
           </div>
         ))}
         <CWButton
           label="Upgrade Member"
           disabled={!role || !user}
-          onClick={handleUpgradeMember}
+          onClick={handleUpgrade}
         />
       </div>
     </div>

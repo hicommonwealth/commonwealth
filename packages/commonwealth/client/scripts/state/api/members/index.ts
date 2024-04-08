@@ -1,3 +1,4 @@
 import useFetchAdminQuery from './fetchAdmin';
+import updateRoles from './updateRoles';
 
-export { useFetchAdminQuery };
+export { updateRoles, useFetchAdminQuery };
