@@ -1,4 +1,4 @@
-import { BalanceType, ChainType } from '@hicommonwealth/core';
+import { BalanceType, ChainType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';

@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { NavigateOptions } from 'react-router-dom';
 
-import { DefaultPage } from '@hicommonwealth/core';
+import { DefaultPage } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFlag } from '../../hooks/useFlag';

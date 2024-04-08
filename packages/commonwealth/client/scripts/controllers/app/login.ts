@@ -1,7 +1,7 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';

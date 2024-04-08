@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
 import type NotificationSubscription from '../../../models/NotificationSubscription';

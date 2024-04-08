@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';
