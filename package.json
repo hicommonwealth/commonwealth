@@ -5,12 +5,6 @@
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
-  "workspaces": [
-    "packages/commonwealth",
-    "packages/discord-bot",
-    "packages/snapshot-listener",
-    "libs/*"
-  ],
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "build-ci": "yarn global add node-gyp && yarn --ignore-engines && yarn build",

@@ -1,22 +1,22 @@
 #! /bin/bash
 
 # Sanity scripts we should run locally before pushing code
-set -e 
+set -e
 
 # lint changes
-yarn lint-branch-warnings
+pnpm run lint-branch-warnings
 
-# check types 
+# check types
 # incrementally builds server/libs (tsc -b --noEmit is not allowed)
-yarn workspaces run clean
-yarn workspace commonwealth build
-yarn workspaces run check-types
+pnpm m run clean
+(cd packages/commonwealth && pnpm run build)
+pnpm m run check-types
 
 # run unit tests
-yarn workspaces run test
+yarn m run test
 
 # run api test
-yarn workspace commonwealth test-api
+(cd packages/commonwealth && pnpm run test-api)
 
 # we are aiming for a devx without builds
-yarn workspaces run clean
+pnpm m run clean
