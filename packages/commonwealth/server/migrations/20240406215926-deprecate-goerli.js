@@ -45,9 +45,13 @@ async function deleteChainNodeDependencies(
   );
 
   if (contractIds.length > 0) {
-    await queryInterface.bulkDelete('CommunityContracts', {
-      contract_id: contractIds.map((c) => c.id),
-    });
+    await queryInterface.bulkDelete(
+      'CommunityContracts',
+      {
+        contract_id: contractIds.map((c) => c.id),
+      },
+      { transaction },
+    );
     await queryInterface.bulkDelete(
       'Contracts',
       {
