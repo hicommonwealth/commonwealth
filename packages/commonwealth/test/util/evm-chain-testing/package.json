@@ -16,12 +16,10 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "morgan": "^1.10.0",
+    "tsx": "^4.7.2",
     "web3": "^1.8.2"
   },
   "optionalDependencies": {
     "ganache": "^7.9.0"
-  },
-  "devDependencies": {
-    "tsx": "^4.7.2"
   }
 }

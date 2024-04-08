@@ -15,9 +15,7 @@
     "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
-    "sequelize": "^6.32.1"
-  },
-  "devDependencies": {
+    "sequelize": "^6.32.1",
     "mocha": "^10.4.0",
     "tsx": "^4.7.2"
   }

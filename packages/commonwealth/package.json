@@ -213,6 +213,7 @@
     "superagent": "^5.2.2",
     "swagger-ui-express": "^5.0.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.7.2",
     "tsconfig-paths": "^4.2.0",
     "tweetnacl": "^1.0.3",
     "underscore": "^1.13.1",
@@ -225,8 +226,5 @@
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
     "zustand": "^4.3.8"
-  },
-  "devDependencies": {
-    "tsx": "^4.7.2"
   }
 }
