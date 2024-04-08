@@ -1,11 +1,11 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * This function batches hundreds of RPC requests (1 per address) into a few batched RPC requests.

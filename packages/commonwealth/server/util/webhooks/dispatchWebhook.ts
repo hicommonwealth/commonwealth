@@ -1,9 +1,9 @@
 import {
   NotificationCategories,
   NotificationDataAndCategory,
-  logger,
   stats,
 } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   CommunityInstance,
   WebhookInstance,
@@ -17,7 +17,7 @@ import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
