@@ -1,4 +1,5 @@
 import { WalletId } from '@hicommonwealth/core';
+import app from 'client/scripts/state';
 import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 
@@ -19,6 +20,7 @@ class LeapWebWalletController extends KeplrLikeWebWalletController {
   public async getSessionSigner() {
     const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
+      bech32Prefix: app.chain?.meta.bech32Prefix,
       signer: {
         type: 'arbitrary',
         signArbitrary: (msg) =>
