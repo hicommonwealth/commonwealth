@@ -1,5 +1,9 @@
-import { AppError, DynamicTemplate, WalletId } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import {
+  AppError,
+  DynamicTemplate,
+  WalletId,
+  logger,
+} from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
@@ -14,8 +18,7 @@ import {
 import { validateCommunity } from '../middleware/validateCommunity';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 export const Errors = {
   AlreadyLoggedIn: 'Already signed in',

@@ -1,10 +1,10 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 export type GetErc1155BalancesOptions = {
   chainNode: ChainNodeInstance;

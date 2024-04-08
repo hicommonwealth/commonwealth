@@ -1,8 +1,8 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import type { Express } from 'express';
 import http from 'http';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 const setupServer = (app: Express, port: number) => {
   app.set('port', port);

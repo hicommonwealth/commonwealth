@@ -3,8 +3,11 @@ import type {
   IForumNotificationData,
   ISnapshotNotificationData,
 } from '@hicommonwealth/core';
-import { DynamicTemplate, NotificationCategories } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import {
+  DynamicTemplate,
+  NotificationCategories,
+  logger,
+} from '@hicommonwealth/core';
 import type { UserAttributes } from '@hicommonwealth/model';
 import { AddressAttributes, DB } from '@hicommonwealth/model';
 import { capitalize } from 'lodash';
@@ -19,7 +22,7 @@ import {
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

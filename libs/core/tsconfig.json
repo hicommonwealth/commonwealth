@@ -6,6 +6,5 @@
     "tsBuildInfoFile": "build/.tsbuildinfo",
     "strict": true
   },
-  "include": ["src"],
-  "references": [{ "path": "../logging" }]
+  "include": ["src"]
 }

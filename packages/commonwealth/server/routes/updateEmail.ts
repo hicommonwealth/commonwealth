@@ -1,5 +1,9 @@
-import { AppError, DynamicTemplate, WalletId } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import {
+  AppError,
+  DynamicTemplate,
+  WalletId,
+  logger,
+} from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
@@ -7,7 +11,7 @@ import moment from 'moment';
 import Sequelize from 'sequelize';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 

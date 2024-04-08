@@ -6,12 +6,12 @@ import {
   setupBankExtension,
   setupStakingExtension,
 } from '@cosmjs/stargate';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 export type GetCosmosNativeBalanceOptions = {
   chainNode: ChainNodeInstance;

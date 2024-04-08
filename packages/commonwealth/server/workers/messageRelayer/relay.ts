@@ -1,11 +1,17 @@
-import { Broker, BrokerTopics, schemas, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { PinoLogger } from '@hicommonwealth/adapters';
+import {
+  Broker,
+  BrokerTopics,
+  logger,
+  schemas,
+  stats,
+} from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 
-const log = logger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 
 const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {
   SnapshotProposalCreated: BrokerTopics.SnapshotListener,

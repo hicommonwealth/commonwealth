@@ -1,12 +1,12 @@
-import { AppError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { PinoLogger } from '@hicommonwealth/adapters';
+import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
-const log = logger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 
 enum SetDiscordBotConfigErrors {
   NoCommunity = 'Must supply a community ID',

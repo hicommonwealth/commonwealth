@@ -1,9 +1,6 @@
 import { command } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-
-const log = logger(__filename);
 
 async function main() {
   const stakedCommunities = await models.Community.findAll({
@@ -37,11 +34,11 @@ async function main() {
       );
 
       if (created) {
-        log.info(
+        console.log(
           `created ${groups.length} stakeholder groups for ${c.id} – refreshing memberships...`,
         );
       } else {
-        log.info(
+        console.log(
           `stakeholder groups (${groups.length}) already exist for ${c.id}`,
         );
       }
@@ -52,10 +49,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  if (err instanceof Error) {
-    log.fatal('Fatal error occurred', err);
-  } else {
-    log.fatal('Fatal error occurred', undefined, { err });
-  }
+  console.error(err);
   process.exit(1);
 });

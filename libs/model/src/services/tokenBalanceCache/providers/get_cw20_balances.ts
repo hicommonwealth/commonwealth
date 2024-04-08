@@ -1,12 +1,11 @@
 import { WasmExtension, setupWasmExtension } from '@cosmjs/cosmwasm-stargate';
 import { QueryClient } from '@cosmjs/stargate';
+import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { getTendermintClient } from '../util';
 
-import { logger } from '@hicommonwealth/logging';
-
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 export type GetCw20BalancesOptions = {
   chainNode: ChainNodeInstance;

@@ -5,12 +5,12 @@ import {
   ProposalStatus,
   numberToLong,
 } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 /**
  * Fetches the most recent (latest) proposal from a Cosmos community that uses the v1 gov module. Depending on the

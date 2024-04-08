@@ -4,12 +4,13 @@ import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
+  ILogger,
   InvalidInput,
   RetryStrategyFn,
   eventHandler,
+  logger,
   schemas,
 } from '@hicommonwealth/core';
-import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
 import * as Rascal from 'rascal';
 import { AckOrNack } from 'rascal';
@@ -60,7 +61,7 @@ export class RabbitMQAdapter implements Broker {
   private _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    this._log = logger(__filename);
+    this._log = logger().getLogger(__filename);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -142,7 +143,7 @@ export class RabbitMQAdapter implements Broker {
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
-          this._log.debug('Message published', {
+          this._log.debug('Message published', undefined, {
             messageId,
             ...logContext,
           });
@@ -207,7 +208,7 @@ export class RabbitMQAdapter implements Broker {
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
           eventHandler(handler, content, true)
             .then(() => {
-              this._log.debug('Message Acked', {
+              this._log.debug('Message Acked', undefined, {
                 topic,
                 message: content,
               });
