@@ -1,6 +1,6 @@
-import { logger } from '@hicommonwealth/logging';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
+import { getInMemoryLogger } from './in-memory-logger';
 import {
   AdapterFactory,
   Analytics,
@@ -8,10 +8,9 @@ import {
   Cache,
   Disposable,
   Disposer,
+  Logger,
   Stats,
 } from './interfaces';
-
-const log = logger(__filename);
 
 /**
  * Map of disposable adapter instances
@@ -28,7 +27,9 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     if (!adapters.has(factory.name)) {
       const instance = factory(adapter);
       adapters.set(factory.name, instance);
-      log.info(`[binding adapter] ${instance.name || factory.name}`);
+      logger()
+        .getLogger(__filename)
+        .info(`[binding adapter] ${instance.name || factory.name}`);
       return instance;
     }
     return adapters.get(factory.name) as T;
@@ -52,7 +53,9 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   await Promise.all(disposers.map((disposer) => disposer()));
   await Promise.all(
     [...adapters].reverse().map(async ([key, adapter]) => {
-      log.info(`[disposing adapter] ${adapter.name || key}`);
+      logger()
+        .getLogger(__filename)
+        .info(`[disposing adapter] ${adapter.name || key}`);
       await adapter.dispose();
     }),
   );
@@ -78,20 +81,31 @@ export const dispose = (
  * Handlers to dispose registered resources on exit or unhandled exceptions
  */
 process.once('SIGINT', async (arg?: any) => {
-  log.info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
+  logger()
+    .getLogger(__filename)
+    .info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('SIGTERM', async (arg?: any) => {
-  log.info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
+  logger()
+    .getLogger(__filename)
+    .info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  log.error('Uncaught Exception', arg);
+  logger().getLogger(__filename).error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  log.error('Unhandled Rejection', arg);
+  logger().getLogger(__filename).error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
+});
+
+/**
+ * Logger port factory
+ */
+export const logger = port(function logger(logger?: Logger) {
+  return logger || getInMemoryLogger();
 });
 
 /**

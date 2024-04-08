@@ -1,5 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["test"],
-  "references": [{ "path": "../../libs/logging" }]
+  "include": ["test"]
 }

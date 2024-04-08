@@ -11,7 +11,6 @@
   "references": [
     { "path": "../../libs/adapters" },
     { "path": "../../libs/core" },
-    { "path": "../../libs/model" },
-    { "path": "../../libs/logging" }
+    { "path": "../../libs/model" }
   ]
 }

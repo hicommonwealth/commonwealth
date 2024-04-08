@@ -1,5 +1,4 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { Express, NextFunction, Request, Response } from 'express';
 
 // Handle server and application errors.
@@ -7,7 +6,7 @@ import type { Express, NextFunction, Request, Response } from 'express';
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
 export const setupErrorHandlers = (app: Express) => {
-  const log = logger(__filename);
+  const log = logger().getLogger(__filename);
 
   // Handle 404 errors
   app.use((req: Request, res: Response) => {
@@ -41,20 +40,14 @@ export const setupErrorHandlers = (app: Express) => {
         error: 'Server error, please try again later.',
       });
     } else if (error instanceof AppError) {
-      log.warn(error.message, {
-        error,
-        reqContext,
-      }); // just warn, to avoid overloading rollbar with bots and attacks
+      log.warn(error.message, error, reqContext); // just warn, to avoid overloading rollbar with bots and attacks
       res.status(error.status).send({
         status: error.status,
         error: error.message,
       });
     } else {
       if (error?.status < 500) {
-        log.warn(error.message || 'Unknown client error', {
-          error,
-          reqContext,
-        });
+        log.warn(error.message || 'Unknown client error', error, reqContext);
         res.status(error.status);
         res.json({
           status: error.status,

@@ -9,12 +9,12 @@ import {
   ChainBase,
   NotificationCategories,
   WalletId,
+  logger,
 } from '@hicommonwealth/core';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
 
-import { logger } from '@hicommonwealth/logging';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -29,7 +29,7 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
-const log = logger(__filename);
+const log = logger().getLogger(__filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,

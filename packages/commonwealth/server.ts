@@ -1,12 +1,12 @@
 import {
   HotShotsStats,
   MixpanelAnalytics,
+  PinoLogger,
   RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { analytics, cache, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { analytics, cache, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
 import {
   DATABASE_CLEAN_HOUR,
@@ -22,7 +22,7 @@ const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
 const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT;
 
 // bootstrap production adapters
-const log = logger(__filename);
+const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 REDIS_URL && cache(new RedisCache(REDIS_URL));
