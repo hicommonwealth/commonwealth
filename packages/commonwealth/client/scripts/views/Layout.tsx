@@ -49,8 +49,6 @@ const LayoutComponent = ({
 
   const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
 
-  console.log(app?.chain);
-
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is
   // set to true, and the navigated-to scope is loaded.
