@@ -3,10 +3,7 @@ import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionSigner } from '@canvas-js/interfaces';
 import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
-
-type TerraAddress = {
-  address: string;
-};
+import app from 'state';
 
 declare global {
   interface Window {
@@ -14,9 +11,9 @@ declare global {
   }
 }
 
-class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
+class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
-  private _accounts: TerraAddress[] = [];
+  private _accounts: string[] = [];
   private _enabling = false;
 
   public readonly name = WalletId.TerraStation;
@@ -84,10 +81,11 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     const { toBase64 } = await import('@cosmjs/encoding');
     const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
+      bech32Prefix: app.chain?.meta.bech32Prefix,
       signer: {
         type: 'bytes',
         signBytes: (message) => window.station.signBytes(toBase64(message)),
-        getAddress: async () => this._accounts[0].address,
+        getAddress: async () => this._accounts[0],
         getChainId: async () => this.getChainId(),
       },
     });
