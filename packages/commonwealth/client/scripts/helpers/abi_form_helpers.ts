@@ -1,4 +1,4 @@
-import Web3, { AbiInput } from 'web3';
+import Web3, { AbiParameter } from 'web3';
 import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 export function validateAbiInput(
@@ -42,11 +42,11 @@ export function handleMappingAbiInputs(
 }
 
 export function processAbiInputsToDataTypes(
-  functionInputs: AbiInput[],
+  functionInputs: readonly AbiParameter[],
   inputsMap: string[],
 ): any[] {
   const processedArgs: any[] = functionInputs.map(
-    (arg: AbiInput, index: number) => {
+    (arg: AbiParameter, index: number) => {
       const type = arg.type;
       if (type.slice(-2) === '[]') return JSON.parse(inputsMap[index]);
       return inputsMap[index];
