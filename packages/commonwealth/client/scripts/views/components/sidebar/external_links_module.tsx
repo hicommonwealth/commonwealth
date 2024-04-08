@@ -8,7 +8,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 export const ExternalLinksModule = () => {
   if (!app.chain) return;
   const meta = app.chain.meta;
-  const { remainingLinks, discords, elements, telegrams, githubs } =
+  const { remainingLinks, discords, elements, telegrams, githubs, twitters } =
     meta.categorizeSocialLinks();
 
   return (
@@ -34,6 +34,14 @@ export const ExternalLinksModule = () => {
           key={link}
           iconName="telegram"
           className="telegram-link"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {twitters.map((link) => (
+        <CWIcon
+          key={link}
+          iconName="twitterX"
+          className="twitter-link"
           onClick={() => window.open(link)}
         />
       ))}

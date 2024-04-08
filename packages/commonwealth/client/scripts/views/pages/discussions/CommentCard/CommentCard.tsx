@@ -12,9 +12,9 @@ import { CommentReactionButton } from 'views/components/ReactionButton/CommentRe
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
@@ -130,7 +130,7 @@ export const CommentCard = ({
         ) : (
           <AuthorAndPublishInfo
             authorAddress={author.address}
-            authorChainId={author.community?.id || author?.profile?.chain}
+            authorCommunityId={author.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"

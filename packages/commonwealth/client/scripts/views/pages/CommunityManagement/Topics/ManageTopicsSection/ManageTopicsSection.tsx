@@ -10,9 +10,9 @@ import {
   useUpdateFeaturedTopicsOrderMutation,
 } from 'client/scripts/state/api/topics';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'client/scripts/views/components/component_kit/new_designs/CWIconButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'client/scripts/views/modals/edit_topic_modal';
 import DraggableTopicsList from 'client/scripts/views/modals/order_topics_modal/draggable_topics_list';
 import React, { useEffect, useState } from 'react';

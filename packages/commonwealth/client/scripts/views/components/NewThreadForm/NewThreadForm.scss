@@ -4,23 +4,14 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
   width: 100%;
 
   .no-pad {
     padding: 0 !important;
   }
 
-  @include smallInclusive {
-    padding: 16px;
-  }
-
   & > .header {
-    padding: 24px 0px 24px 0px;
-  }
-
-  &.isModal {
-    padding: 16px;
+    padding-bottom: 24px;
   }
 
   @include mediumSmallInclusive {
@@ -47,11 +38,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      width: 768px;
-
-      @include mediumInclusive {
-        width: 100%;
-      }
+      width: 100%;
 
       .set-display-name-callout {
         background-color: $purple-50;

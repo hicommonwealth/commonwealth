@@ -8,13 +8,13 @@ import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
 
 interface DeleteThreadProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   address: string;
 }
 
 const deleteThread = async ({
-  chainId,
+  communityId,
   threadId,
   address,
 }: DeleteThreadProps) => {
@@ -24,8 +24,8 @@ const deleteThread = async ({
 
   return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
     data: {
-      author_community_id: chainId,
-      community_id: chainId,
+      author_community_id: communityId,
+      community_id: communityId,
       address: address,
       jwt: app.user.jwt,
       ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
@@ -34,13 +34,13 @@ const deleteThread = async ({
 };
 
 interface UseDeleteThreadMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   currentStage: ThreadStage;
 }
 
 const useDeleteThreadMutation = ({
-  chainId,
+  communityId,
   threadId,
   currentStage,
 }: UseDeleteThreadMutationProps) => {
@@ -57,7 +57,7 @@ const useDeleteThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
-      removeThreadFromAllCaches(chainId, threadId);
+      removeThreadFromAllCaches(communityId, threadId);
       return response.data;
     },
   });

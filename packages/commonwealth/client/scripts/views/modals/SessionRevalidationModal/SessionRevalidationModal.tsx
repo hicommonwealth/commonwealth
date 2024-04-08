@@ -9,10 +9,10 @@ import useWallets from 'hooks/useWallets';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalHeader,
@@ -125,7 +125,7 @@ const SessionRevalidationModal = ({
           ) : walletSsoSource === WalletSsoSource.Twitter ? (
             <CWAuthButton
               type="twitter"
-              label="Twitter"
+              label="X (Twitter)"
               onClick={() => onSocialLogin(WalletSsoSource.Twitter)}
             />
           ) : connectWithEmail ? (
@@ -144,7 +144,7 @@ const SessionRevalidationModal = ({
               <div className="buttons-row">
                 <CWButton
                   label="Back"
-                  buttonType="secondary-blue"
+                  buttonType="secondary"
                   onClick={() => setConnectWithEmail(false)}
                 />
                 <CWButton

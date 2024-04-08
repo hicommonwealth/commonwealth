@@ -6,7 +6,7 @@ import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
-  chainId: string;
+  communityId: string;
   address: string;
   threadId: number;
 }
@@ -16,7 +16,7 @@ interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
 }
 
 const deleteReaction = async ({
-  chainId,
+  communityId,
   address,
   reactionId,
   threadId,
@@ -29,7 +29,7 @@ const deleteReaction = async ({
     `${app.serverUrl()}/reactions/${reactionId}`,
     {
       data: {
-        author_community_id: chainId,
+        author_community_id: communityId,
         address: address,
         community_id: app.chain.id,
         jwt: app.user.jwt,
@@ -51,14 +51,14 @@ const deleteReaction = async ({
 };
 
 const useDeleteThreadReactionMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: UseDeleteThreadReactionMutationProps) => {
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
       updateThreadInAllCaches(
-        chainId,
+        communityId,
         threadId,
         {
           associatedReactions: [

@@ -232,6 +232,7 @@ export const seedDb = async () => {
         has_chain_events_listener: false,
         chain_node_id: 1263,
         namespace: 'IanSpace',
+        namespace_address: '0x0000000000000000000000000000000000000000',
       },
       {
         id: 'csdk-beta-local',

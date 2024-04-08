@@ -12,11 +12,11 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import {
   BaseMixpanelPayload,
@@ -264,7 +264,7 @@ const BasicInformationForm = ({
               </CWText>
             </CWText>
             <CWText type="b1" className="description">
-              Add your Discord, Twitter (X), Telegram, Website, etc.
+              Add your Discord, X (Twitter), Telegram, Website, etc.
             </CWText>
           </section>
 

@@ -47,7 +47,7 @@ export default (
       proposal_id: { type: dataTypes.STRING, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
-      reaction: { type: dataTypes.STRING, allowNull: false },
+      reaction: { type: dataTypes.ENUM('like'), allowNull: false },
       calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
       // signed data
       ...canvasModelSequelizeColumns(dataTypes),
@@ -180,6 +180,7 @@ export default (
             'comment_id',
             'reaction',
           ],
+          name: 'reactions_unique',
           unique: true,
         },
         { fields: ['community_id', 'thread_id'] },
