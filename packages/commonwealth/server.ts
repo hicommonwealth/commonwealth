@@ -8,7 +8,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { analytics, cache, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import {
   DATABASE_CLEAN_HOUR,
   PORT,

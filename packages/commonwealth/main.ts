@@ -15,12 +15,12 @@ import express, {
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
+import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { PRERENDER_TOKEN, SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';

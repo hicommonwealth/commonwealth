@@ -1,12 +1,18 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { createRequire } from 'node:module';
+import path from 'path';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-module.exports = {
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const baseConfig = {
   entry: {
     app: ['index.tsx'],
   },
@@ -235,3 +241,5 @@ module.exports = {
     ],
   },
 };
+
+export default baseConfig;
