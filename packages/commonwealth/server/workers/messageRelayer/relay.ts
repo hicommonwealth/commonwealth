@@ -7,10 +7,12 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 
 const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {

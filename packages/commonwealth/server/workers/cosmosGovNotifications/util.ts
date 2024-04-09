@@ -6,10 +6,12 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 export async function fetchCosmosNotifCommunities(models: DB) {

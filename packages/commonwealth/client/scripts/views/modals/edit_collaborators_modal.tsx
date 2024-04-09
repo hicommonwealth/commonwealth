@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import _ from 'lodash';
 import React, { useState } from 'react';
 import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
@@ -179,7 +179,7 @@ export const EditCollaboratorsModal = ({
           onClick={onModalClose}
         />
         <CWButton
-          disabled={isEqual(thread.collaborators, collaborators)}
+          disabled={_.isEqual(thread.collaborators, collaborators)}
           label="Save changes"
           buttonType="primary"
           buttonHeight="sm"

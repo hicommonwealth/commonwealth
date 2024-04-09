@@ -12,9 +12,12 @@ import {
   schemas,
 } from '@hicommonwealth/core';
 import { Message } from 'amqplib';
+import { fileURLToPath } from 'node:url';
 import * as Rascal from 'rascal';
 import { AckOrNack } from 'rascal';
 import { RascalPublications, RascalSubscriptions } from './types';
+
+const __filename = fileURLToPath(import.meta.url);
 
 const BrokerTopicPublicationMap = {
   [BrokerTopics.DiscordListener]: RascalPublications.DiscordListener,

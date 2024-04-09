@@ -14,11 +14,13 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import { dirname } from 'node:path';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
+import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { PRERENDER_TOKEN, SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -31,9 +33,11 @@ import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
 // set up express async error handling hack
-require('express-async-errors');
 
 const DEV = process.env.NODE_ENV !== 'production';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Bootstraps express app

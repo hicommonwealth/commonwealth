@@ -1,5 +1,8 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { Express, NextFunction, Request, Response } from 'express';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned

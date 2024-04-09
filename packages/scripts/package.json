@@ -2,7 +2,7 @@
   "name": "@hicommonwealth/scripts",
   "private": "true",
   "version": "0.1.0",
-  "description": "Scripts",
+  "type": "module",
   "files": [
     "build"
   ],

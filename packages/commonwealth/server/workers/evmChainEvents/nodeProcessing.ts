@@ -1,10 +1,12 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { NotificationInstance, models } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
 import { getEvents } from './logProcessing';
 import { EvmSource } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 /**

@@ -1,8 +1,10 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import { broker, logger, stats } from '@hicommonwealth/core';
+import { fileURLToPath } from 'node:url';
 import { MESSAGE_RELAYER_TIMEOUT_MS } from '../../config';
 import { relay } from './relay';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 export let numUnrelayedEvents = 0;
 

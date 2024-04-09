@@ -3922,15 +3922,14 @@
     express "^4.17.1"
     node-fetch "^2.6.0"
 
-"@magic-sdk/admin@^1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-1.10.0.tgz#9c5e17f65fe136ba670446e2513d64f80e1544fe"
-  integrity sha512-byPp3DPpGyl+/71zN7lyKlLFEJuP944hI0NArHkJkCDsZBcSZ+6X3T9ipetnKz8MM2eCVTQB+HkYeNDd9lct2Q==
+"@magic-sdk/admin@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-2.4.0.tgz#ec3fd36ab0c11d7c8af069a47e5294e2b30f1e2a"
+  integrity sha512-kuxtmjQNhWz1hPpCLSmd2OsuRSpabG3nLTxkpLi4ceH4YzzKLy1qpxJshzoOeRtwU7PcGlyK6iiQ9KJrHtAHBA==
   dependencies:
-    "@types/atob" "^2.1.2"
-    atob "^2.1.2"
     ethereum-cryptography "^1.0.1"
-    node-fetch "^2.6.0"
+    ethers "^6.11.1"
+    node-fetch "^2.6.7"
 
 "@magic-sdk/commons@^13.1.3":
   version "13.1.3"
@@ -5954,11 +5953,6 @@
   version "1.0.38"
   resolved "https://registry.yarnpkg.com/@types/argparse/-/argparse-1.0.38.tgz#a81fd8606d481f873a3800c6ebae4f1d768a56a9"
   integrity sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==
-
-"@types/atob@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@types/atob/-/atob-2.1.2.tgz#157eb0cc46264a8c55f2273a836c7a1a644fb820"
-  integrity sha512-8GAYQ1jDRUQkSpHzJUqXwAkYFOxuWAOGLhIR4aPd/Y/yL12Q/9m7LsKpHKlfKdNE/362Hc9wPI1Yh6opDfxVJg==
 
 "@types/better-sqlite3@^7.6.8":
   version "7.6.9"
@@ -8334,11 +8328,6 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
-
-atob@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.npmjs.org/atob/-/atob-2.1.2.tgz"
-  integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
 atomic-sleep@^1.0.0:
   version "1.0.0"
@@ -12289,6 +12278,20 @@ ethereumjs-util@^7.1.2:
     ethereum-cryptography "^0.1.3"
     rlp "^2.2.4"
 
+ethereumjs-wallet@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ethereumjs-wallet/-/ethereumjs-wallet-1.0.2.tgz#2c000504b4c71e8f3782dabe1113d192522e99b6"
+  integrity sha512-CCWV4RESJgRdHIvFciVQFnCHfqyhXWchTPlkfp28Qc53ufs+doi5I/cV2+xeK9+qEo25XCWfP9MiL+WEPAZfdA==
+  dependencies:
+    aes-js "^3.1.2"
+    bs58check "^2.1.2"
+    ethereum-cryptography "^0.1.3"
+    ethereumjs-util "^7.1.2"
+    randombytes "^2.1.0"
+    scrypt-js "^3.0.1"
+    utf8 "^3.0.0"
+    uuid "^8.3.2"
+
 ethers@5.7.2, ethers@^5.7.1:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.7.2.tgz#3a7deeabbb8c030d4126b24f84e525466145872e"
@@ -12325,7 +12328,7 @@ ethers@5.7.2, ethers@^5.7.1:
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
-ethers@^6.9.0:
+ethers@^6.11.1, ethers@^6.9.0:
   version "6.11.1"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.11.1.tgz#96aae00b627c2e35f9b0a4d65c7ab658259ee6af"
   integrity sha512-mxTAE6wqJQAbp5QAe/+o+rXOID7Nw91OZXvgpjDa1r4fAbq2Nu314oEZSbjoRLacuCzs7kUC3clEvkCQowffGg==
@@ -23600,7 +23603,7 @@ utf-8-validate@^5.0.5:
   dependencies:
     node-gyp-build "^4.3.0"
 
-utf8@3.0.0:
+utf8@3.0.0, utf8@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/utf8/-/utf8-3.0.0.tgz"
   integrity sha512-E8VjFIQ/TyQgp+TZfS6l8yp/xWppSAHzidGiRrqe4bK4XP9pTRyKFgGJpO3SN7zdX4DeomTrwaseCHovfpFcqQ==

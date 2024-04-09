@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 
 import { Session } from '@canvas-js/interfaces';
@@ -14,6 +15,7 @@ import type {
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
@@ -21,10 +23,9 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
 export const Errors = {
   NoChain: 'Must provide chain',
   InvalidCommunity: 'Invalid community',

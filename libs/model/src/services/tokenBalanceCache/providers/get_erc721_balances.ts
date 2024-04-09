@@ -1,9 +1,11 @@
 import { logger } from '@hicommonwealth/core';
+import { fileURLToPath } from 'node:url';
 import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmOffChainRpcBatching, evmRpcRequest } from '../util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 export type GetErc721BalancesOptions = {

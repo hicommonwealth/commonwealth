@@ -8,9 +8,11 @@ import type { DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
+import { fileURLToPath } from 'node:url';
 import Sequelize from 'sequelize';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 sgMail.setApiKey(SENDGRID_API_KEY);
