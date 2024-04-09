@@ -37,7 +37,9 @@ export function isDefaultStage(stage: string) {
 
 // Provides a default if community has no custom stages.
 export function parseCustomStages(customStages?: string[]): string[] {
-  return customStages ?? Object.values(ThreadStage);
+  return customStages && customStages.length > 0
+    ? customStages
+    : Object.values(ThreadStage);
 }
 
 /*

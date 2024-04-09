@@ -236,6 +236,7 @@ export class Thread implements IUniqueId {
     profile_name,
     avatar_url,
     address_last_active,
+    associatedReactions,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -263,14 +264,14 @@ export class Thread implements IUniqueId {
     numberOfComments?: number;
     topic: Topic;
     reactions?: any[]; // TODO: fix type
-    reactionIds: any[]; // TODO: fix type
-    addressesReacted: any[]; //TODO: fix type,
-    reactedProfileName: string[];
-    reactedProfileAvatarUrl: string[];
-    reactedAddressLastActive: string[];
-    reactionType: any[]; // TODO: fix type
-    reactionTimestamps: string[];
-    reactionWeights: number[];
+    reactionIds?: any[]; // TODO: fix type
+    addressesReacted?: any[]; //TODO: fix type,
+    reactedProfileName?: string[];
+    reactedProfileAvatarUrl?: string[];
+    reactedAddressLastActive?: string[];
+    reactionType?: any[]; // TODO: fix type
+    reactionTimestamps?: string[];
+    reactionWeights?: number[];
     reaction_weights_sum: number;
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
@@ -279,6 +280,7 @@ export class Thread implements IUniqueId {
     profile_name: string;
     avatar_url: string;
     address_last_active: string;
+    associatedReactions?: AssociatedReaction[];
   }) {
     this.author = Address.address;
     this.title = getDecodedString(title);
@@ -315,17 +317,19 @@ export class Thread implements IUniqueId {
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
     this.reactionWeightsSum = reaction_weights_sum;
-    this.associatedReactions = processAssociatedReactions(
-      reactions,
-      reactionIds,
-      reactionType,
-      reactionTimestamps,
-      reactionWeights,
-      addressesReacted,
-      reactedProfileName,
-      reactedProfileAvatarUrl,
-      reactedAddressLastActive,
-    );
+    this.associatedReactions =
+      associatedReactions ??
+      processAssociatedReactions(
+        reactions,
+        reactionIds,
+        reactionType,
+        reactionTimestamps,
+        reactionWeights,
+        addressesReacted,
+        reactedProfileName,
+        reactedProfileAvatarUrl,
+        reactedAddressLastActive,
+      );
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)
       : moment(created_at);

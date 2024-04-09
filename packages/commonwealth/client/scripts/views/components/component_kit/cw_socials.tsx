@@ -44,6 +44,10 @@ export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
       name = 'telegram';
       icon = 'telegram';
       placeholder = 'https://telegram.org/...';
+    } else if (social.includes('t.me/')) {
+      name = 'telegram';
+      icon = 'telegram';
+      placeholder = 'https://telegram.org/...';
     } else if (social.includes('github.com/')) {
       name = 'github';
       icon = 'github';
