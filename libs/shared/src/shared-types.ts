@@ -270,6 +270,7 @@ export enum ChainBase {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Solana = 'solana',
+  Base = 'base',
 }
 
 export enum ContractType {
