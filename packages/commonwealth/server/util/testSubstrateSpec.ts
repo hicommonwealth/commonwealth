@@ -43,7 +43,8 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
       ...sanitizedSpec,
     });
     const version = api.runtimeVersion;
-    const props = await api.rpc.system.properties();
+    // TODO: TS2339: Property 'system' does not exist on type 'DecoratedRpc<"promise", RpcInterface>'.
+    const props = await (api.rpc as any).system.properties();
     log.info(
       `Fetched version: ${version.specName}:${
         version.specVersion
