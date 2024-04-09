@@ -95,8 +95,10 @@ export class ServerProposalsController {
 
     try {
       const Web3 = (await import('web3')).default;
-      const web3Provider = new Web3.providers.HttpProvider(ethNetworkUrl);
-      return new providers.Web3Provider(web3Provider);
+      const web3Provider = new Web3(ethNetworkUrl);
+      return new providers.Web3Provider(
+        web3Provider.givenProvider as providers.ExternalProvider,
+      );
     } catch (e) {
       throw new ServerError(
         `Failed to create EVM provider for ${ethNetworkUrl}. ${e}`,

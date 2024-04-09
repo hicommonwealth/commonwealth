@@ -5,7 +5,7 @@ import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import app from 'state';
 import type Web3 from 'web3';
-import { AbiFunctionFragment, Transaction } from 'web3';
+import { AbiFunctionFragment, Transaction, Web3BaseProvider } from 'web3';
 import type { TransactionReceipt } from 'web3-core/types';
 import WebWalletController from '../../app/web_wallets';
 
@@ -48,7 +48,7 @@ async function sendFunctionCall({
       to: contract.address,
       data: functionTx,
     };
-    txReceipt = await web3.givenProvider.request({
+    txReceipt = await (web3.givenProvider as Web3BaseProvider).request({
       method: 'eth_call',
       params: [tx, 'latest'],
     });

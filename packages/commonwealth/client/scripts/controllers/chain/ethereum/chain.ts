@@ -5,7 +5,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import Web3 from 'web3';
+import Web3, { Web3BaseProvider } from 'web3';
 import type ChainInfo from '../../../models/ChainInfo';
 import type NodeInfo from '../../../models/NodeInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
@@ -153,7 +153,10 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this._api?.givenProvider &&
       this._api.currentProvider instanceof Web3.providers.WebsocketProvider
     ) {
-      this._api.givenProvider.disconnect(1000, 'finished');
+      (this._api.givenProvider as Web3BaseProvider).disconnect(
+        1000,
+        'finished',
+      );
     }
   }
 }
