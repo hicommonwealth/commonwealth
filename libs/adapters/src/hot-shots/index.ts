@@ -1,11 +1,8 @@
 import { Stats, logger } from '@hicommonwealth/core';
 import { StatsD } from 'hot-shots';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
 
 export const HotShotsStats = (): Stats => {
-  const log = logger().getLogger(__filename);
+  const log = logger().getLogger(import.meta.filename);
   let client: StatsD | undefined = new StatsD({
     globalTags: { env: process.env.NODE_ENV || 'development' },
     errorHandler: (error) => {

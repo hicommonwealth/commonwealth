@@ -1,9 +1,6 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { fileURLToPath } from 'node:url';
 
 const PING_INTERVAL = 1_000 * 20;
-
-const __filename = fileURLToPath(import.meta.url);
 
 export enum ServiceKey {
   Commonwealth = 'commonwealth',
@@ -31,7 +28,7 @@ export function startHealthCheckLoop({
   if (!enabled) {
     return;
   }
-  const log = logger().getLogger(__filename);
+  const log = logger().getLogger(import.meta.filename);
   log.info(`starting health check loop for ${service}`);
   const key = `service.health.${service}`;
   // perform a loop that invokes 'checkFn' and sends status to stats

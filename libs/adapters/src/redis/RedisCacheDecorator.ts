@@ -1,14 +1,11 @@
 import { CacheNamespaces, ILogger, cache, logger } from '@hicommonwealth/core';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { fileURLToPath } from 'node:url';
 import {
   CacheKeyDuration,
   CustomRequest,
   defaultKeyGenerator,
   isCacheKeyDuration,
 } from '../utils/cacheKeyUtils';
-
-const __filename = fileURLToPath(import.meta.url);
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
@@ -36,7 +33,7 @@ export class CacheDecorator {
   private _disabled = false;
 
   constructor() {
-    this._log = logger().getLogger(__filename);
+    this._log = logger().getLogger(import.meta.filename);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
       this._log.info(`cacheMiddleware: cache disabled`);

@@ -1,5 +1,4 @@
 import { IDiscordMeta, logger, stats } from '@hicommonwealth/core';
-import { fileURLToPath } from 'node:url';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
@@ -7,8 +6,7 @@ import type { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger().getLogger(import.meta.filename);
 
 export type CommentAttributes = {
   thread_id: string;

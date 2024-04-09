@@ -1,15 +1,12 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { Express, NextFunction, Request, Response } from 'express';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
 export const setupErrorHandlers = (app: Express) => {
-  const log = logger().getLogger(__filename);
+  const log = logger().getLogger(import.meta.filename);
 
   // Handle 404 errors
   app.use((req: Request, res: Response) => {

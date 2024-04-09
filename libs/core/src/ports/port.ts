@@ -1,4 +1,3 @@
-import { fileURLToPath } from 'node:url';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import { getInMemoryLogger } from './in-memory-logger';
@@ -12,8 +11,6 @@ import {
   Logger,
   Stats,
 } from './interfaces';
-
-const __filename = fileURLToPath(import.meta.url);
 
 /**
  * Map of disposable adapter instances
@@ -31,7 +28,7 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
       const instance = factory(adapter);
       adapters.set(factory.name, instance);
       logger()
-        .getLogger(__filename)
+        .getLogger(import.meta.filename)
         .info(`[binding adapter] ${instance.name || factory.name}`);
       return instance;
     }
@@ -57,7 +54,7 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   await Promise.all(
     [...adapters].reverse().map(async ([key, adapter]) => {
       logger()
-        .getLogger(__filename)
+        .getLogger(import.meta.filename)
         .info(`[disposing adapter] ${adapter.name || key}`);
       await adapter.dispose();
     }),
@@ -85,22 +82,26 @@ export const dispose = (
  */
 process.once('SIGINT', async (arg?: any) => {
   logger()
-    .getLogger(__filename)
+    .getLogger(import.meta.filename)
     .info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('SIGTERM', async (arg?: any) => {
   logger()
-    .getLogger(__filename)
+    .getLogger(import.meta.filename)
     .info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  logger().getLogger(__filename).error('Uncaught Exception', arg);
+  logger()
+    .getLogger(import.meta.filename)
+    .error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  logger().getLogger(__filename).error('Unhandled Rejection', arg);
+  logger()
+    .getLogger(import.meta.filename)
+    .error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
 });
 

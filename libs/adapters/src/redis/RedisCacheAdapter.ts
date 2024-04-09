@@ -5,12 +5,9 @@ import {
   logger,
   type CacheNamespaces,
 } from '@hicommonwealth/core';
-import { fileURLToPath } from 'node:url';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
 
 const CONNECT_TIMEOUT = 5000;
-
-const __filename = fileURLToPath(import.meta.url);
 
 export function redisRetryStrategy(retries: number) {
   // Don't stop retrying while app is running
@@ -51,7 +48,7 @@ export class RedisCache implements Cache {
       };
     }
 
-    this._log = logger().getLogger(__filename);
+    this._log = logger().getLogger(import.meta.filename);
     this._log.info(`Connecting to Redis at: ${redis_url}`);
     this._client = createClient(redisOptions) as RedisClientType;
 
