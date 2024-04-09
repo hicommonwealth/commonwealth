@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node10",
-    "module": "nodenext",
-    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "target": "esnext",
     "baseUrl": ".",
     "composite": true,
 
