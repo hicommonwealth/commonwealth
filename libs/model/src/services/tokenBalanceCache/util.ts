@@ -116,7 +116,7 @@ export async function evmOffChainRpcBatching(
     const address = idAddressMap[data.id];
     balances[address] = source.contractAddress
       ? AbiCoder.decodeParameter('uint256', data.result).toString()
-      : ethers.BigNumber.from(data.result).toString(10);
+      : ethers.BigNumber.from(data.result).toString();
   }
 
   return { balances, failedAddresses };

@@ -118,7 +118,7 @@ async function getEthBalance(
     return {};
   } else {
     return {
-      [address]: ethers.BigNumber.from(data.result).toString(10),
+      [address]: ethers.BigNumber.from(data.result).toString(),
     };
   }
 }
