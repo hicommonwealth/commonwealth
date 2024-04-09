@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const ThreadEvent = z.object({
   userAddress: z.string(),
-  chainNodeUrl: z.string(),
+  chainNodeUrl: z
+    .string()
+    .optional()
+    .describe('used for onchain contract calls'),
   contestAddress: z
     .string()
     .optional()
