@@ -1,19 +1,18 @@
 import { Op } from 'sequelize';
 
-import {
-  AppError,
-  ChainBase,
-  DynamicTemplate,
-  NotificationCategories,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError, logger } from '@hicommonwealth/core';
 import type {
   CommunityInstance,
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  DynamicTemplate,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';

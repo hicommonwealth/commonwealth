@@ -1,4 +1,4 @@
-import { WebhookCategory } from '@hicommonwealth/core';
+import { WebhookCategory } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';

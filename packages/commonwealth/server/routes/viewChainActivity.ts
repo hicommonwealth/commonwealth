@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { NextFunction, Request, Response } from 'express';
 
 const viewChainActivity = async (

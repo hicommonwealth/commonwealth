@@ -1,13 +1,11 @@
+import { dispose, schemas, type DeepPartial } from '@hicommonwealth/core';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   NotificationCategories,
-  dispose,
-  schemas,
-  type DeepPartial,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { step } from 'mocha-steps';

@@ -12,15 +12,15 @@ import {
   numberToLong,
   toTimestamp,
 } from '@hicommonwealth/chains';
+import { dispose } from '@hicommonwealth/core';
+import { tester, type DB } from '@hicommonwealth/model';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
-  dispose,
-} from '@hicommonwealth/core';
-import { tester, type DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {

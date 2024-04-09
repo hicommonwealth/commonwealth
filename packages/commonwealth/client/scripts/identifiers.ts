@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ProposalType } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, ProposalType } from '@hicommonwealth/shared';
 import type { ProposalStore } from 'stores';
 import { slugify } from 'utils';
 import type ChainInfo from './models/ChainInfo';
