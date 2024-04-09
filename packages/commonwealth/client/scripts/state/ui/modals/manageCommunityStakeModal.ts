@@ -5,9 +5,9 @@ import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface ManageCommunityStakeModalStore {
-  selectedAddress?: string;
+  selectedAddress?: Readonly<string>;
   setSelectedAddress: (address: string) => void;
-  selectedCommunity?: ChainInfo;
+  selectedCommunity?: Readonly<ChainInfo>;
   setSelectedCommunity: (community: ChainInfo) => void;
   modeOfManageCommunityStakeModal: ManageCommunityStakeModalMode;
   setModeOfManageCommunityStakeModal: (
