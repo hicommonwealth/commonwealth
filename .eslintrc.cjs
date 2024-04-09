@@ -38,6 +38,11 @@ module.exports = {
               '@hicommonwealth/core/**',
               '@hicommonwealth/adapters/**',
               '@hicommonwealth/model/**',
+              '@hicommonwealth/chains/**',
+              '**/core/src/**',
+              '**/adapters/src/**',
+              '**/model/src/**',
+              '**/chains/src/**',
             ],
             message:
               "Avoid importing from 'lib' directories. Import from the main entry point instead.",
