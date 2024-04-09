@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
-import { logger, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB, NotificationInstance } from '@hicommonwealth/model';
 import {
   IChainEventNotificationData,
@@ -16,7 +17,7 @@ import {
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const { Op } = Sequelize;
 
