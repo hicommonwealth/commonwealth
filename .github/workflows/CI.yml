@@ -3,6 +3,7 @@ name: CI
 env:
   ROLLBAR_ENV: 'GitHubCI'
   NODE_ENV: 'test'
+  TEST_WITHOUT_LOGS: 'true'
 
 on:
   pull_request:

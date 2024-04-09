@@ -1,5 +1,6 @@
-import { AppError, CommunityCategoryType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { CommunityCategoryType } from '@hicommonwealth/shared';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

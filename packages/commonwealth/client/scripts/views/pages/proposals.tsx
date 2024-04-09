@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';

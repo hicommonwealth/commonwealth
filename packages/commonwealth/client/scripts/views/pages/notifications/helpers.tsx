@@ -1,5 +1,5 @@
-import type { IForumNotificationData } from '@hicommonwealth/core';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import type { IForumNotificationData } from '@hicommonwealth/shared';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { pluralize } from 'helpers';
 import _ from 'lodash';
 import moment from 'moment';

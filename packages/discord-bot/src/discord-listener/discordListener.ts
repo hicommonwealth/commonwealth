@@ -1,13 +1,13 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { Broker, broker, logger, stats } from '@hicommonwealth/core';
+import { Broker, broker, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   Client,
   IntentsBitField,
@@ -18,7 +18,7 @@ import {
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
