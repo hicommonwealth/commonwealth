@@ -8,13 +8,13 @@ import './ContractInfo.scss';
 
 interface ContractInfo {
   contractAddress: string;
-  bondingCurveAddress?: string;
+  smartContractAddress?: string;
   voteWeightPerStake: string;
 }
 
 const ContractInfo = ({
   contractAddress,
-  bondingCurveAddress,
+  smartContractAddress,
   voteWeightPerStake,
 }: ContractInfo) => {
   return (
@@ -31,16 +31,16 @@ const ContractInfo = ({
           />
         </CWText>
       </div>
-      {bondingCurveAddress && (
+      {smartContractAddress && (
         <div className="row">
-          <CWText type="b2">Bonding curve</CWText>
+          <CWText type="b2">Smart contract</CWText>
           <CWText type="b1" fontWeight="medium">
-            {formatAddressShort(bondingCurveAddress, 5, 5)}
+            {formatAddressShort(smartContractAddress, 5, 5)}
             <CWIcon
               className="copy-icon"
               iconName="copyNew"
               onClick={async () =>
-                await saveToClipboard(bondingCurveAddress, true)
+                await saveToClipboard(smartContractAddress, true)
               }
             />
           </CWText>
@@ -54,7 +54,10 @@ const ContractInfo = ({
         label="Learn more about community stake"
         iconRight="externalLink"
         buttonType="tertiary"
-        // TODO: navigate
+        onClick={() =>
+          (window.location.href =
+            'https://docs.common.xyz/commonwealth/community-overview/community-stake')
+        }
       />
     </section>
   );

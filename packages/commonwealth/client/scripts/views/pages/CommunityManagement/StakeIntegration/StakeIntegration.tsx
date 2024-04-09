@@ -28,9 +28,8 @@ const StakeIntegration = () => {
         <Status communityName={app.activeChainId()} isEnabled={stakeEnabled} />
         <CWDivider />
         <ContractInfo
-          // TODO: correct addresses
-          bondingCurveAddress={contractInfo.factory}
-          contractAddress={contractInfo.communityStake}
+          contractAddress={contractInfo.factory}
+          smartContractAddress={contractInfo.communityStake}
           voteWeightPerStake="1"
         />
         <CWDivider />
