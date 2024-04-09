@@ -51,3 +51,7 @@ test_accounts.txt
 /test-results
 
 summary.json
+
+.eslintcache
+
+.eslintcache

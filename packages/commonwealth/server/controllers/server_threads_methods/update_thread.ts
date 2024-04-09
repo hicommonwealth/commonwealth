@@ -1,9 +1,4 @@
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-  ServerError,
-} from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
@@ -12,6 +7,7 @@ import {
   ThreadInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { uniq } from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';

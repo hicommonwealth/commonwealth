@@ -23,7 +23,7 @@ import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
   authorAddress: string;
-  authorChainId: string;
+  authorCommunityId: string;
   discord_meta?: {
     user: { id: string; username: string };
     channel_id: string;
@@ -50,7 +50,7 @@ export type AuthorAndPublishInfoProps = {
 export const AuthorAndPublishInfo = ({
   isHot,
   authorAddress,
-  authorChainId,
+  authorCommunityId,
   isLocked,
   lockedAt,
   lastUpdated,
@@ -84,7 +84,7 @@ export const AuthorAndPublishInfo = ({
       <FullUser
         avatarSize={24}
         userAddress={authorAddress}
-        userCommunityId={authorChainId}
+        userCommunityId={authorCommunityId}
         shouldShowPopover
         shouldLinkProfile
         shouldShowAddressWithDisplayName={

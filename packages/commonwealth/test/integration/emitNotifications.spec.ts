@@ -1,11 +1,11 @@
+import { dispose } from '@hicommonwealth/core';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   ProposalType,
   SnapshotEventType,
   SupportedNetwork,
-  dispose,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';

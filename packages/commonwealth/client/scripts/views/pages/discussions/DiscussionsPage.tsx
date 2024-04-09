@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -6,7 +6,6 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import useFetchThreadsQuery, {
-  featuredFilterQueryMap,
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
@@ -28,6 +27,8 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -53,14 +54,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     communityId,
   });
 
-  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const containerRef = useRef();
+
+  useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: communityId,
+    communityId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -84,8 +87,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicId,
       stage: stageName ?? undefined,
       includePinnedThreads: true,
-      ...(featuredFilterQueryMap[featuredFilter] && {
-        orderBy: featuredFilterQueryMap[featuredFilter],
+      ...(featuredFilter && {
+        orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
@@ -102,7 +105,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
       return null;
 
-    if (isOnArchivePage && t.archivedAt) return null;
+    if (isOnArchivePage && !t.archivedAt) return null;
 
     return t;
   });
@@ -110,7 +113,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
-    <div className="DiscussionsPage">
+    <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
+      <DiscussionsFeedDiscovery
+        orderBy={featuredFilter}
+        community={communityId}
+        includePinnedThreads={true}
+      />
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
@@ -165,8 +173,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             />
           );
         }}
-        endReached={() => hasNextPage && fetchNextPage()}
-        overscan={200}
+        endReached={() => {
+          hasNextPage && fetchNextPage();
+        }}
+        overscan={50}
         components={{
           // eslint-disable-next-line react/no-multi-comp
           EmptyPlaceholder: () => (
@@ -178,11 +188,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
             <>
-              {isWindowSmallInclusive && (
-                <div className="mobileBreadcrumbs">
-                  <Breadcrumbs />
-                </div>
-              )}
+              <Breadcrumbs />
               <HeaderWithFilters
                 topic={topicName}
                 stage={stageName}
@@ -205,7 +211,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
         }}
       />
-    </div>
+    </CWPageLayout>
   );
 };
 

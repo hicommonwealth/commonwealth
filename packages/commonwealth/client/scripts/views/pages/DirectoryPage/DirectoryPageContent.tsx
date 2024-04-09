@@ -1,3 +1,4 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -5,6 +6,7 @@ import { CWRelatedCommunityCard } from 'views/components/component_kit/new_desig
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import './DirectoryPageContent.scss';
 
 type RowType = {
@@ -41,34 +43,6 @@ interface DirectoryPageContentProps {
   filteredRelatedCommunitiesData: CommunityData[];
 }
 
-const columnInfo = [
-  {
-    key: 'name',
-    customElementKey: 'community',
-    header: 'Community',
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'description',
-    header: 'Description',
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'members',
-    header: 'Members',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'threads',
-    header: 'Threads',
-    numeric: true,
-    sortable: true,
-  },
-];
-
 const DirectoryPageContent = ({
   isLoading,
   noFilteredCommunities,
@@ -79,6 +53,38 @@ const DirectoryPageContent = ({
   tableData,
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
+  const tableState = useCWTableState({
+    columns: [
+      {
+        key: 'name',
+        customElementKey: 'community',
+        header: 'Community',
+        numeric: false,
+        sortable: true,
+      },
+      {
+        key: 'description',
+        header: 'Description',
+        numeric: false,
+        sortable: true,
+      },
+      {
+        key: 'members',
+        header: 'Members',
+        numeric: true,
+        sortable: true,
+      },
+      {
+        key: 'threads',
+        header: 'Threads',
+        numeric: true,
+        sortable: true,
+      },
+    ],
+    initialSortColumn: 'members',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   if (isLoading) {
     return (
       <div className="directory-loader-container">
@@ -104,7 +110,12 @@ const DirectoryPageContent = ({
   }
 
   return selectedViewType === ViewType.Rows ? (
-    <CWTable columnInfo={columnInfo} rowData={tableData} />
+    <CWTable
+      columnInfo={tableState.columns}
+      sortingState={tableState.sorting}
+      setSortingState={tableState.setSorting}
+      rowData={tableData}
+    />
   ) : (
     <div className="directory-tiles-container">
       {filteredRelatedCommunitiesData.map((community) => (

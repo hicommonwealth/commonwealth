@@ -10,25 +10,10 @@
   max-height: 100vh;
   padding-bottom: 100px;
 
-  @include mediumSmallInclusive {
-    max-height: auto;
+  @include extraSmall {
     padding-bottom: 0;
     overflow-x: scroll;
     gap: 16px;
-
-    padding: 0 56px;
-
-    @include medium {
-      padding: 0 40px;
-    }
-
-    @include mediumSmall {
-      padding: 0 32px;
-    }
-
-    @include smallInclusive {
-      padding: 0 16px;
-    }
   }
 
   .community-preview-cards-collection {
@@ -36,7 +21,7 @@
     flex-direction: column;
     z-index: 10;
 
-    @include mediumSmallInclusive {
+    @include extraSmall {
       flex-direction: row;
       z-index: inherit;
       overflow-x: scroll;

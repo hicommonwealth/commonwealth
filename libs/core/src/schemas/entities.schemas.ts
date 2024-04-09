@@ -1,16 +1,15 @@
-import z from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import {
-  BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
   DefaultPage,
-  NodeHealth,
   NotificationCategories,
-} from '../types';
+} from '@hicommonwealth/shared';
+import z from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
+import { BalanceSourceType, NodeHealth } from '../types';
 import * as events from './events.schemas';
 import { EventNames, discordMetaSchema, linksSchema } from './utils.schemas';
 
@@ -209,6 +208,8 @@ export const Thread = z.object({
 
   //notifications
   max_notif_id: z.number(),
+
+  profile_name: z.string(),
 });
 
 export const Comment = z.object({
@@ -343,6 +344,7 @@ export const Community = z.object({
     .max(MAX_SCHEMA_INT)
     .optional(),
   namespace: z.string().optional(),
+  namespace_address: z.string().optional(),
   redirect: z.string().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -457,6 +459,7 @@ export const ChainNode = z.object({
   cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).optional(),
   health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).optional(),
   contracts: z.array(Contract).optional(),
+  block_explorer: z.string().optional(),
 });
 
 // aliases

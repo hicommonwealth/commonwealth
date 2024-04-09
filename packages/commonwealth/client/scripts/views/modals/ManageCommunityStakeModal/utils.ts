@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -19,17 +19,12 @@ export const convertEthToUsd = (
   return (eth * rate).toFixed(2);
 };
 
-export const buildEtherscanLink = (ethChainId: number, txHash: string) => {
-  switch (ethChainId) {
-    case 81457:
-      return `https://blastscan.io/tx/${txHash}`;
-    case 84532:
-      return `https://sepolia.basescan.org/tx/${txHash}`;
-    case 11155111:
-      return `https://sepolia.etherscan.io/tx/${txHash}`;
-    default:
-      return `https://basescan.org/tx/${txHash}`;
-  }
+export const buildEtherscanLink = (txHash: string, chainNodeId?: number) => {
+  const url = chainNodeId
+    ? app.config.nodes.getById(chainNodeId).block_explorer
+    : app.chain?.meta?.ChainNode?.block_explorer ?? 'https://basescan.org/';
+
+  return `${url}tx/${txHash}`;
 };
 
 export const capDecimals = (value: string, capNumber = 8) => {

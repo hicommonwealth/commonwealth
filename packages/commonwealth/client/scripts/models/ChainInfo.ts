@@ -1,16 +1,18 @@
-import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
+import StakeInfo from './StakeInfo';
 
 class ChainInfo {
   public readonly id: string;
   public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
+  public readonly CommunityStakes: StakeInfo[];
   public readonly tokenName: string;
   public readonly threadCount: number;
   public readonly addressCount: number;
@@ -79,6 +81,7 @@ class ChainInfo {
     substrateSpec,
     chain_node_id,
     ChainNode,
+    CommunityStakes,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
@@ -116,6 +119,7 @@ class ChainInfo {
     this.substrateSpec = substrateSpec;
     this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
+    this.CommunityStakes = CommunityStakes;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
@@ -166,6 +170,7 @@ class ChainInfo {
     redirect,
     thread_count,
     address_count,
+    CommunityStakes,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -212,6 +217,7 @@ class ChainInfo {
       tokenName: token_name,
       chain_node_id,
       ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
+      CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
@@ -335,6 +341,7 @@ class ChainInfo {
       discords: [],
       githubs: [],
       telegrams: [],
+      twitters: [],
       elements: [],
       remainingLinks: [],
     };
@@ -350,6 +357,8 @@ class ChainInfo {
           categorizedLinks.telegrams.push(link);
         } else if (link.includes('://matrix.to')) {
           categorizedLinks.elements.push(link);
+        } else if (link.includes('://twitter.com')) {
+          categorizedLinks.twitters.push(link);
         } else {
           categorizedLinks.remainingLinks.push(link);
         }
@@ -363,6 +372,7 @@ export type CategorizedSocialLinks = {
   discords: string[];
   githubs: string[];
   telegrams: string[];
+  twitters: string[];
   elements: string[];
   remainingLinks: string[];
 };

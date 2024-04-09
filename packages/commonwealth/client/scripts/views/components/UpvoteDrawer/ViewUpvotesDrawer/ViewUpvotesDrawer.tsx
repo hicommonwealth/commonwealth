@@ -8,8 +8,9 @@ import CWDrawer from '../../component_kit/new_designs/CWDrawer';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
-import { getColumnInfo } from '../util';
 
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 import './ViewUpvotesDrawer.scss';
 
 type Profile = Account | AddressInfo | MinimumProfile;
@@ -41,6 +42,32 @@ export const ViewUpvotesDrawer = ({
   isOpen,
   setIsOpen,
 }: ViewUpvotesDrawerProps) => {
+  const tableState = useCWTableState({
+    columns: [
+      {
+        key: 'name',
+        header: 'Name',
+        numeric: false,
+        sortable: true,
+      },
+      {
+        key: 'voteWeight',
+        header: 'Vote Weight',
+        numeric: true,
+        sortable: true,
+      },
+      {
+        key: 'timestamp',
+        header: 'Timestamp',
+        numeric: true,
+        sortable: true,
+        chronological: true,
+      },
+    ],
+    initialSortColumn: 'timestamp',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
@@ -106,7 +133,7 @@ export const ViewUpvotesDrawer = ({
             <div className="upvoted-content-header">
               <AuthorAndPublishInfo
                 authorAddress={author?.address}
-                authorChainId={getAuthorCommunityId(author)}
+                authorCommunityId={getAuthorCommunityId(author)}
                 publishDate={publishDate}
                 showUserAddressWithInfo={false}
                 profile={profile}
@@ -119,7 +146,9 @@ export const ViewUpvotesDrawer = ({
           {reactorData?.length > 0 ? (
             <>
               <CWTable
-                columnInfo={getColumnInfo()}
+                columnInfo={tableState.columns}
+                sortingState={tableState.sorting}
+                setSortingState={tableState.setSorting}
                 rowData={getRowData(reactorData)}
               />
               <div className="upvote-totals">

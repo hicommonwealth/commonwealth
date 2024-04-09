@@ -1,4 +1,4 @@
-import { NotificationCategory } from '@hicommonwealth/core';
+import { NotificationCategory } from '@hicommonwealth/shared';
 import moment from 'moment';
 import ChainEvent from './ChainEvent';
 

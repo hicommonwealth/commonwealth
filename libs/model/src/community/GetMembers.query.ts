@@ -132,7 +132,7 @@ export const GetMembers: Query<
       }
       const addresses = allCommunityProfiles.map((p) => p.addresses).flat();
       const balances = await contractHelpers.getNamespaceBalance(
-        community.namespace!,
+        community.namespace_address!,
         stake.stake_id,
         node.eth_chain_id!,
         addresses,

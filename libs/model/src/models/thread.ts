@@ -50,7 +50,7 @@ export default (
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
-      kind: { type: dataTypes.TEXT, allowNull: false },
+      kind: { type: dataTypes.STRING, allowNull: false },
       stage: {
         type: dataTypes.TEXT,
         allowNull: false,
@@ -206,12 +206,15 @@ export default (
     models.Thread.belongsToMany(models.Address, {
       through: models.Collaboration,
       as: 'collaborators',
+      foreignKey: { name: 'thread_id', allowNull: false },
     });
     models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
     });
-    models.Thread.hasMany(models.Collaboration);
+    models.Thread.hasMany(models.Collaboration, {
+      foreignKey: 'thread_id',
+    });
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });

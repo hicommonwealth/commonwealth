@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -107,7 +107,7 @@ const useJoinCommunity = () => {
               return new AddressInfo({
                 id: a.id,
                 address: a.address,
-                chainId: a.community_id,
+                communityId: a.community_id,
                 keytype: a.keytype,
                 walletId: a.wallet_id,
               });

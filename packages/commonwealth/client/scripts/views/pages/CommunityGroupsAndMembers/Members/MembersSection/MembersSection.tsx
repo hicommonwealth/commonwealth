@@ -35,6 +35,8 @@ const MembersSection = ({
     <div className="MembersSection">
       <CWTable
         columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
         rowData={filteredMembers.map((member) => ({
           name: {
             sortValue: member.name + (member.role || ''),
@@ -87,8 +89,6 @@ const MembersSection = ({
         }))}
         onScrollEnd={onLoadMoreMembers}
         isLoadingMoreRows={isLoadingMoreMembers}
-        sortingState={tableState.sorting}
-        setSortingState={tableState.setSorting}
       />
     </div>
   );
