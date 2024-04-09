@@ -5,7 +5,7 @@ import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import { WebpackDeduplicationPlugin } from 'webpack-deduplication-plugin';
 import { merge } from 'webpack-merge';
-import baseConfig from './webpack.base.config.js';
+import baseConfig from './webpack.base.config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
