@@ -2,6 +2,7 @@
   "name": "snapshot-listener",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
