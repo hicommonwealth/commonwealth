@@ -1,4 +1,4 @@
-import { ChainNetwork, ProposalType } from '@hicommonwealth/core';
+import { ChainNetwork, ProposalType } from '@hicommonwealth/shared';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import {
@@ -9,6 +9,7 @@ import {
 import 'pages/new_proposal/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageLoading } from 'views/pages/loading';
 import type ProposalModule from '../../../models/ProposalModule';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -109,12 +110,14 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   };
 
   return (
-    <div className="NewProposalPage">
-      <CWText type="h3" fontWeight="medium">
-        New {proposalSlugToFriendlyName.get(internalType)}
-      </CWText>
-      {getBody()}
-    </div>
+    <CWPageLayout>
+      <div className="NewProposalPage">
+        <CWText type="h3" fontWeight="medium">
+          New {proposalSlugToFriendlyName.get(internalType)}
+        </CWText>
+        {getBody()}
+      </div>
+    </CWPageLayout>
   );
 };
 

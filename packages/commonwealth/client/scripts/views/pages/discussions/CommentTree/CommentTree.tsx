@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -334,7 +334,13 @@ export const CommentTree = ({
           threadId: thread.id,
           parentCommentId: comment.parentComment,
           communityId: app.activeChainId(),
-          address: app.user.activeAccount.address,
+          profile: {
+            id: app.user.activeAccount.profile.id,
+            address: app.user.activeAccount.address,
+            avatarUrl: app.user.activeAccount.profile.avatarUrl,
+            name: app.user.activeAccount.profile.name,
+            lastActive: app.user.activeAccount.profile.lastActive?.toString(),
+          },
         });
         setEdits((p) => ({
           ...p,

@@ -20,6 +20,11 @@ const CWModalHeader: FC<CWModalHeaderProps> = ({
   icon,
   onModalClose,
 }) => {
+  const handleModalClose = (e) => {
+    e.stopPropagation();
+    onModalClose();
+  };
+
   return (
     <div className="CWModalHeader">
       <div className="ModalHeader">
@@ -39,7 +44,7 @@ const CWModalHeader: FC<CWModalHeaderProps> = ({
             </CWText>
           ) : null}
         </div>
-        <X className="close-icon" onClick={onModalClose} size={24} />
+        <X className="close-icon" onClick={handleModalClose} size={24} />
       </div>
     </div>
   );

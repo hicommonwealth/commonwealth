@@ -4,7 +4,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 const bannerTypes: BannerType[] = [
   'default',

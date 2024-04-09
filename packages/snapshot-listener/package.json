@@ -1,15 +1,14 @@
 {
   "name": "snapshot-listener",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn src/index.ts",
-    "test": "ts-mocha --exit './test/**/*.spec.ts'"
+    "test": "NODE_ENV=test ts-mocha './test/**/*.spec.ts'"
   },
   "engines": {
     "node": "20.x"

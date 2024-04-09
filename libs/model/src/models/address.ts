@@ -1,4 +1,4 @@
-import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
@@ -99,7 +99,7 @@ export default (
       wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
       hex: {
-        type: dataTypes.STRING,
+        type: dataTypes.STRING(64),
         allowNull: true,
         validate: {
           isRequiredForCosmos() {
@@ -144,6 +144,46 @@ export default (
       scopes: {
         withPrivateData: {},
       },
+      hooks: {
+        afterCreate: async (
+          address: AddressInstance,
+          options: Sequelize.CreateOptions<AddressAttributes>,
+        ) => {
+          // when address created, increment Community.address_count
+          await sequelize.query(
+            `
+            UPDATE "Communities"
+            SET address_count = address_count + 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: address.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
+        },
+        afterDestroy: async (
+          address: AddressInstance,
+          options: Sequelize.InstanceDestroyOptions,
+        ) => {
+          // when address deleted, decrement Community.address_count
+          await sequelize.query(
+            `
+            UPDATE "Communities"
+            SET address_count = address_count - 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: address.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
+        },
+      },
     },
   );
 
@@ -168,8 +208,11 @@ export default (
     models.Address.belongsToMany(models.Thread, {
       through: models.Collaboration,
       as: 'collaboration',
+      foreignKey: { name: 'address_id', allowNull: false },
     });
-    models.Address.hasMany(models.Collaboration);
+    models.Address.hasMany(models.Collaboration, {
+      foreignKey: { name: 'address_id', allowNull: false },
+    });
     models.Address.hasMany(models.Membership, {
       foreignKey: 'address_id',
       as: 'Memberships',

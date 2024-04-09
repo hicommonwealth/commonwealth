@@ -1,8 +1,10 @@
 import { ExitCode } from './enums';
+import { successfulInMemoryBroker } from './in-memory-brokers';
 import { getInMemoryLogger } from './in-memory-logger';
 import {
   AdapterFactory,
   Analytics,
+  Broker,
   Cache,
   Disposable,
   Disposer,
@@ -122,6 +124,7 @@ export const stats = port(function stats(stats?: Stats) {
       decrementBy: () => {},
       on: () => {},
       off: () => {},
+      gauge: () => {},
       timing: () => {},
     }
   );
@@ -135,6 +138,8 @@ export const cache = port(function cache(cache?: Cache) {
     cache || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
+      ready: () => Promise.resolve(true),
+      isReady: () => true,
       getKey: () => Promise.resolve(''),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
@@ -154,7 +159,6 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-
 export const analytics = port(function analytics(analytics?: Analytics) {
   return (
     analytics || {
@@ -163,4 +167,11 @@ export const analytics = port(function analytics(analytics?: Analytics) {
       track: () => {},
     }
   );
+});
+
+/**
+ * Broker port factory
+ */
+export const broker = port(function broker(broker?: Broker) {
+  return broker || successfulInMemoryBroker;
 });

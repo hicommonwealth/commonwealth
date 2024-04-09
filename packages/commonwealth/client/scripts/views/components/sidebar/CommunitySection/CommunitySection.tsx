@@ -48,6 +48,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const {
     modeOfManageCommunityStakeModal,
     setModeOfManageCommunityStakeModal,
+    selectedCommunity,
   } = useManageCommunityStakeModalStore();
 
   if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
@@ -128,6 +129,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
         onClose={() => setModeOfManageCommunityStakeModal(null)}

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
@@ -14,6 +15,10 @@ import {
 describe('getEventSources', () => {
   before(async () => {
     await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should not return sources that are not subscribed to', async () => {

@@ -12,11 +12,12 @@ interface CWModalProps {
   content: React.ReactNode;
   isFullScreen?: boolean;
   size?: ModalSize;
-  onClose: () => void;
+  onClose: (e: any) => void;
   open: boolean;
   className?: string;
   rootClassName?: string;
   visibleOverflow?: boolean;
+  zIndex?: number;
 }
 
 // Backdrop is needed for modal clickaway events
@@ -41,6 +42,7 @@ const CWModal: FC<CWModalProps> = ({
   rootClassName,
   className,
   visibleOverflow,
+  zIndex,
 }) => (
   <ModalUnstyled
     open={open}
@@ -48,6 +50,7 @@ const CWModal: FC<CWModalProps> = ({
     slots={{ backdrop: Backdrop }}
     disableEnforceFocus
     className={rootClassName}
+    style={{ zIndex: zIndex || null }}
   >
     <div
       className={`${getClasses(

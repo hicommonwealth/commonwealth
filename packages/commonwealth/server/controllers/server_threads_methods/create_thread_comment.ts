@@ -1,15 +1,11 @@
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-  ServerError,
-} from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';

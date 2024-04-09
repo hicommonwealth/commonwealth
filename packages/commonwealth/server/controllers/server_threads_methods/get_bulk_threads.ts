@@ -77,22 +77,22 @@ export async function __getBulkThreads(
     responseThreads = await this.models.sequelize.query(
       `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.community_id AS addr_chain, threads.thread_id, thread_title,
+        addr.community_id AS addr_community_id, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
         threads.archived_at,
-        thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
+        thread_community_id, thread_created, thread_updated, thread_locked, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.discord_meta,
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
         threads.reaction_ids, threads.reaction_timestamps, threads.reaction_weights, threads.reaction_type,
-        threads.addresses_reacted, COALESCE(threads.total_likes, 0)
-          as threads_total_likes,
+        threads.addresses_reacted, threads.reacted_profile_name, threads.reacted_profile_avatar_url,
+        threads.reacted_address_last_active, COALESCE(threads.total_likes, 0) as threads_total_likes,
         threads.reaction_weights_sum,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.community_id AS topic_community_id,
         topics.telegram AS topic_telegram,
-        collaborators
+        collaborators, pr.id as profile_id, pr.profile_name, pr.avatar_url, addr.last_active as address_last_active
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -102,15 +102,17 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
+          t.community_id AS thread_community_id, t.read_only, t.body, t.discord_meta,
+          t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
-          reactions.addresses_reacted, t.reaction_count AS total_likes,
+          reactions.addresses_reacted, t.reaction_count AS total_likes, reactions.reacted_profile_name,
+          reactions.reacted_profile_avatar_url, reactions.reacted_address_last_active,
           t.reaction_weights_sum,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
+              '{ "address": "', editors.address, '", "community_id": "', editors.community_id, '" }'
               )
             ) AS collaborators
         FROM "Threads" t
@@ -124,7 +126,10 @@ export async function __getBulkThreads(
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids,
             STRING_AGG(r.created_at::text, ',') AS reaction_timestamps,
-            STRING_AGG(COALESCE(r.calculated_voting_weight::text, '0'), ',') AS reaction_weights
+            STRING_AGG(COALESCE(r.calculated_voting_weight::text, '0'), ',') AS reaction_weights,
+            STRING_AGG(COALESCE(pr.profile_name::text, ''), ',') AS reacted_profile_name,
+            STRING_AGG(COALESCE(pr.avatar_url::text, ''), ',') AS reacted_profile_avatar_url,
+            STRING_AGG(COALESCE(ad.last_active::text, ''), ',') AS reacted_address_last_active
             FROM "Reactions" as r
             JOIN "Threads" t2
             ON r.thread_id = t2.id and t2.community_id = $community_id ${
@@ -132,6 +137,10 @@ export async function __getBulkThreads(
             }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
+            LEFT JOIN "Users" us
+            ON us.id = ad.user_id
+            LEFT JOIN "Profiles" pr
+            ON pr.user_id = us.id
             where r.community_id = $community_id
             GROUP BY thread_id
         ) reactions
@@ -145,10 +154,15 @@ export async function __getBulkThreads(
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, t.max_notif_id, t.comment_count,
           reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
-          reactions.addresses_reacted)
+          reactions.addresses_reacted, reactions.reacted_profile_name, reactions.reacted_profile_avatar_url,
+          reactions.reacted_address_last_active)
           ORDER BY t.pinned DESC, t.max_notif_id DESC
         ) threads
       ON threads.address_id = addr.id
+      LEFT JOIN "Users" us
+      ON us.id = addr.user_id
+      LEFT JOIN "Profiles" pr
+      ON pr.user_id = us.id
       LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id
       ${fromDate ? ' WHERE threads.thread_created > $from_date ' : ''}
@@ -196,7 +210,7 @@ export async function __getBulkThreads(
       read_only: t.read_only,
       discord_meta: t.discord_meta,
       pinned: t.pinned,
-      chain: t.thread_chain,
+      community_id: t.thread_community_id,
       created_at: t.thread_created,
       updated_at: t.thread_updated,
       locked_at: t.thread_locked,
@@ -208,7 +222,7 @@ export async function __getBulkThreads(
       Address: {
         id: t.addr_id,
         address: t.addr_address,
-        community_id: t.addr_chain,
+        community_id: t.addr_community_id,
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
@@ -222,17 +236,24 @@ export async function __getBulkThreads(
       addressesReacted: t.addresses_reacted
         ? t.addresses_reacted.split(',')
         : [],
+      reactedProfileName: t.reacted_profile_name?.split(','),
+      reactedProfileAvatarUrl: t.reacted_profile_avatar_url?.split(','),
+      reactedAddressLastActive: t.reacted_address_last_active?.split(','),
       reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       marked_as_spam_at: t.marked_as_spam_at,
       archived_at: t.archived_at,
       latest_activity: t.latest_activity,
+      profile_id: t.profile_id,
+      avatar_url: t.avatar_url,
+      address_last_active: t.address_last_active,
+      profile_name: t.profile_name,
     };
     if (t.topic_id) {
       data['topic'] = {
         id: t.topic_id,
         name: t.topic_name,
         description: t.topic_description,
-        chainId: t.topic_community_id,
+        communityId: t.topic_community_id,
         telegram: t.telegram,
       };
     }

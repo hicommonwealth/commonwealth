@@ -8,7 +8,6 @@ const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
-const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
@@ -27,7 +26,6 @@ const UpdateMembersGroupPage = lazy(
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
-const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
@@ -148,11 +146,6 @@ const CommonDomainRoutes = ({
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
-  <Route
-    key="/web3login"
-    path="/web3login"
-    element={withLayout(Web3LoginPage, { type: 'common' })}
-  />,
   ...[
     myCommunityStakePageEnabled ? (
       <Route
@@ -218,11 +211,6 @@ const CommonDomainRoutes = ({
     element={withLayout(FinishNearLoginPage, {
       scoped: true,
     })}
-  />,
-  <Route
-    key="/finishaxielogin"
-    path="/finishaxielogin"
-    element={withLayout(FinishAxieLoginPage, { type: 'common' })}
   />,
   <Route
     key="/finishsociallogin"

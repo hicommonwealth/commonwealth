@@ -1,8 +1,8 @@
 import { ProposalSDKType } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { COSMOS_GOV_V1_CHAIN_IDS as COSMOS_GOV_V1_COMMUNITY_IDS } from '../../../config';
 import { AllCosmosProposals } from './types';
 
 const log = logger().getLogger(__filename);
@@ -32,18 +32,20 @@ export function numberToUint8ArrayBE(num, byteLength = 8) {
   return bytes;
 }
 
-export function filterV1GovCommunities(communities: CommunityInstance[]) {
+export async function filterV1GovCommunities(communities: CommunityInstance[]) {
   const v1Communities = [];
   const v1Beta1Communities = [];
 
-  communities.forEach((c) => {
-    if (COSMOS_GOV_V1_COMMUNITY_IDS.includes(c.id)) {
+  const promises = communities.map(async (c) => {
+    const chainNode = await c.getChainNode();
+    if (chainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1) {
       v1Communities.push(c);
     } else {
       v1Beta1Communities.push(c);
     }
   });
 
+  await Promise.all(promises);
   return { v1Communities, v1Beta1Communities };
 }
 

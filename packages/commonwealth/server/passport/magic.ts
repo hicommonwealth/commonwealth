@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import {
-  ChainBase,
-  NotificationCategories,
-  ServerError,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type {
   DB,
   ProfileAttributes,
@@ -22,6 +15,12 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
@@ -320,6 +319,10 @@ async function loginExistingMagicUser({
       );
     }
 
+    // TODO: we should also remove ghost addresses her, per code in /updateAddress...
+    // or we can leave it alone, although it wont migrate address ownership, most parameters
+    // are by profile anyway.
+
     return existingUserInstance;
   });
 }
@@ -545,24 +548,44 @@ async function magicLoginRoute(
   // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
-  const existingUserInstance = await models.User.scope(
-    'withPrivateData',
-  ).findOne({
-    include: [
-      {
-        model: models.Address,
-        where: {
-          wallet_id: WalletId.Magic,
-          address: canonicalAddress,
-          verified: { [Op.ne]: null },
+  let existingUserInstance = await models.User.scope('withPrivateData').findOne(
+    {
+      include: [
+        {
+          model: models.Address,
+          where: {
+            wallet_id: WalletId.Magic,
+            address: canonicalAddress,
+            verified: { [Op.ne]: null },
+          },
+          required: true,
         },
-        required: true,
-      },
-      {
-        model: models.Profile,
-      },
-    ],
-  });
+        {
+          model: models.Profile,
+        },
+      ],
+    },
+  );
+
+  if (
+    !existingUserInstance &&
+    (!magicUserMetadata.oauthProvider ||
+      magicUserMetadata.oauthProvider === 'email') &&
+    magicUserMetadata.email
+  ) {
+    // if unable to locate a magic user by address, attempt to locate by email.
+    // the ONLY time this should trigger is for claiming ghost addresses on discourse communities,
+    // which requires the email-specific magic login, as the email usage on social providers
+    // is insecure.
+    existingUserInstance = await models.User.scope('withPrivateData').findOne({
+      where: { email: magicUserMetadata.email },
+      include: [
+        {
+          model: models.Profile,
+        },
+      ],
+    });
+  }
 
   log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,

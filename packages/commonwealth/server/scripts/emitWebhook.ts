@@ -1,11 +1,11 @@
+import { WebhookInstance, models } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   ProposalType,
   SupportedNetwork,
   WebhookCategory,
-} from '@hicommonwealth/core';
-import { WebhookInstance, models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
