@@ -14,7 +14,7 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
       const { userAddress, contentUrl, chainNodeUrl, contestAddress } = payload;
 
       const web3Client = await commonProtocol.contestHelper.createWeb3Provider(
-        chainNodeUrl,
+        chainNodeUrl!,
         process.env.PRIVATE_KEY!,
       );
 
@@ -29,7 +29,7 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
       const { userAddress, chainNodeUrl, contestAddress, contentId } = payload;
 
       const web3Client = await commonProtocol.contestHelper.createWeb3Provider(
-        chainNodeUrl,
+        chainNodeUrl!,
         process.env.PRIVATE_KEY!,
       );
 
