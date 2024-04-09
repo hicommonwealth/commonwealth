@@ -12,7 +12,7 @@ import './StakeIntegration.scss';
 import Status from './Status';
 
 const StakeIntegration = () => {
-  const x = useCommunityStake();
+  const { stakeEnabled } = useCommunityStake();
 
   const contractInfo =
     commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.ethChainId];
@@ -25,10 +25,7 @@ const StakeIntegration = () => {
     <CWPageLayout>
       <section className="StakeIntegration">
         <CWText type="h2">Stake</CWText>
-        <Status
-          communityName={app.activeChainId()}
-          isEnabled={x.stakeEnabled}
-        />
+        <Status communityName={app.activeChainId()} isEnabled={stakeEnabled} />
         <CWDivider />
         <ContractInfo
           // TODO: correct addresses
