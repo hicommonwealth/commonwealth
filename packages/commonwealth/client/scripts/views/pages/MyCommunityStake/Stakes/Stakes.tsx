@@ -96,7 +96,7 @@ const Stakes = ({ filterOptions, addressFilter }: TransactionHistoryProps) => {
             ?.name || '',
         )}`,
       }))
-      .filter((transaction) => transaction.stake);
+      .filter((transaction) => transaction.stake > 0);
   })();
 
   return (
