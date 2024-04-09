@@ -87,7 +87,7 @@ export async function __getBulkThreads(
             pinned, community_id, created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
             marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_action as "canvasAction",
-            canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited
+            canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited, address_id
         FROM "Threads"
         WHERE
             community_id = :communityId AND
@@ -119,7 +119,7 @@ export async function __getBulkThreads(
             P.id as profile_id, P.avatar_url as avatar_url, P.profile_name as profile_name
         FROM top_threads TH
         JOIN "Topics" T ON TH.topic_id = T.id
-        LEFT JOIN "Addresses" A ON TH.id = A.id
+        LEFT JOIN "Addresses" A ON TH.address_id = A.id
         LEFT JOIN "Profiles" P ON A.profile_id = P.id
     ), collaborator_data AS (
     -- get the thread collaborators and their profiles
