@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 
 type StakeButtonToolTipHelperProps = {
   isLoggedIn?: boolean;
