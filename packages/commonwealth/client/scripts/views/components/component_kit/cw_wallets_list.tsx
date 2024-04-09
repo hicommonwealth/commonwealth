@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
-import type { ChainNetwork } from '@hicommonwealth/core';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import type { ChainNetwork } from '@hicommonwealth/shared';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import React from 'react';
 import app from 'state';

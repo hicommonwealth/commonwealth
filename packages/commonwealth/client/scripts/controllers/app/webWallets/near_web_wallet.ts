@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 

@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
 import * as siwe from 'siwe';

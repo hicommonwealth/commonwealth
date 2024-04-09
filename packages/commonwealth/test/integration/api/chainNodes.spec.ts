@@ -1,5 +1,6 @@
-import { BalanceType, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';

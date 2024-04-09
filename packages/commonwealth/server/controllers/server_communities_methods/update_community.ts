@@ -1,10 +1,11 @@
 /* eslint-disable no-continue */
-import { AppError, ChainBase } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   CommunityAttributes,
   CommunitySnapshotSpaceWithSpaceAttached,
 } from '@hicommonwealth/model';
 import { UserInstance, commonProtocol } from '@hicommonwealth/model';
+import { ChainBase } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
@@ -243,14 +244,16 @@ export async function __updateCommunity(
       throw new AppError(Errors.NotAdmin);
     }
 
-    await commonProtocol.newNamespaceValidator.validateNamespace(
-      namespace,
-      transactionHash,
-      ownerOfCommunity.address,
-      community,
-    );
+    const namespaceAddress =
+      await commonProtocol.newNamespaceValidator.validateNamespace(
+        namespace,
+        transactionHash,
+        ownerOfCommunity.address,
+        community,
+      );
 
     community.namespace = namespace;
+    community.namespace_address = namespaceAddress;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle

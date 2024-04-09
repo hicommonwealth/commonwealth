@@ -4,16 +4,11 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 0 24px;
 
   .header-section {
     display: flex;
     flex-direction: column;
-    padding: 36px 24px;
-    padding-top: 40px;
-    @include extraSmall {
-      padding-top: 12px;
-    }
+
     gap: 24px;
     position: sticky;
     top: 0;
@@ -54,7 +49,7 @@
       }
 
       .Divider {
-        max-height: 40px;
+        height: 40px;
       }
     }
   }
@@ -64,16 +59,14 @@
     grid-gap: 28px;
     grid-template-columns: repeat(auto-fit, 506px);
     justify-content: center;
-    padding-bottom: 24px;
+    padding-top: 24px;
 
     @include mediumSmall {
       grid-template-columns: 1fr 1fr;
-      padding: 0 24px;
     }
 
     @include extraSmall {
       grid-template-columns: 1fr;
-      padding: 0 24px;
     }
   }
 }

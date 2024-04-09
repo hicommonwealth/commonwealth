@@ -1,8 +1,8 @@
 import faker from 'faker';
 import React from 'react';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 const tagTypes = [
   'passed',

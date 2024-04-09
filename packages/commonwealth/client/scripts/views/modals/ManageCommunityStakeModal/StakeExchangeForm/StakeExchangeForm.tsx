@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
@@ -16,6 +16,7 @@ import { useCommunityStake } from 'views/components/CommunityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import {
@@ -28,7 +29,6 @@ import CWPopover, {
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
 import {
