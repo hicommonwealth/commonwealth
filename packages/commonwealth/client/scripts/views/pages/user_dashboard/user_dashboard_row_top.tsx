@@ -1,4 +1,4 @@
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
@@ -50,7 +50,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
 
   const titleText =
     decodedTitle.length < 1
-      ? `${capitalize(root_type)} ${thread_id}`
+      ? `${_.capitalize(root_type)} ${thread_id}`
       : decodedTitle.length > 50
       ? `${decodedTitle.slice(0, 47)}...`
       : decodedTitle;

@@ -3,7 +3,7 @@ import { TypedPaginatedResult } from 'server/types';
 
 import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { uniq } from 'lodash';
+import _ from 'lodash';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { ServerProfilesController } from '../server_profiles_controller';
@@ -159,7 +159,7 @@ export async function __searchProfiles(
       {
         where: {
           address_id: {
-            [Op.in]: uniq(profileAddressIds),
+            [Op.in]: _.uniq(profileAddressIds),
           },
         },
       },

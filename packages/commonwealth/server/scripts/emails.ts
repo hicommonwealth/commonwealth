@@ -10,7 +10,7 @@ import {
 } from '@hicommonwealth/core';
 import type { UserAttributes } from '@hicommonwealth/model';
 import { AddressAttributes, DB } from '@hicommonwealth/model';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
@@ -168,7 +168,7 @@ export const createImmediateNotificationEmailObject = async (
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(
+      }${chainEventLabel.heading} event on ${_.capitalize(
         ceInstance.community_id,
       )}`;
 

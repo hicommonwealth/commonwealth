@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import { groupBy } from 'lodash';
+import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 
@@ -60,7 +60,7 @@ const threadsUsersCountAndAvatar = async (
         models,
         { community_id, thread_ids },
       );
-      const uniqueAddressesByThread = groupBy<UniqueAddresses>(
+      const uniqueAddressesByThread = _.groupBy<UniqueAddresses>(
         uniqueAddressesByRootIds,
         ({ thread_id }) => thread_id,
       );

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
@@ -60,7 +60,7 @@ export const SnapshotInformationCard = ({
   proposal,
   threads,
 }: SnapshotInformationCardProps) => {
-  const votingSystem = capitalize(
+  const votingSystem = _.capitalize(
     proposal.type.split('-').join(' ').concat(' voting'),
   );
 
