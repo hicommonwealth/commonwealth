@@ -3,7 +3,7 @@
     "allowJs": true,
     "target": "esnext",
     "moduleResolution": "bundler",
-    "module": "esnext",
+    "module": "es2020",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
