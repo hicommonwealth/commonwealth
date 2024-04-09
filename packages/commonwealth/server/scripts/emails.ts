@@ -10,6 +10,7 @@ import {
 } from '@hicommonwealth/core';
 import type { UserAttributes } from '@hicommonwealth/model';
 import { AddressAttributes, DB } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
 import { Op, WhereOptions } from 'sequelize';
@@ -26,8 +27,6 @@ import { SENDGRID_API_KEY } from '../config';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const getForumNotificationCopy = async (

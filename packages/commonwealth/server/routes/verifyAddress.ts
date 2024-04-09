@@ -15,6 +15,7 @@ import type {
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
@@ -25,8 +26,6 @@ import verifySessionSignature from '../util/verifySessionSignature';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
 export const Errors = {
   NoChain: 'Must provide chain',
   InvalidCommunity: 'Invalid community',
