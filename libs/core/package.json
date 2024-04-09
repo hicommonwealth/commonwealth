@@ -1,6 +1,7 @@
 {
   "name": "@hicommonwealth/core",
   "private": "true",
+  "type": "module",
   "version": "0.1.0",
   "description": "Core Abstractions and Shared Utilities",
   "files": [
