@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "esnext",
-    "moduleResolution": "node10",
-    "module": "nodenext",
+    "moduleResolution": "bundler",
+    "module": "esnext",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
