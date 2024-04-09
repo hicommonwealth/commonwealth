@@ -14,6 +14,7 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
@@ -32,11 +33,11 @@ import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
 // set up express async error handling hack
-require('express-async-errors');
 
 const DEV = process.env.NODE_ENV !== 'production';
 
 const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Bootstraps express app
