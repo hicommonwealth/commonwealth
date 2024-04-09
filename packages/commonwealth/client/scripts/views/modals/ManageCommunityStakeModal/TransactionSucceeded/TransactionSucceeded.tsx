@@ -5,11 +5,11 @@ import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import { ManageCommunityStakeModalMode } from '../types';
 import { buildEtherscanLink } from '../utils';
@@ -27,8 +27,7 @@ const TransactionSucceeded = ({
   mode,
   successTransactionHash,
 }: TransactionSucceededProps) => {
-  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
-  const etherscanLink = buildEtherscanLink(ethChainId, successTransactionHash);
+  const etherscanLink = buildEtherscanLink(successTransactionHash);
 
   const handleOpenExternalLink = () => {
     window.open(etherscanLink, '_blank');

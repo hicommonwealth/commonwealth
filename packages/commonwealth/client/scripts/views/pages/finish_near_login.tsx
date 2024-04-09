@@ -19,8 +19,8 @@ import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import { AuthModal } from '../modals/AuthModal';
 
 // TODO:
@@ -76,7 +76,7 @@ const FinishNearLogin = () => {
       const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
       const community =
-        app.user.selectedChain ||
+        app.user.selectedCommunity ||
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing

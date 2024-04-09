@@ -16,8 +16,8 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import Web3 from 'web3';
 import isValidJson from '../../../../../shared/validateJson';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 
 export enum TemplateComponents {
   DIVIDER = 'divider',
@@ -448,13 +448,8 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
         )}
         <CWDivider />
         <div className="bottom-row">
-          <CWButton label="Cancel" buttonType="secondary-black" />
-          <CWButton
-            label="Create"
-            buttonType="primary-black"
-            disabled={!txReady}
-            onClick={handleCreate}
-          />
+          <CWButton label="Cancel" buttonType="secondary" />
+          <CWButton label="Create" disabled={!txReady} onClick={handleCreate} />
         </div>
       </div>
     </div>

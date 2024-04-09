@@ -1,5 +1,4 @@
 import { WEI_PER_ETHER } from '../controllers/chain/ethereum/util';
-import app from '../state/index';
 import { trpc } from '../utils/trpcClient';
 import { buildEtherscanLink } from '../views/modals/ManageCommunityStakeModal/utils';
 import { FilterOptions } from '../views/pages/MyCommunityStake/types';
@@ -14,7 +13,7 @@ const useTransactionHistory = ({
   addressFilter,
 }: TransactionHistoryProps) => {
   const { data } = trpc.community.getStakeTransaction.useQuery({
-    addresses: addressFilter.length > 0 ? addressFilter.join(',') : undefined,
+    addresses: addressFilter.length === 1 ? addressFilter.join(',') : undefined,
   });
 
   let filteredData = !data
@@ -23,6 +22,7 @@ const useTransactionHistory = ({
         community: t.community,
         address: t.address,
         stake: t.stake_amount,
+        price: t.stake_price,
         voteWeight: t.stake_amount * t.vote_weight,
         timestamp: t.timestamp * 1000,
         action: t.stake_direction === 'buy' ? 'mint' : 'burn',
@@ -35,8 +35,8 @@ const useTransactionHistory = ({
           t.stake_amount
         ).toFixed(5)} ETH`,
         etherscanLink: buildEtherscanLink(
-          app.config.nodes.getById(t.community.chain_node_id).ethChainId,
           t.transaction_hash,
+          t.community?.chain_node_id,
         ),
       }));
 

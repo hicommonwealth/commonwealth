@@ -3,7 +3,7 @@ import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
 async function main() {
-  const stakedCommunitiesWithGroups = await models.Community.findAll({
+  const stakedCommunities = await models.Community.findAll({
     where: {
       ...(process.env.COMMUNITY_ID && { id: process.env.COMMUNITY_ID }),
       namespace: {
@@ -11,11 +11,6 @@ async function main() {
       },
     },
     include: [
-      {
-        model: models.Group,
-        as: 'groups',
-        required: true,
-      },
       {
         model: models.CommunityStake,
         as: 'CommunityStakes',
@@ -25,7 +20,7 @@ async function main() {
   });
 
   // generate stakeholder group for each staked community
-  for (const c of stakedCommunitiesWithGroups) {
+  for (const c of stakedCommunities) {
     if ((c.CommunityStakes || []).length > 0) {
       const { groups, created } = await command(
         Community.GenerateStakeholderGroups(),

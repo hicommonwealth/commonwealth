@@ -111,7 +111,7 @@ export async function completeClientLogin(account: Account) {
       addressInfo = new AddressInfo({
         id: account.addressId,
         address: account.address,
-        chainId: account.community.id,
+        communityId: account.community.id,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -262,7 +262,7 @@ export function updateActiveUser(data) {
           new AddressInfo({
             id: a.id,
             address: a.address,
-            chainId: a.community_id,
+            communityId: a.community_id,
             keytype: a.keytype,
             walletId: a.wallet_id,
             walletSsoSource: a.wallet_sso_source,
@@ -537,8 +537,8 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c = app.user.selectedChain
-        ? app.user.selectedChain
+      const c = app.user.selectedCommunity
+        ? app.user.selectedCommunity
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }

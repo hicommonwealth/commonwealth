@@ -344,6 +344,7 @@ export const Community = z.object({
     .max(MAX_SCHEMA_INT)
     .optional(),
   namespace: z.string().optional(),
+  namespace_address: z.string().optional(),
   redirect: z.string().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -458,6 +459,7 @@ export const ChainNode = z.object({
   cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).optional(),
   health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).optional(),
   contracts: z.array(Contract).optional(),
+  block_explorer: z.string().optional(),
 });
 
 // aliases
