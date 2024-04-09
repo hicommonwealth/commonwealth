@@ -1,14 +1,13 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/shared';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';

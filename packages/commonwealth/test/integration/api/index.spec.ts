@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-expressions */
-import { ChainBase, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';

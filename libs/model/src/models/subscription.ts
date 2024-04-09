@@ -1,4 +1,7 @@
-import { EmitNotification, NotificationCategories } from '@hicommonwealth/core';
+import {
+  EmitNotification,
+  NotificationCategories,
+} from '@hicommonwealth/shared';
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
 import type { CommentAttributes } from './comment';

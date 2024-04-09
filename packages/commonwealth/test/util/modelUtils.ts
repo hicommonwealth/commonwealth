@@ -7,7 +7,6 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import type {
   CommunityAttributes,
   DB,
@@ -16,6 +15,7 @@ import type {
   Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import {
   SignTypedDataVersion,
   personalSign,

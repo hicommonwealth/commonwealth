@@ -1,4 +1,4 @@
-import { SupportedNetwork } from '@hicommonwealth/core';
+import { SupportedNetwork } from '@hicommonwealth/shared';
 import type { IEventData } from '../types/cosmos';
 import { EventKind } from '../types/cosmos';
 import { IEventLabel, LabelerFilter } from './util';

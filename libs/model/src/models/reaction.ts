@@ -171,6 +171,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
+        { fields: ['thread_id'] },
         { fields: ['address_id'] },
         {
           fields: [

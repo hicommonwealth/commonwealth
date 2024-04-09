@@ -1,4 +1,4 @@
-import { AbiType } from '@hicommonwealth/core';
+import { AbiType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
 import { ContractsStore } from 'stores';

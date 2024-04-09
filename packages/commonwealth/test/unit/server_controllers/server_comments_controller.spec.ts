@@ -1,5 +1,5 @@
-import { NotificationCategories } from '@hicommonwealth/core';
 import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
