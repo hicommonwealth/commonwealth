@@ -1,4 +1,5 @@
-import { logger, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type {
@@ -7,7 +8,7 @@ import type {
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
 
-const log = logger().getLogger(import.meta.filename);
+const log = logger(import.meta.filename);
 
 export type NotificationAttributes = {
   id: number;

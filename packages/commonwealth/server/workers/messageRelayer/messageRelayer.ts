@@ -1,20 +1,18 @@
 import {
   getRabbitMQConfig,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { broker, logger } from '@hicommonwealth/core';
-import { fileURLToPath } from 'node:url';
+import { broker } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { QueryTypes } from 'sequelize';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(import.meta.filename);
 
 let isServiceHealthy = false;
 

@@ -1,9 +1,10 @@
-import { ServerError, logger } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Express } from 'express';
 import { CustomRequest, lookupKeyDurationInReq } from '../../src';
 import { CacheDecorator } from '../../src/redis';
 
-const log = logger().getLogger(import.meta.filename);
+const log = logger(import.meta.filename);
 
 export enum CACHE_ENDPOINTS {
   BROKEN_5XX = '/cachedummy/broken5xx',

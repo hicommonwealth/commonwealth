@@ -1,7 +1,5 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
-
 import { AllCosmosProposals } from './types';
 import {
   filterV1GovCommunities,
@@ -17,8 +15,7 @@ import {
   fetchUpToLatestCosmosProposalV1,
 } from './v1ProposalFetching';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 /**
  * Fetches all proposals from the given proposal ids to the latest proposal for each community. Works for both v1 and

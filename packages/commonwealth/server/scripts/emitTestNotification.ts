@@ -1,17 +1,16 @@
-import { NotificationCategories, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   NotificationInstance,
   SubscriptionInstance,
   models,
 } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 enum SupportedNotificationChains {
   dydx = 'dydx',

@@ -1,4 +1,4 @@
-import { WebhookCategory } from '@hicommonwealth/core';
+import { WebhookCategory } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import getLinkType from 'helpers/linkType';

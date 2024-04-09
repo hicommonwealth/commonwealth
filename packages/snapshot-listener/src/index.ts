@@ -1,6 +1,5 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
@@ -12,12 +11,11 @@ import {
   BrokerTopics,
   EventContext,
   broker,
-  logger,
   stats,
 } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
-import { fileURLToPath } from 'node:url';
 import v8 from 'v8';
 import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
@@ -28,8 +26,7 @@ import {
 
 let isServiceHealthy = false;
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(import.meta.filename);
 stats(HotShotsStats());
 
 startHealthCheckLoop({
@@ -64,7 +61,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       res.status(400).send('Error sending snapshot event');
     }
 
-    log.debug('Snapshot received', undefined, { requestBody: req.body });
+    log.debug('Snapshot received', { requestBody: req.body });
 
     const parsedId = req.body.id?.replace(/.*\//, '');
     const eventType = req.body.event?.split('/')[1];
@@ -121,7 +118,6 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
-  const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
 
   if (NODE_ENV !== 'test') {

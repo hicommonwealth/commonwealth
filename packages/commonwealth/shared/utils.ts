@@ -1,4 +1,4 @@
-import { AccessLevel, RoleObject } from '@hicommonwealth/core';
+import { AccessLevel, RoleObject } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {

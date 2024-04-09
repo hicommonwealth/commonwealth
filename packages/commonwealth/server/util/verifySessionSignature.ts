@@ -4,14 +4,13 @@ import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
-import { fileURLToPath } from 'node:url';
 
+import { logger } from '@hicommonwealth/logging';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
-  logger,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
@@ -31,8 +30,7 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,

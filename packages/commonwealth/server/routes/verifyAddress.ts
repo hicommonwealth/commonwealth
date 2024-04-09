@@ -1,20 +1,19 @@
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 
-import {
-  AppError,
-  ChainBase,
-  DynamicTemplate,
-  NotificationCategories,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   CommunityInstance,
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  DynamicTemplate,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
@@ -23,8 +22,7 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 export const Errors = {
   NoChain: 'Must provide chain',

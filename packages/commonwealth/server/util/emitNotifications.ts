@@ -1,12 +1,13 @@
 /* eslint-disable max-len */
-import type {
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import type { DB, NotificationInstance } from '@hicommonwealth/model';
+import {
   IChainEventNotificationData,
   IForumNotificationData,
+  NotificationCategories,
   NotificationDataAndCategory,
-} from '@hicommonwealth/core';
-import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
-import type { DB, NotificationInstance } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+} from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import {
@@ -16,8 +17,7 @@ import {
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 const { Op } = Sequelize;
 

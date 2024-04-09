@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import { getProposalUrlPath } from 'identifiers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 

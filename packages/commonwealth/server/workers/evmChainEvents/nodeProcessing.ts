@@ -1,13 +1,12 @@
-import { logger, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { NotificationInstance, models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
 import { getEvents } from './logProcessing';
 import { EvmSource } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since

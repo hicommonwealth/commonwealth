@@ -1,4 +1,5 @@
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { DB } from './models/index';
@@ -58,7 +59,7 @@ export async function getActivityFeed(models: DB, id = 0) {
   return notifications;
 }
 
-const log = logger().getLogger(import.meta.filename);
+const log = logger(import.meta.filename);
 
 export class GlobalActivityCache {
   private _cacheKey = 'global_activity';

@@ -1,5 +1,6 @@
-import { AppError, ChainBase } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { ChainBase } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import type { Request, Response } from 'express';
 import Sequelize from 'sequelize';

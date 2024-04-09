@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';

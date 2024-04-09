@@ -1,6 +1,5 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
@@ -12,16 +11,15 @@ import {
   BrokerTopics,
   Policy,
   broker,
-  logger,
   schemas,
   stats,
 } from '@hicommonwealth/core';
-import { fileURLToPath } from 'node:url';
+import { logger } from '@hicommonwealth/logging';
 import { ZodUndefined } from 'zod';
 import { RABBITMQ_URI } from '../../config';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(import.meta.filename);
+
 stats(HotShotsStats());
 
 let isServiceHealthy = false;

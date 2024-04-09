@@ -1,14 +1,10 @@
-import {
-  AppError,
-  DynamicTemplate,
-  WalletId,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
+import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import { fileURLToPath } from 'node:url';
 import {
   LOGIN_RATE_LIMIT_MINS,
   LOGIN_RATE_LIMIT_TRIES,
@@ -19,8 +15,7 @@ import {
 import { validateCommunity } from '../middleware/validateCommunity';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(import.meta.filename);
 
 export const Errors = {
   AlreadyLoggedIn: 'Already signed in',

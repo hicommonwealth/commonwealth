@@ -1,12 +1,10 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { delay, logger, stats } from '@hicommonwealth/core';
-import { fileURLToPath } from 'node:url';
+import { delay, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Client } from 'pg';
 import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(import.meta.filename);
 const OUTBOX_CHANNEL = 'outbox_channel';
 let retryCount = 0;
 const maxRetries = 5;
@@ -60,7 +58,7 @@ export async function setupListener(): Promise<Client> {
   });
 
   client.on('notification', (payload) => {
-    log.info('Notification received', undefined, { payload });
+    log.info('Notification received', { payload });
     incrementNumUnrelayedEvents(1);
     stats().increment('messageRelayerNotificationReceived');
   });
