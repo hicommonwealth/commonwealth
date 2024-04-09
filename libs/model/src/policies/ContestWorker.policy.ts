@@ -1,4 +1,4 @@
-import { buildThreadUrl, schemas, type Policy } from '@hicommonwealth/core';
+import { schemas, type Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/model';
 
 const inputs = {
@@ -11,13 +11,7 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
   inputs,
   body: {
     ThreadCreated: async ({ payload }) => {
-      const {
-        threadId,
-        communityId,
-        userAddress,
-        chainNodeUrl,
-        contestAddress,
-      } = payload;
+      const { userAddress, contentUrl, chainNodeUrl, contestAddress } = payload;
 
       const web3Client = await commonProtocol.contestHelper.createWeb3Provider(
         chainNodeUrl,
@@ -28,7 +22,7 @@ export const ContestWorker: Policy<typeof inputs> = () => ({
         web3Client,
         contestAddress!,
         userAddress,
-        buildThreadUrl(communityId, threadId),
+        contentUrl,
       );
     },
     ThreadUpvoted: async ({ payload }) => {

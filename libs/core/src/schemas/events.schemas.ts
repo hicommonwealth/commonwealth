@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
 export const ThreadEvent = z.object({
-  threadId: z.number(),
-  communityId: z.string(),
   userAddress: z.string(),
   chainNodeUrl: z.string(),
   contestAddress: z
@@ -10,7 +8,9 @@ export const ThreadEvent = z.object({
     .optional()
     .describe('the contest contract address'),
 });
-export const ThreadCreated = ThreadEvent.extend({});
+export const ThreadCreated = ThreadEvent.extend({
+  contentUrl: z.string().describe('the CW content URL'),
+});
 export const ThreadUpvoted = ThreadEvent.extend({
   contentId: z.string().optional().describe('the onchain content ID'),
 });

@@ -46,7 +46,3 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
 }
 
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
-
-export function buildThreadUrl(communityId: string, threadId: number): string {
-  return `/${communityId}/discussion/${threadId}`;
-}

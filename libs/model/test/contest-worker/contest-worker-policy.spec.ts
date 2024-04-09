@@ -33,9 +33,8 @@ describe('Contest Worker Policy', () => {
       {
         name: 'ThreadCreated',
         payload: {
-          threadId: 1,
-          communityId: 'ethereum',
           userAddress: '0x0',
+          contentUrl: '/ethereum/discussion/1',
           contestAddress: '0x1',
           chainNodeUrl: 'https://chain',
         },
@@ -58,8 +57,6 @@ describe('Contest Worker Policy', () => {
     await eventHandler(ContestWorker(), {
       name: 'ThreadUpvoted',
       payload: {
-        threadId: 1,
-        communityId: 'ethereum',
         userAddress: '0x0',
         contestAddress: '0x1',
         contentId: 'zzz',
