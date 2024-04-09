@@ -1,4 +1,4 @@
-import { DefaultPage } from '@hicommonwealth/core';
+import { DefaultPage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';

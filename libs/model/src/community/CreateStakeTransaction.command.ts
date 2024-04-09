@@ -1,5 +1,6 @@
 import type { Command } from '@hicommonwealth/core';
-import { commonProtocol, schemas } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';

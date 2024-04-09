@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';

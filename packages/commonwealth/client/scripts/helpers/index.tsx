@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';

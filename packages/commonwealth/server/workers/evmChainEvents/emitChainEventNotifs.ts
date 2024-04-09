@@ -1,15 +1,15 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  SupportedNetwork,
-  logger,
-} from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   ContractAttributes,
   NotificationInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  SupportedNetwork,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
 import { RawEvmEvent } from './types';

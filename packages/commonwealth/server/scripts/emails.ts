@@ -1,15 +1,15 @@
+import { logger } from '@hicommonwealth/core';
+import type { UserAttributes } from '@hicommonwealth/model';
+import { AddressAttributes, DB } from '@hicommonwealth/model';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import {
   DynamicTemplate,
   NotificationCategories,
-  logger,
-} from '@hicommonwealth/core';
-import type { UserAttributes } from '@hicommonwealth/model';
-import { AddressAttributes, DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import { capitalize } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';

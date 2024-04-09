@@ -1,10 +1,10 @@
+import { hashAbi, models } from '@hicommonwealth/model';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
-} from '@hicommonwealth/core';
-import { hashAbi, models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import {
   rawCompoundAbi,
   rawDydxAbi,

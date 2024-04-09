@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {

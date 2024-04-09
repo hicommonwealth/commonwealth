@@ -1,6 +1,6 @@
 import { createCanvasSessionPayload } from 'canvas';
 
-import { ChainBase, WalletId } from '@hicommonwealth/core';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
 import {

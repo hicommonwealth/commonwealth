@@ -25,6 +25,7 @@
     { "path": "../../libs/adapters" },
     { "path": "../../libs/chains" },
     { "path": "../../libs/core" },
-    { "path": "../../libs/model" }
+    { "path": "../../libs/model" },
+    { "path": "../../libs/shared" }
   ]
 }

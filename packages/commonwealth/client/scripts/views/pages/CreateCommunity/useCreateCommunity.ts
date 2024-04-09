@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
