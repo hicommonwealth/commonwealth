@@ -10,10 +10,12 @@ import {
   NotificationInstance,
   models,
 } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
 import { RawEvmEvent } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 export async function emitChainEventNotifs(

@@ -6,9 +6,11 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { Client, Message, ThreadChannel } from 'discord.js';
+import { fileURLToPath } from 'node:url';
 import { getImageUrls } from '../discord-listener/util';
 import { getForumLinkedTopic } from '../utils/util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 export async function handleMessage(

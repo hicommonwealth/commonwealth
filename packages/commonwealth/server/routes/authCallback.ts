@@ -1,10 +1,12 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 export const Errors = {

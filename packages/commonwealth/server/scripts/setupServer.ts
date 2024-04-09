@@ -1,7 +1,9 @@
 import { logger } from '@hicommonwealth/core';
 import type { Express } from 'express';
 import http from 'http';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 const setupServer = (app: Express, port: number) => {

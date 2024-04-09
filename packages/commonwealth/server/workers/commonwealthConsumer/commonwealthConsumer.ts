@@ -16,9 +16,11 @@ import {
   schemas,
   stats,
 } from '@hicommonwealth/core';
+import { fileURLToPath } from 'node:url';
 import { ZodUndefined } from 'zod';
 import { RABBITMQ_URI } from '../../config';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 

@@ -9,11 +9,13 @@ import {
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 import { slugify } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import { WebhookDestinations } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 export const REGEX_IMAGE =

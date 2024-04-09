@@ -3,7 +3,7 @@
     "allowJs": true,
     "target": "esnext",
     "moduleResolution": "node10",
-    "module": "node16",
+    "module": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

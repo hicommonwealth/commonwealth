@@ -1,7 +1,9 @@
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 async function createSnapshotProposal(res: any, models: DB) {

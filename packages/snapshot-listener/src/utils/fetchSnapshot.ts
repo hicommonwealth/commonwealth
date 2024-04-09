@@ -1,7 +1,9 @@
 import { logger } from '@hicommonwealth/core';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 dotenv.config();

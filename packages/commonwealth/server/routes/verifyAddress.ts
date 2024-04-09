@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 
 import { Session } from '@canvas-js/interfaces';
@@ -21,6 +22,7 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

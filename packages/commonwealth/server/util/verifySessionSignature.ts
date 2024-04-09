@@ -5,11 +5,13 @@ import type {
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import Sequelize from 'sequelize';
 
 import { getSessionSigners } from 'shared/canvas/verify';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 const verifySessionSignature = async (

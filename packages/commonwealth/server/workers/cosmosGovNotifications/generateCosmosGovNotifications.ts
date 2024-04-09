@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -11,6 +12,7 @@ import {
   filterProposals,
 } from './util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 /**

@@ -4,12 +4,14 @@ import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
 import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
 
 // REQUIRED for S3 env var
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 

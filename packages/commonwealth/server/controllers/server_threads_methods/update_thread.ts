@@ -12,7 +12,7 @@ import {
   ThreadInstance,
   UserInstance,
 } from '@hicommonwealth/model';
-import { uniq } from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -690,8 +690,8 @@ async function updateThreadCollaborators(
       isSuperAdmin: true,
     });
 
-    const toAddUnique = uniq(toAdd || []);
-    const toRemoveUnique = uniq(toRemove || []);
+    const toAddUnique = _.uniq(toAdd || []);
+    const toRemoveUnique = _.uniq(toRemove || []);
 
     // check for overlap between toAdd and toRemove
     for (const r of toRemoveUnique) {
