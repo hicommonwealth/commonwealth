@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node10",
-    "module": "node16",
+    "module": "nodenext",
     "target": "ESNext",
     "baseUrl": ".",
     "composite": true,
