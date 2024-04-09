@@ -1,10 +1,10 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/core';
 import AbiCoder from 'web3-eth-abi';
-import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
+const toBN = require('web3-utils');
 const log = logger().getLogger(__filename);
 
 /**
