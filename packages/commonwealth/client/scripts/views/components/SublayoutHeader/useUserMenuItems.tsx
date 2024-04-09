@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 
-import { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';

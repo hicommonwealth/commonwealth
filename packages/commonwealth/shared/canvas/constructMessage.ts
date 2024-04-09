@@ -1,5 +1,5 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { chainBaseToCaip2 } from './chainMappings';
 
 export const createCanvasSessionPayload = (

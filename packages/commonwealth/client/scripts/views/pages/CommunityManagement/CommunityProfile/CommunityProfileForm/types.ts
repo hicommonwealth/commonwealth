@@ -1,4 +1,4 @@
-import { DefaultPage } from '@hicommonwealth/core';
+import { DefaultPage } from '@hicommonwealth/shared';
 
 export type CommunityTags = 'DeFi' | 'DAO';
 

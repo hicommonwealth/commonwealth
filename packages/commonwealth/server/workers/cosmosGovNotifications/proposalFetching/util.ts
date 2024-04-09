@@ -1,6 +1,7 @@
 import { ProposalSDKType } from '@hicommonwealth/chains';
-import { CosmosGovernanceVersion, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './types';
 

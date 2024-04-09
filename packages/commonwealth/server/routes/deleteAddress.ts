@@ -1,5 +1,6 @@
-import { AppError, WalletId } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { WalletId } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {

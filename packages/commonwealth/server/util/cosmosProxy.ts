@@ -2,13 +2,9 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import {
-  AppError,
-  CosmosGovernanceVersion,
-  NodeHealth,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError, NodeHealth, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import axios from 'axios';
 import * as express from 'express';
 import _ from 'lodash';

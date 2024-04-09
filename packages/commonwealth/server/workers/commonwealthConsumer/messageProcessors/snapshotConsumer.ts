@@ -1,12 +1,10 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
+import { EventHandler, logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import {
-  EventHandler,
   NotificationCategories,
   SnapshotEventType,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';

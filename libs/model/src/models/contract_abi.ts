@@ -1,4 +1,4 @@
-import type { AbiType } from '@hicommonwealth/core';
+import type { AbiType } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import { hashAbi } from '../utils';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';

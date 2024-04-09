@@ -1,4 +1,4 @@
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import type MinimumProfile from 'models/MinimumProfile';
 import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
