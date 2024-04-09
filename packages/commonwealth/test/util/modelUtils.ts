@@ -16,6 +16,8 @@ import type {
   ThreadAttributes,
 } from '@hicommonwealth/model';
 
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { encode, stringify } from '@ipld/dag-json';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
@@ -41,7 +43,7 @@ export async function importEsmModule<T>(name: string): Promise<T> {
   return module as T;
 }
 
-async function createCanvasThing({
+async function createCanvasSignResult({
   session,
   sign,
   action,
@@ -254,8 +256,6 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
   createAndVerifyAddress: async ({ chain }, mnemonic = 'Alice') => {
     if (chain === 'ethereum' || chain === 'alex') {
-      // @ts-ignore
-      const { SIWESigner } = await importEsmModule('@canvas-js/chain-ethereum');
       const wallet_id = 'metamask';
       const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
       const sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
@@ -271,7 +271,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
-      console.log(res.body);
+
       const address_id = res.body.result.id;
 
       res = await chai.request
@@ -283,7 +283,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
           community_id: chain,
           chain_id,
           wallet_id,
-          session,
+          session: stringify(encode(session)),
         });
       console.log(res.body);
       const user_id = res.body.result.user.id;
@@ -324,7 +324,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
           address: session.address.split(':')[2],
           user_id,
           email,
-          session,
+          session: stringify(encode(session)),
         });
       return {
         address_id,
@@ -379,7 +379,11 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       timestamp: Date.now(),
     };
 
-    const canvasSignResult = await createCanvasThing({ session, sign, action });
+    const canvasSignResult = await createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
     const res = await chai.request
       .agent(app)
@@ -452,7 +456,11 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       },
       timestamp: Date.now(),
     };
-    const canvasSignResult = await createCanvasThing({ session, sign, action });
+    const canvasSignResult = await createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
     const res = await chai.request
       .agent(app)
@@ -508,7 +516,11 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       args: { comment_id, value: reaction },
       timestamp: Date.now(),
     };
-    const canvasSignResult = await createCanvasThing({ session, sign, action });
+    const canvasSignResult = await createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
     const res = await chai.request
       .agent(app)
@@ -547,7 +559,11 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       args: { thread_id, value: reaction },
       timestamp: Date.now(),
     };
-    const canvasSignResult = await createCanvasThing({ session, sign, action });
+    const canvasSignResult = await createCanvasSignResult({
+      session,
+      sign,
+      action,
+    });
 
     const res = await chai.request
       .agent(app)
