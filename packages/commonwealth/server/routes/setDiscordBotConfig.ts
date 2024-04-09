@@ -1,11 +1,13 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import { AppError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 
 enum SetDiscordBotConfigErrors {

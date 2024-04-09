@@ -8,6 +8,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { analytics, cache, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
+import { fileURLToPath } from 'node:url';
 import {
   DATABASE_CLEAN_HOUR,
   PORT,
@@ -22,6 +23,7 @@ const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
 const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT;
 
 // bootstrap production adapters
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());

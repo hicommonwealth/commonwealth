@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import { getInMemoryLogger } from './in-memory-logger';
@@ -11,6 +12,8 @@ import {
   Logger,
   Stats,
 } from './interfaces';
+
+const __filename = fileURLToPath(import.meta.url);
 
 /**
  * Map of disposable adapter instances

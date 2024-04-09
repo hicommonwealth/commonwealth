@@ -1,5 +1,8 @@
 import { Stats, logger } from '@hicommonwealth/core';
 import { StatsD } from 'hot-shots';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
 
 export const HotShotsStats = (): Stats => {
   const log = logger().getLogger(__filename);

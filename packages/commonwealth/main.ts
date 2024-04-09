@@ -14,6 +14,7 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
@@ -34,6 +35,8 @@ import ViewCountCache from './server/util/viewCountCache';
 require('express-async-errors');
 
 const DEV = process.env.NODE_ENV !== 'production';
+
+const __filename = fileURLToPath(import.meta.url);
 
 /**
  * Bootstraps express app

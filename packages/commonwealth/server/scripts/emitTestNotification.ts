@@ -4,11 +4,13 @@ import {
   SubscriptionInstance,
   models,
 } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 enum SupportedNotificationChains {

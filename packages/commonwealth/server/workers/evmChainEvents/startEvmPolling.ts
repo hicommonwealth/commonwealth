@@ -1,6 +1,8 @@
 import { PinoLogger } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 
 /**

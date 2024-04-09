@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories, logger } from '@hicommonwealth/core';
+import { fileURLToPath } from 'node:url';
 import request from 'superagent';
 import { ChainEventWebhookData, ForumWebhookData } from '../types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger().getLogger(__filename);
 
 type ZapierWebhookMessage = {

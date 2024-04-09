@@ -5,9 +5,12 @@ import {
   logger,
   type CacheNamespaces,
 } from '@hicommonwealth/core';
+import { fileURLToPath } from 'node:url';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
 
 const CONNECT_TIMEOUT = 5000;
+
+const __filename = fileURLToPath(import.meta.url);
 
 export function redisRetryStrategy(retries: number) {
   // Don't stop retrying while app is running

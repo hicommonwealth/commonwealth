@@ -17,6 +17,7 @@ import {
 } from '@hicommonwealth/core';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
+import { fileURLToPath } from 'node:url';
 import v8 from 'v8';
 import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
@@ -27,6 +28,7 @@ import {
 
 let isServiceHealthy = false;
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(PinoLogger()).getLogger(__filename);
 stats(HotShotsStats());
 
