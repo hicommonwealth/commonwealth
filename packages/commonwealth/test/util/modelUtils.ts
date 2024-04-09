@@ -18,7 +18,6 @@ import type {
 
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
-import wallet from 'ethereumjs-wallet';
 import type { Application } from 'express';
 import { constructSubstrateSignerCWClass } from 'shared/canvas/sessionSigners';
 import {
@@ -26,7 +25,6 @@ import {
   CanvasSignedData,
   toCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
-import Web3 from 'web3-utils';
 import { createRole, findOneRole } from '../../server/util/roles';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC } from '../../shared/canvas';
@@ -196,15 +194,7 @@ export interface JoinCommunityArgs {
   originChain: string;
 }
 
-const generateEthAddress = () => {
-  const keypair = wallet.generate();
-  const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
-  const address = Web3.toChecksumAddress(lowercaseAddress);
-  return { keypair, address };
-};
-
 export type ModelSeeder = {
-  generateEthAddress: () => { keypair: wallet; address: string };
   getTopicId: (args: { chain: string }) => Promise<string>;
   createAndVerifyAddress: (
     args: { chain: string },
@@ -250,8 +240,6 @@ export type ModelSeeder = {
 };
 
 export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
-  generateEthAddress,
-
   getTopicId: async ({ chain }: { chain: string }) => {
     const res = await chai.request
       .agent(app)
