@@ -3,13 +3,13 @@ import {
   BrokerTopics,
   DiscordAction,
   EventContext,
-  logger,
 } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { getImageUrls } from '../discord-listener/util';
 import { getForumLinkedTopic } from '../utils/util';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function handleMessage(
   controller: Broker,
@@ -68,7 +68,7 @@ export async function handleMessage(
     });
   }
 
-  log.info(`Event published`, undefined, {
+  log.info(`Event published`, {
     event,
   });
 }
@@ -137,7 +137,7 @@ export async function handleThreadChannel(
       });
     }
 
-    log.info(`Event published`, undefined, {
+    log.info(`Event published`, {
       event,
     });
   }

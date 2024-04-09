@@ -11,6 +11,11 @@ export const GetStakeTransaction: Query<
   body: async ({ payload }) => {
     const { addresses } = payload;
 
+    let addressFilter = '';
+    if (addresses) {
+      addressFilter = 'WHERE t.address IN (:addresses);';
+    }
+
     return (await models.sequelize.query(
       `
        SELECT 
@@ -31,7 +36,7 @@ export const GetStakeTransaction: Query<
        FROM "StakeTransactions" AS t
        LEFT JOIN "Communities" AS c ON c.id = t.community_id
        LEFT JOIN "CommunityStakes" AS cs ON cs.community_id = t.community_id
-       WHERE :addresses IS NULL OR t.address IN (:addresses);
+       ${addressFilter}
       `,
       {
         type: QueryTypes.SELECT,

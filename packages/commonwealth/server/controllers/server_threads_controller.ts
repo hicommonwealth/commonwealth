@@ -2,6 +2,11 @@ import { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
 
 import {
+  CountThreadsOptions,
+  CountThreadsResult,
+  __countThreads,
+} from './server_threads_methods/count_threads';
+import {
   CreateThreadOptions,
   CreateThreadResult,
   __createThread,
@@ -124,6 +129,12 @@ export class ServerThreadsController {
     options: GetBulkThreadsOptions,
   ): Promise<GetBulkThreadsResult> {
     return __getBulkThreads.call(this, options);
+  }
+
+  async countThreads(
+    options: CountThreadsOptions,
+  ): Promise<CountThreadsResult> {
+    return __countThreads.call(this, options);
   }
 
   async createThreadPoll(

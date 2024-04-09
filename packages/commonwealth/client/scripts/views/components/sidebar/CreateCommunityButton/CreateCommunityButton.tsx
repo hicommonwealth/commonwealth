@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import {
   BaseMixpanelPayload,

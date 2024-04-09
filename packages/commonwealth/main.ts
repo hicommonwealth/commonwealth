@@ -1,5 +1,5 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
 import compression from 'compression';
@@ -57,7 +57,7 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
-  const log = logger().getLogger(__filename);
+  const log = logger(__filename);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,

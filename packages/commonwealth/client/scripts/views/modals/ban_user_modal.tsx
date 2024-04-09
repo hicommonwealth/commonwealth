@@ -7,12 +7,12 @@ import {
   notifySuccess,
 } from '../../controllers/app/notifications';
 import app from '../../state';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
