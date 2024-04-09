@@ -114,7 +114,6 @@ const getFetchThreadsQueryKey = (props) => {
       const toDate = new Date(props.toDate);
       toDate.setMilliseconds(0);
       keys.push(toDate.toISOString());
-      console.log(keys);
     }
     return keys;
   }
