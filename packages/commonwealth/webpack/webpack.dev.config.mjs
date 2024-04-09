@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import { merge } from 'webpack-merge';
-import baseConfig from './webpack.base.config.js';
+import baseConfig from './webpack.base.config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
