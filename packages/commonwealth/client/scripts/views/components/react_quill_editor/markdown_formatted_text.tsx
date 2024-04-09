@@ -11,7 +11,7 @@ import 'components/react_quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
-import { debounce } from 'lodash';
+import _ from 'lodash';
 import { marked } from 'marked';
 import markedFootnote from 'marked-footnote';
 import { markedSmartypants } from 'marked-smartypants';
@@ -120,7 +120,7 @@ export const MarkdownFormattedText = ({
   const toggleDisplay = () => setUserExpand(!userExpand);
 
   const convertTwitterLinks = useCallback(
-    debounce(async () => {
+    _.debounce(async () => {
       // walk through rendered markdown DOM elements
       const walker = document.createTreeWalker(
         containerRef.current,
