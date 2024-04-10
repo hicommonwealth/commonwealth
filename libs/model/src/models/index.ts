@@ -66,12 +66,12 @@ export const buildDb = (sequelize: Sequelize): DB => {
    * Find a way to write this as:
    *
    * db.Community
-   *    .withMany(db.ContestManager, 'communityId')
-   *    .withMany(db.Topic, 'communityId')...
+   *    .toMany(db.ContestManager, 'communityId')
+   *    .toMany(db.Topic, 'communityId')...
    */
-  //oneToMany(db.Community, db.ContestManager, 'communityId');
-  //oneToMany(db.ContestManager, db.Contest, 'contest');
-  //oneToMany(db.Contest, db.ContestAction, 'id');
+  oneToMany(db.Community, db.ContestManager, 'communityId');
+  oneToMany(db.ContestManager, db.Contest, 'contest');
+  oneToMany(db.Contest, db.ContestAction, 'id');
 
   return db;
 };
