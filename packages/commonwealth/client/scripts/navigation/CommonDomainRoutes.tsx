@@ -81,6 +81,13 @@ const CommunityIntegrations = lazy(
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
+const CommunityContests = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ContestsList'),
+);
+const ManageContest = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ManageContest'),
+);
+const Contests = lazy(() => import('views/pages/Contests'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -106,6 +113,7 @@ const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
   myCommunityStakePageEnabled,
+  contestEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -442,6 +450,38 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+  ...(contestEnabled
+    ? [
+        <Route
+          key="/:scope/manage/contests"
+          path="/:scope/manage/contests"
+          element={withLayout(CommunityContests, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/contests/launch"
+          path="/:scope/manage/contests/launch"
+          element={withLayout(ManageContest, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/contests/:contestId"
+          path="/:scope/manage/contests/:contestId"
+          element={withLayout(ManageContest, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/contests"
+          path="/:scope/contests"
+          element={withLayout(Contests, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"
