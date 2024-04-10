@@ -21,6 +21,8 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
+export function createPaginatorDefault() {}
+
 export function createPaginatorMock(
   nrRecords: number,
   pageSize: number,
