@@ -1,5 +1,5 @@
 import { createAsyncWriter } from './createAsyncWriter';
-import { createPaginator } from './createPaginator';
+import { createPaginatorMock } from './createPaginator';
 
 export interface SitemapGenerator {
   readonly exec: () => Promise<void>;
@@ -7,7 +7,7 @@ export interface SitemapGenerator {
 
 export function createSitemapGenerator() {
   const writer = createAsyncWriter('mock');
-  const paginator = createPaginator('mock');
+  const paginator = createPaginatorMock(10, 50000);
 
   async function exec() {
     while (await paginator.hasNext()) {

@@ -1,5 +1,12 @@
 import { Link } from './createPaginator';
 
+/**
+ * Creates a buffer object that allows appending data and converting the buffer to a string.
+ *
+ * @returns {Object} The buffer object.
+ * @property {function} append - Appends the provided data to the buffer.
+ * @property {function} toString - Converts the buffer to a string.
+ */
 function createBuffer() {
   let buff = '';
 
@@ -14,6 +21,12 @@ function createBuffer() {
   return { append, toString };
 }
 
+/**
+ * Creates a sitemap XML string based on the provided links array.
+ *
+ * @param {ReadonlyArray<Link>} links - The array of links.
+ * @returns {string} - The sitemap XML string.
+ */
 export function createSitemap(links: ReadonlyArray<Link>): string {
   const buff = createBuffer();
 

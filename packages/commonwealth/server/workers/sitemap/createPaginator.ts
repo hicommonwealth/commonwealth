@@ -3,33 +3,41 @@ export interface Link {
   readonly updated_at: string;
 }
 
+/**
+ * A single page which holds a batch of links that can be converted to a sitemap.
+ */
 export interface Page {
   readonly links: ReadonlyArray<Link>;
 }
 
+/**
+ * Interface representing a Paginator.
+ *
+ * A Paginator is used to navigate through a collection of pages.  This way
+ * we can avoid fetching all records into memory.
+ */
 interface Paginator {
   readonly hasNext: () => Promise<boolean>;
   readonly next: () => Promise<Page>;
 }
 
-export function createPaginator(type: 'mock' | 'default') {
-  switch (type) {
-    case 'mock':
-      return createPaginatorMock();
-  }
-}
+export function createPaginatorMock(
+  nrRecords: number,
+  pageSize: number,
+): Paginator {
+  let pageIdx = 0;
+  const maxPages = Math.floor(nrRecords / pageSize);
 
-export function createPaginatorMock(): Paginator {
   let idx = 0;
-  const maxPages = 1;
 
   async function hasNext() {
-    return idx < maxPages;
+    return pageIdx < maxPages;
   }
+
   async function next(): Promise<Page> {
     const links = [
       {
-        url: 'http://www.example.com/threads/1',
+        url: 'http://www.example.com/threads/' + idx++,
         updated_at: new Date().toISOString(),
       },
     ];
