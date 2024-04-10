@@ -92,6 +92,7 @@ export function createPaginatorMock(
     ++pageIdx;
     const links = [
       {
+        id: 0,
         url: 'http://www.example.com/threads/' + idx++,
         updated_at: new Date().toISOString(),
       },
