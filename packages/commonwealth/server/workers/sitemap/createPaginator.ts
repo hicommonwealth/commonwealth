@@ -24,7 +24,7 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
-export function createPaginatorDefault(): Paginator {
+export function createPaginatorDefault(limit: number = 50000): Paginator {
   // the page we're on...
   let idx = 0;
 
@@ -44,7 +44,8 @@ export function createPaginatorDefault(): Paginator {
           SELECT "Threads".id, "Threads".updated_at
           FROM "Threads"
           WHERE "Threads".id > ${ptr}
-          ORDER BY "Threads".id;
+          ORDER BY "Threads".id 
+          LIMIT ${limit};
       `,
       { type: QueryTypes.SELECT },
     );
