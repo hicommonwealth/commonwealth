@@ -432,7 +432,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         author_chain: chain,
         chain,
         address: address.split(':')[2],
-        parent_id: parentCommentId,
+        parent_id: parentCommentId || null,
         text,
         jwt,
         ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
