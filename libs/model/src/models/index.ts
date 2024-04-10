@@ -52,6 +52,12 @@ import NotificationsReadFactory, {
   type NotificationsReadModelStatic,
 } from './notifications_read';
 // import OutboxFactory, { type OutboxModelStatic } from './outbox';
+import CommentSubscriptionFactory, {
+  type CommentSubscriptionModelStatic,
+} from './comment_subscriptions';
+import CommunityAlertFactory, {
+  type CommunityAlertModelStatic,
+} from './community_alerts';
 import PollFactory, { type PollModelStatic } from './poll';
 import ProfileFactory, { type ProfileModelStatic } from './profile';
 import ReactionFactory, { type ReactionModelStatic } from './reaction';
@@ -71,8 +77,14 @@ import StarredCommunityFactory, {
 import SubscriptionFactory, {
   type SubscriptionModelStatic,
 } from './subscription';
+import SubscriptionPreferenceFactory, {
+  type SubscriptionPreferenceModelStatic,
+} from './subscription_preference';
 import TemplateFactory, { type TemplateModelStatic } from './template';
 import ThreadFactory, { type ThreadModelStatic } from './thread';
+import ThreadSubscriptionFactory, {
+  type ThreadSubscriptionModelStatic,
+} from './thread_subscriptions';
 import TopicFactory, { type TopicModelStatic } from './topic';
 import UserFactory, { type UserModelStatic } from './user';
 import VoteFactory, { type VoteModelStatic } from './vote';
@@ -118,6 +130,10 @@ export type Models = {
   User: UserModelStatic;
   Webhook: WebhookModelStatic;
   // Outbox: OutboxModelStatic;
+  SubscriptionPreference: SubscriptionPreferenceModelStatic;
+  CommunityAlert: CommunityAlertModelStatic;
+  ThreadSubscription: ThreadSubscriptionModelStatic;
+  CommentSubscription: CommentSubscriptionModelStatic;
 };
 
 export type DB = Models & {
@@ -175,6 +191,10 @@ export const buildDb = (sequelize: Sequelize): DB => {
     Webhook: WebhookFactory(sequelize, DataTypes),
     CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
     // Outbox: OutboxFactory(sequelize, DataTypes),
+    SubscriptionPreference: SubscriptionPreferenceFactory(sequelize, DataTypes),
+    CommunityAlert: CommunityAlertFactory(sequelize, DataTypes),
+    ThreadSubscription: ThreadSubscriptionFactory(sequelize, DataTypes),
+    CommentSubscription: CommentSubscriptionFactory(sequelize, DataTypes),
   };
 
   const db = {

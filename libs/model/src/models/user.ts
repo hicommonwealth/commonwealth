@@ -5,7 +5,9 @@ import { z } from 'zod';
 import type { DB } from '.';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
+import { CommunityAlertAttributes } from './community_alerts';
 import type { ProfileAttributes, ProfileInstance } from './profile';
+import { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
@@ -16,6 +18,8 @@ export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
+  SubscriptionPreferences?: SubscriptionPreferenceAttributes;
+  CommunityAlerts?: CommunityAlertAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -129,6 +133,26 @@ export default (
     models.User.hasMany(models.StarredCommunity, {
       foreignKey: 'user_id',
       sourceKey: 'id',
+    });
+    models.User.hasOne(models.SubscriptionPreference, {
+      foreignKey: 'user_id',
+      sourceKey: 'id',
+      as: 'SubscriptionPreferences',
+    });
+    models.User.hasMany(models.Community, {
+      foreignKey: 'user_id',
+      sourceKey: 'ids',
+      as: 'CommunityAlerts',
+    });
+    models.User.hasMany(models.ThreadSubscription, {
+      foreignKey: 'user_id',
+      sourceKey: 'ids',
+      as: 'ThreadSubscriptions',
+    });
+    models.User.hasMany(models.CommentSubscription, {
+      foreignKey: 'user_id',
+      sourceKey: 'ids',
+      as: 'CommentSubscriptions',
     });
   };
 
