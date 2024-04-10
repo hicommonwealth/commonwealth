@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import app from 'state';
 import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { PageNotFound } from 'views/pages/404';
-import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
+
+import CommunityManagementLayout from '../../common/CommunityManagementLayout';
+import {
+  ContestLiveStep,
+  DetailsFormStep,
+  SignTransactionsStep,
+} from './steps';
 
 import './ManageContest.scss';
 
@@ -12,8 +18,14 @@ interface ManageContestProps {
   contestId?: string;
 }
 
+export type LaunchContestStep =
+  | 'DetailsForm'
+  | 'SignTransactions'
+  | 'ContestLive';
+
 const ManageContest = ({ contestId }: ManageContestProps) => {
-  const editMode = !!contestId;
+  const [launchContestStep, setLaunchContestStep] =
+    useState<LaunchContestStep>('DetailsForm');
 
   if (
     !app.isLoggedIn() ||
@@ -21,6 +33,26 @@ const ManageContest = ({ contestId }: ManageContestProps) => {
   ) {
     return <PageNotFound />;
   }
+
+  const getCurrentStep = () => {
+    switch (launchContestStep) {
+      case 'DetailsForm':
+        return (
+          <DetailsFormStep
+            contestId={contestId}
+            onSetLaunchContestStep={setLaunchContestStep}
+          />
+        );
+
+      case 'SignTransactions':
+        return (
+          <SignTransactionsStep onSetLaunchContestStep={setLaunchContestStep} />
+        );
+
+      case 'ContestLive':
+        return <ContestLiveStep />;
+    }
+  };
 
   return (
     <CommunityManagementLayout
@@ -40,9 +72,7 @@ const ManageContest = ({ contestId }: ManageContestProps) => {
           'Each transaction includes a small contribution to the community pool that can be used to fund contests.',
       }}
     >
-      <div className="ManageContest">
-        {editMode ? 'Edit Contest' : 'Create Contest'}
-      </div>
+      <div className="ManageContest">{getCurrentStep()}</div>
     </CommunityManagementLayout>
   );
 };
