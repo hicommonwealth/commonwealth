@@ -46,12 +46,11 @@ export const AdminOnboardingSlider = () => {
       communityId: app.activeChainId(),
       enabled: !!app.activeChainId(),
     });
-  const { data: threads = [], isLoading: isLoadingThreads = false } =
+  const { data: threadCount = [], isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
       communityId: app.activeChainId(),
-      queryType: 'bulk',
-      page: 1,
-      limit: 20,
+      queryType: 'count',
+      limit: 1,
       apiEnabled: !!app.activeChainId(),
     });
 
@@ -75,7 +74,7 @@ export const AdminOnboardingSlider = () => {
     isLoadingThreads ||
     (topics.length > 0 &&
       groups.length > 0 &&
-      threads.length > 0 &&
+      threadCount > 0 &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     [
@@ -121,7 +120,7 @@ export const AdminOnboardingSlider = () => {
             />
             <AdminOnboardingCard
               cardType="create-thread"
-              isActionCompleted={threads.length > 0}
+              isActionCompleted={threadCount > 0}
               onCTAClick={() => redirectToPage('create-thread')}
             />
           </div>

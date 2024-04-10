@@ -1,5 +1,4 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
 import * as dotenv from 'dotenv';
@@ -10,7 +9,7 @@ import { createGzip } from 'zlib';
 // REQUIRED for S3 env var
 dotenv.config();
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
@@ -99,7 +98,7 @@ async function getTablesToBackup(): Promise<string[]> {
   }
 
   const tablesInPg = result.map((t) => t.table_name);
-  log.info('Possible tables found', undefined, {
+  log.info('Possible tables found', {
     tablesInPg,
   });
 
@@ -125,7 +124,7 @@ async function getTablesToBackup(): Promise<string[]> {
     }),
   );
 
-  log.info('Existing archives retrieved', undefined, {
+  log.info('Existing archives retrieved', {
     archiveExists,
   });
 
@@ -156,7 +155,7 @@ function getCompressedDumpName(dumpName: string): string {
 async function main() {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
-  log.info(`Found ${tables.length} to archive`, undefined, {
+  log.info(`Found ${tables.length} to archive`, {
     tables,
   });
 
@@ -164,19 +163,19 @@ async function main() {
     const dumpName = getDumpName(table);
     const compressedName = getCompressedDumpName(dumpName);
 
-    log.info(`Dumping table`, undefined, { table });
+    log.info(`Dumping table`, { table });
     const res = dumpTablesSync(table, dumpName);
     if (!res) continue;
-    log.info(`Dump complete`, undefined, { dumpName });
+    log.info(`Dump complete`, { dumpName });
 
-    log.info('Compressing dump', undefined, { table });
+    log.info('Compressing dump', { table });
     try {
       await compressFile(dumpName, compressedName);
     } catch (e) {
       log.error(`Failed to compress ${dumpName} to ${compressedName}`);
       continue;
     }
-    log.info('Compression complete beginning S3 upload', undefined, {
+    log.info('Compression complete beginning S3 upload', {
       compressedName,
     });
 
@@ -184,7 +183,7 @@ async function main() {
   }
 
   if (tables.length > 0) {
-    log.info('Archive outbox complete', undefined, {
+    log.info('Archive outbox complete', {
       tables,
     });
   } else {
