@@ -21,7 +21,7 @@ describe('createReaction Integration Tests', () => {
   const deleteReaction = async (reactionId, jwtToken, address) => {
     const validRequest = {
       jwt: jwtToken,
-      address,
+      address: address.split(':')[2],
       author_chain: 'ethereum',
       chain: 'ethereum',
     };
@@ -47,7 +47,7 @@ describe('createReaction Integration Tests', () => {
   };
 
   before(async () => {
-    Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
+    // Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
     server = await testServer();
 
     const res = await server.seeder.createAndVerifyAddress(

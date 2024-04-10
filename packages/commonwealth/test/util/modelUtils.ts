@@ -3,8 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   Action,
+  Awaitable,
   Message,
   Session,
+  SessionSigner,
   Signature,
 } from '@canvas-js/interfaces';
 import type {
@@ -31,24 +33,13 @@ import { createRole, findOneRole } from '../../server/util/roles';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
-// Our codebase is currently configured to use CommonJS, but we want to import some
-// ESM modules (@ipld/dag-json, @canvas-js chains).
-// Usually this is done by importing them using `await import(...)` but ts-node
-// replaces this with require, which then fails because you can't call require on ESM modules.
-// So the trick here is to use eval to call `await import`, which then doesn't get replaced
-// by ts-node.
-// https://stackoverflow.com/questions/65265420/how-to-prevent-typescript-from-transpiling-dynamic-imports-into-require
-export async function importEsmModule<T>(name: string): Promise<T> {
-  const module = eval(`(async () => {return await import("${name}")})()`);
-  return module as T;
-}
-
 async function createCanvasSignResult({
   session,
   sign,
   action,
 }): Promise<CanvasSignResult> {
   const { encode } = await import('@ipld/dag-json');
+  const { sha256 } = await import('@noble/hashes/sha256');
 
   const sessionMessage = {
     clock: 0,
@@ -72,7 +63,7 @@ async function createCanvasSignResult({
     sessionMessage,
     sessionMessageSignature,
   };
-  const canvasHash = Buffer.from(encode(actionMessage)).toString('hex');
+  const canvasHash = Buffer.from(sha256(encode(actionMessage))).toString('hex');
   return {
     canvasSignedData,
     canvasHash,
@@ -208,7 +199,7 @@ export type ModelSeeder = {
     email: string;
     session: Session;
     sessionSigner?: any;
-    sign: (message: Message<Action | Session>) => Signature;
+    sign: (message: Message<Action | Session>) => Awaitable<Signature>;
   }>;
   updateProfile: (args: {
     chain: string;
@@ -255,87 +246,58 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   createAndVerifyAddress: async ({ chain }, mnemonic = 'Alice') => {
+    let wallet_id: string;
+    let chain_id: string;
+    let sessionSigner: SessionSigner;
     if (chain === 'ethereum' || chain === 'alex') {
-      const wallet_id = 'metamask';
-      const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
-      const sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
-      const session = await sessionSigner.getSession(CANVAS_TOPIC, {});
-
-      let res = await chai.request
-        .agent(app)
-        .post('/api/createAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address: session.address.split(':')[2],
-          community_id: chain,
-          wallet_id,
-          block_info: TEST_BLOCK_INFO_STRING,
-        });
-
-      const address_id = res.body.result.id;
-
-      res = await chai.request
-        .agent(app)
-        .post('/api/verifyAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address: session.address.split(':')[2],
-          community_id: chain,
-          chain_id,
-          wallet_id,
-          session: stringify(encode(session)),
-        });
-      console.log(res.body);
-      const user_id = res.body.result.user.id;
-      const email = res.body.result.user.email;
-      return {
-        address_id,
-        address: session.address,
-        user_id,
-        email,
-        session,
-        sign: sessionSigner.sign,
-      };
-    }
-    if (chain === 'edgeware') {
+      wallet_id = 'metamask';
+      chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
+      sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
+    } else if (chain === 'edgeware') {
+      wallet_id = 'polkadot';
       const SubstrateSignerCW = await constructSubstrateSignerCWClass();
-      const sessionSigner = new SubstrateSignerCW();
-      const session = await sessionSigner.getSession(CANVAS_TOPIC, {});
-      const wallet_id = 'polkadot';
-      let res = await chai.request
-        .agent(app)
-        .post('/api/createAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address: session.address.split(':')[2],
-          community_id: chain,
-          wallet_id,
-        });
-
-      const user_id = res.body.result.user.id;
-      const email = res.body.result.user.email;
-      const address_id = res.body.result.id;
-      res = await chai.request
-        .agent(app)
-        .post('/api/verifyAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address_id,
-          address: session.address.split(':')[2],
-          user_id,
-          email,
-          session: stringify(encode(session)),
-        });
-      return {
-        address_id,
-        address: session.address,
-        user_id,
-        email,
-        session,
-        sign: sessionSigner.sign,
-      };
+      sessionSigner = new SubstrateSignerCW();
+    } else {
+      throw new Error(`invalid chain ${chain}`);
     }
-    throw new Error('invalid chain');
+
+    const session = await sessionSigner.getSession(CANVAS_TOPIC, {});
+    const walletAddress = session.address.split(':')[2];
+
+    let res = await chai.request
+      .agent(app)
+      .post('/api/createAddress')
+      .set('Accept', 'application/json')
+      .send({
+        address: walletAddress,
+        community_id: chain,
+        wallet_id,
+        block_info: TEST_BLOCK_INFO_STRING,
+      });
+
+    const address_id = res.body.result.id;
+
+    res = await chai.request
+      .agent(app)
+      .post('/api/verifyAddress')
+      .set('Accept', 'application/json')
+      .send({
+        address: walletAddress,
+        community_id: chain,
+        chain_id,
+        wallet_id,
+        session: stringify(encode(session)),
+      });
+    const user_id = res.body.result.user.id;
+    const email = res.body.result.user.email;
+    return {
+      address_id,
+      address: session.address,
+      user_id,
+      email,
+      session,
+      sign: sessionSigner.sign.bind(sessionSigner),
+    };
   },
 
   updateProfile: async ({ chain, address, data, jwt, skipChainFetch }) => {
@@ -392,7 +354,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         author_chain: chainId,
         chain: chainId,
-        address,
+        address: address.split(':')[2],
         title: encodeURIComponent(title),
         body: encodeURIComponent(body),
         kind,
@@ -452,7 +414,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       args: {
         body: text,
         thread_id,
-        parent_comment_id: parentCommentId,
+        parent_comment_id: parentCommentId || null,
       },
       timestamp: Date.now(),
     };
@@ -469,7 +431,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         author_chain: chain,
         chain,
-        address,
+        address: address.split(':')[2],
         parent_id: parentCommentId,
         text,
         jwt,
@@ -522,13 +484,14 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
+    const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
       .post(`/api/comments/${comment_id}/reactions`)
       .set('Accept', 'application/json')
       .send({
         chain,
-        address,
+        address: walletAddress,
         reaction,
         comment_id,
         author_chain,
@@ -564,14 +527,14 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
       action,
     });
-
+    const walletAddress = address.split(':')[2];
     const res = await chai.request
       .agent(app)
       .post(`/api/threads/${thread_id}/reactions`)
       .set('Accept', 'application/json')
       .send({
         chain,
-        address,
+        address: walletAddress,
         reaction,
         author_chain,
         jwt,
