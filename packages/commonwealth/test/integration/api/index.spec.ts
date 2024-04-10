@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-expressions */
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { dispose } from '@hicommonwealth/core';
+import { encode, stringify } from '@ipld/dag-json';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { bech32ToHex } from 'shared/utils';
-import { importEsmModule } from 'test/util/modelUtils';
 import { TestServer, testServer } from '../../../server-test';
 import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC } from '../../../shared/canvas';
@@ -32,8 +33,6 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
-      // @ts-ignore
-      const { SIWESigner } = await importEsmModule('@canvas-js/chain-ethereum');
       const wallet = new SIWESigner({ chainId: 1 });
       const session = await wallet.getSession(CANVAS_TOPIC);
 
@@ -82,10 +81,6 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
-      // @ts-ignore
-      const { SIWESigner } = await importEsmModule('@canvas-js/chain-ethereum');
-      // @ts-ignore
-      const ipldDagJson = await importEsmModule('@ipld/dag-json');
       const chainId = '1'; // use ETH mainnet for testing
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
@@ -115,8 +110,7 @@ describe('API Tests', () => {
           address: session.address,
           community_id,
           wallet_id,
-          // @ts-ignore
-          session: ipldDagJson.stringify(ipldDagJson.encode(session)),
+          session: stringify(encode(session)),
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
