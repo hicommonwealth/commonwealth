@@ -138,7 +138,7 @@ export default (
       foreignKey: 'user_id',
       as: 'SubscriptionPreferences',
     });
-    models.User.hasMany(models.Community, {
+    models.User.hasMany(models.CommunityAlert, {
       foreignKey: 'user_id',
       as: 'CommunityAlerts',
     });
