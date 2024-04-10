@@ -1,3 +1,6 @@
+import { models } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
+
 export interface Link {
   readonly url: string;
   readonly updated_at: string;
@@ -21,7 +24,50 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
-export function createPaginatorDefault() {}
+export function createPaginatorDefault(): Paginator {
+  // the page we're on...
+  let idx = 0;
+
+  let ptr = -1;
+
+  let records: ReadonlyArray<Link> = [];
+
+  async function hasNext() {
+    return idx === 0 || records.length !== 0;
+  }
+
+  async function next(): Promise<Page> {
+    ++idx;
+
+    const raw = await models.sequelize.query(
+      `
+          SELECT "Threads".id, "Threads".updated_at
+          FROM "Threads"
+          WHERE "Threads".id > ${ptr}
+          ORDER BY "Threads".id;
+      `,
+      { type: QueryTypes.SELECT },
+    );
+    //
+    // records = raw.map(current => {
+    //   let id = current[0];
+    //   const url = `http://www.example.com/${id}`
+    //   const updated_at: Date = current[1]
+    //   return {
+    //     url,
+    //     updated_at: updated_at.toISOString()
+    //   }
+    // })
+    //
+    // return {
+    //   links: records
+    // }
+
+    return { links: [] };
+  }
+
+  return { hasNext, next };
+}
 
 export function createPaginatorMock(
   nrRecords: number,
