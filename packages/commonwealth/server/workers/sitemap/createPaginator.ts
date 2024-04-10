@@ -1,7 +1,8 @@
-import { models } from '@hicommonwealth/model';
+import { models, ThreadInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
 export interface Link {
+  readonly id: number;
   readonly url: string;
   readonly updated_at: string;
 }
@@ -36,6 +37,8 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
     return idx === 0 || records.length !== 0;
   }
 
+  type ThreadPartial = Pick<ThreadInstance, 'id' | 'updated_at'>;
+
   async function next(): Promise<Page> {
     ++idx;
 
@@ -51,14 +54,18 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
     );
 
     records = raw.map((current) => {
-      let id = current[0];
-      const url = `http://www.example.com/${id}`;
-      const updated_at: Date = current[1];
+      const currentThread = current as ThreadPartial;
+      const url = `http://www.example.com/${currentThread.id}`;
       return {
+        id: currentThread.id,
         url,
-        updated_at: updated_at.toISOString(),
+        updated_at: currentThread.updated_at.toISOString(),
       };
     });
+
+    if (records.length > 0) {
+      ptr = records[records.length - 1].id;
+    }
 
     return {
       links: records,
