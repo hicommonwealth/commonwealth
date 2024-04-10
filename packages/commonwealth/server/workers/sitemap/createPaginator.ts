@@ -16,7 +16,7 @@ export interface Page {
  * A Paginator is used to navigate through a collection of pages.  This way
  * we can avoid fetching all records into memory.
  */
-interface Paginator {
+export interface Paginator {
   readonly hasNext: () => Promise<boolean>;
   readonly next: () => Promise<Page>;
 }

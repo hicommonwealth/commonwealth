@@ -3,12 +3,12 @@ import AWS from 'aws-sdk';
 
 const s3 = new AWS.S3();
 
-interface Resource {
+export interface Resource {
   readonly location: string;
 }
 
-interface AsyncWriter {
-  readonly write: (path: string, content: string) => Promise<Resource>;
+export interface AsyncWriter {
+  readonly write: (filename: string, content: string) => Promise<Resource>;
 }
 
 export function createAsyncWriter(type: 'mock' | 's3'): AsyncWriter {
@@ -21,9 +21,9 @@ export function createAsyncWriter(type: 'mock' | 's3'): AsyncWriter {
 }
 
 function createAsyncWriterMock(): AsyncWriter {
-  async function write() {
+  async function write(filename: string) {
     return {
-      location: 'https://www.example.com',
+      location: 'https://www.example.com/' + filename,
     };
   }
 
@@ -31,10 +31,10 @@ function createAsyncWriterMock(): AsyncWriter {
 }
 
 function createAsyncWriterS3(): AsyncWriter {
-  async function write(path: string, content: string): Promise<Resource> {
+  async function write(filename: string, content: string): Promise<Resource> {
     const params: S3.Types.PutObjectRequest = {
       Bucket: 'assets.commonwealth.im',
-      Key: `${path}`,
+      Key: `${filename}`,
       Body: content,
       ContentType: 'text/xml; charset=utf-8',
     };
