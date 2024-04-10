@@ -5,7 +5,7 @@ import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
 
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   ChainBase,
   NotificationCategories,
@@ -29,7 +29,7 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,
