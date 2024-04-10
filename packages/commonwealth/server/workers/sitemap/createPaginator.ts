@@ -48,22 +48,20 @@ export function createPaginatorDefault(): Paginator {
       `,
       { type: QueryTypes.SELECT },
     );
-    //
-    // records = raw.map(current => {
-    //   let id = current[0];
-    //   const url = `http://www.example.com/${id}`
-    //   const updated_at: Date = current[1]
-    //   return {
-    //     url,
-    //     updated_at: updated_at.toISOString()
-    //   }
-    // })
-    //
-    // return {
-    //   links: records
-    // }
 
-    return { links: [] };
+    records = raw.map((current) => {
+      let id = current[0];
+      const url = `http://www.example.com/${id}`;
+      const updated_at: Date = current[1];
+      return {
+        url,
+        updated_at: updated_at.toISOString(),
+      };
+    });
+
+    return {
+      links: records,
+    };
   }
 
   return { hasNext, next };

@@ -33,7 +33,7 @@ export function createAsyncWriterMock() {
   return { write, written };
 }
 
-function createAsyncWriterS3(): AsyncWriter {
+export function createAsyncWriterS3(): AsyncWriter {
   async function write(filename: string, content: string): Promise<Resource> {
     const params: S3.Types.PutObjectRequest = {
       Bucket: 'assets.commonwealth.im',
