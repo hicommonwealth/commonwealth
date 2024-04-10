@@ -36,7 +36,7 @@ export function createAsyncWriterMock() {
 export function createAsyncWriterS3(): AsyncWriter {
   async function write(filename: string, content: string): Promise<Resource> {
     const params: S3.Types.PutObjectRequest = {
-      Bucket: 'assets.commonwealth.im',
+      Bucket: 'common-sitemap',
       Key: `${filename}`,
       Body: content,
       ContentType: 'text/xml; charset=utf-8',
