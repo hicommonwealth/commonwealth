@@ -1,7 +1,8 @@
 import { Projection, schemas } from '@hicommonwealth/core';
 
 const inputs = {
-  ContestManagerDeployed: schemas.events.ContestManagerDeployed,
+  ContestManagerDeployed: schemas.events.RecurringContestManagerDeployed,
+  OneOffContestManagerDeployed: schemas.events.OneOffContestManagerDeployed,
   ContestStarted: schemas.events.ContestStarted,
   ContestContentAdded: schemas.events.ContestContentAdded,
   ContestContentUpvoted: schemas.events.ContestContentUpvoted,
@@ -11,7 +12,8 @@ const inputs = {
 export const Contests: Projection<typeof inputs> = () => ({
   inputs,
   body: {
-    ContestManagerDeployed: async () => {},
+    RecurringContestManagerDeployed: async () => {},
+    OneOffContestManagerDeployed: async () => {},
     ContestStarted: async () => {},
     ContestContentAdded: async () => {},
     ContestContentUpvoted: async () => {},

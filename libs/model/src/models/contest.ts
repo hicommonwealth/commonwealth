@@ -9,14 +9,13 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<Contest>>sequelize.define<Contest>(
     'Contest',
     {
+      contest: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+      },
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-      },
-      contest: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        references: { model: 'ContestManagers', key: 'address' }, // TODO: can we enforce typings in references
       },
       startTime: {
         type: Sequelize.DATE,

@@ -8,21 +8,11 @@ export type DB = Models<typeof Factories> & {
 };
 
 /**
- * Association options
- * @param targetKey target attribute, defaults to the PK of the target model
+ * Builds on-to-many association between two models,
+ * @param parent parent model with PK
+ * @param child child model with FK
+ * @param foreignKey the foreign key field in the child model - sequelize defaults the PK
  * @param optional true to allow children without parents (null FKs), defaults to false
- */
-type ManyOptions<T extends Record<string, unknown>> = {
-  targetKey?: keyof T & string;
-  optional?: boolean;
-};
-
-/**
- * Builds on-to-many association between two models
- * @param parent parent model with target field
- * @param child child model with FK field
- * @param foreignKey FK field in child model
- * @param options association options
  */
 const oneToMany = <
   Parent extends Record<string, unknown>,
@@ -31,12 +21,57 @@ const oneToMany = <
   parent: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   foreignKey: keyof Child & string,
-  options?: ManyOptions<Parent>,
+  optional?: boolean,
 ) => {
+  // this can be optional
   parent.hasMany(child, {
-    foreignKey: { name: foreignKey, allowNull: options?.optional },
+    foreignKey: { name: foreignKey, allowNull: optional },
   });
-  child.belongsTo(parent, { foreignKey, targetKey: options?.targetKey });
+  // this can be optional
+  child.belongsTo(parent, { foreignKey });
+};
+
+/**
+ * Composite key mappings (must match field names in parent and child)
+ */
+type CompositeKey<
+  Parent extends Record<string, unknown>,
+  Child extends Record<string, unknown>,
+> = Array<keyof Parent & keyof Child & string>;
+
+/**
+ * Builds composite FK constraints (not supported by sequelize)
+ * @param parent parent model with target field
+ * @param child child model with FK field
+ * @param key composite key
+ * @param drop drops key instead (to avoid SequelizeUnknownConstraintError on sync)
+ */
+export const buildCompositeFK = <
+  Parent extends Record<string, unknown>,
+  Child extends Record<string, unknown>,
+>(
+  parent: ModelStatic<Model<Parent>>,
+  child: ModelStatic<Model<Child>>,
+  key: CompositeKey<Parent, Child>,
+  drop = false,
+) => {
+  const fkName = `${child.tableName}_${parent.tableName}_fkey`;
+  const fk = key.map((k) => k).join(',');
+  child.sequelize?.query(
+    drop
+      ? `
+      DO $$
+      BEGIN
+        IF EXISTS(SELECT 1 FROM pg_constraint WHERE conname = '${fkName}') THEN
+          ALTER TABLE "${child.tableName}" DROP CONSTRAINT "${fkName}";
+        END IF;
+      END $$;
+      `
+      : `
+    ALTER TABLE "${child.tableName}" ADD CONSTRAINT "${fkName}"
+    FOREIGN KEY (${fk}) REFERENCES "${parent.tableName}"(${fk});
+    `,
+  );
 };
 
 /**
@@ -71,7 +106,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
    */
   oneToMany(db.Community, db.ContestManager, 'communityId');
   oneToMany(db.ContestManager, db.Contest, 'contest');
-  oneToMany(db.Contest, db.ContestAction, 'id');
+  oneToMany(db.Contest, db.ContestAction, 'contest');
 
   return db;
 };

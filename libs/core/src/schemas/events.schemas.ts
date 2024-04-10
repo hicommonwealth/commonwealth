@@ -58,39 +58,49 @@ export const EventMetadata = z.object({
 });
 
 // on-chain contest manager events
-export const ContestManagerDeployed = EventMetadata.extend({
+export const RecurringContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
   contest: z.string().describe('Contest manager address'),
   interval: z.number().int().positive().describe('Recurring constest interval'),
-  oneOff: z.boolean().describe('Flags one-off contests'),
-}).describe('When a contest contract manager gets deployed');
+}).describe('When a new recurring contest manager gets deployed');
 
-export const ContestStarted = EventMetadata.extend({
+export const OneOffContestManagerDeployed = EventMetadata.extend({
+  namespace: z.string().describe('Community namespace'),
   contest: z.string().describe('Contest manager address'),
-  contestId: z.number().int().describe('New contest instance id'),
+  length: z.number().int().positive().describe('Length of contest in days'),
+}).describe('When a new one-off contest manager gets deployed');
+
+const ContestManagerEvent = EventMetadata.extend({
+  contest: z.string().describe('Contest manager address'),
+  contestId: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Recurring contest id'),
+});
+
+export const ContestStarted = ContestManagerEvent.extend({
   startTime: z.date().describe('Contest start time'),
   endTime: z.date().describe('Contest end time'),
 }).describe('When a contest instance gets started');
 
-export const ContestContentAdded = EventMetadata.extend({
-  contest: z.string().describe('Contest manager address'),
-  contestId: z.number().describe('Contest instance id'),
-  contentId: z.number().describe('New content id'),
+export const ContestContentAdded = ContestManagerEvent.extend({
+  contentId: z.number().int().positive().describe('New content id'),
   creator: z.string().describe('Address of content creator'),
   url: z.string().describe('Content url'),
 }).describe('When new content is added to a running contest');
 
-export const ContestContentUpvoted = EventMetadata.extend({
-  contest: z.string().describe('Contest manager address'),
-  contestId: z.number().describe('Contest instance id'),
-  contentId: z.number().describe('New content id'),
+export const ContestContentUpvoted = ContestManagerEvent.extend({
+  contentId: z.number().int().positive().describe('Content id'),
   address: z.string().describe('Address upvoting on content'),
-  weight: z.number().describe('Stake weight of address upvoting on content'),
+  weight: z
+    .number()
+    .int()
+    .describe('Stake weight of address upvoting on content'),
 }).describe('When users upvote content on running contest');
 
-export const ContestWinnersRecorded = EventMetadata.extend({
-  contest: z.string().describe('Contest manager address'),
-  contestId: z.number().describe('Contest instance id'),
+export const ContestWinnersRecorded = ContestManagerEvent.extend({
   winners: z
     .array(z.string())
     .describe('Ranked contest-winning creator addresses'),

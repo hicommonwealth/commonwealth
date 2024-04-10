@@ -11,16 +11,13 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestManager>>sequelize.define<ContestManager>(
     'ContestManager',
     {
-      address: {
+      contest: {
         type: Sequelize.STRING,
         primaryKey: true,
-        unique: true,
-        allowNull: false,
       },
       communityId: {
         type: Sequelize.STRING,
         allowNull: false,
-        references: { model: 'Communities' },
       },
       interval: {
         type: Sequelize.INTEGER,

@@ -11,26 +11,25 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestAction>>sequelize.define<ContestAction>(
     'ContestAction',
     {
+      contest: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+      },
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        allowNull: false,
-        references: { model: 'Contests' },
       },
       contentId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        allowNull: false,
       },
       address: {
         type: Sequelize.STRING,
         primaryKey: true,
-        allowNull: false,
       },
       action: {
         type: Sequelize.ENUM(...schemas.projections.CONSTEST_ACTIONS),
         primaryKey: true,
-        allowNull: false,
       },
       contentUrl: {
         type: Sequelize.STRING,

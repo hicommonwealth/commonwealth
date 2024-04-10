@@ -3,7 +3,7 @@ import path from 'node:path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
-import { buildDb, type DB } from '../models';
+import { buildCompositeFK, buildDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
@@ -184,7 +184,7 @@ ORDER BY 1, 2;`,
   return tables;
 };
 
-let testdb: DB | undefined = undefined;
+let db: DB | undefined = undefined;
 /**
  * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
  * and creating/migrating a fresh instance if it doesn't exist.
@@ -196,10 +196,10 @@ export const bootstrap_testing = async (
   log = false,
 ): Promise<DB> => {
   if (!TESTING) throw new Error('Seeds only work when testing!');
-  if (!testdb) {
+  if (!db) {
     await verify_db(TEST_DB_NAME);
     try {
-      testdb = buildDb(
+      db = buildDb(
         new Sequelize({
           dialect: 'postgres',
           database: TEST_DB_NAME,
@@ -208,16 +208,25 @@ export const bootstrap_testing = async (
           logging: false,
         }),
       );
-      await testdb.sequelize.sync({
+
+      // TODO: find better place to do this (hooks?)
+      buildCompositeFK(db.Contest, db.ContestAction, ['contest', 'id'], true);
+      buildCompositeFK(db.ContestManager, db.Contest, ['contest'], true);
+
+      await db.sequelize.sync({
         force: true,
         logging: log ? console.log : false,
       });
+
+      // TODO: find better place to do this (hooks?)
+      buildCompositeFK(db.Contest, db.ContestAction, ['contest', 'id']);
+      buildCompositeFK(db.ContestManager, db.Contest, ['contest']);
     } catch (error) {
       console.error('Error bootstrapping test db:', error);
       throw error;
     }
-  } else if (truncate) await truncate_db(testdb);
-  return testdb;
+  } else if (truncate) await truncate_db(db);
+  return db;
 };
 
-TESTING && dispose(async () => truncate_db(testdb));
+TESTING && dispose(async () => truncate_db(db));
