@@ -136,22 +136,18 @@ export default (
     });
     models.User.hasOne(models.SubscriptionPreference, {
       foreignKey: 'user_id',
-      sourceKey: 'id',
       as: 'SubscriptionPreferences',
     });
     models.User.hasMany(models.Community, {
       foreignKey: 'user_id',
-      sourceKey: 'ids',
       as: 'CommunityAlerts',
     });
     models.User.hasMany(models.ThreadSubscription, {
       foreignKey: 'user_id',
-      sourceKey: 'ids',
       as: 'ThreadSubscriptions',
     });
     models.User.hasMany(models.CommentSubscription, {
       foreignKey: 'user_id',
-      sourceKey: 'ids',
       as: 'CommentSubscriptions',
     });
   };

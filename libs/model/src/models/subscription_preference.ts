@@ -76,5 +76,6 @@ export default (
       foreignKey: 'user_id',
     });
   };
+
   return SubscriptionPreferences;
 };
