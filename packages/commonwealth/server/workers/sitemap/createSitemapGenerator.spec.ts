@@ -10,29 +10,27 @@ describe('createSitemapGenerator', function () {
 
     expect(community.id).to.not.equal(null);
 
-    const now = new Date();
-    const t = await models.Thread.create({
-      title: 'First post',
-      community_id: community.id,
-      kind: 'unknown',
-      created_at: now,
-      updated_at: now,
-    });
+    const nrPosts = 50;
 
-    // const writer = createAsyncWriterMock();
+    for (let i = 0; i < nrPosts; ++i) {
+      const now = new Date();
+
+      await models.Thread.create({
+        title: 'Post ' + i,
+        community_id: community.id,
+        kind: 'unknown',
+        created_at: now,
+        updated_at: now,
+      });
+    }
+
     const writer = createAsyncWriterS3();
-    //const paginator = createPaginatorMock(10, 50000);
-    const paginator = createPaginatorDefault();
+    const paginator = createPaginatorDefault(20);
 
     const sitemapGenerator = createSitemapGenerator(writer, paginator);
 
     const written = await sitemapGenerator.exec();
 
-    console.log(written);
-
-    // expect(Object.keys(writer.written).length).to.equal(1);
-    // expect(Object.keys(writer.written)).to.contain('sitemap-0.xml');
-    //
-    // console.log(writer.written)
+    expect(Object.keys(written.children.length)).to.equal(4);
   });
 });
