@@ -6,6 +6,7 @@ export const GetThreadsParamsSchema = z.object({
   thread_ids: z.coerce.number().int().array().optional(),
   active: z.string().optional(),
   search: z.string().optional(),
+  count: z.coerce.boolean().optional().default(false),
 });
 
 export const GetBulkThreadsParamsSchema = z.object({

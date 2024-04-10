@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
   fetchLatestProposals,
@@ -11,7 +11,7 @@ import {
   filterProposals,
 } from './util';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.
