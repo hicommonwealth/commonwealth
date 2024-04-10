@@ -209,8 +209,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
 
     const cosm = await import('@cosmjs/stargate');
-    const dbId = chain.meta.id;
-    let client;
+    // const dbId = chain.meta.id;
 
     // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
     // TODO: WARNING: this breaks Evmos txn signing with Keplr. Injective txn signing is already broken...
@@ -232,7 +231,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     //   );
     // }
 
-    client = await getSigningClient(chain.meta.node.url, wallet.offlineSigner);
+    const client = await getSigningClient(
+      chain.meta.node.url,
+      wallet.offlineSigner,
+    );
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
