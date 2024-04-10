@@ -12,7 +12,11 @@ export function createSitemapGenerator(
 ): SitemapGenerator {
   async function exec() {
     let idx = 0;
+
+    console.log('FIXME 0');
+
     while (await paginator.hasNext()) {
+      console.log('FIXME 1');
       const page = await paginator.next();
       const sitemap = createSitemap(page.links);
       await writer.write(`sitemap-${idx++}.xml`, sitemap);

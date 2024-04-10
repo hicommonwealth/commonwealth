@@ -20,14 +20,17 @@ export function createAsyncWriter(type: 'mock' | 's3'): AsyncWriter {
   }
 }
 
-function createAsyncWriterMock(): AsyncWriter {
-  async function write(filename: string) {
+export function createAsyncWriterMock() {
+  const written: { [key: string]: string } = {};
+
+  async function write(filename: string, content: string) {
+    written[filename] = content;
     return {
       location: 'https://www.example.com/' + filename,
     };
   }
 
-  return { write };
+  return { write, written };
 }
 
 function createAsyncWriterS3(): AsyncWriter {

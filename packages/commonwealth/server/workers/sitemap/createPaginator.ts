@@ -31,10 +31,11 @@ export function createPaginatorMock(
   let idx = 0;
 
   async function hasNext() {
-    return pageIdx < maxPages;
+    return pageIdx <= maxPages;
   }
 
   async function next(): Promise<Page> {
+    ++pageIdx;
     const links = [
       {
         url: 'http://www.example.com/threads/' + idx++,
