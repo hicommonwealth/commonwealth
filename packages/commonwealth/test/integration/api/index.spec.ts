@@ -35,6 +35,7 @@ describe('API Tests', () => {
     it('should create an ETH address', async () => {
       const wallet = new SIWESigner({ chainId: 1 });
       const session = await wallet.getSession(CANVAS_TOPIC);
+      const address = session.address.split(':')[2];
 
       const chain = 'ethereum';
       const wallet_id = 'metamask';
@@ -43,7 +44,7 @@ describe('API Tests', () => {
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({
-          address: session.address,
+          address,
           community_id: chain,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
@@ -51,7 +52,7 @@ describe('API Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
-      expect(res.body.result.address).to.be.equal(session.address);
+      expect(res.body.result.address).to.be.equal(address);
       expect(res.body.result.community_id).to.equal(chain);
       expect(res.body.result.verification_token).to.be.not.null;
     });
@@ -88,6 +89,7 @@ describe('API Tests', () => {
       const session = await sessionSigner.getSession(CANVAS_TOPIC, {
         timestamp,
       });
+      const address = session.address.split(':')[2];
 
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
@@ -96,7 +98,7 @@ describe('API Tests', () => {
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({
-          address: session.address,
+          address,
           community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
@@ -107,7 +109,7 @@ describe('API Tests', () => {
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
         .send({
-          address: session.address,
+          address,
           community_id,
           wallet_id,
           session: stringify(encode(session)),

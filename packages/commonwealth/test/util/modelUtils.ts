@@ -432,6 +432,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         chain,
         address: address.split(':')[2],
         parent_id: parentCommentId || null,
+        thread_id,
         text,
         jwt,
         ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
@@ -653,7 +654,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         .post('/api/linkExistingAddressToCommunity')
         .set('Accept', 'application/json')
         .send({
-          address,
+          address: address.split(':')[2],
           community_id: chain,
           originChain,
           jwt,
