@@ -26,7 +26,9 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
-export function createPaginatorDefault(limit: number = 50000): Paginator {
+export function createDatabasePaginatorDefault(
+  limit: number = 50000,
+): Paginator {
   // the page we're on...
   let idx = 0;
 
@@ -85,7 +87,7 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
   return { hasNext, next };
 }
 
-export function createPaginatorMock(
+export function createDatabasePaginatorMock(
   nrRecords: number,
   pageSize: number,
 ): Paginator {

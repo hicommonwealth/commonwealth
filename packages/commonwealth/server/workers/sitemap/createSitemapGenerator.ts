@@ -1,5 +1,5 @@
 import { AsyncWriter } from './createAsyncWriter';
-import { Paginator } from './createPaginator';
+import { Paginator } from './createDatabasePaginator';
 import { createSitemap } from './createSitemap';
 import { createSitemapIndex } from './createSitemapIndex';
 

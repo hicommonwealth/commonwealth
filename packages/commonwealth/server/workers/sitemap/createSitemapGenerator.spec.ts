@@ -1,7 +1,7 @@
 import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { createAsyncWriterS3 } from './createAsyncWriter';
-import { createPaginatorDefault } from './createPaginator';
+import { createDatabasePaginatorDefault } from './createDatabasePaginator';
 import { createSitemapGenerator } from './createSitemapGenerator';
 
 describe('createSitemapGenerator', function () {
@@ -25,7 +25,7 @@ describe('createSitemapGenerator', function () {
     }
 
     const writer = createAsyncWriterS3();
-    const paginator = createPaginatorDefault(20);
+    const paginator = createDatabasePaginatorDefault(20);
 
     const sitemapGenerator = createSitemapGenerator(writer, paginator);
 

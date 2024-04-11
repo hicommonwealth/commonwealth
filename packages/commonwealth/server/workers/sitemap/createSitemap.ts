@@ -1,5 +1,5 @@
 import { createBuffer } from './createBuffer';
-import { Link } from './createPaginator';
+import { Link } from './createDatabasePaginator';
 
 /**
  * Creates a sitemap XML string based on the provided links array.
