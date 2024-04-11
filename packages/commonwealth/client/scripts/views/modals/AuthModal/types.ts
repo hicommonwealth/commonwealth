@@ -13,7 +13,6 @@ export type BaseModalProps = {
     | ChainBase.Ethereum
     | ChainBase.CosmosSDK
     | ChainBase.Solana
-    | ChainBase.Base
     | ChainBase.Substrate;
 };
 
