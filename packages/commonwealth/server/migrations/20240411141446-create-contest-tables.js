@@ -37,7 +37,7 @@ CREATE TABLE public."ContestActions" (
   action public."enum_ContestActions_action" NOT NULL,
   content_url character varying(255) NOT NULL,
   weight integer NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp with time zone NOT NULL
 );
 ALTER TABLE ONLY public."ContestActions" ADD CONSTRAINT "ContestActions_pkey" 
 PRIMARY KEY (contest, contest_id, content_id, address, action);

@@ -1,5 +1,10 @@
-import { Actor, dispose, handleEvent, query } from '@hicommonwealth/core';
-import { EventNames } from '@hicommonwealth/core/src/schemas';
+import {
+  Actor,
+  dispose,
+  handleEvent,
+  query,
+  schemas,
+} from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
@@ -36,7 +41,7 @@ describe('Contests projection lifecycle', () => {
 
   it('should project events', async () => {
     await handleEvent(Contests(), {
-      name: EventNames.RecurringContestManagerDeployed,
+      name: schemas.EventNames.RecurringContestManagerDeployed,
       payload: {
         namespace,
         contest,
@@ -45,7 +50,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
     await handleEvent(Contests(), {
-      name: EventNames.ContestStarted,
+      name: schemas.EventNames.ContestStarted,
       payload: {
         contest,
         contestId,
@@ -55,7 +60,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
     await handleEvent(Contests(), {
-      name: EventNames.ContestContentAdded,
+      name: schemas.EventNames.ContestContentAdded,
       payload: {
         contest,
         contestId,
