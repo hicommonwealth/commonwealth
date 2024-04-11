@@ -1,6 +1,7 @@
 {
   "name": "@hicommonwealth/shared",
   "private": "true",
+  "type": "module",
   "version": "0.1.0",
   "description": "Client and Server Shared Utilities",
   "files": [
