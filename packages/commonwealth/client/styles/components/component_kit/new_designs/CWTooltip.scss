@@ -71,19 +71,8 @@
       @include tip(-4px, auto, auto, calc(50% - 8px));
 
       @include medium {
-        // left: calc(50% - 8px / 2);
         @include tip(-4px, auto, auto, calc(20% - 8px));
       }
-
-      // @include mediumAndUp {
-      //   // left: calc(50% - 8px / 2);
-      //   @include tip(-4px, auto, auto, calc(50% - 8px));
-      // }
-
-      // @include large {
-      //   // left: calc(50% - 8px / 2);
-      //   @include tip(-4px, auto, auto, calc(50% - 8px));
-      // }
     }
 
     &.tipLeft {
