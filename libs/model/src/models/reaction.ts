@@ -1,11 +1,12 @@
-import { logger, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export type ReactionAttributes = {
   address_id: number;
@@ -171,6 +172,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
+        { fields: ['thread_id'] },
         { fields: ['address_id'] },
         {
           fields: [

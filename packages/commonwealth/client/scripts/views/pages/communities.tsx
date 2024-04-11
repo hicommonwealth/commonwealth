@@ -2,7 +2,7 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityCategoryType,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import { findDenominationString } from 'helpers/findDenomination';
 import numeral from 'numeral';

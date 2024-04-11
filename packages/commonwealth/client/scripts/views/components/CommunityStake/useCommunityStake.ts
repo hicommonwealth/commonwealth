@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';

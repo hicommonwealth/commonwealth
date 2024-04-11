@@ -1,4 +1,4 @@
-import { AccessLevel } from '@hicommonwealth/core';
+import { AccessLevel } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';

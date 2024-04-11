@@ -12,7 +12,7 @@ import {
   ChainNetwork,
   CosmosGovernanceVersion,
   WalletId,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import BN from 'bn.js';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';

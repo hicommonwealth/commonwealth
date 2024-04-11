@@ -3,7 +3,7 @@ import {
   ChainNetwork,
   NotificationCategories,
   WebhookCategory,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import React, { useState } from 'react';
 import app from 'state';
 import '../../../styles/modals/webhook_settings_modal.scss';
