@@ -1,5 +1,6 @@
 import { Projection, schemas } from '@hicommonwealth/core';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 
 const inputs = {
   RecurringContestManagerDeployed:
@@ -19,12 +20,13 @@ export const Contests: Projection<typeof inputs> = () => ({
         where: { namespace: payload.namespace },
         raw: true,
       });
-      if (!community) throw Error('Community with namespace not found');
-
-      await models.ContestManager.create({
-        ...payload,
-        communityId: community.id!,
-      });
+      if (
+        mustExist(`Community with namespace: ${payload.namespace}`, community)
+      )
+        await models.ContestManager.upsert({
+          ...payload,
+          communityId: community.id!,
+        });
     },
 
     OneOffContestManagerDeployed: async ({ payload }) => {
@@ -32,40 +34,40 @@ export const Contests: Projection<typeof inputs> = () => ({
         where: { namespace: payload.namespace },
         raw: true,
       });
-      if (!community) throw Error('Community with namespace not found');
-
-      await models.ContestManager.create({
-        ...payload,
-        communityId: community.id!,
-        interval: 0,
-      });
+      if (
+        mustExist(`Community with namespace: ${payload.namespace}`, community)
+      )
+        await models.ContestManager.upsert({
+          ...payload,
+          communityId: community.id!,
+          interval: 0,
+        });
     },
 
     ContestStarted: async ({ payload }) => {
-      await models.Contest.create({
+      await models.Contest.upsert({
         ...payload,
         contestId: payload.contestId || 0,
       });
     },
 
     ContestContentAdded: async ({ payload }) => {
-      await models.ContestAction.create({
+      await models.ContestAction.upsert({
         ...payload,
         contestId: payload.contestId || 0,
         address: payload.creator,
         action: 'added',
         contentUrl: payload.url,
-        weight: 0, // TODO: find creator weight
+        weight: 0,
       });
     },
 
     ContestContentUpvoted: async ({ payload }) => {
-      await models.ContestAction.create({
+      await models.ContestAction.upsert({
         ...payload,
         contestId: payload.contestId || 0,
         action: 'upvoted',
-        contentUrl: '', // TODO: find url in add action,
-        weight: 0, // TODO: find actor weight
+        contentUrl: '',
       });
     },
 

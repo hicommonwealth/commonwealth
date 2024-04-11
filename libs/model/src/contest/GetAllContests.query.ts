@@ -6,6 +6,21 @@ export const GetAllContests: Query<
 > = () => ({
   ...schemas.queries.GetAllContests,
   auth: [],
-  body: ({ payload }) =>
-    models.ContestAction.findAll({ where: payload, raw: true }),
+  body: async ({ payload }) => {
+    const result = await models.Contest.findAll({
+      where: payload,
+      include: {
+        model: models.ContestAction,
+        attributes: [
+          'action',
+          'address',
+          'weight',
+          'contentId',
+          'contentUrl',
+          'createdAt',
+        ],
+      },
+    });
+    return result.map((r) => r.toJSON()) as any; // TODO: fix output schema
+  },
 });
