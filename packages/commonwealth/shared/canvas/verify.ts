@@ -5,7 +5,6 @@ import type {
   Session,
   Signature,
 } from '@canvas-js/interfaces';
-
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
 import { CANVAS_TOPIC } from './constants';

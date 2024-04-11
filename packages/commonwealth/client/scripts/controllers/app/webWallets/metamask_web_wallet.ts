@@ -10,7 +10,7 @@ import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 

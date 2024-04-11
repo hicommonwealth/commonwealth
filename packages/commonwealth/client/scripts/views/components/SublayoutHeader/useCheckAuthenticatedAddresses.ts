@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { CANVAS_TOPIC, chainBaseToCanvasChainId } from 'canvas';
 import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
 import { getSessionSigners } from 'shared/canvas/verify';

@@ -1,4 +1,5 @@
-import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { fileURLToPath } from 'node:url';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
@@ -7,7 +8,7 @@ import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export const Errors = {
   // TODO: write unit tests

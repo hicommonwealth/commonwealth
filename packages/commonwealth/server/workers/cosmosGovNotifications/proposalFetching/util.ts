@@ -1,12 +1,13 @@
 import { ProposalSDKType } from '@hicommonwealth/chains';
-import { CosmosGovernanceVersion, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { fileURLToPath } from 'node:url';
 import { AllCosmosProposals } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export function uint8ArrayToNumberBE(bytes) {
   if (!bytes) return 0;

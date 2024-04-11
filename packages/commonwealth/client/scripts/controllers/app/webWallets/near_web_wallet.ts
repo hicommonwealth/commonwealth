@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { SessionSigner } from '@canvas-js/interfaces';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import IWebWallet from '../../../models/IWebWallet';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login

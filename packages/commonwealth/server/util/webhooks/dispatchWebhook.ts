@@ -1,14 +1,14 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   CommunityInstance,
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
@@ -19,7 +19,7 @@ import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(

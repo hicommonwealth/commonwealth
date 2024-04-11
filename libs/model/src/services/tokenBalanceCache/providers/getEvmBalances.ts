@@ -1,4 +1,5 @@
-import { BalanceSourceType, logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'node:url';
 import Web3 from 'web3';
 import { models } from '../../../database';
@@ -10,7 +11,7 @@ import { __getErc721Balances } from './get_erc721_balances';
 import { __getEthBalances } from './get_eth_balances';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function getEvmBalances(
   options: GetEvmBalancesOptions,

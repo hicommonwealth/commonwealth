@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type {
   Action,
   Awaitable,
@@ -17,8 +18,6 @@ import type {
   Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-
-import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { encode, stringify } from '@ipld/dag-json';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';

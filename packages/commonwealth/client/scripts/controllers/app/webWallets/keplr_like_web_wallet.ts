@@ -5,7 +5,7 @@ import type {
 } from '@cosmjs/proto-signing';
 import type { ChainInfo } from '@keplr-wallet/types';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';

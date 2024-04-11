@@ -1,5 +1,5 @@
-import { DynamicTemplate } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { DynamicTemplate } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import moment from 'moment';
 import { Op } from 'sequelize';

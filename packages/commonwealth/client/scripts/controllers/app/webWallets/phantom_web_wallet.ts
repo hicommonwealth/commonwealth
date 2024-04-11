@@ -2,7 +2,7 @@ declare let window: any;
 
 import type { SessionSigner } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { constructSolanaSignerCWClass } from 'shared/canvas/sessionSigners';
 import IWebWallet from '../../../models/IWebWallet';
 

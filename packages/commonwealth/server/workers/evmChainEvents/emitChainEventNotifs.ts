@@ -1,22 +1,22 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  SupportedNetwork,
-  logger,
-} from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   CommunityAttributes,
   ContractAttributes,
   NotificationInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  SupportedNetwork,
+} from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
 import { RawEvmEvent } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,

@@ -7,7 +7,7 @@ import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
 import type { SessionSigner } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 
 import { constructSubstrateSignerCWClass } from 'shared/canvas/sessionSigners';
 import { addressSwapper } from 'shared/utils';

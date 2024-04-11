@@ -1,15 +1,15 @@
+import { logger } from '@hicommonwealth/logging';
+import type { UserAttributes } from '@hicommonwealth/model';
+import { AddressAttributes, DB } from '@hicommonwealth/model';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import {
   DynamicTemplate,
   NotificationCategories,
-  logger,
-} from '@hicommonwealth/core';
-import type { UserAttributes } from '@hicommonwealth/model';
-import { AddressAttributes, DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +25,7 @@ import {
 import { SENDGRID_API_KEY } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 

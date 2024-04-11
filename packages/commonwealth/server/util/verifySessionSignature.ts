@@ -1,18 +1,18 @@
 import { Session } from '@canvas-js/interfaces';
-import { NotificationCategories, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   AddressInstance,
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import Sequelize from 'sequelize';
-
 import { getSessionSigners } from 'shared/canvas/verify';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const verifySessionSignature = async (
   models: DB,

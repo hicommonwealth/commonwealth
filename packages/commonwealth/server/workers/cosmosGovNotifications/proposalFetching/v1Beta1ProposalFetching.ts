@@ -1,5 +1,5 @@
 import { ProposalStatus } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { fileURLToPath } from 'node:url';
@@ -8,7 +8,7 @@ import { GovV1Beta1ClientType } from './types';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * See {@Link fetchLatestCosmosProposalV1}. Same logic applies, but for

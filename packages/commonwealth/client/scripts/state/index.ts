@@ -1,4 +1,4 @@
-import { CommunityCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';

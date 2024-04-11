@@ -1,8 +1,8 @@
+import { CommunityInstance } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
-} from '@hicommonwealth/core';
-import { CommunityInstance } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import _ from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';

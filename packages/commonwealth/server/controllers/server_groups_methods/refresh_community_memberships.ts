@@ -1,4 +1,5 @@
-import { AppError, logger } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   AddressAttributes,
   Balances,
@@ -21,7 +22,7 @@ import validateGroupMembership from '../../util/requirementsModule/validateGroup
 import { ServerGroupsController } from '../server_groups_controller';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const Errors = {
   GroupNotFound: 'Group not found',

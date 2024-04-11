@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionSigner } from '@canvas-js/interfaces';

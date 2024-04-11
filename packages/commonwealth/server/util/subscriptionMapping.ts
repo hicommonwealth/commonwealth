@@ -1,12 +1,12 @@
+import { logger } from '@hicommonwealth/logging';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
-  logger,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * This function maps fields from the different notification data objects to Subscription model fields. It returns an

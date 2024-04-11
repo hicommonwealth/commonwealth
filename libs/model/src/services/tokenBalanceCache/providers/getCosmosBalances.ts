@@ -1,5 +1,6 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { BalanceSourceType, logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'node:url';
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
@@ -9,7 +10,7 @@ import { __getCw20Balances } from './get_cw20_balances';
 import { __getCw721Balances } from './get_cw721_balances';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function getCosmosBalances(
   options: GetCosmosBalancesOptions,

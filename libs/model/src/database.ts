@@ -1,11 +1,11 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'node:url';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI, TESTING } from './config';
 import { buildDb } from './models';
 
 const __filename = fileURLToPath(import.meta.url);
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 !process.env.DATABASE_URL &&
   process.env.NODE_ENV !== 'production' &&

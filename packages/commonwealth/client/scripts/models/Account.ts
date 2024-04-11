@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 

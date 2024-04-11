@@ -1,16 +1,15 @@
-import z from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import {
-  BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
   DefaultPage,
-  NodeHealth,
   NotificationCategories,
-} from '../types';
+} from '@hicommonwealth/shared';
+import z from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
+import { BalanceSourceType, NodeHealth } from '../types';
 import * as events from './events.schemas';
 import { EventNames, discordMetaSchema, linksSchema } from './utils.schemas';
 

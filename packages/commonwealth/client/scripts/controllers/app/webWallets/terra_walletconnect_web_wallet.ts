@@ -3,7 +3,7 @@ import type {
   WalletController,
 } from '@terra-money/wallet-provider';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
 import IWebWallet from '../../../models/IWebWallet';
 
