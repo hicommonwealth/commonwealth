@@ -18,11 +18,12 @@ FOREIGN KEY (community_id) REFERENCES public."Communities"(id) ON UPDATE CASCADE
 
 CREATE TABLE public."Contests" (
   contest character varying(255) NOT NULL,
-  id integer NOT NULL,
+  contest_id integer NOT NULL,
   start_time timestamp with time zone NOT NULL,
-  end_time timestamp with time zone NOT NULL
+  end_time timestamp with time zone NOT NULL,
+  winners character varying(255)[]
 );
-ALTER TABLE ONLY public."Contests" ADD CONSTRAINT "Contests_pkey" PRIMARY KEY (contest, id);
+ALTER TABLE ONLY public."Contests" ADD CONSTRAINT "Contests_pkey" PRIMARY KEY (contest, contest_id);
 CREATE INDEX contests_start_time ON public."Contests" USING btree (start_time);
 ALTER TABLE ONLY public."Contests" ADD CONSTRAINT "Contests_contestmanagers_fkey" 
 FOREIGN KEY (contest) REFERENCES public."ContestManagers"(contest);
@@ -30,19 +31,18 @@ FOREIGN KEY (contest) REFERENCES public."ContestManagers"(contest);
 CREATE TYPE public."enum_ContestActions_action" AS ENUM ('added', 'upvoted');
 CREATE TABLE public."ContestActions" (
   contest character varying(255) NOT NULL,
-  id integer NOT NULL,
+  contest_id integer NOT NULL,
   content_id integer NOT NULL,
   address character varying(255) NOT NULL,
   action public."enum_ContestActions_action" NOT NULL,
   content_url character varying(255) NOT NULL,
   weight integer NOT NULL,
   created_at timestamp with time zone NOT NULL,
-  winners character varying(255)[]
 );
 ALTER TABLE ONLY public."ContestActions" ADD CONSTRAINT "ContestActions_pkey" 
-PRIMARY KEY (contest, id, content_id, address, action);
+PRIMARY KEY (contest, contest_id, content_id, address, action);
 ALTER TABLE ONLY public."ContestActions" ADD CONSTRAINT "ContestActions_contests_fkey" 
-FOREIGN KEY (contest, id) REFERENCES public."Contests"(contest, id);
+FOREIGN KEY (contest, contest_id) REFERENCES public."Contests"(contest, contest_id);
         `,
         {
           transaction: t,

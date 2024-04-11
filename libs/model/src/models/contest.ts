@@ -13,7 +13,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      id: {
+      contestId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
@@ -25,11 +25,15 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.DATE,
         allowNull: false,
       },
+      winners: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+      },
     },
     {
       tableName: 'Contests',
       timestamps: false,
       underscored: true,
       indexes: [{ fields: ['start_time'] }], // TODO: can we enforce typings in indexes?
+      // hooks: syncHooks,
     },
   );

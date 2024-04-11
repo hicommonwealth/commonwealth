@@ -15,7 +15,7 @@ export type DB = Models<typeof Factories> & {
 export const syncDb = async (db: DB, log = false) => {
   // TODO: build this map when creating one to many associations with composite keys
   const compositeKeys = [
-    mapFk(db.Contest, db.ContestAction, ['contest', 'id']),
+    mapFk(db.Contest, db.ContestAction, ['contest', 'contestId']),
     mapFk(db.ContestManager, db.Contest, ['contest']),
   ];
 

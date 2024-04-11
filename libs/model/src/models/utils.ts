@@ -1,4 +1,4 @@
-import { Model, ModelStatic, Sequelize } from 'sequelize';
+import { Model, ModelStatic, Sequelize, SyncOptions } from 'sequelize';
 import type { CompositeKey, State } from './types';
 
 /**
@@ -29,7 +29,7 @@ export const mapFk = <Parent extends State, Child extends State>(
   parent: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   key: CompositeKey<Parent, Child>,
-) => ({ parent, child, key });
+) => ({ parent, child, key: key.map((k) => parent.getAttributes()[k].field!) });
 
 /**
  * Creates composite FK constraints (not supported by sequelize)
@@ -69,4 +69,22 @@ export const dropFk = (
       END $$;
       `,
   );
+};
+
+/**
+ * Model sync hooks that can be used to inspect sequelize generated scripts
+ */
+export const syncHooks = {
+  beforeSync(options: SyncOptions) {
+    options.logging = (sql) => {
+      const s = sql.replace('Executing (default): ', '');
+      if (!s.startsWith('SELECT')) {
+        console.info('--', this);
+        s.split(';').forEach((l) => console.info(l));
+      }
+    };
+  },
+  afterSync(options: SyncOptions) {
+    options.logging = false;
+  },
 };

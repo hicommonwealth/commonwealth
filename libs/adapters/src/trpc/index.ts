@@ -134,7 +134,7 @@ export const event = <
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await core.eventHandler(
+        return await core.handleEvent(
           md,
           { name: name as core.schemas.Events, payload },
           false,

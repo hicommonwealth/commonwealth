@@ -15,7 +15,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      id: {
+      contestId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
@@ -40,14 +40,12 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
       },
       createdAt: { type: Sequelize.DATE, allowNull: false },
-      winners: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-      },
     },
     {
       tableName: 'ContestActions',
       timestamps: false,
       underscored: true,
       indexes: [],
+      // hooks: syncHooks,
     },
   );

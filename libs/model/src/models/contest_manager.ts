@@ -31,5 +31,6 @@ export default (sequelize: Sequelize.Sequelize) =>
       timestamps: false,
       underscored: true,
       indexes: [],
+      // hooks: syncHooks,
     },
   );
