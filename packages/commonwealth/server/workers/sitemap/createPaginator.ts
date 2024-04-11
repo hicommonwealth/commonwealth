@@ -1,6 +1,6 @@
 import { models, ThreadInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { slugify } from 'utils';
+import { getThreadUrl } from 'utils';
 
 export interface Link {
   readonly id: number;
@@ -40,24 +40,18 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
 
   type ThreadRecordPartial = Pick<
     ThreadInstance,
-    'id' | 'updated_at' | 'title'
+    'id' | 'updated_at' | 'title' | 'community_id'
   >;
 
-  // FIXME need to use getThreadUrl andI need to pull out the right parameters.
-
-  type ThreadPartial = ThreadRecordPartial & {
-    readonly community_name: string;
-  };
+  type ThreadPartial = ThreadRecordPartial & {};
 
   async function next(): Promise<Page> {
     ++idx;
 
     const raw = await models.sequelize.query(
       `
-          SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Communities".name as 'community_type', "Communities".chain as 'community_type_id' 
+          SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Threads".community_id 
           FROM "Threads"
-          LEFT JOIN "Communities"
-            ON "Threads".community_id = "Communities".id
           WHERE "Threads".id > ${ptr}
           ORDER BY "Threads".id 
           LIMIT ${limit};
@@ -67,11 +61,11 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
 
     records = raw.map((current) => {
       const currentThread = current as ThreadPartial;
-      const titleSlug = slugify(currentThread.title);
-      // FIXME: is the slug function right?
-      // getThreadUrl
-
-      const url = `https://commonwealth.im/${currentThread.community_name}/discussion/${currentThread.id}-${titleSlug}`;
+      const url = getThreadUrl({
+        chain: currentThread.community_id,
+        id: currentThread.id,
+        title: currentThread.title,
+      });
       return {
         id: currentThread.id,
         url,
