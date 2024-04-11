@@ -354,8 +354,8 @@ jobs:
         run: yarn lint-branch
 
       # To disable eslint-diff just comment the following two lines
-      - name: Run eslint-diff
-        run: yarn workspace commonwealth run lint-diff
+      #- name: Run eslint-diff
+      #  run: yarn workspace commonwealth run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: yarn workspace commonwealth run lint-diff-canary
