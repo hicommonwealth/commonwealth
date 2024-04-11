@@ -186,26 +186,6 @@ module.exports = {
       );
       console.log('Thread Subscriptions done');
 
-      await queryInterface.sequelize.query(
-        `
-          CREATE OR REPLACE FUNCTION insert_thread_subscription()
-          RETURNS TRIGGER AS $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM "ThreadSubscriptions"
-              WHERE user_id = NEW.subscriber_id
-                AND thread_id = NEW.thread_id
-            ) THEN
-              INSERT INTO "ThreadSubscriptions" (user_id, thread_id, created_at, updated_at)
-              VALUES (NEW.subscriber_id, NEW.thread_id, NEW.created_at, NEW.updated_at);
-            END IF;
-            RETURN NEW;
-          END;
-          $$ LANGUAGE plpgsql;
-        `,
-        { transaction },
-      );
-
       /**
        * Comment Subscriptions (subscribe to comments)
        */
@@ -270,26 +250,6 @@ module.exports = {
       );
       console.log('Comment Subscriptions done');
 
-      await queryInterface.sequelize.query(
-        `
-          CREATE OR REPLACE FUNCTION insert_comment_subscription()
-          RETURNS TRIGGER AS $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM "CommentSubscriptions"
-              WHERE user_id = NEW.subscriber_id
-                AND comment_id = NEW.comment_id
-            ) THEN
-              INSERT INTO "CommentSubscriptions" (user_id, comment_id, created_at, updated_at)
-              VALUES (NEW.subscriber_id, NEW.comment_id, NEW.created_at, NEW.updated_at);
-            END IF;
-            RETURN NEW;
-          END;
-          $$ LANGUAGE plpgsql;
-        `,
-        { transaction },
-      );
-
       /**
        * Community Alerts (subscribed to chain-events and snapshot proposals)
        */
@@ -349,26 +309,6 @@ module.exports = {
       );
       console.log('Community Alerts done');
 
-      await queryInterface.sequelize.query(
-        `
-          CREATE OR REPLACE FUNCTION insert_community_alert()
-          RETURNS TRIGGER AS $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM "CommunityAlerts"
-              WHERE user_id = NEW.subscriber_id
-                AND community_id = NEW.community_id
-            ) THEN
-              INSERT INTO "CommunityAlerts" (user_id, community_id, created_at, updated_at)
-              VALUES (NEW.subscriber_id, NEW.community_id, NEW.created_at, NEW.updated_at);
-            END IF;
-            RETURN NEW;
-          END;
-          $$ LANGUAGE plpgsql;
-        `,
-        { transaction },
-      );
-
       /**
        * Triggers for Thread/Comment Subscriptions and Community Alerts
        */
@@ -396,6 +336,7 @@ module.exports = {
         `,
         { transaction },
       );
+      console.log('old_subscriptions_delete function created');
 
       await queryInterface.sequelize.query(
         `
@@ -406,6 +347,7 @@ module.exports = {
         `,
         { transaction },
       );
+      console.log('old_subscriptions_delete trigger created');
 
       await queryInterface.sequelize.query(
         `
@@ -413,11 +355,35 @@ module.exports = {
           RETURNS TRIGGER AS $$
           BEGIN
             IF NEW.category_id IN ('chain-event', 'snapshot-proposal') THEN
-              PERFORM insert_community_alert();
+              IF NOT EXISTS (
+                SELECT 1 FROM "CommunityAlerts"
+                WHERE user_id = NEW.subscriber_id
+                  AND community_id = NEW.community_id
+              ) THEN
+                INSERT INTO "CommunityAlerts" (user_id, community_id, created_at, updated_at)
+                VALUES (NEW.subscriber_id, NEW.community_id, NEW.created_at, NEW.updated_at);
+              END IF;
+              RETURN NEW;
             ELSIF NEW.category_id = 'new-comment-creation' AND NEW.comment_id IS NOT NULL THEN
-              PERFORM insert_comment_subscription();
+              IF NOT EXISTS (
+                SELECT 1 FROM "CommentSubscriptions"
+                WHERE user_id = NEW.subscriber_id
+                  AND comment_id = NEW.comment_id
+              ) THEN
+                INSERT INTO "CommentSubscriptions" (user_id, comment_id, created_at, updated_at)
+                VALUES (NEW.subscriber_id, NEW.comment_id, NEW.created_at, NEW.updated_at);
+              END IF;
+              RETURN NEW;
             ELSIF NEW.category_id = 'new-comment-creation' AND NEW.thread_id IS NOT NULL THEN
-              PERFORM insert_thread_subscription();
+              IF NOT EXISTS (
+                SELECT 1 FROM "ThreadSubscriptions"
+                WHERE user_id = NEW.subscriber_id
+                  AND thread_id = NEW.thread_id
+              ) THEN
+                INSERT INTO "ThreadSubscriptions" (user_id, thread_id, created_at, updated_at)
+                VALUES (NEW.subscriber_id, NEW.thread_id, NEW.created_at, NEW.updated_at);
+              END IF;
+              RETURN NEW;
             END IF;
             RETURN NEW;
           END;
@@ -425,6 +391,7 @@ module.exports = {
         `,
         { transaction },
       );
+      console.log('old_subscriptions_insert function created');
 
       await queryInterface.sequelize.query(
         `
@@ -433,6 +400,29 @@ module.exports = {
           FOR EACH ROW
           EXECUTE FUNCTION old_subscriptions_insert();
         `,
+        { transaction },
+      );
+      console.log('old_subscriptions_insert trigger created');
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE TRIGGER deactivating_subscription_trigger
+        AFTER UPDATE ON "Subscriptions"
+        FOR EACH ROW
+        WHEN (NEW.is_active = false AND OLD.is_active = true)
+        EXECUTE FUNCTION old_subscriptions_delete();
+      `,
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE TRIGGER activating_subscription_trigger
+        AFTER UPDATE ON "Subscriptions"
+        FOR EACH ROW
+        WHEN (NEW.is_active = true AND OLD.is_active = false)
+        EXECUTE FUNCTION old_subscriptions_insert();
+      `,
         { transaction },
       );
     });
@@ -446,6 +436,8 @@ module.exports = {
         DROP TRIGGER IF EXISTS insert_subscription_preference_trigger ON "Users";
         DROP TRIGGER IF EXISTS old_subscriptions_delete_trigger ON "Subscriptions";
         DROP TRIGGER IF EXISTS old_subscriptions_insert_trigger ON "Subscriptions";
+        DROP TRIGGER IF EXISTS deactivating_subscription_trigger ON "Subscriptions";
+        DROP TRIGGER IF EXISTS activating_subscription_trigger ON "Subscriptions";
       `,
         { transaction },
       );
@@ -454,9 +446,6 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         DROP FUNCTION IF EXISTS insert_subscription_preference();
-        DROP FUNCTION IF EXISTS insert_thread_subscription();
-        DROP FUNCTION IF EXISTS insert_comment_subscription();
-        DROP FUNCTION IF EXISTS insert_community_alert();
         DROP FUNCTION IF EXISTS old_subscriptions_delete();
         DROP FUNCTION IF EXISTS old_subscriptions_insert();
       `,
