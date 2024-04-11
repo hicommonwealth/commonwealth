@@ -1,9 +1,17 @@
-import { default as React, default as React } from 'react';
+import React from 'react';
 import app from 'state';
 import CommunityStakeStep from 'views/pages/CreateCommunity/steps/CommunityStakeStep';
 import AddressInfo from '../../../../../models/AddressInfo';
 
-const EnableStake = ({ ethChainId, onChangeStep }) => {
+type EnableStakeProps = {
+  ethChainId: string;
+  onChangeStep: () => void;
+};
+
+const EnableStake: React.FC<EnableStakeProps> = ({
+  ethChainId,
+  onChangeStep,
+}) => {
   const createdCommunityName = app.config.chains.getById(
     app.activeChainId(),
   ).name;
