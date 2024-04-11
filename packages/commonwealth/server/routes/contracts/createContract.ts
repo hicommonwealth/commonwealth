@@ -1,5 +1,4 @@
-import type { ContractType } from '@hicommonwealth/core';
-import { AbiType, AppError } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   ChainNodeAttributes,
   ContractAbiInstance,
@@ -8,6 +7,8 @@ import type {
   DB,
 } from '@hicommonwealth/model';
 import { hashAbi } from '@hicommonwealth/model';
+import type { ContractType } from '@hicommonwealth/shared';
+import { AbiType } from '@hicommonwealth/shared';
 import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';

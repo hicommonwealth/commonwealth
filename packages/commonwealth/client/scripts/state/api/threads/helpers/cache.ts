@@ -99,6 +99,7 @@ export const cacheTypes = {
   SINGLE_THREAD: 'single',
   BULK_THREADS: 'bulk',
   ACTIVE_THREADS: 'active',
+  COUNT_THREADS: 'count',
 };
 
 const updateCacheForBulkThreads = ({

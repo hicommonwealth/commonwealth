@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { toBN } from 'web3-utils';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
@@ -9,7 +9,7 @@ import {
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export type GetEthBalancesOptions = {
   chainNode: ChainNodeInstance;

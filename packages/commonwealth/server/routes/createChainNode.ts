@@ -1,5 +1,6 @@
-import { AppError, BalanceType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 export const Errors = {

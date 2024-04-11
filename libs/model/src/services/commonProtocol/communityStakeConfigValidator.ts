@@ -1,4 +1,5 @@
-import { AppError, commonProtocol } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { CommunityAttributes } from '../../models/community';
