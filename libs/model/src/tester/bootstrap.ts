@@ -3,7 +3,7 @@ import path from 'node:path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
-import { buildCompositeFK, buildDb, type DB } from '../models';
+import { buildDb, syncDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
@@ -208,19 +208,7 @@ export const bootstrap_testing = async (
           logging: false,
         }),
       );
-
-      // TODO: find better place to do this (hooks?)
-      buildCompositeFK(db.Contest, db.ContestAction, ['contest', 'id'], true);
-      buildCompositeFK(db.ContestManager, db.Contest, ['contest'], true);
-
-      await db.sequelize.sync({
-        force: true,
-        logging: log ? console.log : false,
-      });
-
-      // TODO: find better place to do this (hooks?)
-      buildCompositeFK(db.Contest, db.ContestAction, ['contest', 'id']);
-      buildCompositeFK(db.ContestManager, db.Contest, ['contest']);
+      await syncDb(db, log);
     } catch (error) {
       console.error('Error bootstrapping test db:', error);
       throw error;

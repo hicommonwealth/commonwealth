@@ -1,6 +1,7 @@
-import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 import { Factories } from './factories';
 import type { Models } from './types';
+import { createFk, dropFk, mapFk, oneToMany } from './utils';
 
 export type DB = Models<typeof Factories> & {
   sequelize: Sequelize;
@@ -8,69 +9,25 @@ export type DB = Models<typeof Factories> & {
 };
 
 /**
- * Builds on-to-many association between two models,
- * @param parent parent model with PK
- * @param child child model with FK
- * @param foreignKey the foreign key field in the child model - sequelize defaults the PK
- * @param optional true to allow children without parents (null FKs), defaults to false
+ * Wraps sequelize sync with the process of building composite foreign key constraints
+ * - This is not yet supported by sequelize
  */
-const oneToMany = <
-  Parent extends Record<string, unknown>,
-  Child extends Record<string, unknown>,
->(
-  parent: ModelStatic<Model<Parent>>,
-  child: ModelStatic<Model<Child>>,
-  foreignKey: keyof Child & string,
-  optional?: boolean,
-) => {
-  // this can be optional
-  parent.hasMany(child, {
-    foreignKey: { name: foreignKey, allowNull: optional },
+export const syncDb = async (db: DB, log = false) => {
+  // TODO: build this map when creating one to many associations with composite keys
+  const compositeKeys = [
+    mapFk(db.Contest, db.ContestAction, ['contest', 'id']),
+    mapFk(db.ContestManager, db.Contest, ['contest']),
+  ];
+
+  compositeKeys.forEach(({ parent, child }) =>
+    dropFk(db.sequelize, parent.tableName, child.tableName),
+  );
+  await db.sequelize.sync({
+    force: true,
+    logging: log ? console.log : false,
   });
-  // this can be optional
-  child.belongsTo(parent, { foreignKey });
-};
-
-/**
- * Composite key mappings (must match field names in parent and child)
- */
-type CompositeKey<
-  Parent extends Record<string, unknown>,
-  Child extends Record<string, unknown>,
-> = Array<keyof Parent & keyof Child & string>;
-
-/**
- * Builds composite FK constraints (not supported by sequelize)
- * @param parent parent model with target field
- * @param child child model with FK field
- * @param key composite key
- * @param drop drops key instead (to avoid SequelizeUnknownConstraintError on sync)
- */
-export const buildCompositeFK = <
-  Parent extends Record<string, unknown>,
-  Child extends Record<string, unknown>,
->(
-  parent: ModelStatic<Model<Parent>>,
-  child: ModelStatic<Model<Child>>,
-  key: CompositeKey<Parent, Child>,
-  drop = false,
-) => {
-  const fkName = `${child.tableName}_${parent.tableName}_fkey`;
-  const fk = key.map((k) => k).join(',');
-  child.sequelize?.query(
-    drop
-      ? `
-      DO $$
-      BEGIN
-        IF EXISTS(SELECT 1 FROM pg_constraint WHERE conname = '${fkName}') THEN
-          ALTER TABLE "${child.tableName}" DROP CONSTRAINT "${fkName}";
-        END IF;
-      END $$;
-      `
-      : `
-    ALTER TABLE "${child.tableName}" ADD CONSTRAINT "${fkName}"
-    FOREIGN KEY (${fk}) REFERENCES "${parent.tableName}"(${fk});
-    `,
+  compositeKeys.forEach(({ parent, child, key }) =>
+    createFk(db.sequelize, parent.tableName, child.tableName, key),
   );
 };
 
