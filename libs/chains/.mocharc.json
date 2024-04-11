@@ -1,0 +1,8 @@
+{
+  "require": [
+    "tsconfig-paths/register",
+    "source-map-support/register"
+  ],
+  "timeout": 20000,
+  "exit": true
+}
