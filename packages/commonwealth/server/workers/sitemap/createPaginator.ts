@@ -1,5 +1,6 @@
 import { models, ThreadInstance } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { slugify } from 'utils';
 
 export interface Link {
   readonly id: number;
@@ -37,15 +38,24 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
     return idx === 0 || records.length !== 0;
   }
 
-  type ThreadPartial = Pick<ThreadInstance, 'id' | 'updated_at'>;
+  type ThreadRecordPartial = Pick<
+    ThreadInstance,
+    'id' | 'updated_at' | 'title'
+  >;
+
+  type ThreadPartial = ThreadRecordPartial & {
+    readonly community_name: string;
+  };
 
   async function next(): Promise<Page> {
     ++idx;
 
     const raw = await models.sequelize.query(
       `
-          SELECT "Threads".id, "Threads".updated_at
+          SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Communities".name as 'community_name'
           FROM "Threads"
+          LEFT JOIN "Communities"
+            ON "Threads".community_id = "Communities".id
           WHERE "Threads".id > ${ptr}
           ORDER BY "Threads".id 
           LIMIT ${limit};
@@ -55,7 +65,9 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
 
     records = raw.map((current) => {
       const currentThread = current as ThreadPartial;
-      const url = `http://www.example.com/${currentThread.id}`;
+      const titleSlug = slugify(currentThread.title);
+      // FIXME: is the slug function right?
+      const url = `https://commonwealth.im/${currentThread.community_name}/discussion/${currentThread.id}-${titleSlug}`;
       return {
         id: currentThread.id,
         url,

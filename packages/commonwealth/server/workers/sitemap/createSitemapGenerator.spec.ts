@@ -31,6 +31,6 @@ describe('createSitemapGenerator', function () {
 
     const written = await sitemapGenerator.exec();
 
-    expect(Object.keys(written.children.length)).to.equal(4);
+    expect(written.children.length).to.equal(4);
   });
 });
