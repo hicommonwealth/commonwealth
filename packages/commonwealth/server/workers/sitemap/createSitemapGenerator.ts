@@ -18,18 +18,19 @@ export interface SitemapGenerator {
 
 export function createSitemapGenerator(
   writer: AsyncWriter,
-  paginator: Paginator,
+  paginators: ReadonlyArray<Paginator>,
 ): SitemapGenerator {
   async function exec(): Promise<SitemapManifest> {
     let idx = 0;
 
     let children = [];
-
-    while (await paginator.hasNext()) {
-      const page = await paginator.next();
-      const sitemap = createSitemap(page.links);
-      const res = await writer.write(`sitemap-${idx++}.xml`, sitemap);
-      children.push({ location: res.location });
+    for (const paginator of paginators) {
+      while (await paginator.hasNext()) {
+        const page = await paginator.next();
+        const sitemap = createSitemap(page.links);
+        const res = await writer.write(`sitemap-${idx++}.xml`, sitemap);
+        children.push({ location: res.location });
+      }
     }
 
     async function writeIndex() {
