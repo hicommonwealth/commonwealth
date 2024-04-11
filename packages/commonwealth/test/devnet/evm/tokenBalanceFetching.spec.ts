@@ -1,17 +1,12 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import {
-  BalanceSourceType,
-  BalanceType,
-  cache,
-  delay,
-  dispose,
-} from '@hicommonwealth/core';
+import { BalanceSourceType, cache, delay, dispose } from '@hicommonwealth/core';
 import {
   tester,
   tokenBalanceCache,
   type Balances,
   type DB,
 } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';

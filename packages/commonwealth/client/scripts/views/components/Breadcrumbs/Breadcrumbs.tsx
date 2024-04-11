@@ -57,6 +57,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     profileId,
     navigate,
+    app.isCustomDomain() ? app.activeChainId() : undefined,
     currentDiscussion,
   );
 

@@ -1,5 +1,6 @@
-import { AppError, ChainNetwork, ServerError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { providers } from 'ethers';
 import {
   GetProposalVotesOptions,

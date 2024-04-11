@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
 import type Contract from 'models/Contract';

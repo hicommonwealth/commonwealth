@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
 import type { DeltaStatic } from 'quill';

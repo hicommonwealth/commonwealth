@@ -1,4 +1,5 @@
-import { ChainNetwork, ServerError } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { providers } from 'ethers';
