@@ -1,4 +1,8 @@
-import { models, ThreadInstance } from '@hicommonwealth/model';
+import {
+  models,
+  ProfileAttributes,
+  ThreadInstance,
+} from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { getThreadUrl } from 'utils';
 
@@ -64,6 +68,39 @@ function createThreadsTableAdapter(): TableAdapter {
           FROM "Threads"
           WHERE "Threads".id > ${ptr}
           ORDER BY "Threads".id
+          LIMIT ${limit};
+      `,
+      { type: QueryTypes.SELECT },
+    );
+  }
+  return { toRecord, executeQuery };
+}
+
+function createProfilesTableAdapter(): TableAdapter {
+  type ProfileInstancePartial = Required<Pick<ProfileAttributes, 'id'>> &
+    Pick<ProfileAttributes, 'updated_at'>;
+
+  function toRecord(obj: object) {
+    const profile = obj as ProfileInstancePartial;
+    const url = `https://commonwealth.im/profile/id/${profile.id}`;
+    return {
+      id: profile.id,
+      url,
+      updated_at: profile.updated_at.toISOString(),
+    };
+  }
+
+  async function executeQuery(
+    ptr: number,
+    limit: number,
+  ): Promise<ReadonlyArray<object>> {
+    return await models.sequelize.query(
+      `
+          SELECT "Profiles".id,
+                 "Profiles".updated_at
+          FROM "Profiles"
+          WHERE "Profiles".id > ${ptr}
+          ORDER BY "Profiles".id
           LIMIT ${limit};
       `,
       { type: QueryTypes.SELECT },
