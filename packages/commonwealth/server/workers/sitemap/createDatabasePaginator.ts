@@ -26,7 +26,54 @@ export interface Paginator {
   readonly next: () => Promise<Page>;
 }
 
-export function createDatabasePaginatorDefault(
+interface TableAdapter {
+  toRecord: (obj: object) => Link;
+  executeQuery: (ptr: number, limit: number) => Promise<ReadonlyArray<object>>;
+}
+
+function createThreadsTableAdapter(): TableAdapter {
+  type ThreadInstancePartial = Pick<
+    ThreadInstance,
+    'id' | 'updated_at' | 'title' | 'community_id'
+  >;
+
+  function toRecord(obj: object) {
+    const thread: ThreadInstancePartial = obj;
+    const url = getThreadUrl({
+      chain: thread.community_id,
+      id: thread.id,
+      title: thread.title,
+    });
+    return {
+      id: thread.id,
+      url,
+      updated_at: thread.updated_at.toISOString(),
+    };
+  }
+
+  async function executeQuery(
+    ptr: number,
+    limit: number,
+  ): Promise<ReadonlyArray<object>> {
+    return await models.sequelize.query(
+      `
+          SELECT "Threads".id,
+                 "Threads".updated_at,
+                 "Threads".title,
+                 "Threads".community_id
+          FROM "Threads"
+          WHERE "Threads".id > ${ptr}
+          ORDER BY "Threads".id
+          LIMIT ${limit};
+      `,
+      { type: QueryTypes.SELECT },
+    );
+  }
+  return { toRecord, executeQuery };
+}
+
+// TODO: next is profiles... I have to paginate that too.
+export function createDatabasePaginatorDefault<T>(
   limit: number = 50000,
 ): Paginator {
   // the page we're on...
@@ -34,42 +81,19 @@ export function createDatabasePaginatorDefault(
 
   let ptr = -1;
 
+  const adapter = createThreadsTableAdapter();
+
   let records: ReadonlyArray<Link> = [];
 
   async function hasNext() {
     return idx === 0 || records.length !== 0;
   }
 
-  type ThreadInstancePartial = Pick<
-    ThreadInstance,
-    'id' | 'updated_at' | 'title' | 'community_id'
-  >;
   async function next(): Promise<Page> {
     ++idx;
 
-    const raw: ReadonlyArray<ThreadInstancePartial> =
-      await models.sequelize.query(
-        `
-          SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Threads".community_id 
-          FROM "Threads"
-          WHERE "Threads".id > ${ptr}
-          ORDER BY "Threads".id 
-          LIMIT ${limit};
-      `,
-        { type: QueryTypes.SELECT },
-      );
-    records = raw.map((current) => {
-      const url = getThreadUrl({
-        chain: current.community_id,
-        id: current.id,
-        title: current.title,
-      });
-      return {
-        id: current.id,
-        url,
-        updated_at: current.updated_at.toISOString(),
-      };
-    });
+    const raw = await adapter.executeQuery(ptr, limit);
+    records = raw.map(adapter.toRecord);
 
     if (records.length > 0) {
       ptr = records[records.length - 1].id;
