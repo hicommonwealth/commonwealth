@@ -78,6 +78,10 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+
+const AdminStake = lazy(
+  () => import('views/pages/CommunityManagement/Integrations/Stake/StakePage'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -425,6 +429,13 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/integrations"
     path="/:scope/manage/integrations"
     element={withLayout(CommunityIntegrations, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/integrations/stake"
+    path="/:scope/manage/integrations/stake"
+    element={withLayout(AdminStake, {
       scoped: true,
     })}
   />,

@@ -41,6 +41,8 @@ const useReserveCommunityNamespace = ({
         errorText: '',
       });
 
+      console.log({ namespace, userAddress, chainId });
+
       const txReceipt = await namespaceFactory.deployNamespace(
         namespace,
         userAddress,

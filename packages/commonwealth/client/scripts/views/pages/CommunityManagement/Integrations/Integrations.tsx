@@ -6,6 +6,7 @@ import Directory from './Directory';
 import Discord from './Discord';
 import './Integrations.scss';
 import Snapshots from './Snapshots';
+import Stake from './Stake';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
@@ -23,6 +24,7 @@ const Integrations = () => {
     >
       <section className="Integrations">
         <Directory />
+        <Stake />
         <Snapshots />
         <Discord />
         <Webhooks />

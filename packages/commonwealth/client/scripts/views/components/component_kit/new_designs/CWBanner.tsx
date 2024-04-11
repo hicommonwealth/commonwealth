@@ -42,6 +42,9 @@ interface CWBannerProps {
   className?: string;
   onClose: () => void;
   footer?: ReactNode;
+  bodyClassName?: string;
+  headerClassName?: string;
+  hideCloseIcon?: boolean;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -64,6 +67,9 @@ const CWBanner = ({
   className,
   onClose,
   footer,
+  bodyClassName,
+  headerClassName,
+  hideCloseIcon,
 }: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
 
@@ -75,12 +81,16 @@ const CWBanner = ({
         </div>
       )}
       <div className="content-container">
-        <CWText type="b1" fontWeight="medium" className="header">
+        <CWText
+          type="b1"
+          fontWeight="medium"
+          className={clsx('header', headerClassName)}
+        >
           {title}
         </CWText>
         {body && (
           <div>
-            <CWText type="b2" className="body">
+            <CWText type="b2" className={clsx('body', bodyClassName)}>
               {body}
             </CWText>
           </div>
@@ -103,9 +113,16 @@ const CWBanner = ({
         )}
         {footer && <div className="footer">{footer}</div>}
       </div>
-      <div className="close-icon-container">
-        <X weight="light" size={20} className="close-icon" onClick={onClose} />
-      </div>
+      {hideCloseIcon ? null : (
+        <div className="close-icon-container">
+          <X
+            weight="light"
+            size={20}
+            className="close-icon"
+            onClick={onClose}
+          />
+        </div>
+      )}
     </div>
   );
 };

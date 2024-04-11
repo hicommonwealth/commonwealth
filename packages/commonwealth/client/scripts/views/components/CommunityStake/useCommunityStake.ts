@@ -30,6 +30,14 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
+  console.log({
+    activeCommunityId,
+    activeCommunityNamespace,
+    chainRpc,
+    ethChainId,
+    activeAccountAddress,
+  });
+
   const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
     useFetchCommunityStakeQuery({
       communityId: activeCommunityId,
@@ -87,6 +95,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
+    ethChainId,
   };
 };
 
