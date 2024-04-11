@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { UserAttributes } from '@hicommonwealth/model';
 import { AddressAttributes, DB } from '@hicommonwealth/model';
 import type {
@@ -22,7 +22,7 @@ import {
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
