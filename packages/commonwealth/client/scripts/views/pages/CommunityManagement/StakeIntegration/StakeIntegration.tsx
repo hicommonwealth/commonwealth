@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import React from 'react';
 import app from 'state';
 import { useCommunityStake } from 'views/components/CommunityStake';
