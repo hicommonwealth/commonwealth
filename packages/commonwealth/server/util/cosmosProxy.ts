@@ -2,7 +2,8 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { AppError, NodeHealth, logger } from '@hicommonwealth/core';
+import { AppError, NodeHealth } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { DB } from '@hicommonwealth/model';
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import axios from 'axios';
@@ -13,7 +14,7 @@ import {
   calcCosmosRPCCacheKeyDuration,
 } from './cosmosCache';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 const DEFAULT_CACHE_DURATION = 60 * 10; // 10 minutes
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300; // 5 min
 const Errors = {
