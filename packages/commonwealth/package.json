@@ -55,7 +55,7 @@
     "test-select": "NODE_ENV=test nyc ts-mocha",
     "test-suite": "NODE_ENV=test nyc ts-mocha './test/**/*.spec.ts'",
     "unit-test": "NODE_ENV=test ts-mocha './test/unit/seed_hack.spec.ts' && NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true ts-mocha './test/unit/**/*.spec.ts'",
-    "unit-test:watch": "NODE_ENV=test ts-mocha --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
+    "unit-test:watch": "NODE_ENV=test ts-mocha --timeout 10000 './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
     "refresh-all-memberships": "tsx -r tsconfig-paths/register ./scripts/refresh-all-memberships.ts",
     "cosmos:build": "chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh --build",
