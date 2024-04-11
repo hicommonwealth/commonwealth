@@ -35,6 +35,19 @@ interface TableAdapter {
   executeQuery: (ptr: number, limit: number) => Promise<ReadonlyArray<object>>;
 }
 
+export function createDatabasePaginatorDefault(limit: number = 50000) {
+  const threads = createDatabasePaginatorWithAdapter(
+    createThreadsTableAdapter(),
+    limit,
+  );
+  const profiles = createDatabasePaginatorWithAdapter(
+    createProfilesTableAdapter(),
+    limit,
+  );
+
+  return { threads, profiles };
+}
+
 function createThreadsTableAdapter(): TableAdapter {
   type ThreadInstancePartial = Pick<
     ThreadInstance,
@@ -109,16 +122,14 @@ function createProfilesTableAdapter(): TableAdapter {
   return { toRecord, executeQuery };
 }
 
-// TODO: next is profiles... I have to paginate that too.
-export function createDatabasePaginatorDefault<T>(
-  limit: number = 50000,
+export function createDatabasePaginatorWithAdapter<T>(
+  adapter: TableAdapter,
+  limit: number,
 ): Paginator {
   // the page we're on...
   let idx = 0;
 
   let ptr = -1;
-
-  const adapter = createThreadsTableAdapter();
 
   let records: ReadonlyArray<Link> = [];
 

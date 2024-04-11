@@ -27,10 +27,8 @@ describe('createSitemapGenerator', function () {
     const writer = createAsyncWriterS3();
     const paginator = createDatabasePaginatorDefault(20);
 
-    const sitemapGenerator = createSitemapGenerator(writer, paginator);
-
+    const sitemapGenerator = createSitemapGenerator(writer, paginator.threads);
     const written = await sitemapGenerator.exec();
-
     expect(written.children.length).to.equal(4);
   });
 });
