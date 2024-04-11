@@ -78,7 +78,7 @@ const CommunityTypeStep = ({
     handleContinue();
   };
 
-  const [blastOption, ethereumOption, ...advancedOptions] =
+  const [baseOption, blastOption, ethereumOption, ...advancedOptions] =
     communityTypeOptions;
 
   return (
@@ -92,11 +92,24 @@ const CommunityTypeStep = ({
       </CWText>
       <div className="advanced-options-container">
         <CWCommunitySelector
+          key={baseOption.type}
+          type={baseOption.type}
+          title={baseOption.title}
+          description={baseOption.description}
+          isRecommended={true}
+          onClick={() =>
+            handleCommunitySelection({
+              type: baseOption.type,
+              chainBase: ethereumOption.chainBase,
+            })
+          }
+        />
+        <CWCommunitySelector
           key={blastOption.type}
           type={blastOption.type}
           title={blastOption.title}
           description={blastOption.description}
-          isRecommended={true}
+          isRecommended={false}
           onClick={() =>
             handleCommunitySelection({
               type: blastOption.type,
