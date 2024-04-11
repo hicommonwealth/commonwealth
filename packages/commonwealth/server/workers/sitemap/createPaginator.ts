@@ -43,6 +43,8 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
     'id' | 'updated_at' | 'title'
   >;
 
+  // FIXME need to use getThreadUrl andI need to pull out the right parameters.
+
   type ThreadPartial = ThreadRecordPartial & {
     readonly community_name: string;
   };
@@ -52,7 +54,7 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
 
     const raw = await models.sequelize.query(
       `
-          SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Communities".name as 'community_name'
+          SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Communities".name as 'community_type', "Communities".chain as 'community_type_id' 
           FROM "Threads"
           LEFT JOIN "Communities"
             ON "Threads".community_id = "Communities".id
@@ -67,6 +69,8 @@ export function createPaginatorDefault(limit: number = 50000): Paginator {
       const currentThread = current as ThreadPartial;
       const titleSlug = slugify(currentThread.title);
       // FIXME: is the slug function right?
+      // getThreadUrl
+
       const url = `https://commonwealth.im/${currentThread.community_name}/discussion/${currentThread.id}-${titleSlug}`;
       return {
         id: currentThread.id,
