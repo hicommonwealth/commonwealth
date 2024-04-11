@@ -40,38 +40,34 @@ export function createDatabasePaginatorDefault(
     return idx === 0 || records.length !== 0;
   }
 
-  type ThreadRecordPartial = Pick<
+  type ThreadInstancePartial = Pick<
     ThreadInstance,
     'id' | 'updated_at' | 'title' | 'community_id'
   >;
-
-  type ThreadPartial = ThreadRecordPartial & {};
-
   async function next(): Promise<Page> {
     ++idx;
 
-    const raw = await models.sequelize.query(
-      `
+    const raw: ReadonlyArray<ThreadInstancePartial> =
+      await models.sequelize.query(
+        `
           SELECT "Threads".id, "Threads".updated_at, "Threads".title, "Threads".community_id 
           FROM "Threads"
           WHERE "Threads".id > ${ptr}
           ORDER BY "Threads".id 
           LIMIT ${limit};
       `,
-      { type: QueryTypes.SELECT },
-    );
-
+        { type: QueryTypes.SELECT },
+      );
     records = raw.map((current) => {
-      const currentThread = current as ThreadPartial;
       const url = getThreadUrl({
-        chain: currentThread.community_id,
-        id: currentThread.id,
-        title: currentThread.title,
+        chain: current.community_id,
+        id: current.id,
+        title: current.title,
       });
       return {
-        id: currentThread.id,
+        id: current.id,
         url,
-        updated_at: currentThread.updated_at.toISOString(),
+        updated_at: current.updated_at.toISOString(),
       };
     });
 
