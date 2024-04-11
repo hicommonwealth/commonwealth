@@ -1,17 +1,15 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
+import { EventHandler, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { models } from '@hicommonwealth/model';
 import {
-  EventHandler,
   NotificationCategories,
   SnapshotEventType,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 
 export const processSnapshotProposalCreated: EventHandler<
   'SnapshotProposalCreated',
@@ -37,7 +35,7 @@ export const processSnapshotProposalCreated: EventHandler<
     expire,
   };
 
-  log.info(`Processing snapshot message`, undefined, payload);
+  log.info(`Processing snapshot message`, payload);
 
   let proposal;
 

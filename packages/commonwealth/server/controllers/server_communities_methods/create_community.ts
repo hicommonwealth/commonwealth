@@ -1,14 +1,5 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import {
-  AppError,
-  BalanceType,
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  DefaultPage,
-  NotificationCategories,
-  schemas,
-} from '@hicommonwealth/core';
+import { AppError, schemas } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -16,6 +7,14 @@ import type {
   RoleAttributes,
 } from '@hicommonwealth/model';
 import { UserInstance } from '@hicommonwealth/model';
+import {
+  BalanceType,
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  DefaultPage,
+  NotificationCategories,
+} from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import axios from 'axios';

@@ -1,4 +1,4 @@
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import useWallets from 'client/scripts/hooks/useWallets';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';

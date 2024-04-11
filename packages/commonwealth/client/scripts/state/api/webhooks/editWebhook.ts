@@ -1,4 +1,4 @@
-import { WebhookCategory } from '@hicommonwealth/core';
+import { WebhookCategory } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Webhook from 'models/Webhook';
