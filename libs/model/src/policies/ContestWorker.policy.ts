@@ -1,5 +1,5 @@
 import { schemas, type Policy } from '@hicommonwealth/core';
-// noinspection ES6UnusedImports
+// prettier-ignore
 
 const inputs = {
   ThreadCreated: schemas.events.ThreadCreated,
