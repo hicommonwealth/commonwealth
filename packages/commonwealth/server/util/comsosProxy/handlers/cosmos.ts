@@ -5,6 +5,7 @@ import axios from 'axios';
 import type { Request, Response } from 'express';
 import _ from 'lodash';
 import {
+  IGNORE_COSMOS_CHAIN_IDS,
   queryExternalProxy,
   updateNodeHealthIfNeeded,
   upgradeBetaNodeIfNeeded,
@@ -100,7 +101,7 @@ export async function cosmosHandler(
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {
         requestType,
-        chainNode: community?.ChainNode,
+        cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
       });
       await updateNodeHealthIfNeeded(
         req,
@@ -109,6 +110,17 @@ export async function cosmosHandler(
           error: err,
         },
       );
+
+      if (
+        IGNORE_COSMOS_CHAIN_IDS.includes(community.ChainNode.cosmos_chain_id)
+      ) {
+        log.warn('Ignoring external proxy request for dev Cosmos chain', {
+          cosmos_chain_id: community.ChainNode.cosmos_chain_id,
+        });
+        return res.status(err?.response?.status || 500).json({
+          message: err?.message,
+        });
+      }
     }
   }
 

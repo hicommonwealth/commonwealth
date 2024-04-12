@@ -8,10 +8,12 @@ import {
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';
 import { Request } from 'express';
+import _ from 'lodash';
+
+export const IGNORE_COSMOS_CHAIN_IDS = ['csdk', 'evmosdev'];
 
 const log = logger(__filename);
 const DEVNET_COSMOS_ID_RE = /^(csdk|evmosdev)/;
-const IGNORE_COSMOS_CHAIN_IDS = ['csdk', 'evmosdev'];
 const IGNORE_COSMOS_METHODS = ['tx', 'auth'];
 const IGNORE_ERRORS = ['cosmos_chain_id is required'];
 
@@ -101,7 +103,6 @@ export async function updateSlip44IfNeeded(
     // don't need to throw here, just trying to update slip44 if available
     log.error('Error querying for registered chain', err, {
       cosmos_chain_id,
-      communityChainNode,
     });
   }
 }
@@ -154,7 +155,7 @@ export async function updateNodeHealthIfNeeded(
   } catch (err) {
     log.error('Error updating node health', err, {
       request: req,
-      chainNode: chainNode.toJSON(),
+      chainNodeId: chainNode.id,
       contextData,
     });
   }
@@ -165,13 +166,6 @@ export async function queryExternalProxy(
   webProtocol: 'RPC' | 'REST',
   chainNode: ChainNodeInstance,
 ) {
-  if (IGNORE_COSMOS_CHAIN_IDS.includes(chainNode.cosmos_chain_id)) {
-    log.warn('Ignoring external proxy request for dev Cosmos chain', {
-      cosmos_chain_id: chainNode.cosmos_chain_id,
-    });
-    return;
-  }
-
   let url: string;
   const proxyUrl = `https://${webProtocol}.cosmos.directory/${chainNode.cosmos_chain_id}`;
   if (webProtocol === 'RPC') {
@@ -180,11 +174,10 @@ export async function queryExternalProxy(
     url = req.originalUrl.replace(req.baseUrl, proxyUrl);
   }
 
-  const response = await axios.post(url, req.body, {
+  return await axios.post(url, _.isEmpty(req.body) ? null : req.body, {
     headers: {
       origin: 'https://commonwealth.im',
       Referer: process.env.COSMOS_PROXY_REFERER || 'https://commonwealth.im',
     },
   });
-  return response;
 }
