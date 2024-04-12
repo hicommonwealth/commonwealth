@@ -122,7 +122,7 @@ function createProfilesTableAdapter(): TableAdapter {
   return { toRecord, executeQuery };
 }
 
-export function createDatabasePaginatorWithAdapter<T>(
+export function createDatabasePaginatorWithAdapter(
   adapter: TableAdapter,
   limit: number,
 ): Paginator {
