@@ -3,6 +3,7 @@ import { logger } from '@hicommonwealth/logging';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
 import axios from 'axios';
 import type { Request, Response } from 'express';
+import _ from 'lodash';
 import {
   queryExternalProxy,
   updateNodeHealthIfNeeded,
@@ -35,23 +36,49 @@ export async function cosmosHandler(
   );
 
   if (
-    community.ChainNode.alt_wallet_url &&
-    (community.ChainNode.health === NodeHealth.Healthy ||
-      (community.ChainNode.health === NodeHealth.Failed &&
-        new Date() > nodeTimeoutEnd))
+    !community.ChainNode.health ||
+    community.ChainNode.health === NodeHealth.Healthy ||
+    (community.ChainNode.health === NodeHealth.Failed &&
+      new Date() > nodeTimeoutEnd)
   ) {
-    const url =
-      requestType === 'REST'
-        ? community.ChainNode.alt_wallet_url?.trim()
-        : community.ChainNode.private_url?.trim() ||
-          community.ChainNode.url?.trim();
+    let url: string;
+    console.log(
+      '\noriginalUrl',
+      req.originalUrl,
+      '\nbaseUrl',
+      req.baseUrl,
+      '\nurl',
+      req.url,
+    );
+    if (requestType === 'REST' && community.ChainNode.alt_wallet_url) {
+      url = req.originalUrl.replace(
+        req.baseUrl,
+        // remove trailing slash
+        community.ChainNode.alt_wallet_url.trim().replace(/\/$/, ''),
+      );
+    } else if (requestType === 'RPC') {
+      url =
+        community.ChainNode.private_url?.trim() ||
+        community.ChainNode.url?.trim();
+    }
+
+    if (!url) {
+      log.error('No URL found for chain node', undefined, {
+        cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
+      });
+      throw new Error('No URL found for chain node');
+    }
 
     try {
-      const response = await axios.post(url, req.body, {
-        headers: {
-          origin: 'https://commonwealth.im',
+      const response = await axios.post(
+        url,
+        _.isEmpty(req.body) ? null : req.body,
+        {
+          headers: {
+            origin: 'https://commonwealth.im',
+          },
         },
-      });
+      );
 
       await updateNodeHealthIfNeeded(
         req,
@@ -72,6 +99,7 @@ export async function cosmosHandler(
       return res.send(response.data);
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {
+        requestType,
         chainNode: community?.ChainNode,
       });
       await updateNodeHealthIfNeeded(
@@ -84,10 +112,25 @@ export async function cosmosHandler(
     }
   }
 
-  const response = await queryExternalProxy(
-    req,
-    requestType,
-    community.ChainNode as ChainNodeInstance,
-  );
-  return res.send(response?.data);
+  try {
+    const response = await queryExternalProxy(
+      req,
+      requestType,
+      community.ChainNode as ChainNodeInstance,
+    );
+
+    if (!response)
+      return res
+        .status(500)
+        .json({ message: 'External proxy request not supported' });
+
+    return res.status(response.status || 200).send(response?.data);
+  } catch (err) {
+    log.error('Failed to query external Cosmos proxy', err, {
+      chainNode: community?.ChainNode.cosmos_chain_id,
+    });
+    return res.status(err?.response?.status || 500).json({
+      message: err?.message || 'Failed to query external Cosmos proxy',
+    });
+  }
 }

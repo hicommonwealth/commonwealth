@@ -27,7 +27,7 @@ export function setupCosmosProxies(
       DEFAULT_CACHE_DURATION,
       lookupKeyDurationInReq,
     ),
-    cosmosHandler.bind('RPC'),
+    cosmosHandler.bind(this, 'RPC'),
   );
 
   app.use(
@@ -38,14 +38,14 @@ export function setupCosmosProxies(
       DEFAULT_CACHE_DURATION,
       lookupKeyDurationInReq,
     ),
-    cosmosHandler.bind('REST'),
+    cosmosHandler.bind(this, 'REST'),
   );
 
   // magic
-  app.options('/magicCosmosAPI/:chain', cosmosMagicOptionsHandler);
+  app.options('/magicCosmosAPI/:chain', cosmosMagicOptionsHandler.bind(this));
   app.use(
     '/magicCosmosAPI/:chain/?(node_info)?',
     express.text() as express.RequestHandler,
-    cosmosMagicNodeInfoProxyHandler,
+    cosmosMagicNodeInfoProxyHandler.bind(this),
   );
 }

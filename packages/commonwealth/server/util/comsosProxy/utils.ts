@@ -165,11 +165,12 @@ export async function queryExternalProxy(
   webProtocol: 'RPC' | 'REST',
   chainNode: ChainNodeInstance,
 ) {
-  if (
-    !chainNode.cosmos_chain_id ||
-    IGNORE_COSMOS_CHAIN_IDS.includes(chainNode.cosmos_chain_id)
-  )
+  if (IGNORE_COSMOS_CHAIN_IDS.includes(chainNode.cosmos_chain_id)) {
+    log.warn('Ignoring external proxy request for dev Cosmos chain', {
+      cosmos_chain_id: chainNode.cosmos_chain_id,
+    });
     return;
+  }
 
   let url: string;
   const proxyUrl = `https://${webProtocol}.cosmos.directory/${chainNode.cosmos_chain_id}`;
