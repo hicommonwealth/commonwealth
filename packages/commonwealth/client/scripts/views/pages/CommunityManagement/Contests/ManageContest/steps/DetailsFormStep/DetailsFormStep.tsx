@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import NumberSelector from 'views/components/NumberSelector';
@@ -19,6 +19,9 @@ import CommunityManagementLayout from 'views/pages/CommunityManagement/common/Co
 import { LaunchContestStep } from '../../ManageContest';
 import { detailsFormValidationSchema } from './validation';
 
+import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
@@ -74,11 +77,18 @@ const DetailsFormStep = ({
   const [payoutStructure, setPayoutStructure] = useState<number[]>(
     initialPayoutStructure,
   );
-  const [isProcessingProfileImage, setIsProcessingProfileImage] =
-    useState(false);
   const [prizePercentage, setPrizePercentage] = useState(
     INITIAL_PERCENTAGE_VALUE,
   );
+  const [topicList, setTopicList] = useState<
+    {
+      name: string;
+      id: number;
+      checked: boolean;
+    }[]
+  >([]);
+  const [isProcessingProfileImage, setIsProcessingProfileImage] =
+    useState(false);
 
   const editMode = !!contestId;
 
@@ -87,6 +97,21 @@ const DetailsFormStep = ({
     0,
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
+
+  const { data: topics } = useFetchTopicsQuery({
+    communityId: app.activeChainId(),
+  });
+
+  useEffect(() => {
+    if (topics && topicList.length === 0) {
+      const mappedTopics = topics.map((topic) => ({
+        name: topic.name,
+        id: topic.id,
+        checked: true,
+      }));
+      setTopicList(mappedTopics);
+    }
+  }, [topicList.length, topics]);
 
   const goBack = () => {
     // TODO distinct if user came from /manage/contests or /contests
@@ -125,6 +150,14 @@ const DetailsFormStep = ({
   const handleRemoveWinner = () => {
     setPayoutStructure((prevState) => [...prevState.slice(0, -1)]);
   };
+
+  const sortedTopics = [...topics]?.sort((a, b) => {
+    if (!a.order || !b.order) {
+      return 1;
+    }
+
+    return a.order - b.order;
+  });
 
   return (
     <CommunityManagementLayout
@@ -391,6 +424,50 @@ const DetailsFormStep = ({
                   Only threads posted to these topics will be eligible for the
                   contest prizes.
                 </CWText>
+
+                <div>
+                  <div>
+                    <CWText>Topic</CWText>
+                    <CWText>Eligible</CWText>
+                  </div>
+                  {topicList.length &&
+                    sortedTopics.map((topic) => {
+                      return (
+                        <div key={topic.id}>
+                          <CWText>{topic.name}</CWText>
+                          <CWToggle
+                            checked={
+                              topicList.find((t) => t.id === topic.id).checked
+                            }
+                            size="small"
+                            onChange={() =>
+                              setTopicList((prevState) => {
+                                const isChecked = prevState.find(
+                                  (t) => t.id === topic.id,
+                                ).checked;
+
+                                return prevState.map((t) => {
+                                  if (t.id === topic.id) {
+                                    return {
+                                      ...t,
+                                      checked: !isChecked,
+                                    };
+                                  }
+                                  return t;
+                                });
+                              })
+                            }
+                          />
+                        </div>
+                      );
+                    })}
+                  <CWText>All</CWText>
+                  <CWToggle
+                    checked={true}
+                    size="small"
+                    // onChange={() => setIsSmallToggled(!isSmallToggled)}
+                  />
+                </div>
               </div>
 
               <CWButton
