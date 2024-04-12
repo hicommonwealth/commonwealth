@@ -1526,13 +1526,14 @@
   resolved "https://registry.yarnpkg.com/@brillout/import/-/import-0.2.3.tgz#98f04656692b35d70664cc917f3cb0e8f74942dd"
   integrity sha512-1T8WlD75eeFSMrptGy8jiLHmfHgMmSjWvLOIUvHmSVZt+6k0eQqYUoK4KbmE4T9pVLIfxvZSOm2D68VEqKRHRw==
 
-"@canvas-js/chain-cosmos@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-cosmos/-/chain-cosmos-0.8.26.tgz#5a50bc670c65e080f1ecd803877b5b1103cc46ef"
-  integrity sha512-x8CNqg47yCMlm0gsVirUyFwecmfC/ZGkwEkCtG7ttpiVYkgv8+Cgpo5j2SIrzmlzSi3mphMN8SddkCX8vom4HA==
+"@canvas-js/chain-cosmos@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-cosmos/-/chain-cosmos-0.9.0-next.1.tgz#a6577c41d35c97f515bb29cc76bbec9eefd7ea42"
+  integrity sha512-bKe32V8Ag9S+qmbiZK4ZOLfNUT8GVFGx1//MpF9OirFm+S3ikeWvkwUPkxJi6Z1lPB/FZglljoFhl2YDs3B7AQ==
   dependencies:
-    "@canvas-js/interfaces" "0.8.26"
-    "@canvas-js/signed-cid" "0.8.26"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/signatures" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@cosmjs/amino" "^0.30.1"
     "@cosmjs/crypto" "^0.30.1"
     "@cosmjs/encoding" "^0.30.1"
@@ -1542,42 +1543,45 @@
     "@libp2p/logger" "^4.0.2"
     "@noble/curves" "^1.3.0"
     "@noble/hashes" "^1.3.2"
+    ethers "^6.9.0"
     multiformats "^13.0.1"
 
-"@canvas-js/chain-ethereum@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.8.26.tgz#80e3117931916f8b8ede65580c07c13e7243a078"
-  integrity sha512-7xQKlZlcLz8Bx6sUEDdE6uAZBYv7ZaLnCOBPtVeGMTsiCriojxLxUIaqSZazyOq6oLQcjPKiuNTESqOb2H5tJA==
+"@canvas-js/chain-ethereum@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.9.0-next.1.tgz#945a9d265522731110c37e5e1f88c61a07f7a637"
+  integrity sha512-ksGNsnwbea/x1KhbNvBbtRh52O6g09+meGhCwkY0S3VqkdzkI9K3CHOmDGBNUPmkt7OR47V7cUYlwRNiQf4uqg==
   dependencies:
-    "@canvas-js/interfaces" "0.8.26"
-    "@canvas-js/signed-cid" "0.8.26"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/signatures" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     ethers "^6.9.0"
     multiformats "^13.0.1"
     siwe "^2.1.4"
 
-"@canvas-js/chain-solana@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-solana/-/chain-solana-0.8.26.tgz#e603a1873e080089eef50f922a0074bff5de3f4f"
-  integrity sha512-pen+iEXnUPvzd71MrXqIME1cEHLcWBlEcw0qDC4JTvyTjuJytNUFminCsNDq7rrunU+JZ9xG1h+TQLMdDIeB9w==
+"@canvas-js/chain-solana@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-solana/-/chain-solana-0.9.0-next.1.tgz#47def92866497fa7df8c2baa598488ad6492341d"
+  integrity sha512-PsYeeKwPlQivrBsQaacrJtWrljdWlyI6pGDA0yoohaKu21rKeVbVfVGrxiXOi664uijf9HkxXzEg9SDXFALR2g==
   dependencies:
-    "@canvas-js/interfaces" "0.8.26"
-    "@canvas-js/signed-cid" "0.8.26"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/signatures" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     "@noble/curves" "^1.3.0"
     "@solana/web3.js" "^1.87.6"
     multiformats "^13.0.1"
 
-"@canvas-js/chain-substrate@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-substrate/-/chain-substrate-0.8.26.tgz#19a2376b568948ee92271984921e66215748013c"
-  integrity sha512-JpephTlqRLy948zxCTIX6yVae8FLwiSJxDijQIHf/7aI3hSE28usJPnkVGAMO7MPi7r8kYAljxUixOWR8zrMDg==
+"@canvas-js/chain-substrate@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-substrate/-/chain-substrate-0.9.0-next.1.tgz#3c74548df086e31083ebf385cfb8c9540e3c2be9"
+  integrity sha512-5vlo07uFAvlFMS9FcN60dJcB7SV+gFHD8fUuw725qB8zHHXoD6HTdoGWD9wVNaBYrviZMG9f2XVl/l/SgN3S7g==
   dependencies:
-    "@canvas-js/interfaces" "0.8.26"
-    "@canvas-js/signed-cid" "0.8.26"
-    "@ipld/dag-cbor" "^9.0.6"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/signatures" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     "@noble/curves" "^1.3.0"
@@ -1587,18 +1591,19 @@
     "@polkadot/util-crypto" "^12.2.1"
     multiformats "^13.0.1"
 
-"@canvas-js/core@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/core/-/core-0.8.26.tgz#0202bcaa6201129c217dad51316066333a89f081"
-  integrity sha512-lQTpB2BiApv4T8DTKKpmu77EbtZTuZJg9GZgLuGrS3COMAznR92PNh/Ce0oHpbPYhVgjL3GYe4rNmRRRQOIW2A==
+"@canvas-js/core@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/core/-/core-0.9.0-next.1.tgz#9f7a29fdf69eb92cd7a235600faf6d0d3f4808ab"
+  integrity sha512-AyYLsi05rEo8j6yPZEBV1RZ09b5uBN3BnygbKwlIXqS4DltIr7CGAsVL7AD1pduPRJzUcohqsXrdRr0h7O3aow==
   dependencies:
-    "@canvas-js/chain-ethereum" "0.8.26"
-    "@canvas-js/discovery" "0.8.26"
-    "@canvas-js/gossiplog" "0.8.26"
-    "@canvas-js/interfaces" "0.8.26"
-    "@canvas-js/modeldb" "0.8.26"
-    "@canvas-js/signed-cid" "0.8.26"
-    "@canvas-js/vm" "0.8.26"
+    "@canvas-js/chain-ethereum" "0.9.0-next.1"
+    "@canvas-js/discovery" "0.9.0-next.1"
+    "@canvas-js/gossiplog" "0.9.0-next.1"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/modeldb" "0.9.0-next.1"
+    "@canvas-js/signatures" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
+    "@canvas-js/vm" "0.9.0-next.1"
     "@chainsafe/libp2p-gossipsub" "^11.0.1"
     "@chainsafe/libp2p-noise" "^14.1.0"
     "@ipld/dag-cbor" "^9.0.6"
@@ -1634,17 +1639,19 @@
     microcbor "^0.3.0"
     multiformats "^13.0.1"
     p-queue "^8.0.0"
+    pg "^8.11.3"
     prom-client "^15.0.0"
     quickjs-emscripten "^0.26.0"
     uint8arraylist "^2.4.7"
     uint8arrays "^5.0.0"
 
-"@canvas-js/discovery@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/discovery/-/discovery-0.8.26.tgz#5eea8394eba3913edc7f0b31ca56f25b4cdc4a4b"
-  integrity sha512-GiMxQdXGL0ql9yDP77q8wDkMrVHmiwEk802xyiVlC8Wp7dAXyHC7UriSG2zjLOR4dLbO4+i6UEbMryQZ2qAeXg==
+"@canvas-js/discovery@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/discovery/-/discovery-0.9.0-next.1.tgz#88e4665910af4a906563eebc87ec2b3e8b145048"
+  integrity sha512-AEAWGVTz0EKfPyeaQEU8crewPTxTMtcKCOrq3LAMmdYlFK5pqe0/NeLQhJpfTrSiVU3Fin1gBcQ1NNQLb9claw==
   dependencies:
-    "@canvas-js/interfaces" "0.8.26"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@ipld/dag-cbor" "^9.0.6"
     "@libp2p/fetch" "^1.0.5"
     "@libp2p/interface" "^1.0.2"
@@ -1655,17 +1662,19 @@
     "@multiformats/multiaddr" "^12.1.11"
     p-queue "^8.0.0"
 
-"@canvas-js/gossiplog@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/gossiplog/-/gossiplog-0.8.26.tgz#3e166b23c8dc69ed10eeaebbe531c4af18d567c3"
-  integrity sha512-latMPm0WVri8xlwdx+JNhTFobqXvbMXUFKoW5hJHM8nVpQftJd0lFFKNWK2gCwbsflN1nsk7JtwKJYZOce6Emw==
+"@canvas-js/gossiplog@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/gossiplog/-/gossiplog-0.9.0-next.1.tgz#29d80d55303445850878e4cd7cbf756ce1657949"
+  integrity sha512-+7BKoMc81BfFDyTLwmQyNQjUaY+EKOQFNVaODLWQAU076C5FNHjHY1ShVcGobbAeaQ/8u1ldZATEWWxJFfvY9w==
   dependencies:
-    "@canvas-js/interfaces" "0.8.26"
-    "@canvas-js/okra" "^0.2.0"
-    "@canvas-js/okra-idb" "^0.2.2"
-    "@canvas-js/okra-memory" "^0.2.1"
-    "@canvas-js/okra-node" "^0.5.6"
-    "@canvas-js/signed-cid" "0.8.26"
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/okra" "^0.3.0"
+    "@canvas-js/okra-idb" "^0.3.0"
+    "@canvas-js/okra-memory" "^0.3.0"
+    "@canvas-js/okra-node" "^0.6.0"
+    "@canvas-js/okra-pg" "^0.1.0"
+    "@canvas-js/signatures" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@ipld/dag-cbor" "^9.0.6"
     "@ipld/schema" "^4.2.5"
     "@libp2p/interface" "^1.0.2"
@@ -1683,88 +1692,113 @@
     multiformats "^13.0.1"
     nanoid "^5.0.4"
     p-queue "^8.0.0"
+    pg "^8.11.3"
+    pg-cursor "^2.10.3"
     protons-runtime "^5.2.0"
     uint8arraylist "^2.4.7"
     uint8arrays "^5.0.0"
 
-"@canvas-js/interfaces@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.8.26.tgz#6c4c216ca5cf530432f1714c6631f10a6d946c92"
-  integrity sha512-JC1E1ykRPHQFgZAbwL4l+iOwp2zPAjtQUUTMyPgEUWm70cvw31+9y3chnHpfTqdDCSlgZ0xohk1pNHzqJv0puA==
+"@canvas-js/interfaces@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.9.0-next.1.tgz#d737813a351fde7734d91c5c257afcd712333934"
+  integrity sha512-UY/UYxh9T4hItrwlQuCjKN/dXiVSZtQFndMS6ISx1B/cC2QUx8CvqXMRrtBwWUmpxofBtmW7+Vx6IJJ499seTA==
   dependencies:
     multiformats "^13.0.1"
 
-"@canvas-js/modeldb@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/modeldb/-/modeldb-0.8.26.tgz#0400cff3f0b8699d215d16d941ad88a96ba16c16"
-  integrity sha512-oilhWYa/ws/9BQOuZF9MLTWxGjAtEOHuMusgGgGeUB+F9wEGUmObKjSHYkwlVKco9EUU+CB5zlQrfYEWBKmijQ==
+"@canvas-js/modeldb@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/modeldb/-/modeldb-0.9.0-next.1.tgz#afcffb2b961756eb5fe7a63d0991b2a11700f812"
+  integrity sha512-zQfSYUgAGyTzrVzM1vS48CINYwEuC2EAsb+5RxfbZ1jNJnKY1dpGVIgKhKyvmIRkKSUuWdHxOAx81OuUbiYJgg==
   dependencies:
+    "@canvas-js/utils" "0.9.0-next.1"
     "@libp2p/logger" "^4.0.2"
     "@types/react" "^18.2.45"
     better-sqlite3 "^9.2.2"
     fast-deep-equal "^3.1.3"
     idb "^8.0.0"
+    pg "^8.11.3"
+    pg-cursor "^2.10.3"
     uint8arrays "^5.0.0"
 
-"@canvas-js/okra-idb@^0.2.2":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@canvas-js/okra-idb/-/okra-idb-0.2.4.tgz#4f31a173bd713a226d36fc18f13585481832bb2c"
-  integrity sha512-XLtz4fFInY4nuE28pASSOMKwdxJ/ZQqXslzJG2lLoBgRTDcwaPdkFAwq9gZNHKb6Tsxiy1+XUOcahc+F9+tR/g==
+"@canvas-js/okra-idb@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/okra-idb/-/okra-idb-0.3.0.tgz#14ef1080b4598f7f518a127abfb05e96ea38a395"
+  integrity sha512-kEfGKNGTT+630vA5rnPGTbRAE7TvEG/oE4adTtEzPZtsiSW1ACG3guYPpxlhn7KozqJegSGzM7LUxOi14W2PmA==
   dependencies:
-    "@canvas-js/okra" "^0.2.0"
+    "@canvas-js/okra" "^0.3.0"
     debug "^4.3.4"
 
-"@canvas-js/okra-memory@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/okra-memory/-/okra-memory-0.2.1.tgz#4082ff981477e6b550b9b54d04841f316d458941"
-  integrity sha512-lLQUUsIrsUKsF3gn7bs0EN3HGwL+49o60TnPsJtN1Azu4MV12kJ71H7J2DS0qUjCPap0AsOZLAn5G73fAY7Kxg==
+"@canvas-js/okra-memory@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/okra-memory/-/okra-memory-0.3.0.tgz#54e4ca5c30f7c48b3ec0f06a0e7bad7c6f6804d0"
+  integrity sha512-CKG46yK3zc6or5Y5sqMJOB/O8RD0IwHR9yAoA3DuczRO0X8QaAMpTV/7rX9ZvwygxTiIS90AnzvYLnYC2aiObw==
   dependencies:
-    "@canvas-js/okra" "^0.2.0"
-    "@types/debug" "^4.1.9"
-    abstract-level "^1.0.3"
+    "@canvas-js/okra" "^0.3.0"
+    "@types/debug" "^4.1.12"
+    abstract-level "^1.0.4"
     debug "^4.3.4"
     events "^3.3.0"
     memory-level "^1.0.0"
 
-"@canvas-js/okra-node@^0.5.6":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@canvas-js/okra-node/-/okra-node-0.5.6.tgz#f43a7bed06d62eb8b5cb9da016a611d5ae9086ef"
-  integrity sha512-ymbV6JM6Dvtz8fMs7R/O3gW66myD1obRJELN2awlSp2K6Ub63v2kTwRhv7R/J5sHXplCcOqEWV/dQtd3R8H6WQ==
+"@canvas-js/okra-node@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/okra-node/-/okra-node-0.6.0.tgz#95904b37211ffd347531b0fb642e91664e06bc88"
+  integrity sha512-G0DeyglEb4R1FlRiUxYl95YpBxz5lTU/WfhJAC2gQZoN2Fbpi6oqbY5rupNtFRASalkSY1d032Fdm4AEwFtBRA==
   dependencies:
-    "@canvas-js/okra" "^0.2.0"
-    "@noble/hashes" "^1.3.2"
-    "@types/debug" "^4.1.9"
+    "@canvas-js/okra" "^0.3.0"
+    "@noble/hashes" "^1.4.0"
+    "@types/debug" "^4.1.12"
     debug "^4.3.4"
-    detect-libc "^2.0.2"
-    p-queue "^7.4.1"
-    uint8arrays "^4.0.6"
+    detect-libc "^2.0.3"
+    p-queue "^8.0.1"
+    uint8arrays "^5.0.3"
 
-"@canvas-js/okra@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/okra/-/okra-0.2.0.tgz#c946fdc562c657abaf5c0f015d84fdeb0e424326"
-  integrity sha512-1m5PujB1n7chJdf3QZ4Bq1lWrHVABWzxPiaJl9rsIf97wd+nCymwQkttfnTKkr3lYKpHd49Ykbz5xVBWTs/lsQ==
+"@canvas-js/okra-pg@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/okra-pg/-/okra-pg-0.1.0.tgz#3c72ee8d13e6a68a33f0c07e1ad9ef2df0e59b3d"
+  integrity sha512-SGcJ0oU/906mJB+eGyC16MIAOXtmyEh4pazHcaujUsp/dCCZ/Ilbb1AUCghqE1Rfi/D2khD1oI6mrWUbQOS8tA==
   dependencies:
-    "@noble/hashes" "^1.3.2"
-    "@types/debug" "^4.1.8"
-    abstract-level "^1.0.3"
+    "@canvas-js/okra" "^0.3.0"
+    "@noble/hashes" "^1.4.0"
+    pg "^8.11.3"
+    pg-cursor "^2.10.3"
+    uint8arrays "^5.0.3"
+
+"@canvas-js/okra@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/okra/-/okra-0.3.0.tgz#13ec42f8fc0a4f988a53163b823640a3d0de9de6"
+  integrity sha512-GCF1pr1BbrammUzQlnXf4jfsWo8dRYzo4+lIFfTJaWeL8C+6eRZW/dOUS53bdtbr9HSKJXb9S0qlYijWayRskA==
+  dependencies:
+    "@noble/hashes" "^1.4.0"
+    "@types/debug" "^4.1.12"
     debug "^4.3.4"
 
-"@canvas-js/signed-cid@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/signed-cid/-/signed-cid-0.8.26.tgz#3ff9cdcab5c42c955fd1470d73a65148dc7c9c80"
-  integrity sha512-vh4AGM9ah5YprQ5i/EzZ4eKpZG9hh9LNQc+pU8CLXe0L2ofasCsTvI29BmP9DkYxaE67kqnvujhuJTL6Aqzz7A==
+"@canvas-js/signatures@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/signatures/-/signatures-0.9.0-next.1.tgz#52c65adf8cbb4b3acd54f856cb963abad3e0e114"
+  integrity sha512-mU43r9zCLCjcsueTXH+QRlx1HnB/UPVzlC1scHp3wcr52uXP36bR5NKwS2JZDcpEuTKtVm351OAtnm5iLWptug==
   dependencies:
+    "@canvas-js/interfaces" "0.9.0-next.1"
+    "@canvas-js/utils" "0.9.0-next.1"
     "@ipld/dag-cbor" "^9.0.6"
-    "@ipld/dag-json" "^10.1.5"
+    "@ipld/dag-json" "^10.2.0"
+    "@libp2p/logger" "^4.0.6"
     "@noble/curves" "^1.3.0"
     "@noble/hashes" "^1.3.1"
+    ethers "^6.9.1"
     multiformats "^13.0.1"
 
-"@canvas-js/vm@0.8.26":
-  version "0.8.26"
-  resolved "https://registry.yarnpkg.com/@canvas-js/vm/-/vm-0.8.26.tgz#61593f1c602ad5ef040f5e9d3f66691822bb63ba"
-  integrity sha512-JQ0uzuKVxGqCoOLYHxVTo/9+y260d5WwKRgKlT3wTD3qhKwbDyY7yZo9J6A2TNqm2tYWV53O/9rMAWNrCneC+A==
+"@canvas-js/utils@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/utils/-/utils-0.9.0-next.1.tgz#0710d1a8ee0078a2a998692ec945b4e9bf6e4976"
+  integrity sha512-GEri2igIoUfxzpE6jJCjeslIUVTo1UpO6NCtghI9Dfz48eDaa+qGTN4nqN3ZGXSs3Yd88l+7VNAyhEz1GsVJPw==
+
+"@canvas-js/vm@0.9.0-next.1":
+  version "0.9.0-next.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/vm/-/vm-0.9.0-next.1.tgz#cfbebbd17a7ddb6dd77358cb5b894a72f05069f9"
+  integrity sha512-pguGKbiP7MI4j3qrhuIzVlmEq7qql/B4GuNWjjBrnTNLrxDFAzeb2IRf6JI14tftdrSBm1LzXnCFISUZo1jYzQ==
   dependencies:
+    "@canvas-js/utils" "0.9.0-next.1"
     "@libp2p/logger" "^4.0.2"
     "@noble/hashes" "^1.3.3"
     quickjs-emscripten "^0.26.0"
@@ -3348,7 +3382,7 @@
     cborg "^4.0.0"
     multiformats "^13.1.0"
 
-"@ipld/dag-json@^10.1.5":
+"@ipld/dag-json@^10.1.5", "@ipld/dag-json@^10.2.0":
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/@ipld/dag-json/-/dag-json-10.2.0.tgz#32468182ce510284aae75a07e33b3a0da284994e"
   integrity sha512-O9YLUrl3d3WbVz7v1WkajFkyfOLEe2Fep+wor4fgVe0ywxzrivrj437NiPcVyB+2EDdFn/Q7tCHFf8YVhDf8ZA==
@@ -4188,6 +4222,11 @@
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
+
+"@noble/hashes@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
+  integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
 
 "@noble/secp256k1@1.7.1", "@noble/secp256k1@~1.7.0":
   version "1.7.1"
@@ -6096,17 +6135,17 @@
   dependencies:
     "@types/node" "*"
 
+"@types/debug@^4.1.12":
+  version "4.1.12"
+  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.12.tgz#a155f21690871953410df4b6b6f53187f0500917"
+  integrity sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==
+  dependencies:
+    "@types/ms" "*"
+
 "@types/debug@^4.1.8":
   version "4.1.8"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.8.tgz#cef723a5d0a90990313faec2d1e22aee5eecb317"
   integrity sha512-/vPO1EPOs306Cvhwv7KfVfYvOJqA/S/AXjaHQiJboCZzcNDb+TIJFN9/2C9DZ//ijSKWioNyUxD792QmDJ+HKQ==
-  dependencies:
-    "@types/ms" "*"
-
-"@types/debug@^4.1.9":
-  version "4.1.12"
-  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.12.tgz#a155f21690871953410df4b6b6f53187f0500917"
-  integrity sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==
   dependencies:
     "@types/ms" "*"
 
@@ -7706,6 +7745,19 @@ abstract-level@^1.0.0, abstract-level@^1.0.2, abstract-level@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/abstract-level/-/abstract-level-1.0.3.tgz#78a67d3d84da55ee15201486ab44c09560070741"
   integrity sha512-t6jv+xHy+VYwc4xqZMn2Pa9DjcdzvzZmQGRjTFc8spIbRGHgBrEKbPq+rYXc7CCo0lxgYvSgKVg9qZAhpVQSjA==
+  dependencies:
+    buffer "^6.0.3"
+    catering "^2.1.0"
+    is-buffer "^2.0.5"
+    level-supports "^4.0.0"
+    level-transcoder "^1.0.1"
+    module-error "^1.0.1"
+    queue-microtask "^1.2.3"
+
+abstract-level@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/abstract-level/-/abstract-level-1.0.4.tgz#3ad8d684c51cc9cbc9cf9612a7100b716c414b57"
+  integrity sha512-eUP/6pbXBkMbXFdx4IH2fVgvB7M0JvR7/lIL33zcs0IBcwjdzSSl31TOJsaCzmKSSDF9h8QYSOJux4Nd4YJqFg==
   dependencies:
     buffer "^6.0.3"
     catering "^2.1.0"
@@ -10818,10 +10870,15 @@ detect-libc@^1.0.3:
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
   integrity sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=
 
-detect-libc@^2.0.0, detect-libc@^2.0.1, detect-libc@^2.0.2:
+detect-libc@^2.0.0, detect-libc@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.2.tgz#8ccf2ba9315350e1241b88d0ac3b0e1fbd99605d"
   integrity sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw==
+
+detect-libc@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.3.tgz#f0cd503b40f9939b894697d19ad50895e30cf700"
+  integrity sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==
 
 dezalgo@^1.0.4:
   version "1.0.4"
@@ -12328,7 +12385,7 @@ ethers@5.7.2, ethers@^5.7.1:
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
-ethers@^6.11.1, ethers@^6.9.0:
+ethers@^6.11.1, ethers@^6.9.0, ethers@^6.9.1:
   version "6.11.1"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.11.1.tgz#96aae00b627c2e35f9b0a4d65c7ab658259ee6af"
   integrity sha512-mxTAE6wqJQAbp5QAe/+o+rXOID7Nw91OZXvgpjDa1r4fAbq2Nu314oEZSbjoRLacuCzs7kUC3clEvkCQowffGg==
@@ -17036,11 +17093,6 @@ multiformats@^11.0.0:
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-11.0.2.tgz#b14735efc42cd8581e73895e66bebb9752151b60"
   integrity sha512-b5mYMkOkARIuVZCpvijFj9a6m5wMVLC7cf/jIPd5D/ARDOfLC5+IFkbgDXQgcU2goIsTD/O9NY4DI/Mt4OGvlg==
 
-multiformats@^12.0.1:
-  version "12.0.1"
-  resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-12.0.1.tgz#dd3e19dd44114c2672e4795a36888d263be30131"
-  integrity sha512-s01wijBJoDUqESWSzePY0lvTw7J3PVO9x2Cc6ASI5AMZM2Gnhh7BC17+nlFhHKU7dDzaCaRfb+NiqNzOsgPUoQ==
-
 multiformats@^13.0.0, multiformats@^13.0.1, multiformats@^13.1.0:
   version "13.1.0"
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-13.1.0.tgz#5aa9d2175108a448fc3bdb54ba8a3d0b6cab3ac3"
@@ -18027,14 +18079,6 @@ p-map@^5.1.0, p-map@^5.3.0:
   dependencies:
     aggregate-error "^4.0.0"
 
-p-queue@^7.4.1:
-  version "7.4.1"
-  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-7.4.1.tgz#7f86f853048beca8272abdbb7cec1ed2afc0f265"
-  integrity sha512-vRpMXmIkYF2/1hLBKisKeVYJZ8S2tZ0zEAmIJgdVKP2nq0nh4qCdf8bgw+ZgKrkh71AOCaqzwbJJk1WtdcF3VA==
-  dependencies:
-    eventemitter3 "^5.0.1"
-    p-timeout "^5.0.2"
-
 p-queue@^8.0.0, p-queue@^8.0.1:
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-8.0.1.tgz#718b7f83836922ef213ddec263ff4223ce70bef8"
@@ -18065,11 +18109,6 @@ p-timeout@^3.1.0:
   integrity sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==
   dependencies:
     p-finally "^1.0.0"
-
-p-timeout@^5.0.2:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/p-timeout/-/p-timeout-5.1.0.tgz#b3c691cf4415138ce2d9cfe071dba11f0fee085b"
-  integrity sha512-auFDyzzzGZZZdHz3BtET9VEz0SE/uMEAx7uWfGPucfzEwwe/xH0iVeZibQmANYE/hp9T2+UUZT5m+BKyrDp3Ew==
 
 p-timeout@^6.0.0:
   version "6.1.1"
@@ -18395,6 +18434,11 @@ pg-connection-string@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.6.2.tgz#713d82053de4e2bd166fab70cd4f26ad36aab475"
   integrity sha512-ch6OwaeaPYcova4kKZ15sbJ2hKb/VP48ZD2gE7i1J+L4MspCtBMAx8nMgz7bksc7IojCIIWuEhHibSMFH8m8oA==
+
+pg-cursor@^2.10.3:
+  version "2.10.5"
+  resolved "https://registry.yarnpkg.com/pg-cursor/-/pg-cursor-2.10.5.tgz#7b2d1524f4dfc3c72741c017f188f34aa59dcd04"
+  integrity sha512-wzgmyk+k9mwuYe30ylLA6qRWw2TBFSee4Bw23oTz66YL9RdRJjDi2TaROMMF+V3QB6QWB3FFCju22loDftjKkw==
 
 pg-int8@1.0.1:
   version "1.0.1"
@@ -23266,17 +23310,17 @@ uint8arrays@^4.0.2:
   dependencies:
     multiformats "^11.0.0"
 
-uint8arrays@^4.0.6:
-  version "4.0.10"
-  resolved "https://registry.yarnpkg.com/uint8arrays/-/uint8arrays-4.0.10.tgz#3ec5cde3348903c140e87532fc53f46b8f2e921f"
-  integrity sha512-AnJNUGGDJAgFw/eWu/Xb9zrVKEGlwJJCaeInlf3BkecE/zcTobk5YXYIPNQJO1q5Hh1QZrQQHf0JvcHqz2hqoA==
-  dependencies:
-    multiformats "^12.0.1"
-
 uint8arrays@^5.0.0, uint8arrays@^5.0.1, uint8arrays@^5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/uint8arrays/-/uint8arrays-5.0.2.tgz#f05479bcd521d37c2e7710b24132a460b0ac80e3"
   integrity sha512-S0GaeR+orZt7LaqzTRs4ZP8QqzAauJ+0d4xvP2lJTA99jIkKsE2FgDs4tGF/K/z5O9I/2W5Yvrh7IuqNeYH+0Q==
+  dependencies:
+    multiformats "^13.0.0"
+
+uint8arrays@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/uint8arrays/-/uint8arrays-5.0.3.tgz#92b894d9c4269ba97c51544d6e1f279fe6f80d1f"
+  integrity sha512-6LBuKji28kHjgPJMkQ6GDaBb1lRwIhyOYq6pDGwYMoDPfImE9SkuYENVmR0yu9yGgs2clHUSY9fKDukR+AXfqQ==
   dependencies:
     multiformats "^13.0.0"
 
