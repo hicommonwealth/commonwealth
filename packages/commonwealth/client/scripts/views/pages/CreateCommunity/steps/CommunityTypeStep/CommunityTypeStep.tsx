@@ -96,11 +96,11 @@ const CommunityTypeStep = ({
           type={baseOption.type}
           title={baseOption.title}
           description={baseOption.description}
-          isRecommended={true}
+          isRecommended={baseOption.isRecommended}
           onClick={() =>
             handleCommunitySelection({
               type: baseOption.type,
-              chainBase: ethereumOption.chainBase,
+              chainBase: baseOption.chainBase,
             })
           }
         />
@@ -109,11 +109,11 @@ const CommunityTypeStep = ({
           type={blastOption.type}
           title={blastOption.title}
           description={blastOption.description}
-          isRecommended={false}
+          isRecommended={blastOption.isRecommended}
           onClick={() =>
             handleCommunitySelection({
               type: blastOption.type,
-              chainBase: ethereumOption.chainBase,
+              chainBase: blastOption.chainBase,
             })
           }
         />
@@ -123,7 +123,7 @@ const CommunityTypeStep = ({
           type={ethereumOption.type}
           title={ethereumOption.title}
           description={ethereumOption.description}
-          isRecommended={false}
+          isRecommended={ethereumOption.isRecommended}
           onClick={() =>
             handleCommunitySelection({
               type: ethereumOption.type,

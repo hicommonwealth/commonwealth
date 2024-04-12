@@ -23,7 +23,7 @@ export const communityTypeOptions = [
     type: CommunityType.Ethereum,
     chainBase: ChainBase.Ethereum,
     title: 'Ethereum (EVM)',
-    isRecommended: true,
+    isRecommended: false,
     description:
       'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. ' +
       'Select this community type if you have minted a token on the Ethereum blockchain.',
