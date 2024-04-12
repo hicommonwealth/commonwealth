@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   CommunityAttributes,
   ContractAttributes,
@@ -14,7 +14,7 @@ import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
 import { RawEvmEvent } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,

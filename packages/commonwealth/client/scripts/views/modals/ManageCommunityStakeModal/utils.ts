@@ -56,6 +56,18 @@ export const getInitialAccountValue = (
   return activeAddressOption || addressOptions[0];
 };
 
+export const getUniqueUserAddressesForChainBase = (chainBase: string) => {
+  const uniqueChainAddresses = [
+    ...new Set(
+      app.user.addresses
+        .filter((x) => x?.community?.base === chainBase)
+        .map((x) => x.address),
+    ),
+  ];
+
+  return uniqueChainAddresses;
+};
+
 export const getAvailableAddressesForStakeExchange = (
   activeAccounts: Account[],
   userAddresses: AddressInfo[],

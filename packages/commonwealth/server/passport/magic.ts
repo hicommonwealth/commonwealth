@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError, logger } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   DB,
   ProfileAttributes,
@@ -34,7 +35,7 @@ import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 type MagicLoginContext = {
   models: DB;
