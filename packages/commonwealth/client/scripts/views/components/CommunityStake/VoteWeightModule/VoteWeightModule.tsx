@@ -49,6 +49,7 @@ export const VoteWeightModule = ({
       buttonHeight="sm"
       buttonWidth="full"
       disabled={!canBuyStake}
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onClick={handleBuyStakeClick}
     />
   );
@@ -87,6 +88,7 @@ export const VoteWeightModule = ({
                 buttonAlt="green"
                 buttonHeight="sm"
                 buttonWidth="full"
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onClick={handleBuyStakeClick}
               />
               <CWButton
