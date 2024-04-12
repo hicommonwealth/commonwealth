@@ -2,9 +2,9 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import apiRouter from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import ddd from '../routes/ddd';
 
 import {
   methodNotAllowedMiddleware,
@@ -154,6 +154,7 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
+import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
@@ -231,6 +232,9 @@ function setupRouter(
   const router = express.Router();
 
   router.use(useragent.express());
+
+  // Routes API
+  app.use('/api', apiRouter);
 
   // Updating the address
   registerRoute(
@@ -618,6 +622,15 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     getThreadsHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'get',
+    '/feed',
+    databaseValidationService.validateCommunity,
+    getFeedHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'get',
@@ -1293,9 +1306,6 @@ function setupRouter(
   );
 
   app.use(endpoint, router);
-
-  // new ddd routes
-  app.use('/ddd', ddd);
 
   app.use(methodNotAllowedMiddleware());
 }

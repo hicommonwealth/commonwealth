@@ -1,9 +1,12 @@
 import { command } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
+const log = logger(__filename);
+
 async function main() {
-  const stakedCommunitiesWithGroups = await models.Community.findAll({
+  const stakedCommunities = await models.Community.findAll({
     where: {
       ...(process.env.COMMUNITY_ID && { id: process.env.COMMUNITY_ID }),
       namespace: {
@@ -11,11 +14,6 @@ async function main() {
       },
     },
     include: [
-      {
-        model: models.Group,
-        as: 'groups',
-        required: true,
-      },
       {
         model: models.CommunityStake,
         as: 'CommunityStakes',
@@ -25,7 +23,7 @@ async function main() {
   });
 
   // generate stakeholder group for each staked community
-  for (const c of stakedCommunitiesWithGroups) {
+  for (const c of stakedCommunities) {
     if ((c.CommunityStakes || []).length > 0) {
       const { groups, created } = await command(
         Community.GenerateStakeholderGroups(),
@@ -39,11 +37,11 @@ async function main() {
       );
 
       if (created) {
-        console.log(
+        log.info(
           `created ${groups.length} stakeholder groups for ${c.id} – refreshing memberships...`,
         );
       } else {
-        console.log(
+        log.info(
           `stakeholder groups (${groups.length}) already exist for ${c.id}`,
         );
       }
@@ -54,6 +52,10 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
+  if (err instanceof Error) {
+    log.fatal('Fatal error occurred', err);
+  } else {
+    log.fatal('Fatal error occurred', undefined, { err });
+  }
   process.exit(1);
 });

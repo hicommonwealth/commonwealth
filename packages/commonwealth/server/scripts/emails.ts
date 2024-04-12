@@ -1,15 +1,15 @@
+import { logger } from '@hicommonwealth/logging';
+import type { UserAttributes } from '@hicommonwealth/model';
+import { AddressAttributes, DB } from '@hicommonwealth/model';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import {
   DynamicTemplate,
   NotificationCategories,
-  logger,
-} from '@hicommonwealth/core';
-import type { UserAttributes } from '@hicommonwealth/model';
-import { AddressAttributes, DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import { capitalize } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
@@ -22,7 +22,7 @@ import {
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

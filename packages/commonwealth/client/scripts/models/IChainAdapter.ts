@@ -1,4 +1,4 @@
-import type { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 
 import axios from 'axios';

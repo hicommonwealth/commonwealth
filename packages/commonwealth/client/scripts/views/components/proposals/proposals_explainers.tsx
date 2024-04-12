@@ -3,7 +3,7 @@ import React from 'react';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import { BigNumber } from 'ethers';
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWButton } from '../component_kit/cw_button';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { GovExplainer } from '../gov_explainer';
 
 type CompoundProposalStatsProps = { chain: Compound };
@@ -42,7 +42,7 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
       ]}
       statAction={
         <CWButton
-          buttonType="primary-blue"
+          buttonType="primary"
           onClick={() => navigate('/new/proposal')}
           label="New proposal"
         />

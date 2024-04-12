@@ -5,7 +5,7 @@ import type {
   QueryTallyResultResponseSDKType,
   QueryVotesResponseSDKType,
 } from '@hicommonwealth/chains';
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import type {
   CosmosProposalState,

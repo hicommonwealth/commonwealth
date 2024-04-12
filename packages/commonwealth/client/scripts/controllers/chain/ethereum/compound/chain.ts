@@ -1,5 +1,5 @@
 import type { ERC20Votes } from '@hicommonwealth/chains';
-import { ContractType } from '@hicommonwealth/core';
+import { ContractType } from '@hicommonwealth/shared';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 import type { BigNumber } from 'ethers';

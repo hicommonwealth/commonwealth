@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWText } from '../../component_kit/cw_text';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
 import CWCircleButton from '../../component_kit/new_designs/CWCircleButton';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
 import './AdminOnboardingCard.scss';
 
 const CARD_TYPES = {

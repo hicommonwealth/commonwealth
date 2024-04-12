@@ -2,22 +2,12 @@
 
 .ProposalsPage {
   flex: 1;
-  padding: 24px;
-
-  @include smallInclusive {
-    padding: 16px;
-  }
 
   .header {
-    padding-top: 32px;
     padding-bottom: 32px;
 
     @include small {
-      padding-top: 14px;
       padding-bottom: 14px;
-    }
-    @include extraSmall {
-      padding-top: 0px;
     }
   }
 

@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -19,9 +19,12 @@ export const convertEthToUsd = (
   return (eth * rate).toFixed(2);
 };
 
-export const buildEtherscanLink = (txHash: string) => {
-  //const prefix = 'Base.';
-  return `https://basescan.org/tx/${txHash}`;
+export const buildEtherscanLink = (txHash: string, chainNodeId?: number) => {
+  const url = chainNodeId
+    ? app.config.nodes.getById(chainNodeId).block_explorer
+    : app.chain?.meta?.ChainNode?.block_explorer ?? 'https://basescan.org/';
+
+  return `${url}tx/${txHash}`;
 };
 
 export const capDecimals = (value: string, capNumber = 8) => {
@@ -51,6 +54,18 @@ export const getInitialAccountValue = (
   );
 
   return activeAddressOption || addressOptions[0];
+};
+
+export const getUniqueUserAddressesForChainBase = (chainBase: string) => {
+  const uniqueChainAddresses = [
+    ...new Set(
+      app.user.addresses
+        .filter((x) => x?.community?.base === chainBase)
+        .map((x) => x.address),
+    ),
+  ];
+
+  return uniqueChainAddresses;
 };
 
 export const getAvailableAddressesForStakeExchange = (

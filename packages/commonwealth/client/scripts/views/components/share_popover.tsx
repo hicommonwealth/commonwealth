@@ -70,7 +70,7 @@ export const SharePopover = ({
         {
           iconLeft: 'twitterOutline',
           iconLeftSize: 'regular',
-          label: 'Share on Twitter',
+          label: 'Share on X (Twitter)',
           onClick: async () => {
             if (!commentId) {
               await window.open(

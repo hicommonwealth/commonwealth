@@ -15,12 +15,12 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { User } from '../components/user/user';
 
 import '../../../styles/modals/edit_collaborators_modal.scss';
@@ -44,7 +44,7 @@ export const EditCollaboratorsModal = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -199,7 +199,7 @@ export const EditCollaboratorsModal = ({
               try {
                 const updatedThread = await editThread({
                   threadId: thread.id,
-                  chainId: app.activeChainId(),
+                  communityId: app.activeChainId(),
                   address: app.user.activeAccount.address,
                   collaborators: {
                     ...(newCollaborators.length > 0 && {
