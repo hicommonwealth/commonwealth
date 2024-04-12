@@ -1,4 +1,4 @@
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { addressSwapper } from 'utils';
 
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';

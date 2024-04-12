@@ -1,7 +1,6 @@
 import { schemas, type Policy } from '@hicommonwealth/core';
 // FIXME tell prettier to NOT mangle imports and fix this with eslint so this
 // can be disabled
-// import { z } from 'zod';
 
 const inputs = {
   ThreadCreated: schemas.events.ThreadCreated,
