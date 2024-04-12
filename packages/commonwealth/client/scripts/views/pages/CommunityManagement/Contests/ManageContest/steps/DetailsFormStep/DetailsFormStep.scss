@@ -1,2 +1,26 @@
-.DetailsFormStep {
+.CommunityManagementLayout {
+  .contest-description {
+    display: inline;
+
+    .Text {
+      display: inline;
+    }
+  }
+
+  .DetailsFormStep {
+    width: 100%;
+
+    .contest-name,
+    .funding-token-address {
+      .MessageRow:first-child {
+        display: none; // hide input label
+      }
+    }
+
+    .CoverImageUploader {
+      .Label {
+        display: none;
+      }
+    }
+  }
 }

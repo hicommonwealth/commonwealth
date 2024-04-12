@@ -53,6 +53,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
       <input
         type="radio"
         className={`radio-button ${disabled ? 'disabled' : ''}`}
+        disabled={disabled}
         checked={checked}
         name={groupName}
         value={value}
