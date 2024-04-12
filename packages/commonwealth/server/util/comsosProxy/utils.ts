@@ -1,10 +1,6 @@
 import { NodeHealth } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import {
-  ChainNodeAttributes,
-  ChainNodeInstance,
-  models,
-} from '@hicommonwealth/model';
+import { ChainNodeInstance, models } from '@hicommonwealth/model';
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';
 import { Request } from 'express';
@@ -72,15 +68,14 @@ export async function updateV1NodeIfNeeded(
  * useful for determining the type of the Cosmos chain (e.g. Cosmos EVM chains).
  */
 export async function updateSlip44IfNeeded(
-  communityChainNode: ChainNodeAttributes,
-  cosmos_chain_id: string,
+  chainNode: ChainNodeInstance,
 ): Promise<void> {
   try {
-    const slip44 = communityChainNode?.slip44;
-    if (slip44 || DEVNET_COSMOS_ID_RE.test(cosmos_chain_id)) return;
+    const slip44 = chainNode?.slip44;
+    if (slip44 || DEVNET_COSMOS_ID_RE.test(chainNode.cosmos_chain_id)) return;
 
     const registeredChain = await axios.get(
-      `https://chains.cosmos.directory/${cosmos_chain_id}`,
+      `https://chains.cosmos.directory/${chainNode.cosmos_chain_id}`,
       {
         headers: {
           origin: 'https://commonwealth.im',
@@ -91,18 +86,13 @@ export async function updateSlip44IfNeeded(
     );
 
     if (registeredChain && registeredChain?.data?.chain?.slip44) {
-      const chainNode = await models.ChainNode.findOne({
-        where: { cosmos_chain_id },
-      });
-      if (!chainNode) return;
-
       chainNode.slip44 = registeredChain.data.chain.slip44;
       await chainNode.save();
     }
   } catch (err) {
     // don't need to throw here, just trying to update slip44 if available
     log.error('Error querying for registered chain', err, {
-      cosmos_chain_id,
+      cosmos_chain_id: chainNode.cosmos_chain_id,
     });
   }
 }

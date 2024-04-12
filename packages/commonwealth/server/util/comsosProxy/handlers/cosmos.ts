@@ -8,6 +8,8 @@ import {
   IGNORE_COSMOS_CHAIN_IDS,
   queryExternalProxy,
   updateNodeHealthIfNeeded,
+  updateSlip44IfNeeded,
+  updateV1NodeIfNeeded,
   upgradeBetaNodeIfNeeded,
 } from '../utils';
 
@@ -31,6 +33,8 @@ export async function cosmosHandler(
   if (!community) {
     throw new Error(`Invalid community id: ${req.params.community_id}`);
   }
+
+  await updateSlip44IfNeeded(community.ChainNode as ChainNodeInstance);
 
   const nodeTimeoutEnd = new Date(
     community.ChainNode.updated_at.getTime() + FALLBACK_NODE_DURATION,
@@ -93,6 +97,11 @@ export async function cosmosHandler(
         await upgradeBetaNodeIfNeeded(
           req,
           response,
+          community.ChainNode as ChainNodeInstance,
+        );
+      } else if (requestType === 'REST') {
+        await updateV1NodeIfNeeded(
+          req,
           community.ChainNode as ChainNodeInstance,
         );
       }
