@@ -8,7 +8,10 @@
     "outDir": "build",
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
+      //      "@hicommonwealth/*": ["../../libs/*/src"],
+      "@hicommonwealth/core": [
+        "/Users/burton/projects/commonwealth-pnpm/libs/core"
+      ],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
@@ -24,7 +27,7 @@
   "references": [
     { "path": "../../libs/adapters" },
     { "path": "../../libs/chains" },
-    { "path": "../../libs/core" },
+    { "path": "/Users/burton/projects/commonwealth-pnpm/libs/core" },
     { "path": "../../libs/model" },
     { "path": "../../libs/shared" }
   ]
