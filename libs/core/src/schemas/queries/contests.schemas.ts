@@ -6,5 +6,11 @@ export const GetAllContests = {
     contest_address: z.string().optional(),
     contest_id: z.number().int().optional(),
   }),
-  output: z.array(Contest.extend({ ContestActions: z.array(ContestAction) })),
+  output: z.array(
+    Contest.extend({
+      ContestActions: z.array(
+        ContestAction.omit({ contestAddress: true, contestId: true }),
+      ),
+    }),
+  ),
 };

@@ -1,4 +1,5 @@
 import { Query, schemas } from '@hicommonwealth/core';
+import { z } from 'zod';
 import { models } from '../database';
 
 export const GetAllContests: Query<
@@ -21,6 +22,8 @@ export const GetAllContests: Query<
         ],
       },
     });
-    return result.map((r) => r.toJSON()) as any; // TODO: fix output schema
+    return result.map((r) => r.toJSON()) as z.infer<
+      typeof schemas.queries.GetAllContests.output
+    >;
   },
 });

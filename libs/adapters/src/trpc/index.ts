@@ -69,8 +69,6 @@ export enum Tag {
   Comment = 'Comment',
   Reaction = 'Reaction',
   Query = 'Query',
-  Policy = 'Policy',
-  Projection = 'Projection',
   Integration = 'Integration',
 }
 
@@ -118,7 +116,7 @@ export const event = <
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
 >(
   factory: () => EventsHandlerMetadata<Input, Output>,
-  tag: Tag.Policy | Tag.Projection | Tag.Integration,
+  tag: Tag.Integration,
 ) => {
   const md = factory();
   return trpc.procedure
