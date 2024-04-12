@@ -1,4 +1,5 @@
 import { schemas, type Policy } from '@hicommonwealth/core';
+// noinspection ES6UnusedImports
 
 const inputs = {
   ThreadCreated: schemas.events.ThreadCreated,
