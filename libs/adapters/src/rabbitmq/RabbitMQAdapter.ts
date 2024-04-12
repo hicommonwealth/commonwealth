@@ -4,12 +4,12 @@ import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
-  ILogger,
   InvalidInput,
+  RetryStrategyFn,
   eventHandler,
-  logger,
   schemas,
 } from '@hicommonwealth/core';
+import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
 import * as Rascal from 'rascal';
 import { AckOrNack } from 'rascal';
@@ -25,6 +25,31 @@ const BrokerTopicSubscriptionMap = {
   [BrokerTopics.SnapshotListener]: RascalSubscriptions.SnapshotListener,
 };
 
+const defaultRetryStrategy: RetryStrategyFn = (
+  err: Error | undefined,
+  topic: BrokerTopics,
+  content: any,
+  ackOrNackFn: AckOrNack,
+  log: ILogger,
+) => {
+  if (err instanceof InvalidInput) {
+    log.error(`Invalid event`, err, {
+      topic,
+      message: content,
+    });
+    ackOrNackFn(err, { strategy: 'nack' });
+  } else {
+    log.error(`Failed to process event`, err, {
+      topic,
+      message: content,
+    });
+    ackOrNackFn(err, [
+      { strategy: 'republish', defer: 2000, attempts: 3 },
+      { strategy: 'nack' },
+    ]);
+  }
+};
+
 export class RabbitMQAdapter implements Broker {
   protected _initialized = false;
 
@@ -35,7 +60,7 @@ export class RabbitMQAdapter implements Broker {
   private _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    this._log = logger().getLogger(__filename);
+    this._log = logger(__filename);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -112,23 +137,12 @@ export class RabbitMQAdapter implements Broker {
       return false;
     }
 
-    const schema = schemas.events[event.name];
-    const validationResult = schema.safeParse(event.payload);
-    if (!validationResult.success) {
-      this._log.error(
-        'Event schema validation failed',
-        validationResult.error,
-        logContext,
-      );
-      return false;
-    }
-
     try {
       const publication = await this.broker!.publish(rascalPubName, event);
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
-          this._log.debug('Message published', undefined, {
+          this._log.debug('Message published', {
             messageId,
             ...logContext,
           });
@@ -160,6 +174,7 @@ export class RabbitMQAdapter implements Broker {
   public async subscribe(
     topic: BrokerTopics,
     handler: EventsHandlerMetadata<EventSchemas>,
+    retryStrategy?: RetryStrategyFn,
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
@@ -190,31 +205,25 @@ export class RabbitMQAdapter implements Broker {
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
-          eventHandler(handler, content)
+          eventHandler(handler, content, true)
             .then(() => {
-              this._log.debug('Message Acked', undefined, {
+              this._log.debug('Message Acked', {
                 topic,
                 message: content,
               });
               ackOrNackFn();
             })
             .catch((err: Error | undefined) => {
-              if (err instanceof InvalidInput) {
-                this._log.error(`Invalid event`, err, {
+              if (retryStrategy)
+                retryStrategy(err, topic, content, ackOrNackFn, this._log);
+              else
+                defaultRetryStrategy(
+                  err,
                   topic,
-                  message: content,
-                });
-                ackOrNackFn(err, { strategy: 'nack' });
-              } else {
-                this._log.error(`Failed to process event`, err, {
-                  topic,
-                  message: content,
-                });
-                ackOrNackFn(err, [
-                  { strategy: 'republish', defer: 2000, attempts: 3 },
-                  { strategy: 'nack' },
-                ]);
-              }
+                  content,
+                  ackOrNackFn,
+                  this._log,
+                );
             });
         },
       );

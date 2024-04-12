@@ -2,6 +2,7 @@ import { StdFee } from '@cosmjs/amino';
 import { Slip10RawIndex } from '@cosmjs/crypto';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Wallet as EthWallet } from '@ethersproject/wallet';
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
@@ -94,6 +95,10 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     signerAddr = signerAddress;
   });
 
+  after(async () => {
+    await dispose()();
+  });
+
   const getActiveVotingProposals = async () => {
     const { proposals: activeProposals } = await rpc.gov.proposals(
       ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
@@ -171,6 +176,11 @@ describe('Ethermint Governance v1beta1 util Tests', () => {
     before(async () => {
       await tester.seedDb();
     });
+
+    after(async () => {
+      await dispose()();
+    });
+
     it('should fetch active proposals (evmos-dev-local)', async () => {
       const id = 'evmos-dev-local'; // CI devnet
       const tmClient = await getTMClient(

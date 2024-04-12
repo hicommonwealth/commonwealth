@@ -1,12 +1,19 @@
-import { BalanceType } from '@hicommonwealth/core';
-import { models, tester, UserInstance } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
-  beforeEach(async () => {
-    await tester.seedDb();
+  let models: DB;
+
+  before(async () => {
+    models = await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('Creates new ChainNode when', async () => {
@@ -33,6 +40,7 @@ describe('ChainNode Tests', () => {
   });
 
   it('adds eth chain node to db', async () => {
+    await models.ChainNode.destroy({ where: { eth_chain_id: 123 } });
     assert.equal(
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
@@ -199,6 +207,7 @@ describe('ChainNode Tests', () => {
       assert.equal(updatedNode.balance_type, 'ethereum');
       assert.equal(updatedNode.eth_chain_id, 123);
     });
+
     it('Cosmos', async () => {
       const cosmos_chain_id = 'osmosiz';
       const controller = new ServerCommunitiesController(models, null);

@@ -1,4 +1,4 @@
-import { AccessLevel } from '@hicommonwealth/core';
+import { AccessLevel } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
@@ -6,7 +6,7 @@ import React, { useMemo, useState } from 'react';
 import app from 'state';
 import RoleInfo from '../../../../../models/RoleInfo';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
-import { CWButton } from '../../../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../../../components/members_search_bar';
 import './UpgradeRolesForm.scss';

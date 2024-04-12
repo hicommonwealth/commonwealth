@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import {
-  ChainBase,
-  NotificationCategories,
-  ServerError,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   DB,
   ProfileAttributes,
@@ -22,6 +16,12 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
@@ -35,7 +35,7 @@ import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 type MagicLoginContext = {
   models: DB;

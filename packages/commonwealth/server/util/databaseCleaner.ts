@@ -1,4 +1,5 @@
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,8 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
  * the cleaning functions to run at a specific hour each day as defined by the `hourToRun` constructor argument. This
  * class uses UTC so that deployments/execution in various timezones does not affect functionality.
  */
-export default class DatabaseCleaner {
-  private readonly log = logger().getLogger(__filename);
+export class DatabaseCleaner {
+  private readonly log = logger(__filename);
   private _models: DB;
   private _timeToRun: Date;
   private _completed = false;
@@ -331,5 +332,3 @@ export default class DatabaseCleaner {
     return this._timeoutID;
   }
 }
-
-export const databaseCleaner = new DatabaseCleaner();

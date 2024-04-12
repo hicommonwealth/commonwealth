@@ -1,4 +1,4 @@
-import { AccessLevel } from '@hicommonwealth/core';
+import { AccessLevel } from '@hicommonwealth/shared';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';

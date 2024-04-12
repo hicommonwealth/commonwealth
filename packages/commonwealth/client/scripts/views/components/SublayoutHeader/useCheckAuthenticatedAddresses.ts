@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { chainBaseToCanvasChainId } from 'canvas';
 import app from 'state';
 

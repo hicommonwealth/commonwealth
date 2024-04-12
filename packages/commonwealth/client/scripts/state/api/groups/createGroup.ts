@@ -4,7 +4,7 @@ import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface CreateGroupProps {
-  chainId: string;
+  communityId: string;
   address: string;
   groupName: string;
   topicIds: number[];
@@ -14,7 +14,7 @@ interface CreateGroupProps {
 }
 
 const createGroup = async ({
-  chainId,
+  communityId,
   address,
   groupName,
   groupDescription,
@@ -24,8 +24,8 @@ const createGroup = async ({
 }: CreateGroupProps) => {
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
-    community_id: chainId,
-    author_community_id: chainId,
+    community_id: communityId,
+    author_community_id: communityId,
     address,
     metadata: {
       name: groupName,
@@ -39,11 +39,11 @@ const createGroup = async ({
   });
 };
 
-const useCreateGroupMutation = ({ chainId }: { chainId: string }) => {
+const useCreateGroupMutation = ({ communityId }: { communityId: string }) => {
   return useMutation({
     mutationFn: createGroup,
     onSuccess: async () => {
-      const key = [ApiEndpoints.FETCH_GROUPS, chainId];
+      const key = [ApiEndpoints.FETCH_GROUPS, communityId];
       queryClient.cancelQueries(key);
       queryClient.refetchQueries(key);
     },

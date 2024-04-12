@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
@@ -90,7 +90,9 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
 
     try {
       const signBytesResult = await window.station.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
+        Buffer.from(
+          canvas.serializeSessionPayload(canvasSessionPayload),
+        ).toString('base64'),
       );
 
       result = signBytesResult;

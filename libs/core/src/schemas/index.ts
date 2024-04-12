@@ -15,8 +15,10 @@ export type Aggregates = Extract<
   | 'Subscription'
   | 'Thread'
   | 'User'
+  | 'StakeTransaction'
 >;
 export { entities };
 
 export * as commands from './commands';
 export * as queries from './queries';
+export * from './utils.schemas';

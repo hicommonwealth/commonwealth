@@ -2,13 +2,10 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import {
-  AppError,
-  CosmosGovernanceVersion,
-  NodeHealth,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError, NodeHealth } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { ChainNodeAttributes, DB } from '@hicommonwealth/model';
+import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import axios from 'axios';
 import * as express from 'express';
 import _ from 'lodash';
@@ -17,7 +14,7 @@ import {
   calcCosmosRPCCacheKeyDuration,
 } from './cosmosCache';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 const DEFAULT_CACHE_DURATION = 60 * 10; // 10 minutes
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300; // 5 min
 const ALLOW_FAIL_RE = /^(tx)|(auth)/;
@@ -41,7 +38,7 @@ function setupCosmosProxy(
       lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
-      log.trace('Got request:', null, { body: req.body });
+      log.trace('Got request:', { body: req.body });
       let cosmos_chain_id, chainNodeUrl, previouslyFailed, isAllowedToFail;
       try {
         isAllowedToFail = ALLOW_FAIL_RE.test(req.body?.method); // all Cosmos chains do TX via RPC
@@ -72,7 +69,7 @@ function setupCosmosProxy(
         }
 
         if (chainNodeUrl && !useProxy) {
-          log.trace('Found cosmos endpoint:', null, { chainNodeUrl });
+          log.trace('Found cosmos endpoint:', { chainNodeUrl });
           response = await axios
             .post(chainNodeUrl, req.body, {
               headers: {
@@ -103,7 +100,7 @@ function setupCosmosProxy(
 
         await upgradeBetaNodeIfNeeded(req, response, community.ChainNode);
 
-        log.trace('Got response from endpoint:', null, { data: response.data });
+        log.trace('Got response from endpoint:', { data: response.data });
         return res.send(response.data);
       } catch (err) {
         const error = { message: err.response?.data?.message ?? err.message };
@@ -132,7 +129,10 @@ function setupCosmosProxy(
       lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
-      log.trace('Got request:', null, { request: req.originalUrl });
+      log.trace('Got request:', null, {
+        requestUrl: req.originalUrl,
+        requestBody: req.body,
+      });
       let cosmos_chain_id, chainNodeRestUrl, previouslyFailed, isAllowedToFail;
       try {
         const communityId = req.params.community_id;
@@ -277,7 +277,6 @@ function setupCosmosProxy(
     log.trace(
       `Problem with endpoint ${failedUrl}.
        Marking node as 'failed' for ${FALLBACK_NODE_DURATION} seconds.`,
-      null,
       { failedUrl, cosmos_chain_id, error },
     );
   };
@@ -368,7 +367,7 @@ function setupCosmosProxy(
       });
       const targetRestUrl = chainNode?.alt_wallet_url;
       const targetRpcUrl = chainNode?.url;
-      log.trace('Found cosmos endpoint', null, { targetRestUrl, targetRpcUrl });
+      log.trace(`Found cosmos endpoint: ${targetRestUrl}, ${targetRpcUrl}`);
 
       try {
         let response;
@@ -379,7 +378,7 @@ function setupCosmosProxy(
             },
           });
         }
-        log.trace('Got response from endpoint', null, { data: response.data });
+        log.trace('Response from endpoint', response?.data);
 
         // magicCosmosAPI is CORS-approved for the magic iframe
         res.setHeader('Access-Control-Allow-Origin', 'https://auth.magic.link');

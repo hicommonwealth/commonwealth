@@ -1,5 +1,6 @@
-import { AppError, BalanceType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import { UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {

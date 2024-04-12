@@ -11,7 +11,10 @@ describe('makeGetBalancesOptions', () => {
   it('should return empty array', () => {
     const groups: GroupAttributes[] = [];
     const addresses: AddressAttributes[] = [];
-    const result = makeGetBalancesOptions(groups, addresses);
+    const result = makeGetBalancesOptions(
+      groups,
+      addresses.map((a) => a.address),
+    );
     expect(Array.isArray(result)).to.be.true;
     expect(result).to.have.length(0);
   });
@@ -109,7 +112,10 @@ describe('makeGetBalancesOptions', () => {
         },
       },
     ];
-    const result = makeGetBalancesOptions(groups, addresses);
+    const result = makeGetBalancesOptions(
+      groups,
+      addresses.map((a) => a.address),
+    );
     expect(result).to.have.same.deep.members(expectedResult);
     expect(result);
   });
@@ -252,7 +258,10 @@ describe('makeGetBalancesOptions', () => {
         },
       },
     ];
-    const result = makeGetBalancesOptions(groups, addresses);
+    const result = makeGetBalancesOptions(
+      groups,
+      addresses.map((a) => a.address),
+    );
     expect(result).to.have.same.deep.members(expectedResult);
     expect(result);
   });

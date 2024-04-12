@@ -1,4 +1,4 @@
-import { CommunityCategoryType } from '@hicommonwealth/core';
+import { CommunityCategoryType } from '@hicommonwealth/shared';
 import app from 'state';
 
 export const getCommunityTags = (community: string) => {

@@ -7,11 +7,12 @@
     "build"
   ],
   "main": "build/index",
+  "types": "src/index",
   "scripts": {
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts' --exit"
+    "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
     "@trpc/server": "^10.45.1",
@@ -23,9 +24,6 @@
     "node-fetch": "2",
     "passport": "^0.4.0",
     "pg": "^8.11.3",
-    "pino": "^8.19.0",
-    "pino-http": "^9.0.0",
-    "pino-http-print": "^3.1.0",
     "rascal": "^14.4.5",
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
@@ -34,7 +32,5 @@
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
   },
-  "devDependencies": {
-    "pino-pretty": "^10.3.1"
-  }
+  "devDependencies": {}
 }

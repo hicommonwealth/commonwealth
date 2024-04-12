@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -37,7 +37,9 @@ export function isDefaultStage(stage: string) {
 
 // Provides a default if community has no custom stages.
 export function parseCustomStages(customStages?: string[]): string[] {
-  return customStages ?? Object.values(ThreadStage);
+  return customStages && customStages.length > 0
+    ? customStages
+    : Object.values(ThreadStage);
 }
 
 /*
@@ -195,7 +197,13 @@ export function formatAddressShort(
   numberOfVisibleCharacters = 5,
   numberOfVisibleCharactersTail = 4,
 ) {
-  if (address.length < 10) return address;
+  if (
+    address.length <
+    numberOfVisibleCharacters + numberOfVisibleCharactersTail + 1
+  ) {
+    return address;
+  }
+
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
     -numberOfVisibleCharactersTail,
   )}`;
@@ -332,17 +340,3 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
 
   return decimals;
 }
-
-export const shortenIdentifier = (identifer: string) => {
-  // Check if the string is longer than 6 characters
-  if (identifer.length > 6) {
-    // Extract the first three and last three characters
-    const start = identifer.substring(0, 3);
-    const end = identifer.substring(identifer.length - 3);
-    // Return the formatted string
-    return `${start}...${end}`;
-  } else {
-    // Return the original string if it's 6 characters or shorter
-    return identifer;
-  }
-};

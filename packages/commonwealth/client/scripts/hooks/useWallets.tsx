@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   completeClientLogin,
@@ -299,7 +299,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       if (app.chain) {
         const community =
-          app.user.selectedChain ||
+          app.user.selectedCommunity ||
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,

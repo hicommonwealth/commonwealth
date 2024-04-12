@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import React, { useState } from 'react';
 import app from 'state';

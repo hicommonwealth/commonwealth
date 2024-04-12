@@ -6,7 +6,7 @@ import type {
 } from '@cosmjs/proto-signing';
 import type { ChainInfo } from '@keplr-wallet/types';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
