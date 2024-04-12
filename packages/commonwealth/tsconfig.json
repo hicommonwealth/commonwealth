@@ -8,21 +8,11 @@
     "outDir": "build",
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/core": [
-        "/Users/burton/projects/commonwealth-pnpm/libs/core"
-      ],
-      "@hicommonwealth/shared": [
-        "/Users/burton/projects/commonwealth-pnpm/libs/shared"
-      ],
-      "@hicommonwealth/model": [
-        "/Users/burton/projects/commonwealth-pnpm/libs/model"
-      ],
-      "@hicommonwealth/chains": [
-        "/Users/burton/projects/commonwealth-pnpm/libs/chains"
-      ],
-      "@hicommonwealth/adapters": [
-        "/Users/burton/projects/commonwealth-pnpm/libs/adapters"
-      ],
+      "@hicommonwealth/core": ["../../libs/core"],
+      "@hicommonwealth/shared": ["../../libs/shared"],
+      "@hicommonwealth/model": ["../../libs/model"],
+      "@hicommonwealth/chains": ["../../libs/chains"],
+      "@hicommonwealth/adapters": ["../../libs/adapters"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
@@ -38,7 +28,7 @@
   "references": [
     { "path": "../../libs/adapters" },
     { "path": "../../libs/chains" },
-    { "path": "/Users/burton/projects/commonwealth-pnpm/libs/core" },
+    { "path": "../../libs/core" },
     { "path": "../../libs/model" },
     { "path": "../../libs/shared" }
   ]
