@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import passport from 'passport';
 import {
   createOpenApiExpressMiddleware,
@@ -190,7 +190,9 @@ export const toExpress = (router: OpenApiRouter) =>
   });
 
 // used for REST like routes (External)
-export const toOpenApiExpress = (router: OpenApiRouter) =>
+export const toOpenApiExpress = (
+  router: OpenApiRouter,
+): ((req: Request, res: Response) => Promise<void>) =>
   createOpenApiExpressMiddleware({
     router,
     createContext: ({ req }) => ({ req }),
