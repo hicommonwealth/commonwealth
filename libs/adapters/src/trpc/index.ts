@@ -10,6 +10,7 @@ import {
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request, Response } from 'express';
+import { OpenAPIV3 } from 'openapi-types';
 import passport from 'passport';
 import {
   createOpenApiExpressMiddleware,
@@ -204,6 +205,7 @@ export const toOpenApiExpress = (
 export const toOpenApiDocument = (
   router: OpenApiRouter,
   opts: GenerateOpenApiDocumentOptions,
-) => generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
+): OpenAPIV3.Document =>
+  generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
 
 export const router = trpc.router;
