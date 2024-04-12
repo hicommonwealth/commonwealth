@@ -1,7 +1,7 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'node:url';
-import type { DataTypes } from 'sequelize';
+import type { DataTypes, Sequelize } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import {
@@ -37,7 +37,7 @@ export type ReactionInstance = ModelInstance<ReactionAttributes>;
 export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
 export default (
-  sequelize: Sequelize.Sequelize,
+  sequelize: Sequelize,
   dataTypes: typeof DataTypes,
 ): ReactionModelStatic => {
   const Reaction = <ReactionModelStatic>sequelize.define(
