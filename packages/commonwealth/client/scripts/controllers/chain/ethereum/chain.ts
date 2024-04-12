@@ -83,22 +83,22 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this.app.chain.meta.node.ethChainId !== 1
     ) {
       this.app.chain.block.height = Number(headers.number);
-      this.app.chain.block.lastTime = moment.unix(+Number(headers.timestamp));
+      this.app.chain.block.lastTime = moment.unix(Number(headers.timestamp));
 
       // TODO: @Timothee - delete all this and the dependencies on app.chain.block.duration
       // compute the average block time
       // TODO: cache the average blocktime on server rather than computing it here every time
       const nHeadersForBlocktime = 5;
       let totalDuration = 0;
-      let lastBlockTime = +Number(headers.timestamp);
+      let lastBlockTime = Number(headers.timestamp);
       for (let n = 0; n < nHeadersForBlocktime; n++) {
         const prevBlockNumber = blockNumber - 1 - n;
         if (prevBlockNumber > 0) {
           const prevHeader = await this._api.eth.getBlock(
             `${blockNumber - 1 - n}`,
           );
-          const duration = lastBlockTime - +Number(prevHeader.timestamp);
-          lastBlockTime = +Number(prevHeader.timestamp);
+          const duration = lastBlockTime - Number(prevHeader.timestamp);
+          lastBlockTime = Number(prevHeader.timestamp);
           totalDuration += duration;
         } else {
           break;
@@ -153,10 +153,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this._api?.givenProvider &&
       this._api.currentProvider instanceof Web3.providers.WebsocketProvider
     ) {
-      (this._api.givenProvider as Web3BaseProvider).disconnect(
-        1000,
-        'finished',
-      );
+      if (this._api.givenProvider instanceof Web3BaseProvider) {
+        this._api.givenProvider.disconnect(1000, 'finished');
+      }
     }
   }
 }
