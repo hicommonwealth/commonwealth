@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';

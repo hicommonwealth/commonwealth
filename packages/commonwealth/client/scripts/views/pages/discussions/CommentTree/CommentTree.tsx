@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';

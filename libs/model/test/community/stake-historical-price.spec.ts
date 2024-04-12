@@ -1,4 +1,5 @@
-import { BalanceType, dispose, query } from '@hicommonwealth/core';
+import { dispose, query } from '@hicommonwealth/core';
+import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';

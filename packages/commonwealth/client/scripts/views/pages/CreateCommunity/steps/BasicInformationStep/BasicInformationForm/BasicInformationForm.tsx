@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
@@ -28,6 +28,7 @@ import './BasicInformationForm.scss';
 import {
   BASE_ID,
   BLAST_ID,
+  ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   existingCommunityIds,
@@ -112,9 +113,15 @@ const BasicInformationForm = ({
 
   const getInitialValue = () => {
     switch (selectedCommunity.type) {
-      case CommunityType.Ethereum:
+      case CommunityType.Base:
         return {
           chain: getChainOptions()?.find((o) => o.value === BASE_ID),
+        };
+      case CommunityType.Ethereum:
+        return {
+          chain: getChainOptions()?.find(
+            (o) => o.value === ETHEREUM_MAINNET_ID,
+          ),
         };
       case CommunityType.Cosmos:
         return {

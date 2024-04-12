@@ -38,7 +38,7 @@ class GqlLazyLoader {
   public static async SPACE_QUERY() {
     await this.init();
     return this.gql`
-  query Space($space: String) {
+  query Space($space: String!) {
     space(id: $space) {
       id
       name
@@ -191,7 +191,6 @@ async function getApolloClient() {
   const { ApolloClient, createHttpLink, InMemoryCache } = await import(
     '@apollo/client/core'
   );
-
   // HTTP connection to the API
   const httpLink = createHttpLink({
     // You should use an absolute URL here
@@ -199,7 +198,6 @@ async function getApolloClient() {
       process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
     }/graphql`,
   });
-
   // Create the apollo client
   apolloClient = new ApolloClient({
     link: httpLink,
@@ -284,7 +282,6 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
       space,
     },
   });
-
   return spaceObj.data.space;
 }
 

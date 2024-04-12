@@ -1,4 +1,4 @@
-import { AbiType } from '@hicommonwealth/core';
+import { AbiType } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 
 export type RawEvmEvent = {
