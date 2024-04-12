@@ -11,7 +11,7 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestAction>>sequelize.define<ContestAction>(
     'ContestAction',
     {
-      contest: {
+      contestAddress: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
@@ -23,7 +23,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      address: {
+      actorAddress: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
@@ -33,10 +33,9 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
       contentUrl: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
-      weight: {
-        type: Sequelize.INTEGER, // TODO: we have integer in stakes, is this OK?
+      votingPower: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       createdAt: { type: Sequelize.DATE, allowNull: false },

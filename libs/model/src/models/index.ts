@@ -15,8 +15,8 @@ export type DB = Models<typeof Factories> & {
 export const syncDb = async (db: DB, log = false) => {
   // TODO: build this map when creating one to many associations with composite keys
   const compositeKeys = [
-    mapFk(db.Contest, db.ContestAction, ['contest', 'contestId']),
-    mapFk(db.ContestManager, db.Contest, ['contest']),
+    mapFk(db.Contest, db.ContestAction, ['contestAddress', 'contestId']),
+    mapFk(db.ContestManager, db.Contest, ['contestAddress']),
   ];
 
   compositeKeys.forEach(({ parent, child }) =>
@@ -62,8 +62,8 @@ export const buildDb = (sequelize: Sequelize): DB => {
    *    .toMany(db.Topic, 'communityId')...
    */
   oneToMany(db.Community, db.ContestManager, 'communityId');
-  oneToMany(db.ContestManager, db.Contest, 'contest');
-  oneToMany(db.Contest, db.ContestAction, 'contest');
+  oneToMany(db.ContestManager, db.Contest, 'contestAddress');
+  oneToMany(db.Contest, db.ContestAction, 'contestAddress');
 
   return db;
 };

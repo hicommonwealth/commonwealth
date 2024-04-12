@@ -13,8 +13,8 @@ export const GetAllContests: Query<
         model: models.ContestAction,
         attributes: [
           'action',
-          'address',
-          'weight',
+          'actorAddress',
+          'votingPower',
           'contentId',
           'contentUrl',
           'createdAt',

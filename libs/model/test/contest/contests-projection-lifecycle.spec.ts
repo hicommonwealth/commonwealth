@@ -8,6 +8,7 @@ import {
 } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
 import { bootstrap_testing, seed } from '../../src/tester';
@@ -55,7 +56,7 @@ describe('Contests projection lifecycle', () => {
       name: schemas.EventNames.RecurringContestManagerDeployed,
       payload: {
         namespace,
-        contest: recurring,
+        contestAddress: recurring,
         interval: 10,
         createdAt,
       },
@@ -64,7 +65,7 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestStarted,
       payload: {
-        contest: recurring,
+        contestAddress: recurring,
         contestId,
         startTime: new Date(),
         endTime: new Date(),
@@ -76,7 +77,7 @@ describe('Contests projection lifecycle', () => {
       name: schemas.EventNames.OneOffContestManagerDeployed,
       payload: {
         namespace,
-        contest: oneoff,
+        contestAddress: oneoff,
         length: 1,
         createdAt,
       },
@@ -85,7 +86,7 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestStarted,
       payload: {
-        contest: oneoff,
+        contestAddress: oneoff,
         startTime: new Date(),
         endTime: new Date(),
         createdAt,
@@ -95,10 +96,10 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentAdded,
       payload: {
-        contest: oneoff,
+        contestAddress: oneoff,
         contentId,
-        creator,
-        url: contentUrl,
+        creatorAddress: creator,
+        contentUrl: contentUrl,
         createdAt,
       },
     });
@@ -106,11 +107,11 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentAdded,
       payload: {
-        contest: recurring,
+        contestAddress: recurring,
         contestId,
         contentId,
-        creator,
-        url: contentUrl,
+        creatorAddress: creator,
+        contentUrl: contentUrl,
         createdAt,
       },
     });
@@ -118,11 +119,11 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentUpvoted,
       payload: {
-        contest: recurring,
+        contestAddress: recurring,
         contestId,
         contentId,
-        address: voter1,
-        weight: votingPower1,
+        voterAddress: voter1,
+        votingPower: votingPower1,
         createdAt,
       },
     });
@@ -130,11 +131,11 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentUpvoted,
       payload: {
-        contest: recurring,
+        contestAddress: recurring,
         contestId,
         contentId,
-        address: voter2,
-        weight: votingPower2,
+        voterAddress: voter2,
+        votingPower: votingPower2,
         createdAt,
       },
     });
@@ -142,10 +143,20 @@ describe('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentUpvoted,
       payload: {
-        contest: oneoff,
+        contestAddress: oneoff,
         contentId,
-        address: voter3,
-        weight: votingPower3,
+        voterAddress: voter3,
+        votingPower: votingPower3,
+        createdAt,
+      },
+    });
+
+    await handleEvent(Contests(), {
+      name: schemas.EventNames.ContestWinnersRecorded,
+      payload: {
+        contestAddress: recurring,
+        contestId,
+        winners: [voter2, voter1],
         createdAt,
       },
     });
@@ -158,41 +169,41 @@ describe('Contests projection lifecycle', () => {
 
     const result = await query(GetAllContests(), {
       actor,
-      payload: { contest: recurring },
+      payload: { contest_address: recurring },
     });
     expect(result).to.deep.eq([
       {
-        contest: recurring,
+        contestAddress: recurring,
         contestId,
         startTime: result?.at(0)?.startTime, // sql date
         endTime: result?.at(0)?.endTime, // sql date
-        winners: null,
+        winners: [voter2, voter1],
         ContestActions: [
           {
             action: 'added',
-            address: creator,
+            actorAddress: creator,
             contentId,
             contentUrl,
-            weight: 0,
+            votingPower: 0,
             createdAt,
           },
           {
             action: 'upvoted',
-            address: voter1,
+            actorAddress: voter1,
             contentId,
-            contentUrl: '',
-            weight: 1,
+            contentUrl: null,
+            votingPower: 1,
             createdAt,
           },
           {
             action: 'upvoted',
-            address: voter2,
+            actorAddress: voter2,
             contentId,
-            contentUrl: '',
-            weight: 2,
+            contentUrl: null,
+            votingPower: 2,
             createdAt,
           },
-        ],
+        ] as Array<z.infer<typeof schemas.projections.ContestAction>>,
       },
     ]);
   });
@@ -203,7 +214,7 @@ describe('Contests projection lifecycle', () => {
         name: schemas.EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
-          contest: recurring,
+          contestAddress: recurring,
           interval: 10,
           createdAt,
         },

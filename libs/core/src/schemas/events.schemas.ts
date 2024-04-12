@@ -60,18 +60,18 @@ export const EventMetadata = z.object({
 // on-chain contest manager events
 export const RecurringContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
-  contest: z.string().describe('Contest manager address'),
+  contestAddress: z.string().describe('Contest manager address'),
   interval: z.number().int().positive().describe('Recurring constest interval'),
 }).describe('When a new recurring contest manager gets deployed');
 
 export const OneOffContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
-  contest: z.string().describe('Contest manager address'),
+  contestAddress: z.string().describe('Contest manager address'),
   length: z.number().int().positive().describe('Length of contest in days'),
 }).describe('When a new one-off contest manager gets deployed');
 
 const ContestManagerEvent = EventMetadata.extend({
-  contest: z.string().describe('Contest manager address'),
+  contestAddress: z.string().describe('Contest manager address'),
   contestId: z
     .number()
     .int()
@@ -87,17 +87,17 @@ export const ContestStarted = ContestManagerEvent.extend({
 
 export const ContestContentAdded = ContestManagerEvent.extend({
   contentId: z.number().int().positive().describe('New content id'),
-  creator: z.string().describe('Address of content creator'),
-  url: z.string().describe('Content url'),
+  creatorAddress: z.string().describe('Address of content creator'),
+  contentUrl: z.string(),
 }).describe('When new content is added to a running contest');
 
 export const ContestContentUpvoted = ContestManagerEvent.extend({
   contentId: z.number().int().positive().describe('Content id'),
-  address: z.string().describe('Address upvoting on content'),
-  weight: z
+  voterAddress: z.string().describe('Address upvoting on content'),
+  votingPower: z
     .number()
     .int()
-    .describe('Stake weight of address upvoting on content'),
+    .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
 
 export const ContestWinnersRecorded = ContestManagerEvent.extend({

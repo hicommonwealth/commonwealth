@@ -55,10 +55,10 @@ export const Contests: Projection<typeof inputs> = () => ({
       await models.ContestAction.upsert({
         ...payload,
         contestId: payload.contestId || 0,
-        address: payload.creator,
+        actorAddress: payload.creatorAddress,
         action: 'added',
-        contentUrl: payload.url,
-        weight: 0,
+        contentUrl: payload.contentUrl,
+        votingPower: 0,
       });
     },
 
@@ -66,8 +66,8 @@ export const Contests: Projection<typeof inputs> = () => ({
       await models.ContestAction.upsert({
         ...payload,
         contestId: payload.contestId || 0,
+        actorAddress: payload.voterAddress,
         action: 'upvoted',
-        contentUrl: '',
       });
     },
 
@@ -78,7 +78,7 @@ export const Contests: Projection<typeof inputs> = () => ({
         },
         {
           where: {
-            contest: payload.contest,
+            contestAddress: payload.contestAddress,
             contestId: payload.contestId || 0,
           },
         },

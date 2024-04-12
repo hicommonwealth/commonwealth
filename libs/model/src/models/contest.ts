@@ -9,7 +9,7 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<Contest>>sequelize.define<Contest>(
     'Contest',
     {
-      contest: {
+      contestAddress: {
         type: Sequelize.STRING,
         primaryKey: true,
       },

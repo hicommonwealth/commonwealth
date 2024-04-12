@@ -11,7 +11,7 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestManager>>sequelize.define<ContestManager>(
     'ContestManager',
     {
-      contest: {
+      contestAddress: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
