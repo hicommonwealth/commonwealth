@@ -11,15 +11,6 @@ export interface AsyncWriter {
   readonly write: (filename: string, content: string) => Promise<Resource>;
 }
 
-export function createAsyncWriter(type: 'mock' | 's3'): AsyncWriter {
-  switch (type) {
-    case 'mock':
-      return createAsyncWriterMock();
-    case 's3':
-      return createAsyncWriterS3();
-  }
-}
-
 export function createAsyncWriterMock() {
   const written: { [key: string]: string } = {};
 
