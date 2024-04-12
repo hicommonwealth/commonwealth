@@ -1,7 +1,7 @@
 import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { createAsyncWriterS3 } from './createAsyncWriter';
-import { createDatabasePaginatorDefault } from './createDatabasePaginator';
+import { createAsyncWriterMock } from './createAsyncWriter';
+import { createDatabasePaginatorMock } from './createDatabasePaginator';
 import { createSitemapGenerator } from './createSitemapGenerator';
 
 describe('createSitemapGenerator', function () {
@@ -24,13 +24,15 @@ describe('createSitemapGenerator', function () {
       });
     }
 
-    const writer = createAsyncWriterS3();
-    const paginator = createDatabasePaginatorDefault(20);
+    const writer = createAsyncWriterMock();
+    const paginator = createDatabasePaginatorMock(50, 10);
 
     const sitemapGenerator = createSitemapGenerator(writer, [
       paginator.threads,
+      paginator.profiles,
     ]);
+
     const written = await sitemapGenerator.exec();
-    expect(written.children.length).to.equal(4);
+    expect(written.children.length).to.equal(12);
   });
 });

@@ -158,6 +158,25 @@ export function createDatabasePaginatorWithAdapter<T>(
 export function createDatabasePaginatorMock(
   nrRecords: number,
   pageSize: number,
+) {
+  const threads = createDatabasePaginatorMockForTable(
+    'threads',
+    nrRecords,
+    pageSize,
+  );
+  const profiles = createDatabasePaginatorMockForTable(
+    'profiles',
+    nrRecords,
+    pageSize,
+  );
+
+  return { threads, profiles };
+}
+
+export function createDatabasePaginatorMockForTable(
+  table: string,
+  nrRecords: number,
+  pageSize: number,
 ): Paginator {
   let pageIdx = 0;
   const maxPages = Math.floor(nrRecords / pageSize);
@@ -173,7 +192,7 @@ export function createDatabasePaginatorMock(
     const links = [
       {
         id: 0,
-        url: 'http://www.example.com/threads/' + idx++,
+        url: `http://www.example.com/${table}/` + idx++,
         updated_at: new Date().toISOString(),
       },
     ];
