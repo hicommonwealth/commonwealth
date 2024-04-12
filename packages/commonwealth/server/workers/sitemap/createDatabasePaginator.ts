@@ -55,7 +55,7 @@ function createThreadsTableAdapter(): TableAdapter {
   >;
 
   function toRecord(obj: object) {
-    const thread: ThreadInstancePartial = obj;
+    const thread = obj as ThreadInstancePartial;
     const url = getThreadUrl({
       chain: thread.community_id,
       id: thread.id,
