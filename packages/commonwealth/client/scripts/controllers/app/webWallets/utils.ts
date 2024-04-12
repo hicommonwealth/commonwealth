@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/core';
+import { BalanceType } from '@hicommonwealth/shared';
 import app from 'state';
 
 export const getCosmosChains = (isEvm?: boolean): string[] => {

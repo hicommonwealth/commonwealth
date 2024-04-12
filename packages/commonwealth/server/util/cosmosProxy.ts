@@ -129,7 +129,7 @@ function setupCosmosProxy(
       lookupKeyDurationInReq,
     ),
     async function cosmosProxy(req, res) {
-      log.trace('Got request:', null, {
+      log.trace('Got request:', {
         requestUrl: req.originalUrl,
         requestBody: req.body,
       });
@@ -325,7 +325,7 @@ function setupCosmosProxy(
         });
         if (!chainNode) return;
         chainNode.slip44 = registeredChain.data.chain.slip44;
-        log.trace('Registered chain found. slip44 recorded.', null, {
+        log.trace('Registered chain found. slip44 recorded.', {
           cosmos_chain_id,
           slip44: registeredChain?.data?.chain?.slip44,
         });
