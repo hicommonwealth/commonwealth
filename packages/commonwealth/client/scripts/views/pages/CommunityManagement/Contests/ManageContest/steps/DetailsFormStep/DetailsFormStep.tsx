@@ -1,21 +1,24 @@
+import moment from 'moment';
 import React, { useState } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
-
-import { LaunchContestStep } from '../../ManageContest';
-import { detailsFormValidationSchema } from './validation';
-
+import NumberSelector from 'views/components/NumberSelector';
 import {
   CWCoverImageUploader,
   ImageBehavior,
 } from 'views/components/component_kit/cw_cover_image_uploader';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
+
+import { LaunchContestStep } from '../../ManageContest';
+import { detailsFormValidationSchema } from './validation';
+
 import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
@@ -28,12 +31,14 @@ export enum ContestFeeType {
   DirectDeposit = 'direct-deposit',
 }
 
-enum ContestReccuringType {
+enum ContestRecurringType {
   Yes = 'yes',
   No = 'no',
 }
 
 const INITIAL_PERCENTAGE_VALUE = 10;
+const MAX_WINNERS = 10;
+const MIN_WINNERS = 1;
 
 const prizePercentageOptions = [
   {
@@ -58,12 +63,17 @@ const prizePercentageOptions = [
   },
 ];
 
+const initialPayoutStructure = [60, 25, 15];
+
 const DetailsFormStep = ({
   contestId,
   onSetLaunchContestStep,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
 
+  const [payoutStructure, setPayoutStructure] = useState<number[]>(
+    initialPayoutStructure,
+  );
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
   const [prizePercentage, setPrizePercentage] = useState(
@@ -71,6 +81,12 @@ const DetailsFormStep = ({
   );
 
   const editMode = !!contestId;
+
+  const totalPayoutPercentage = payoutStructure.reduce(
+    (acc, val) => acc + val,
+    0,
+  );
+  const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const goBack = () => {
     // TODO distinct if user came from /manage/contests or /contests
@@ -82,6 +98,10 @@ const DetailsFormStep = ({
   };
 
   const handleSubmit = () => {
+    if (totalPayoutPercentageError) {
+      return;
+    }
+
     if (editMode) {
       // save edit API call
       return goBack();
@@ -93,9 +113,17 @@ const DetailsFormStep = ({
   const getInitialValues = () => {
     return {
       feeType: ContestFeeType.CommunityStake,
-      contestRecurring: ContestReccuringType.Yes,
+      contestRecurring: ContestRecurringType.Yes,
       prizePercentage,
     };
+  };
+
+  const handleAddWinner = () => {
+    setPayoutStructure((prevState) => [...prevState, 0]);
+  };
+
+  const handleRemoveWinner = () => {
+    setPayoutStructure((prevState) => [...prevState.slice(0, -1)]);
   };
 
   return (
@@ -182,7 +210,7 @@ const DetailsFormStep = ({
                   name="feeType"
                   hookToForm
                   onChange={() => {
-                    setValue('contestRecurring', ContestReccuringType.Yes);
+                    setValue('contestRecurring', ContestRecurringType.Yes);
                   }}
                 />
                 <CWRadioButton
@@ -227,19 +255,19 @@ const DetailsFormStep = ({
 
                 <CWRadioButton
                   label="Yes"
-                  value={ContestReccuringType.Yes}
+                  value={ContestRecurringType.Yes}
                   name="contestRecurring"
                   hookToForm
                 />
                 <CWRadioButton
                   label="No"
-                  value={ContestReccuringType.No}
+                  value={ContestRecurringType.No}
                   name="contestRecurring"
                   hookToForm
                   disabled={watch('feeType') === ContestFeeType.CommunityStake}
                 />
 
-                {watch('contestRecurring') === ContestReccuringType.Yes && (
+                {watch('contestRecurring') === ContestRecurringType.Yes && (
                   <>
                     <CWText type="h5">
                       How much of the funds would you like to use weekly?
@@ -268,11 +296,91 @@ const DetailsFormStep = ({
 
               <div>
                 <CWText type="h4">Winners & payouts</CWText>
-                <CWText type="b1">
+                <CWText type="b1" className="winners-description">
                   Set the number of winners and how much of the total prize pool
-                  they take. 20% of each prize will be split amongst the voters
-                  of the winning content.
+                  they take{' '}
+                  <CWText fontWeight="medium">20% of each prize</CWText> will be
+                  split amongst the voters of the winning content.
                 </CWText>
+
+                {payoutStructure.map((payoutNumber, index) => {
+                  return (
+                    <>
+                      <div className="PayoutRow">
+                        <div className="color-square"></div>
+                        <CWText type="h5">
+                          {moment.localeData().ordinal(index + 1)}
+                        </CWText>
+                      </div>
+
+                      <NumberSelector
+                        value={payoutNumber + '%'}
+                        key={index}
+                        onInput={(e) => {
+                          let value = e.target.value;
+
+                          if (!value.includes('%')) {
+                            value = value.slice(0, value.length - 1);
+                          } else {
+                            value = value.replace(/%/g, '');
+                          }
+
+                          if (isNaN(Number(value))) {
+                            return;
+                          }
+
+                          const newPayoutStructure = [
+                            ...payoutStructure.slice(0, index),
+                            Number(value),
+                            ...payoutStructure.slice(index + 1),
+                          ];
+                          setPayoutStructure(newPayoutStructure);
+                        }}
+                        minusDisabled={payoutStructure[index] === 0}
+                        onMinusClick={() => {
+                          const updatedPayoutStructure = [...payoutStructure];
+                          updatedPayoutStructure[index] -= 1;
+                          setPayoutStructure(updatedPayoutStructure);
+                        }}
+                        onPlusClick={() => {
+                          const updatedPayoutStructure = [...payoutStructure];
+                          updatedPayoutStructure[index] += 1;
+                          setPayoutStructure(updatedPayoutStructure);
+                        }}
+                      />
+                    </>
+                  );
+                })}
+
+                <div>
+                  <CWText type="h4">Total =</CWText>
+                  <CWText className="total-percentage">
+                    {totalPayoutPercentage}%
+                  </CWText>
+                  <MessageRow
+                    hasFeedback={totalPayoutPercentageError}
+                    validationStatus="failure"
+                    statusMessage="Total prize must equal 100%"
+                  />
+                </div>
+
+                <div>
+                  <CWButton
+                    label="Remove Winner"
+                    buttonType="secondary"
+                    buttonHeight="sm"
+                    disabled={payoutStructure.length === MIN_WINNERS}
+                    type="button"
+                    onClick={handleRemoveWinner}
+                  />
+                  <CWButton
+                    label="Add Winner"
+                    buttonHeight="sm"
+                    disabled={payoutStructure.length === MAX_WINNERS}
+                    type="button"
+                    onClick={handleAddWinner}
+                  />
+                </div>
               </div>
 
               <CWDivider />

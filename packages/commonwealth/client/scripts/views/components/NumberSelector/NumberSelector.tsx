@@ -9,7 +9,7 @@ interface NumberSelectorProps {
   onMinusClick: () => void;
   minusDisabled: boolean;
   onPlusClick: () => void;
-  plusDisabled: boolean;
+  plusDisabled?: boolean;
   onInput: (e) => void;
   value: string | number;
   inputClassName?: string;
