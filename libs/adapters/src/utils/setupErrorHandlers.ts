@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { Express, NextFunction, Request, Response } from 'express';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 

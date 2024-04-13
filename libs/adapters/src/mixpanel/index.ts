@@ -1,7 +1,7 @@
 import { Analytics, AnalyticsOptions } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import MixpanelLib from 'mixpanel';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 

@@ -1,7 +1,7 @@
 import { Stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { StatsD } from 'hot-shots';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 

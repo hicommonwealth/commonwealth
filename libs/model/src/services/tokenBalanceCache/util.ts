@@ -1,7 +1,7 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/logging';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import AbiCoder from 'web3-eth-abi';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';

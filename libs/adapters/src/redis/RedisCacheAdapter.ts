@@ -1,7 +1,7 @@
 import { Cache, delay, type CacheNamespaces } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
+import { fileURLToPath } from 'url';
 
 const CONNECT_TIMEOUT = 5000;
 

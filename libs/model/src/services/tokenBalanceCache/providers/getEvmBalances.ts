@@ -1,6 +1,6 @@
 import { BalanceSourceType } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { models } from '../../../database';
 import { Balances, GetEvmBalancesOptions } from '../types';

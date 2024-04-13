@@ -1,7 +1,7 @@
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { DB } from './models/index';
 

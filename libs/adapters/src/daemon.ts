@@ -1,6 +1,6 @@
 import { CacheNamespaces } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { CacheDecorator, KeyFunction } from './redis';
 
 const __filename = fileURLToPath(import.meta.url);

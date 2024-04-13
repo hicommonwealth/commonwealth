@@ -1,7 +1,7 @@
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import {
   CacheKeyDuration,
   CustomRequest,

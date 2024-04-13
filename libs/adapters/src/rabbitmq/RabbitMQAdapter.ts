@@ -11,9 +11,9 @@ import {
 } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
-import { fileURLToPath } from 'node:url';
 import * as Rascal from 'rascal';
 import { AckOrNack } from 'rascal';
+import { fileURLToPath } from 'url';
 import { RascalPublications, RascalSubscriptions } from './types';
 
 const __filename = fileURLToPath(import.meta.url);

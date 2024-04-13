@@ -1,7 +1,7 @@
 import { ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { Express } from 'express';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { CustomRequest, lookupKeyDurationInReq } from '../../src';
 import { CacheDecorator } from '../../src/redis';
 
