@@ -15,17 +15,19 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:node:url';
 import { ZodUndefined } from 'zod';
 import { RABBITMQ_URI } from '../../config';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: __filename.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {

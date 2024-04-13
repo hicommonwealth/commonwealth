@@ -8,6 +8,7 @@ import {
 import { analytics, cache, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import express from 'express';
+import { fileURLToPath } from 'url';
 import {
   DATABASE_CLEAN_HOUR,
   PORT,
@@ -22,7 +23,8 @@ const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
 const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT;
 
 // bootstrap production adapters
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 REDIS_URL && cache(new RedisCache(REDIS_URL));

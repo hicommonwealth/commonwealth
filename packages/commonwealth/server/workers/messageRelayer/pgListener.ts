@@ -1,10 +1,12 @@
 import { delay, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { Client } from 'pg';
 import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 const OUTBOX_CHANNEL = 'outbox_channel';
 let retryCount = 0;
 const maxRetries = 5;

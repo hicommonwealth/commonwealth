@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
@@ -23,7 +24,8 @@ import {
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 

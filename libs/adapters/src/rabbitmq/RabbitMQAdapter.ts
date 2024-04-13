@@ -13,6 +13,7 @@ import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
 import * as Rascal from 'rascal';
 import { AckOrNack } from 'rascal';
+import { fileURLToPath } from 'url';
 import { RascalPublications, RascalSubscriptions } from './types';
 
 const BrokerTopicPublicationMap = {
@@ -60,7 +61,8 @@ export class RabbitMQAdapter implements Broker {
   private _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    this._log = logger(import.meta.filename);
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);

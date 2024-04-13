@@ -2,9 +2,11 @@ import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 type UniqueAddresses = {
   thread_id: number;

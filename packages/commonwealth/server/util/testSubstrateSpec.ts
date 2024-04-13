@@ -1,9 +1,11 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { RegisteredTypes } from '@polkadot/types/types';
+import { fileURLToPath } from 'node:url';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   // test out spec

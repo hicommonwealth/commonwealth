@@ -10,11 +10,13 @@ import {
   NotificationDataAndCategory,
   SupportedNetwork,
 } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import emitNotifications from '../../util/emitNotifications';
 import { RawEvmEvent } from './types';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function emitChainEventNotifs(
   chainNodeId: number,

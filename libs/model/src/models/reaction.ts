@@ -2,11 +2,13 @@ import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export type ReactionAttributes = {
   address_id: number;

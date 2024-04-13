@@ -6,11 +6,13 @@ import {
   NotificationCategories,
   SupportedNetwork,
 } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'node:url';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function fetchCosmosNotifCommunities(models: DB) {
   const subscriptions = await models.Subscription.findAll({

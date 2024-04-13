@@ -1,6 +1,7 @@
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { fileURLToPath } from 'url';
 import {
   CacheKeyDuration,
   CustomRequest,
@@ -34,7 +35,8 @@ export class CacheDecorator {
   private _disabled = false;
 
   constructor() {
-    this._log = logger(import.meta.filename);
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
       this._log.info(`cacheMiddleware: cache disabled`);

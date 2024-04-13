@@ -16,6 +16,7 @@ import {
 import { logger } from '@hicommonwealth/logging';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
@@ -26,7 +27,8 @@ import {
 
 let isServiceHealthy = false;
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 stats(HotShotsStats());
 
 startHealthCheckLoop({

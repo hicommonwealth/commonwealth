@@ -5,12 +5,14 @@ import {
   models,
 } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'node:url';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 enum SupportedNotificationChains {
   dydx = 'dydx',

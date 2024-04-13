@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
@@ -11,7 +12,8 @@ import {
   Stats,
 } from './interfaces';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * Map of disposable adapter instances

@@ -6,10 +6,12 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { Client, Message, ThreadChannel } from 'discord.js';
+import { fileURLToPath } from 'url';
 import { getImageUrls } from '../discord-listener/util';
 import { getForumLinkedTopic } from '../utils/util';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function handleMessage(
   controller: Broker,

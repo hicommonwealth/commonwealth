@@ -7,12 +7,14 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 let isServiceHealthy = false;
 

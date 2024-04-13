@@ -9,12 +9,14 @@ import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import axios from 'axios';
 import * as express from 'express';
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 import {
   calcCosmosLCDCacheKeyDuration,
   calcCosmosRPCCacheKeyDuration,
 } from './cosmosCache';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 const DEFAULT_CACHE_DURATION = 60 * 10; // 10 minutes
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300; // 5 min
 const Errors = {

@@ -4,6 +4,7 @@ import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
+import { fileURLToPath } from 'node:url';
 
 import { logger } from '@hicommonwealth/logging';
 import {
@@ -30,7 +31,8 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,

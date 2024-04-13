@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 
 import { AppError } from '@hicommonwealth/core';
@@ -22,7 +23,8 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export const Errors = {
   NoChain: 'Must provide chain',

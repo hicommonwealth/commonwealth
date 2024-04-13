@@ -1,5 +1,6 @@
 import { BalanceSourceType, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import { getCosmosBalances, getEvmBalances } from './providers';
 import {
   Balances,
@@ -9,7 +10,8 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = logger(import.meta.filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * This is the main function through which all balances should be fetched.
