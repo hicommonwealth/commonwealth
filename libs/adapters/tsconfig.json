@@ -7,7 +7,7 @@
     "strict": true,
     "paths": {
       "@hicommonwealth/core": ["core/src"],
-      "@hicommonwealth/shared": ["core/shared"]
+      "@hicommonwealth/shared": ["shared/src"]
     }
   },
   "include": ["src"],
