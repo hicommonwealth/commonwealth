@@ -1,8 +1,8 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,

@@ -1,7 +1,7 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { BalanceSourceType } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';

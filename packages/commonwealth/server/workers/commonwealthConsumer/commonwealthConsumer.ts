@@ -27,7 +27,7 @@ stats(HotShotsStats());
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: __filename.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {

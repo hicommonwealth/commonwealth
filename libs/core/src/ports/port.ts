@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {

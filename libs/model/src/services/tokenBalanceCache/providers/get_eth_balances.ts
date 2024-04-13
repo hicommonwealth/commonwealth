@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { ethers } from 'ethers';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {

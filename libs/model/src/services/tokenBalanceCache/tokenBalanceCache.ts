@@ -1,6 +1,6 @@
 import { BalanceSourceType, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { getCosmosBalances, getEvmBalances } from './providers';
 import {
   Balances,

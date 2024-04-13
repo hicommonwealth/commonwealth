@@ -16,7 +16,7 @@ import {
 import { logger } from '@hicommonwealth/logging';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';

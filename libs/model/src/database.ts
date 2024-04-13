@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
 import { Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { DATABASE_URI, TESTING } from './config';
 import { buildDb } from './models';
 

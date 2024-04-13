@@ -15,7 +15,7 @@ import {
   MessageType,
   ThreadChannel,
 } from 'discord.js';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 

@@ -73,6 +73,9 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+const CommunityStakeIntegration = lazy(
+  () => import('views/pages/CommunityManagement/StakeIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -99,6 +102,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
   myCommunityStakePageEnabled,
+  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -345,6 +349,17 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(existingCommunityStakeIntegrationEnabled
+      ? [
+          <Route
+            key="/manage/integrations/stake"
+            path="/manage/integrations/stake"
+            element={withLayout(CommunityStakeIntegration, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/manage/topics"
       path="/manage/topics"
