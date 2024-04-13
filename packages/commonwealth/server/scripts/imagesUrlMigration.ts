@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 AWS.config.update({
   signatureVersion: 'v4',
 });

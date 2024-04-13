@@ -46,6 +46,7 @@ export class RedisCache implements Cache {
       };
     }
 
+    const __filename = fileURLToPath(import.meta.url);
     this._log = logger(__filename);
     this._log.info(`Connecting to Redis at: ${redis_url}`);
     this._client = createClient(redisOptions) as RedisClientType;

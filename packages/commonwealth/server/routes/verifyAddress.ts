@@ -15,9 +15,7 @@ import {
   NotificationCategories,
   WalletId,
 } from '@hicommonwealth/shared';
-
 import sgMail from '@sendgrid/mail';
-
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';

@@ -37,6 +37,7 @@ export class CacheDecorator {
   private _disabled = false;
 
   constructor() {
+    const __filename = fileURLToPath(import.meta.url);
     this._log = logger(__filename);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {

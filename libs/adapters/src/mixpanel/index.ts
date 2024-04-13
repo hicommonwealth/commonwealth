@@ -3,9 +3,8 @@ import { logger } from '@hicommonwealth/logging';
 import MixpanelLib from 'mixpanel';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-
 export const MixpanelAnalytics = (): Analytics => {
+  const __filename = fileURLToPath(import.meta.url);
   const log = logger(__filename);
 
   let mixpanelNode: MixpanelLib.Mixpanel;

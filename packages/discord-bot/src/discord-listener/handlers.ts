@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { Client, Message, ThreadChannel } from 'discord.js';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { getImageUrls } from '../discord-listener/util';
 import { getForumLinkedTopic } from '../utils/util';
 

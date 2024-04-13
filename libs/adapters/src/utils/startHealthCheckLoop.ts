@@ -32,6 +32,7 @@ export function startHealthCheckLoop({
   if (!enabled) {
     return;
   }
+  const __filename = fileURLToPath(import.meta.url);
   const log = logger(__filename);
   log.info(`starting health check loop for ${service}`);
   const key = `service.health.${service}`;
