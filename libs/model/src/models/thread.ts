@@ -8,6 +8,7 @@ import { NotificationAttributes } from './notification';
 import type { TopicAttributes } from './topic';
 import {
   canvasModelSequelizeColumns,
+  type CanvasModelAttributes,
   type ModelInstance,
   type ModelStatic,
 } from './types';
@@ -33,7 +34,7 @@ export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
-};
+} & CanvasModelAttributes;
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
   // no mixins used

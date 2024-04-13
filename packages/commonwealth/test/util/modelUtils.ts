@@ -81,7 +81,7 @@ export interface ThreadArgs {
   url?: string;
   readOnly?: boolean;
   session: Session;
-  sign: (message: Message<Action | Session>) => Signature;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 type createDeleteLinkArgs = {
@@ -105,7 +105,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   thread_id?: any;
   session: Session;
-  sign: (message: Message<Action | Session>) => Signature;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 export interface EditCommentArgs {
@@ -134,7 +134,7 @@ export interface CreateReactionArgs {
   comment_id?: number;
   thread_id?: number;
   session: Session;
-  sign: (message: Message<Action | Session>) => Signature;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 export interface CreateThreadReactionArgs {
@@ -145,7 +145,7 @@ export interface CreateThreadReactionArgs {
   jwt: string;
   thread_id?: number;
   session: Session;
-  sign: (message: Message<Action | Session>) => Signature;
+  sign: (message: Message<Action | Session>) => Awaitable<Signature>;
 }
 
 export interface EditTopicArgs {
