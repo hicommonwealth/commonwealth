@@ -13,7 +13,7 @@ pnpm m run clean
 pnpm m run check-types
 
 # run unit tests
-yarn m run test
+pnpm m run test
 
 # run api test
 (cd packages/commonwealth && pnpm run test-api)

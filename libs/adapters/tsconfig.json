@@ -6,9 +6,10 @@
     "tsBuildInfoFile": "build/.tsbuildinfo",
     "strict": true,
     "paths": {
-      "@hicommonwealth/core": ["core/src"]
+      "@hicommonwealth/core": ["core/src"],
+      "@hicommonwealth/shared": ["core/shared"]
     }
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }]
+  "references": [{ "path": "../core" }, { "path": "../shared" }]
 }
