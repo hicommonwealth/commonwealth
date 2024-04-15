@@ -37,7 +37,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
-      tableName: 'Template',
+      tableName: 'Templates',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
