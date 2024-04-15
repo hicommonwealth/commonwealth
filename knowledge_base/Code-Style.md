@@ -2,17 +2,18 @@
 
 This is the starter page for the Commonwealth Code Style Guide. As of 231109, it is considered under development and far from comprehensive!
 
-Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScript. It is expected that engineers are already familiar with and follow the official [[TypeScript style guide](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines)](<https://github.com/microsoft/TypeScript/wiki/Coding-guidelines>) which this document supplements.
+Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScript. It is expected that engineers are already familiar with and follow the official [TypeScript style guide](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines).
 
-For a list of React-specific guidelines, see [React Best Practices](./React-Best-Practices-And-Improvements.md).
+For a list of PENG-specific guidelines, see [React Best Practices](./React-Best-Practices.md).
 
-For a list of API-specific guidelines, see [Platform Coding Guidelines](./Platform-Coding-Guidelines.md).
+For a list of platform-specific guidelines, see [Platform Coding Guidelines](./Platform-Coding-Guidelines.md).
 
 ## Contents
 
 - [Inline Documentation](#inline-documentation)
   + [TSDoc](#tsdoc)
   + [Inline Comments](#inline-comments)
+- []
 - [Change Log](#change-log)
 
 ## Inline documentation
@@ -76,17 +77,20 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 - Place comments above the code they describe.
 - Use comments to provide context and explain _why_ something is being done, not just 'what' is being done. This helps future developers understand the purpose and intent of the code.
 - Use descriptive variable and function names to reduce the need for comments by making the code more self-explanatory.
-- Datestamps, when used, should be formatted YYMMDD.
+- Datestamps, when used, should be formatted YYMMDD. In general, the [indexical language guidelines](./_README.md#indexicality--timestamps) recommended for documentation hold for inline comments as well.
+
+## Error handling
 
 ### Backend Errors
+
 Backend errors currently come in two varieties:
+
 - Errors instructive for the end user
 - Errors instructive for the client
 
-Errors instructive for the user should be formatted with formatErrorPretty from the errorUtils. These will be displayed
-on the front end directly in the modal.
-Errors instructive for the client should be directly passed to the backend. These should be handled by the backend for
-the possibility of taking recovery actions.
+Errors instructive for the user should be formatted with `formatErrorPretty` from the `errorUtils`. These will be displayed on the front end directly in the modal.
+
+Errors instructive for the client should be directly passed to the backend. These should be handled by the backend for the possibility of taking recovery actions.
 
 ## Change Log
 

@@ -1,10 +1,12 @@
-**Contents**
+# Performance Benchmarks
+
+## Contents
 
 - [Core Web Performance Metrics](#core-web-performance-metrics)
 - [Essential Performance Tools](#essential-performance-tools)
-  * [Browser Network Tab: Chrome/Firefox/Safari](#browser-network-tab--chrome-firefox-safari)
-    + [Geographic Performance Assessment: WebPageTest.org](#geographic-performance-assessment--webpagetestorg)
-  * [Load Testing: Artillery](#load-testing--artillery)
+  * [Browser Network Tab: Chrome/Firefox/Safari](#browser-network-tab-chromefirefoxsafari)
+    + [Geographic Performance Assessment: WebPageTest.org](#geographic-performance-assessment-webpagetestorg)
+  * [Load Testing: Artillery](#load-testing-artillery)
     + [Geographic Performance Assessment - Upcoming](#geographic-performance-assessment---upcoming)
     + [Benchmark PR Improvements](#benchmark-pr-improvements)
   * [Datadog Dashboards](#datadog-dashboards)
@@ -13,7 +15,7 @@
     + [Geographic Performance Assessment - Forthcoming](#geographic-performance-assessment---forthcoming)
 - [Change Log](#change-log)
 
-# Core Web Performance Metrics
+## Core Web Performance Metrics
 
 The performance of a website is key to its effective functionality and ensuring an exceptional user experience. Three critical performance metrics that have a substantial impact include:
 
@@ -25,15 +27,15 @@ The performance of a website is key to its effective functionality and ensuring 
 
 It's crucial to test these metrics from various geographical locations as website performance can vary significantly based on factors such as server location, network latency, and local internet speeds. Evaluating performance metrics from different global regions guarantees a comprehensive understanding of user experiences and aids in fine-tuning the website for optimal performance worldwide.
 
-# Essential Performance Tools
+## Essential Performance Tools
 
-## Browser Network Tab: Chrome/Firefox/Safari
+### Browser Network Tab: Chrome/Firefox/Safari
 
 This is an indispensable tool for performance analysis, offering functions like cache disabling, traffic throttling, waterfall graph visualization, request/response analysis, and WebSocket traffic inspection. It also allows for the export of HAR files for future analysis and comparison.
 
 Refer to the [Chrome DevTools Network Reference Guide](https://developer.chrome.com/docs/devtools/network/reference/) for more information.
 
-### Geographic Performance Assessment: WebPageTest.org
+#### Geographic Performance Assessment: WebPageTest.org
 
 This tool enables performance testing from multiple global locations, providing insights into performance discrepancies based on geography. Key features include HAR file exports, result history storage, result sharing, and CDN setup and caching verification across various edge servers.
 
@@ -41,7 +43,7 @@ Check out this [Example Test Run](https://www.webpagetest.org/result/230620_AiDc
 
 <img width="1152" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/53611c67-1ee5-45fd-80ed-a83c0d33a464">
 
-## Load Testing: Artillery
+### Load Testing: Artillery
 
 Load testing assesses system behavior under certain loads in terms of concurrent users or transactions. It assists in identifying an application's maximum operating capacity, bottlenecks, and elements contributing to performance degradation.
 
@@ -65,7 +67,7 @@ yarn --cwd load-testing install
 yarn test-load
 ```
 
-### Geographic Performance Assessment - Upcoming
+#### Geographic Performance Assessment - Upcoming
 
 - We plan to set up Artillery to run using AWS Lambda function(s) in different regions such as ap-southeast-1, us-east-1, and eu-central-1.
 <img width="323" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/ab04cb54-5f1f-4834-9815-d73aaff25d72">
@@ -78,14 +80,14 @@ Here's a sample call leveraging AWS Lambda to run the benchmark from Singapore:
 artillery run -o output_dir/report.json --environment frick app/scenarios/commonwealth-api-threads.yml --platform aws:lambda --platform-opt region ap-southeast-1
 ```
 
-### Benchmark PR Improvements
+#### Benchmark PR Improvements
 
 - We encourage you to include load testing in your PR test workflow.
 - The load testing tool can be run against improvements proposed in your PR. You can deploy the PR on Frick & Frack, and run load testing to measure average runtimes against your PR. This will help confirm the performance improvements provided by your PR.
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/67b264d9-f051-4b69-86c4-556f8fce10d2)
 
-## Datadog Dashboards
+### Datadog Dashboards
 
 We've implemented two new performance dashboards to monitor and track improvements in latency and call volume over time.
 
@@ -94,7 +96,7 @@ We've implemented two new performance dashboards to monitor and track improvemen
 - They are instrumental in monitoring the effect of improvements over time, as shown by specific examples corresponding to PRs like `getAddressProfile` larger batches and performance enhancements in backend API calls such as `/viewUserActivity` and `/status`.
 - Additionally, they can effectively detect abnormal spikes in latency and call volume through real-time metrics reported to Datadog.
 
-### QPS - Queries Per Second Dashboard
+#### QPS - Queries Per Second Dashboard
 
 - This dashboard displays the QPS for common endpoints.
 - Here's an example screenshot:
@@ -102,7 +104,7 @@ We've implemented two new performance dashboards to monitor and track improvemen
 
 From the dashboard, we observe that the `getAddressProfile` query count has substantially dropped from thousands to hundreds after a recent change that increased the batch size. This change can be found in [PR #3391](https://github.com/hicommonwealth/commonwealth/pull/3391).
 
-### Latency Dashboard
+#### Latency Dashboard
 
 - This dashboard presents the 95th percentile latency for the same endpoints as the QPS dashboard.
 - Here's an example screenshot for your reference:
@@ -114,7 +116,7 @@ Similarly, a tenfold performance enhancement has been achieved in the `status` c
 
 These improvements are discussed in detail [here](./Request-Handler-Optimization.md).
 
-### Geographic Performance Assessment - Forthcoming
+#### Geographic Performance Assessment - Forthcoming
 
 - We aim to extend the location TAG using `req.headers['cf-ipcountry']` - added by Cloudflare to each request. It can be included in the list of tags for the `express.response_time` metric reported to Datadog by the backend app available [here](https://github.com/hicommonwealth/commonwealth/blob/7e5c72252078ee2cfc237f99c43a1ad67e97dcf7/packages/commonwealth/server/scripts/setupExpressStats.ts#L29).
 - We plan to filter the entire dashboard using a Dashboard variable to view performance from just one geographic location.

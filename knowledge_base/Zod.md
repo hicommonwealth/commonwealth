@@ -1,13 +1,4 @@
-# Tools
-
-_This entry serves as a bucket entry for documenting libraries and tools employed in the codebase._
-
-## Contents
-
-- [Zod](#zod)
-- [Change Log](#change-log)
-
-## Zod
+# Zod
 
 As of 231024, we are moving toward Zod as a unified back- and frontend solution for schema validation. For legacy support reasons, external routes may present an exception, and continue using Express Validator instead.
 

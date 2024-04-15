@@ -1,4 +1,6 @@
-**Contents**
+# Notifications QA
+
+## Contents
 
 - [Prerequisites](#prerequisites)
   * [Subscriptions](#subscriptions)
@@ -23,40 +25,40 @@
   * [Notifications](#notifications-3)
 - [Change Log](#change-log
 
-# Prerequisites
+## Prerequisites
 
-## Subscriptions
+### Subscriptions
 
 - Be logged in on a new account with MetaMask that has no pre-existing joined communities.
 - Should have the `Networks` tab of Chrome Dev Tools open.
 
-## Notifications
+### Notifications
 
 - Be logged in on 2 new accounts both with MetaMask. This is most easily done by using Chrome and Firefox with different MetaMask accounts but you can also simply logout and log back in with a different account on the same browser.
 - The account used to receive and view notifications will be called the `viewer` and the account used to produce notifications will be called the `producer`.
 
-# Forum
+## Forum
 
-## Subscriptions
+### Subscriptions
 
-### New Threads
+#### New Threads
 
 1. Navigate to any community's discussion page that you have not yet subscribed to e.g. [https://commonwealth.im/ethereum/discussions][1]
     - Ensure that the Notifications button in the sidebar (shown in the image below) shows `Notifications Off`
-3. Click on the button to turn on Notifications.
+2. Click on the button to turn on Notifications.
     - The button should be filled with the color blue and display `Notifications On` like in the image below
     - The networks tab should show a single new request to `/createSubscription` which returned the new subscription
-4. Navigate to your notification settings page i.e. [https://commonwealth.im/notification-settings][2]
+3. Navigate to your notification settings page i.e. [https://commonwealth.im/notification-settings][2]
     - A new row for the community you subscribed to should be present.
     - When clicking the drop-down a single sub-row should appear showing the new threads subscription.
-5. Navigate back to the discussion page by hitting the back button.
+4. Navigate back to the discussion page by hitting the back button.
     - The notifications button should still display `Notifications On`.
-6. Click the notifications button again to delete the subscription.
+5. Click the notifications button again to delete the subscription.
     - The networks tab should show a single successful route call to `/deleteSubscription`
-7. Navigate to your notification settings again.
+6. Navigate to your notification settings again.
     - The row for the community you interacted with should no longer be listed under `Discussion`
 
-### New Comments and New Reactions
+#### New Comments and New Reactions
 
 **Another User's Thread**
 
@@ -112,17 +114,17 @@
 5. Repeat for the sub-comment subscription.
 6. Navigate back to the comment you created. Due to [known issue #4659][8] you cannot resubscribe now that the subscriptions are deleted.
 
-### New Mention
+#### New Mention
 
 Due to [known bug #4657][9] you cannot manage your mention subscription from the notification settings page.
 
-### New Collaboration
+#### New Collaboration
 
 Due to [known bug #4657][9] you cannot manage your collaboration subscription from the notification settings page.
 
-## Notifications
+### Notifications
 
-### New Threads
+#### New Threads
 
 1. With your viewer account navigate to any MetaMask-compatible community (preferably an unpopular one since notifications will be emitted faster e.g. alex-test-2). If you have not yet joined this community, join it now.
 2. Subscribe to new thread notifications using the viewer account by clicking the large `Notifications Off/On` button in the sidebar.
@@ -132,7 +134,7 @@ Due to [known bug #4657][9] you cannot manage your collaboration subscription fr
 5. Once the notification appears, click on it
     - You should be taken to the thread page of the thread you just created from the producer.
 
-### New Comments
+#### New Comments
 
 This section picks up exactly where the previous New Threads section left off (from the viewer account on the threads page).
 
@@ -144,7 +146,7 @@ This section picks up exactly where the previous New Threads section left off (f
 5. Using your viewer account click on the notification.
     - You should be taken to the comment on the thread you created with your producer account.
 
-### New Reactions
+#### New Reactions
 
 This section picks up exactly where the previous New Comments section left off (from the comment on the threads page).
 
@@ -155,7 +157,7 @@ This section picks up exactly where the previous New Comments section left off (
 4. Using your viewer account click on the notification.
     - You should be taken to the thread you created with your producer account.
 
-### New Mention
+#### New Mention
 
 **As of 230803, not working due to [known bug #4690][11]**
 
@@ -169,7 +171,7 @@ This section picks up exactly where the previous New Reactions section left off 
 5. Using your viewer account click on the notification.
     - You should be taken to the comment you are tagged in.
 
-### New Collaboration
+#### New Collaboration
 
 This section picks up exactly where the previous New Mention section left off (from the threads page).
 
@@ -180,9 +182,9 @@ This section picks up exactly where the previous New Mention section left off (f
 4. Using your viewer account click on the notification.
     - You should be taken to the thread that you are now a collaborator of.
 
-# Snapshot
+## Snapshot
 
-## Subscriptions
+### Subscriptions
 
 1. Navigate to the snapshot page of a community that has an associated snapshot space like dYdX i.e. [https://commonwealth.im/dydx/snapshot/dydxgov.eth][6]
 2. Click on the `Subscribe to Notifications` button.
@@ -193,13 +195,13 @@ This section picks up exactly where the previous New Mention section left off (f
     - The button should switch back to `Subscribe to Notifications`.
     - The network tab should show a single new successful request to `/deleteSubscriptions`
 
-## Notifications
+### Notifications
 
 Cannot QA Snapshot notifications until [#4667][10] is completed.
 
-# Chain Event
+## Chain Event
 
-## Subscriptions
+### Subscriptions
 
 1. Navigate to your [notifications settings page][2].
     - Assuming you haven't joined any communities, the `Chain Events` section will be empty.
@@ -213,11 +215,11 @@ Cannot QA Snapshot notifications until [#4667][10] is completed.
 5. Click the toggle again.
     - The network tab should show a single new succesful request to `/disableSubscription`
     - The console tab should show a single log: `Deleting Websocket subscriptions for: ['tribe']`
-5. Click the toggle again.
+6. Click the toggle again.
     - The network tab should show a single new succesful request to `/enableSubscription`
     - The console tab should show a single log: `Adding Websocket subscriptions for: ['tribe']`
 
-## Notifications
+### Notifications
 
 Cannot QA chain-event notifications until [#4667][10] is completed.
 

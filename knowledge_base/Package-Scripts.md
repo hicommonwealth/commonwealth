@@ -60,15 +60,10 @@ If you add a script to the `package.json` file, please add documentation for it 
   - [sanity](#sanity)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
-  - [listen](#listen)
   - [start](#start)
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
   - [start-evm-ce](#start-evm-ce)
-- [Devnets](#devnets)
-  - [cosmos:build](#cosmos:build)
-  - [cosmos:start](#cosmos:start)
-  - [cosmos:stop](#cosmos:stop)
 - [Util scripts](#util-scripts)
   - [add-components-showcase](#add-component-showcase)
   - [set-super-admin](#set-super-admin)
@@ -474,6 +469,7 @@ Description: It sets whether a user is a super admin or not. The script accepts 
 Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
 
 Examples:
+
 - `yarn set-super-admin`
   - This sets the local user specified by the environment variables to a super admin.
 - `yarn set-super-admin false`

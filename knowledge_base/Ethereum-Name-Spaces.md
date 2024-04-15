@@ -1,8 +1,8 @@
-### Prerequisites
+# Ethereum Name Spaces
 
-- You must have some ETH in your Ethereum-based wallet
+## Setup
 
-### Setup
+As a prerequisite, you must have some ETH in your Ethereum-based wallet.
 
 1. Go to <https://app.ens.domains/> and connect your wallet (you must be on mainnet)
 2. Search an ENS name and click on your payment method, and then click next
@@ -31,9 +31,10 @@ wait for it to complete and then wait another 60 seconds to perform the 2nd tran
 
 ### Next steps
 
-- [See how to use this ENS for setting up a snapshot space](https://github.com/hicommonwealth/commonwealth/wiki/Setup-snapshot-space)
+For steps to use this ENS in setting up a Snapshot space, see [Snapshot.md](./Snapshot.md)
 
 ## Change Log
 
+- 240415: Renamed and generalized by Graham Johnson from `Setup-ENS.md` to `Ethereum-Name-Spaces.md`.
 - 231012: Flagged by Graham Johnson for asset transfer.
 - 230712: Authored by Malik Zulqurnain.
