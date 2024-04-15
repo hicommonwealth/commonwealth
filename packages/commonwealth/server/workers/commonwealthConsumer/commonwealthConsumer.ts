@@ -1,24 +1,18 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import {
-  Broker,
-  BrokerTopics,
-  broker,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
+import { Broker, BrokerTopics, broker, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;

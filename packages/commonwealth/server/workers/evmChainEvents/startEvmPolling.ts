@@ -1,9 +1,9 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { models } from '@hicommonwealth/model';
 import { EVM_CE_POLL_INTERVAL_MS } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from
@@ -16,8 +16,6 @@ const log = logger(PinoLogger()).getLogger(__filename);
 export async function startEvmPolling(
   interval: number,
 ): Promise<NodeJS.Timeout> {
-  const { models } = await import('@hicommonwealth/model');
-
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(

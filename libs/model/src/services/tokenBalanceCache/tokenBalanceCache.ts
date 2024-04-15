@@ -1,4 +1,5 @@
-import { BalanceSourceType, logger, stats } from '@hicommonwealth/core';
+import { BalanceSourceType, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { getCosmosBalances, getEvmBalances } from './providers';
 import {
   Balances,
@@ -8,7 +9,7 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * This is the main function through which all balances should be fetched.

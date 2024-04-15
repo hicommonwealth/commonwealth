@@ -1,6 +1,7 @@
 import { Log } from '@ethersproject/providers';
-import { AbiType, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
+import { AbiType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';

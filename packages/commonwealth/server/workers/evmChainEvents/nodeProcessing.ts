@@ -1,10 +1,10 @@
-import { logger, schemas, stats } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { schemas, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since

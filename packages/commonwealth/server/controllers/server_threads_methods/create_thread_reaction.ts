@@ -1,14 +1,11 @@
-import {
-  AppError,
-  NotificationCategories,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
+import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';

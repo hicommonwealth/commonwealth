@@ -1,6 +1,6 @@
 import { Log } from '@ethersproject/providers';
-import { AbiType } from '@hicommonwealth/core';
 import { EvmEventSourceAttributes } from '@hicommonwealth/model';
+import { AbiType } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 
 export type EvmEvent = {

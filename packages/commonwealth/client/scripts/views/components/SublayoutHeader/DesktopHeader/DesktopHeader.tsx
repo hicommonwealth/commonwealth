@@ -2,16 +2,16 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import { NotificationsMenuPopover } from 'views/menus/notifications_menu';

@@ -17,8 +17,8 @@ import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStak
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { useFlag } from '../../../../hooks/useFlag';
 import type Topic from '../../../../models/Topic';

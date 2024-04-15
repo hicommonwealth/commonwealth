@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
 import MobileSearchModal from 'views/modals/MobileSearchModal';

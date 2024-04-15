@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { SupportedNetwork } from '@hicommonwealth/core';
+import { SupportedNetwork } from '@hicommonwealth/shared';
 import type { IEventData } from '../types/aave';
 import { EventKind } from '../types/aave';
 import { IEventLabel, LabelerFilter } from './util';

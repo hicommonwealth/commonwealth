@@ -1,3 +1,4 @@
+import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -6,7 +7,6 @@ import type ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -16,15 +16,16 @@ import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import { CWButton } from '../CWButton';
 import { CWTooltip } from '../CWTooltip';
-import { CWButton } from '../cw_button';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
-  community: ChainInfo | CommunityData;
+  community: ChainInfo;
   memberCount: string | number;
   threadCount: string | number;
+  canBuyStake?: boolean;
   onStakeBtnClick?: () => void;
   ethUsdRate?: string;
   historicalPrice?: string;
@@ -35,6 +36,7 @@ export const CWRelatedCommunityCard = ({
   community,
   memberCount,
   threadCount,
+  canBuyStake,
   onStakeBtnClick,
   ethUsdRate,
   historicalPrice,
@@ -44,7 +46,7 @@ export const CWRelatedCommunityCard = ({
   const { isLoggedIn } = useUserLoggedIn();
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
-    community: community as ChainInfo,
+    community: community,
     ethUsdRate,
     stakeId: 2,
     historicalPrice,
@@ -79,6 +81,8 @@ export const CWRelatedCommunityCard = ({
     setSelectedCommunity(community);
   };
 
+  const disableStakeButton = !isLoggedIn || !canBuyStake;
+
   const stakeButton = (
     <CWButton
       label="Buy Stake"
@@ -86,7 +90,7 @@ export const CWRelatedCommunityCard = ({
       buttonAlt="green"
       buttonHeight="sm"
       buttonWidth="narrow"
-      disabled={!isLoggedIn}
+      disabled={disableStakeButton}
       onClick={(e) => {
         e.stopPropagation();
         handleBuyStakeClick();
@@ -106,10 +110,7 @@ export const CWRelatedCommunityCard = ({
           <div className="community-info">
             <div className="header">
               <div className="community-name">
-                <CWCommunityAvatar
-                  community={community as ChainInfo}
-                  size="large"
-                />
+                <CWCommunityAvatar community={community} size="large" />
                 <CWText type="h5" title={community.name} fontWeight="medium">
                   {community.name}
                 </CWText>
@@ -169,10 +170,13 @@ export const CWRelatedCommunityCard = ({
         </div>
         {stakeEnabled && (
           <div className="actions">
-            {!isLoggedIn ? (
+            {disableStakeButton ? (
               <CWTooltip
                 placement="right"
-                content="Login to buy stakes"
+                content={disabledStakeButtonTooltipText({
+                  isLoggedIn: isLoggedIn,
+                  connectBaseChainToBuy: community.base,
+                })}
                 renderTrigger={(handleInteraction) => (
                   <span
                     onMouseEnter={handleInteraction}

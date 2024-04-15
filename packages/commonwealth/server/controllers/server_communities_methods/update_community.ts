@@ -1,10 +1,11 @@
 /* eslint-disable no-continue */
-import { AppError, ChainBase } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   CommunityAttributes,
   CommunitySnapshotSpaceWithSpaceAttached,
 } from '@hicommonwealth/model';
 import { UserInstance, commonProtocol } from '@hicommonwealth/model';
+import { ChainBase } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';

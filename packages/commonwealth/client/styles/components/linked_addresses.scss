@@ -2,20 +2,8 @@
 
 .LinkedAddresses {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-gap: 40px;
-
-  @include mediumInclusive {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  @include smallInclusive {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @include extraSmall {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: repeat(auto-fit, 160px);
+  grid-gap: 30px;
 
   .AddressContainer {
     display: flex;

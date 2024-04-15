@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 const DrawersShowcase = () => {
   const [leftOpen, setLeftOpen] = useState(false);
