@@ -22,6 +22,47 @@ const PayoutRow = ({
   index,
   payoutNumber,
 }: PayoutRowProps) => {
+  const handleInput = (e) => {
+    let value = e.target.value;
+
+    // percentage symbol is inserted in the input so this logic
+    // helps edit the input without messing with percentage symbol
+
+    if (!value.includes('%')) {
+      // this means that user hit "backspace" so we remove last character
+      // before the percentage symbol
+      value = value.slice(0, value.length - 1);
+    } else {
+      // this means that user hit some other symbol, so for time being
+      // we need to remove percentage symbol
+      value = value.replace(/%/g, '');
+    }
+
+    if (isNaN(Number(value))) {
+      // eg if user typed non-numeric character
+      return;
+    }
+
+    const newPayoutStructure = [
+      ...payoutStructure.slice(0, index),
+      Number(value),
+      ...payoutStructure.slice(index + 1),
+    ];
+    onSetPayoutStructure(newPayoutStructure);
+  };
+
+  const handleMinusClick = () => {
+    const updatedPayoutStructure = [...payoutStructure];
+    updatedPayoutStructure[index] -= 1;
+    onSetPayoutStructure(updatedPayoutStructure);
+  };
+
+  const handlePlusClick = () => {
+    const updatedPayoutStructure = [...payoutStructure];
+    updatedPayoutStructure[index] += 1;
+    onSetPayoutStructure(updatedPayoutStructure);
+  };
+
   return (
     <>
       <div className="payout-row">
@@ -38,37 +79,10 @@ const PayoutRow = ({
           <NumberSelector
             value={payoutNumber + '%'}
             key={index}
-            onInput={(e) => {
-              let value = e.target.value;
-
-              if (!value.includes('%')) {
-                value = value.slice(0, value.length - 1);
-              } else {
-                value = value.replace(/%/g, '');
-              }
-
-              if (isNaN(Number(value))) {
-                return;
-              }
-
-              const newPayoutStructure = [
-                ...payoutStructure.slice(0, index),
-                Number(value),
-                ...payoutStructure.slice(index + 1),
-              ];
-              onSetPayoutStructure(newPayoutStructure);
-            }}
+            onInput={handleInput}
             minusDisabled={payoutStructure[index] === 0}
-            onMinusClick={() => {
-              const updatedPayoutStructure = [...payoutStructure];
-              updatedPayoutStructure[index] -= 1;
-              onSetPayoutStructure(updatedPayoutStructure);
-            }}
-            onPlusClick={() => {
-              const updatedPayoutStructure = [...payoutStructure];
-              updatedPayoutStructure[index] += 1;
-              onSetPayoutStructure(updatedPayoutStructure);
-            }}
+            onMinusClick={handleMinusClick}
+            onPlusClick={handlePlusClick}
           />
         </div>
       </div>
