@@ -9,17 +9,13 @@ import {
   DetailsFormStep,
   SignTransactionsStep,
 } from './steps';
+import { LaunchContestStep } from './types';
 
 import './ManageContest.scss';
 
 interface ManageContestProps {
   contestId?: string;
 }
-
-export type LaunchContestStep =
-  | 'DetailsForm'
-  | 'SignTransactions'
-  | 'ContestLive';
 
 const ManageContest = ({ contestId }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =

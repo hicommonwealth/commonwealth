@@ -3,7 +3,7 @@ import React from 'react';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 
-import { LaunchContestStep } from '../../ManageContest';
+import { LaunchContestStep } from '../../types';
 
 import './SignTransactionsStep.scss';
 

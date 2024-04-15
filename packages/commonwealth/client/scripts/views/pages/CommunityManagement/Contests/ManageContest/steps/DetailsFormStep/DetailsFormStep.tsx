@@ -1,10 +1,8 @@
-import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import NumberSelector from 'views/components/NumberSelector';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -19,8 +17,20 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
-import * as colors from '../../../../../../../../styles/mixins/colors.scss';
-import { LaunchContestStep } from '../../ManageContest';
+import {
+  ContestFeeType,
+  ContestFormSubmitValues,
+  ContestRecurringType,
+  LaunchContestStep,
+} from '../../types';
+import PayoutRow from './PayoutRow';
+import {
+  INITIAL_PERCENTAGE_VALUE,
+  MAX_WINNERS,
+  MIN_WINNERS,
+  initialPayoutStructure,
+  prizePercentageOptions,
+} from './utils';
 import { detailsFormValidationSchema } from './validation';
 
 import './DetailsFormStep.scss';
@@ -29,61 +39,6 @@ interface DetailsFormStepProps {
   contestId?: string;
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
 }
-
-export enum ContestFeeType {
-  CommunityStake = 'community-stake',
-  DirectDeposit = 'direct-deposit',
-}
-
-enum ContestRecurringType {
-  Yes = 'yes',
-  No = 'no',
-}
-
-const INITIAL_PERCENTAGE_VALUE = 10;
-const MAX_WINNERS = 10;
-const MIN_WINNERS = 1;
-
-const prizePercentageOptions = [
-  {
-    label: '10%',
-    value: INITIAL_PERCENTAGE_VALUE,
-  },
-  {
-    label: '20%',
-    value: 20,
-  },
-  {
-    label: '30%',
-    value: 30,
-  },
-  {
-    label: '40%',
-    value: 40,
-  },
-  {
-    label: '50%',
-    value: 50,
-  },
-];
-
-const initialPayoutStructure = [60, 25, 15];
-
-const getPrizeColor = (index: number) => {
-  if (index === 0) {
-    return colors['yellow-500'];
-  }
-
-  if (index === 1) {
-    return colors['neutral-100'];
-  }
-
-  if (index === 2) {
-    return colors['yellow-600'];
-  }
-
-  return '#000';
-};
 
 const DetailsFormStep = ({
   contestId,
@@ -108,60 +63,45 @@ const DetailsFormStep = ({
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
 
-  const editMode = !!contestId;
+  const { data: topicsData } = useFetchTopicsQuery({
+    communityId: app.activeChainId(),
+  });
 
+  const editMode = !!contestId;
+  const payoutRowError = payoutStructure.some((payout) => payout < 1);
+  const topicsEnabledError = toggledTopicList.every(({ checked }) => !checked);
   const totalPayoutPercentage = payoutStructure.reduce(
     (acc, val) => acc + val,
     0,
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
-  const payoutRowError = payoutStructure.some((payout) => payout < 1);
-  const topicsEnabledError = toggledTopicList.every(({ checked }) => !checked);
 
-  const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+  const sortedTopics = [...topicsData]?.sort((a, b) => {
+    if (!a.order || !b.order) {
+      return 1;
+    }
+
+    // if order is not defined, push topic to the end of the list
+    return a.order - b.order;
   });
 
+  // we need separate state to handle topic toggling
   useEffect(() => {
-    if (topics && toggledTopicList.length === 0) {
-      const mappedTopics = topics.map((topic) => ({
-        name: topic.name,
-        id: topic.id,
+    if (topicsData && toggledTopicList.length === 0) {
+      const mappedTopics = topicsData.map(({ name, id }) => ({
+        name,
+        id,
         checked: true,
       }));
       setToggledTopicList(mappedTopics);
     }
-  }, [toggledTopicList.length, topics]);
+  }, [toggledTopicList.length, topicsData]);
 
-  const goBack = () => {
-    // TODO distinct if user came from /manage/contests or /contests
-    navigate('/manage/contests');
-  };
-
-  const handleCancel = () => {
-    goBack();
-  };
-
-  const handleSubmit = () => {
-    if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
-      return;
-    }
-
-    if (editMode) {
-      // save edit API call
-      return goBack();
-    }
-
-    onSetLaunchContestStep('SignTransactions');
-  };
-
-  const getInitialValues = () => {
-    return {
-      feeType: ContestFeeType.CommunityStake,
-      contestRecurring: ContestRecurringType.Yes,
-      prizePercentage,
-    };
-  };
+  const getInitialValues = () => ({
+    feeType: ContestFeeType.CommunityStake,
+    contestRecurring: ContestRecurringType.Yes,
+    prizePercentage,
+  });
 
   const handleAddWinner = () => {
     setPayoutStructure((prevState) => [...prevState, 0]);
@@ -171,13 +111,20 @@ const DetailsFormStep = ({
     setPayoutStructure((prevState) => [...prevState.slice(0, -1)]);
   };
 
-  const sortedTopics = [...topics]?.sort((a, b) => {
-    if (!a.order || !b.order) {
-      return 1;
-    }
+  const handleToggleTopic = (topicId: number) =>
+    setToggledTopicList((prevState) => {
+      const isChecked = prevState.find((topic) => topic.id === topicId).checked;
 
-    return a.order - b.order;
-  });
+      return prevState.map((topic) => {
+        if (topic.id === topicId) {
+          return {
+            ...topic,
+            checked: !isChecked,
+          };
+        }
+        return topic;
+      });
+    });
 
   const handleToggleAllTopics = () => {
     const mappedTopics = sortedTopics?.map((topic) => ({
@@ -186,6 +133,29 @@ const DetailsFormStep = ({
     }));
     setToggledTopicList(mappedTopics);
     setAllTopicsToggled((prevState) => !prevState);
+  };
+
+  const goBack = () => {
+    navigate('/manage/contests');
+  };
+
+  const handleCancel = () => {
+    // TODO show warning that prevents quitting
+    goBack();
+  };
+
+  const handleSubmit = (values: ContestFormSubmitValues) => {
+    console.log('values', values);
+    if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
+      return;
+    }
+
+    if (editMode) {
+      // TODO save edit API call
+      return goBack();
+    }
+
+    onSetLaunchContestStep('SignTransactions');
   };
 
   return (
@@ -220,7 +190,6 @@ const DetailsFormStep = ({
                   We recommend naming your contest if you’re going to have
                   multiple contest
                 </CWText>
-
                 <CWTextInput
                   containerClassName="contest-name-input"
                   name="contestName"
@@ -239,7 +208,6 @@ const DetailsFormStep = ({
                   Set an image to entice users to your contest (1920x1080 jpg or
                   png)
                 </CWText>
-
                 <CWCoverImageUploader
                   uploadCompleteCallback={console.log}
                   canSelectImageBehaviour={false}
@@ -262,7 +230,6 @@ const DetailsFormStep = ({
                   directly via deposit. You can add funds directly to contests
                   at any time.
                 </CWText>
-
                 <div className="radio-row">
                   <CWRadioButton
                     label="Use Community Stake fees"
@@ -280,7 +247,6 @@ const DetailsFormStep = ({
                     hookToForm
                   />
                 </div>
-
                 {watch('feeType') === ContestFeeType.DirectDeposit && (
                   <>
                     <CWText className="funding-token-address-description">
@@ -314,7 +280,6 @@ const DetailsFormStep = ({
                     </>
                   )}
                 </CWText>
-
                 <div className="radio-row">
                   <CWRadioButton
                     label="Yes"
@@ -332,7 +297,6 @@ const DetailsFormStep = ({
                     }
                   />
                 </div>
-
                 {watch('contestRecurring') === ContestRecurringType.Yes && (
                   <div className="prize-subsection">
                     <CWText type="h5">
@@ -341,7 +305,6 @@ const DetailsFormStep = ({
                     <CWText type="b1">
                       Tip: smaller prizes makes the contest run longer
                     </CWText>
-
                     <div className="percentage-buttons">
                       {prizePercentageOptions.map(({ value, label }) => (
                         <CWButton
@@ -349,10 +312,10 @@ const DetailsFormStep = ({
                           key={value}
                           label={label}
                           buttonHeight="sm"
+                          onClick={() => setPrizePercentage(value)}
                           buttonType={
                             prizePercentage === value ? 'primary' : 'secondary'
                           }
-                          onClick={() => setPrizePercentage(value)}
                         />
                       ))}
                     </div>
@@ -372,68 +335,15 @@ const DetailsFormStep = ({
                 </CWText>
                 <div className="payout-container">
                   {payoutStructure.map((payoutNumber, index) => (
-                    <>
-                      <div className="payout-row" key={index}>
-                        <div className="left-side">
-                          <div
-                            className="color-square"
-                            style={{ backgroundColor: getPrizeColor(index) }}
-                          ></div>
-                          <CWText type="h5">
-                            {moment.localeData().ordinal(index + 1)} Prize
-                          </CWText>
-                        </div>
-                        <div className="right-side">
-                          <NumberSelector
-                            value={payoutNumber + '%'}
-                            key={index}
-                            onInput={(e) => {
-                              let value = e.target.value;
-
-                              if (!value.includes('%')) {
-                                value = value.slice(0, value.length - 1);
-                              } else {
-                                value = value.replace(/%/g, '');
-                              }
-
-                              if (isNaN(Number(value))) {
-                                return;
-                              }
-
-                              const newPayoutStructure = [
-                                ...payoutStructure.slice(0, index),
-                                Number(value),
-                                ...payoutStructure.slice(index + 1),
-                              ];
-                              setPayoutStructure(newPayoutStructure);
-                            }}
-                            minusDisabled={payoutStructure[index] === 0}
-                            onMinusClick={() => {
-                              const updatedPayoutStructure = [
-                                ...payoutStructure,
-                              ];
-                              updatedPayoutStructure[index] -= 1;
-                              setPayoutStructure(updatedPayoutStructure);
-                            }}
-                            onPlusClick={() => {
-                              const updatedPayoutStructure = [
-                                ...payoutStructure,
-                              ];
-                              updatedPayoutStructure[index] += 1;
-                              setPayoutStructure(updatedPayoutStructure);
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <MessageRow
-                        hasFeedback={payoutNumber < 1}
-                        validationStatus="failure"
-                        statusMessage="Prize must be greater than 0%"
-                      />
-                    </>
+                    <PayoutRow
+                      key={index}
+                      index={index}
+                      payoutNumber={payoutNumber}
+                      payoutStructure={payoutStructure}
+                      onSetPayoutStructure={setPayoutStructure}
+                    />
                   ))}
                 </div>
-
                 <div className="payout-summary">
                   <div className="payout-total">
                     <CWText type="h4">Total = </CWText>
@@ -447,7 +357,6 @@ const DetailsFormStep = ({
                     statusMessage="Total prize must equal 100%"
                   />
                 </div>
-
                 <div className="payout-buttons">
                   <CWButton
                     label="Remove Winner"
@@ -476,44 +385,25 @@ const DetailsFormStep = ({
                   Only threads posted to these topics will be eligible for the
                   contest prizes.
                 </CWText>
-
                 <div className="topics-list">
                   <div className="list-header">
                     <CWText>Topic</CWText>
                     <CWText>Eligible</CWText>
                   </div>
                   {toggledTopicList.length &&
-                    sortedTopics.map((topic) => {
-                      return (
-                        <div key={topic.id} className="list-row">
-                          <CWText>{topic.name}</CWText>
-                          <CWToggle
-                            checked={
-                              toggledTopicList.find((t) => t.id === topic.id)
-                                .checked
-                            }
-                            size="small"
-                            onChange={() =>
-                              setToggledTopicList((prevState) => {
-                                const isChecked = prevState.find(
-                                  (t) => t.id === topic.id,
-                                ).checked;
-
-                                return prevState.map((t) => {
-                                  if (t.id === topic.id) {
-                                    return {
-                                      ...t,
-                                      checked: !isChecked,
-                                    };
-                                  }
-                                  return t;
-                                });
-                              })
-                            }
-                          />
-                        </div>
-                      );
-                    })}
+                    sortedTopics.map((topic) => (
+                      <div key={topic.id} className="list-row">
+                        <CWText>{topic.name}</CWText>
+                        <CWToggle
+                          checked={
+                            toggledTopicList.find((t) => t.id === topic.id)
+                              .checked
+                          }
+                          size="small"
+                          onChange={() => handleToggleTopic(topic.id)}
+                        />
+                      </div>
+                    ))}
                   <div className="list-footer">
                     <CWText>All</CWText>
                     <CWToggle

@@ -1,6 +1,7 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
 import z from 'zod';
-import { ContestFeeType } from './DetailsFormStep';
+
+import { ContestFeeType } from '../../types';
 
 export const detailsFormValidationSchema = z
   .object({
