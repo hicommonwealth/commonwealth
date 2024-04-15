@@ -7,7 +7,7 @@ const logout = async (models: DB, req: Request, res: Response) => {
   // early, so we also call req.session.destroy() and clear the
   // session cookie before returning
   stats().decrement('cw.users.logged_in');
-  req.logout();
+  req.logout({}, () => {});
   req.session.destroy(() => {
     res.clearCookie('connect.sid');
     res.redirect('/');
