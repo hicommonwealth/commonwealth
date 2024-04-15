@@ -10,6 +10,7 @@
   "include": ["src"],
   "references": [
     { "path": "../../libs/adapters" },
-    { "path": "../../libs/core" }
+    { "path": "../../libs/core" },
+    { "path": "../../libs/logging" }
   ]
 }

@@ -26,6 +26,9 @@ const featureFlags = {
   myCommunityStakePageEnabled: buildFlag(
     process.env.FLAG_MY_COMMUNITY_STAKE_PAGE_ENABLED,
   ),
+  existingCommunityStakeIntegrationEnabled: buildFlag(
+    process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
+  ),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
