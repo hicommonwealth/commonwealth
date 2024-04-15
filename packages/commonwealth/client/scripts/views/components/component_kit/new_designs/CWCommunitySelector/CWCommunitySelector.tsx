@@ -10,6 +10,7 @@ import './CWCommunitySelector.scss';
 
 export enum CommunityType {
   Blast = 'blast',
+  Base = 'base',
   Ethereum = 'ethereum',
   Cosmos = 'cosmos',
   Polygon = 'polygon',

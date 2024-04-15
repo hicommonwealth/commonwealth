@@ -1,6 +1,7 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
@@ -20,6 +21,7 @@ import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import './DirectoryPage.scss';
 
 const DirectoryPage = () => {
+  useUserActiveAccount();
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
