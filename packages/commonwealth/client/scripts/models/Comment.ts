@@ -27,8 +27,7 @@ export class Comment<T extends IUniqueId> {
   public readonly rootThread: string;
   public readonly parentId: number;
 
-  public readonly canvasAction: string;
-  public readonly canvasSession: string;
+  public readonly canvasSignedData: string;
   public readonly canvasHash: string;
   public readonly discord_meta: any;
 
@@ -49,9 +48,8 @@ export class Comment<T extends IUniqueId> {
     deleted_at,
     authorChain,
     last_edited,
+    canvas_signed_data,
     canvas_hash,
-    canvas_action,
-    canvas_session,
     version_history,
     marked_as_spam_at,
     discord_meta,
@@ -93,8 +91,7 @@ export class Comment<T extends IUniqueId> {
       : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.length > 0 ? true : false;
-    this.canvasAction = canvas_action;
-    this.canvasSession = canvas_session;
+    this.canvasSignedData = canvas_signed_data;
     this.canvasHash = canvas_hash;
     this.reactions = (reactions || []).map((r) => new Reaction(r));
     this.reactionWeightsSum = reaction_weights_sum;

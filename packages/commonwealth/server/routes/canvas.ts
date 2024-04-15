@@ -28,16 +28,16 @@ export const getCanvasData = async (
 
   const [rows] = await models.sequelize.query(
     `
-(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at
-    FROM "Threads" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW())
+(SELECT canvas_signed_data, canvas_hash as hash, updated_at
+    FROM "Threads" WHERE canvas_signed_data IS NOT NULL AND updated_at < COALESCE(?, NOW())
     ORDER BY updated_at DESC LIMIT 50)
 UNION
-(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at
-    FROM "Comments" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW())
+(SELECT canvas_signed_data, canvas_hash as hash, updated_at
+    FROM "Comments" WHERE canvas_signed_data IS NOT NULL AND updated_at < COALESCE(?, NOW())
     ORDER BY updated_at DESC LIMIT 50)
 UNION
-(SELECT canvas_action as action, canvas_session as session, canvas_hash as hash, updated_at
-    FROM "Reactions" WHERE canvas_action IS NOT NULL AND updated_at < COALESCE(?, NOW())
+(SELECT canvas_signed_data, canvas_hash as hash, updated_at
+    FROM "Reactions" WHERE canvas_signed_data IS NOT NULL AND updated_at < COALESCE(?, NOW())
     ORDER BY updated_at DESC LIMIT 50)
 ORDER BY updated_at DESC LIMIT 50;
 `,
@@ -45,8 +45,7 @@ ORDER BY updated_at DESC LIMIT 50;
   );
 
   type QueryResult = {
-    action: string;
-    session: string;
+    canvas_signed_data: string;
     hash: string;
     updated_at: string;
   };
@@ -54,8 +53,7 @@ ORDER BY updated_at DESC LIMIT 50;
     .map((row: QueryResult) => {
       try {
         return {
-          action: JSON.parse(row.action),
-          session: JSON.parse(row.session),
+          canvas_signed_data: row.canvas_signed_data,
           hash: row.hash,
           updated_at: row.updated_at,
         };
