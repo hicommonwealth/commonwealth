@@ -18,6 +18,8 @@
     "@anatine/zod-mock": "^3.13.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@cosmjs/cosmwasm-stargate": "^0.31.3",
+    "@cosmjs/encoding": "^0.31.3",
     "@faker-js/faker": "^8.4.1",
     "mocha-steps": "^1.3.0",
     "node-object-hash": "^3.0.0",
@@ -25,8 +27,14 @@
     "sequelize": "^6.32.1",
     "umzug": "^3.7.0",
     "web3": "1.8.2",
+    "web3-eth-abi": "1.8.2",
     "web3-core": "1.8.2",
     "web3-utils": "1.8.2",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "moment": "^2.23.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "@types/moment": "^2.13.0"
   }
 }

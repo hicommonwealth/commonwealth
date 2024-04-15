@@ -73,6 +73,17 @@
   },
   "keywords": [],
   "dependencies": {
+    "pino-http": "=9.0.0",
+    "web3-eth-contract": "=1.8.2",
+    "@ethersproject/wallet": "=5.6.2",
+    "@polkadot/keyring": "=7.4.1",
+    "long": "4.0.0",
+    "@polkadot/extension-inject": "=0.40.3",
+    "@ethersproject/bytes": "=5.7.0",
+    "@ethersproject/keccak256": "=5.7.0",
+    "@ethersproject/providers": "=5.7.2",
+    "bignumber.js": "=9.0.0",
+    "ethers": "=5.7.2",
     "@apollo/client": "^3.3.18",
     "@brillout/import": "^0.2.2",
     "@canvas-js/interfaces": "0.5.0-alpha4",
@@ -81,6 +92,10 @@
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@cosmjs/encoding": "^0.31.3",
+    "@cosmjs/crypto": "^0.31.3",
+    "@cosmjs/utils": "^0.31.3",
+    "cosmjs-types": "=0.8.0",
     "@glidejs/glide": "^3.6.0",
     "@hookform/resolvers": "^3.3.1",
     "@keplr-wallet/types": "^0.12.23",
@@ -93,7 +108,8 @@
     "@mui/base": "5.0.0-beta.5",
     "@openfeature/core": "^0.0.25",
     "@openfeature/react-sdk": "^0.1.1-experimental",
-    "@openfeature/server-sdk": "^1.11.0",
+    "@openfeature/server-sdk": "=1.11.0",
+    "@openfeature/web-sdk": "0.4.12",
     "@phosphor-icons/react": "^2.0.8",
     "@polkadot/api": "6.0.5",
     "@polkadot/api-derive": "6.0.5",
@@ -226,5 +242,7 @@
     "zod": "^3.22.4",
     "zustand": "^4.3.8"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/moment": "^2.13.0"
+  }
 }
