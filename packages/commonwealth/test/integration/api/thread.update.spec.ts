@@ -1,5 +1,6 @@
 import type {
   Action,
+  Awaitable,
   Message,
   Session,
   Signature,
@@ -24,7 +25,7 @@ describe('Thread Patch Update', () => {
   let userAddress: string;
   let userSession: {
     session: Session;
-    sign: (payload: Message<Action | Session>) => Signature;
+    sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
   };
   let topicId: number;
 

@@ -1,5 +1,6 @@
 import type {
   Action,
+  Awaitable,
   Message,
   Session,
   Signature,
@@ -30,13 +31,13 @@ describe('Linking Tests', () => {
     adminAddress: string,
     adminSession: {
       session: Session;
-      sign: (payload: Message<Action | Session>) => Signature;
+      sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
     },
     userJWT: string,
     userAddress: string,
     userSession: {
       session: Session;
-      sign: (payload: Message<Action | Session>) => Signature;
+      sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
     },
     thread1: ThreadAttributes,
     thread2: ThreadAttributes;
