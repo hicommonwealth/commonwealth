@@ -1,5 +1,5 @@
 import { fromTimestamp } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { DB } from '@hicommonwealth/model';
 import {
   ChainBase,
@@ -10,7 +10,7 @@ import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function fetchCosmosNotifCommunities(models: DB) {
   const subscriptions = await models.Subscription.findAll({

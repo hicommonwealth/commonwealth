@@ -1,8 +1,8 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import { DatabaseCleaner } from '../util/databaseCleaner';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 const databaseCleaner = new DatabaseCleaner();
 databaseCleaner.init(models);
 databaseCleaner

@@ -1,5 +1,6 @@
 import { Log } from '@ethersproject/providers';
-import { logger as _logger, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger as _logger } from '@hicommonwealth/logging';
 import { ethers } from 'ethers';
 import {
   AbiSignatures,
@@ -8,7 +9,7 @@ import {
   RawEvmEvent,
 } from './types';
 
-const logger = _logger().getLogger(__filename);
+const logger = _logger(__filename);
 
 /**
  * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines

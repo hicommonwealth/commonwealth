@@ -1,5 +1,6 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { BalanceSourceType, logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
@@ -7,7 +8,7 @@ import { __getCosmosNativeBalances } from './get_cosmos_balances';
 import { __getCw20Balances } from './get_cw20_balances';
 import { __getCw721Balances } from './get_cw721_balances';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function getCosmosBalances(
   options: GetCosmosBalancesOptions,

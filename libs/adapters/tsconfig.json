@@ -7,9 +7,14 @@
     "strict": true,
     "paths": {
       "@hicommonwealth/core": ["core/src"],
-      "@hicommonwealth/shared": ["shared/src"]
+      "@hicommonwealth/shared": ["shared/src"],
+      "@hicommonwealth/logging": ["logging/src"]
     }
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../shared" }]
+  "references": [
+    { "path": "../core" },
+    { "path": "../shared" },
+    { "path": "../logging" }
+  ]
 }
