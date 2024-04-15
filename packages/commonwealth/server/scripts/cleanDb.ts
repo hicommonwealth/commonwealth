@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import { DatabaseCleaner } from 'commonwealth/server/util/databaseCleaner';
+import { DatabaseCleaner } from '../util/databaseCleaner';
 
 const log = logger(__filename);
 const databaseCleaner = new DatabaseCleaner();

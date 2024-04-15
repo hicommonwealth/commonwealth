@@ -4,7 +4,12 @@
     "rootDir": "src",
     "outDir": "build",
     "tsBuildInfoFile": "build/.tsbuildinfo",
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@hicommonwealth/core": ["core/src"],
+      "@hicommonwealth/chains": ["chains/src"],
+      "@hicommonwealth/shared": ["shared/src"]
+    }
   },
   "include": ["src"],
   "references": [
