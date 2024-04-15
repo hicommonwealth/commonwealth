@@ -97,6 +97,7 @@ const DetailsFormStep = ({
     0,
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
+  const payoutRowError = payoutStructure.some((payout) => payout < 1);
 
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -123,7 +124,7 @@ const DetailsFormStep = ({
   };
 
   const handleSubmit = () => {
-    if (totalPayoutPercentageError) {
+    if (totalPayoutPercentageError || payoutRowError) {
       return;
     }
 
@@ -344,43 +345,53 @@ const DetailsFormStep = ({
                         <CWText type="h5">
                           {moment.localeData().ordinal(index + 1)}
                         </CWText>
+                        <div>
+                          <NumberSelector
+                            value={payoutNumber + '%'}
+                            key={index}
+                            onInput={(e) => {
+                              let value = e.target.value;
+
+                              if (!value.includes('%')) {
+                                value = value.slice(0, value.length - 1);
+                              } else {
+                                value = value.replace(/%/g, '');
+                              }
+
+                              if (isNaN(Number(value))) {
+                                return;
+                              }
+
+                              const newPayoutStructure = [
+                                ...payoutStructure.slice(0, index),
+                                Number(value),
+                                ...payoutStructure.slice(index + 1),
+                              ];
+                              setPayoutStructure(newPayoutStructure);
+                            }}
+                            minusDisabled={payoutStructure[index] === 0}
+                            onMinusClick={() => {
+                              const updatedPayoutStructure = [
+                                ...payoutStructure,
+                              ];
+                              updatedPayoutStructure[index] -= 1;
+                              setPayoutStructure(updatedPayoutStructure);
+                            }}
+                            onPlusClick={() => {
+                              const updatedPayoutStructure = [
+                                ...payoutStructure,
+                              ];
+                              updatedPayoutStructure[index] += 1;
+                              setPayoutStructure(updatedPayoutStructure);
+                            }}
+                          />
+                          <MessageRow
+                            hasFeedback={payoutNumber < 1}
+                            validationStatus="failure"
+                            statusMessage="Prize must be greater than 0%"
+                          />
+                        </div>
                       </div>
-
-                      <NumberSelector
-                        value={payoutNumber + '%'}
-                        key={index}
-                        onInput={(e) => {
-                          let value = e.target.value;
-
-                          if (!value.includes('%')) {
-                            value = value.slice(0, value.length - 1);
-                          } else {
-                            value = value.replace(/%/g, '');
-                          }
-
-                          if (isNaN(Number(value))) {
-                            return;
-                          }
-
-                          const newPayoutStructure = [
-                            ...payoutStructure.slice(0, index),
-                            Number(value),
-                            ...payoutStructure.slice(index + 1),
-                          ];
-                          setPayoutStructure(newPayoutStructure);
-                        }}
-                        minusDisabled={payoutStructure[index] === 0}
-                        onMinusClick={() => {
-                          const updatedPayoutStructure = [...payoutStructure];
-                          updatedPayoutStructure[index] -= 1;
-                          setPayoutStructure(updatedPayoutStructure);
-                        }}
-                        onPlusClick={() => {
-                          const updatedPayoutStructure = [...payoutStructure];
-                          updatedPayoutStructure[index] += 1;
-                          setPayoutStructure(updatedPayoutStructure);
-                        }}
-                      />
                     </>
                   );
                 })}
