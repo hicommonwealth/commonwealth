@@ -1,17 +1,12 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import {
-  EventHandler,
-  Policy,
-  commonProtocol,
-  logger,
-  schemas,
-} from '@hicommonwealth/core';
+import { EventHandler, Policy, schemas } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleGovernanceProposalEvents } from './handleGovnernanceProposalEvents';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 
 const genericWeb3 = new Web3();
 
@@ -34,7 +29,7 @@ export const processChainEventCreated: EventHandler<
   if (communityStakeContractAddresses.includes(contractAddress)) {
     await handleCommunityStakeTrades(models, payload);
   } else if (namespaceFactoryContractAddresses.includes(contractAddress)) {
-    log.info('Implementation not defined', undefined, { payload });
+    log.info('Implementation not defined', { payload });
   } else if (payload.eventSource.kind.includes('proposal')) {
     await handleGovernanceProposalEvents(models, payload);
   } else {

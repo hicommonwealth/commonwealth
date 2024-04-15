@@ -1,5 +1,6 @@
 import { schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { DB } from '@hicommonwealth/model';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';

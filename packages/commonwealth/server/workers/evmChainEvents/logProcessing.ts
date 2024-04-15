@@ -211,7 +211,7 @@ export async function migrateEvents(
       oldestBlock,
       endingBlockNum,
     );
-    logger.info('Events migrated', undefined, {
+    logger.info('Events migrated', {
       startingBlockNum: oldestBlock,
       endingBlockNum,
     });

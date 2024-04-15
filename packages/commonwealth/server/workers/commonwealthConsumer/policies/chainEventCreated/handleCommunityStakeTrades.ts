@@ -1,11 +1,11 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { logger, schemas } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 
 export async function handleCommunityStakeTrades(
   models: DB,

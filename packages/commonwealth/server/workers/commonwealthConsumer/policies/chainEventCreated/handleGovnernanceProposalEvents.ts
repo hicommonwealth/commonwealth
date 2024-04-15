@@ -1,19 +1,18 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
+import { schemas } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   SupportedNetwork,
-  logger,
-  schemas,
-} from '@hicommonwealth/core';
-import { CommunityAttributes, DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { QueryTypes } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';
 import emitNotifications from '../../../../util/emitNotifications';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 const web3 = new Web3();
 
 export async function handleGovernanceProposalEvents(
