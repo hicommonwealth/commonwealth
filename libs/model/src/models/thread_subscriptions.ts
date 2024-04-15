@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ThreadSubscriptionAttributes = z.infer<
-  typeof schemas.entities.ThreadSubscriptions
+  typeof schemas.entities.ThreadSubscription
 >;
 
 export type ThreadSubscriptionInstance =

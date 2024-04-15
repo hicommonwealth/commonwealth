@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type SubscriptionPreferenceAttributes = z.infer<
-  typeof schemas.entities.SubscriptionPreferences
+  typeof schemas.entities.SubscriptionPreference
 >;
 
 export type SubscriptionPreferenceInstance =

@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityAlertAttributes = z.infer<
-  typeof schemas.entities.CommunityAlerts
+  typeof schemas.entities.CommunityAlert
 >;
 
 export type CommunityAlertInstance = ModelInstance<CommunityAlertAttributes>;

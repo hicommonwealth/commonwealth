@@ -492,20 +492,20 @@ export const Outbox = z.object({
   updated_at: z.date(),
 });
 
-export const SubscriptionPreferences = z.object({
+export const SubscriptionPreference = z.object({
   id: z.number(),
   user_id: z.number(),
-  email_notifications_enabled: z.boolean(),
-  digest_email_enabled: z.boolean(),
-  recap_email_enabled: z.boolean(),
-  mobile_push_notifications_enabled: z.boolean(),
-  mobile_push_discussion_activity_enabled: z.boolean(),
-  mobile_push_admin_alerts_enabled: z.boolean(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  email_notifications_enabled: z.boolean().default(false),
+  digest_email_enabled: z.boolean().default(false),
+  recap_email_enabled: z.boolean().default(false),
+  mobile_push_notifications_enabled: z.boolean().default(false),
+  mobile_push_discussion_activity_enabled: z.boolean().default(false),
+  mobile_push_admin_alerts_enabled: z.boolean().default(false),
+  created_at: z.date().default(new Date()),
+  updated_at: z.date().default(new Date()),
 });
 
-export const ThreadSubscriptions = z.object({
+export const ThreadSubscription = z.object({
   id: z.number(),
   user_id: z.number(),
   thread_id: z.number(),
@@ -513,7 +513,7 @@ export const ThreadSubscriptions = z.object({
   updated_at: z.date(),
 });
 
-export const CommentSubscriptions = z.object({
+export const CommentSubscription = z.object({
   id: z.number(),
   user_id: z.number(),
   comment_id: z.number(),
@@ -521,7 +521,7 @@ export const CommentSubscriptions = z.object({
   updated_at: z.date(),
 });
 
-export const CommunityAlerts = z.object({
+export const CommunityAlert = z.object({
   id: z.number(),
   user_id: z.number(),
   community_id: z.number(),
