@@ -61,7 +61,9 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   adapters.clear();
 
   // exit when not unit testing
-  code !== 'UNIT_TEST' && process.exit(code === 'ERROR' ? 1 : 0);
+  process.env.NODE_ENV !== 'test' &&
+    code !== 'UNIT_TEST' &&
+    process.exit(code === 'ERROR' ? 1 : 0);
 };
 
 /**
