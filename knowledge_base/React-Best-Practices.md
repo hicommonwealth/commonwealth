@@ -2,7 +2,7 @@
 
 - ⚠️ This entry intentionally stays silent on state management. See [State Management](./State-Management.md) entry instead.
 - ⚠️ This entry is not oriented toward performance improvements. It is concerned with improving developer experience, increasing readability, and aligning our codebase with current React standards.
-- ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is actually organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
+- ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is currently organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
 
 ## Contents
 
@@ -19,10 +19,11 @@
   + [Markup readability](#markup-readability)
   + [Linting](#linting)
   + [Example file composition](#example-component-composition)
+- [StrictMode](#strictmode)
 
 ## Directory structure
 
-Currently, our frontend's directory structure is derived from the MVC model, with which React has little in common, and from which we want to gradually move away.
+As of 230815, our frontend's directory structure is derived from the MVC model, with which React has little in common, and from which we want to gradually move away.
 
 Suggested changes:
 
@@ -202,6 +203,16 @@ const useComponent = () => {
 
 export default useComponent
 ```
+
+## StrictMode
+
+When a React application is wrapped in `React.StrictMode`, React performs extra checks and validations during development mode. These checks include:
+
+- Identifying components with unsafe lifecycle methods and providing warnings about them.
+- Detecting legacy string ref usage and warning about it.
+- Detecting deprecated findDOMNode usages and warning about it.
+- Detecting unexpected side effects within the render phase and warning about it.
+- Detecting a few other potential issues.
 
 ## Change Log
 

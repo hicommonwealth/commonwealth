@@ -79,7 +79,9 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 - Datestamps, when used, should be formatted YYMMDD.
 
 ### Backend Errors
+
 Backend errors currently come in two varieties:
+
 - Errors instructive for the end user
 - Errors instructive for the client
 
