@@ -56,9 +56,7 @@ export class aaveGovernor implements IGovernor {
     }
 
     return {
-      proposalId: String(
-        proposalId['events']['ProposalCreated']['returnValues'][0],
-      ),
+      proposalId: String(proposalId.events?.ProposalCreated.returnValues[0]),
       block: proposalId['blockNumber'],
     };
   }
@@ -173,7 +171,7 @@ export class aaveGovernor implements IGovernor {
     } catch {
       console.log('already Delegated');
     }
-    return { block: txReceipt['blockNumber'] };
+    return { block: txReceipt?.blockNumber };
   }
 
   public async endToEndSim(): Promise<void> {

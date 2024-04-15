@@ -58,10 +58,7 @@ export class compoundGovernor implements IGovernor {
       proposalId: String(
         provider.eth.abi.decodeParameter(
           'uint256',
-          String(proposalId['events']['ProposalCreated']['raw']['data']).slice(
-            0,
-            66,
-          ),
+          String(proposalId.events?.ProposalCreated?.raw?.data).slice(0, 66),
         ),
       ),
       block: proposalId['blockNumber'],
@@ -208,7 +205,7 @@ export class compoundGovernor implements IGovernor {
     } catch {
       console.log('already Delegated');
     }
-    return { block: txReceipt['blockNumber'] };
+    return { block: txReceipt?.blockNumber };
   }
 
   public async endToEndSim(): Promise<void> {
