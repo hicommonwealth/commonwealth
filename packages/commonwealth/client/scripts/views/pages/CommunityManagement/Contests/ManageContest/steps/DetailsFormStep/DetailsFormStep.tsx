@@ -80,13 +80,14 @@ const DetailsFormStep = ({
   const [prizePercentage, setPrizePercentage] = useState(
     INITIAL_PERCENTAGE_VALUE,
   );
-  const [topicList, setTopicList] = useState<
+  const [toggledTopicList, setToggledTopicList] = useState<
     {
       name: string;
       id: number;
       checked: boolean;
     }[]
   >([]);
+  const [allTopicsToggled, setAllTopicsToggled] = useState(true);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
 
@@ -98,21 +99,22 @@ const DetailsFormStep = ({
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
+  const topicsEnabledError = toggledTopicList.every(({ checked }) => !checked);
 
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
 
   useEffect(() => {
-    if (topics && topicList.length === 0) {
+    if (topics && toggledTopicList.length === 0) {
       const mappedTopics = topics.map((topic) => ({
         name: topic.name,
         id: topic.id,
         checked: true,
       }));
-      setTopicList(mappedTopics);
+      setToggledTopicList(mappedTopics);
     }
-  }, [topicList.length, topics]);
+  }, [toggledTopicList.length, topics]);
 
   const goBack = () => {
     // TODO distinct if user came from /manage/contests or /contests
@@ -124,7 +126,7 @@ const DetailsFormStep = ({
   };
 
   const handleSubmit = () => {
-    if (totalPayoutPercentageError || payoutRowError) {
+    if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
       return;
     }
 
@@ -159,6 +161,15 @@ const DetailsFormStep = ({
 
     return a.order - b.order;
   });
+
+  const handleToggleAllTopics = () => {
+    const mappedTopics = sortedTopics?.map((topic) => ({
+      ...topic,
+      checked: !allTopicsToggled,
+    }));
+    setToggledTopicList(mappedTopics);
+    setAllTopicsToggled((prevState) => !prevState);
+  };
 
   return (
     <CommunityManagementLayout
@@ -441,18 +452,19 @@ const DetailsFormStep = ({
                     <CWText>Topic</CWText>
                     <CWText>Eligible</CWText>
                   </div>
-                  {topicList.length &&
+                  {toggledTopicList.length &&
                     sortedTopics.map((topic) => {
                       return (
                         <div key={topic.id}>
                           <CWText>{topic.name}</CWText>
                           <CWToggle
                             checked={
-                              topicList.find((t) => t.id === topic.id).checked
+                              toggledTopicList.find((t) => t.id === topic.id)
+                                .checked
                             }
                             size="small"
                             onChange={() =>
-                              setTopicList((prevState) => {
+                              setToggledTopicList((prevState) => {
                                 const isChecked = prevState.find(
                                   (t) => t.id === topic.id,
                                 ).checked;
@@ -474,9 +486,14 @@ const DetailsFormStep = ({
                     })}
                   <CWText>All</CWText>
                   <CWToggle
-                    checked={true}
+                    checked={allTopicsToggled}
                     size="small"
-                    // onChange={() => setIsSmallToggled(!isSmallToggled)}
+                    onChange={handleToggleAllTopics}
+                  />
+                  <MessageRow
+                    hasFeedback={topicsEnabledError}
+                    validationStatus="failure"
+                    statusMessage="Must include one or more topics"
                   />
                 </div>
               </div>
