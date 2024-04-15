@@ -15,6 +15,10 @@
 
     .Divider {
       margin-block: 64px;
+
+      @include extraSmall {
+        margin-block: 40px;
+      }
     }
 
     .contest-section {
@@ -31,6 +35,7 @@
         display: flex;
         align-items: center;
         justify-items: flex-start;
+        flex-wrap: wrap;
 
         .container {
           margin-right: 24px;
@@ -73,9 +78,18 @@
           align-items: center;
           justify-content: space-between;
           gap: 16px;
+          flex-wrap: wrap;
+
+          @include extraSmall {
+            gap: unset;
+          }
 
           .Button {
             padding-inline: 36px;
+
+            @include extraSmall {
+              padding-inline: 10px;
+            }
           }
         }
       }
@@ -109,8 +123,16 @@
             .NumberSelector {
               gap: 16px;
 
+              @include extraSmall {
+                gap: 8px;
+              }
+
               .input-and-icon-container {
                 width: 110px;
+
+                @include extraSmall {
+                  width: 110px;
+                }
 
                 input {
                   font-family: $font-family-silka;
