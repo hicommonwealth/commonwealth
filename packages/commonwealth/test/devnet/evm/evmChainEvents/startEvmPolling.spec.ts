@@ -89,9 +89,6 @@ describe('EVM Chain Events End to End Tests', () => {
     expect(events[0]?.event_name).to.equal(
       schemas.EventNames.ChainEventCreated,
     );
-    expect(events[0]?.event_payload?.event_name).to.equal(
-      schemas.EventNames.ChainEventCreated,
-    );
 
     const event = events[0].event_payload as z.infer<
       typeof schemas.events.ChainEventCreated

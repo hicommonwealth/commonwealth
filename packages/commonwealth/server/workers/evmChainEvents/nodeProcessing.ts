@@ -1,6 +1,7 @@
 import { schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { DB } from '@hicommonwealth/model';
+import { z } from 'zod';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
@@ -70,14 +71,19 @@ export async function processChainNode(
       }
 
       if (allEvents.length > 0) {
-        const records = allEvents.map((event) => ({
-          event_name: schemas.EventNames.ChainEventCreated,
-          event_payload: {
-            event_name: schemas.EventNames
-              .ChainEventCreated as typeof schemas.EventNames.ChainEventCreated,
-            ...event,
-          },
-        }));
+        const records = allEvents.map(
+          (
+            event,
+          ): {
+            event_name: schemas.EventNames.ChainEventCreated;
+            event_payload: z.infer<typeof schemas.events.ChainEventCreated>;
+          } => ({
+            event_name: schemas.EventNames.ChainEventCreated,
+            event_payload: event as z.infer<
+              typeof schemas.events.ChainEventCreated
+            >,
+          }),
+        );
         await models.Outbox.bulkCreate(records, { transaction });
       }
     });
