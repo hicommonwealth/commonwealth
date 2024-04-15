@@ -1,3 +1,5 @@
+@import '../../../../../../../../styles/shared';
+
 .CommunityManagementLayout {
   .contest-description,
   .winners-description {
@@ -11,8 +13,194 @@
   .DetailsFormStep {
     width: 100%;
 
-    .contest-name,
-    .funding-token-address {
+    .Divider {
+      margin-block: 64px;
+    }
+
+    .contest-section {
+      .Text.b1 {
+        color: $neutral-500;
+      }
+
+      .Text.h4 {
+        display: flex;
+        align-items: center;
+      }
+
+      .radio-row {
+        display: flex;
+        align-items: center;
+        justify-items: flex-start;
+
+        .container {
+          margin-right: 24px;
+          margin-top: 16px;
+        }
+      }
+    }
+
+    .contest-section-name {
+      margin-bottom: 64px;
+
+      .contest-name-input {
+        margin-top: 16px;
+      }
+    }
+
+    .contest-section-image {
+      .Text.h4 {
+        .b1 {
+          margin-left: 4px;
+        }
+      }
+    }
+
+    .contest-section-fee {
+      .funding-token-address-description {
+        font-weight: 500;
+        margin-bottom: 8px;
+        margin-top: 24px;
+      }
+    }
+
+    .contest-section-recurring {
+      .prize-subsection {
+        margin-top: 24px;
+
+        .percentage-buttons {
+          margin-top: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+
+          .Button {
+            padding-inline: 36px;
+          }
+        }
+      }
+    }
+
+    .contest-section-payout {
+      .payout-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 24px;
+
+        .payout-row {
+          margin-top: 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .left-side {
+            display: flex;
+            gap: 8px;
+
+            .color-square {
+              width: 24px;
+              height: 24px;
+              background-color: red;
+              border-radius: 4px;
+            }
+          }
+
+          .right-side {
+            .NumberSelector {
+              gap: 16px;
+
+              .input-and-icon-container {
+                width: 110px;
+
+                input {
+                  font-family: $font-family-silka;
+                  font-size: 29px;
+                  font-weight: 700;
+                  height: 48px;
+                  text-align: center;
+                }
+              }
+            }
+          }
+        }
+
+        .MessageRow {
+          margin-top: 4px;
+          margin-left: auto;
+        }
+      }
+
+      .payout-summary {
+        .payout-total {
+          display: flex;
+          justify-content: end;
+
+          .Text.h4 {
+            color: $neutral-500;
+          }
+
+          .total-percentage {
+            font-family: $font-family-silka;
+            font-size: 29px;
+            font-weight: 700;
+            margin-left: 4px;
+          }
+        }
+
+        .MessageRow {
+          justify-content: end;
+        }
+      }
+
+      .payout-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 32px;
+      }
+    }
+
+    .contest-section-topics {
+      .topics-list {
+        .list-header {
+          display: flex;
+          justify-content: space-between;
+          padding: 12px 8px;
+        }
+
+        .list-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 12px 8px;
+          border-top: 1px solid $neutral-100;
+
+          .Text {
+            color: $neutral-700;
+          }
+        }
+
+        .list-footer {
+          display: flex;
+          justify-content: end;
+          gap: 16px;
+          padding: 12px 8px;
+          border-top: 1px solid $neutral-100;
+        }
+
+        .MessageRow {
+          justify-content: flex-end;
+        }
+      }
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 32px;
+    }
+
+    .contest-name-input,
+    .funding-token-address-input {
       .MessageRow:first-child {
         display: none; // hide input label
       }

@@ -2,6 +2,8 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import NumberSelector from 'views/components/NumberSelector';
 import {
   CWCoverImageUploader,
@@ -14,14 +16,13 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import * as colors from '../../../../../../../../styles/mixins/colors.scss';
 import { LaunchContestStep } from '../../ManageContest';
 import { detailsFormValidationSchema } from './validation';
 
-import app from 'state';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
@@ -67,6 +68,22 @@ const prizePercentageOptions = [
 ];
 
 const initialPayoutStructure = [60, 25, 15];
+
+const getPrizeColor = (index: number) => {
+  if (index === 0) {
+    return colors['yellow-500'];
+  }
+
+  if (index === 1) {
+    return colors['neutral-100'];
+  }
+
+  if (index === 2) {
+    return colors['yellow-600'];
+  }
+
+  return '#000';
+};
 
 const DetailsFormStep = ({
   contestId,
@@ -197,8 +214,7 @@ const DetailsFormStep = ({
         >
           {({ watch, setValue }) => (
             <>
-              {/*// TODO add class for header => grey font*/}
-              <div>
+              <div className="contest-section contest-section-name">
                 <CWText type="h4">Name your contest</CWText>
                 <CWText type="b1">
                   We recommend naming your contest if you’re going to have
@@ -206,7 +222,7 @@ const DetailsFormStep = ({
                 </CWText>
 
                 <CWTextInput
-                  containerClassName="contest-name"
+                  containerClassName="contest-name-input"
                   name="contestName"
                   hookToForm
                   placeholder="Give your contest a name"
@@ -215,7 +231,7 @@ const DetailsFormStep = ({
                 />
               </div>
 
-              <div>
+              <div className="contest-section contest-section-image">
                 <CWText type="h4">
                   Featured image<CWText type="b1"> (optional)</CWText>
                 </CWText>
@@ -238,10 +254,8 @@ const DetailsFormStep = ({
 
               <CWDivider />
 
-              <div>
-                <CWText type="h4">
-                  Use Community Stake fees for contest?{' '}
-                </CWText>
+              <div className="contest-section contest-section-fee">
+                <CWText type="h4">Use Community Stake fees for contest?</CWText>
                 <CWText type="b1">
                   You can fund your contest using the funds generated from the
                   purchase of Community Stake, or you can fund your contest
@@ -249,30 +263,32 @@ const DetailsFormStep = ({
                   at any time.
                 </CWText>
 
-                <CWRadioButton
-                  label="Use Community Stake fees"
-                  value={ContestFeeType.CommunityStake}
-                  name="feeType"
-                  hookToForm
-                  onChange={() => {
-                    setValue('contestRecurring', ContestRecurringType.Yes);
-                  }}
-                />
-                <CWRadioButton
-                  label="Direct deposit only"
-                  value={ContestFeeType.DirectDeposit}
-                  name="feeType"
-                  hookToForm
-                />
+                <div className="radio-row">
+                  <CWRadioButton
+                    label="Use Community Stake fees"
+                    value={ContestFeeType.CommunityStake}
+                    name="feeType"
+                    hookToForm
+                    onChange={() =>
+                      setValue('contestRecurring', ContestRecurringType.Yes)
+                    }
+                  />
+                  <CWRadioButton
+                    label="Direct deposit only"
+                    value={ContestFeeType.DirectDeposit}
+                    name="feeType"
+                    hookToForm
+                  />
+                </div>
 
                 {watch('feeType') === ContestFeeType.DirectDeposit && (
                   <>
-                    <CWText>
+                    <CWText className="funding-token-address-description">
                       Enter the address of the token you would like to use to
                       fund your contest
                     </CWText>
                     <CWTextInput
-                      containerClassName="funding-token-address"
+                      containerClassName="funding-token-address-input"
                       name="fundingTokenAddress"
                       hookToForm
                       placeholder="Enter funding token address"
@@ -285,12 +301,13 @@ const DetailsFormStep = ({
 
               <CWDivider />
 
-              <div>
+              <div className="contest-section contest-section-recurring">
                 <CWText type="h4">Make contest recurring?</CWText>
                 <CWText type="b1">
                   The remaining prize pool will roll over week to week until you
-                  end the contest.{' '}
-                  {watch('feeType') === ContestFeeType.CommunityStake && (
+                  end the contest.
+                  <br />
+                  {watch('contestRecurring') === ContestRecurringType.Yes && (
                     <>
                       Contests run using Community Stake funds must be
                       recurring.
@@ -298,22 +315,26 @@ const DetailsFormStep = ({
                   )}
                 </CWText>
 
-                <CWRadioButton
-                  label="Yes"
-                  value={ContestRecurringType.Yes}
-                  name="contestRecurring"
-                  hookToForm
-                />
-                <CWRadioButton
-                  label="No"
-                  value={ContestRecurringType.No}
-                  name="contestRecurring"
-                  hookToForm
-                  disabled={watch('feeType') === ContestFeeType.CommunityStake}
-                />
+                <div className="radio-row">
+                  <CWRadioButton
+                    label="Yes"
+                    value={ContestRecurringType.Yes}
+                    name="contestRecurring"
+                    hookToForm
+                  />
+                  <CWRadioButton
+                    label="No"
+                    value={ContestRecurringType.No}
+                    name="contestRecurring"
+                    hookToForm
+                    disabled={
+                      watch('feeType') === ContestFeeType.CommunityStake
+                    }
+                  />
+                </div>
 
                 {watch('contestRecurring') === ContestRecurringType.Yes && (
-                  <>
+                  <div className="prize-subsection">
                     <CWText type="h5">
                       How much of the funds would you like to use weekly?
                     </CWText>
@@ -321,25 +342,27 @@ const DetailsFormStep = ({
                       Tip: smaller prizes makes the contest run longer
                     </CWText>
 
-                    {prizePercentageOptions.map(({ value, label }) => (
-                      <CWButton
-                        type="button"
-                        key={value}
-                        label={label}
-                        buttonHeight="sm"
-                        buttonType={
-                          prizePercentage === value ? 'primary' : 'secondary'
-                        }
-                        onClick={() => setPrizePercentage(value)}
-                      />
-                    ))}
-                  </>
+                    <div className="percentage-buttons">
+                      {prizePercentageOptions.map(({ value, label }) => (
+                        <CWButton
+                          type="button"
+                          key={value}
+                          label={label}
+                          buttonHeight="sm"
+                          buttonType={
+                            prizePercentage === value ? 'primary' : 'secondary'
+                          }
+                          onClick={() => setPrizePercentage(value)}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 
               <CWDivider />
 
-              <div>
+              <div className="contest-section contest-section-payout">
                 <CWText type="h4">Winners & payouts</CWText>
                 <CWText type="b1" className="winners-description">
                   Set the number of winners and how much of the total prize pool
@@ -347,16 +370,20 @@ const DetailsFormStep = ({
                   <CWText fontWeight="medium">20% of each prize</CWText> will be
                   split amongst the voters of the winning content.
                 </CWText>
-
-                {payoutStructure.map((payoutNumber, index) => {
-                  return (
+                <div className="payout-container">
+                  {payoutStructure.map((payoutNumber, index) => (
                     <>
-                      <div className="PayoutRow">
-                        <div className="color-square"></div>
-                        <CWText type="h5">
-                          {moment.localeData().ordinal(index + 1)}
-                        </CWText>
-                        <div>
+                      <div className="payout-row" key={index}>
+                        <div className="left-side">
+                          <div
+                            className="color-square"
+                            style={{ backgroundColor: getPrizeColor(index) }}
+                          ></div>
+                          <CWText type="h5">
+                            {moment.localeData().ordinal(index + 1)} Prize
+                          </CWText>
+                        </div>
+                        <div className="right-side">
                           <NumberSelector
                             value={payoutNumber + '%'}
                             key={index}
@@ -396,22 +423,24 @@ const DetailsFormStep = ({
                               setPayoutStructure(updatedPayoutStructure);
                             }}
                           />
-                          <MessageRow
-                            hasFeedback={payoutNumber < 1}
-                            validationStatus="failure"
-                            statusMessage="Prize must be greater than 0%"
-                          />
                         </div>
                       </div>
+                      <MessageRow
+                        hasFeedback={payoutNumber < 1}
+                        validationStatus="failure"
+                        statusMessage="Prize must be greater than 0%"
+                      />
                     </>
-                  );
-                })}
+                  ))}
+                </div>
 
-                <div>
-                  <CWText type="h4">Total =</CWText>
-                  <CWText className="total-percentage">
-                    {totalPayoutPercentage}%
-                  </CWText>
+                <div className="payout-summary">
+                  <div className="payout-total">
+                    <CWText type="h4">Total = </CWText>
+                    <CWText type="h3" className="total-percentage">
+                      {totalPayoutPercentage}%
+                    </CWText>
+                  </div>
                   <MessageRow
                     hasFeedback={totalPayoutPercentageError}
                     validationStatus="failure"
@@ -419,7 +448,7 @@ const DetailsFormStep = ({
                   />
                 </div>
 
-                <div>
+                <div className="payout-buttons">
                   <CWButton
                     label="Remove Winner"
                     buttonType="secondary"
@@ -439,7 +468,8 @@ const DetailsFormStep = ({
               </div>
 
               <CWDivider />
-              <div>
+
+              <div className="contest-section contest-section-topics">
                 <CWText type="h4">Included topics</CWText>
                 <CWText type="b1">
                   Select which topics you would like to include in this contest.
@@ -447,15 +477,15 @@ const DetailsFormStep = ({
                   contest prizes.
                 </CWText>
 
-                <div>
-                  <div>
+                <div className="topics-list">
+                  <div className="list-header">
                     <CWText>Topic</CWText>
                     <CWText>Eligible</CWText>
                   </div>
                   {toggledTopicList.length &&
                     sortedTopics.map((topic) => {
                       return (
-                        <div key={topic.id}>
+                        <div key={topic.id} className="list-row">
                           <CWText>{topic.name}</CWText>
                           <CWToggle
                             checked={
@@ -484,12 +514,14 @@ const DetailsFormStep = ({
                         </div>
                       );
                     })}
-                  <CWText>All</CWText>
-                  <CWToggle
-                    checked={allTopicsToggled}
-                    size="small"
-                    onChange={handleToggleAllTopics}
-                  />
+                  <div className="list-footer">
+                    <CWText>All</CWText>
+                    <CWToggle
+                      checked={allTopicsToggled}
+                      size="small"
+                      onChange={handleToggleAllTopics}
+                    />
+                  </div>
                   <MessageRow
                     hasFeedback={topicsEnabledError}
                     validationStatus="failure"
@@ -498,16 +530,18 @@ const DetailsFormStep = ({
                 </div>
               </div>
 
-              <CWButton
-                label="Cancel"
-                buttonType="secondary"
-                onClick={handleCancel}
-              />
-              <CWButton
-                label={editMode ? 'Save changes' : 'Save & continue'}
-                type="submit"
-                disabled={isProcessingProfileImage}
-              />
+              <div className="cta-buttons">
+                <CWButton
+                  label="Cancel"
+                  buttonType="secondary"
+                  onClick={handleCancel}
+                />
+                <CWButton
+                  label={editMode ? 'Save changes' : 'Save & continue'}
+                  type="submit"
+                  disabled={isProcessingProfileImage}
+                />
+              </div>
             </>
           )}
         </CWForm>
