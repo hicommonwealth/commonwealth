@@ -186,8 +186,7 @@ export const Thread = z.object({
 
   has_poll: z.boolean().optional(),
 
-  canvas_action: z.string(),
-  canvas_session: z.string(),
+  canvas_signed_data: z.string(),
   canvas_hash: z.string(),
 
   created_at: z.date().optional(),
@@ -221,8 +220,7 @@ export const Comment = z.object({
   parent_id: z.string().optional(),
   version_history: z.array(z.string()).optional(),
 
-  canvas_action: z.string(),
-  canvas_session: z.string(),
+  canvas_signed_data: z.string(),
   canvas_hash: z.string(),
 
   created_at: z.any(),

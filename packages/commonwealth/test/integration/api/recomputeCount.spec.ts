@@ -240,10 +240,10 @@ describe('recomputeCounts', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000000';
     await server.models.sequelize.query(
       `
-    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
-    VALUES(-300, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
-    (-400, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
-    (-500, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now())
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_hash", "created_at", "updated_at")
+    VALUES(-300, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '${canvas_hash}', now(), now()),
+    (-400, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '${canvas_hash}', now(), now()),
+    (-500, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '${canvas_hash}', now(), now())
     `,
     );
   }
@@ -254,8 +254,8 @@ describe('recomputeCounts', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000000';
     await server.models.sequelize.query(
       `
-    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
-    VALUES(-3000, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', null, ${server.e2eTestEntities.testComments[0].id}, '{}', '${canvas_hash}', '{}', now(), now())
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_hash", "created_at", "updated_at")
+    VALUES(-3000, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', null, ${server.e2eTestEntities.testComments[0].id}, '${canvas_hash}', now(), now())
     `,
     );
   }

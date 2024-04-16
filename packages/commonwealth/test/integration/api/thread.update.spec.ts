@@ -190,6 +190,7 @@ describe('Thread Patch Update', () => {
       });
 
       // admin sets thread as pinned
+      const adminWalletAddress = adminAddress.split(':')[2];
       {
         const res = await chai.request
           .agent(server.app)
@@ -198,7 +199,7 @@ describe('Thread Patch Update', () => {
           .send({
             author_chain: thread.community_id,
             chain: thread.community_id,
-            address: adminAddress,
+            address: adminWalletAddress,
             jwt: adminJWT,
             pinned: true,
             topicId,
@@ -216,7 +217,7 @@ describe('Thread Patch Update', () => {
           .send({
             author_chain: thread.community_id,
             chain: thread.community_id,
-            address: adminAddress,
+            address: adminWalletAddress,
             jwt: adminJWT,
             spam: true,
             topicId,

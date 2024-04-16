@@ -1,6 +1,7 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type { DataTypes, Sequelize } from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize/lib/sequelize';
 import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
