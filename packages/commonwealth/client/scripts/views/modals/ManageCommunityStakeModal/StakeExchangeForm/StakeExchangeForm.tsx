@@ -342,7 +342,7 @@ const StakeExchangeForm = ({
               onInput={handleInput}
               value={numberOfStakeToExchange}
               inputClassName={clsx('number', {
-                expanded: numberOfStakeToExchange?.toString().length > 3,
+                expanded: numberOfStakeToExchange?.toString?.()?.length > 3,
               })}
             />
           </div>

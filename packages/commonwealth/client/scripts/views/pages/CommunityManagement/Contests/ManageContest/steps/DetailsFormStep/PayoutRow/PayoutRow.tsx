@@ -23,7 +23,7 @@ const PayoutRow = ({
   payoutNumber,
 }: PayoutRowProps) => {
   const handleInput = (e) => {
-    let value = e.target.value;
+    let value = e.target.value.trim();
 
     // percentage symbol is inserted in the input so this logic
     // helps edit the input without messing with percentage symbol
