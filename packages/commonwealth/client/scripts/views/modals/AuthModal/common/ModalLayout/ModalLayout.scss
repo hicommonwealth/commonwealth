@@ -1,6 +1,6 @@
-@import '../../../../../styles/shared';
+@import '../../../../../../styles/shared';
 
-.BaseModal {
+.ModalLayout {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -33,32 +33,17 @@
     text-align: center;
   }
 
+  .description {
+    text-align: center;
+    color: $neutral-600;
+    margin-top: -12px;
+  }
+
   .content {
     padding: 0 48px;
 
     @include extraSmall {
       padding: 0 32px;
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-
-      .Tab {
-        .Text {
-          width: 100%;
-          max-width: 100%;
-        }
-      }
-    }
-
-    .auth-options {
-      display: flex;
-      flex-direction: column;
-      overflow-y: scroll;
-      gap: 12px;
-      width: 100%;
-      max-height: 430px;
     }
   }
 
@@ -69,6 +54,8 @@
       padding-bottom: 32px;
     }
 
+    display: flex;
+    flex-direction: column;
     justify-content: center;
 
     .Text {
@@ -78,8 +65,18 @@
     a,
     a:visited,
     a:active,
-    a:hover {
+    a:hover,
+    button {
       color: $primary-600;
+    }
+
+    button {
+      text-decoration: none;
+      outline: none;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      cursor: pointer;
     }
   }
 }
