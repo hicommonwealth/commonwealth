@@ -13,11 +13,11 @@ import {
   useSellStakeMutation,
 } from 'state/api/communityStake';
 import { useCommunityStake } from 'views/components/CommunityStake';
+import NumberSelector from 'views/components/NumberSelector';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import {
   CWModalBody,
@@ -27,7 +27,6 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
@@ -334,28 +333,18 @@ const StakeExchangeForm = ({
             <CWText type="b1" fontWeight="bold">
               Stake
             </CWText>
-            <div className="stake-selector">
-              <CWCircleButton
-                buttonType="secondary"
-                iconName="minus"
-                onClick={handleMinus}
-                disabled={minusDisabled}
-              />
-              <CWTextInput
-                onInput={handleInput}
-                value={numberOfStakeToExchange}
-                inputClassName={clsx('number', {
-                  expanded: numberOfStakeToExchange?.toString().length > 3,
-                })}
-                containerClassName="number-container"
-              />
-              <CWCircleButton
-                buttonType="secondary"
-                iconName="plus"
-                onClick={handlePlus}
-                disabled={plusDisabled}
-              />
-            </div>
+
+            <NumberSelector
+              onMinusClick={handleMinus}
+              minusDisabled={minusDisabled}
+              onPlusClick={handlePlus}
+              plusDisabled={plusDisabled}
+              onInput={handleInput}
+              value={numberOfStakeToExchange}
+              inputClassName={clsx('number', {
+                expanded: numberOfStakeToExchange?.toString?.()?.length > 3,
+              })}
+            />
           </div>
           <div className="price-per-unit-row">
             <CWText type="caption" className="label">

@@ -10,7 +10,7 @@ import './CommunityManagementLayout.scss';
 
 type CommunityManagementLayout = {
   title: string;
-  description: string;
+  description: string | React.ReactNode;
   children: ReactNode;
   featureHint: {
     title: string;
