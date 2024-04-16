@@ -4,7 +4,7 @@ import {
   ThreadInstance,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
-import { getThreadUrl } from 'utils';
+import { getThreadUrl } from '../../../shared/utils';
 
 export interface Link {
   readonly id: number;
