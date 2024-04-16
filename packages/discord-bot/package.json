@@ -12,7 +12,7 @@
     "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node build/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
-    "test": "ts-mocha 'test/**/*.spec.ts'"
+    "test": "NODE_ENV=test NODE_OPTIONS='--import tsx' mocha 'test/**/*.spec.ts'"
   },
   "keywords": [],
   "author": "",

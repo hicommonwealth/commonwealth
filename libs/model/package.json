@@ -13,7 +13,7 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "yarn build && NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
+    "test": "yarn build && NODE_ENV=test NODE_OPTIONS='--import tsx' mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",
