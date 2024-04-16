@@ -25,14 +25,14 @@ export const handleEvent = async <
   { name, payload }: EventContext<Name>,
   validate = true,
 ): Promise<Partial<z.infer<Output>> | undefined> => {
+  if (inputs[name]) throw new InvalidInput(`Unhandled event: ${name}`);
   try {
-    if (inputs[name])
-      return (
-        (await body[name]({
-          name,
-          payload: validate ? inputs[name]!.parse(payload) : payload,
-        })) ?? undefined
-      );
+    return (
+      (await body[name]({
+        name,
+        payload: validate ? inputs[name]!.parse(payload) : payload,
+      })) ?? undefined
+    );
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'ZodError') {
