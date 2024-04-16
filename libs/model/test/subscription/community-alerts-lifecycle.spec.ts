@@ -9,7 +9,7 @@ import {
 } from '../../src/subscription';
 import { seed } from '../../src/tester';
 
-describe.only('Community alerts lifecycle', () => {
+describe('Community alerts lifecycle', () => {
   let actor: Actor;
   let community, communityTwo;
   before(async () => {
@@ -71,13 +71,13 @@ describe.only('Community alerts lifecycle', () => {
     });
   });
 
-  it('should delete a community alert via id', async () => {
+  it('should delete a single community alert via id', async () => {
     const [alert] = await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community.id,
     });
     const payload = {
-      id: alert.id,
+      ids: [alert.id],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
@@ -105,13 +105,13 @@ describe.only('Community alerts lifecycle', () => {
     expect(res).to.equal(2);
   });
 
-  it('should delete a community alert via community id', async () => {
+  it('should delete a single community alert via community id', async () => {
     await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community.id,
     });
     const payload = {
-      community_id: community.id,
+      community_ids: [community.id],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,

@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { CommunityAlert, SubscriptionPreference } from '../entities.schemas';
+import {
+  CommentSubscription,
+  CommunityAlert,
+  SubscriptionPreference,
+} from '../entities.schemas';
 
 export const GetSubscriptionPreferences = {
   input: z.object({}),
@@ -9,4 +13,9 @@ export const GetSubscriptionPreferences = {
 export const GetCommunityAlerts = {
   input: z.object({}),
   output: CommunityAlert.array(),
+};
+
+export const GetCommentSubscriptions = {
+  input: z.object({}),
+  output: CommentSubscription.array(),
 };

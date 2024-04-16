@@ -167,18 +167,18 @@ export const Group = z.object({
 
 export const Thread = z.object({
   Address: Address.optional(),
-  address_id: z.number(),
+  address_id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
-  id: z.number().optional(),
+  id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   body: z.string().optional(),
   plaintext: z.string().optional(),
   url: z.string().optional(),
-  topic_id: z.number().optional(),
+  topic_id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   pinned: z.boolean().optional(),
   community_id: z.string(),
-  view_count: z.number(),
+  view_count: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   links: z.object(linksSchema).array().optional(),
 
   read_only: z.boolean().optional(),
@@ -201,22 +201,22 @@ export const Thread = z.object({
   discord_meta: z.object(discordMetaSchema).optional(),
 
   //counts
-  reaction_count: z.number(),
-  reaction_weights_sum: z.number(),
-  comment_count: z.number(),
+  reaction_count: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  reaction_weights_sum: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  comment_count: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
 
   //notifications
-  max_notif_id: z.number(),
+  max_notif_id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
 
   profile_name: z.string(),
 });
 
 export const Comment = z.object({
-  thread_id: z.string(),
-  address_id: z.number(),
+  thread_id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  address_id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   text: z.string(),
   plaintext: z.string(),
-  id: z.number().optional(),
+  id: z.number().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   community_id: z.string(),
   parent_id: z.string().optional(),
   version_history: z.array(z.string()).optional(),
@@ -241,8 +241,12 @@ export const Comment = z.object({
     })
     .optional(),
 
-  reaction_count: z.number(),
-  reaction_weights_sum: z.number().optional(),
+  reaction_count: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  reaction_weights_sum: z
+    .number()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional(),
 
   Address: Address.optional(),
 });

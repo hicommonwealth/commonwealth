@@ -14,12 +14,8 @@ export const DeleteCommunityAlerts: Command<
       user_id: actor.user.id,
     };
 
-    if ('id' in payload) {
-      where.id = payload.id;
-    } else if ('ids' in payload) {
+    if ('ids' in payload) {
       where.id = payload.ids;
-    } else if ('community_id' in payload) {
-      where.community_id = payload.community_id;
     } else if ('community_ids' in payload) {
       where.community_id = payload.community_ids;
     }
