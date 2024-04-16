@@ -28,6 +28,7 @@ import './BasicInformationForm.scss';
 import {
   BASE_ID,
   BLAST_ID,
+  ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   existingCommunityIds,
@@ -112,9 +113,15 @@ const BasicInformationForm = ({
 
   const getInitialValue = () => {
     switch (selectedCommunity.type) {
-      case CommunityType.Ethereum:
+      case CommunityType.Base:
         return {
           chain: getChainOptions()?.find((o) => o.value === BASE_ID),
+        };
+      case CommunityType.Ethereum:
+        return {
+          chain: getChainOptions()?.find(
+            (o) => o.value === ETHEREUM_MAINNET_ID,
+          ),
         };
       case CommunityType.Cosmos:
         return {

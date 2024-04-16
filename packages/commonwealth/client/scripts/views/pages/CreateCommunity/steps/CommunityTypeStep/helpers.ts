@@ -3,20 +3,27 @@ import { CommunityType } from 'views/components/component_kit/new_designs/CWComm
 
 export const communityTypeOptions = [
   {
+    type: CommunityType.Base,
+    chainBase: ChainBase.Ethereum,
+    title: 'BASE',
+    isRecommended: true,
+    description:
+      'Base in an Ethereum layer 2 network with high TVL and low transaction fees',
+  },
+  {
     type: CommunityType.Blast,
     chainBase: ChainBase.Ethereum,
     title: 'Blast',
-    isRecommended: true,
+    isRecommended: false,
     description:
-      'Blast is an Ethereum Layer 2 network with high TVL, offering native yield,' +
+      'Blast is an Ethereum Layer 2 network with high TVL, offering native yield, ' +
       'and secure decentralized app platform.',
   },
-
   {
     type: CommunityType.Ethereum,
     chainBase: ChainBase.Ethereum,
     title: 'Ethereum (EVM)',
-    isRecommended: true,
+    isRecommended: false,
     description:
       'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. ' +
       'Select this community type if you have minted a token on the Ethereum blockchain.',
