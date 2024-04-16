@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import path from 'node:path';
+import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
@@ -137,10 +137,10 @@ export const get_info_schema = async (
 ): Promise<Record<string, TABLE_INFO>> => {
   const columns = await db.query<COLUMN_INFO>(
     `
-SELECT 
+SELECT
 	table_name,
-	column_name, 
-	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name) 
+	column_name,
+	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name)
 	|| CASE WHEN is_identity = 'YES' THEN '-id' ELSE '' END
 	|| CASE WHEN is_nullable = 'YES' THEN '-null' ELSE '' END as column_type,
 	column_default
@@ -151,11 +151,11 @@ ORDER BY 1, 2;`,
   );
   const constraints = await db.query<CONSTRAINT_INFO>(
     `
-SELECT 
-	c.table_name, 
+SELECT
+	c.table_name,
 	c.constraint_type || '(' || STRING_AGG(k.column_name, ',' order by column_name) || ')' as constraint,
 	c.constraint_name
-FROM 
+FROM
 	information_schema.table_constraints c
 	JOIN information_schema.key_column_usage k on c.constraint_name = k.constraint_name
 WHERE c.table_schema = 'public'
