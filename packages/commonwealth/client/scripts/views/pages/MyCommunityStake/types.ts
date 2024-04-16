@@ -21,5 +21,6 @@ export type TransactionsProps = {
     totalPrice: string;
     avgPrice: string;
     etherscanLink: string;
+    chain: string;
   }[];
 };
