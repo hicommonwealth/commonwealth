@@ -138,7 +138,7 @@ export async function __searchProfiles(
       user_id: profile.user_id,
       profile_name: profile.profile_name,
       avatar_url: profile.avatar_url,
-      addresses: profile.address_ids.map((_, i) => ({
+      addresses: profile.address_ids.map((unused1, i) => ({
         id: profile.address_ids[i],
         community_id: profile.community_ids[i],
         address: profile.addresses[i],
