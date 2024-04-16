@@ -3,7 +3,7 @@ import {
   ProfileAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
-import { QueryTypes } from 'sequelize';
+import { Op } from 'sequelize';
 import { getThreadUrl } from 'utils';
 
 export interface Link {
@@ -72,19 +72,14 @@ function createThreadsTableAdapter(): TableAdapter {
     ptr: number,
     limit: number,
   ): Promise<ReadonlyArray<object>> {
-    return await models.sequelize.query(
-      `
-          SELECT "Threads".id,
-                 "Threads".updated_at,
-                 "Threads".title,
-                 "Threads".community_id
-          FROM "Threads"
-          WHERE "Threads".id > ${ptr}
-          ORDER BY "Threads".id
-          LIMIT ${limit};
-      `,
-      { type: QueryTypes.SELECT },
-    );
+    return await models.Thread.findAll({
+      attributes: ['id', 'updated_at', 'title', 'community_id'],
+      where: {
+        id: { [Op.gt]: ptr },
+      },
+      order: [['id', 'ASC']],
+      limit,
+    });
   }
   return { toRecord, executeQuery };
 }
@@ -107,17 +102,14 @@ function createProfilesTableAdapter(): TableAdapter {
     ptr: number,
     limit: number,
   ): Promise<ReadonlyArray<object>> {
-    return await models.sequelize.query(
-      `
-          SELECT "Profiles".id,
-                 "Profiles".updated_at
-          FROM "Profiles"
-          WHERE "Profiles".id > ${ptr}
-          ORDER BY "Profiles".id
-          LIMIT ${limit};
-      `,
-      { type: QueryTypes.SELECT },
-    );
+    return await models.Profile.findAll({
+      attributes: ['id', 'updated_at'],
+      where: {
+        id: { [Op.gt]: ptr },
+      },
+      order: [['id', 'ASC']],
+      limit,
+    });
   }
   return { toRecord, executeQuery };
 }
