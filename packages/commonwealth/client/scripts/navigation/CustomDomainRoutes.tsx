@@ -73,9 +73,19 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+const CommunityStakeIntegration = lazy(
+  () => import('views/pages/CommunityManagement/StakeIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
+const CommunityContests = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ContestsList'),
+);
+const ManageContest = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ManageContest'),
+);
+const Contests = lazy(() => import('views/pages/Contests'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -99,6 +109,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
   myCommunityStakePageEnabled,
+  contestEnabled,
+  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -345,6 +357,17 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(existingCommunityStakeIntegrationEnabled
+      ? [
+          <Route
+            key="/manage/integrations/stake"
+            path="/manage/integrations/stake"
+            element={withLayout(CommunityStakeIntegration, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/manage/topics"
       path="/manage/topics"
@@ -359,6 +382,38 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(contestEnabled
+      ? [
+          <Route
+            key="/manage/contests"
+            path="/manage/contests"
+            element={withLayout(CommunityContests, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/contests/launch"
+            path="/manage/contests/launch"
+            element={withLayout(ManageContest, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/contests/:contestId"
+            path="/manage/contests/:contestId"
+            element={withLayout(ManageContest, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/contests"
+            path="/contests"
+            element={withLayout(Contests, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/discord-callback"
       path="/discord-callback"
