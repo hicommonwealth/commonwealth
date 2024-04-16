@@ -13,7 +13,8 @@ For a list of platform-specific guidelines, see [Platform Coding Guidelines](./P
 - [Inline Documentation](#inline-documentation)
   + [TSDoc](#tsdoc)
   + [Inline Comments](#inline-comments)
-- []
+- [Error Handling](#error-handling)
+  + [Backend Errors](#backend-errors)
 - [Change Log](#change-log)
 
 ## Inline documentation
