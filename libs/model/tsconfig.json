@@ -7,5 +7,9 @@
     "strict": true
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../chains" }]
+  "references": [
+    { "path": "../core" },
+    { "path": "../chains" },
+    { "path": "../shared" }
+  ]
 }

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { CWCheckbox } from '../../component_kit/cw_checkbox';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { HIDE_PROMPT } from '../constants';
 import './AndroidPrompt.scss';
 

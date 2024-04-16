@@ -3,8 +3,6 @@
 .AdminPanel {
   display: flex;
   flex-direction: column;
-  max-width: 80%;
-  padding: 44px;
   gap: 32px;
 
   .TaskGroup {
@@ -17,7 +15,6 @@
       flex-direction: row;
       gap: 44px;
       align-items: flex-end;
-      max-width: 600px;
 
       .Downloading {
         display: flex;
@@ -48,7 +45,6 @@
         display: flex;
         gap: 8px;
         align-items: center;
-        max-width: 600px;
       }
 
       .AnalyticsList {
@@ -56,7 +52,6 @@
         gap: 4px;
         overflow-y: scroll;
         max-height: 200px;
-        max-width: 600px;
         flex-direction: column;
         border: 1px solid $neutral-300;
         border-radius: 4px;
@@ -74,7 +69,6 @@
 
       .Stats {
         display: flex;
-        max-width: 600px;
         flex-wrap: wrap;
         border: 1px solid $neutral-300;
         border-radius: 4px;

@@ -1,8 +1,5 @@
-import {
-  AppError,
-  BalanceSourceType,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError, BalanceSourceType } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Balances, getBalances } from '../tokenBalanceCache';

@@ -1,5 +1,6 @@
-import { NotificationCategories, delay, dispose } from '@hicommonwealth/core';
+import { delay, dispose } from '@hicommonwealth/core';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';

@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -54,6 +54,18 @@ export const getInitialAccountValue = (
   );
 
   return activeAddressOption || addressOptions[0];
+};
+
+export const getUniqueUserAddressesForChainBase = (chainBase: string) => {
+  const uniqueChainAddresses = [
+    ...new Set(
+      app.user.addresses
+        .filter((x) => x?.community?.base === chainBase)
+        .map((x) => x.address),
+    ),
+  ];
+
+  return uniqueChainAddresses;
 };
 
 export const getAvailableAddressesForStakeExchange = (

@@ -24,6 +24,7 @@ export type GetThreadsRequestQuery = {
   bulk?: string;
   active?: string;
   search?: string;
+  count?: boolean;
 };
 export type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
@@ -43,6 +44,10 @@ export type BulkThreadsRequestQuery = {
   to_date?: string;
   archived?: string;
 };
+export type CountThreadsRequestQuery = {
+  limit?: number;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GetThreadsResponse = any;
 
@@ -54,6 +59,7 @@ export const getThreadsHandler = async (
         | ActiveThreadsRequestQuery
         | SearchThreadsRequestQuery
         | BulkThreadsRequestQuery
+        | CountThreadsRequestQuery
       )
   >,
   res: TypedResponse<GetThreadsResponse>,
@@ -66,7 +72,7 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const { thread_ids, bulk, active, search, community_id } =
+  const { thread_ids, bulk, active, search, count, community_id } =
     queryValidationResult.data;
 
   // get threads by IDs
@@ -144,6 +150,16 @@ export const getThreadsHandler = async (
       orderDirection: order_direction as any,
     });
     return success(res, searchResults);
+  }
+
+  // count threads
+  if (count) {
+    const { limit } = req.query as CountThreadsRequestQuery;
+    const countResult = await controllers.threads.countThreads({
+      communityId: community_id,
+      limit,
+    });
+    return success(res, { count: countResult });
   }
 
   throw new AppError(Errors.InvalidRequest);
