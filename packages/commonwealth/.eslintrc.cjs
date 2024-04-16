@@ -1,15 +1,19 @@
 const path = require('path');
 
 module.exports = {
+  parserOptions: {
+    sourceType: 'module',
+    ecmaVersion: 'latest',
+  },
   settings: {
     'import/resolver': {
       webpack: {
         config: path.resolve(__dirname, 'webpack/webpack.base.config.js'),
       },
     },
-    'react': {
-      'version': 'detect',
-    }
+    react: {
+      version: 'detect',
+    },
   },
   plugins: ['@tanstack/query', 'prettier'],
   rules: {
@@ -23,7 +27,7 @@ module.exports = {
     'no-underscore-dangle': 0,
     'no-param-reassign': 0,
     'no-console': 0,
-    'camelcase': 0,
+    camelcase: 0,
     'no-else-return': 0,
     'no-unused-vars': 0,
     'no-unused-expressions': 0,
@@ -38,7 +42,7 @@ module.exports = {
     'object-curly-newline': 0,
     'nonblock-statement-body-position': 0,
     'no-extraneous-dependencies': 0,
-    'curly': 0,
+    curly: 0,
     'no-nested-ternary': 0,
     'import/first': 0,
     'import/no-extraneous-dependencies': 0,
@@ -88,27 +92,39 @@ module.exports = {
     '@tanstack/query/exhaustive-deps': 'error',
     '@tanstack/query/prefer-query-object-syntax': 'error',
     'react/destructuring-assignment': [1, 'always'],
-    'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
-    'react/no-multi-comp': [1, { "ignoreStateless": false }],
-    'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
+    'react/function-component-definition': [
+      1,
+      { namedComponents: 'arrow-function' },
+    ],
+    'react/no-multi-comp': [1, { ignoreStateless: false }],
+    'react/jsx-curly-brace-presence': [
+      1,
+      { props: 'never', children: 'never' },
+    ],
     '@typescript-eslint/no-unused-vars': 1,
     'react/jsx-key': 1,
-    "no-restricted-imports": ["error", {
-      patterns: [{
-        group: [
-          "@hicommonwealth/core/**",
-          "@hicommonwealth/adapters/**",
-          "@hicommonwealth/model/**"
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: [
+              '@hicommonwealth/core/**',
+              '@hicommonwealth/adapters/**',
+              '@hicommonwealth/model/**',
+            ],
+            message:
+              "Avoid importing from 'lib' directories. Import from the main entry point instead.",
+          },
         ],
-        message: "Avoid importing from 'lib' directories. Import from the main entry point instead.",
-      }]
-    }]
+      },
+    ],
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [
     'prettier/prettier',
     'plugin:@tanstack/eslint-plugin-query/recommended',
-    "plugin:react-hooks/recommended",
-    "plugin:react/recommended"
+    'plugin:react-hooks/recommended',
+    'plugin:react/recommended',
   ],
-}
+};
