@@ -262,7 +262,7 @@ export const NewSnapshotProposalForm = ({
             }}
             defaultValue={form.name}
           />
-          {form.choices.map((_, idx) => {
+          {form.choices.map((unused1, idx) => {
             return (
               <CWTextInput
                 key={`choice-${idx}`}

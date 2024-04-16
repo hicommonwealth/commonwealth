@@ -33,6 +33,7 @@ const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
 
 type SnapshotInfoLinkRowProps = SnapshotInfoRowProps & { url: string };
 
+// eslint-disable-next-line react/no-multi-comp
 const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
   const { label, url, value } = props;
 
@@ -56,6 +57,7 @@ type SnapshotInformationCardProps = {
   threads: Array<{ id: number; title: string }> | null;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SnapshotInformationCard = ({
   proposal,
   threads,

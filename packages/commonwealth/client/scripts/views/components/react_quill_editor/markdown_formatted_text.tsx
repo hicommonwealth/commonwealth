@@ -119,6 +119,7 @@ export const MarkdownFormattedText = ({
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const convertTwitterLinks = useCallback(
     _.debounce(async () => {
       // walk through rendered markdown DOM elements
