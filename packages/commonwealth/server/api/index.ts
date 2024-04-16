@@ -1,9 +1,11 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
+import { NEW_SUBSCRIPTION_API_FLAG } from '../config';
 import * as community from './community';
 import * as feed from './feed';
 import * as integrations from './integrations';
+import * as subscription from './subscription';
 import * as thread from './threads';
 
 /**
@@ -14,6 +16,7 @@ const apiV1 = trpc.router({
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
+  subscription: NEW_SUBSCRIPTION_API_FLAG ? subscription.trpcRouter : undefined,
 });
 export type ApiV1 = typeof apiV1;
 

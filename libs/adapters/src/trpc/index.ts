@@ -72,6 +72,7 @@ export enum Tag {
   Policy = 'Policy',
   Projection = 'Projection',
   Integration = 'Integration',
+  Subscription = 'Subscription',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(

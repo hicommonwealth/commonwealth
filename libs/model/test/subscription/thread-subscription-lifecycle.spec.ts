@@ -9,7 +9,7 @@ import {
 } from '../../src/subscription';
 import { seed } from '../../src/tester';
 
-describe.only('Thread subscription lifecycle', () => {
+describe('Thread subscription lifecycle', () => {
   let actor: Actor;
   let threadOne, threadTwo;
   before(async () => {
