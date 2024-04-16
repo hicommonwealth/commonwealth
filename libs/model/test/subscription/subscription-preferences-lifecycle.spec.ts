@@ -1,6 +1,5 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { expect } from 'chai';
 import { models } from '../../src/database';
 import {
   GetSubscriptionPreferences,
@@ -8,9 +7,7 @@ import {
 } from '../../src/subscription';
 import { seed } from '../../src/tester';
 
-chai.use(chaiAsPromised);
-
-describe.only('Subscription preferences lifecycle', () => {
+describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
   let subPreferences;
   before(async () => {

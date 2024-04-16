@@ -522,9 +522,9 @@ export const CommentSubscription = z.object({
 });
 
 export const CommunityAlert = z.object({
-  id: z.number(),
+  id: z.number().optional(),
   user_id: z.number(),
-  community_id: z.number(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  community_id: z.string(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SubscriptionPreference } from '../entities.schemas';
+import { CommunityAlert, SubscriptionPreference } from '../entities.schemas';
 
 export const UpdateSubscriptionPreferences = {
   input: z
@@ -15,4 +15,29 @@ export const UpdateSubscriptionPreferences = {
       return Object.values(data).some((value) => value !== undefined);
     }),
   output: SubscriptionPreference,
+};
+
+export const CreateCommunityAlert = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: CommunityAlert,
+};
+
+export const DeleteCommunityAlert = {
+  input: z.union([
+    z.object({
+      community_id: z.string(),
+    }),
+    z.object({
+      community_ids: z.array(z.string()),
+    }),
+    z.object({
+      id: z.number(),
+    }),
+    z.object({
+      ids: z.array(z.number()),
+    }),
+  ]),
+  output: z.number().describe('Number of rows deleted'),
 };
