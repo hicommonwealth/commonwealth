@@ -17,6 +17,12 @@ const columnInfo = [
     hasCustomSortValue: true,
   },
   {
+    key: 'chain',
+    header: 'Chain',
+    numeric: true,
+    sortable: true,
+  },
+  {
     key: 'address',
     header: 'Address',
     numeric: false,
