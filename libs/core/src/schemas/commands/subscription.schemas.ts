@@ -3,6 +3,7 @@ import {
   CommentSubscription,
   CommunityAlert,
   SubscriptionPreference,
+  ThreadSubscription,
 } from '../entities.schemas';
 
 export const UpdateSubscriptionPreferences = {
@@ -29,14 +30,9 @@ export const CreateCommunityAlert = {
 };
 
 export const DeleteCommunityAlert = {
-  input: z.union([
-    z.object({
-      community_ids: z.array(z.string()),
-    }),
-    z.object({
-      ids: z.array(z.number()),
-    }),
-  ]),
+  input: z.object({
+    community_ids: z.array(z.string()),
+  }),
   output: z
     .number()
     .describe('Number of community alert subscriptions deleted'),
@@ -54,4 +50,18 @@ export const DeleteCommentSubscription = {
     comment_ids: z.array(z.number().int()),
   }),
   output: z.number().describe('Number of comment subscriptions deleted'),
+};
+
+export const DeleteThreadSubscription = {
+  input: z.object({
+    thread_ids: z.array(z.number().int()),
+  }),
+  output: z.number().describe('Number of thread subscriptions deleted'),
+};
+
+export const CreateThreadSubscription = {
+  input: z.object({
+    thread_id: z.number().int(),
+  }),
+  output: ThreadSubscription,
 };

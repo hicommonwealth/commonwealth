@@ -3,6 +3,7 @@ import {
   CommentSubscription,
   CommunityAlert,
   SubscriptionPreference,
+  ThreadSubscription,
 } from '../entities.schemas';
 
 export const GetSubscriptionPreferences = {
@@ -18,4 +19,9 @@ export const GetCommunityAlerts = {
 export const GetCommentSubscriptions = {
   input: z.object({}),
   output: CommentSubscription.array(),
+};
+
+export const GetThreadSubscriptions = {
+  input: z.object({}),
+  output: ThreadSubscription.array(),
 };
