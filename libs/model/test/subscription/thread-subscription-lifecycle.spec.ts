@@ -102,11 +102,10 @@ describe('Thread subscription lifecycle', () => {
   });
 
   it('should delete a thread subscriptions', async () => {
-    const [threadSubOne, threadSubTwo] =
-      await models.ThreadSubscription.bulkCreate([
-        { user_id: actor.user.id, thread_id: threadOne.id },
-        { user_id: actor.user.id, thread_id: threadTwo.id },
-      ]);
+    await models.ThreadSubscription.bulkCreate([
+      { user_id: actor.user.id, thread_id: threadOne.id },
+      { user_id: actor.user.id, thread_id: threadTwo.id },
+    ]);
 
     const payload = {
       thread_ids: [threadOne.id, threadTwo.id],

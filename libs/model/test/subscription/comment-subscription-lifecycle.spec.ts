@@ -108,11 +108,10 @@ describe.only('Comment subscription lifecycle', () => {
   });
 
   it('should delete a comment subscriptions', async () => {
-    const [commentSubOne, commentSubTwo] =
-      await models.CommentSubscription.bulkCreate([
-        { user_id: actor.user.id, comment_id: commentOne.id },
-        { user_id: actor.user.id, comment_id: commentTwo.id },
-      ]);
+    await models.CommentSubscription.bulkCreate([
+      { user_id: actor.user.id, comment_id: commentOne.id },
+      { user_id: actor.user.id, comment_id: commentTwo.id },
+    ]);
 
     const payload = {
       comment_ids: [commentOne.id, commentTwo.id],
