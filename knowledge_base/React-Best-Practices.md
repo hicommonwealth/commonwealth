@@ -21,19 +21,7 @@
   + [Example file composition](#example-component-composition)
 - [StrictMode](#strictmode)
 
-## Directory structure
-
-As of 230815, our frontend's directory structure is derived from the MVC model, with which React has little in common, and from which we want to gradually move away.
-
-Suggested changes:
-
-- The `commonwealth/client` folder should serve as root for the front-end application. This means that the `scripts` folder should be removed and its content moved to `client`.
-- The `styles` folder should contain only global styles, such as `index.scss`, `normalize.css`, or shared styles. Any other style files should neighbor the `.tsx` files where page or component files are defined. (See discussion in [Components](#components) section.)
-- The `views` folder suggests an MVC architecture. This should be removed, with the main `client` folder housing only two immediate children: `components` and `pages`.
-
 ### Components
-
-_Currently housed in `client/script/views/components`; aspirationally housed in `client/components`._
 
 All reusable components (i.e. components that may be invoked multiple times across the app) are kept in the `/components` folder.
 
@@ -76,8 +64,6 @@ Skeleton components should be returned via a conditional `if` statement, e.g. `i
 ```
 
 ### Pages
-
-_Currently housed in `client/script/views/pages`; aspirationally housed in `client/pages`._
 
 Aspirationally, only those components serving as entry points for routes are housed in this directory.
 
@@ -132,12 +118,6 @@ We should place as little logic as possible in the component's `return`, as this
 - E.g., all calculations should be made in the component body prior to the `return`; there result can be assigned to const for later reference.
   
 The same is true for event handler definitions, like `onClick`. Define the handler functions in the component body and reference them in the `return`.
-
-#### Linting
-
-Pre-commit, we should run `yarn format`, which runs the `prettier` library to ensure our code is well-formatted.
-
-Down the line we [may want to involve the Husky library in this process](https://prettier.io/docs/en/precommit.html).
 
 #### Example component composition
 
