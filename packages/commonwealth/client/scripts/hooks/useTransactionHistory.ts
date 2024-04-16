@@ -38,6 +38,7 @@ const useTransactionHistory = ({
           t.transaction_hash,
           t.community?.chain_node_id,
         ),
+        chain: '',
       }));
 
   // filter by community name and symbol
