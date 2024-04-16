@@ -21,6 +21,10 @@
   + [Example file composition](#example-component-composition)
 - [StrictMode](#strictmode)
 
+## Directory Structure
+
+As of 240416, our frontend's directory structure is derived from the MVC model, with which React has little in common, and from which we want to gradually move away.
+
 ### Components
 
 All reusable components (i.e. components that may be invoked multiple times across the app) are kept in the `/components` folder.
@@ -196,5 +200,6 @@ When a React application is wrapped in `React.StrictMode`, React performs extra 
 
 ## Change Log
 
+- 240416: Obsolete recommendations purged by Graham Johnson (#7460).
 - 230815: Certified fresh by Graham Johnson.
 - 230502: Authored by Marcin Maslanka.
