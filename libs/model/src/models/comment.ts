@@ -6,12 +6,7 @@ import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
-import {
-  canvasModelSequelizeColumns,
-  type CanvasModelAttributes,
-  type ModelInstance,
-  type ModelStatic,
-} from './types';
+import { type ModelInstance, type ModelStatic } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -40,7 +35,11 @@ export type CommentAttributes = {
   //counts
   reaction_count: number;
   reaction_weights_sum: number;
-} & CanvasModelAttributes;
+
+  // canvas-related columns
+  canvas_signed_data: string;
+  canvas_hash: string;
+};
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
 
@@ -73,8 +72,10 @@ export default (
         defaultValue: [],
         allowNull: false,
       },
-      // signed data
-      ...canvasModelSequelizeColumns(dataTypes),
+
+      // canvas-related columns
+      canvas_signed_data: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
 
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },

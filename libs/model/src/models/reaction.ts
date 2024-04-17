@@ -5,12 +5,7 @@ import Sequelize from 'sequelize/lib/sequelize';
 import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import {
-  canvasModelSequelizeColumns,
-  type CanvasModelAttributes,
-  type ModelInstance,
-  type ModelStatic,
-} from './types';
+import { type ModelInstance, type ModelStatic } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -31,7 +26,11 @@ export type ReactionAttributes = {
 
   Chain?: CommunityAttributes;
   Address?: AddressAttributes;
-} & CanvasModelAttributes;
+
+  // canvas-related columns
+  canvas_signed_data: string;
+  canvas_hash: string;
+};
 
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
@@ -52,8 +51,9 @@ export default (
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       reaction: { type: dataTypes.ENUM('like'), allowNull: false },
       calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
-      // signed data
-      ...canvasModelSequelizeColumns(dataTypes),
+      // canvas-related columns
+      canvas_signed_data: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
     },
     {
       hooks: {

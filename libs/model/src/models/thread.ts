@@ -6,11 +6,7 @@ import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
 import type { TopicAttributes } from './topic';
-import {
-  canvasModelSequelizeColumns,
-  type ModelInstance,
-  type ModelStatic,
-} from './types';
+import { type ModelInstance, type ModelStatic } from './types';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -87,8 +83,9 @@ export default (
       discord_meta: { type: dataTypes.JSONB, allowNull: true },
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
-      // signed data
-      ...canvasModelSequelizeColumns(dataTypes),
+      // canvas-related columns
+      canvas_signed_data: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
       // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
