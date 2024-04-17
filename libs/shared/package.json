@@ -14,5 +14,6 @@
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/shared"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {}
 }

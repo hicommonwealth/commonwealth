@@ -22,6 +22,7 @@
     "@cosmjs/tendermint-rpc": "^0.31.3",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/address": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/constants": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",
@@ -31,7 +32,12 @@
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "@osmonauts/lcd": "^0.10.0",
-    "ethers": "5.7.2"
+    "ethers": "5.7.2",
+    "long": "^5.2.3",
+    "protobufjs": "^6.0.0",
+    "web3": "1.8.2",
+    "web3-core": "1.8.2",
+    "web3-utils": "1.8.2"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

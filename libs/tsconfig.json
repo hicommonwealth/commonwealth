@@ -1,7 +1,16 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ESNext",
+    "allowJs": true,
+    "target": "esnext",
+    "moduleResolution": "Node16",
+    "module": "node16",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "downlevelIteration": true,
+    "traceResolution": false,
+
+    "types": ["node"],
+
     "baseUrl": ".",
     "composite": true,
 

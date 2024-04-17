@@ -10,7 +10,7 @@ export const createLCDClient = async ({
   return {
     cosmos: {
       gov: {
-        v1: new (await import('./gov/v1/query.lcd')).LCDQueryClient({
+        v1: new (await import('./gov/v1/query.lcd.js')).LCDQueryClient({
           requestClient,
         }),
       },

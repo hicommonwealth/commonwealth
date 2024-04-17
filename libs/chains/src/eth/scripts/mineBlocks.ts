@@ -14,7 +14,7 @@ async function increaseTime(
 
 async function main(argv: string[]) {
   const Web3 = (await import('web3')).default;
-  const web3Provider = new Web3.providers.WebsocketProvider(
+  const web3Provider = new Web3.default.providers.WebsocketProvider(
     'ws://localhost:8545',
   );
   const provider = new providers.Web3Provider(web3Provider as any);

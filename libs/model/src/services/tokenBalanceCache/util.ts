@@ -115,7 +115,9 @@ export async function evmOffChainRpcBatching(
 
     const address = idAddressMap[data.id];
     balances[address] = source.contractAddress
-      ? AbiCoder.decodeParameter('uint256', data.result).toString()
+      ? (
+          AbiCoder.decodeParameter('uint256', data.result) as Balances
+        ).toString()
       : toBN(data.result).toString(10);
   }
 
@@ -213,7 +215,10 @@ export async function evmBalanceFetcherBatching(
         continue;
       }
 
-      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
+      const balances = AbiCoder.decodeParameter(
+        'uint256[]',
+        data.result,
+      ) as Balances;
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = balances[i]),
       );

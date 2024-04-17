@@ -15,9 +15,11 @@
     "test": "echo No tests to run"
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
     "pino": "^8.19.0",
     "pino-http": "^9.0.0",
-    "pino-http-print": "^3.1.0"
+    "pino-http-print": "^3.1.0",
+    "rollbar": "^2.6.1"
   },
   "devDependencies": {
     "pino-pretty": "^10.3.1"

@@ -9,7 +9,7 @@ import {
 async function main() {
   // TODO: configure URL based on chain
   const Web3 = (await import('web3')).default;
-  const web3Provider = new Web3.providers.WebsocketProvider(
+  const web3Provider = new Web3.default.providers.WebsocketProvider(
     'http://localhost:8545',
     {
       reconnect: {
