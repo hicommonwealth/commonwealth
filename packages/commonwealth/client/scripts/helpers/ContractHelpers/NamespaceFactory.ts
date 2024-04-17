@@ -152,6 +152,44 @@ class NamespaceFactory extends ContractBase {
     }
     return txReceipt;
   }
+
+  async newContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    stakeId: number = 2,
+    prizeShare: number,
+    voterShare: number,
+    feeShare: number,
+    weight: number = 1,
+    walletAddress: string,
+  ): Promise<any> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .newContest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          stakeId,
+          prizeShare,
+          voterShare,
+          feeShare,
+          weight,
+        )
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+    } catch {
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
 }
 
 export default NamespaceFactory;
