@@ -74,6 +74,9 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_CONTEST': JSON.stringify(process.env.FLAG_CONTEST),
+    }),
+    new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new webpack.DefinePlugin({
