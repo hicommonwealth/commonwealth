@@ -32,8 +32,6 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
-// set up express async error handling hack
-
 const DEV = process.env.NODE_ENV !== 'production';
 
 const __filename = fileURLToPath(import.meta.url);
