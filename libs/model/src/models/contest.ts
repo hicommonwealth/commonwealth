@@ -9,19 +9,19 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<Contest>>sequelize.define<Contest>(
     'Contest',
     {
-      contestAddress: {
+      contest_address: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      contestId: {
+      contest_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      startTime: {
+      start_time: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      endTime: {
+      end_time: {
         type: Sequelize.DATE,
         allowNull: false,
       },

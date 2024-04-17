@@ -14,12 +14,13 @@ export const GetAllContests: Query<
         model: models.ContestAction,
         attributes: [
           'action',
-          'actorAddress',
-          'votingPower',
-          'contentId',
-          'contentUrl',
-          'createdAt',
+          'actor_address',
+          'voting_power',
+          'content_id',
+          'content_url',
+          'created_at',
         ],
+        as: 'actions',
       },
     });
     return result.map((r) => r.toJSON()) as z.infer<

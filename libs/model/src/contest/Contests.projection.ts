@@ -23,9 +23,9 @@ export const Contests: Projection<typeof inputs> = () => ({
       if (
         mustExist(`Community with namespace: ${payload.namespace}`, community)
       )
-        await models.ContestManager.upsert({
+        await models.ContestManager.create({
           ...payload,
-          communityId: community.id!,
+          community_id: community.id!,
         });
     },
 
@@ -37,36 +37,36 @@ export const Contests: Projection<typeof inputs> = () => ({
       if (
         mustExist(`Community with namespace: ${payload.namespace}`, community)
       )
-        await models.ContestManager.upsert({
+        await models.ContestManager.create({
           ...payload,
-          communityId: community.id!,
+          community_id: community.id!,
           interval: 0,
         });
     },
 
     ContestStarted: async ({ payload }) => {
-      await models.Contest.upsert({
+      await models.Contest.create({
         ...payload,
-        contestId: payload.contestId || 0,
+        contest_id: payload.contest_id || 0,
       });
     },
 
     ContestContentAdded: async ({ payload }) => {
-      await models.ContestAction.upsert({
+      await models.ContestAction.create({
         ...payload,
-        contestId: payload.contestId || 0,
-        actorAddress: payload.creatorAddress,
+        contest_id: payload.contest_id || 0,
+        actor_address: payload.creator_address,
         action: 'added',
-        contentUrl: payload.contentUrl,
-        votingPower: 0,
+        content_url: payload.content_url,
+        voting_power: 0,
       });
     },
 
     ContestContentUpvoted: async ({ payload }) => {
-      await models.ContestAction.upsert({
+      await models.ContestAction.create({
         ...payload,
-        contestId: payload.contestId || 0,
-        actorAddress: payload.voterAddress,
+        contest_id: payload.contest_id || 0,
+        actor_address: payload.voter_address,
         action: 'upvoted',
       });
     },
@@ -78,8 +78,8 @@ export const Contests: Projection<typeof inputs> = () => ({
         },
         {
           where: {
-            contestAddress: payload.contestAddress,
-            contestId: payload.contestId || 0,
+            contest_address: payload.contest_address,
+            contest_id: payload.contest_id || 0,
           },
         },
       );

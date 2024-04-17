@@ -6,17 +6,19 @@ import type { CompositeKey, State } from './types';
  * @param parent parent model with PK
  * @param child child model with FK
  * @param foreignKey the foreign key field in the child model - sequelize defaults the PK
+ * @param as association alias, defaults to model name
  * @param optional true to allow children without parents (null FKs), defaults to false
  */
 export const oneToMany = <Parent extends State, Child extends State>(
   parent: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   foreignKey: keyof Child & string,
-  optional?: boolean,
+  options?: { as?: string; optional?: boolean },
 ) => {
   // this can be optional
   parent.hasMany(child, {
-    foreignKey: { name: foreignKey, allowNull: optional },
+    foreignKey: { name: foreignKey, allowNull: options?.optional },
+    as: options?.as,
   });
   // this can be optional
   child.belongsTo(parent, { foreignKey });

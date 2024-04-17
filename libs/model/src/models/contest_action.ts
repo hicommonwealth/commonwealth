@@ -11,19 +11,19 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestAction>>sequelize.define<ContestAction>(
     'ContestAction',
     {
-      contestAddress: {
+      contest_address: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      contestId: {
+      contest_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      contentId: {
+      content_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      actorAddress: {
+      actor_address: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
@@ -31,14 +31,14 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.ENUM(...schemas.projections.CONSTEST_ACTIONS),
         primaryKey: true,
       },
-      contentUrl: {
+      content_url: {
         type: Sequelize.STRING,
       },
-      votingPower: {
+      voting_power: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      createdAt: { type: Sequelize.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'ContestActions',

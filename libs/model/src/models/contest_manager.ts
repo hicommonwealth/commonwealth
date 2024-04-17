@@ -11,11 +11,11 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestManager>>sequelize.define<ContestManager>(
     'ContestManager',
     {
-      contestAddress: {
+      contest_address: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      communityId: {
+      community_id: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -24,7 +24,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
         validate: { min: 0 },
       },
-      createdAt: { type: Sequelize.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'ContestManagers',

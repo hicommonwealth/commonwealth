@@ -49,7 +49,7 @@ export const DiscordMessageCreated = z.object({
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({
-  createdAt: z.date().describe('When the event was emitted'),
+  created_at: z.date().describe('When the event was emitted'),
   // TODO: TBD
   // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
   // aggregateId: z.string().describe("Event emitter aggregate id")
@@ -60,19 +60,19 @@ export const EventMetadata = z.object({
 // on-chain contest manager events
 export const RecurringContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
-  contestAddress: z.string().describe('Contest manager address'),
+  contest_address: z.string().describe('Contest manager address'),
   interval: z.number().int().positive().describe('Recurring constest interval'),
 }).describe('When a new recurring contest manager gets deployed');
 
 export const OneOffContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
-  contestAddress: z.string().describe('Contest manager address'),
+  contest_address: z.string().describe('Contest manager address'),
   length: z.number().int().positive().describe('Length of contest in days'),
 }).describe('When a new one-off contest manager gets deployed');
 
 const ContestManagerEvent = EventMetadata.extend({
-  contestAddress: z.string().describe('Contest manager address'),
-  contestId: z
+  contest_address: z.string().describe('Contest manager address'),
+  contest_id: z
     .number()
     .int()
     .positive()
@@ -81,20 +81,20 @@ const ContestManagerEvent = EventMetadata.extend({
 });
 
 export const ContestStarted = ContestManagerEvent.extend({
-  startTime: z.date().describe('Contest start time'),
-  endTime: z.date().describe('Contest end time'),
+  start_time: z.date().describe('Contest start time'),
+  end_time: z.date().describe('Contest end time'),
 }).describe('When a contest instance gets started');
 
 export const ContestContentAdded = ContestManagerEvent.extend({
-  contentId: z.number().int().positive().describe('New content id'),
-  creatorAddress: z.string().describe('Address of content creator'),
-  contentUrl: z.string(),
+  content_id: z.number().int().positive().describe('New content id'),
+  creator_address: z.string().describe('Address of content creator'),
+  content_url: z.string(),
 }).describe('When new content is added to a running contest');
 
 export const ContestContentUpvoted = ContestManagerEvent.extend({
-  contentId: z.number().int().positive().describe('Content id'),
-  voterAddress: z.string().describe('Address upvoting on content'),
-  votingPower: z
+  content_id: z.number().int().positive().describe('Content id'),
+  voter_address: z.string().describe('Address upvoting on content'),
+  voting_power: z
     .number()
     .int()
     .describe('Voting power of address upvoting on content'),

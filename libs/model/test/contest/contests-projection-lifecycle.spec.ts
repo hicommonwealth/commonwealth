@@ -20,17 +20,17 @@ describe('Contests projection lifecycle', () => {
   const namespace = 'test-namespace';
   const recurring = 'test-recurring-contest';
   const oneoff = 'test-oneoff-contest';
-  const contestId = 1;
-  const contentId = 1;
-  const contentUrl = 'http://content-1';
+  const contest_id = 1;
+  const content_id = 1;
+  const content_url = 'http://content-1';
   const creator = 'creator-address';
   const voter1 = 'voter-address1';
   const voter2 = 'voter-address2';
   const voter3 = 'voter-address3';
-  const votingPower1 = 1;
-  const votingPower2 = 2;
-  const votingPower3 = 3;
-  const createdAt = new Date();
+  const voting_power1 = 1;
+  const voting_power2 = 2;
+  const voting_power3 = 3;
+  const created_at = new Date();
 
   before(async () => {
     await bootstrap_testing();
@@ -56,20 +56,20 @@ describe('Contests projection lifecycle', () => {
       name: schemas.EventNames.RecurringContestManagerDeployed,
       payload: {
         namespace,
-        contestAddress: recurring,
+        contest_address: recurring,
         interval: 10,
-        createdAt,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestStarted,
       payload: {
-        contestAddress: recurring,
-        contestId,
-        startTime: new Date(),
-        endTime: new Date(),
-        createdAt,
+        contest_address: recurring,
+        contest_id,
+        start_time: new Date(),
+        end_time: new Date(),
+        created_at,
       },
     });
 
@@ -77,87 +77,87 @@ describe('Contests projection lifecycle', () => {
       name: schemas.EventNames.OneOffContestManagerDeployed,
       payload: {
         namespace,
-        contestAddress: oneoff,
+        contest_address: oneoff,
         length: 1,
-        createdAt,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestStarted,
       payload: {
-        contestAddress: oneoff,
-        startTime: new Date(),
-        endTime: new Date(),
-        createdAt,
+        contest_address: oneoff,
+        start_time: new Date(),
+        end_time: new Date(),
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentAdded,
       payload: {
-        contestAddress: oneoff,
-        contentId,
-        creatorAddress: creator,
-        contentUrl: contentUrl,
-        createdAt,
+        contest_address: oneoff,
+        content_id,
+        creator_address: creator,
+        content_url: content_url,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentAdded,
       payload: {
-        contestAddress: recurring,
-        contestId,
-        contentId,
-        creatorAddress: creator,
-        contentUrl: contentUrl,
-        createdAt,
+        contest_address: recurring,
+        contest_id,
+        content_id,
+        creator_address: creator,
+        content_url: content_url,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentUpvoted,
       payload: {
-        contestAddress: recurring,
-        contestId,
-        contentId,
-        voterAddress: voter1,
-        votingPower: votingPower1,
-        createdAt,
+        contest_address: recurring,
+        contest_id,
+        content_id,
+        voter_address: voter1,
+        voting_power: voting_power1,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentUpvoted,
       payload: {
-        contestAddress: recurring,
-        contestId,
-        contentId,
-        voterAddress: voter2,
-        votingPower: votingPower2,
-        createdAt,
+        contest_address: recurring,
+        contest_id,
+        content_id,
+        voter_address: voter2,
+        voting_power: voting_power2,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestContentUpvoted,
       payload: {
-        contestAddress: oneoff,
-        contentId,
-        voterAddress: voter3,
-        votingPower: votingPower3,
-        createdAt,
+        contest_address: oneoff,
+        content_id,
+        voter_address: voter3,
+        voting_power: voting_power3,
+        created_at,
       },
     });
 
     await handleEvent(Contests(), {
       name: schemas.EventNames.ContestWinnersRecorded,
       payload: {
-        contestAddress: recurring,
-        contestId,
+        contest_address: recurring,
+        contest_id,
         winners: [voter2, voter1],
-        createdAt,
+        created_at,
       },
     });
 
@@ -173,35 +173,35 @@ describe('Contests projection lifecycle', () => {
     });
     expect(result).to.deep.eq([
       {
-        contestAddress: recurring,
-        contestId,
-        startTime: result?.at(0)?.startTime, // sql date
-        endTime: result?.at(0)?.endTime, // sql date
+        contest_address: recurring,
+        contest_id,
+        start_time: result?.at(0)?.start_time, // sql date
+        end_time: result?.at(0)?.end_time, // sql date
         winners: [voter2, voter1],
-        ContestActions: [
+        actions: [
           {
             action: 'added',
-            actorAddress: creator,
-            contentId,
-            contentUrl,
-            votingPower: 0,
-            createdAt,
+            actor_address: creator,
+            content_id,
+            content_url,
+            voting_power: 0,
+            created_at,
           },
           {
             action: 'upvoted',
-            actorAddress: voter1,
-            contentId,
-            contentUrl: null,
-            votingPower: 1,
-            createdAt,
+            actor_address: voter1,
+            content_id,
+            content_url: null,
+            voting_power: 1,
+            created_at,
           },
           {
             action: 'upvoted',
-            actorAddress: voter2,
-            contentId,
-            contentUrl: null,
-            votingPower: 2,
-            createdAt,
+            actor_address: voter2,
+            content_id,
+            content_url: null,
+            voting_power: 2,
+            created_at,
           },
         ] as Array<z.infer<typeof schemas.projections.ContestAction>>,
       },
@@ -214,9 +214,9 @@ describe('Contests projection lifecycle', () => {
         name: schemas.EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
-          contestAddress: recurring,
+          contest_address: recurring,
           interval: 10,
-          createdAt,
+          created_at,
         },
       }),
     ).to.eventually.be.rejectedWith(InvalidState);

@@ -8,8 +8,8 @@ export const GetAllContests = {
   }),
   output: z.array(
     Contest.extend({
-      ContestActions: z.array(
-        ContestAction.omit({ contestAddress: true, contestId: true }),
+      actions: z.array(
+        ContestAction.omit({ contest_address: true, contest_id: true }),
       ),
     }),
   ),
