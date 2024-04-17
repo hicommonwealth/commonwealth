@@ -1,10 +1,10 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
@@ -14,7 +14,6 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { StakeGrowl } from './components/StakeGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
@@ -34,11 +33,22 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const communityStakeEnabled = useFlag('communityStake');
 
-  const { toggleMobileView } = useWindowResize({
+  const location = useLocation();
+
+  useWindowResize({
     setMenu,
   });
+
+  const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -100,17 +110,12 @@ const Sublayout = ({
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
-            {!toggleMobileView && (
-              <div className="breadcrumbContainer">
-                <Breadcrumbs />
-              </div>
-            )}
+            {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
             {isInsideCommunity && <AdminOnboardingSlider />}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {communityStakeEnabled && !isWindowExtraSmall && <StakeGrowl />}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

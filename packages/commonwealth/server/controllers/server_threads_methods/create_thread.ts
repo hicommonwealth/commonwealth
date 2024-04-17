@@ -1,16 +1,13 @@
 import moment from 'moment';
 
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
@@ -236,7 +233,7 @@ export async function __createThread(
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalThread.Address.address);
 
-  // dispatch notifications to subscribers of the given chain
+  // dispatch notifications to subscribers of the given community
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({

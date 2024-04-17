@@ -23,7 +23,6 @@ const UpdateMembersGroupPage = lazy(
 );
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
-const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
@@ -74,9 +73,19 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+const CommunityStakeIntegration = lazy(
+  () => import('views/pages/CommunityManagement/StakeIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
+const CommunityContests = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ContestsList'),
+);
+const ManageContest = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ManageContest'),
+);
+const Contests = lazy(() => import('views/pages/Contests'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -100,6 +109,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
   myCommunityStakePageEnabled,
+  contestEnabled,
+  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -168,11 +179,6 @@ const CustomDomainRoutes = ({
         scoped: true,
         type: 'common',
       })}
-    />,
-    <Route
-      key="/finishaxielogin"
-      path="/finishaxielogin"
-      element={withLayout(FinishAxieLoginPage, { type: 'common' })}
     />,
     <Route
       key="/finishsociallogin"
@@ -351,6 +357,17 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(existingCommunityStakeIntegrationEnabled
+      ? [
+          <Route
+            key="/manage/integrations/stake"
+            path="/manage/integrations/stake"
+            element={withLayout(CommunityStakeIntegration, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/manage/topics"
       path="/manage/topics"
@@ -365,6 +382,38 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(contestEnabled
+      ? [
+          <Route
+            key="/manage/contests"
+            path="/manage/contests"
+            element={withLayout(CommunityContests, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/contests/launch"
+            path="/manage/contests/launch"
+            element={withLayout(ManageContest, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/contests/:contestId"
+            path="/manage/contests/:contestId"
+            element={withLayout(ManageContest, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/contests"
+            path="/contests"
+            element={withLayout(Contests, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/discord-callback"
       path="/discord-callback"
@@ -474,11 +523,6 @@ const CustomDomainRoutes = ({
       key="/:scope/finishNearLogin"
       path="/:scope/finishNearLogin"
       element={<Navigate to="/finishNearLogin" />}
-    />,
-    <Route
-      key="/:scope/finishaxielogin"
-      path="/:scope/finishaxielogin"
-      element={<Navigate to="/finishaxielogin" />}
     />,
     <Route
       key="/:scope/finishsociallogin"

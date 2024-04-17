@@ -49,7 +49,7 @@ The goal of this document is to describe the current state of the app initializa
         - If Network is Sputnik, import the Sputnik adapter (NEAR + gov).
         - If Network is Compound, import the Compound adapter (ETH).
         - If Network is Aave, import the Aave adapter (ETH).
-        - If Network is ERC20 or Axie Infinity, import the (ETH) tokenAdapter.
+        - If Network is ERC20, import the (ETH) tokenAdapter.
         - If Network is ERC721, import the (ETH) NftAdapter.
         - If Network is SPL, import the Solana adapter.
         - If ChainBase is Solana, import the Solana adapter.

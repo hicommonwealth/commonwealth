@@ -1,5 +1,20 @@
 import z from 'zod';
 
+export const PaginationParamsSchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+  cursor: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .default(1)
+    .describe(
+      'required for tRPC useInfiniteQuery hook, equivalent to page number',
+    ),
+  order_by: z.string().optional(),
+  order_direction: z.enum(['ASC', 'DESC']).optional(),
+});
+
 export type TypedPaginatedResult<T> = {
   results: T[];
   limit: number;
@@ -8,15 +23,12 @@ export type TypedPaginatedResult<T> = {
   totalResults: number;
 };
 
-export const PaginatedResultSchema = (innerSchema: z.AnyZodObject) => {
-  return z.object({
-    results: innerSchema.array(),
-    limit: z.number().int(),
-    page: z.number().int(),
-    totalPages: z.number().int(),
-    totalResults: z.number().int(),
-  });
-};
+export const PaginatedResultSchema = z.object({
+  limit: z.number().int(),
+  page: z.number().int(),
+  totalPages: z.number().int(),
+  totalResults: z.number().int(),
+});
 
 /*
 These methods are for generating the sequelize formatting for
@@ -101,13 +113,17 @@ export const buildPaginationSql = (
 export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
-  bind: PaginationSqlBind,
+  options: {
+    limit?: number;
+    offset?: number;
+  },
 ): TypedPaginatedResult<T> {
+  const limit = options.limit || 10;
   return {
     results: items,
-    limit: bind.limit!,
-    page: Math.floor(bind.offset! / bind.limit!) + 1,
-    totalPages: Math.floor(totalResults / bind.limit!) + 1,
+    limit: options.limit!,
+    page: Math.floor(options.offset! / limit) + 1,
+    totalPages: Math.floor(totalResults / limit) + 1,
     totalResults,
   };
 }

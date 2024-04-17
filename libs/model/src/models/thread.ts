@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
-import { models } from '../database';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
@@ -51,7 +50,7 @@ export default (
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
-      kind: { type: dataTypes.TEXT, allowNull: false },
+      kind: { type: dataTypes.STRING, allowNull: false },
       stage: {
         type: dataTypes.TEXT,
         allowNull: false,
@@ -148,7 +147,7 @@ export default (
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
           // when thread created, increment Community.thread_count
-          await models.sequelize.query(
+          await sequelize.query(
             `
             UPDATE "Communities"
             SET thread_count = thread_count + 1
@@ -167,7 +166,7 @@ export default (
           options: Sequelize.InstanceDestroyOptions,
         ) => {
           // when thread deleted, decrement Community.thread_count
-          await models.sequelize.query(
+          await sequelize.query(
             `
             UPDATE "Communities"
             SET thread_count = thread_count - 1
@@ -207,12 +206,15 @@ export default (
     models.Thread.belongsToMany(models.Address, {
       through: models.Collaboration,
       as: 'collaborators',
+      foreignKey: { name: 'thread_id', allowNull: false },
     });
     models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
     });
-    models.Thread.hasMany(models.Collaboration);
+    models.Thread.hasMany(models.Collaboration, {
+      foreignKey: 'thread_id',
+    });
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });

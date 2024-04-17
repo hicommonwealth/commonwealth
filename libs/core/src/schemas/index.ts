@@ -6,9 +6,19 @@ import * as entities from './entities.schemas';
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
   Entities,
-  'User' | 'Community' | 'Thread' | 'Comment' | 'Contract'
+  | 'ChainNode'
+  | 'Comment'
+  | 'Community'
+  | 'NotificationCategory'
+  | 'SnapshotProposal'
+  | 'SnapshotSpace'
+  | 'Subscription'
+  | 'Thread'
+  | 'User'
+  | 'StakeTransaction'
 >;
 export { entities };
 
 export * as commands from './commands';
 export * as queries from './queries';
+export * from './utils.schemas';

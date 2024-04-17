@@ -1,12 +1,7 @@
-import {
-  AppError,
-  ChainBase,
-  ChainNetwork,
-  WalletId,
-  WalletSsoSource,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB, UserInstance } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
@@ -57,7 +52,7 @@ export async function createAddressHelper(
     where: { id: req.community_id },
   });
 
-  if (!community || community.network === ChainNetwork.AxieInfinity) {
+  if (!community) {
     throw new AppError(Errors.InvalidCommunity);
   }
 

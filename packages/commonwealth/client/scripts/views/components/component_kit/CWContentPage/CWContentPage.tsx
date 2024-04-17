@@ -120,7 +120,7 @@ export const CWContentPage = ({
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -185,7 +185,7 @@ export const CWContentPage = ({
           lastUpdated: thread.updatedAt.toISOString(),
         })}
         authorAddress={author?.address}
-        authorChainId={authorCommunityId}
+        authorCommunityId={authorCommunityId}
         collaboratorsInfo={collaborators}
         publishDate={moment(createdOrEditedDate)}
         viewsCount={viewCount}
@@ -195,6 +195,7 @@ export const CWContentPage = ({
         threadStage={stageLabel}
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
+        profile={thread?.profile}
       />
     </div>
   );

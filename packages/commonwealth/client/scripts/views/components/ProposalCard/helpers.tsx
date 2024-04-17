@@ -9,8 +9,8 @@ import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import {
   blocknumToDuration,
+  formatAddressShort,
   formatNumberLong,
-  shortenIdentifier,
 } from 'helpers';
 import moment from 'moment';
 import type { AnyProposal } from '../../../models/types';
@@ -54,6 +54,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
     proposal.endTime.kind === 'fixed'
       ? [
           <Countdown
+            key={proposal.endTime.kind}
             duration={moment
               .duration(proposal.endTime.time.diff(moment()))
               .asMilliseconds()}
@@ -63,6 +64,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
       : proposal.endTime.kind === 'fixed_block'
       ? [
           <Countdown
+            key={proposal.endTime.kind}
             duration={blocknumToDuration(proposal.endTime.blocknum)}
           />,
           ` left (ends on block ${formatNumberLong(
@@ -72,6 +74,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
       : proposal.endTime.kind === 'dynamic'
       ? [
           <Countdown
+            key={proposal.endTime.kind}
             duration={blocknumToDuration(proposal.endTime.getBlocknum())}
           />,
           ` left (ends on block ${formatNumberLong(
@@ -136,4 +139,4 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
 };
 
 export const getPrimaryTagText = (proposal: AnyProposal) => `
-  Prop ${shortenIdentifier(proposal.shortIdentifier)}`;
+  Prop ${formatAddressShort(proposal.shortIdentifier, 3, 3)}`;

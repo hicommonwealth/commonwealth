@@ -1,8 +1,8 @@
 import { ServerError } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
+import type { ReactionType } from 'models/Reaction';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
@@ -18,9 +18,22 @@ export type GetBulkThreadsOptions = {
   archived: boolean;
 };
 
+export type AssociatedReaction = {
+  id: number | string;
+  type: ReactionType;
+  address: string;
+  updated_at: string;
+  voting_weight: number;
+  profile_name?: string;
+  avatar_url?: string;
+  last_active?: string;
+};
+
+type ThreadsQuery = ThreadAttributes & AssociatedReaction[];
+
 export type GetBulkThreadsResult = {
   numVotingThreads: number;
-  threads: ThreadAttributes[];
+  threads: ThreadsQuery[];
   limit: number;
   page: number;
 };
@@ -31,7 +44,6 @@ export async function __getBulkThreads(
     communityId,
     stage,
     topicId,
-    includePinnedThreads,
     page,
     limit,
     orderBy,
@@ -41,218 +53,156 @@ export async function __getBulkThreads(
   }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
-  const bind = (() => {
-    const _limit = limit ? (limit > 500 ? 500 : limit) : 20;
+  const replacements = (() => {
+    const _limit = limit ? Math.min(limit, 500) : 20;
     const _page = page || 1;
     const _offset = _limit * (_page - 1) || 0;
     const _to_date = toDate || moment().toISOString();
 
     return {
-      from_date: fromDate,
-      to_date: _to_date,
+      fromDate,
+      toDate: _to_date,
       page: _page,
       limit: _limit,
       offset: _offset,
-      ...(communityId && { community_id: communityId }),
-      ...(stage && { stage }),
-      ...(topicId && { topic_id: topicId }),
+      communityId,
+      stage,
+      topicId,
     };
   })();
 
   // sql query parts that order results by provided query param
   const orderByQueries = {
-    'createdAt:asc': 'threads.thread_created ASC',
-    'createdAt:desc': 'threads.thread_created DESC',
-    'numberOfComments:asc': 'threads_number_of_comments ASC',
-    'numberOfComments:desc': 'threads_number_of_comments DESC',
-    'numberOfLikes:asc': 'threads_total_likes ASC',
-    'numberOfLikes:desc': 'threads_total_likes DESC',
-    'latestActivity:asc': 'latest_activity ASC',
-    'latestActivity:desc': 'latest_activity DESC',
+    newest: 'created_at DESC',
+    oldest: 'created_at ASC',
+    mostLikes: 'reaction_count DESC',
+    mostComments: 'comment_count DESC',
+    latestActivity: 'updated_at DESC',
   };
 
-  // get response threads from query
-  let responseThreads;
-  try {
-    responseThreads = await this.models.sequelize.query(
-      `
-      SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.community_id AS addr_chain, threads.thread_id, thread_title,
-        threads.marked_as_spam_at,
-        threads.archived_at,
-        thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
-        threads.read_only, threads.body, threads.stage, threads.discord_meta,
-        threads.has_poll, threads.plaintext,
-        threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
-        threads.reaction_ids, threads.reaction_timestamps, threads.reaction_weights, threads.reaction_type,
-        threads.addresses_reacted, COALESCE(threads.total_likes, 0)
-          as threads_total_likes,
-        threads.reaction_weights_sum,
-        threads.links as links,
-        topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
-        topics.community_id AS topic_community_id,
-        topics.telegram AS topic_telegram,
-        collaborators
-      FROM "Addresses" AS addr
-      RIGHT JOIN (
-        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
-          t.created_at AS thread_created,
-          t.max_notif_id AS latest_activity,
-          t.marked_as_spam_at,
-          t.archived_at,
-          t.updated_at AS thread_updated,
-          t.locked_at AS thread_locked,
-          t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
-          reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
-          reactions.addresses_reacted, t.reaction_count AS total_likes,
-          t.reaction_weights_sum,
-          t.has_poll,
-          t.plaintext,
-          t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
-            CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
-              )
-            ) AS collaborators
-        FROM "Threads" t
-        LEFT JOIN "Collaborations" AS collaborations
-        ON t.id = collaborations.thread_id
-        LEFT JOIN "Addresses" editors
-        ON collaborations.address_id = editors.id
-        LEFT JOIN (
-            SELECT thread_id,
-            STRING_AGG(ad.address::text, ',') AS addresses_reacted,
-            STRING_AGG(r.reaction::text, ',') AS reaction_type,
-            STRING_AGG(r.id::text, ',') AS reaction_ids,
-            STRING_AGG(r.created_at::text, ',') AS reaction_timestamps,
-            STRING_AGG(COALESCE(r.calculated_voting_weight::text, '0'), ',') AS reaction_weights
-            FROM "Reactions" as r
-            JOIN "Threads" t2
-            ON r.thread_id = t2.id and t2.community_id = $community_id ${
-              topicId ? ` AND t2.topic_id = $topic_id ` : ''
-            }
-            LEFT JOIN "Addresses" ad
-            ON r.address_id = ad.id
-            where r.community_id = $community_id
-            GROUP BY thread_id
-        ) reactions
-        ON t.id = reactions.thread_id
-        WHERE t.deleted_at IS NULL
-          ${communityId ? ` AND t.community_id = $community_id` : ''}
-          ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
-          ${stage ? ` AND t.stage = $stage ` : ''}
-          ${` AND t.archived_at IS ${archived ? 'NOT' : ''} NULL `}
-          AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
-          (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
-          GROUP BY (t.id, t.max_notif_id, t.comment_count,
-          reactions.reaction_ids, reactions.reaction_timestamps, reactions.reaction_weights, reactions.reaction_type,
-          reactions.addresses_reacted)
-          ORDER BY t.pinned DESC, t.max_notif_id DESC
-        ) threads
-      ON threads.address_id = addr.id
-      LEFT JOIN "Topics" topics
-      ON threads.topic_id = topics.id
-      ${fromDate ? ' WHERE threads.thread_created > $from_date ' : ''}
-      ${
-        toDate
-          ? (fromDate ? ' AND ' : ' WHERE ') +
-            ' threads.thread_created < $to_date '
-          : ''
-      }
-      ${includePinnedThreads || orderByQueries[orderBy] ? 'ORDER BY ' : ''}
-      ${includePinnedThreads ? ' threads.pinned DESC' : ''}
-      ${
-        orderByQueries[orderBy]
-          ? (includePinnedThreads ? ',' : '') + orderByQueries[orderBy]
-          : ''
-      }
-      LIMIT $limit OFFSET $offset
-    `,
-      {
-        bind,
-        type: QueryTypes.SELECT,
-      },
-    );
-  } catch (e) {
-    console.error(e);
-    throw new ServerError('Could not fetch threads');
-  }
+  const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
+    `
+        WITH top_threads AS (
+        SELECT id, title, url, body, version_history, kind, stage, read_only, discord_meta,
+            pinned, community_id, created_at, updated_at, locked_at as thread_locked, links,
+            has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
+            marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_action as "canvasAction",
+            canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited, address_id
+        FROM "Threads"
+        WHERE
+            community_id = :communityId AND
+            deleted_at IS NULL AND
+            archived_at IS ${archived ? 'NOT' : ''} NULL 
+            ${topicId ? ' AND topic_id = :topicId' : ''}
+            ${stage ? ' AND stage = :stage' : ''}
+            ${fromDate ? ' AND created_at > :fromDate' : ''}
+            ${toDate ? ' AND created_at < :toDate' : ''}            
+        ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'created_at DESC'} 
+        LIMIT :limit OFFSET :offset
+    ), thread_metadata AS (
+    -- get the thread authors and their profiles
+        SELECT
+            TH.id as thread_id,
+            json_build_object(
+                'id', T.id,
+                'name', T.name,
+                'description', T.description,
+                'communityId', T.community_id,
+                'telegram', T.telegram
+            ) as topic,
+            json_build_object(
+                'id', A.id,
+                'address', A.address,
+                'community_id', A.community_id
+            ) as "Address",
+            A.profile_id as profile_id, A.last_active as address_last_active,
+            P.id as profile_id, P.avatar_url as avatar_url, P.profile_name as profile_name
+        FROM top_threads TH
+        JOIN "Topics" T ON TH.topic_id = T.id
+        LEFT JOIN "Addresses" A ON TH.address_id = A.id
+        LEFT JOIN "Profiles" P ON A.profile_id = P.id
+    ), collaborator_data AS (
+    -- get the thread collaborators and their profiles
+        SELECT
+            TT.id as thread_id,
+            CASE WHEN max(A.id) IS NOT NULL THEN
+                json_agg(json_strip_nulls(json_build_object(
+                    'address', A.address,
+                    'community_id', A.community_id,
+                    'User', json_build_object(
+                        'Profiles', json_build_array(json_build_object(
+                            'id', editor_profiles.id,
+                            'name', editor_profiles.profile_name,
+                            'address', A.address,
+                            'lastActive', A.last_active::text,
+                            'avatarUrl', editor_profiles.avatar_url::text
+                        ))
+                    )
+                ))) 
+            ELSE '[]'::json
+            END AS collaborators
+        FROM top_threads TT
+        LEFT JOIN "Collaborations" AS C ON TT.id = C.thread_id
+        LEFT JOIN "Addresses" A ON C.address_id = A.id
+        LEFT JOIN "Profiles" AS editor_profiles ON A.user_id = editor_profiles.user_id
+        GROUP BY TT.id
+    ), reaction_data AS (
+    -- get the thread reactions and the address/profile of the user who reacted
+        SELECT
+            TT.id as thread_id,
+            json_agg(json_strip_nulls(json_build_object(
+            'id', R.id,
+            'type', R.reaction,
+            'address', A.address,
+            'updated_at', R.updated_at::text,
+            'vote_weight', R.calculated_voting_weight,
+            'profile_name', P.profile_name,
+            'avatar_url', P.avatar_url,
+            'last_active', A.last_active::text
+        ))) as "associatedReactions"
+        FROM "Reactions" R
+        JOIN top_threads TT ON TT.id = R.thread_id
+        JOIN "Addresses" A ON A.id = R.address_id
+        JOIN "Profiles" P ON P.id = A.profile_id
+        -- where clause doesn't change query result but forces DB to use the correct indexes
+        WHERE R.community_id = :communityId AND R.thread_id = TT.id
+        GROUP BY TT.id
+    )
+    SELECT
+        TT.*, TM.*, CD.*, RD.*
+    FROM top_threads TT
+    LEFT JOIN thread_metadata TM ON TT.id = TM.thread_id
+    LEFT JOIN collaborator_data CD ON TT.id = CD.thread_id
+    LEFT JOIN reaction_data RD ON TT.id = RD.thread_id;
+  `,
+    {
+      replacements,
+      type: QueryTypes.SELECT,
+    },
+  );
 
-  // transform thread response
-  let threads = responseThreads.map(async (t) => {
-    const collaborators = JSON.parse(t.collaborators[0]).address?.length
-      ? t.collaborators.map((c) => JSON.parse(c))
-      : [];
-
-    const last_edited = getLastEdited(t);
-
-    const data = {
-      id: t.thread_id,
-      title: t.thread_title,
-      url: t.url,
-      body: t.body,
-      last_edited,
-      kind: t.kind,
-      stage: t.stage,
-      read_only: t.read_only,
-      discord_meta: t.discord_meta,
-      pinned: t.pinned,
-      chain: t.thread_chain,
-      created_at: t.thread_created,
-      updated_at: t.thread_updated,
-      locked_at: t.thread_locked,
-      links: t.links,
-      collaborators,
-      has_poll: t.has_poll,
-      last_commented_on: t.last_commented_on,
-      plaintext: t.plaintext,
-      Address: {
-        id: t.addr_id,
-        address: t.addr_address,
-        community_id: t.addr_chain,
-      },
-      numberOfComments: t.threads_number_of_comments,
-      reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
-      reactionTimestamps: t.reaction_timestamps
-        ? t.reaction_timestamps.split(',')
-        : [],
-      reactionWeights: t.reaction_weights
-        ? t.reaction_weights.split(',').map((n) => parseInt(n, 10))
-        : [],
-      reaction_weights_sum: t.reaction_weights_sum,
-      addressesReacted: t.addresses_reacted
-        ? t.addresses_reacted.split(',')
-        : [],
-      reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
-      marked_as_spam_at: t.marked_as_spam_at,
-      archived_at: t.archived_at,
-      latest_activity: t.latest_activity,
-    };
-    if (t.topic_id) {
-      data['topic'] = {
-        id: t.topic_id,
-        name: t.topic_name,
-        description: t.topic_description,
-        chainId: t.topic_community_id,
-        telegram: t.telegram,
-      };
-    }
-    return data;
-  });
-
-  const numVotingThreads = await this.models.Thread.count({
+  const numVotingThreadsQuery = this.models.Thread.count({
     where: {
       community_id: communityId,
       stage: 'voting',
     },
   });
 
-  threads = await Promise.all(threads);
+  try {
+    const [threads, numVotingThreads] = await Promise.all([
+      responseThreadsQuery,
+      numVotingThreadsQuery,
+    ]);
 
-  return {
-    limit: bind.limit,
-    page: bind.page,
-    // data params
-    threads,
-    numVotingThreads,
-  };
+    return {
+      limit: replacements.limit,
+      page: replacements.page,
+      // data params
+      threads,
+      numVotingThreads,
+    };
+  } catch (e) {
+    console.error(e);
+    throw new ServerError('Could not fetch threads');
+  }
 }

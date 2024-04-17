@@ -1,6 +1,6 @@
-declare let window: any;
+import axios from 'axios';
 
-import $ from 'jquery';
+declare let window: any;
 
 import type Web3 from 'web3';
 import type Account from '../../../models/Account';
@@ -13,7 +13,7 @@ import { hexToNumber } from 'web3-utils';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
@@ -141,8 +141,8 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
           const rpcUrl =
             app.chain.meta.node.altWalletUrl || `https://${wsRpcUrl.host}`;
 
-          const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId === chainId);
+          const chains = await axios.get('https://chainid.network/chains.json');
+          const baseChain = chains.data.find((c) => c.chainId === chainId);
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [
@@ -211,8 +211,10 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
         });
       } catch (error) {
         if (error.code === 4902) {
-          const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId === communityChain);
+          const chains = await axios.get('https://chainid.network/chains.json');
+          const baseChain = chains.data.find(
+            (c) => c.chainId === communityChain,
+          );
           // Check if the string contains '${' and '}'
           const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           const url =

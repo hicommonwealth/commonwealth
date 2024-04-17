@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
 import app from 'state';
 

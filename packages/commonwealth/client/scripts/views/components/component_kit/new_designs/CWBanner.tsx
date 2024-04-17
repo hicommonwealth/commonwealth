@@ -15,7 +15,7 @@ import {
   ButtonProps,
   ButtonType,
   CWButton,
-} from 'views/components/component_kit/new_designs/cw_button';
+} from 'views/components/component_kit/new_designs/CWButton';
 
 // TODO this component covers only one type of Banner,
 // it should be extended with other types

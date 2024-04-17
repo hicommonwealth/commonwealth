@@ -1,4 +1,30 @@
 @import '../../../../../styles/shared';
 
 .Stakes {
+  .Table {
+    .header-content.cursor-pointer.select-none.numeric {
+      justify-content: start;
+    }
+    .data-container {
+      vertical-align: middle;
+
+      .numeric {
+        text-align: start;
+      }
+
+      .etherscanLink {
+        cursor: pointer;
+        color: $neutral-500;
+        text-decoration: none;
+
+        &:focus,
+        &:active,
+        &:hover,
+        &:visited {
+          outline: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
 }

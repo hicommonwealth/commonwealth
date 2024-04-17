@@ -15,6 +15,8 @@ export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
   communityHomepageEnabled: boolean;
   myCommunityStakePageEnabled: boolean;
+  existingCommunityStakeIntegrationEnabled: boolean;
+  contestEnabled: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -31,10 +33,18 @@ const Router = (customDomain: string) => {
     'myCommunityStakePageEnabled',
     false,
   );
+  const existingCommunityStakeIntegrationEnabled = client.getBooleanValue(
+    'existingCommunityStakeIntegrationEnabled',
+    false,
+  );
+  const contestEnabled = client.getBooleanValue('contest', false);
+
   const flags = {
     proposalTemplatesEnabled,
     communityHomepageEnabled,
     myCommunityStakePageEnabled,
+    contestEnabled,
+    existingCommunityStakeIntegrationEnabled,
   };
 
   return createBrowserRouter(
