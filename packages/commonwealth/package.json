@@ -53,7 +53,7 @@
     "test-integration-util": "NODE_ENV=test nyc ts-mocha ./test/integration/*.spec.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha",
     "test-suite": "NODE_ENV=test nyc ts-mocha './test/**/*.spec.ts'",
-    "unit-test": "NODE_ENV=test ts-mocha './test/unit/seed_hack.spec.ts' && NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true ts-mocha './test/unit/**/*.spec.ts' './server/**/*.spec.ts'",
+    "unit-test": "NODE_ENV=test ts-mocha './test/unit/seed_hack.spec.ts' && NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true ts-mocha './test/unit/**/*.spec.ts'",
     "unit-test:watch": "NODE_ENV=test ts-mocha --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
     "refresh-all-memberships": "npx ts-node -r tsconfig-paths/register -T ./scripts/refresh-all-memberships.ts",

@@ -1,9 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { createAsyncWriterMock } from './createAsyncWriter';
-import { createDatabasePaginatorDefault } from './createDatabasePaginator';
-import { createSitemapGenerator } from './createSitemapGenerator';
+import { createAsyncWriterMock } from '../../../../server/workers/sitemap/createAsyncWriter';
+import { createDatabasePaginatorDefault } from '../../../../server/workers/sitemap/createDatabasePaginator';
+import { createSitemapGenerator } from '../../../../server/workers/sitemap/createSitemapGenerator';
 
 describe('createSitemapGenerator', function () {
   before(async () => {
