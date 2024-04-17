@@ -37,6 +37,7 @@ export const CWCircleButton = ({
       })}
     >
       <button
+        type="button"
         className={getClasses(
           {
             disabled,

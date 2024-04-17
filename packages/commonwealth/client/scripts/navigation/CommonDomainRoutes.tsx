@@ -78,9 +78,19 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+const CommunityStakeIntegration = lazy(
+  () => import('views/pages/CommunityManagement/StakeIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
+const CommunityContests = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ContestsList'),
+);
+const ManageContest = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ManageContest'),
+);
+const Contests = lazy(() => import('views/pages/Contests'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -106,6 +116,8 @@ const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
   myCommunityStakePageEnabled,
+  contestEnabled,
+  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -428,6 +440,17 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+  ...(existingCommunityStakeIntegrationEnabled
+    ? [
+        <Route
+          key="/:scope/manage/integrations/stake"
+          path="/:scope/manage/integrations/stake"
+          element={withLayout(CommunityStakeIntegration, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
@@ -442,6 +465,38 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+  ...(contestEnabled
+    ? [
+        <Route
+          key="/:scope/manage/contests"
+          path="/:scope/manage/contests"
+          element={withLayout(CommunityContests, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/contests/launch"
+          path="/:scope/manage/contests/launch"
+          element={withLayout(ManageContest, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/contests/:contestId"
+          path="/:scope/manage/contests/:contestId"
+          element={withLayout(ManageContest, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/contests"
+          path="/:scope/contests"
+          element={withLayout(Contests, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"

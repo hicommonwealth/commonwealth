@@ -2,8 +2,15 @@
 
 .Stakes {
   .Table {
+    .header-content.cursor-pointer.select-none.numeric {
+      justify-content: start;
+    }
     .data-container {
       vertical-align: middle;
+
+      .numeric {
+        text-align: start;
+      }
 
       .etherscanLink {
         cursor: pointer;
