@@ -23,6 +23,7 @@
     "@hicommonwealth/logging": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "mocha-steps": "^1.3.0",
+    "moment": "^2.23.0",
     "node-object-hash": "^3.0.0",
     "pg": "^8.11.3",
     "sequelize": "^6.32.1",
@@ -31,5 +32,8 @@
     "web3-core": "1.8.2",
     "web3-utils": "1.8.2",
     "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/moment": "^2.13.0"
   }
 }

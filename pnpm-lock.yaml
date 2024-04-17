@@ -577,6 +577,9 @@ importers:
       mocha-steps:
         specifier: ^1.3.0
         version: 1.3.0
+      moment:
+        specifier: ^2.23.0
+        version: 2.30.1
       node-object-hash:
         specifier: ^3.0.0
         version: 3.0.0
@@ -601,6 +604,10 @@ importers:
       zod:
         specifier: ^3.22.4
         version: 3.22.4
+    devDependencies:
+      '@types/moment':
+        specifier: ^2.13.0
+        version: 2.13.0
 
   libs/shared: {}
 
@@ -1087,6 +1094,9 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
+      '@types/moment':
+        specifier: ^2.13.0
+        version: 2.13.0
       '@types/passport':
         specifier: ^1.0.16
         version: 1.0.16
