@@ -18,5 +18,6 @@
     "zod": "^3.22.4",
     "@hicommonwealth/logging": "workspace:*",
     "@hicommonwealth/shared": "workspace:*"
-  }
+  },
+  "devDependencies": {}
 }

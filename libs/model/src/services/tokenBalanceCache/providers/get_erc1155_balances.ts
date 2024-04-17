@@ -98,7 +98,10 @@ async function getOnChainBatchErc1155Balances(
         log.error(msg, data.error);
         continue;
       }
-      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
+      const balances = AbiCoder.decodeParameter(
+        'uint256[]',
+        data.result,
+      ) as Balances;
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + batchSize, addresses.length);
