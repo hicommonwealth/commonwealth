@@ -1,5 +1,6 @@
 import useTransactionHistory from 'client/scripts/hooks/useTransactionHistory';
 import { formatAddressShort } from 'helpers';
+import { getCommunityStakeSymbol } from 'helpers/stakes';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import app from 'state';
@@ -56,9 +57,14 @@ const MyCommunityStake = () => {
     filterOptions,
     addressFilter,
   });
+  const updatedData = data.map((info) => {
+    info.chain = getCommunityStakeSymbol(
+      app.config.chains.getById(info.community.id)?.ChainNode?.name || '',
+    );
+    return info;
+  });
 
   if (!isLoggedIn) return <PageNotFound />;
-
   return (
     <CWPageLayout>
       <section className="MyCommunityStake">
@@ -114,9 +120,9 @@ const MyCommunityStake = () => {
             </CWTabsRow>
 
             {activeTabIndex === 0 ? (
-              <Stakes transactions={data} />
+              <Stakes transactions={updatedData} />
             ) : (
-              <Transactions transactions={data} />
+              <Transactions transactions={updatedData} />
             )}
           </>
         )}
