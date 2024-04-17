@@ -187,7 +187,6 @@ const verifyAddress = async (
   const community = await models.Community.findOne({
     where: { id: req.body.community_id },
   });
-
   if (!community) {
     return next(new AppError(Errors.InvalidCommunity));
   }

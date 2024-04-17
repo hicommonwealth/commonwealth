@@ -9,8 +9,6 @@ import {
   isCacheKeyDuration,
 } from '../utils/cacheKeyUtils';
 
-const __filename = fileURLToPath(import.meta.url);
-
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
   UNDEF = 'UNDEF', // cache is undefined

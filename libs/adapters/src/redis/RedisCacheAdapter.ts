@@ -5,8 +5,6 @@ import { fileURLToPath } from 'url';
 
 const CONNECT_TIMEOUT = 5000;
 
-const __filename = fileURLToPath(import.meta.url);
-
 export function redisRetryStrategy(retries: number) {
   // Don't stop retrying while app is running
   // if (retries > 5) {

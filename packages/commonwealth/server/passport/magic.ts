@@ -488,13 +488,6 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
-    // const session: Session = {
-    //   type: 'session',
-    //   signature: req.body.signature,
-    //   payload: req.body.sessionPayload
-    //     ? JSON.parse(req.body.sessionPayload)
-    //     : undefined,
-    // };
     const session: Session = ipldDagJson.decode(
       ipldDagJson.parse(req.body.session),
     );
