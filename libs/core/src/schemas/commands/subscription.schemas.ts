@@ -5,6 +5,7 @@ import {
   SubscriptionPreference,
   ThreadSubscription,
 } from '../entities.schemas';
+import { PG_INT } from '../utils.schemas';
 
 export const UpdateSubscriptionPreferences = {
   input: z.object({
@@ -40,28 +41,28 @@ export const DeleteCommunityAlert = {
 
 export const CreateCommentSubscription = {
   input: z.object({
-    comment_id: z.number().int(),
+    comment_id: PG_INT,
   }),
   output: CommentSubscription,
 };
 
 export const DeleteCommentSubscription = {
   input: z.object({
-    comment_ids: z.array(z.number().int()),
+    comment_ids: z.array(PG_INT),
   }),
-  output: z.number().describe('Number of comment subscriptions deleted'),
+  output: PG_INT.describe('Number of comment subscriptions deleted'),
 };
 
 export const DeleteThreadSubscription = {
   input: z.object({
-    thread_ids: z.array(z.number().int()),
+    thread_ids: z.array(PG_INT),
   }),
-  output: z.number().describe('Number of thread subscriptions deleted'),
+  output: PG_INT.describe('Number of thread subscriptions deleted'),
 };
 
 export const CreateThreadSubscription = {
   input: z.object({
-    thread_id: z.number().int(),
+    thread_id: PG_INT,
   }),
   output: ThreadSubscription,
 };
