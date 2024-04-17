@@ -5,6 +5,9 @@ import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
 
+// handle exceptions thrown in express routes
+import 'express-async-errors';
+
 const TEST_WITHOUT_LOGS = process.env.TEST_WITHOUT_LOGS === 'true';
 
 /**
