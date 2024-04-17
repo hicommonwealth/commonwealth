@@ -23,11 +23,11 @@ const MODAL_COPY = {
 };
 
 export type ModalLayoutProps = {
-  onClose: () => any;
+  onClose: () => void;
   type: 'create-account' | 'sign-in';
   body: ReactNode;
   bodyClassName?: string;
-  onSignInClick?: () => any;
+  onSignInClick?: () => void;
 };
 
 const ModalLayout = ({

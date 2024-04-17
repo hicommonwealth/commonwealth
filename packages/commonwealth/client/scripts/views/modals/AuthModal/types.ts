@@ -7,7 +7,7 @@ export type AuthModalTabs = {
 };
 
 export type CreateAccountModal = {
-  onClose: () => any;
+  onClose: () => void;
 };
 
 export type SignInModalProps = {
