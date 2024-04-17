@@ -11,6 +11,8 @@ import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const proposalTemplatesEnabled = useFlag('proposalTemplates');
+  const contestsEnabled = useFlag('contest');
+
   const navigate = useCommonNavigate();
   const location = useLocation();
   const { resetSidebarState, setToggleTree, toggledTreeState } =
@@ -33,6 +35,14 @@ const AdminSection = () => {
   );
   const matchesCommunityModeratorsRoute = matchRoutes(
     [{ path: '/manage/moderators' }, { path: ':scope/manage/moderators' }],
+    location,
+  );
+  const matchesContestsRoute = matchRoutes(
+    [{ path: '/manage/contests/*' }, { path: ':scope/manage/contests/*' }],
+    location,
+  );
+  const matchesMembersAndGroupsRoute = matchRoutes(
+    [{ path: '/members' }, { path: ':scope/members' }],
     location,
   );
   const matchesAnalyticsRoute = matchRoutes(
@@ -138,7 +148,7 @@ const AdminSection = () => {
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: false,
+      isActive: !!matchesMembersAndGroupsRoute,
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
@@ -155,6 +165,32 @@ const AdminSection = () => {
         );
       },
     },
+    ...(contestsEnabled
+      ? [
+          {
+            title: 'Contests',
+            containsChildren: false,
+            displayData: null,
+            hasDefaultToggle: false,
+            isActive: !!matchesContestsRoute,
+            isVisible: true,
+            isUpdated: false,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
+              resetSidebarState();
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/manage/contests`,
+                app.activeChainId(),
+                () => {
+                  setToggleTree(`children.contests.toggledState`, toggle);
+                },
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: 'Analytics',
       containsChildren: false,
