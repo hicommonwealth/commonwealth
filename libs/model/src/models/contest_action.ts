@@ -43,7 +43,6 @@ export default (sequelize: Sequelize.Sequelize) =>
     {
       tableName: 'ContestActions',
       timestamps: false,
-      underscored: true,
       indexes: [],
       // hooks: syncHooks,
     },

@@ -29,7 +29,6 @@ export default (sequelize: Sequelize.Sequelize) =>
     {
       tableName: 'ContestManagers',
       timestamps: false,
-      underscored: true,
       indexes: [],
       // hooks: syncHooks,
     },

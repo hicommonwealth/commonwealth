@@ -32,7 +32,6 @@ export default (sequelize: Sequelize.Sequelize) =>
     {
       tableName: 'Contests',
       timestamps: false,
-      underscored: true,
       indexes: [{ fields: ['start_time'] }], // TODO: can we enforce typings in indexes?
       // hooks: syncHooks,
     },
