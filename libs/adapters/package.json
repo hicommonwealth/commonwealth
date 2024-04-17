@@ -10,11 +10,14 @@
   "types": "src/index",
   "scripts": {
     "build": "tsc -b",
+    "tsc-watch": "tsc --watch",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/logging": "workspace:*",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
