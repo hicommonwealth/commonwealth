@@ -6,7 +6,7 @@ import type {
 import type { ChainInfo } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -84,7 +84,6 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getSessionSigner() {
-    const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
       bech32Prefix: app.chain?.meta.bech32Prefix,
       signer: {

@@ -5,8 +5,10 @@ import {
   type Window as KeplrWindow,
 } from '@keplr-wallet/types';
 
+import { fromBech32 } from '@cosmjs/encoding';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
+import { bytesToHex } from '@noble/hashes/utils';
+import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -75,7 +77,6 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getSessionSigner() {
-    const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
       bech32Prefix: app.chain.meta.bech32Prefix,
       signer: {
@@ -94,8 +95,6 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           return `0x${Buffer.from(signature).toString('hex')}`;
         },
         getAddress: async () => {
-          const { fromBech32 } = await import('@cosmjs/encoding');
-          const { bytesToHex } = await import('@noble/hashes/utils');
           const { data: addressData } = fromBech32(this.accounts[0].address);
           return `0x${bytesToHex(addressData)}`;
         },

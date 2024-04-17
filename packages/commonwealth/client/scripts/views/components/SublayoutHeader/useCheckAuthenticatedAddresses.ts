@@ -27,7 +27,7 @@ const useCheckAuthenticatedAddresses = ({
 
   useEffect(() => {
     const updateAuthenticatedAddresses = async () => {
-      const sessionSigners = await getSessionSigners();
+      const sessionSigners = getSessionSigners();
 
       const newAuthenticatedAddresses: Record<string, boolean> = {};
 

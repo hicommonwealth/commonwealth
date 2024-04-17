@@ -22,6 +22,7 @@ import {
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
+import { decode, parse } from '@ipld/dag-json';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import { fileURLToPath } from 'node:url';
@@ -408,7 +409,6 @@ async function magicLoginRoute(
   decodedMagicToken: MagicUser,
   cb: DoneFunc,
 ) {
-  const ipldDagJson = await import('@ipld/dag-json');
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let communityToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
@@ -488,9 +488,7 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
-    const session: Session = ipldDagJson.decode(
-      ipldDagJson.parse(req.body.session),
-    );
+    const session: Session = decode(parse(req.body.session));
 
     if (communityToJoin) {
       if (isCosmos) {
@@ -528,11 +526,11 @@ async function magicLoginRoute(
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       // verify the session signature using session signer
-      const sessionSigner = await getSessionSignerForAddress(session.address);
+      const sessionSigner = getSessionSignerForAddress(session.address);
       if (!sessionSigner) {
         throw new Error('No session signer found for address');
       }
-      sessionSigner.verifySession(CANVAS_TOPIC, session);
+      await sessionSigner.verifySession(CANVAS_TOPIC, session);
     }
   } catch (err) {
     log.warn(

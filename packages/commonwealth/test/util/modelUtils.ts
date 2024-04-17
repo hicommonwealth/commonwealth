@@ -19,10 +19,11 @@ import type {
   ThreadAttributes,
 } from '@hicommonwealth/model';
 import { encode, stringify } from '@ipld/dag-json';
+import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
-import { constructSubstrateSignerCWClass } from 'shared/canvas/sessionSigners';
+import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
 import {
   CanvasSignResult,
   CanvasSignedData,
@@ -37,9 +38,6 @@ async function createCanvasSignResult({
   sign,
   action,
 }): Promise<CanvasSignResult> {
-  const { encode } = await import('@ipld/dag-json');
-  const { sha256 } = await import('@noble/hashes/sha256');
-
   const sessionMessage = {
     clock: 0,
     parents: [],
@@ -254,7 +252,6 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
     } else if (chain === 'edgeware') {
       wallet_id = 'polkadot';
-      const SubstrateSignerCW = await constructSubstrateSignerCWClass();
       sessionSigner = new SubstrateSignerCW();
     } else {
       throw new Error(`invalid chain ${chain}`);

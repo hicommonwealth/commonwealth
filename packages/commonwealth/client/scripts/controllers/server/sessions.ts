@@ -7,7 +7,7 @@ import {
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
 } from 'shared/canvas/chainMappings';
-import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
 import { addressSwapper } from 'shared/utils';
@@ -46,7 +46,6 @@ export const getMagicCosmosSessionSigner = async (
   address: string,
   chainId: string,
 ) => {
-  const CosmosSignerCW = await constructCosmosSignerCWClass();
   return new CosmosSignerCW({
     signer: {
       type: 'amino',
@@ -100,7 +99,7 @@ async function sign(
   const { encode } = await import('@ipld/dag-json');
 
   const address = getCaip2Address(address_);
-  const sessionSigners = await getSessionSigners();
+  const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) {
       let lookupAddress = address;

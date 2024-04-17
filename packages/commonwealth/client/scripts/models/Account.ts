@@ -3,6 +3,7 @@ import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import { Session } from '@canvas-js/interfaces';
+import { encode, stringify } from '@ipld/dag-json';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
@@ -166,13 +167,11 @@ class Account {
   }
 
   public async validate(session: Session, shouldRedraw = true) {
-    const ipldDagJson = await import('@ipld/dag-json');
-
     const params = {
       address: this.address,
       community_id: this.community.id,
       jwt: app.user.jwt,
-      session: ipldDagJson.stringify(ipldDagJson.encode(session)),
+      session: stringify(encode(session)),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
     };

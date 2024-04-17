@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type {
   Action,
   Message,
   Session,
   Signature,
 } from '@canvas-js/interfaces';
+import { Ed25519DelegateSigner } from '@canvas-js/signatures';
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
 import { CANVAS_TOPIC } from './constants';
 import {
-  constructCosmosSignerCWClass,
-  constructSolanaSignerCWClass,
-  constructSubstrateSignerCWClass,
+  CosmosSignerCW,
+  SolanaSignerCW,
+  SubstrateSignerCW,
 } from './sessionSigners';
 export const stringify = configure({
   bigint: false,
@@ -20,14 +22,7 @@ export const stringify = configure({
   deterministic: true,
 });
 
-// can we do this without needing an async method?
-// we should just be using ESM
-// TODO: add the other signers
-export const getSessionSigners = async () => {
-  const { SIWESigner } = await import('@canvas-js/chain-ethereum');
-  const CosmosSignerCW = await constructCosmosSignerCWClass();
-  const SubstrateSignerCW = await constructSubstrateSignerCWClass();
-  const SolanaSignerCW = await constructSolanaSignerCWClass();
+export const getSessionSigners = () => {
   return [
     new SIWESigner(),
     new CosmosSignerCW(),
@@ -36,8 +31,8 @@ export const getSessionSigners = async () => {
   ];
 };
 
-export const getSessionSignerForAddress = async (address: string) => {
-  const sessionSigners = await getSessionSigners();
+export const getSessionSignerForAddress = (address: string) => {
+  const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) {
       return signer;
@@ -46,9 +41,9 @@ export const getSessionSignerForAddress = async (address: string) => {
 };
 
 export async function verifySession(session: Session) {
-  for (const signer of await getSessionSigners()) {
+  for (const signer of getSessionSigners()) {
     if (signer.match(session.address)) {
-      signer.verifySession(CANVAS_TOPIC, session);
+      await signer.verifySession(CANVAS_TOPIC, session);
       return;
     }
   }
@@ -69,7 +64,6 @@ export const verify = async ({
   sessionMessage,
   sessionMessageSignature,
 }: VerifyArgs) => {
-  const { Ed25519DelegateSigner } = await import('@canvas-js/signatures');
   // verify the session
   await verifySession(sessionMessage.payload);
 

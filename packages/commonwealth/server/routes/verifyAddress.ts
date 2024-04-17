@@ -15,6 +15,7 @@ import {
   NotificationCategories,
   WalletId,
 } from '@hicommonwealth/shared';
+import { decode, parse } from '@ipld/dag-json';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
@@ -203,10 +204,7 @@ const verifyAddress = async (
         })
       : req.body.address;
 
-  const ipldDagJson = await import('@ipld/dag-json');
-  const decodedSession: Session = ipldDagJson.decode(
-    ipldDagJson.parse(req.body.session),
-  );
+  const decodedSession: Session = decode(parse(req.body.session));
 
   await processAddress(
     models,

@@ -4,7 +4,7 @@ import type {
 } from '@terra-money/wallet-provider';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { constructCosmosSignerCWClass } from 'shared/canvas/sessionSigners';
+import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
@@ -62,7 +62,6 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getSessionSigner() {
-    const CosmosSignerCW = await constructCosmosSignerCWClass();
     return new CosmosSignerCW({
       signer: {
         type: 'bytes',

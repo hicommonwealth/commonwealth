@@ -1,4 +1,5 @@
 import { Action, Message, Session, Signature } from '@canvas-js/interfaces';
+import { decode, encode, parse, stringify } from '@ipld/dag-json';
 
 export type CanvasSignedData = {
   sessionMessage: Message<Session>;
@@ -15,7 +16,6 @@ export type CanvasSignResult = {
 export const toCanvasSignedDataApiArgs = async (
   data: undefined | CanvasSignResult,
 ): Promise<CanvasSignedDataApiArgs> => {
-  const { encode, stringify } = await import('@ipld/dag-json');
   // ignore undefined data
   if (data === undefined) {
     return;
@@ -37,8 +37,6 @@ export type CanvasSignedDataApiArgs = {
 export const fromCanvasSignedDataApiArgs = async (
   data: CanvasSignedDataApiArgs,
 ): Promise<CanvasSignResult> => {
-  const { decode, parse } = await import('@ipld/dag-json');
-
   const canvasSignedData: CanvasSignedData = decode(
     parse(data.canvas_signed_data),
   );

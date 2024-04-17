@@ -9,7 +9,6 @@ import type { SessionSigner } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 
-import { constructSubstrateSignerCWClass } from 'shared/canvas/sessionSigners';
 import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
@@ -56,7 +55,6 @@ class PolkadotWebWalletController
     });
 
     const extension = await web3FromAddress(reencodedAddress);
-    const SubstrateSignerCW = await constructSubstrateSignerCWClass();
     // @ts-ignore
     return new SubstrateSignerCW({ extension });
   }

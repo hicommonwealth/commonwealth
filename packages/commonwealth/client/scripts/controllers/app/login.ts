@@ -10,7 +10,12 @@ import { isSameAccount } from 'helpers';
 import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
+import { encode, stringify } from '@ipld/dag-json';
+import { CosmosExtension } from '@magic-ext/cosmos';
+import { OAuthExtension } from '@magic-ext/oauth';
+import { Magic } from 'magic-sdk';
 import { CANVAS_TOPIC } from 'shared/canvas';
 
 import axios from 'axios';
@@ -195,7 +200,7 @@ export async function updateActiveAddresses({
     // From the sorted adddress in the current community, find an address which has an active session key
     let foundAddressWithActiveSessionKey = null;
 
-    const sessionSigners = await getSessionSigners();
+    const sessionSigners = getSessionSigners();
     for (const communityAccount of communityAddressesSortedByLastUsed) {
       const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
         sessionSigner.match(communityAccount.address),
@@ -320,10 +325,6 @@ export async function createUserWithAddress(
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
-  const { Magic } = await import('magic-sdk');
-  const { OAuthExtension } = await import('@magic-ext/oauth');
-  const { CosmosExtension } = await import('@magic-ext/cosmos');
-
   if (isCosmos && !chain) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
@@ -426,8 +427,6 @@ export async function handleSocialLoginCallback({
   chain?: string;
   walletSsoSource?: string;
 }): Promise<string> {
-  const ipldDagJson = await import('@ipld/dag-json');
-  const { SIWESigner } = await import('@canvas-js/chain-ethereum');
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
@@ -495,8 +494,7 @@ export async function handleSocialLoginCallback({
       const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
 
       const sessionSigner = new SIWESigner({
-        // @ts-ignore
-        signer: signer,
+        signer,
         chainId: app.chain?.meta.node?.ethChainId || 1,
       });
       // TODO: provide blockhash
@@ -520,7 +518,7 @@ export async function handleSocialLoginCallback({
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,
-        session: ipldDagJson.stringify(ipldDagJson.encode(session)),
+        session: stringify(encode(session)),
         walletSsoSource,
       },
     },

@@ -20,7 +20,7 @@ const verifySessionSignature = async (
   user_id: number,
   session: Session,
 ): Promise<boolean> => {
-  const signers = await getSessionSigners();
+  const signers = getSessionSigners();
 
   const expectedAddress = addressModel.address;
   const sessionAddress = session.address.split(':')[2];
