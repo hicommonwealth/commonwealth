@@ -104,7 +104,7 @@
     "@popperjs/core": "^2.0.6",
     "@sendgrid/mail": "^6.5.0",
     "@snapshot-labs/snapshot.js": "^0.4.35",
-    "@solana/web3.js": "^1.30.2",
+    "@solana/web3.js": "^1.91.3",
     "@tanstack/react-query": "^4.29.7",
     "@tanstack/react-query-devtools": "^4.29.7",
     "@tanstack/react-table": "^8.9.7",
