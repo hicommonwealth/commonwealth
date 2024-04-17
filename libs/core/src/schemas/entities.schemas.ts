@@ -167,15 +167,15 @@ export const Group = z.object({
 
 export const Thread = z.object({
   Address: Address.optional(),
-  address_id: z.number(),
+  address_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
-  id: z.number().optional(),
+  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   body: z.string().optional(),
   plaintext: z.string().optional(),
   url: z.string().optional(),
-  topic_id: z.number().optional(),
+  topic_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
   pinned: z.boolean().optional(),
   community_id: z.string(),
   view_count: z.number(),
@@ -206,7 +206,7 @@ export const Thread = z.object({
   comment_count: z.number(),
 
   //notifications
-  max_notif_id: z.number(),
+  max_notif_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
 
   profile_name: z.string(),
 });
