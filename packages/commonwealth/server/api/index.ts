@@ -11,7 +11,7 @@ import * as thread from './threads';
 /**
  * API v1 - tRPC Router
  */
-const procedures = {
+const artifacts = {
   community: community.trpcRouter,
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
@@ -19,10 +19,10 @@ const procedures = {
 };
 
 if (NEW_SUBSCRIPTION_API_FLAG) {
-  procedures['subscription'] = subscription.trpcRouter;
+  artifacts['subscription'] = subscription.trpcRouter;
 }
 
-const apiV1 = trpc.router(procedures);
+const apiV1 = trpc.router(artifacts);
 
 export type ApiV1 = typeof apiV1;
 
