@@ -6,7 +6,7 @@ execute_ts_mocha() {
   shift # Shift to skip the first argument (path) and get additional arguments
 
   # Construct the full command
-  full_command="NODE_ENV=test ts-mocha \"$path\" $*"
+  full_command="NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha \"$path\" $*"
 
   # Log the full command
   echo "Executing: $full_command"
