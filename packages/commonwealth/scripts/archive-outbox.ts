@@ -1,3 +1,4 @@
+import { HotShotsStats } from '@hicommonwealth/adapters';
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { S3 } from 'aws-sdk';
@@ -196,7 +197,7 @@ if (require.main === module) {
   main()
     .then(() => {
       log.info('Success');
-      stats().increment('cw.scheduler.send-cosmos-notifs');
+      stats(HotShotsStats()).increment('cw.scheduler.archive-outbox');
       process.exit(0);
     })
     .catch((err) => {
