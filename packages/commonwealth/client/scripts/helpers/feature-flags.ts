@@ -19,6 +19,7 @@ const buildFlag = (env: string) => {
 };
 
 const featureFlags = {
+  contest: buildFlag(process.env.FLAG_CONTEST),
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
@@ -28,6 +29,7 @@ const featureFlags = {
   existingCommunityStakeIntegrationEnabled: buildFlag(
     process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
   ),
+  userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

@@ -1,0 +1,31 @@
+@import '../../../../styles/shared';
+
+.NumberSelector {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+
+  @include smallInclusive {
+    gap: 0;
+  }
+
+  .number-container {
+    .input-and-icon-container {
+      width: unset;
+
+      .number {
+        font-size: 29px;
+        background: transparent;
+        font-weight: bold;
+        text-align: center;
+        width: 5ch;
+        transition: width 0.2s ease-in-out;
+        border: 1px solid $neutral-200;
+
+        &.expanded {
+          width: 8ch;
+        }
+      }
+    }
+  }
+}

@@ -68,6 +68,9 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_CONTEST': JSON.stringify(process.env.FLAG_CONTEST),
+    }),
+    new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new webpack.DefinePlugin({
@@ -85,6 +88,11 @@ module.exports = {
         JSON.stringify(
           process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
         ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_USER_ONBOARDING_ENABLED': JSON.stringify(
+        process.env.FLAG_USER_ONBOARDING_ENABLED,
+      ),
     }),
     new webpack.DefinePlugin({
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
