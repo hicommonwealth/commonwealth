@@ -1,4 +1,5 @@
-import { Actor, BalanceType, command, dispose } from '@hicommonwealth/core';
+import { Actor, command, dispose } from '@hicommonwealth/core';
+import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { CreateStakeTransaction } from '../../src/community/CreateStakeTransaction.command';

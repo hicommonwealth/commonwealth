@@ -1,7 +1,10 @@
-export * as communityStakeConfigValidator from './communityStakeConfigValidator';
 export * as newNamespaceValidator from './newNamespaceValidator';
+
+import * as communityStakeConfigValidatorModule from './communityStakeConfigValidator';
 import * as contractHelpersModule from './contractHelpers';
 
-// Export contractHelpers as an object and not an ES Module,
-// so it can be stubbed in tests
+// export modules as objects so they can be stubbed in tests
 export const contractHelpers = { ...contractHelpersModule };
+export const communityStakeConfigValidator = {
+  ...communityStakeConfigValidatorModule,
+};
