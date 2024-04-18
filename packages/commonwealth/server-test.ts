@@ -2,7 +2,9 @@
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
 import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
+import { tester } from '@hicommonwealth/model';
 import express from 'express';
+import { main } from './main';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
 
 // handle exceptions thrown in express routes
@@ -37,9 +39,6 @@ export type TestServer = {
 export const testServer = async (): Promise<TestServer> => {
   // bootstrap test adapters
   cache(new RedisCache('redis://localhost:6379'));
-
-  const { tester } = await import('@hicommonwealth/model');
-  const { main } = await import('./main');
 
   const db = await tester.seedDb();
   const app = express();

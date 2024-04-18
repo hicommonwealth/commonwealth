@@ -2,6 +2,8 @@ import type { Action, Message, Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC } from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
+import { encode } from '@ipld/dag-json';
+import { sha256 } from '@noble/hashes/sha256';
 import app from 'client/scripts/state';
 import {
   chainBaseToCaip2,
@@ -95,9 +97,6 @@ async function sign(
   call: string,
   args: any,
 ): Promise<CanvasSignResult> {
-  const { sha256 } = await import('@noble/hashes/sha256');
-  const { encode } = await import('@ipld/dag-json');
-
   const address = getCaip2Address(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
