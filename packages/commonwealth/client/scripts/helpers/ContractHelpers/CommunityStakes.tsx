@@ -1,3 +1,4 @@
+import { toBigInt } from 'web3-utils';
 import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -43,12 +44,12 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = this.toBN(
+    const totalPrice = toBigInt(
       await this.contract.methods
         .getBuyPriceAfterFee(namespaceAddress, id, amount)
         .call(),
     );
-    const feeFreePrice = this.toBN(
+    const feeFreePrice = toBigInt(
       await this.contract.methods
         .getBuyPrice(namespaceAddress, id, amount)
         .call(),
@@ -76,12 +77,12 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = this.toBN(
+    const totalPrice = toBigInt(
       await this.contract.methods
         .getSellPriceAfterFee(namespaceAddress, id, amount)
         .call(),
     );
-    const feeFreePrice = this.toBN(
+    const feeFreePrice = toBigInt(
       await this.contract.methods
         .getSellPrice(namespaceAddress, id, amount)
         .call(),

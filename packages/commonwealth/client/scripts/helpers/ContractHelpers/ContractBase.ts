@@ -59,10 +59,6 @@ abstract class ContractBase {
       );
     }
   }
-
-  protected toBN(number: string | number) {
-    return this.web3.utils.toBigInt(number);
-  }
 }
 
 export default ContractBase;
