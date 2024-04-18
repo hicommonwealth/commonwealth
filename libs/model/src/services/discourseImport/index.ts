@@ -4,6 +4,7 @@ export * from './comments';
 export * from './constants';
 export * from './profiles';
 export * from './reactions';
+export * from './streamDumpImport';
 export * from './subscriptions';
 export * from './threads';
 export * from './users';

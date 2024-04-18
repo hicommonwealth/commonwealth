@@ -11,6 +11,7 @@ import {
   createAllSubscriptionsInCW,
   createAllThreadsInCW,
   createAllUsersInCW,
+  streamDumpImport,
 } from '../services/discourseImport';
 
 export const ImportDiscourseCommunity: Command<
@@ -21,14 +22,14 @@ export const ImportDiscourseCommunity: Command<
     /* TODO: isSuperAdmin() */
   ],
   body: async ({ id, payload }) => {
-    const { communityId, base, accountsClaimable, dumpData } = payload;
+    const { id: communityId, base, accountsClaimable, dumpUrl } = payload;
     const cwConnection = models.sequelize;
 
     // TODO: sanitize dump data?
 
     // create temp discourse DB
     const discourseDbName = `temp_discourse_dump_${Date.now()}`;
-    await cwConnection.query(`CREATE DATABASE ${discourseDbName}`);
+    await cwConnection.query(`CREATE DATABASE ${discourseDbName};`);
 
     // TODO: create discourse DB user with restricted permissions for DB import?
 
@@ -36,6 +37,7 @@ export const ImportDiscourseCommunity: Command<
     const discourseDbUri = (() => {
       const parsedUrl = new URL(DATABASE_URI);
       parsedUrl.pathname = discourseDbName;
+      parsedUrl.searchParams.set('sslmode', 'disable');
       return parsedUrl.toString();
     })();
 
@@ -44,8 +46,20 @@ export const ImportDiscourseCommunity: Command<
       discourseDbUri,
     );
 
+    await discourseConnection.query('DROP SCHEMA public CASCADE;');
     // import dump into discourse DB
-    await discourseConnection.query(dumpData);
+    await streamDumpImport(dumpUrl, discourseConnection);
+
+    // console.log('fetching dump...');
+    // const response = await axios({
+    //   method: 'get',
+    //   url: dumpUrl,
+    // });
+    // console.log('done');
+
+    // console.log('running queries...');
+    // await discourseConnection.query(response.data);
+    // console.log('done');
 
     const tables: Record<string, any> = {};
     const transaction = await models.sequelize.transaction();

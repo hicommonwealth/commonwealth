@@ -40,6 +40,7 @@ export const createDiscourseDBConnection = (databaseUri: string) => {
       log.trace(msg);
     },
     dialectOptions: {
+      multipleStatements: true,
       requestTimeout: 40_000,
       ssl: {
         rejectUnauthorized: false,
