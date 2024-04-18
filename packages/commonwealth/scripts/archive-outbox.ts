@@ -196,7 +196,7 @@ if (require.main === module) {
   main()
     .then(() => {
       log.info('Success');
-      stats().increment('cw.scheduler.send-cosmos-notifs');
+      stats().increment('cw.scheduler.archive-outbox');
       process.exit(0);
     })
     .catch((err) => {

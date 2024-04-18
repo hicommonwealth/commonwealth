@@ -1,6 +1,7 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
+import * as dotenv from 'dotenv';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -13,6 +14,7 @@ import {
 } from './util';
 
 const log = logger(__filename);
+dotenv.config();
 
 /**
  * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.
