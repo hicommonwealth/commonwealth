@@ -10,7 +10,7 @@ import { BalanceType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
-import { toWei } from 'web3-utils';
+import Web3Utils from 'web3-utils';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
@@ -112,7 +112,7 @@ describe('Token Balance Cache EVM Tests', function () {
       );
       await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
       await sdk.getErc20(chainLinkAddress, addressTwo, transferAmount);
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(Web3Utils.toWei(transferAmount));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -300,7 +300,7 @@ describe('Token Balance Cache EVM Tests', function () {
       originalAddressTwoBalance = await web3.eth.getBalance(addressTwo);
       await sdk.getETH(addressOne, transferAmount);
       await sdk.getETH(addressTwo, transferAmount);
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(Web3Utils.toWei(transferAmount));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -761,7 +761,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
       await delay(20000);
 
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(Web3Utils.toWei(transferAmount));
       const finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);

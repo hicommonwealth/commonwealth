@@ -38,7 +38,7 @@ export async function startEvmPolling(
   );
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   startEvmPolling(120_000).catch((e) => {
     log.error('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
