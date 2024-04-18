@@ -38,7 +38,8 @@ export async function startEvmPolling(
   );
 }
 
-if (import.meta.url === import.meta.main) {
+const isMainModule = import.meta.url.endsWith(process.argv[1]);
+if (isMainModule) {
   startEvmPolling(120_000).catch((e) => {
     log.error('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
