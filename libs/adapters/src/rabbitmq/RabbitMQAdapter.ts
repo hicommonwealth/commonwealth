@@ -6,7 +6,7 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
   RetryStrategyFn,
-  eventHandler,
+  handleEvent,
   schemas,
 } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
@@ -206,7 +206,7 @@ export class RabbitMQAdapter implements Broker {
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
-          eventHandler(handler, content, true)
+          handleEvent(handler, content, true)
             .then(() => {
               this._log.debug('Message Acked', {
                 topic,

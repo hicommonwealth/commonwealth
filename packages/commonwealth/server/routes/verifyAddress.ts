@@ -102,7 +102,7 @@ const processAddress = async (
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      const newUser = await models.User.createWithProfile(models, {
+      const newUser = await models.User.createWithProfile({
         email: null,
       });
       addressInstance.profile_id = (
