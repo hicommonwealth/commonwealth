@@ -47,12 +47,16 @@ export const migrate_db = async (sequelize: Sequelize) => {
       glob: path.resolve('../../packages/commonwealth/server/migrations/*.js'),
       // migration resolver since we use v2 migration interface
       resolve: ({ name, path, context }) => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const migration = require(path!);
         return {
           name,
-          up: async () => migration.up(context, Sequelize),
-          down: async () => migration.down(context, Sequelize),
+          up: async () => {
+            const migration = (await import(path!)).default;
+            return migration.up(context, Sequelize);
+          },
+          down: async () => {
+            const migration = (await import(path!)).default;
+            return migration.down(context, Sequelize);
+          },
         };
       },
     },

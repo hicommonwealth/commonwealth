@@ -63,7 +63,7 @@
     "@openzeppelin/contracts": "^2.4.0",
     "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
     "@osmonauts/lcd": "^0.10.0",
-    "@playwright/test": "^1.31.2",
+    "@playwright/test": "^1.43.1",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@tharsis/address-converter": "^0.1.8",
     "@types/amqplib": "^0.8.2",

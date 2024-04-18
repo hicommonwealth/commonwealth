@@ -17,6 +17,9 @@ import {
 } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
+// handle exceptions thrown in express routes
+import 'express-async-errors';
+
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;

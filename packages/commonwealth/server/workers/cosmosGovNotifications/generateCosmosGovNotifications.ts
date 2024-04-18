@@ -65,7 +65,7 @@ export async function generateCosmosGovNotifications() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
     .then(() => process.exit(0))
     .catch((err) => {

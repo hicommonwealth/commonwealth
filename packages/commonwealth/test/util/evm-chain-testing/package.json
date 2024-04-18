@@ -1,6 +1,7 @@
 {
   "name": "chain-testing",
   "version": "1.0.0",
+  "type": "module",
   "description": "A private blockchain environment with a private chain and transaction/interface abstraction API",
   "main": "index.ts",
   "scripts": {

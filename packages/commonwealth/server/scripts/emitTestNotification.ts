@@ -410,7 +410,7 @@ async function main() {
  * chain-event notification and re-emits it as if it were a brand new notification. Since it replaces an old
  * (but real) notification, it links to a real proposal.
  */
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       process.exit(0);

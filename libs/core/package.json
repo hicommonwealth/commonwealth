@@ -13,9 +13,10 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
+    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "tsx": "^4.7.2",
     "zod": "^3.22.4"
   }
 }
