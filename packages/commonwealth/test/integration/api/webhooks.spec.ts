@@ -176,7 +176,7 @@ describe('Webhook Tests', () => {
       expect(webhookUrls).to.have.length(0);
     });
 
-    it.skip('should fail to delete a non-existent webhook', async () => {
+    it('should fail to delete a non-existent webhook', async () => {
       const webhookUrl = faker.internet.url();
       const errorRes = await chai.request
         .agent(server.app)
@@ -186,7 +186,7 @@ describe('Webhook Tests', () => {
       expectErrorOnResponse(400, Errors.NoWebhookFound, errorRes);
     });
 
-    it.skip('should fail to delete a webhook from non-admin', async () => {
+    it('should fail to delete a webhook from non-admin', async () => {
       const webhookUrl = faker.internet.url();
       await chai.request
         .agent(server.app)

@@ -127,7 +127,7 @@ describe('Thread Patch Update', () => {
       expect(res.body.result.archived).to.not.be.null;
     });
 
-    it.skip('should not allow non-admin to set pinned or spam', async () => {
+    it('should not allow non-admin to set pinned or spam', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
         address: userAddress,

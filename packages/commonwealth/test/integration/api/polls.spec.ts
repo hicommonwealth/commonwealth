@@ -104,7 +104,7 @@ describe('Polls', () => {
     pollId = res.body.result.id;
   });
 
-  it.skip('should fail to cast a vote with invalid option', async () => {
+  it('should fail to cast a vote with invalid option', async () => {
     const data = {
       option: 'optionC',
     };
