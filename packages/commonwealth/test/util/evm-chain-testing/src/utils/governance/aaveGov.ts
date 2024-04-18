@@ -63,7 +63,7 @@ export class aaveGovernor implements IGovernor {
 
   public async queueProposal(
     proposalId: string | number,
-    advanceTime?: boolean | undefined,
+    _advanceTime?: boolean | undefined,
   ): Promise<any> {
     const secs = 3 * 86400;
     const blocks = secs / 12 + 500;
@@ -118,7 +118,7 @@ export class aaveGovernor implements IGovernor {
 
   public async executeProposal(
     proposalId: string | number,
-    advanceTime?: boolean | undefined,
+    _advanceTime?: boolean | undefined,
   ): Promise<any> {
     const secs = 86400;
     const blocks = secs / 12 + 500;
