@@ -16,8 +16,6 @@ import { AckOrNack } from 'rascal';
 import { fileURLToPath } from 'url';
 import { RascalPublications, RascalSubscriptions } from './types';
 
-const __filename = fileURLToPath(import.meta.url);
-
 const BrokerTopicPublicationMap = {
   [BrokerTopics.DiscordListener]: RascalPublications.DiscordListener,
   [BrokerTopics.SnapshotListener]: RascalPublications.SnapshotListener,

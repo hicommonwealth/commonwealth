@@ -4,8 +4,6 @@ import { fileURLToPath } from 'url';
 
 const PING_INTERVAL = 1_000 * 20;
 
-const __filename = fileURLToPath(import.meta.url);
-
 export enum ServiceKey {
   Commonwealth = 'commonwealth',
   CommonwealthConsumer = 'commonwealth-consumer',
