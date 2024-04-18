@@ -3,7 +3,7 @@ import axios from 'axios';
 import app from 'state';
 import RoleInfo from '../../../models/RoleInfo';
 
-type UpgradeRolesProps = {
+type UpgradeRoleProps = {
   onRoleUpdate: (oldRole, newRole) => any;
   newRoleToBeUpgraded: string;
   upgradedUser;
@@ -14,10 +14,10 @@ type RemoveRoleProps = {
   onRoleUpdate: (oldRole, newRole) => void;
 };
 
-const upgradeRoles = async ({
+const upgradeRole = async ({
   upgradedUser,
   newRoleToBeUpgraded,
-}: UpgradeRolesProps) => {
+}: UpgradeRoleProps) => {
   const communityObj = { chain: app.activeChainId() };
   const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
     new_role: newRoleToBeUpgraded,
@@ -48,9 +48,9 @@ const upgradeRoles = async ({
   }
 };
 
-const useUpgradeRolesMutation = ({ onRoleUpdate }: UpgradeRolesProps) => {
+const useUpgradeRoleMutation = ({ onRoleUpdate }: UpgradeRoleProps) => {
   return useMutation({
-    mutationFn: upgradeRoles,
+    mutationFn: upgradeRole,
     onSuccess: (data) => {
       onRoleUpdate(data.upgradedUser, data.newRole);
     },
@@ -85,7 +85,7 @@ const removeRole = async ({ roleToBeDeleted }: RemoveRoleProps) => {
   }
 };
 
-const useRemoveRolesMutation = ({ onRoleUpdate }: RemoveRoleProps) => {
+const useRemoveRoleMutation = ({ onRoleUpdate }: RemoveRoleProps) => {
   return useMutation({
     mutationFn: removeRole,
     onSuccess: async (data) => {
@@ -95,8 +95,8 @@ const useRemoveRolesMutation = ({ onRoleUpdate }: RemoveRoleProps) => {
 };
 
 const updateRoles = {
-  useRemoveRolesMutation,
-  useUpgradeRolesMutation,
+  useRemoveRoleMutation,
+  useUpgradeRoleMutation,
 };
 
 export default updateRoles;

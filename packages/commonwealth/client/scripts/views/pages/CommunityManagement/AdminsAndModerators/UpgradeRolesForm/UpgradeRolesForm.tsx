@@ -41,8 +41,8 @@ export const UpgradeRolesForm = ({
   let newRoleToBeUpgraded;
   const membersRef = useRef();
 
-  const { useUpgradeRolesMutation } = updateRoles;
-  const { mutateAsync: upgradeRole } = useUpgradeRolesMutation({
+  const { useUpgradeRoleMutation } = updateRoles;
+  const { mutateAsync: upgradeRole } = useUpgradeRoleMutation({
     onRoleUpdate,
     newRoleToBeUpgraded,
     upgradedUser,

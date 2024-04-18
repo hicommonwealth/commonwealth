@@ -24,8 +24,8 @@ export const ManageRoles = ({
   const navigate = useCommonNavigate();
 
   let roleToBeDeleted;
-  const { useRemoveRolesMutation } = updateRoles;
-  const { mutateAsync: removeRole } = useRemoveRolesMutation({
+  const { useRemoveRoleMutation } = updateRoles;
+  const { mutateAsync: removeRole } = useRemoveRoleMutation({
     onRoleUpdate,
     roleToBeDeleted,
   });
