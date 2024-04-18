@@ -2,6 +2,7 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import * as community from './community';
+import * as contest from './contest';
 import * as feed from './feed';
 import * as integrations from './integrations';
 import * as thread from './threads';
@@ -14,6 +15,7 @@ const apiV1 = trpc.router({
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
+  contest: contest.trpcRouter,
 });
 export type ApiV1 = typeof apiV1;
 
