@@ -1,2 +1,76 @@
+@import '../../../../../../../../styles/shared';
+
 .ContestLiveStep {
+  margin: 40px auto 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  max-width: 590px;
+
+  @include small {
+    max-width: unset;
+  }
+
+  .img {
+    width: 265px;
+    height: 190px;
+  }
+
+  .content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+
+    .copy-address-input {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 5px 12px;
+      background-color: $neutral-50;
+      border: 1px solid $neutral-200;
+      border-radius: 6px;
+
+      .address {
+        margin-right: 12px;
+        word-break: break-all;
+        text-align: left;
+      }
+    }
+
+    .description {
+      color: $neutral-500;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+
+      @include smallInclusive {
+        gap: 16px;
+      }
+
+      .cta-btn {
+        @include smallInclusive {
+          width: 100%;
+        }
+
+        .Button {
+          width: 287px;
+
+          @include smallInclusive {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
 }
