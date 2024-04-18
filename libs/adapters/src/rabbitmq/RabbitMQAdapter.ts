@@ -11,8 +11,7 @@ import {
 } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
-import * as Rascal from 'rascal';
-import { AckOrNack } from 'rascal';
+import { AckOrNack, default as Rascal } from 'rascal';
 import { fileURLToPath } from 'url';
 import { RascalPublications, RascalSubscriptions } from './types';
 

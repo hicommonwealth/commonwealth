@@ -1,6 +1,11 @@
-import { DataTypes, Model, Sequelize, type BuildOptions } from 'sequelize';
+import {
+  Model,
+  Sequelize,
+  DataTypes as SequelizeDataTypes,
+  type BuildOptions,
+} from 'sequelize';
 
-type ModelFactory<T> = (sequelize: Sequelize, dataTypes: typeof DataTypes) => T;
+type ModelFactory<T> = (sequelize: Sequelize, dataTypes: DataTypes) => T;
 type ModelFactories = Record<string, ModelFactory<unknown>>;
 export type Models<T extends ModelFactories> = {
   [K in keyof T]: ReturnType<T[K]>;
@@ -24,6 +29,22 @@ export type CompositeMap<Parent extends State, Child extends State> = {
   parent: ModelStatic<Model<Parent>>;
   child: ModelStatic<Model<Child>>;
   key: CompositeKey<Parent, Child>;
+};
+
+/**
+ * Reexported DataTypes. Avoids ts build error with `typeof DataTypes`
+ */
+export type DataTypes = {
+  STRING: typeof SequelizeDataTypes.STRING;
+  INTEGER: typeof SequelizeDataTypes.INTEGER;
+  TEXT: typeof SequelizeDataTypes.TEXT;
+  BOOLEAN: typeof SequelizeDataTypes.BOOLEAN;
+  DATE: typeof SequelizeDataTypes.DATE;
+  ARRAY: typeof SequelizeDataTypes.ARRAY;
+  JSON: typeof SequelizeDataTypes.JSON;
+  JSONB: typeof SequelizeDataTypes.JSONB;
+  BIGINT: typeof SequelizeDataTypes.BIGINT;
+  ENUM: typeof SequelizeDataTypes.ENUM;
 };
 
 /**

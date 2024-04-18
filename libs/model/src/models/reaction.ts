@@ -1,11 +1,11 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize/lib/sequelize';
 import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import {
+  DataTypes,
   canvasModelSequelizeColumns,
   type CanvasModelAttributes,
   type ModelInstance,
@@ -38,8 +38,8 @@ export type ReactionInstance = ModelInstance<ReactionAttributes>;
 export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
 export default (
-  sequelize: Sequelize,
-  dataTypes: typeof DataTypes,
+  sequelize: Sequelize.Sequelize,
+  dataTypes: DataTypes,
 ): ReactionModelStatic => {
   const Reaction = <ReactionModelStatic>sequelize.define(
     'Reaction',
