@@ -37,7 +37,6 @@ export const syncDb = async (db: DB, log = false) => {
  * @returns built db model
  */
 export const buildDb = (sequelize: Sequelize): DB => {
-  // build models
   const models = Object.fromEntries(
     Object.entries(Factories).map(([key, factory]) => {
       const model = factory(sequelize, DataTypes);
@@ -47,14 +46,12 @@ export const buildDb = (sequelize: Sequelize): DB => {
   ) as Models<typeof Factories>;
 
   const db = { sequelize, Sequelize, ...models };
-
-  // invoke association hooks
   Object.keys(models).forEach((key) => {
     const model = models[key as keyof typeof Factories];
-    'associate' in model && model.associate(models);
+    'associate' in model && model.associate(db);
   });
 
-  // TODO: proposed pattern to associate models with type safety
+  // Proposed pattern to associate models with type safety
   db.Community.withMany(db.CommunityStake, 'community_id').withMany(
     db.ContestManager,
     'community_id',

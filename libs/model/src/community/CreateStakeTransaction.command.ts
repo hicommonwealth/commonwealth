@@ -53,7 +53,7 @@ export const CreateStakeTransaction: Command<
     }
 
     // TODO: @kurtisassad web3 should be encapsulated behind a protocol service
-    // TODO: @kurtisassad so we can easiliy mock chain actions in unit tests
+    // TODO: @kurtisassad so we can easily mock chain actions in unit tests
     const web3 = new Web3(
       community!.ChainNode!.private_url || community!.ChainNode!.url,
     );
