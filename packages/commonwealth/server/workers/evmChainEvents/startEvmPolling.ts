@@ -1,4 +1,7 @@
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**
@@ -35,7 +38,7 @@ export async function startEvmPolling(
   );
 }
 
-if (require.main === module) {
+if (import.meta.url === import.meta.main) {
   startEvmPolling(120_000).catch((e) => {
     log.error('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
