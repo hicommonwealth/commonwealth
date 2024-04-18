@@ -87,7 +87,7 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
-      const { keypair, address } = server.seeder.generateEthAddress();
+      const { privateKey, address } = server.seeder.generateEthAddress();
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
       let res = await chai
@@ -115,7 +115,6 @@ describe('API Tests', () => {
       const nonce = siwe.generateNonce();
       const domain = 'https://commonwealth.test';
       const siweMessage = createSiweMessage(message, domain, nonce);
-      const privateKey = keypair.getPrivateKey();
       const signatureData = personalSign({ privateKey, data: siweMessage });
       const signature = `${domain}/${nonce}/${signatureData}`;
       res = await chai
