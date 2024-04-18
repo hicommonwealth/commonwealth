@@ -1,11 +1,11 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
-import type { CreateOptions, DataTypes } from 'sequelize';
+import type { CreateOptions } from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
@@ -50,7 +50,7 @@ export type UserModelStatic = ModelStatic<UserInstance> &
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): UserModelStatic => {
   const User = <UserModelStatic>sequelize.define(
     'User',

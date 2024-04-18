@@ -1,9 +1,8 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type StakeTransactionAttributes = z.infer<
   typeof schemas.entities.StakeTransaction
@@ -19,7 +18,7 @@ export type StakeTransactionModelStatic = ModelStatic<StakeTransactionInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): StakeTransactionModelStatic => {
   const StakeTransaction = <StakeTransactionModelStatic>sequelize.define(
     'StakeTransaction',
