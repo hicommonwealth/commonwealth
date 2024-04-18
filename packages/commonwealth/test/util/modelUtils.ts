@@ -166,7 +166,7 @@ const sortedStringify = configureStableStringify({
 
 const generateEthAddress = () => {
   const keypair = ethers.Wallet.createRandom();
-  const lowercaseAddress = `0x${keypair.address.toString()}`;
+  const lowercaseAddress = keypair.address.toString();
   const address = Web3.toChecksumAddress(lowercaseAddress);
   const privateKey = Buffer.from(keypair.privateKey, 'hex');
   return { privateKey, address };
