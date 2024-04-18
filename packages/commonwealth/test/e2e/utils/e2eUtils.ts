@@ -83,9 +83,9 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (ethChainNodeExists[0].length === 0) {
         try {
           await testDb.sequelize.query(`
-        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
         VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}', 1,
-         'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
+         'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)', NOW(), NOW());
     `);
         } catch (e) {
           console.log('ethChainNodeExists ERROR: ', e);
@@ -94,9 +94,9 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         if (polygonChainNodeExists[0].length === 0) {
           try {
             await testDb.sequelize.query(`
-        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
         VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 137,
-        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum', 'Polygon');
+        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum', 'Polygon', NOW(), NOW());
     `);
           } catch (e) {
             console.log('polygonChainNodeExists ERROR: ', e);
