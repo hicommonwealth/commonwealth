@@ -173,7 +173,7 @@ const generateEthAddress = () => {
 };
 
 export type ModelSeeder = {
-  generateEthAddress: () => { address: string };
+  generateEthAddress: () => { privateKey: Buffer; address: string };
   getTopicId: (args: { chain: string }) => Promise<string>;
   createAndVerifyAddress: (
     args: { chain: string },
