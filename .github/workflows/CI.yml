@@ -341,7 +341,7 @@ jobs:
       - name: Assert yarn.lock is correct
         run: |
           if ! git diff --quiet; then
-            echo 'You need to update the yarn.lock file'
+            echo 'You need to update the yarn.lock file (potentially after running: yarn global add node-gyp)'
             exit 1
           fi
 
@@ -354,8 +354,8 @@ jobs:
         run: yarn lint-branch
 
       # To disable eslint-diff just comment the following two lines
-      - name: Run eslint-diff
-        run: yarn workspace commonwealth run lint-diff
+      #- name: Run eslint-diff
+      #  run: yarn workspace commonwealth run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: yarn workspace commonwealth run lint-diff-canary
