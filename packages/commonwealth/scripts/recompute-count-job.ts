@@ -147,8 +147,7 @@ export async function recomputeCounts(
   });
 }
 
-const isMainModule = import.meta.url.endsWith(process.argv[1]);
-if (isMainModule) {
+if (import.meta.url.endsWith(process.argv[1])) {
   console.log('recompute job started');
   recomputeCounts(console.log)
     .then(() => {

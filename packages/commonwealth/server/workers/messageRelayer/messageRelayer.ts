@@ -63,7 +63,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   return relayForever(maxRelayIterations);
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   startMessageRelayer().catch((err) => {
     log.fatal(
       'Unknown error fatal requires immediate attention. Restart REQUIRED!',

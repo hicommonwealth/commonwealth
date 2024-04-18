@@ -193,7 +193,7 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       log.info('Success');
