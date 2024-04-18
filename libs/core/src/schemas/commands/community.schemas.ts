@@ -108,3 +108,13 @@ export const GenerateStakeholderGroups = {
     created: z.boolean(),
   }),
 };
+
+export const ImportDiscourseCommunity = {
+  input: z.object({
+    communityId: z.string(),
+    base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
+    accountsClaimable: z.boolean(),
+    dumpData: z.string(),
+  }),
+  output: z.object({}),
+};

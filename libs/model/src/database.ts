@@ -33,3 +33,21 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 });
 
 export const models = buildDb(sequelize);
+
+export const createDiscourseDBConnection = (databaseUri: string) => {
+  return new Sequelize(databaseUri, {
+    logging: (msg) => {
+      log.trace(msg);
+    },
+    dialectOptions: {
+      requestTimeout: 40_000,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
+    pool: {
+      max: 3,
+      min: 0,
+    },
+  });
+};
