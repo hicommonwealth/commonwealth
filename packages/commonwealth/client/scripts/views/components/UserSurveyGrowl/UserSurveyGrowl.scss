@@ -4,54 +4,76 @@
   display: flex;
   flex-direction: column;
   background-color: $white;
-  align-self: flex-end;
-  cursor: pointer;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  z-index: 200;
-  display: flex;
-  width: 320px;
-  padding: 0 20px 28px 20px;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
+  cursor: pointer;
+  border-bottom-left-radius: 0.3125rem;
+  border-bottom-right-radius: 0.3125rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.5);
 
-  .image-button {
+  .closeButton {
+    align-self: flex-end;
+    cursor: pointer;
+    position: absolute;
+    color: $white;
+    top: 1rem;
+    right: 0rem;
+    z-index: 2;
+
+    &:hover {
+      color: $neutral-400;
+    }
+  }
+
+  .img {
     width: 320px;
     height: 200px;
     margin-bottom: 8px;
     cursor: default;
-    border-radius: 10px 10px 0 0;
+    border-top-left-radius: 0.3125rem;
+    border-top-right-radius: 0.3125rem;
+    overflow: hidden;
     background-color: $black;
-
-    .img {
-      width: 240px;
-      height: 167.379px;
-      position: absolute;
-      right: 0;
-      margin-top: 20px;
-    }
-    .close-button {
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      top: 0;
-      right: 0;
-      margin: 8px;
-      color: $white;
-      z-index: 201;
-    }
+    z-index: 1;
   }
-  .discord-link {
-    text-decoration: none;
 
-    &:hover {
-      text-decoration: none;
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    gap: 1rem;
+    cursor: default;
+
+    .subtitle-text {
+      margin-top: -12px;
+    }
+
+    .body {
+      color: $neutral-600;
+      font-weight: 400;
     }
   }
 
-  .checkbox-text {
-    color: $neutral-500;
-    font-weight: 400;
+  .icon {
+    align-self: center;
+    padding-left: 6px;
+  }
+
+  .checkboxContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 20px;
+
+    .checkbox {
+      cursor: pointer;
+      color: $neutral-400;
+    }
   }
 }

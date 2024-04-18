@@ -33,62 +33,66 @@ export const UserSurveyGrowl = () => {
   return (
     <CWGrowl disabled={isDisabled} position="bottom-right">
       <div className="UserSurveyGrowl">
-        <div className="image-button">
-          <CWIconButton
-            iconName="close"
-            iconSize="medium"
-            className="close-button"
-            onClick={handleExit}
-          />
-          <img src="/static/img/userSurveyGrowlImage.svg" className="img" />
-        </div>
-        <CWText type="h2" fontWeight="bold" isCentered>
-          Complete our survey and get a free NFT!
-        </CWText>
-        <CWText type="b1" fontWeight="medium" isCentered className="body">
-          We’d like to get to know you better! Take our 2 minute audience
-          survey, and we can build Common’s future together.
-        </CWText>
-        <CWButton
-          className="user-survey-button"
-          buttonType="primary"
-          buttonHeight="med"
-          label=" Complete Survey"
-          onClick={(e) => {
-            e.preventDefault();
-            window.open('https://bit.ly/CMNSRVY', '_blank');
-          }}
+        <CWIconButton
+          iconName="close"
+          iconSize="medium"
+          className="closeButton"
+          onClick={handleExit}
         />
-        <CWText type="caption" fontWeight="regular" isCentered className="body">
-          Have more feedback? Reach out to us on Discord!
-        </CWText>
-        <a
-          href="https://discord.com/channels/799041511165394986/1099034105997426709"
-          target="_blank"
-          rel="noreferrer"
-          style={{ textDecoration: 'none' }}
-        >
-          <CWText
-            className="discord-link"
-            type="b1"
-            fontWeight="link"
-            isCentered
-          >
-            Open Discord
-            <CWIcon
-              iconName="arrowSquareOut"
-              iconSize="medium"
-              className="icon"
-            />
+        <img
+          src="/static/img/userSurveyGrowlImage.svg"
+          alt=""
+          className="img"
+        />
+        <div className="container">
+          <CWText type="h2" fontWeight="bold" isCentered>
+            Complete our survey and get a free NFT!
           </CWText>
-        </a>
+          <CWText type="b1" fontWeight="medium" isCentered className="body">
+            We’d like to get to know you better! Take our 2 minute audience
+            survey, and we can build Common’s future together.
+          </CWText>
+          <CWButton
+            className="CalenderButton"
+            buttonType="primary"
+            buttonHeight="med"
+            label="Complete Survey"
+            onClick={(e) => {
+              e.preventDefault();
+              window.open('https://bit.ly/CMNSRVY', '_blank');
+            }}
+          />
+          <CWText type="b2" fontWeight="regular" isCentered className="body">
+            Have more feedback? Reach out to us on Discord!
+          </CWText>
+          <a
+            href="https://discord.com/channels/799041511165394986/1099034105997426709"
+            target="_blank"
+            rel="noreferrer"
+            style={{ textDecoration: 'none' }}
+          >
+            <CWText
+              type="b1"
+              fontWeight="link"
+              isCentered
+              className="discordLink"
+            >
+              Open Discord
+              <CWIcon
+                iconName="arrowSquareOut"
+                iconSize="medium"
+                className="icon"
+              />
+            </CWText>
+          </a>
+        </div>
         <div className="checkboxContainer">
           <CWCheckbox
-            labelClassName="checkbox-text"
-            label="Please don't show this again"
             onChange={() =>
               setShouldHideGrowlPermanently(!shouldHideGrowlPermanently)
             }
+            label="Please don't show this again"
+            labelClassName="checkbox"
           />
         </div>
       </div>
