@@ -39,6 +39,14 @@
       right: 0;
       margin: 8px;
       color: $white;
+      z-index: 201;
+    }
+  }
+  .discord-link {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
     }
   }
 

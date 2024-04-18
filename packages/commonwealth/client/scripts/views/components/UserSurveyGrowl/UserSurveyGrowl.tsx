@@ -8,7 +8,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import './UserSurveyGrowl.scss';
 
-const LOCALSTORAGE_USER_SURVEY_GROWL_KEY = 'stakeGrowlHidden';
+const LOCALSTORAGE_USER_SURVEY_GROWL_KEY = 'userSurveyGrowlHidden';
 
 export const UserSurveyGrowl = () => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
@@ -66,8 +66,14 @@ export const UserSurveyGrowl = () => {
           href="https://discord.com/channels/799041511165394986/1099034105997426709"
           target="_blank"
           rel="noreferrer"
+          style={{ textDecoration: 'none' }}
         >
-          <CWText type="b1" fontWeight="link" isCentered className="learnMore">
+          <CWText
+            className="discord-link"
+            type="b1"
+            fontWeight="link"
+            isCentered
+          >
             Open Discord
             <CWIcon
               iconName="arrowSquareOut"
