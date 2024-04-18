@@ -1,3 +1,4 @@
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
@@ -65,7 +66,10 @@ export async function generateCosmosGovNotifications() {
 
 if (require.main === module) {
   generateCosmosGovNotifications()
-    .then(() => process.exit(0))
+    .then(() => {
+      process.exit(0);
+      stats().increment('cw.scheduler.send-cosmos-notifs');
+    })
     .catch((err) => {
       log.error(err);
       process.exit(1);

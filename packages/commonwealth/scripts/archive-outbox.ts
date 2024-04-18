@@ -1,3 +1,4 @@
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
@@ -195,6 +196,7 @@ if (require.main === module) {
   main()
     .then(() => {
       log.info('Success');
+      stats().increment('cw.scheduler.send-cosmos-notifs');
       process.exit(0);
     })
     .catch((err) => {
