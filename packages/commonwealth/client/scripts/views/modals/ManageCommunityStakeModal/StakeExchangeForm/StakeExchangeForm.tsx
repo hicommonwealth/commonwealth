@@ -131,6 +131,9 @@ const StakeExchangeForm = ({
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,
+        ...(community?.ChainNode?.ethChainId && {
+          chainId: `${community.ChainNode.ethChainId}`,
+        }),
       });
 
       await createStakeTransaction.mutateAsync({

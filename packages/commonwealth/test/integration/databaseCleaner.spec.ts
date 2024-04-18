@@ -177,7 +177,7 @@ describe('DatabaseCleaner Tests', async () => {
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
       // create old user and address
-      const oldUser = await models.User.createWithProfile(models, {
+      const oldUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
       });
@@ -190,7 +190,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new user and address
-      const newUser = await models.User.createWithProfile(models, {
+      const newUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
       });
