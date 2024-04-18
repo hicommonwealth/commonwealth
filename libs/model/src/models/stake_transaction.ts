@@ -51,16 +51,5 @@ export default (
     },
   );
 
-  StakeTransaction.associate = (models) => {
-    models.StakeTransaction.belongsTo(models.CommunityStake, {
-      foreignKey: 'community_id',
-      targetKey: 'community_id',
-    });
-    models.StakeTransaction.belongsTo(models.CommunityStake, {
-      foreignKey: 'stake_id',
-      targetKey: 'stake_id',
-    });
-  };
-
   return StakeTransaction;
 };
