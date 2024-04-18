@@ -1,4 +1,5 @@
-import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';
@@ -9,7 +10,7 @@ export const Errors = {
   SlackWebhookError: 'SLACK_FEEDBACK_WEBHOOK missing.',
 };
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const sendFeedback = async (
   models: DB,

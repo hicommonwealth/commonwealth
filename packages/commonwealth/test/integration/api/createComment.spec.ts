@@ -5,7 +5,8 @@ import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
-import Chance = require('chance');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Chance = require('chance');
 
 chai.use(chaiHttp);
 const chance = new Chance();

@@ -2,13 +2,15 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityCategoryType,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
+import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   default as ChainInfo,
   default as CommunityInfo,
@@ -16,16 +18,15 @@ import {
 import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
 import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import { CommunityData } from './DirectoryPage/DirectoryPageContent';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -59,6 +60,7 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 const STAKE_FILTER_KEY = 'Stake';
 
 const CommunitiesPage = () => {
+  useUserLoggedIn();
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap(),
   );
@@ -67,9 +69,8 @@ const CommunitiesPage = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
-  const [selectedCommunity, setSelectedCommunity] = React.useState<
-    ChainInfo | CommunityData
-  >(null);
+  const [selectedCommunity, setSelectedCommunity] =
+    React.useState<ChainInfo>(null);
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
@@ -176,12 +177,18 @@ const CommunitiesPage = () => {
         return threadCountB - threadCountA;
       })
       .map((community: CommunityInfo, i) => {
+        // allow user to buy stake if they have a connected address that matches this community's base chain
+        const canBuyStake = !!app?.user?.addresses?.find?.(
+          (address) => address?.community?.base === community?.base,
+        );
+
         return (
           <CWRelatedCommunityCard
             key={i}
             community={community}
             memberCount={community.addressCount}
             threadCount={community.threadCount}
+            canBuyStake={canBuyStake}
             onStakeBtnClick={() => setSelectedCommunity(community)}
             ethUsdRate={ethUsdRate}
             historicalPrice={historicalPriceMap?.get(community.id)}
@@ -204,98 +211,96 @@ const CommunitiesPage = () => {
     : [];
 
   return (
-    <div className="CommunitiesPage">
-      <div className="header-section">
-        <div className="description">
-          <CWText type="h2" fontWeight="semiBold">
-            Explore communities
-          </CWText>
-          <div className="actions">
-            <CWText type="caption" className="communities-count">
-              {activeCommunities &&
-                buildCommunityString(activeCommunities.totalCommunitiesCount)}
+    <CWPageLayout>
+      <div className="CommunitiesPage">
+        <div className="header-section">
+          <div className="description">
+            <CWText type="h2" fontWeight="semiBold">
+              Explore communities
             </CWText>
-            <CreateCommunityButton />
+            <div className="actions">
+              <CWText type="caption" className="communities-count">
+                {activeCommunities &&
+                  buildCommunityString(activeCommunities.totalCommunitiesCount)}
+              </CWText>
+              <CreateCommunityButton />
+            </div>
+          </div>
+          <div className="filters">
+            <CWIcon iconName="funnelSimple" />
+            <CWButton
+              label={STAKE_FILTER_KEY}
+              buttonHeight="sm"
+              buttonType={filterMap[STAKE_FILTER_KEY] ? 'primary' : 'secondary'}
+              onClick={() => {
+                handleSetFilterMap(STAKE_FILTER_KEY);
+              }}
+              iconLeft="coins"
+            />
+            <CWDivider isVertical />
+            {communityCategories.map((cat, i) => {
+              return (
+                <CWButton
+                  key={i}
+                  label={cat}
+                  buttonHeight="sm"
+                  buttonType={filterMap[cat] ? 'primary' : 'secondary'}
+                  onClick={() => {
+                    handleSetFilterMap(cat);
+                  }}
+                />
+              );
+            })}
+            {communityNetworks.map((network, i) => {
+              return (
+                <CWButton
+                  key={i}
+                  label={network}
+                  buttonHeight="sm"
+                  buttonType={filterMap[network] ? 'primary' : 'secondary'}
+                  onClick={() => {
+                    handleSetFilterMap(network);
+                  }}
+                />
+              );
+            })}
+            {communityBases.map((base, i) => {
+              return (
+                <CWButton
+                  key={i}
+                  label={base}
+                  buttonHeight="sm"
+                  buttonType={filterMap[base] ? 'primary' : 'secondary'}
+                  onClick={() => {
+                    handleSetFilterMap(base);
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
-        <div className="filters">
-          <CWIcon iconName="funnelSimple" />
-          <CWButton
-            label={STAKE_FILTER_KEY}
-            buttonType={
-              filterMap[STAKE_FILTER_KEY] ? 'primary-black' : 'secondary-black'
-            }
-            onClick={() => {
-              handleSetFilterMap(STAKE_FILTER_KEY);
-            }}
-            iconLeft="coins"
-          />
-          <CWDivider isVertical />
-          {communityCategories.map((cat, i) => {
-            return (
-              <CWButton
-                key={i}
-                label={cat}
-                buttonType={
-                  filterMap[cat] ? 'primary-black' : 'secondary-black'
-                }
-                onClick={() => {
-                  handleSetFilterMap(cat);
-                }}
-              />
-            );
-          })}
-          {communityNetworks.map((network, i) => {
-            return (
-              <CWButton
-                key={i}
-                label={network}
-                buttonType={
-                  filterMap[network] ? 'primary-black' : 'secondary-black'
-                }
-                onClick={() => {
-                  handleSetFilterMap(network);
-                }}
-              />
-            );
-          })}
-          {communityBases.map((base, i) => {
-            return (
-              <CWButton
-                key={i}
-                label={base}
-                buttonType={
-                  filterMap[base] ? 'primary-black' : 'secondary-black'
-                }
-                onClick={() => {
-                  handleSetFilterMap(base);
-                }}
-              />
-            );
-          })}
-        </div>
+        {isLoading ? (
+          <CWCircleMultiplySpinner />
+        ) : (
+          <div className="communities-list">
+            {sortedCommunities}
+            <NewCommunityCard />
+          </div>
+        )}
+        <CWModal
+          size="small"
+          content={
+            <ManageCommunityStakeModal
+              mode={modeOfManageCommunityStakeModal}
+              onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+              community={selectedCommunity}
+            />
+          }
+          onClose={() => setModeOfManageCommunityStakeModal(null)}
+          open={!!modeOfManageCommunityStakeModal}
+        />
       </div>
-      {isLoading ? (
-        <CWCircleMultiplySpinner />
-      ) : (
-        <div className="communities-list">
-          {sortedCommunities}
-          <NewCommunityCard />
-        </div>
-      )}
-      <CWModal
-        size="small"
-        content={
-          <ManageCommunityStakeModal
-            mode={modeOfManageCommunityStakeModal}
-            onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-            community={selectedCommunity}
-          />
-        }
-        onClose={() => setModeOfManageCommunityStakeModal(null)}
-        open={!!modeOfManageCommunityStakeModal}
-      />
-    </div>
+    </CWPageLayout>
   );
 };
 

@@ -1,4 +1,4 @@
-import { AppError, NotificationCategories } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import {
   CommentInstance,
@@ -6,6 +6,7 @@ import {
   SubscriptionAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';

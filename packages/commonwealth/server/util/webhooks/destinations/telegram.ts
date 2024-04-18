@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import request from 'superagent';
 import { SERVER_URL, TELEGRAM_BOT_TOKEN } from '../../../config';
 import {

@@ -12,7 +12,7 @@ import { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';

@@ -1,10 +1,10 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import { groupBy } from 'lodash';
 import { QueryTypes } from 'sequelize';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 type UniqueAddresses = {
   thread_id: number;

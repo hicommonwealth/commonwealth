@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
@@ -12,11 +12,11 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import {
   BaseMixpanelPayload,
@@ -28,6 +28,7 @@ import './BasicInformationForm.scss';
 import {
   BASE_ID,
   BLAST_ID,
+  ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   existingCommunityIds,
@@ -112,9 +113,15 @@ const BasicInformationForm = ({
 
   const getInitialValue = () => {
     switch (selectedCommunity.type) {
-      case CommunityType.Ethereum:
+      case CommunityType.Base:
         return {
           chain: getChainOptions()?.find((o) => o.value === BASE_ID),
+        };
+      case CommunityType.Ethereum:
+        return {
+          chain: getChainOptions()?.find(
+            (o) => o.value === ETHEREUM_MAINNET_ID,
+          ),
         };
       case CommunityType.Cosmos:
         return {

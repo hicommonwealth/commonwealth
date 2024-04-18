@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -9,7 +9,7 @@ import { useEditThreadMutation } from 'state/api/threads';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';

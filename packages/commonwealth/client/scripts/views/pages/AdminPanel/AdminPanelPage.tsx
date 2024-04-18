@@ -2,6 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/AdminPanel.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import UpdateCommunityIdTask from 'views/pages/AdminPanel/UpdateCommunityIdTask';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -23,18 +24,20 @@ const AdminPanelPage = () => {
   }, [navigate]);
 
   return (
-    <div className="AdminPanel">
-      <CWText type="h2">Site Analytics</CWText>
-      <Analytics />
-      <CWDivider />
-      <CWText type="h2">Site Admin Tasks</CWText>
-      <DeleteChainTask />
-      <UpdateCommunityIdTask />
-      <DownloadMembersListTask />
-      <RPCEndpointTask />
-      <MakeSiteAdminTask />
-      <TopUsers />
-    </div>
+    <CWPageLayout>
+      <div className="AdminPanel">
+        <CWText type="h2">Site Analytics</CWText>
+        <Analytics />
+        <CWDivider />
+        <CWText type="h2">Site Admin Tasks</CWText>
+        <DeleteChainTask />
+        <UpdateCommunityIdTask />
+        <DownloadMembersListTask />
+        <RPCEndpointTask />
+        <MakeSiteAdminTask />
+        <TopUsers />
+      </div>
+    </CWPageLayout>
   );
 };
 

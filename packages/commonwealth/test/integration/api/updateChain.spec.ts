@@ -1,4 +1,4 @@
-import { ChainBase, ChainType, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import {
   tester,
   tokenBalanceCache,
@@ -6,6 +6,7 @@ import {
   type DB,
   type UserInstance,
 } from '@hicommonwealth/model';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { assert } from 'chai';
 import Sinon from 'sinon';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
