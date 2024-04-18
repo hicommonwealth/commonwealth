@@ -7,6 +7,8 @@ import CWDrawer, {
 
 import FundContestForm from './FundContestForm';
 
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './FundContestDrawer.scss';
 
 interface FundContestDrawerProps {
@@ -14,6 +16,21 @@ interface FundContestDrawerProps {
   onClose: () => void;
   contestAddress: string;
 }
+
+const fakeApiCall = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const randomNum = Math.random();
+      if (randomNum < 0.5) {
+        resolve('API call successful');
+      } else {
+        reject(new Error('API call failed'));
+      }
+    }, 2000);
+  });
+};
+
+export type FundContestStep = 'Form' | 'Loading' | 'Success' | 'Failure';
 
 const FundContestDrawer = ({
   isOpen,
@@ -30,6 +47,8 @@ const FundContestDrawer = ({
     label: app.user.activeAccount.address,
   };
 
+  const [fundContestDrawerStep, setFundContestDrawerStep] =
+    useState<FundContestStep>('Form');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
   const [amountEth, setAmountEth] = useState('0');
 
@@ -50,15 +69,22 @@ const FundContestDrawer = ({
     setAmountEth(e.target.value);
   };
 
-  const handleTransferFunds = () => {
-    console.log('transfer funds');
+  // write fake api call that uses math random and sometimes throws an error and sometimes succeeds
+
+  const handleTransferFunds = async () => {
+    try {
+      setFundContestDrawerStep('Loading');
+      await fakeApiCall();
+      setFundContestDrawerStep('Success');
+    } catch (err) {
+      setFundContestDrawerStep('Failure');
+    }
   };
 
-  return (
-    <div className="FundContestDrawer">
-      <CWDrawer open={isOpen} onClose={onClose}>
-        <CWDrawerTopBar onClose={onClose} />
-        <div className="fund-contest-drawer-container">
+  const getCurrentStep = () => {
+    switch (fundContestDrawerStep) {
+      case 'Form':
+        return (
           <FundContestForm
             onClose={onClose}
             handleTransferFunds={handleTransferFunds}
@@ -77,7 +103,43 @@ const FundContestDrawer = ({
             transferFeesInUsd={transferFeesInUsd}
             contestAddress={contestAddress}
           />
-        </div>
+        );
+
+      case 'Loading':
+        return (
+          <div>
+            <CWCircleMultiplySpinner />
+          </div>
+        );
+
+      case 'Failure':
+        return (
+          <div>
+            <CWButton
+              label="Try again"
+              onClick={() => setFundContestDrawerStep('Form')}
+            />
+          </div>
+        );
+
+      case 'Success':
+        return (
+          <div>
+            <CWButton label="Close" onClick={onClose} buttonType="secondary" />
+            <CWButton
+              label="View transactions"
+              onClick={() => window.open('https://etherscan.io', '_blank')}
+            />
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="FundContestDrawer">
+      <CWDrawer open={isOpen} onClose={onClose}>
+        <CWDrawerTopBar onClose={onClose} />
+        <div className="fund-contest-drawer-container">{getCurrentStep()}</div>
       </CWDrawer>
     </div>
   );
