@@ -1,7 +1,6 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import useWallets from 'client/scripts/hooks/useWallets';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import app from 'state';
 import AuthButton from '../../../components/AuthButton';
 import {
@@ -9,12 +8,6 @@ import {
   AuthWallets,
   EVMWallets,
 } from '../../../components/AuthButton/types';
-import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../../../components/component_kit/cw_text';
-import {
-  CWModalBody,
-  CWModalFooter,
-} from '../../../components/component_kit/new_designs/CWModal';
 import {
   CWTab,
   CWTabsRow,
@@ -22,10 +15,15 @@ import {
 import { EVMWalletsSubModal } from '../EVMWalletsSubModal';
 import { EmailForm } from '../EmailForm';
 import { MobileWalletConfirmationSubModal } from '../MobileWalletConfirmationSubModal';
-import { AuthModalTabs, BaseModalProps } from '../types';
-import './BaseModal.scss';
+import { ModalLayout } from '../common/ModalLayout';
+import { AuthModalTabs, SignInModalProps } from '../types';
+import './SignInModal.scss';
 
-const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
+const SignInModal = ({
+  onClose,
+  onSuccess,
+  showWalletsFor,
+}: SignInModalProps) => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
     useState(false);
@@ -154,71 +152,58 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
 
   return (
     <>
-      <section className="BaseModal">
-        <CWIcon iconName="close" onClick={handleClose} className="close-btn" />
+      <ModalLayout
+        onClose={handleClose}
+        type="sign-in"
+        body={
+          <>
+            <CWTabsRow className="tabs">
+              {tabsList.map((tab, index) => (
+                <CWTab
+                  key={tab.name}
+                  label={tab.name}
+                  isDisabled={isMagicLoading}
+                  isSelected={tabsList[activeTabIndex].name === tab.name}
+                  onClick={() => setActiveTabIndex(index)}
+                />
+              ))}
+            </CWTabsRow>
 
-        <img src="/static/img/branding/common-logo.svg" className="logo" />
+            <section className="auth-options">
+              {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}
+              {activeTabIndex === 0 &&
+                tabsList[activeTabIndex].options.length === 0 && (
+                  <AuthButton type="NO_WALLETS_FOUND" />
+                )}
 
-        <CWText type="h2" className="header" isCentered>
-          Sign into Common
-        </CWText>
-
-        <CWModalBody className="content">
-          <CWTabsRow className="tabs">
-            {tabsList.map((tab, index) => (
-              <CWTab
-                key={tab.name}
-                label={tab.name}
-                isDisabled={isMagicLoading}
-                isSelected={tabsList[activeTabIndex].name === tab.name}
-                onClick={() => setActiveTabIndex(index)}
-              />
-            ))}
-          </CWTabsRow>
-
-          <section className="auth-options">
-            {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}
-            {activeTabIndex === 0 &&
-              tabsList[activeTabIndex].options.length === 0 && (
-                <AuthButton type="NO_WALLETS_FOUND" />
-              )}
-
-            {/*
+              {/*
               If email option is selected don't render SSO's list,
               else render wallets/SSO's list based on activeTabIndex
             */}
-            {(activeTabIndex === 0 ||
-              (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
-              tabsList[activeTabIndex].options.map((option, key) => (
-                <AuthButton
-                  key={key}
-                  type={option}
-                  disabled={isMagicLoading}
-                  onClick={async () => await onAuthMethodSelect(option)}
+              {(activeTabIndex === 0 ||
+                (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
+                tabsList[activeTabIndex].options.map((option, key) => (
+                  <AuthButton
+                    key={key}
+                    type={option}
+                    disabled={isMagicLoading}
+                    onClick={async () => await onAuthMethodSelect(option)}
+                  />
+                ))}
+
+              {/* If email option is selected from the SSO's list, show email form */}
+              {activeTabIndex === 1 && isAuthenticatingWithEmail && (
+                <EmailForm
+                  isLoading={isMagicLoading}
+                  onCancel={() => setIsAuthenticatingWithEmail(false)}
+                  onSubmit={async ({ email }) => await onEmailLogin(email)}
                 />
-              ))}
-
-            {/* If email option is selected from the SSO's list, show email form */}
-            {activeTabIndex === 1 && isAuthenticatingWithEmail && (
-              <EmailForm
-                isLoading={isMagicLoading}
-                onCancel={() => setIsAuthenticatingWithEmail(false)}
-                onSubmit={async ({ email }) => await onEmailLogin(email)}
-              />
-            )}
-          </section>
-        </CWModalBody>
-
-        <CWModalFooter className="footer">
-          <CWText isCentered>
-            By connecting to Common you agree to our&nbsp;
-            <br />
-            <Link to="/terms">Terms of Service</Link>
-            &nbsp;and&nbsp;
-            <Link to="/privacy">Privacy Policy</Link>
-          </CWText>
-        </CWModalFooter>
-      </section>
+              )}
+            </section>
+          </>
+        }
+        bodyClassName="SignInModal"
+      />
       <EVMWalletsSubModal
         availableWallets={
           [
@@ -246,4 +231,4 @@ const BaseModal = ({ onClose, onSuccess, showWalletsFor }: BaseModalProps) => {
   );
 };
 
-export { BaseModal };
+export { SignInModal };
