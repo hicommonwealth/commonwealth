@@ -59,7 +59,7 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        const user = await models.User.createWithProfile(models, {
+        const user = await models.User.createWithProfile({
           email: null,
         });
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
