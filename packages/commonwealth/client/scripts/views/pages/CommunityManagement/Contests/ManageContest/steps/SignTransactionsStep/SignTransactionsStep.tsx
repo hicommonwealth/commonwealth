@@ -16,46 +16,49 @@ import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
+  isDirectDepositSelected: boolean;
 }
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
+  isDirectDepositSelected,
 }: SignTransactionsStepProps) => {
   // TODO all the logic here is temporary, it will be moved to react-query
   // when hooking up with the backend/protocol layer
-  const [launchContestOnchainData, setLaunchContestOnchainData] = useState({
+  const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
     errorText: '',
   });
 
-  const [rerouteCommunityStakeFeesData, setRerouteCommunityStakeFeesData] =
+  const [launchContestAndRerouteFeesData, setLaunchContestAndRerouteFeesData] =
     useState({
       state: 'not-started' as ActionStepProps['state'],
       errorText: '',
     });
 
-  const handleLaunchContestOnchain = () => {
-    setLaunchContestOnchainData((prevState) => ({
+  const handleLaunchContest = () => {
+    setLaunchContestData((prevState) => ({
       ...prevState,
       state: 'loading',
     }));
 
     setTimeout(() => {
-      setLaunchContestOnchainData((prevState) => ({
+      setLaunchContestData((prevState) => ({
         ...prevState,
         state: 'completed',
       }));
+      onSetLaunchContestStep('ContestLive');
     }, 2000);
   };
 
-  const handleRerouteCommunityStakeFees = () => {
-    setRerouteCommunityStakeFeesData((prevState) => ({
+  const handleLaunchContestAndRerouteFees = () => {
+    setLaunchContestAndRerouteFeesData((prevState) => ({
       ...prevState,
       state: 'loading',
     }));
 
     setTimeout(() => {
-      setRerouteCommunityStakeFeesData((prevState) => ({
+      setLaunchContestAndRerouteFeesData((prevState) => ({
         ...prevState,
         state: 'completed',
       }));
@@ -68,42 +71,44 @@ const SignTransactionsStep = ({
   };
 
   const getActionSteps = (): ActionStepsProps['steps'] => {
-    return [
-      {
-        label: 'Launch contest onchain',
-        state: launchContestOnchainData.state,
-        errorText: launchContestOnchainData.errorText,
-        actionButton: {
-          label:
-            launchContestOnchainData.state === 'completed' ? 'Signed' : 'Sign',
-          disabled:
-            launchContestOnchainData.state === 'loading' ||
-            launchContestOnchainData.state === 'completed',
-          onClick: handleLaunchContestOnchain,
-        },
-      },
-      {
-        label: 'Re-route Community Stake fees',
-        state: rerouteCommunityStakeFeesData.state,
-        errorText: rerouteCommunityStakeFeesData.errorText,
-        ...(launchContestOnchainData.state === 'completed'
-          ? {
-              actionButton: {
-                label: 'Sign',
-                disabled:
-                  rerouteCommunityStakeFeesData.state === 'loading' ||
-                  rerouteCommunityStakeFeesData.state === 'completed',
-                onClick: handleRerouteCommunityStakeFees,
-              },
-            }
-          : {}),
-      },
-    ];
+    return isDirectDepositSelected
+      ? [
+          {
+            label: 'Launch contest',
+            state: launchContestData.state,
+            errorText: launchContestData.errorText,
+            actionButton: {
+              label:
+                launchContestData.state === 'completed' ? 'Signed' : 'Sign',
+              disabled:
+                launchContestData.state === 'loading' ||
+                launchContestData.state === 'completed',
+              onClick: handleLaunchContest,
+            },
+          },
+        ]
+      : [
+          {
+            label: 'Launch contest & re-route fees',
+            state: launchContestAndRerouteFeesData.state,
+            errorText: launchContestAndRerouteFeesData.errorText,
+            actionButton: {
+              label:
+                launchContestAndRerouteFeesData.state === 'completed'
+                  ? 'Signed'
+                  : 'Sign',
+              disabled:
+                launchContestAndRerouteFeesData.state === 'loading' ||
+                launchContestAndRerouteFeesData.state === 'completed',
+              onClick: handleLaunchContestAndRerouteFees,
+            },
+          },
+        ];
   };
 
   const cancelDisabled =
-    launchContestOnchainData.state === 'loading' ||
-    rerouteCommunityStakeFeesData.state === 'loading';
+    launchContestData.state === 'loading' ||
+    launchContestAndRerouteFeesData.state === 'loading';
 
   return (
     <CWPageLayout>
