@@ -19,8 +19,8 @@ export type CommunityStakeModelStatic = ModelStatic<CommunityStakeInstance>;
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): CommunityStakeModelStatic => {
-  const CommunityStake = <CommunityStakeModelStatic>sequelize.define(
+): CommunityStakeModelStatic =>
+  <CommunityStakeModelStatic>sequelize.define<CommunityStakeInstance>(
     'CommunityStakes',
     {
       community_id: {
@@ -48,13 +48,3 @@ export default (
       indexes: [{ fields: ['community_id'] }, { fields: ['stake_id'] }],
     },
   );
-
-  CommunityStake.associate = (models) => {
-    models.CommunityStake.belongsTo(models.Community, {
-      foreignKey: { name: 'community_id' },
-      targetKey: 'id',
-    });
-  };
-
-  return CommunityStake;
-};
