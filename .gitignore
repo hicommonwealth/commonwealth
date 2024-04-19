@@ -14,4 +14,4 @@ redis-data
 **/.nyc_output
 **/dependency-graph.svg
 *dump.sql
-.ghostel
+.ghostal

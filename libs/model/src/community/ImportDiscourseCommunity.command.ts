@@ -1,4 +1,5 @@
 import { schemas, type Command } from '@hicommonwealth/core';
+import { Sequelize } from 'sequelize';
 import { URL } from 'url';
 import { DATABASE_URI } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
@@ -11,8 +12,13 @@ import {
   createAllSubscriptionsInCW,
   createAllThreadsInCW,
   createAllUsersInCW,
-  streamDumpImport,
+  importDump,
 } from '../services/discourseImport';
+
+type CleanupFn = {
+  description: string;
+  fn: () => Promise<void>;
+};
 
 export const ImportDiscourseCommunity: Command<
   typeof schemas.commands.ImportDiscourseCommunity
@@ -22,44 +28,105 @@ export const ImportDiscourseCommunity: Command<
     /* TODO: isSuperAdmin() */
   ],
   body: async ({ id, payload }) => {
+    // TODO: use global lock to limit concurrency on this command?
+
     const { id: communityId, base, accountsClaimable, dumpUrl } = payload;
-    const cwConnection = models.sequelize;
 
-    // TODO: sanitize dump data?
+    // cleanup functions are pushed to this array, then popped off
+    // and invoked after everything is done
+    const cleanupStack: CleanupFn[] = [];
 
-    // create temp discourse DB
-    const discourseDbName = `temp_discourse_dump_${Date.now()}`;
-    await cwConnection.query(`CREATE DATABASE ${discourseDbName};`);
+    const cwConnection: Sequelize = models.sequelize;
+    let restrictedDiscourseConnection: Sequelize | null = null;
 
-    // TODO: create discourse DB user with restricted permissions for DB import?
+    try {
+      const now = Date.now();
 
-    // copy and modify CW DB URI to create discourse DB URI
-    const discourseDbUri = (() => {
-      const parsedUrl = new URL(DATABASE_URI);
-      parsedUrl.pathname = discourseDbName;
-      parsedUrl.searchParams.set('sslmode', 'disable');
-      return parsedUrl.toString();
-    })();
+      const discourseDbName = `temp_discourse_dump_${now}`;
+      const restrictedDiscourseDbUser = `temp_discourse_importer_${now}`;
+      const restrictedDiscourseDbPass = `temp_discourse_importer_pass_${now}`;
 
-    // connect to discourse DB
-    const discourseConnection = await createDiscourseDBConnection(
-      discourseDbUri,
-    );
+      // create discourse DB user
+      await cwConnection.query(
+        `CREATE ROLE ${restrictedDiscourseDbUser} WITH LOGIN PASSWORD '${restrictedDiscourseDbPass}';`,
+      );
+      cleanupStack.push({
+        description: 'Drop discourse DB user',
+        fn: async () => {
+          await cwConnection.query(`DROP ROLE ${restrictedDiscourseDbUser};`);
+        },
+      });
 
-    await discourseConnection.query('DROP SCHEMA public CASCADE;');
-    // import dump into discourse DB
-    await streamDumpImport(dumpUrl, discourseConnection);
+      // create discourse DB
+      await cwConnection.query(`CREATE DATABASE ${discourseDbName};`);
+      cleanupStack.push({
+        description: 'Drop discourse DB',
+        fn: async () => {
+          await cwConnection.query(`
+            SELECT pg_terminate_backend(pid)
+            FROM pg_stat_activity
+            WHERE datname = '${discourseDbName}' AND pid <> pg_backend_pid();
+          `);
+          await cwConnection.query(`DROP DATABASE ${discourseDbName};`);
+        },
+      });
 
-    // console.log('fetching dump...');
-    // const response = await axios({
-    //   method: 'get',
-    //   url: dumpUrl,
-    // });
-    // console.log('done');
+      // connect to discourse DB as superuser to create
+      // restricted user and grant privileges
+      const superUserDiscourseDbUri = (() => {
+        const parsedUrl = new URL(DATABASE_URI);
+        parsedUrl.pathname = discourseDbName;
+        parsedUrl.searchParams.set('sslmode', 'disable'); // TODO: allow SSL on prod?
+        return parsedUrl.toString();
+      })();
+      const superUserDiscourseConnection = await createDiscourseDBConnection(
+        superUserDiscourseDbUri,
+      );
+      await superUserDiscourseConnection.query(
+        `GRANT ALL ON SCHEMA public TO ${restrictedDiscourseDbUser};`,
+      );
+      cleanupStack.push({
+        description:
+          'Disconnect super user from temp discourse DB so it can be dropped',
+        fn: async () => {
+          await superUserDiscourseConnection.close();
+        },
+      });
 
-    // console.log('running queries...');
-    // await discourseConnection.query(response.data);
-    // console.log('done');
+      // create restricted discourse DB URI
+      const restrictedDiscourseDbUri = (() => {
+        const parsedUrl = new URL(DATABASE_URI);
+        const host = parsedUrl.host;
+        const port = parsedUrl.port || 5432;
+        const sslmode = 'disable'; // TODO: allow SSL on prod?
+        return `postgresql://${restrictedDiscourseDbUser}:${restrictedDiscourseDbPass}@${host}:${port}/${discourseDbName}?sslmode=${sslmode}`;
+      })();
+
+      // connect to discourse DB
+      restrictedDiscourseConnection = await createDiscourseDBConnection(
+        restrictedDiscourseDbUri,
+      );
+
+      cleanupStack.push({
+        description:
+          'Disconnect restricted user from temporary discourse DB so it can be dropped',
+        fn: async () => {
+          await restrictedDiscourseConnection?.close();
+        },
+      });
+
+      // import dump
+      await importDump(dumpUrl, restrictedDiscourseDbUri);
+    } catch (err) {
+      console.error(err);
+      await runCleanup(cleanupStack);
+      throw err;
+    }
+
+    // sanity check
+    if (!restrictedDiscourseConnection) {
+      throw new Error('failed to connect to discourse DB');
+    }
 
     const tables: Record<string, any> = {};
     const transaction = await models.sequelize.transaction();
@@ -68,7 +135,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert users
       const { newUsers, existingUsers } = await createAllUsersInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         { communityId },
         { transaction },
@@ -79,7 +146,7 @@ export const ImportDiscourseCommunity: Command<
       // insert profiles
       const profiles = await createAllProfilesInCW(
         cwConnection,
-        discourseConnection,
+        restrictedDiscourseConnection,
         { newUsers },
         { transaction },
       );
@@ -88,7 +155,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert addresses
       const addresses = await createAllAddressesInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         {
           users: newUsers.concat(...existingUsers),
@@ -103,7 +170,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert categories (topics)
       const categories = await createAllCategoriesInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         { communityId },
         { transaction },
@@ -113,7 +180,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert topics (threads)
       const threads = await createAllThreadsInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         { users: newUsers.concat(existingUsers), categories, communityId },
         { transaction },
@@ -123,7 +190,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert posts (comments)
       const comments = await createAllCommentsInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         { communityId, addresses, threads },
         { transaction },
@@ -133,7 +200,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert reactions
       const reactions = await createAllReactionsInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         { addresses, communityId, threads, comments },
         { transaction },
@@ -143,7 +210,7 @@ export const ImportDiscourseCommunity: Command<
 
       // insert subscriptions
       const subscriptions = await createAllSubscriptionsInCW(
-        discourseConnection,
+        restrictedDiscourseConnection,
         cwConnection,
         { communityId, users: newUsers.concat(existingUsers), threads },
         { transaction },
@@ -156,6 +223,20 @@ export const ImportDiscourseCommunity: Command<
     } catch (err) {
       await transaction.rollback();
       throw err;
+    } finally {
+      await runCleanup(cleanupStack);
     }
   },
 });
+
+const runCleanup = async (cleanupStack: CleanupFn[]) => {
+  while (cleanupStack.length > 0) {
+    const { description, fn } = cleanupStack.pop()!;
+    try {
+      console.log(`RUNNING CLEANUP: ${description}`);
+      await fn();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+};
