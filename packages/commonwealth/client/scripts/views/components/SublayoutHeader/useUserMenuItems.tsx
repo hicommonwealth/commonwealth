@@ -6,7 +6,6 @@ import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
@@ -162,8 +161,6 @@ const useUserMenuItems = ({
     },
   );
 
-  const myCommunityStakePageEnabled = useFlag('myCommunityStakePageEnabled');
-
   return [
     // if a user is in a stake enabled community without membership, show user addresses that
     // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
@@ -209,15 +206,11 @@ const useUserMenuItems = ({
       label: 'Edit profile',
       onClick: () => navigate(`/profile/edit`, {}, null),
     },
-    ...(myCommunityStakePageEnabled
-      ? [
-          {
-            type: 'default',
-            label: 'My community stake',
-            onClick: () => navigate(`/myCommunityStake`, {}, null),
-          },
-        ]
-      : []),
+    {
+      type: 'default',
+      label: 'My community stake',
+      onClick: () => navigate(`/myCommunityStake`, {}, null),
+    },
     {
       type: 'default',
       label: 'Notifications',
