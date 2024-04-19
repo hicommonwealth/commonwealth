@@ -88,6 +88,9 @@ export const DiscussionSection = () => {
     ? 'Forum'
     : 'Discussion';
 
+  // TODO contest item should be visible only if at least one contest exists
+  const contestsItemVisible = false;
+
   // Build Toggle Tree
   const discussionsDefaultToggleTree: ToggleTree = {
     toggledState: false,
@@ -149,7 +152,7 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
-    ...(contestsEnabled
+    ...(contestsEnabled && contestsItemVisible
       ? [
           {
             title: 'Contests',

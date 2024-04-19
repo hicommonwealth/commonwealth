@@ -1,0 +1,10 @@
+@import '../../../../../../../../styles/shared';
+
+.FundContestLoading {
+  height: calc(100% - 52px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
