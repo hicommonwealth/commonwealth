@@ -21,7 +21,7 @@ export default (
   dataTypes: typeof DataTypes,
 ): SubscriptionPreferenceModelStatic => {
   const SubscriptionPreferences = <SubscriptionPreferenceModelStatic>(
-    sequelize.define(
+    sequelize.define<SubscriptionPreferenceInstance>(
       'SubscriptionPreferences',
       {
         id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
