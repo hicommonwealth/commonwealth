@@ -115,7 +115,6 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
-  myCommunityStakePageEnabled,
   contestEnabled,
   existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => [
@@ -158,17 +157,11 @@ const CommonDomainRoutes = ({
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
-  ...[
-    myCommunityStakePageEnabled ? (
-      <Route
-        key="/myCommunityStake"
-        path="/myCommunityStake"
-        element={withLayout(MyCommunityStake, { type: 'common' })}
-      />
-    ) : (
-      []
-    ),
-  ],
+  <Route
+    key="/myCommunityStake"
+    path="/myCommunityStake"
+    element={withLayout(MyCommunityStake, { type: 'common' })}
+  />,
   // scoped
   <Route
     key="/:scope/overview"
