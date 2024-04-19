@@ -32,7 +32,7 @@ export const getAccounts = async (req: Request, res: Response) => {
 export const getBlock = async (req: Request, res: Response) => {
   function getJsonStringifiableValue(value: any): any {
     if (typeof value === 'bigint') {
-      return value.toString();
+      return Number(value);
     } else {
       return value;
     }

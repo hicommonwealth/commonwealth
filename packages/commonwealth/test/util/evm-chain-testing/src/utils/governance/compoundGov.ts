@@ -62,7 +62,7 @@ export class compoundGovernor implements IGovernor {
           String(proposalId.events?.ProposalCreated?.raw?.data).slice(0, 66),
         ),
       ),
-      block: proposalId['blockNumber'].toString(),
+      block: Number(proposalId['blockNumber']),
     };
   }
 
@@ -74,7 +74,7 @@ export class compoundGovernor implements IGovernor {
       .cancel(proposalId)
       .send({ from: accounts[0], gas: '150000' });
     console.log(cancel);
-    return { block: cancel['blockNumber'].toString() };
+    return { block: Number(cancel['blockNumber']) };
   }
 
   public async castVote(
@@ -89,7 +89,7 @@ export class compoundGovernor implements IGovernor {
       .castVote(proposalId, Number(forAgainst))
       .send({ from: accounts, gas: '1000000' });
     console.log(vote);
-    return { block: vote['blockNumber'].toString() };
+    return { block: Number(vote['blockNumber']) };
   }
 
   public async getProposalDetails(proposalId: number | string): Promise<any> {
@@ -115,7 +115,7 @@ export class compoundGovernor implements IGovernor {
       .queue(proposalId)
       .send({ from: accounts, gas: '500000' });
     console.log(queued);
-    return { block: queued['blockNumber'].toString() };
+    return { block: Number(queued['blockNumber']) };
   }
 
   public async executeProposal(
@@ -134,7 +134,7 @@ export class compoundGovernor implements IGovernor {
       .execute(proposalId)
       .send({ from: accounts, value: '0', gas: '1000000' });
     console.log(executed);
-    return { block: executed['blockNumber'].toString() };
+    return { block: Number(executed['blockNumber']) };
   }
 
   public async getVotes(
@@ -206,7 +206,7 @@ export class compoundGovernor implements IGovernor {
     } catch {
       console.log('already Delegated');
     }
-    return { block: txReceipt?.blockNumber.toString() };
+    return { block: Number(txReceipt?.blockNumber) };
   }
 
   public async endToEndSim(): Promise<void> {

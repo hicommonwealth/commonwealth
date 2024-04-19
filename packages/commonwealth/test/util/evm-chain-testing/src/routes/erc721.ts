@@ -25,7 +25,10 @@ export const approve721 = async (req: Request, res: Response) => {
       : await contract.methods
           .setApprovalForAll(accounts[request.to], true)
           .send({ from: account, gas: '500000' });
-    res.status(200).json({ block: txReceipt['blockNumber'].toString() }).send();
+    res
+      .status(200)
+      .json({ block: Number(txReceipt['blockNumber']) })
+      .send();
   } catch (err) {
     console.error(err);
     res
@@ -50,7 +53,10 @@ export const transfer721 = async (req: Request, res: Response) => {
     const txReceipt = await contract.methods
       .safeTransferFrom(account, accounts[request.to], request.tokenId)
       .send({ from: account, gas: '500000' });
-    res.status(200).json({ block: txReceipt['blockNumber'].toString() }).send();
+    res
+      .status(200)
+      .json({ block: Number(txReceipt['blockNumber']) })
+      .send();
   } catch (err) {
     console.error(err);
     res
@@ -101,7 +107,10 @@ export const mintBurn721 = async (req: Request, res: Response) => {
       : await contract.methods.burn(request.tokenId);
     const txReceipt = await tx.send({ from: accounts[0], gas: '500000' });
 
-    res.status(200).json({ block: txReceipt['blockNumber'].toString() }).send();
+    res
+      .status(200)
+      .json({ block: Number(txReceipt['blockNumber']) })
+      .send();
   } catch (err) {
     console.error(err);
     res

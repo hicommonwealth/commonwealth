@@ -64,7 +64,10 @@ export const mint1155 = async (req: Request, res: Response) => {
     );
     const txReceipt = await tx.send({ from: accounts[0], gas: '500000' });
 
-    res.status(200).json({ block: txReceipt['blockNumber'].toString() }).send();
+    res
+      .status(200)
+      .json({ block: Number(txReceipt['blockNumber']) })
+      .send();
   } catch (err) {
     console.error(err);
     res
