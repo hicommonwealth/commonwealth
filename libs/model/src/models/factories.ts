@@ -26,7 +26,7 @@ import Membership from './membership';
 import Notification from './notification';
 import NotificationCategory from './notification_category';
 import NotificationsRead from './notifications_read';
-// import Outbox from './outbox';
+import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
 import Reaction from './reaction';
@@ -74,7 +74,7 @@ export const Factories = {
   Notification,
   NotificationCategory,
   NotificationsRead,
-  // Outbox,
+  Outbox,
   Poll,
   Profile,
   Reaction,
