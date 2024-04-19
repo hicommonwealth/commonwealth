@@ -4,7 +4,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
@@ -40,8 +39,7 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
-      const keypair = wallet.generate();
-      const address = `0x${keypair.getAddress().toString('hex')}`;
+      const { privateKey, address } = server.seeder.generateEthAddress();
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
