@@ -1,4 +1,4 @@
-import { delay, schemas } from '@hicommonwealth/core';
+import { delay } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { Client } from 'pg';
@@ -28,7 +28,8 @@ describe('pgListener', () => {
     expect(events.length).to.equal(0);
 
     await models.Outbox.create({
-      event_name: 'test' as schemas.EventNames,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      event_name: 'test' as any,
       event_payload: {
         event_name: 'test',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +41,8 @@ describe('pgListener', () => {
 
   it('should not send a NOTIF when relayed is updated in the Outbox', async () => {
     const event = await models.Outbox.create({
-      event_name: 'test' as schemas.EventNames,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      event_name: 'test' as any,
       event_payload: {
         event_name: 'test',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

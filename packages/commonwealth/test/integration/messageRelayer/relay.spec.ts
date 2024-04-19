@@ -1,8 +1,4 @@
-import {
-  Broker,
-  schemas,
-  successfulInMemoryBroker,
-} from '@hicommonwealth/core';
+import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { relay } from '../../../server/workers/messageRelayer/relay';
@@ -23,7 +19,8 @@ describe('relay', () => {
 
   it('Should relay a single event and update relayed column', async () => {
     await models.Outbox.create({
-      event_name: 'test' as schemas.EventNames,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      event_name: 'test' as any,
       event_payload: {
         event_name: 'test',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
