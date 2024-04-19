@@ -1,4 +1,4 @@
-import updateRoles from 'client/scripts/state/api/members/updateRoles';
+import updateRole from 'client/scripts/state/api/members/updateRoles';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -24,7 +24,7 @@ export const ManageRoles = ({
   const navigate = useCommonNavigate();
 
   let roleToBeDeleted;
-  const { useRemoveRoleMutation } = updateRoles;
+  const { useRemoveRoleMutation } = updateRole;
   const { mutateAsync: removeRole } = useRemoveRoleMutation({
     onRoleUpdate,
     roleToBeDeleted,

@@ -94,9 +94,9 @@ const useRemoveRoleMutation = ({ onRoleUpdate }: RemoveRoleProps) => {
   });
 };
 
-const updateRoles = {
+const updateRole = {
   useRemoveRoleMutation,
   useUpgradeRoleMutation,
 };
 
-export default updateRoles;
+export default updateRole;

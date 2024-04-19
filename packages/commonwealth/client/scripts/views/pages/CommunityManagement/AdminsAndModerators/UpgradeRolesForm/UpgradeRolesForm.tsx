@@ -1,5 +1,5 @@
 import { AccessLevel } from '@hicommonwealth/core';
-import updateRoles from 'client/scripts/state/api/members/updateRoles';
+import updateRole from 'client/scripts/state/api/members/updateRoles';
 import { formatAddressShort } from 'helpers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import app from 'state';
@@ -41,7 +41,7 @@ export const UpgradeRolesForm = ({
   let newRoleToBeUpgraded;
   const membersRef = useRef();
 
-  const { useUpgradeRoleMutation } = updateRoles;
+  const { useUpgradeRoleMutation } = updateRole;
   const { mutateAsync: upgradeRole } = useUpgradeRoleMutation({
     onRoleUpdate,
     newRoleToBeUpgraded,
