@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc -b && tsc-alias",
+    "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
