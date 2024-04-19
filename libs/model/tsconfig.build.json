@@ -4,5 +4,11 @@
     "rootDir": "src",
     "outDir": "build"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../chains" },
+    { "path": "../shared" },
+    { "path": "../logging" }
+  ]
 }
