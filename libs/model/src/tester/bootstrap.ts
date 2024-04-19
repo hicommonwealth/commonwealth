@@ -1,9 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import path from 'node:path';
+import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
-import { buildDb, type DB } from '../models';
+import { buildDb, syncDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
@@ -137,10 +137,10 @@ export const get_info_schema = async (
 ): Promise<Record<string, TABLE_INFO>> => {
   const columns = await db.query<COLUMN_INFO>(
     `
-SELECT 
+SELECT
 	table_name,
-	column_name, 
-	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name) 
+	column_name,
+	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name)
 	|| CASE WHEN is_identity = 'YES' THEN '-id' ELSE '' END
 	|| CASE WHEN is_nullable = 'YES' THEN '-null' ELSE '' END as column_type,
 	column_default
@@ -151,11 +151,11 @@ ORDER BY 1, 2;`,
   );
   const constraints = await db.query<CONSTRAINT_INFO>(
     `
-SELECT 
-	c.table_name, 
+SELECT
+	c.table_name,
 	c.constraint_type || '(' || STRING_AGG(k.column_name, ',' order by column_name) || ')' as constraint,
 	c.constraint_name
-FROM 
+FROM
 	information_schema.table_constraints c
 	JOIN information_schema.key_column_usage k on c.constraint_name = k.constraint_name
 WHERE c.table_schema = 'public'
@@ -184,7 +184,7 @@ ORDER BY 1, 2;`,
   return tables;
 };
 
-let testdb: DB | undefined = undefined;
+let db: DB | undefined = undefined;
 /**
  * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
  * and creating/migrating a fresh instance if it doesn't exist.
@@ -196,10 +196,10 @@ export const bootstrap_testing = async (
   log = false,
 ): Promise<DB> => {
   if (!TESTING) throw new Error('Seeds only work when testing!');
-  if (!testdb) {
+  if (!db) {
     await verify_db(TEST_DB_NAME);
     try {
-      testdb = buildDb(
+      db = buildDb(
         new Sequelize({
           dialect: 'postgres',
           database: TEST_DB_NAME,
@@ -208,16 +208,13 @@ export const bootstrap_testing = async (
           logging: false,
         }),
       );
-      await testdb.sequelize.sync({
-        force: true,
-        logging: log ? console.log : false,
-      });
+      await syncDb(db, log);
     } catch (error) {
       console.error('Error bootstrapping test db:', error);
       throw error;
     }
-  } else if (truncate) await truncate_db(testdb);
-  return testdb;
+  } else if (truncate) await truncate_db(db);
+  return db;
 };
 
-TESTING && dispose(async () => truncate_db(testdb));
+TESTING && dispose(async () => truncate_db(db));

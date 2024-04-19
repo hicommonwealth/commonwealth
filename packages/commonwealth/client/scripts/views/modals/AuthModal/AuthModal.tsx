@@ -1,10 +1,12 @@
 import React from 'react';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
-import { BaseModal } from './BaseModal';
+import { CreateAccountModal } from './CreateAccountModal';
+import { SignInModal } from './SignInModal';
 import { AuthModalProps } from './types';
 
 const AuthModal = ({
+  type = 'sign-in',
   isOpen,
   onClose,
   onSuccess,
@@ -17,11 +19,15 @@ const AuthModal = ({
       size="medium"
       className="AuthModal"
       content={
-        <BaseModal
-          onClose={onClose}
-          onSuccess={onSuccess}
-          showWalletsFor={showWalletsFor}
-        />
+        type === 'sign-in' ? (
+          <SignInModal
+            onClose={onClose}
+            onSuccess={onSuccess}
+            showWalletsFor={showWalletsFor}
+          />
+        ) : (
+          <CreateAccountModal onClose={onClose} />
+        )
       }
     />
   );

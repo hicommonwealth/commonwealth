@@ -1,0 +1,23 @@
+@import '../../../../../../../../styles/shared';
+
+.SignTransactionsStep {
+  margin-top: 8px;
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  max-width: 596px;
+
+  .description {
+    color: $neutral-500;
+  }
+
+  .Divider {
+    margin-block: 8px;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+}

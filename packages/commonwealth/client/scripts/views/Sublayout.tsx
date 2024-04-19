@@ -14,6 +14,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
+import { UserSurveyGrowl } from './components/UserSurveyGrowl/UserSurveyGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 
 type SublayoutProps = {
@@ -116,6 +117,7 @@ const Sublayout = ({
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
+        <UserSurveyGrowl />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>
