@@ -171,9 +171,6 @@ jobs:
       - name: Add custom domain to /etc/hosts
         run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Run e2e tests (yarn test-e2e)
         env:
           PORT: 8080
