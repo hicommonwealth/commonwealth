@@ -3,6 +3,7 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
+import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import numeral from 'numeral';
 import 'pages/communities.scss';
@@ -59,6 +60,7 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 const STAKE_FILTER_KEY = 'Stake';
 
 const CommunitiesPage = () => {
+  useUserLoggedIn();
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap(),
   );

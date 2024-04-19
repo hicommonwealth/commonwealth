@@ -40,7 +40,10 @@ const ManageContest = ({ contestId }: ManageContestProps) => {
 
       case 'SignTransactions':
         return (
-          <SignTransactionsStep onSetLaunchContestStep={setLaunchContestStep} />
+          <SignTransactionsStep
+            onSetLaunchContestStep={setLaunchContestStep}
+            isDirectDepositSelected={false}
+          />
         );
 
       case 'ContestLive':
