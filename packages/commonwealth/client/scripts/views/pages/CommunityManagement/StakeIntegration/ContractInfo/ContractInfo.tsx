@@ -56,10 +56,11 @@ const ContractInfo = ({
         label="Learn more about community stake"
         iconRight="externalLink"
         buttonType="tertiary"
-        onClick={() =>
-          (window.location.href =
-            'https://docs.common.xyz/commonwealth/community-overview/community-stake')
-        }
+        onClick={() => {
+          window.open(
+            'https://docs.common.xyz/commonwealth/community-overview/community-stake',
+          );
+        }}
       />
     </section>
   );
