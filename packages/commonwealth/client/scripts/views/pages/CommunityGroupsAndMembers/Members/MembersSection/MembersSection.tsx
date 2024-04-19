@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react';
+import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import moment from 'moment';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
@@ -13,54 +15,28 @@ type Member = {
   role: 'admin' | 'moderator' | '';
   groups: string[];
   stakeBalance?: string;
+  lastActive?: string;
 };
 
 type MembersSectionProps = {
   filteredMembers: Member[];
   onLoadMoreMembers: () => any;
   isLoadingMoreMembers?: boolean;
-  isStakedCommunity?: boolean;
+  tableState: CWTableState;
 };
 
 const MembersSection = ({
   filteredMembers,
   onLoadMoreMembers,
   isLoadingMoreMembers,
-  isStakedCommunity,
+  tableState,
 }: MembersSectionProps) => {
-  const columns = useMemo(() => {
-    const c = [
-      {
-        key: 'name',
-        header: 'Name',
-        hasCustomSortValue: true,
-        numeric: false,
-        sortable: false,
-      },
-      {
-        key: 'groups',
-        header: 'Groups',
-        hasCustomSortValue: true,
-        numeric: false,
-        sortable: false,
-      },
-    ];
-    if (isStakedCommunity) {
-      c.push({
-        key: 'stakeBalance',
-        header: 'Stake',
-        hasCustomSortValue: true,
-        numeric: true,
-        sortable: false,
-      });
-    }
-    return c;
-  }, [isStakedCommunity]);
-
   return (
     <div className="MembersSection">
       <CWTable
-        columnInfo={columns}
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
         rowData={filteredMembers.map((member) => ({
           name: {
             sortValue: member.name + (member.role || ''),
@@ -99,8 +75,14 @@ const MembersSection = ({
           stakeBalance: {
             sortValue: parseInt(member.stakeBalance || '0', 10),
             customElement: (
-              <div className="table-cell last-column">
-                {member.stakeBalance}
+              <div className="table-cell text-right">{member.stakeBalance}</div>
+            ),
+          },
+          lastActive: {
+            sortValue: moment(member.lastActive).unix(),
+            customElement: (
+              <div className="table-cell">
+                {moment(member.lastActive).fromNow()}
               </div>
             ),
           },
