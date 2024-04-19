@@ -120,3 +120,6 @@ export const MESSAGE_RELAYER_PREFETCH =
 
 export const EVM_CE_POLL_INTERVAL_MS =
   parseInt(process.env.EVM_CE_POLL_INTERVAL) || 120_000;
+
+export const NEW_SUBSCRIPTION_API_FLAG =
+  process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -54,3 +55,5 @@ export enum EventNames {
   ContestContentUpvoted = 'ContestContentUpvoted',
   ContestWinnersRecorded = 'ContestWinnersRecorded',
 }
+
+export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);

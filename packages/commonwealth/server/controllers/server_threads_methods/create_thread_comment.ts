@@ -157,7 +157,7 @@ export async function __createThreadComment(
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
   const commentContent: CommentAttributes = {
-    thread_id: `${threadId}`,
+    thread_id: threadId,
     text,
     plaintext,
     version_history,
