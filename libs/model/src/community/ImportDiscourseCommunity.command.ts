@@ -1,4 +1,5 @@
 import { schemas, type Command } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Sequelize } from 'sequelize';
 import { URL } from 'url';
 import { DATABASE_URI } from '../config';
@@ -14,6 +15,8 @@ import {
   createAllUsersInCW,
   importDump,
 } from '../services/discourseImport';
+
+const log = logger(__filename);
 
 type CleanupFn = {
   description: string;
@@ -118,7 +121,7 @@ export const ImportDiscourseCommunity: Command<
       // import dump
       await importDump(dumpUrl, restrictedDiscourseDbUri);
     } catch (err) {
-      console.error(err);
+      log.error('import stage failed: ', err as Error);
       await runCleanup(cleanupStack);
       throw err;
     }
@@ -141,7 +144,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['users'] = newUsers;
-      console.log('Users:', newUsers.length);
+      log.debug(`Users: ${newUsers.length}`);
 
       // insert profiles
       const profiles = await createAllProfilesInCW(
@@ -151,7 +154,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['profiles'] = profiles;
-      console.log('Profiles:', profiles.length);
+      log.debug(`Profiles: ${profiles.length}`);
 
       // insert addresses
       const addresses = await createAllAddressesInCW(
@@ -166,7 +169,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['addresses'] = addresses;
-      console.log('Addresses:', addresses.length);
+      log.debug(`Addresses: ${addresses.length}`);
 
       // insert categories (topics)
       const categories = await createAllCategoriesInCW(
@@ -176,7 +179,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['categories'] = categories;
-      console.log('Categories:', categories.length);
+      log.debug(`Categories: ${categories.length}`);
 
       // insert topics (threads)
       const threads = await createAllThreadsInCW(
@@ -186,7 +189,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['threads'] = threads;
-      console.log('Threads:', threads.length);
+      log.debug(`Threads: ${threads.length}`);
 
       // insert posts (comments)
       const comments = await createAllCommentsInCW(
@@ -196,7 +199,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['comments'] = comments;
-      console.log('Comments:', comments.length);
+      log.debug(`Comments: ${comments.length}`);
 
       // insert reactions
       const reactions = await createAllReactionsInCW(
@@ -206,7 +209,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['reactions'] = reactions;
-      console.log('Reactions:', reactions.length);
+      log.debug(`Reactions: ${reactions.length}`);
 
       // insert subscriptions
       const subscriptions = await createAllSubscriptionsInCW(
@@ -216,7 +219,7 @@ export const ImportDiscourseCommunity: Command<
         { transaction },
       );
       tables['subscriptions'] = subscriptions;
-      console.log('Subscriptions:', subscriptions.length);
+      log.debug(`Subscriptions: ${subscriptions.length}`);
 
       await transaction.commit();
       return {};
@@ -233,10 +236,10 @@ const runCleanup = async (cleanupStack: CleanupFn[]) => {
   while (cleanupStack.length > 0) {
     const { description, fn } = cleanupStack.pop()!;
     try {
-      console.log(`RUNNING CLEANUP: ${description}`);
+      log.debug(`RUNNING CLEANUP: ${description}`);
       await fn();
     } catch (err) {
-      console.error(err);
+      log.error('cleanup failed: ', err as Error);
     }
   }
 };
