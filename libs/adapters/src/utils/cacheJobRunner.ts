@@ -27,7 +27,7 @@ export abstract class JobRunner<CacheT> {
   }
 
   public close() {
-    clearInterval(this._timeoutHandle);
+    clearInterval(this._timeoutHandle as number | undefined);
     this._timeoutHandle = undefined;
   }
 

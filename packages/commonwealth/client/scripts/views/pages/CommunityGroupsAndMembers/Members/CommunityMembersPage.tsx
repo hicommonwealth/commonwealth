@@ -1,5 +1,7 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -53,6 +55,7 @@ const CommunityMembersPage = () => {
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0],
   });
+
   const {
     shouldShowGroupMutationBannerForCommunities,
     setShouldShowGroupMutationBannerForCommunity,
@@ -74,6 +77,47 @@ const CommunityMembersPage = () => {
     500,
   );
 
+  const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
+    .namespace;
+
+  const columns: CWTableColumnInfo[] = [
+    {
+      key: 'name',
+      header: 'Name',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'groups',
+      header: 'Groups',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: false,
+    },
+    {
+      key: 'stakeBalance',
+      header: 'Stake',
+      hasCustomSortValue: true,
+      numeric: true,
+      sortable: true,
+      hidden: !isStakedCommunity,
+    },
+    {
+      key: 'lastActive',
+      header: 'Last Active',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+  ];
+
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'lastActive',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   const {
     data: members,
     fetchNextPage,
@@ -81,8 +125,8 @@ const CommunityMembersPage = () => {
   } = trpc.community.getMembers.useInfiniteQuery(
     {
       limit: 30,
-      order_by: APIOrderBy.LastActive,
-      order_direction: APIOrderDirection.Desc,
+      order_by: tableState.orderBy,
+      order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
       include_roles: true,
@@ -161,6 +205,7 @@ const CommunityMembersPage = () => {
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
+        lastActive: p.last_active,
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -278,7 +323,7 @@ const CommunityMembersPage = () => {
                 type="info"
                 title="Don't see your group right away?"
                 body={`
-            Our app is crunching numbers, which takes some time. 
+            Our app is crunching numbers, which takes some time.
             Give it a few minutes and refresh to see your group.
           `}
                 onClose={() =>
@@ -374,9 +419,7 @@ const CommunityMembersPage = () => {
               }
             }}
             isLoadingMoreMembers={isLoadingMembers}
-            isStakedCommunity={
-              !!app.config.chains.getById(app.activeChainId()).namespace
-            }
+            tableState={tableState}
           />
         )}
       </section>

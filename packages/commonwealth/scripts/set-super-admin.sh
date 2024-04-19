@@ -63,7 +63,7 @@ echo "bool_flag: $bool_flag"
 if [[ $env_arg != "local" ]]; then
     DATABASE_URL=$(heroku config:get DATABASE_URL -a commonwealth-$env_arg)
     echo "DATABASE_URL is set to: $DATABASE_URL"
-    DATABASE_URL=$DATABASE_URL NODE_ENV=production ts-node -r tsconfig-paths/register -T ./scripts/set-super-admin.ts $bool_flag
+    DATABASE_URL=$DATABASE_URL NODE_ENV=production tsx -r tsconfig-paths/register ./scripts/set-super-admin.ts $bool_flag
 else
-    ts-node -r tsconfig-paths/register -T ./scripts/set-super-admin.ts $bool_flag
+    tsx -r tsconfig-paths/register ./scripts/set-super-admin.ts $bool_flag
 fi
