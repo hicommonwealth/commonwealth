@@ -108,7 +108,6 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
-  myCommunityStakePageEnabled,
   contestEnabled,
   existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => {
@@ -185,17 +184,11 @@ const CustomDomainRoutes = ({
       path="/finishsociallogin"
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
-    ...[
-      myCommunityStakePageEnabled ? (
-        <Route
-          key="/myCommunityStake"
-          path="/myCommunityStake"
-          element={withLayout(MyCommunityStake, { type: 'common' })}
-        />
-      ) : (
-        []
-      ),
-    ],
+    <Route
+      key="/myCommunityStake"
+      path="/myCommunityStake"
+      element={withLayout(MyCommunityStake, { type: 'common' })}
+    />,
 
     // NOTIFICATIONS
     <Route

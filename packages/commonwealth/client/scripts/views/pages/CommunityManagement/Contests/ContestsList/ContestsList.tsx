@@ -28,30 +28,38 @@ const ContestsList = () => {
     return <PageNotFound />;
   }
 
+  const isStakeEnabled = false;
+  const isContestAvailable = false;
+
   return (
     <CWPageLayout>
-      <div className="ContestsList">Contests</div>
+      <div className="ContestsList">
+        <CWText type="h2">Contests</CWText>
 
-      {mockedContests.length === 0 ? (
-        <EmptyContestsList />
-      ) : (
-        <>
-          <CWButton
-            iconLeft="plusPhosphor"
-            label="Create contest"
-            onClick={() => navigate('/manage/contests/launch')}
+        {!isStakeEnabled || !isContestAvailable ? (
+          <EmptyContestsList
+            isStakeEnabled={isStakeEnabled}
+            isContestAvailable={isContestAvailable}
           />
-          {mockedContests.map((contest) => (
-            <CWCard key={contest.id}>
-              <CWText>{contest.title}</CWText>
-              <CWButton
-                label="Edit contest"
-                onClick={() => navigate(`/manage/contests/${contest.id}`)}
-              />
-            </CWCard>
-          ))}
-        </>
-      )}
+        ) : (
+          <>
+            <CWButton
+              iconLeft="plusPhosphor"
+              label="Create contest"
+              onClick={() => navigate('/manage/contests/launch')}
+            />
+            {mockedContests.map((contest) => (
+              <CWCard key={contest.id}>
+                <CWText>{contest.title}</CWText>
+                <CWButton
+                  label="Edit contest"
+                  onClick={() => navigate(`/manage/contests/${contest.id}`)}
+                />
+              </CWCard>
+            ))}
+          </>
+        )}
+      </div>
     </CWPageLayout>
   );
 };
