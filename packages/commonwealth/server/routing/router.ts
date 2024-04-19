@@ -1309,7 +1309,7 @@ function setupRouter(
   app.use(endpoint, router);
 
   app.use(methodNotAllowedMiddleware());
-  app.use('/api/*', function (req, res, next) {
+  app.use('/api/*', function (_req, res) {
     res.status(404);
     return failure(res, 'Not Found');
   });
