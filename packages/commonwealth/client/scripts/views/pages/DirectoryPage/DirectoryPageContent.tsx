@@ -7,6 +7,7 @@ import { CWRelatedCommunityCard } from 'views/components/component_kit/new_desig
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import './DirectoryPageContent.scss';
 
@@ -44,6 +45,34 @@ interface DirectoryPageContentProps {
   filteredRelatedCommunitiesData: CommunityData[];
 }
 
+const columns: CWTableColumnInfo[] = [
+  {
+    key: 'name',
+    customElementKey: 'community',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'description',
+    header: 'Description',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'members',
+    header: 'Members',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'threads',
+    header: 'Threads',
+    numeric: true,
+    sortable: true,
+  },
+];
+
 const DirectoryPageContent = ({
   isLoading,
   noFilteredCommunities,
@@ -55,33 +84,7 @@ const DirectoryPageContent = ({
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
   const tableState = useCWTableState({
-    columns: [
-      {
-        key: 'name',
-        customElementKey: 'community',
-        header: 'Community',
-        numeric: false,
-        sortable: true,
-      },
-      {
-        key: 'description',
-        header: 'Description',
-        numeric: false,
-        sortable: true,
-      },
-      {
-        key: 'members',
-        header: 'Members',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'threads',
-        header: 'Threads',
-        numeric: true,
-        sortable: true,
-      },
-    ],
+    columns,
     initialSortColumn: 'members',
     initialSortDirection: APIOrderDirection.Desc,
   });

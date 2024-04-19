@@ -1,4 +1,5 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
@@ -10,7 +11,7 @@ import './Stakes.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
-const columns = [
+const columns: CWTableColumnInfo[] = [
   {
     key: 'community',
     header: 'Community',

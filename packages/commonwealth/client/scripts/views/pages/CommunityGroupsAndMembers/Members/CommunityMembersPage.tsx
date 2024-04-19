@@ -1,5 +1,6 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import { trpc } from 'client/scripts/utils/trpcClient';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -79,38 +80,40 @@ const CommunityMembersPage = () => {
   const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
     .namespace;
 
+  const columns: CWTableColumnInfo[] = [
+    {
+      key: 'name',
+      header: 'Name',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'groups',
+      header: 'Groups',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: false,
+    },
+    {
+      key: 'stakeBalance',
+      header: 'Stake',
+      hasCustomSortValue: true,
+      numeric: true,
+      sortable: true,
+      hidden: !isStakedCommunity,
+    },
+    {
+      key: 'lastActive',
+      header: 'Last Active',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+  ];
+
   const tableState = useCWTableState({
-    columns: [
-      {
-        key: 'name',
-        header: 'Name',
-        hasCustomSortValue: true,
-        numeric: false,
-        sortable: true,
-      },
-      {
-        key: 'groups',
-        header: 'Groups',
-        hasCustomSortValue: true,
-        numeric: false,
-        sortable: false,
-      },
-      {
-        key: 'stakeBalance',
-        header: 'Stake',
-        hasCustomSortValue: true,
-        numeric: true,
-        sortable: true,
-        hidden: !isStakedCommunity,
-      },
-      {
-        key: 'lastActive',
-        header: 'Last Active',
-        hasCustomSortValue: true,
-        numeric: false,
-        sortable: true,
-      },
-    ],
+    columns,
     initialSortColumn: 'lastActive',
     initialSortDirection: APIOrderDirection.Desc,
   });

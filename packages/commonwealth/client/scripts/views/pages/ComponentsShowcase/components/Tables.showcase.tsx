@@ -1,4 +1,5 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import faker from 'faker';
 import React from 'react';
@@ -61,46 +62,48 @@ const makeData = (num: number) => {
 
 const rowData = makeData(6);
 
+const columns: CWTableColumnInfo[] = [
+  {
+    key: 'name',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'description',
+    header: 'Description',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'members',
+    header: 'Members',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'threads',
+    header: 'Threads',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'tags',
+    header: 'Tags',
+    numeric: false,
+    sortable: false,
+  },
+  {
+    key: 'buttons',
+    header: 'Buttons',
+    numeric: false,
+    sortable: false,
+  },
+];
+
 const TablesShowcase = () => {
   const tableState = useCWTableState({
-    columns: [
-      {
-        key: 'name',
-        header: 'Community',
-        numeric: false,
-        sortable: true,
-      },
-      {
-        key: 'description',
-        header: 'Description',
-        numeric: false,
-        sortable: true,
-      },
-      {
-        key: 'members',
-        header: 'Members',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'threads',
-        header: 'Threads',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'tags',
-        header: 'Tags',
-        numeric: false,
-        sortable: false,
-      },
-      {
-        key: 'buttons',
-        header: 'Buttons',
-        numeric: false,
-        sortable: false,
-      },
-    ],
+    columns,
     initialSortColumn: 'members',
     initialSortDirection: APIOrderDirection.Desc,
   });
