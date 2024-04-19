@@ -55,7 +55,7 @@ export type CanvasModelAttributes = {
   canvas_hash: string;
 };
 
-export const canvasModelSequelizeColumns = (dataTypes: typeof DataTypes) => ({
+export const canvasModelSequelizeColumns = (dataTypes: DataTypes) => ({
   canvas_signed_data: { type: dataTypes.JSONB, allowNull: true },
   canvas_hash: { type: dataTypes.STRING, allowNull: true },
 });
