@@ -18,7 +18,8 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 - [Sprint Cadence](#sprint-cadence)
   * [Standup Meetings](#standup-meetings)
   * [Deep Work Wednesdays](#deep-work-wednesdays)
-  * [Friday Meetings](#friday-meetings)
+  * [Fix-It & Fearless Fridays](#fix-it--fearless-fridays)
+    + [Friday Meetings](#friday-meetings)
 - [Agile Release Schedule](#agile-release-schedule)
   * [Release and Deploy Procedure](#release--deploy-procedure)
 - [Change Log](#change-log)
@@ -44,6 +45,8 @@ Next, a ticket is "Teed Up" (moved to the "Teed Up" stage) by a lead or project 
 Work should not begin on a ticket until (1) an engineer has been assigned to the ticket by a lead (2) the engineer has given the ticket a [story-point value](#story-point-estimation) (3) the engineer has moved the ticket to "In Progress."
 
 Typically, engineers should only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress").
+
+Tickets tagged `cleanup` and `cleanup-frontend` may be self-assigned and worked on during Fix-it Fridays.
 
 #### Triage
 
@@ -156,7 +159,13 @@ Standup meetings are held Mondays, Tuesdays, and Thursdays. Wednesdays are inten
 
 Wednesdays are intended to be deep focus days, so recurring or long meetings are not scheduled for Wednesday. This your chance to work uninterrupted on your sprint stories.
 
-### Friday Meetings
+### Fix-it & Fearless Fridays
+
+Fridays are designated Fix-it or Fearless Fridays. These are reserved for codebase cleanup and long-term experimental work; they may be joined by engineers who have finished their regular sprint cycle work for the week.
+
+Tickets tagged `cleanup` and `cleanup-frontend` may be self-assigned and worked on during Fix-it Fridays, without following the sprint cycle's usual tee-up and assignation system. (_See [Project Management Flow](#project-management-flow) section._)
+
+#### Friday Meetings
 
 We try to keep all our regular 1:1's on Friday, the final day of the sprint. Our stated goal is to have sprint stories mostly completed by the Weekly Retro, which takes place every Friday at 12:00 (and where appropriate, demo things that were shipped at the the retro meeting for all to see).
 

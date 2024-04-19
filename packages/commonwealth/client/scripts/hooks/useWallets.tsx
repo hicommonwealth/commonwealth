@@ -219,9 +219,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       } else {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       }
 
       trackAnalytics({
@@ -257,9 +257,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       } else {
-        walletProps.onModalClose();
+        await walletProps?.onModalClose?.();
       }
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
@@ -310,7 +310,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (exitOnComplete) {
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
       if (walletProps.onSuccess) walletProps.onSuccess(account.address);
     }
   };
@@ -441,7 +441,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
     }
     setActiveStep('welcome');
   };
@@ -492,11 +492,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (walletProps.onSuccess)
         walletProps.onSuccess(primaryAccountToUse.profile.address);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
     } catch (e) {
       console.log(e);
       notifyError('Failed to save profile info');
-      walletProps.onModalClose();
+      await walletProps?.onModalClose?.();
     }
   };
 
@@ -613,16 +613,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setSignerAccount(signingAccount);
         setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        if (createAccountWithDefaultValues) {
-          onAccountVerified(
-            signingAccount,
-            newlyCreated,
-            isLinkingWallet,
-            wallet,
-          );
-        } else {
-          setActiveStep('redirectToSign');
-        }
+        setActiveStep('redirectToSign');
       } else {
         onAccountVerified(
           signingAccount,
@@ -691,15 +682,28 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      if (createAccountWithDefaultValues) {
-        onAccountVerified(account, false, false);
-      } else {
-        setActiveStep('redirectToSign');
-      }
-      return;
+      setActiveStep('redirectToSign');
     } else {
       onAccountVerified(account, false, false);
     }
+  };
+
+  const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
+    useState(false);
+  useEffect(() => {
+    setIsMobileWalletVerificationStep(
+      isMobile && activeStep === 'redirectToSign',
+    );
+  }, [isMobile, activeStep]);
+  const onVerifyMobileWalletSignature = async () => {
+    await onAccountVerified(
+      signerAccount,
+      isNewlyCreated,
+      isLinkingWallet,
+      selectedWallet,
+    );
+    setIsMobileWalletVerificationStep(false);
+    await walletProps?.onModalClose?.();
   };
 
   return {
@@ -733,6 +737,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setUsername,
     setSidebarType,
     onSessionKeyRevalidation,
+    isMobileWalletVerificationStep,
+    onVerifyMobileWalletSignature,
   };
 };
 

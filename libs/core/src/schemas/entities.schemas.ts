@@ -90,6 +90,7 @@ export const CommunityMember = z.object({
   ),
   roles: z.array(z.string()).optional(),
   group_ids: z.array(z.number().int()),
+  last_active: z.any().optional().nullable().describe('string or date'),
 });
 
 const ContractSource = z.object({
@@ -447,6 +448,7 @@ export const ChainNode = z.object({
   description: z.string().max(255).optional(),
   ss58: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   bech32: z.string().max(255).optional(),
+  slip44: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
   created_at: z.any(),
   updated_at: z.any(),
   cosmos_chain_id: z
@@ -486,6 +488,43 @@ export const Outbox = z.object({
     }),
   ]),
   relayed: z.boolean(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const SubscriptionPreferences = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  email_notifications_enabled: z.boolean(),
+  digest_email_enabled: z.boolean(),
+  recap_email_enabled: z.boolean(),
+  mobile_push_notifications_enabled: z.boolean(),
+  mobile_push_discussion_activity_enabled: z.boolean(),
+  mobile_push_admin_alerts_enabled: z.boolean(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const ThreadSubscriptions = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  thread_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const CommentSubscriptions = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  comment_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const CommunityAlerts = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  community_id: z.number(),
   created_at: z.date(),
   updated_at: z.date(),
 });

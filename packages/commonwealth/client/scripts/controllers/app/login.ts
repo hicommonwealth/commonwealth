@@ -169,6 +169,7 @@ export async function updateActiveAddresses({
           addr.keytype,
           false,
         );
+        tempAddr.profile = addr.profile;
         tempAddr.lastActive = addr.lastActive;
         return tempAddr;
       })

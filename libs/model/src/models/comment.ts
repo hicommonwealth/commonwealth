@@ -178,6 +178,9 @@ export default (
       foreignKey: 'comment_id',
       as: 'reactions',
     });
+    models.Comment.hasMany(models.CommentSubscription, {
+      foreignKey: 'comment_id',
+    });
   };
 
   return Comment;

@@ -185,6 +185,9 @@ export default (
       as: 'groups',
       foreignKey: 'community_id',
     });
+    models.Community.hasMany(models.CommunityAlert, {
+      foreignKey: 'community_id',
+    });
   };
 
   return Community;
