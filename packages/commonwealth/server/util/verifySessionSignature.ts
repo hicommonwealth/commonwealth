@@ -294,7 +294,6 @@ const verifySessionSignature = async (
 
     // both in base64 encoding
     const nacl = (await import('tweetnacl')).default;
-    console.log('nacl', nacl);
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
 
     isValid = nacl.sign.detached.verify(
