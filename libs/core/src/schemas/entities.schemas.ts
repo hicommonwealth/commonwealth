@@ -89,6 +89,7 @@ export const CommunityMember = z.object({
   ),
   roles: z.array(z.string()).optional(),
   group_ids: z.array(PG_INT),
+  last_active: z.any().optional().nullable().describe('string or date'),
 });
 
 const ContractSource = z.object({
@@ -450,6 +451,7 @@ export const ChainNode = z.object({
   description: z.string().max(255).optional(),
   ss58: PG_INT.optional(),
   bech32: z.string().max(255).optional(),
+  slip44: PG_INT.optional(),
   created_at: z.any(),
   updated_at: z.any(),
   cosmos_chain_id: z

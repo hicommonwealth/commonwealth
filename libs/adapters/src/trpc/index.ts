@@ -69,8 +69,6 @@ export enum Tag {
   Comment = 'Comment',
   Reaction = 'Reaction',
   Query = 'Query',
-  Policy = 'Policy',
-  Projection = 'Projection',
   Integration = 'Integration',
   Subscription = 'Subscription',
 }
@@ -122,7 +120,7 @@ export const event = <
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
 >(
   factory: () => EventsHandlerMetadata<Input, Output>,
-  tag: Tag.Policy | Tag.Projection | Tag.Integration,
+  tag: Tag.Integration,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -138,7 +136,7 @@ export const event = <
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await core.eventHandler(
+        return await core.handleEvent(
           md,
           { name: name as core.schemas.Events, payload },
           false,

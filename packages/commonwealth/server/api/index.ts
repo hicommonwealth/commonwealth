@@ -3,6 +3,7 @@ import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { NEW_SUBSCRIPTION_API_FLAG } from '../config';
 import * as community from './community';
+import * as contest from './contest';
 import * as feed from './feed';
 import * as integrations from './integrations';
 import * as subscription from './subscription';
@@ -16,6 +17,7 @@ const artifacts = {
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
+  contest: contest.trpcRouter,
 };
 
 if (NEW_SUBSCRIPTION_API_FLAG) {
@@ -23,7 +25,6 @@ if (NEW_SUBSCRIPTION_API_FLAG) {
 }
 
 const apiV1 = trpc.router(artifacts);
-
 export type ApiV1 = typeof apiV1;
 
 /**
