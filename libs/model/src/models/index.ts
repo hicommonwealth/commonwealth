@@ -56,8 +56,15 @@ export const buildDb = (sequelize: Sequelize): DB => {
     db.ContestManager,
     'community_id',
   );
-  db.ContestManager.withMany(db.Contest, 'contest_address');
+
+  db.ContestManager.withMany(db.Contest, 'contest_address').withMany(
+    db.ContestTopic,
+    'contest_address',
+  );
+  db.ContestTopic.belongsTo(db.Topic);
   db.Contest.withMany(db.ContestAction, 'contest_address', { as: 'actions' });
+  db.ContestAction.belongsTo(db.Thread);
+
   db.CommunityStake.withMany(db.StakeTransaction, 'community_id').withMany(
     db.StakeTransaction,
     'stake_id',

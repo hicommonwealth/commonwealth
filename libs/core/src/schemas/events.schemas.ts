@@ -102,6 +102,32 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
 
 export const ContestWinnersRecorded = ContestManagerEvent.extend({
   winners: z
-    .array(z.string())
+    .array(
+      z.object({
+        creator_address: z.string(),
+        prize: z.number(),
+      }),
+    )
     .describe('Ranked contest-winning creator addresses'),
 }).describe('When contest winners are recorded and contest ends');
+
+// @rbennettcw TODO: emit this
+export const ContestManagerMetadataCreated = ContestManagerEvent.extend({
+  community_id: z.string(),
+  name: z.string(),
+  image_url: z.string(),
+  topics: z.array(z.number().int()),
+  payout_structure: z
+    .array(z.number())
+    .describe(
+      'Sorted array of percentages for prize, from first to last, adding up to 1',
+    ),
+});
+
+// @rbennettcw TODO: emit this
+export const ContestManagerMetadataUpdated = ContestManagerEvent.extend({
+  name: z.string().optional(),
+  image_url: z.string().optional(),
+  topics_added: z.array(z.number().int()).optional(),
+  topics_removed: z.array(z.number().int()).optional(),
+});
