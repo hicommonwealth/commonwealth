@@ -223,7 +223,7 @@ export const createAllUsersInCW = async (
   // new users are users that we created as part of the import
   // existing users are users that have already user their email to
   // sign in to commonwealth so they already have profiles but they don't
-  // have addresses that puts them in the abracadabra community
+  // have addresses that puts them in the community
   return {
     newUsers: result as UserObject[],
     existingUsers: usersAlreadyExistingInCW,
