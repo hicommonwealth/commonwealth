@@ -293,7 +293,8 @@ const verifySessionSignature = async (
     //
 
     // both in base64 encoding
-    const nacl = await import('tweetnacl');
+    const nacl = (await import('tweetnacl')).default;
+    console.log('nacl', nacl);
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
 
     isValid = nacl.sign.detached.verify(
@@ -310,7 +311,7 @@ const verifySessionSignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
-        const nacl = await import('tweetnacl');
+        const nacl = (await import('tweetnacl')).default;
         isValid = nacl.sign.detached.verify(
           Buffer.from(sortedStringify(canvasSessionPayload)),
           bs58.decode(signatureString),
