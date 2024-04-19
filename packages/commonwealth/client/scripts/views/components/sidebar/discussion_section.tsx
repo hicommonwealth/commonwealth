@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'components/sidebar/index.scss';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -46,12 +47,19 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 export const DiscussionSection = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+
+  const contestsEnabled = useFlag('contest');
+
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
     location,
   );
   const matchesOverviewRoute = matchRoutes(
     [{ path: '/overview' }, { path: ':scope/overview' }],
+    location,
+  );
+  const matchesContestsRoute = matchRoutes(
+    [{ path: '/contests' }, { path: ':scope/contests' }],
     location,
   );
   const matchesArchivedRoute = matchRoutes(
@@ -79,6 +87,9 @@ export const DiscussionSection = () => {
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
     ? 'Forum'
     : 'Discussion';
+
+  // TODO contest item should be visible only if at least one contest exists
+  const contestsItemVisible = false;
 
   // Build Toggle Tree
   const discussionsDefaultToggleTree: ToggleTree = {
@@ -141,6 +152,35 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
+    ...(contestsEnabled && contestsItemVisible
+      ? [
+          {
+            title: 'Contests',
+            containsChildren: false,
+            displayData: null,
+            hasDefaultToggle: false,
+            isActive: !!matchesContestsRoute,
+            isVisible: true,
+            isUpdated: true,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
+              resetSidebarState();
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/contests`,
+                app.activeChainId(),
+                () => {
+                  setDiscussionsToggleTree(
+                    `children.Contests.toggledState`,
+                    toggle,
+                  );
+                },
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: 'Overview',
       containsChildren: false,

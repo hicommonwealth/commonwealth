@@ -45,4 +45,12 @@ export enum EventNames {
   GroupCreated = 'GroupCreated',
   SnapshotProposalCreated = 'SnapshotProposalCreated',
   ThreadCreated = 'ThreadCreated',
+
+  // Contests
+  RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
+  OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
+  ContestStarted = 'ContestStarted',
+  ContestContentAdded = 'ContestContentAdded',
+  ContestContentUpvoted = 'ContestContentUpvoted',
+  ContestWinnersRecorded = 'ContestWinnersRecorded',
 }
