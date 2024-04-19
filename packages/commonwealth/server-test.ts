@@ -36,7 +36,7 @@ export const testServer = async (): Promise<TestServer> => {
   cache(new RedisCache('redis://localhost:6379'));
 
   const { tester } = await import('@hicommonwealth/model');
-  const { main } = await import('./main');
+  const { main } = await require('./main');
 
   const db = await tester.seedDb();
   const app = express();
