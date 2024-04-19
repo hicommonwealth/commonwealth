@@ -73,8 +73,8 @@ export const ImportDiscourseCommunity: Command<
         },
       });
 
-      // connect to discourse DB as superuser to create
-      // restricted user and grant privileges
+      // connect to discourse DB as superuser to
+      // grant privileges to restricted user
       const superUserDiscourseDbUri = (() => {
         const parsedUrl = new URL(DATABASE_URI);
         parsedUrl.pathname = discourseDbName;
