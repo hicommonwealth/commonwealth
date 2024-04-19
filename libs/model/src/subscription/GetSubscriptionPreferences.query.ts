@@ -1,5 +1,6 @@
 import { schemas, type Query } from '@hicommonwealth/core';
 import { models } from '../database';
+import { shouldExist } from '../middleware/guards';
 
 export const GetSubscriptionPreferences: Query<
   typeof schemas.queries.GetSubscriptionPreferences
@@ -12,10 +13,10 @@ export const GetSubscriptionPreferences: Query<
       where: { user_id: actor.user.id },
     });
 
-    // We discussed throwing errors from here previously -> if not here then where can this be thrown?
-    // It essentially should never happen except in the case of data corruption
-    if (!subPreferences) throw new Error('Subscription preferences not found');
+    if (!shouldExist('Subscription preferences', subPreferences)) {
+      return {};
+    }
 
-    return subPreferences.get({ plain: true });
+    return subPreferences!.get({ plain: true });
   },
 });
