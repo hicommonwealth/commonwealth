@@ -50,9 +50,6 @@ const ContestLiveStep = () => {
         </div>
       </CWPageLayout>
       <FundContestDrawer
-        // TODO reset state on close
-        //  this below works but breaks slide animation
-        // key={Number(isDrawerOpen)}
         onClose={() => setIsDrawerOpen(false)}
         isOpen={isDrawerOpen}
         contestAddress={createdContestAddress}

@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
 
-import FundContestForm from './FundContestForm';
+import {
+  FundContestFailure,
+  FundContestForm,
+  FundContestLoading,
+  FundContestSuccess,
+} from './steps';
 
 import './FundContestDrawer.scss';
 
@@ -48,7 +51,7 @@ const FundContestDrawer = ({
   };
 
   const [fundContestDrawerStep, setFundContestDrawerStep] =
-    useState<FundContestStep>('Form');
+    useState<FundContestStep>('Failure');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
   const [amountEth, setAmountEth] = useState('0.0001');
 
@@ -111,35 +114,18 @@ const FundContestDrawer = ({
         );
 
       case 'Loading':
-        return (
-          <div>
-            <CWCircleMultiplySpinner />
-          </div>
-        );
+        return <FundContestLoading />;
 
       case 'Failure':
         return (
-          <div>
-            <CWButton
-              label="Try again"
-              onClick={() => setFundContestDrawerStep('Form')}
-            />
-          </div>
+          <FundContestFailure
+            onSetFundContestDrawerStep={setFundContestDrawerStep}
+          />
         );
 
       case 'Success':
         return (
-          <div>
-            <CWButton
-              label="Close"
-              onClick={handleClose}
-              buttonType="secondary"
-            />
-            <CWButton
-              label="View transactions"
-              onClick={() => window.open('https://etherscan.io', '_blank')}
-            />
-          </div>
+          <FundContestSuccess onClose={handleClose} address={contestAddress} />
         );
     }
   };
