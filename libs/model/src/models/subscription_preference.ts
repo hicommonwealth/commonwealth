@@ -1,8 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type SubscriptionPreferenceAttributes = z.infer<
   typeof schemas.entities.SubscriptionPreferences
@@ -18,7 +17,7 @@ export type SubscriptionPreferenceModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): SubscriptionPreferenceModelStatic => {
   const SubscriptionPreferences = <SubscriptionPreferenceModelStatic>(
     sequelize.define<SubscriptionPreferenceInstance>(
