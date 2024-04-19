@@ -2,7 +2,7 @@
 
 - ⚠️ This entry intentionally stays silent on state management. See [State Management](./State-Management.md) entry instead.
 - ⚠️ This entry is not oriented toward performance improvements. It is concerned with improving developer experience, increasing readability, and aligning our codebase with current React standards.
-- ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is actually organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
+- ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is currently organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
 
 ## Contents
 
@@ -19,20 +19,13 @@
   + [Markup readability](#markup-readability)
   + [Linting](#linting)
   + [Example file composition](#example-component-composition)
+- [StrictMode](#strictmode)
 
-## Directory structure
+## Directory Structure
 
-Currently, our frontend's directory structure is derived from the MVC model, with which React has little in common, and from which we want to gradually move away.
-
-Suggested changes:
-
-- The `commonwealth/client` folder should serve as root for the front-end application. This means that the `scripts` folder should be removed and its content moved to `client`.
-- The `styles` folder should contain only global styles, such as `index.scss`, `normalize.css`, or shared styles. Any other style files should neighbor the `.tsx` files where page or component files are defined. (See discussion in [Components](#components) section.)
-- The `views` folder suggests an MVC architecture. This should be removed, with the main `client` folder housing only two immediate children: `components` and `pages`.
+As of 240416, our frontend's directory structure is derived from the MVC model, with which React has little in common, and from which we want to gradually move away.
 
 ### Components
-
-_Currently housed in `client/script/views/components`; aspirationally housed in `client/components`._
 
 All reusable components (i.e. components that may be invoked multiple times across the app) are kept in the `/components` folder.
 
@@ -75,8 +68,6 @@ Skeleton components should be returned via a conditional `if` statement, e.g. `i
 ```
 
 ### Pages
-
-_Currently housed in `client/script/views/pages`; aspirationally housed in `client/pages`._
 
 Aspirationally, only those components serving as entry points for routes are housed in this directory.
 
@@ -131,12 +122,6 @@ We should place as little logic as possible in the component's `return`, as this
 - E.g., all calculations should be made in the component body prior to the `return`; there result can be assigned to const for later reference.
   
 The same is true for event handler definitions, like `onClick`. Define the handler functions in the component body and reference them in the `return`.
-
-#### Linting
-
-Pre-commit, we should run `yarn format`, which runs the `prettier` library to ensure our code is well-formatted.
-
-Down the line we [may want to involve the Husky library in this process](https://prettier.io/docs/en/precommit.html).
 
 #### Example component composition
 
@@ -203,7 +188,18 @@ const useComponent = () => {
 export default useComponent
 ```
 
+## StrictMode
+
+When a React application is wrapped in `React.StrictMode`, React performs extra checks and validations during development mode. These checks include:
+
+- Identifying components with unsafe lifecycle methods and providing warnings about them.
+- Detecting legacy string ref usage and warning about it.
+- Detecting deprecated findDOMNode usages and warning about it.
+- Detecting unexpected side effects within the render phase and warning about it.
+- Detecting a few other potential issues.
+
 ## Change Log
 
+- 240416: Obsolete recommendations purged by Graham Johnson (#7460).
 - 230815: Certified fresh by Graham Johnson.
 - 230502: Authored by Marcin Maslanka.
