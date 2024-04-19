@@ -211,6 +211,7 @@ export type MemberResult = {
   }[];
   group_ids?: [];
   roles?: any[];
+  last_active: string;
 };
 type MemberResultRowProps = {
   addr: MemberResult;
