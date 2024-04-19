@@ -40,7 +40,7 @@ export default (
           throw new Error('event_id is read-only');
         },
       },
-      event_name: { type: dataTypes.STRING, allowNull: false },
+      event_name: { type: dataTypes.TEXT, allowNull: false },
       event_payload: { type: dataTypes.JSONB, allowNull: false },
       relayed: {
         type: dataTypes.BOOLEAN,
