@@ -51,7 +51,7 @@ const FundContestDrawer = ({
   };
 
   const [fundContestDrawerStep, setFundContestDrawerStep] =
-    useState<FundContestStep>('Failure');
+    useState<FundContestStep>('Form');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
   const [amountEth, setAmountEth] = useState('0.0001');
 
