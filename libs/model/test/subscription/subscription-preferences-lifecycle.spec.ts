@@ -102,4 +102,16 @@ describe('Subscription preferences lifecycle', () => {
       mobile_push_admin_alerts_enabled: false,
     });
   });
+
+  it('should not throw if the subscription preference does not', async () => {
+    const numDeleted = await models.SubscriptionPreference.destroy({
+      where: { user_id: actor.user.id },
+    });
+    expect(numDeleted).to.equal(1);
+    const res = await query(GetSubscriptionPreferences(), {
+      actor,
+      payload: {},
+    });
+    expect(res).to.deep.equal({});
+  });
 });
