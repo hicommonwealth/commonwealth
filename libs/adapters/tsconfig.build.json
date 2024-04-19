@@ -5,5 +5,8 @@
     "outDir": "build"
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../logging" }]
+  "references": [
+    { "path": "../core/tsconfig.build.json" },
+    { "path": "../logging/tsconfig.build.json" }
+  ]
 }

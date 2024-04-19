@@ -6,5 +6,8 @@
     "tsBuildInfoFile": "build/.tsbuildinfo"
   },
   "include": ["src", "test"],
-  "references": [{ "path": "../logging" }, { "path": "../shared" }]
+  "references": [
+    { "path": "../logging/tsconfig.build.json" },
+    { "path": "../shared/tsconfig.build.json" }
+  ]
 }

@@ -6,9 +6,9 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../core" },
-    { "path": "../chains" },
-    { "path": "../shared" },
-    { "path": "../logging" }
+    { "path": "../core/tsconfig.build.json" },
+    { "path": "../chains/tsconfig.build.json" },
+    { "path": "../shared/tsconfig.build.json" },
+    { "path": "../logging/tsconfig.build.json" }
   ]
 }
