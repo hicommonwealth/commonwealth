@@ -4,6 +4,7 @@ import { Sequelize } from 'sequelize';
 import { URL } from 'url';
 import { DATABASE_URI } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
+import { isSuperAdmin } from '../middleware';
 import {
   createAllAddressesInCW,
   createAllCategoriesInCW,
@@ -27,13 +28,11 @@ export const ImportDiscourseCommunity: Command<
   typeof schemas.commands.ImportDiscourseCommunity
 > = () => ({
   ...schemas.commands.ImportDiscourseCommunity,
-  auth: [
-    /* TODO: isSuperAdmin() */
-  ],
-  body: async ({ id, payload }) => {
+  auth: [isSuperAdmin],
+  body: async ({ id: communityId, payload }) => {
     // TODO: use global lock to limit concurrency on this command?
 
-    const { id: communityId, base, accountsClaimable, dumpUrl } = payload;
+    const { base, accountsClaimable, dumpUrl } = payload;
 
     // cleanup functions are pushed to this array, then popped off
     // and invoked after everything is done
@@ -121,6 +120,7 @@ export const ImportDiscourseCommunity: Command<
       // import dump
       await importDump(dumpUrl, restrictedDiscourseDbUri);
     } catch (err) {
+      // on error, cleanup and throw
       log.error('import stage failed: ', err as Error);
       await runCleanup(cleanupStack);
       throw err;
@@ -140,7 +140,7 @@ export const ImportDiscourseCommunity: Command<
       const { newUsers, existingUsers } = await createAllUsersInCW(
         restrictedDiscourseConnection,
         cwConnection,
-        { communityId },
+        { communityId: communityId! },
         { transaction },
       );
       tables['users'] = newUsers;
@@ -163,7 +163,7 @@ export const ImportDiscourseCommunity: Command<
         {
           users: newUsers.concat(...existingUsers),
           profiles,
-          communityId,
+          communityId: communityId!,
           base,
         },
         { transaction },
@@ -175,7 +175,7 @@ export const ImportDiscourseCommunity: Command<
       const categories = await createAllCategoriesInCW(
         restrictedDiscourseConnection,
         cwConnection,
-        { communityId },
+        { communityId: communityId! },
         { transaction },
       );
       tables['categories'] = categories;
@@ -185,7 +185,11 @@ export const ImportDiscourseCommunity: Command<
       const threads = await createAllThreadsInCW(
         restrictedDiscourseConnection,
         cwConnection,
-        { users: newUsers.concat(existingUsers), categories, communityId },
+        {
+          users: newUsers.concat(existingUsers),
+          categories,
+          communityId: communityId!,
+        },
         { transaction },
       );
       tables['threads'] = threads;
@@ -195,7 +199,7 @@ export const ImportDiscourseCommunity: Command<
       const comments = await createAllCommentsInCW(
         restrictedDiscourseConnection,
         cwConnection,
-        { communityId, addresses, threads },
+        { communityId: communityId!, addresses, threads },
         { transaction },
       );
       tables['comments'] = comments;
@@ -205,7 +209,7 @@ export const ImportDiscourseCommunity: Command<
       const reactions = await createAllReactionsInCW(
         restrictedDiscourseConnection,
         cwConnection,
-        { addresses, communityId, threads, comments },
+        { addresses, communityId: communityId!, threads, comments },
         { transaction },
       );
       tables['reactions'] = reactions;
@@ -215,7 +219,11 @@ export const ImportDiscourseCommunity: Command<
       const subscriptions = await createAllSubscriptionsInCW(
         restrictedDiscourseConnection,
         cwConnection,
-        { communityId, users: newUsers.concat(existingUsers), threads },
+        {
+          communityId: communityId!,
+          users: newUsers.concat(existingUsers),
+          threads,
+        },
         { transaction },
       );
       tables['subscriptions'] = subscriptions;
@@ -227,6 +235,7 @@ export const ImportDiscourseCommunity: Command<
       await transaction.rollback();
       throw err;
     } finally {
+      // always cleanup
       await runCleanup(cleanupStack);
     }
   },

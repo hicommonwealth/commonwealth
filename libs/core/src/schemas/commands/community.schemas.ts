@@ -111,7 +111,6 @@ export const GenerateStakeholderGroups = {
 
 export const ImportDiscourseCommunity = {
   input: z.object({
-    id: z.string(),
     base: z.enum(['ETHEREUM', 'COSMOS', 'NEAR']),
     accountsClaimable: z.boolean(),
     dumpUrl: z.string(),
