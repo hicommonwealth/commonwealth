@@ -493,3 +493,40 @@ export const Outbox = z.object({
   created_at: z.date(),
   updated_at: z.date(),
 });
+
+export const SubscriptionPreferences = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  email_notifications_enabled: z.boolean(),
+  digest_email_enabled: z.boolean(),
+  recap_email_enabled: z.boolean(),
+  mobile_push_notifications_enabled: z.boolean(),
+  mobile_push_discussion_activity_enabled: z.boolean(),
+  mobile_push_admin_alerts_enabled: z.boolean(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const ThreadSubscriptions = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  thread_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const CommentSubscriptions = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  comment_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const CommunityAlerts = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  community_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
