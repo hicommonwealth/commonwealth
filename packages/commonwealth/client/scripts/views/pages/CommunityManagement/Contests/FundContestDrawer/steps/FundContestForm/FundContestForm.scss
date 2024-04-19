@@ -1,0 +1,82 @@
+@import '../../../../../../../../styles/shared';
+
+.FundContestForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  .description {
+    color: $neutral-500;
+  }
+
+  .CWSelectList {
+    margin-top: 24px;
+  }
+
+  .current-balance-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+
+    .Text {
+      color: $neutral-500;
+    }
+  }
+
+  .to-address-row {
+    margin-top: 24px;
+  }
+
+  .eth-amount {
+    margin-top: 24px;
+
+    // hide arrow
+    input[type='number']::-webkit-outer-spin-button,
+    input[type='number']::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+      margin: 0;
+    }
+  }
+
+  .amount-helper-row {
+    margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .Text.b2 {
+      margin-left: auto;
+    }
+  }
+
+  .summary-balance-row {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+
+    .first-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 4px;
+
+      .Text:first-child {
+        color: $neutral-500;
+      }
+    }
+  }
+
+  .footer {
+    .Divider {
+      margin-block: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+  }
+}
