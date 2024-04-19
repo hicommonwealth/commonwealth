@@ -1,3 +1,6 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
 import React from 'react';
@@ -8,7 +11,7 @@ import './Stakes.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
-const columnInfo = [
+const columns: CWTableColumnInfo[] = [
   {
     key: 'community',
     header: 'Community',
@@ -56,6 +59,12 @@ const columnInfo = [
 ];
 
 const Stakes = ({ transactions }: TransactionsProps) => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'voteWeight',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   // aggregate transaction per community per address
   const stakes = (() => {
     const accumulatedStakes = {};
@@ -100,7 +109,9 @@ const Stakes = ({ transactions }: TransactionsProps) => {
   return (
     <section className="Stakes">
       <CWTable
-        columnInfo={columnInfo}
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
         rowData={stakes.map((tx) => ({
           ...tx,
           community: {
