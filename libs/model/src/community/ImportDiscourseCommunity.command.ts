@@ -2,7 +2,7 @@ import { schemas, type Command } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { Sequelize } from 'sequelize';
 import { URL } from 'url';
-import { DATABASE_URI } from '../config';
+import { DATABASE_URI, DEV } from '../config';
 import { createDiscourseDBConnection, models } from '../database';
 import { isSuperAdmin } from '../middleware';
 import {
@@ -78,7 +78,9 @@ export const ImportDiscourseCommunity: Command<
       const superUserDiscourseDbUri = (() => {
         const parsedUrl = new URL(DATABASE_URI);
         parsedUrl.pathname = discourseDbName;
-        parsedUrl.searchParams.set('sslmode', 'disable'); // TODO: allow SSL on prod?
+        if (DEV) {
+          parsedUrl.searchParams.set('sslmode', 'disable');
+        }
         return parsedUrl.toString();
       })();
       const superUserDiscourseConnection = await createDiscourseDBConnection(
@@ -100,8 +102,11 @@ export const ImportDiscourseCommunity: Command<
         const parsedUrl = new URL(DATABASE_URI);
         const host = parsedUrl.host;
         const port = parsedUrl.port || 5432;
-        const sslmode = 'disable'; // TODO: allow SSL on prod?
-        return `postgresql://${restrictedDiscourseDbUser}:${restrictedDiscourseDbPass}@${host}:${port}/${discourseDbName}?sslmode=${sslmode}`;
+        let uri = `postgresql://${restrictedDiscourseDbUser}:${restrictedDiscourseDbPass}@${host}:${port}/${discourseDbName}`;
+        if (DEV) {
+          uri += '?sslmode=disable';
+        }
+        return uri;
       })();
 
       // connect to discourse DB
