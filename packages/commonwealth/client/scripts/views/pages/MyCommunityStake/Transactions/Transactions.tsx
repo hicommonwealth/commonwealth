@@ -1,3 +1,6 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { formatAddressShort } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
 import React from 'react';
@@ -8,7 +11,7 @@ import './Transactions.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
-const columnInfo = [
+const columns: CWTableColumnInfo[] = [
   {
     key: 'community',
     header: 'Community',
@@ -69,10 +72,18 @@ const columnInfo = [
 ];
 
 const Transactions = ({ transactions }: TransactionsProps) => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'timestamp',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   return (
     <section className="Transactions">
       <CWTable
-        columnInfo={columnInfo}
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
         rowData={transactions.map((tx) => ({
           ...tx,
           community: {
