@@ -104,7 +104,7 @@ const FundContestForm = ({
 
         <CWTextInput
           placeholder="0.00"
-          value={amountEth}
+          value={Number(amountEth)}
           onInput={handleChangeEthAmount}
           label="Amount"
           type="number"

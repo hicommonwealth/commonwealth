@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 import app from 'state';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
 
 import FundContestForm from './FundContestForm';
 
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './FundContestDrawer.scss';
 
 interface FundContestDrawerProps {
@@ -50,7 +50,7 @@ const FundContestDrawer = ({
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
-  const [amountEth, setAmountEth] = useState('0');
+  const [amountEth, setAmountEth] = useState('0.0001');
 
   const userEthBalance = '113.456';
   const contestEthBalance = '56.102';
@@ -69,8 +69,6 @@ const FundContestDrawer = ({
     setAmountEth(e.target.value);
   };
 
-  // write fake api call that uses math random and sometimes throws an error and sometimes succeeds
-
   const handleTransferFunds = async () => {
     try {
       setFundContestDrawerStep('Loading');
@@ -81,12 +79,19 @@ const FundContestDrawer = ({
     }
   };
 
+  const handleClose = () => {
+    onClose();
+    setFundContestDrawerStep('Form');
+    setAmountEth('0');
+    setSelectedAddress(activeAccountOption);
+  };
+
   const getCurrentStep = () => {
     switch (fundContestDrawerStep) {
       case 'Form':
         return (
           <FundContestForm
-            onClose={onClose}
+            onClose={handleClose}
             handleTransferFunds={handleTransferFunds}
             amountEth={amountEth}
             amountError={amountError}
@@ -125,7 +130,11 @@ const FundContestDrawer = ({
       case 'Success':
         return (
           <div>
-            <CWButton label="Close" onClick={onClose} buttonType="secondary" />
+            <CWButton
+              label="Close"
+              onClick={handleClose}
+              buttonType="secondary"
+            />
             <CWButton
               label="View transactions"
               onClick={() => window.open('https://etherscan.io', '_blank')}
@@ -137,8 +146,8 @@ const FundContestDrawer = ({
 
   return (
     <div className="FundContestDrawer">
-      <CWDrawer open={isOpen} onClose={onClose}>
-        <CWDrawerTopBar onClose={onClose} />
+      <CWDrawer open={isOpen} onClose={handleClose}>
+        <CWDrawerTopBar onClose={handleClose} />
         <div className="fund-contest-drawer-container">{getCurrentStep()}</div>
       </CWDrawer>
     </div>
