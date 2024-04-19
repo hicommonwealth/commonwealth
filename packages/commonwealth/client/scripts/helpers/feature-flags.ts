@@ -23,9 +23,6 @@ const featureFlags = {
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  myCommunityStakePageEnabled: buildFlag(
-    process.env.FLAG_MY_COMMUNITY_STAKE_PAGE_ENABLED,
-  ),
   existingCommunityStakeIntegrationEnabled: buildFlag(
     process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
   ),
