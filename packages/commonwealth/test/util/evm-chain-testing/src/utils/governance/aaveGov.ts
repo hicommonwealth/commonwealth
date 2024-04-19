@@ -57,7 +57,7 @@ export class aaveGovernor implements IGovernor {
 
     return {
       proposalId: String(proposalId.events?.ProposalCreated.returnValues[0]),
-      block: proposalId['blockNumber'],
+      block: proposalId['blockNumber'].toString(),
     };
   }
 
@@ -76,7 +76,7 @@ export class aaveGovernor implements IGovernor {
       .queue(proposalId)
       .send({ from: accounts, gas: '500000' });
     console.log(queued);
-    return { block: queued['blockNumber'] };
+    return { block: queued['blockNumber'].toString() };
   }
 
   public async cancelProposal(proposalId: string | number): Promise<any> {
@@ -91,7 +91,7 @@ export class aaveGovernor implements IGovernor {
       .cancel(proposalId)
       .send({ from: accounts[0], gas: '200000' });
     console.log(cancel);
-    return { block: cancel['blockNumber'] };
+    return { block: cancel['blockNumber'].toString() };
   }
 
   public async castVote(
@@ -106,7 +106,7 @@ export class aaveGovernor implements IGovernor {
       .submitVote(proposalId, Number(forAgainst))
       .send({ from: accounts, gas: '1000000' });
     console.log(vote);
-    return { block: vote['blockNumber'] };
+    return { block: vote['blockNumber'].toString() };
   }
 
   public async getProposalDetails(proposalId: string | number): Promise<any> {
@@ -130,7 +130,7 @@ export class aaveGovernor implements IGovernor {
       .execute(proposalId)
       .send({ from: accounts, value: '0', gas: '1000000' });
     console.log(executed);
-    return { block: executed['blockNumber'] };
+    return { block: executed['blockNumber'].toString() };
   }
 
   public async getVotes(
@@ -171,7 +171,7 @@ export class aaveGovernor implements IGovernor {
     } catch {
       console.log('already Delegated');
     }
-    return { block: txReceipt?.blockNumber };
+    return { block: txReceipt?.blockNumber.toString() };
   }
 
   public async endToEndSim(): Promise<void> {

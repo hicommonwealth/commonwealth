@@ -61,7 +61,7 @@ export const transfer = async (req: Request, res: Response) => {
         .transfer(request.to, Web3.utils.toWei(request.amount, 'ether'))
         .send({ from: account, gas: '400000' });
     }
-    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
+    res.status(200).json({ block: txReceipt['blockNumber'].toString() }).send();
   } catch (err) {
     console.error(err);
     res
@@ -83,7 +83,7 @@ export const approve = async (req: Request, res: Response) => {
     const txReceipt = await contract.methods
       .approve(request.spender, request.amount)
       .send({ from: accounts[request.accountIndex ?? 0] });
-    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
+    res.status(200).json({ block: txReceipt['blockNumber'].toString() }).send();
   } catch (err) {
     console.error(err);
     res
