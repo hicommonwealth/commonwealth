@@ -36,7 +36,7 @@ const ContestsList = () => {
       <div className="ContestsList">
         <CWText type="h2">Contests</CWText>
 
-        {isStakeEnabled || isContestAvailable ? (
+        {!isStakeEnabled || !isContestAvailable ? (
           <EmptyContestsList
             isStakeEnabled={isStakeEnabled}
             isContestAvailable={isContestAvailable}
