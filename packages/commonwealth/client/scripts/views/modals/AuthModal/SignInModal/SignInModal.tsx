@@ -33,7 +33,7 @@ const SignInModal = ({
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
     setIsEVMWalletsModalVisible(false);
-    isWalletConnectEnabled && (await onResetWalletConnect());
+    isWalletConnectEnabled && (await onResetWalletConnect().catch(() => null));
     await onClose();
   };
 
