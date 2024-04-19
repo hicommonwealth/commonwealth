@@ -185,9 +185,6 @@ export default (
       as: 'groups',
       foreignKey: 'community_id',
     });
-    models.Community.hasMany(models.CommunityStake, {
-      foreignKey: { name: 'community_id' },
-    });
   };
 
   return Community;
