@@ -108,6 +108,11 @@ export async function createAddressHelper(
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: req.community_id, address: encodedAddress },
+      include: [
+        {
+          model: models.Profile,
+        },
+      ],
     },
   );
 
@@ -209,7 +214,7 @@ export async function createAddressHelper(
     }
 
     const newObj = await models.sequelize.transaction(async (transaction) => {
-      return models.Address.create(
+      const address = await models.Address.create(
         {
           user_id,
           profile_id,
@@ -226,6 +231,13 @@ export async function createAddressHelper(
         },
         { transaction },
       );
+
+      address.Profile = await models.Profile.findOne({
+        where: { id: profile_id },
+        transaction,
+      });
+
+      return address;
     });
 
     // if user.id is undefined, the address is being used to create a new user,
