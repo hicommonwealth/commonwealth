@@ -57,6 +57,7 @@ class PolkadotWebWalletController
 
     const extension = await web3FromAddress(reencodedAddress);
     const SubstrateSignerCW = await constructSubstrateSignerCWClass();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return new SubstrateSignerCW({ extension });
   }

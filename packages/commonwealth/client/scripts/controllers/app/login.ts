@@ -495,6 +495,7 @@ export async function handleSocialLoginCallback({
       const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
 
       const sessionSigner = new SIWESigner({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         signer: signer,
         chainId: app.chain?.meta.node?.ethChainId || 1,
