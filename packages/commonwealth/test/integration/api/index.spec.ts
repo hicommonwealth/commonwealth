@@ -39,7 +39,7 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
-      const { privateKey, address } = server.seeder.generateEthAddress();
+      const { address } = server.seeder.generateEthAddress();
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
