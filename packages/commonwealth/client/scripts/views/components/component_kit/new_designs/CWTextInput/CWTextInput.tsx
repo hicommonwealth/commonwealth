@@ -38,6 +38,9 @@ export type BaseTextInputProps = {
   manualStatusMessage?: string;
   inputRef?: any;
   rightTextAddon?: string;
+  type?: 'text' | 'number';
+  min?: number;
+  step?: number;
 };
 
 type InputStyleProps = {
@@ -104,6 +107,9 @@ const CWTextInput = (props: TextInputProps) => {
     validationStatus,
     alignLabelToRight,
     rightTextAddon,
+    type = 'text',
+    min,
+    step,
   } = props;
 
   const formContext = useFormContext();
@@ -202,6 +208,9 @@ const CWTextInput = (props: TextInputProps) => {
           value={value}
           defaultValue={defaultValue}
           style={{ paddingRight: rightPaddingForAddon }}
+          type={type}
+          min={min}
+          step={step}
         />
         {rightTextAddon && (
           <div className="right-text-addon">{rightTextAddon}</div>

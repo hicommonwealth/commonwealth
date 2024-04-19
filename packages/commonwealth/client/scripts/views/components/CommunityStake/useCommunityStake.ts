@@ -30,12 +30,15 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
 
-  const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
-    useFetchCommunityStakeQuery({
-      communityId: activeCommunityId,
-      stakeId,
-      apiEnabled: communityStakeEnabled && !!activeCommunityId,
-    });
+  const {
+    isInitialLoading: communityStakeLoading,
+    data: stakeResponse,
+    refetch: refetchStakeQuery,
+  } = useFetchCommunityStakeQuery({
+    communityId: activeCommunityId,
+    stakeId,
+    apiEnabled: communityStakeEnabled && !!activeCommunityId,
+  });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
@@ -87,6 +90,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
+    refetchStakeQuery,
   };
 };
 
