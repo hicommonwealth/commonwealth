@@ -20,8 +20,8 @@ export type StakeTransactionModelStatic = ModelStatic<StakeTransactionInstance>;
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): StakeTransactionModelStatic => {
-  const StakeTransaction = <StakeTransactionModelStatic>sequelize.define(
+): StakeTransactionModelStatic =>
+  <StakeTransactionModelStatic>sequelize.define<StakeTransactionInstance>(
     'StakeTransaction',
     {
       transaction_hash: {
@@ -44,23 +44,8 @@ export default (
       timestamp: { type: dataTypes.INTEGER, allowNull: false },
     },
     {
-      underscored: true,
-      timestamps: false,
       tableName: 'StakeTransactions',
+      timestamps: false,
       indexes: [{ fields: ['address'] }, { fields: ['community_id'] }],
     },
   );
-
-  StakeTransaction.associate = (models) => {
-    models.StakeTransaction.belongsTo(models.CommunityStake, {
-      foreignKey: 'community_id',
-      targetKey: 'community_id',
-    });
-    models.StakeTransaction.belongsTo(models.CommunityStake, {
-      foreignKey: 'stake_id',
-      targetKey: 'stake_id',
-    });
-  };
-
-  return StakeTransaction;
-};

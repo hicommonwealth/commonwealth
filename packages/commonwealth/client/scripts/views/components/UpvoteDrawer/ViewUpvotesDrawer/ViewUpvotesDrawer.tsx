@@ -4,8 +4,9 @@ import MinimumProfile from 'client/scripts/models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
-import CWDrawer from '../../component_kit/new_designs/CWDrawer';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
+import CWDrawer, {
+  CWDrawerTopBar,
+} from '../../component_kit/new_designs/CWDrawer';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import { getColumnInfo } from '../util';
@@ -93,13 +94,8 @@ export const ViewUpvotesDrawer = ({
         open={isOpen}
         onClose={() => setIsOpen(false)}
       >
-        <div className="drawer-actions">
-          <CWIconButton
-            iconName="caretDoubleRight"
-            onClick={() => setIsOpen(false)}
-            buttonSize="sm"
-          />
-        </div>
+        <CWDrawerTopBar onClose={() => setIsOpen(false)} />
+
         <div className="content-container">
           <CWText type="h3">{header}</CWText>
           <div className="upvoted-content">

@@ -52,6 +52,8 @@ export const CreateStakeTransaction: Command<
       throw Error('Chain does not have deployed namespace factory');
     }
 
+    // TODO: @kurtisassad web3 should be encapsulated behind a protocol service
+    // TODO: @kurtisassad so we can easily mock chain actions in unit tests
     const web3 = new Web3(
       community!.ChainNode!.private_url || community!.ChainNode!.url,
     );
