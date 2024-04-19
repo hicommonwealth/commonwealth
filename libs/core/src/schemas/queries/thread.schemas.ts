@@ -4,6 +4,7 @@ import {
   discordMetaSchema,
   linksSchema,
   paginationSchema,
+  PG_INT,
 } from '../utils.schemas';
 
 export const OrderByQueriesKeys = z.enum([
@@ -24,19 +25,19 @@ export const GetBulkThreads = {
     toDate: z.coerce.date().optional(),
     archived: zBoolean.default(false),
     includePinnedThreads: zBoolean.default(false),
-    topicId: z.number().optional(),
+    topicId: PG_INT.optional(),
     stage: z.string().optional(),
     orderBy: OrderByQueriesKeys.default('createdAt:desc'),
-    cursor: z.number().optional(),
+    cursor: PG_INT.optional(),
     ...paginationSchema,
   }),
   output: z.object({
-    limit: z.number(),
-    numVotingThreads: z.number(),
-    cursor: z.number(),
+    limit: PG_INT,
+    numVotingThreads: PG_INT,
+    cursor: PG_INT,
     threads: z
       .object({
-        id: z.number(),
+        id: PG_INT,
         title: z.string(),
         url: z.string().nullable(),
         body: z.string(),
@@ -56,15 +57,15 @@ export const GetBulkThreads = {
         last_commented_on: z.date().nullable().optional(),
         plaintext: z.string().nullable().optional(),
         Address: z.object({
-          id: z.number(),
+          id: PG_INT,
           address: z.string(),
           community_id: z.string(),
         }),
-        numberOfComments: z.number(),
+        numberOfComments: PG_INT,
         reactionIds: z.string().array(),
         reactionTimestamps: z.coerce.date().array(),
-        reactionWeights: z.number().array(),
-        reaction_weights_sum: z.number(),
+        reactionWeights: PG_INT.array(),
+        reaction_weights_sum: PG_INT,
         addressesReacted: z.string().array(),
         reactedProfileName: z.string().array().optional(),
         reactedProfileAvatarUrl: z.string().array().optional(),
@@ -75,13 +76,13 @@ export const GetBulkThreads = {
         latest_activity: z.date().nullable().optional(),
         topic: z
           .object({
-            id: z.number(),
+            id: PG_INT,
             name: z.string(),
             description: z.string(),
             chainId: z.string(),
           })
           .optional(),
-        profile_id: z.number(),
+        profile_id: PG_INT,
         avatar_url: z.string().nullable(),
         address_last_active: z.date().nullable(),
         profile_name: z.string().nullable(),

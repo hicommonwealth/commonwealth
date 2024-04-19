@@ -11,10 +11,15 @@ import z from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { BalanceSourceType, NodeHealth } from '../types';
 import * as events from './events.schemas';
-import { EventNames, discordMetaSchema, linksSchema } from './utils.schemas';
+import {
+  EventNames,
+  PG_INT,
+  discordMetaSchema,
+  linksSchema,
+} from './utils.schemas';
 
 export const User = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  id: PG_INT.optional(),
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).optional(),
   disableRichText: z.boolean().default(false).optional(),
@@ -29,8 +34,8 @@ export const User = z.object({
 });
 
 export const Profile = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
-  user_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  id: PG_INT,
+  user_id: PG_INT,
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
   profile_name: z.string().max(255).optional(),
@@ -46,10 +51,10 @@ export const Profile = z.object({
 });
 
 export const Address = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  id: PG_INT.optional(),
   address: z.string().max(255),
   community_id: z.string().max(255).optional(),
-  user_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  user_id: PG_INT.optional(),
   verification_token: z.string().max(255).optional(),
   verification_token_expires: z.date().nullable().optional(),
   verified: z.date().nullable().optional(),
@@ -58,13 +63,7 @@ export const Address = z.object({
   is_councillor: z.boolean().optional(),
   is_validator: z.boolean().optional(),
   ghost_address: z.boolean().optional(),
-  profile_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .nullish()
-    .optional(),
+  profile_id: PG_INT.nullish().optional(),
   wallet_id: z.string().max(255).optional(),
   block_info: z.string().max(255).optional(),
   is_user_default: z.boolean().optional(),
@@ -76,20 +75,20 @@ export const Address = z.object({
 });
 
 export const CommunityMember = z.object({
-  id: z.number().int(),
-  user_id: z.number().int(),
+  id: PG_INT,
+  user_id: PG_INT,
   profile_name: z.string().optional().nullable(),
   avatar_url: z.string().optional().nullable(),
   addresses: z.array(
     z.object({
-      id: z.number().int(),
+      id: PG_INT,
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.string().optional(),
     }),
   ),
   roles: z.array(z.string()).optional(),
-  group_ids: z.array(z.number().int()),
+  group_ids: z.array(PG_INT),
   last_active: z.any().optional().nullable().describe('string or date'),
 });
 
@@ -99,7 +98,7 @@ const ContractSource = z.object({
     BalanceSourceType.ERC721,
     BalanceSourceType.ERC1155,
   ]),
-  evm_chain_id: z.number(),
+  evm_chain_id: PG_INT,
   contract_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
   token_id: z
     .string()
@@ -109,7 +108,7 @@ const ContractSource = z.object({
 
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
-  evm_chain_id: z.number(),
+  evm_chain_id: PG_INT,
 });
 
 const CosmosSource = z.object({
@@ -152,12 +151,12 @@ export const Requirement = z.union([
 export const GroupMetadata = z.object({
   name: z.string(),
   description: z.string(),
-  required_requirements: z.number().optional(),
+  required_requirements: PG_INT.optional(),
   membership_ttl: z.number().optional(), // NOT USED
 });
 
 export const Group = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  id: PG_INT,
   community_id: z.string(),
   metadata: GroupMetadata,
   requirements: z.array(Requirement),
@@ -168,18 +167,18 @@ export const Group = z.object({
 
 export const Thread = z.object({
   Address: Address.optional(),
-  address_id: z.number(),
+  address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
-  id: z.number().optional(),
+  id: PG_INT.optional(),
   body: z.string().optional(),
   plaintext: z.string().optional(),
   url: z.string().optional(),
-  topic_id: z.number().optional(),
+  topic_id: PG_INT.optional(),
   pinned: z.boolean().optional(),
   community_id: z.string(),
-  view_count: z.number(),
+  view_count: PG_INT,
   links: z.object(linksSchema).array().optional(),
 
   read_only: z.boolean().optional(),
@@ -202,22 +201,22 @@ export const Thread = z.object({
   discord_meta: z.object(discordMetaSchema).optional(),
 
   //counts
-  reaction_count: z.number(),
-  reaction_weights_sum: z.number(),
-  comment_count: z.number(),
+  reaction_count: PG_INT,
+  reaction_weights_sum: PG_INT,
+  comment_count: PG_INT,
 
   //notifications
-  max_notif_id: z.number(),
+  max_notif_id: PG_INT,
 
   profile_name: z.string(),
 });
 
 export const Comment = z.object({
-  thread_id: z.string(),
-  address_id: z.number(),
+  thread_id: PG_INT,
+  address_id: PG_INT,
   text: z.string(),
   plaintext: z.string(),
-  id: z.number().optional(),
+  id: PG_INT.optional(),
   community_id: z.string(),
   parent_id: z.string().optional(),
   version_history: z.array(z.string()).optional(),
@@ -242,8 +241,12 @@ export const Comment = z.object({
     })
     .optional(),
 
-  reaction_count: z.number(),
-  reaction_weights_sum: z.number().optional(),
+  reaction_count: PG_INT,
+  reaction_weights_sum: z
+    .number()
+    .min(MIN_SCHEMA_INT)
+    .max(MAX_SCHEMA_INT)
+    .optional(),
 
   Address: Address.optional(),
 });
@@ -251,18 +254,18 @@ export const Comment = z.object({
 export const StakeTransaction = z.object({
   transaction_hash: z.string().length(66),
   community_id: z.string(),
-  stake_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).default(2),
+  stake_id: PG_INT.default(2),
   address: z.string(),
-  stake_amount: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  stake_amount: PG_INT,
   stake_price: z.coerce.string(),
   stake_direction: z.enum(['buy', 'sell']),
-  timestamp: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  timestamp: PG_INT,
 });
 
 export const CommunityStake = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  id: PG_INT.optional(),
   community_id: z.string(),
-  stake_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).default(1),
+  stake_id: PG_INT.default(1),
   stake_token: z.string().default(''),
   vote_weight: z
     .number()
@@ -277,7 +280,7 @@ export const CommunityStake = z.object({
 });
 
 export const Topic = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  id: PG_INT.optional(),
   name: z.string().max(255).default('General'),
   community_id: z.string().max(255),
   description: z.string().default(''),
@@ -285,17 +288,15 @@ export const Topic = z.object({
   featured_in_sidebar: z.boolean().default(false),
   featured_in_new_post: z.boolean().default(false),
   default_offchain_template: z.string().optional().nullable(),
-  order: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  order: PG_INT.optional(),
   channel_id: z.string().max(255).optional().nullable(),
-  group_ids: z
-    .array(z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT))
-    .default([]),
+  group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().optional().nullable(),
 });
 
 export const Community = z.object({
   name: z.string(),
-  chain_node_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  chain_node_id: PG_INT,
   default_symbol: z.string().default(''),
   network: z.nativeEnum(ChainNetwork).default(ChainNetwork.Ethereum),
   base: z.nativeEnum(ChainBase),
@@ -355,17 +356,17 @@ export const Community = z.object({
 });
 
 export const CommunityContract = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  id: PG_INT,
   community_id: z.string().max(255),
-  contract_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  contract_id: PG_INT,
   created_at: z.date(),
   updated_at: z.date(),
 });
 
 export const Contract = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  id: PG_INT,
   address: z.string().max(255),
-  chain_node_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  chain_node_id: PG_INT,
   abi_id: z
     .number()
     .int()
@@ -373,7 +374,7 @@ export const Contract = z.object({
     .max(MAX_SCHEMA_INT)
     .optional()
     .nullable(),
-  decimals: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  decimals: PG_INT.optional(),
   token_name: z.string().max(255).optional(),
   symbol: z.string().max(255).optional(),
   type: z.string().max(255),
@@ -409,8 +410,8 @@ export const SnapshotProposal = z.object({
 });
 
 export const Subscription = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
-  subscriber_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
+  id: PG_INT,
+  subscriber_id: PG_INT,
   category_id: z.nativeEnum(NotificationCategories),
   is_active: z.boolean().default(true),
   created_at: z.date(),
@@ -435,7 +436,7 @@ export const Subscription = z.object({
 });
 
 export const ChainNode = z.object({
-  id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  id: PG_INT.optional(),
   url: z.string().max(255),
   eth_chain_id: z
     .number()
@@ -448,9 +449,9 @@ export const ChainNode = z.object({
   balance_type: z.nativeEnum(BalanceType),
   name: z.string().max(255),
   description: z.string().max(255).optional(),
-  ss58: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  ss58: PG_INT.optional(),
   bech32: z.string().max(255).optional(),
-  slip44: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),
+  slip44: PG_INT.optional(),
   created_at: z.any(),
   updated_at: z.any(),
   cosmos_chain_id: z
@@ -467,7 +468,7 @@ export const ChainNode = z.object({
 export const Chain = Community;
 
 export const Outbox = z.object({
-  id: z.number(),
+  id: PG_INT,
   event_name: z.nativeEnum(EventNames),
   event_payload: z.union([
     events.ThreadCreated.extend({
@@ -494,39 +495,39 @@ export const Outbox = z.object({
   updated_at: z.date(),
 });
 
-export const SubscriptionPreferences = z.object({
-  id: z.number(),
-  user_id: z.number(),
-  email_notifications_enabled: z.boolean(),
-  digest_email_enabled: z.boolean(),
-  recap_email_enabled: z.boolean(),
-  mobile_push_notifications_enabled: z.boolean(),
-  mobile_push_discussion_activity_enabled: z.boolean(),
-  mobile_push_admin_alerts_enabled: z.boolean(),
+export const SubscriptionPreference = z.object({
+  id: PG_INT,
+  user_id: PG_INT,
+  email_notifications_enabled: z.boolean().default(false),
+  digest_email_enabled: z.boolean().default(false),
+  recap_email_enabled: z.boolean().default(false),
+  mobile_push_notifications_enabled: z.boolean().default(false),
+  mobile_push_discussion_activity_enabled: z.boolean().default(false),
+  mobile_push_admin_alerts_enabled: z.boolean().default(false),
+  created_at: z.date().default(new Date()),
+  updated_at: z.date().default(new Date()),
+});
+
+export const ThreadSubscription = z.object({
+  id: PG_INT,
+  user_id: PG_INT,
+  thread_id: PG_INT,
   created_at: z.date(),
   updated_at: z.date(),
 });
 
-export const ThreadSubscriptions = z.object({
-  id: z.number(),
-  user_id: z.number(),
-  thread_id: z.number(),
+export const CommentSubscription = z.object({
+  id: PG_INT,
+  user_id: PG_INT,
+  comment_id: PG_INT,
   created_at: z.date(),
   updated_at: z.date(),
 });
 
-export const CommentSubscriptions = z.object({
-  id: z.number(),
-  user_id: z.number(),
-  comment_id: z.number(),
-  created_at: z.date(),
-  updated_at: z.date(),
-});
-
-export const CommunityAlerts = z.object({
-  id: z.number(),
-  user_id: z.number(),
-  community_id: z.number(),
-  created_at: z.date(),
-  updated_at: z.date(),
+export const CommunityAlert = z.object({
+  id: PG_INT.optional(),
+  user_id: PG_INT,
+  community_id: z.string(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });

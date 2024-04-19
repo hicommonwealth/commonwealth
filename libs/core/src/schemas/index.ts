@@ -16,6 +16,8 @@ export type Aggregates = Extract<
   | 'Thread'
   | 'User'
   | 'StakeTransaction'
+  | 'SubscriptionPreference'
+  | 'CommunityAlert'
 >;
 export { entities };
 
