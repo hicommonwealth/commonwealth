@@ -4,6 +4,7 @@ import { comp_gov, erc20 } from '../contracts';
 import getProvider from '../getProvider';
 import { IGovernor } from './IGovernor';
 
+/* eslint-disable max-len */
 export class compoundGovernor implements IGovernor {
   readonly contractAddress = '0xc0Da02939E1441F497fd74F78cE7Decb17B66529';
   readonly compToken = '0xc00e94Cb662C3520282E6f5717214004A7f26888';
@@ -40,9 +41,7 @@ export class compoundGovernor implements IGovernor {
         [0],
         [''],
         [
-          `0xecb9a875000000000000000000000000c3d688b66703497daa19211eedff47f25
-          384cdc3000000000000000000000000c00e94cb662c3520282e6f5717214004a7f2
-          68880000000000000000000000000000000000000000000000000b84c09a3b930000`,
+          '0xecb9a875000000000000000000000000c3d688b66703497daa19211eedff47f25384cdc3000000000000000000000000c00e94cb662c3520282e6f5717214004a7f268880000000000000000000000000000000000000000000000000b84c09a3b930000',
         ],
         'Liquidation ratio propoasl',
       )

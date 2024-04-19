@@ -23,7 +23,7 @@ export const getBalance = async (req: Request, res: Response) => {
     res
       .status(200)
       .json({
-        balance: balance,
+        balance: balance.toString(),
       })
       .send();
   } catch (err) {

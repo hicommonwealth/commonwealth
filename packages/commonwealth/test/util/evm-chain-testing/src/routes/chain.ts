@@ -30,9 +30,22 @@ export const getAccounts = async (req: Request, res: Response) => {
 };
 
 export const getBlock = async (req: Request, res: Response) => {
+  function getJsonStringifiableValue(value: any): any {
+    if (typeof value === 'bigint') {
+      return value.toString();
+    } else {
+      return value;
+    }
+  }
   try {
     const block = await getBlockInfo();
-    res.status(200).json(block).send();
+    const sanitizedBlock = Object.fromEntries(
+      Object.entries(block).map(([key, value]) => [
+        key,
+        getJsonStringifiableValue(value),
+      ]),
+    );
+    res.status(200).json(sanitizedBlock).send();
   } catch (err) {
     console.error(err);
     res
