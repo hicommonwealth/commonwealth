@@ -1,5 +1,4 @@
 import Sequelize, { DataTypes } from 'sequelize';
-import { DB } from '.';
 import { ModelInstance, ModelStatic } from './types';
 
 export type LastProcessedEvmBlockAttributes = {
@@ -34,7 +33,7 @@ export default (
     },
   );
 
-  LastProcessedEvmBlock.associate = (models: DB) => {
+  LastProcessedEvmBlock.associate = (models) => {
     models.LastProcessedEvmBlock.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
       targetKey: 'id',
