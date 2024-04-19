@@ -168,7 +168,7 @@ const generateEthAddress = () => {
   const keypair = ethers.Wallet.createRandom();
   const lowercaseAddress = keypair.address.toString();
   const address = Web3.toChecksumAddress(lowercaseAddress);
-  const privateKey = Buffer.from(keypair.privateKey, 'hex');
+  const privateKey = Uint8Array.from(Buffer.from(keypair.privateKey, 'hex'));
   return { privateKey, address };
 };
 
