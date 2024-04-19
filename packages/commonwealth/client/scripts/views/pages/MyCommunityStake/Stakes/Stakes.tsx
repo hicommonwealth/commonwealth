@@ -2,9 +2,7 @@ import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
-import { getCommunityStakeSymbol } from 'helpers/stakes';
 import React from 'react';
-import app from 'state';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import CommunityInfo from '../common/CommunityInfo';
 import { TransactionsProps } from '../types';
@@ -12,48 +10,56 @@ import './Stakes.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
+const columns = [
+  {
+    key: 'community',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+    hasCustomSortValue: true,
+  },
+  {
+    key: 'chain',
+    header: 'Chain',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'address',
+    header: 'Address',
+    numeric: false,
+    sortable: true,
+    hasCustomSortValue: true,
+  },
+  {
+    key: 'stake',
+    header: 'Stake',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'voteWeight',
+    header: 'Vote weight',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'avgPrice',
+    header: 'Avg. price',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'etherscanLink',
+    header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
+    numeric: false,
+    sortable: false,
+  },
+];
+
 const Stakes = ({ transactions }: TransactionsProps) => {
   const tableState = useCWTableState({
-    columns: [
-      {
-        key: 'community',
-        header: 'Community',
-        numeric: false,
-        sortable: true,
-        hasCustomSortValue: true,
-      },
-      {
-        key: 'address',
-        header: 'Address',
-        numeric: false,
-        sortable: true,
-        hasCustomSortValue: true,
-      },
-      {
-        key: 'stake',
-        header: 'Stake',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'voteWeight',
-        header: 'Vote weight',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'avgPrice',
-        header: 'Avg. price',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'etherscanLink',
-        header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
-        numeric: false,
-        sortable: false,
-      },
-    ],
+    columns,
     initialSortColumn: 'voteWeight',
     initialSortDirection: APIOrderDirection.Desc,
   });
@@ -71,6 +77,7 @@ const Stakes = ({ transactions }: TransactionsProps) => {
       accumulatedStakes[key] = {
         ...transaction,
         ...(accumulatedStakes[key] || {}),
+        chain: transaction.chain,
         stake:
           (accumulatedStakes[key]?.stake || 0) + transaction.stake * action,
         voteWeight:
@@ -93,12 +100,9 @@ const Stakes = ({ transactions }: TransactionsProps) => {
       .map((transaction: any) => ({
         ...transaction,
         voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
-        avgPrice: `${transaction.avgPrice.toFixed(5)} ${getCommunityStakeSymbol(
-          app.config.chains.getById(transaction?.community?.id)?.ChainNode
-            ?.name || '',
-        )}`,
+        avgPrice: `${transaction.avgPrice.toFixed(5)} ${'ETH'}`,
       }))
-      .filter((transaction) => transaction.stake);
+      .filter((transaction) => transaction.stake > 0);
   })();
 
   return (

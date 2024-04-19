@@ -1,6 +1,7 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
+import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -118,14 +119,24 @@ const DirectoryPageContent = ({
     />
   ) : (
     <div className="directory-tiles-container">
-      {filteredRelatedCommunitiesData.map((community) => (
-        <CWRelatedCommunityCard
-          key={community.id}
-          community={community}
-          memberCount={community.members}
-          threadCount={community.threads}
-        />
-      ))}
+      {filteredRelatedCommunitiesData.map((community) => {
+        const chain = app.config.chains.getById(community.id);
+
+        // allow user to buy stake if they have a connected address that matches active community base chain
+        const canBuyStake = !!app?.user?.addresses?.find?.(
+          (address) => address?.community?.base === chain?.base,
+        );
+
+        return (
+          <CWRelatedCommunityCard
+            key={community.id}
+            community={chain}
+            canBuyStake={canBuyStake}
+            memberCount={community.members}
+            threadCount={community.threads}
+          />
+        );
+      })}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
 
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   ChainBase,
   NotificationCategories,
@@ -29,7 +29,7 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -345,7 +345,7 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        const user = await models.User.createWithProfile(models, {
+        const user = await models.User.createWithProfile({
           email: null,
         });
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;

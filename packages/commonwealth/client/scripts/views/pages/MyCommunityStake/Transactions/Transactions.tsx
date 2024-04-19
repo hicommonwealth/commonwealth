@@ -10,61 +10,69 @@ import './Transactions.scss';
 import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
+const columns = [
+  {
+    key: 'community',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+    hasCustomSortValue: true,
+  },
+  {
+    key: 'chain',
+    header: 'Chain',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'address',
+    header: 'Address',
+    numeric: false,
+    sortable: true,
+    hasCustomSortValue: true,
+  },
+  {
+    key: 'action',
+    header: 'Action',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'stake',
+    header: 'Stake',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'avgPrice',
+    header: 'Avg. price',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'totalPrice',
+    header: 'Total price',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    numeric: true,
+    sortable: true,
+    hasCustomSortValue: true,
+  },
+  {
+    key: 'etherscanLink',
+    header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
+    numeric: false,
+    sortable: false,
+  },
+];
+
 const Transactions = ({ transactions }: TransactionsProps) => {
   const tableState = useCWTableState({
-    columns: [
-      {
-        key: 'community',
-        header: 'Community',
-        numeric: false,
-        sortable: true,
-        hasCustomSortValue: true,
-      },
-      {
-        key: 'address',
-        header: 'Address',
-        numeric: false,
-        sortable: true,
-        hasCustomSortValue: true,
-      },
-      {
-        key: 'action',
-        header: 'Action',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'stake',
-        header: 'Stake',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'avgPrice',
-        header: 'Avg. price',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'totalPrice',
-        header: 'Total price',
-        numeric: true,
-        sortable: true,
-      },
-      {
-        key: 'timestamp',
-        header: 'Timestamp',
-        numeric: true,
-        sortable: true,
-        hasCustomSortValue: true,
-      },
-      {
-        key: 'etherscanLink',
-        header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
-        numeric: false,
-        sortable: false,
-      },
-    ],
+    columns,
     initialSortColumn: 'timestamp',
     initialSortDirection: APIOrderDirection.Desc,
   });

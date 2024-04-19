@@ -48,7 +48,7 @@ export type Actor = {
 export class InvalidInput extends Error {
   public readonly details?: string[];
   constructor(message: string, details?: string[]) {
-    super(message);
+    super(details ? `${message}:\n${details.join('\n')}` : message);
     this.name = INVALID_INPUT_ERROR;
     this.details = details;
   }
