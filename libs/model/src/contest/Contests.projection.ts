@@ -44,7 +44,7 @@ async function updateOrCreateWithAlert(
   );
   if (!updated) {
     // when contest manager metadata is not found, it means it failed creation or was deleted -> alert admins and create default
-    const msg = `Missing contest manager ${contest_address} on namespace ${namespace}`;
+    const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
     log.error(msg, new MissingContestManager(msg, namespace, contest_address));
 
     const community = await models.Community.findOne({

@@ -23,7 +23,8 @@ describe('Contests projection lifecycle', () => {
   const contest_id = 1;
   const content_id = 1;
   const content_url = 'http://content-1';
-  const creator = 'creator-address';
+  const creator1 = 'creator-address1';
+  const creator2 = 'creator-address2';
   const voter1 = 'voter-address1';
   const voter2 = 'voter-address2';
   const voter3 = 'voter-address3';
@@ -31,11 +32,16 @@ describe('Contests projection lifecycle', () => {
   const voting_power2 = 2;
   const voting_power3 = 3;
   const created_at = new Date();
+  const winners = [
+    { creator_address: creator1, prize: 1 },
+    { creator_address: creator2, prize: 2 },
+  ];
+  let community_id: string;
 
   before(async () => {
     await bootstrap_testing();
     const [chain] = await seed('ChainNode', { contracts: [] });
-    await seed('Community', {
+    const [community] = await seed('Community', {
       name: 'test-community',
       namespace,
       chain_node_id: chain!.id,
@@ -45,6 +51,7 @@ describe('Contests projection lifecycle', () => {
       topics: [],
       groups: [],
     });
+    community_id = community?.id!;
   });
 
   after(async () => {
@@ -52,6 +59,32 @@ describe('Contests projection lifecycle', () => {
   });
 
   it('should project events on multiple contests', async () => {
+    await handleEvent(Contests(), {
+      name: schemas.EventNames.ContestManagerMetadataCreated,
+      payload: {
+        community_id,
+        contest_address: recurring,
+        created_at,
+        name: recurring,
+        topics: [],
+        image_url: 'url',
+        payout_structure: [0.9, 0.1],
+      },
+    });
+
+    await handleEvent(Contests(), {
+      name: schemas.EventNames.ContestManagerMetadataCreated,
+      payload: {
+        community_id,
+        contest_address: oneoff,
+        created_at,
+        name: oneoff,
+        topics: [],
+        image_url: 'url',
+        payout_structure: [0.9, 0.1],
+      },
+    });
+
     await handleEvent(Contests(), {
       name: schemas.EventNames.RecurringContestManagerDeployed,
       payload: {
@@ -98,7 +131,7 @@ describe('Contests projection lifecycle', () => {
       payload: {
         contest_address: oneoff,
         content_id,
-        creator_address: creator,
+        creator_address: creator1,
         content_url: content_url,
         created_at,
       },
@@ -110,7 +143,7 @@ describe('Contests projection lifecycle', () => {
         contest_address: recurring,
         contest_id,
         content_id,
-        creator_address: creator,
+        creator_address: creator2,
         content_url: content_url,
         created_at,
       },
@@ -156,7 +189,7 @@ describe('Contests projection lifecycle', () => {
       payload: {
         contest_address: recurring,
         contest_id,
-        winners: [voter2, voter1],
+        winners,
         created_at,
       },
     });
@@ -177,11 +210,11 @@ describe('Contests projection lifecycle', () => {
         contest_id,
         start_time: result?.at(0)?.start_time, // sql date
         end_time: result?.at(0)?.end_time, // sql date
-        winners: [voter2, voter1],
+        winners,
         actions: [
           {
             action: 'added',
-            actor_address: creator,
+            actor_address: creator2,
             content_id,
             content_url,
             voting_power: 0,
@@ -214,7 +247,7 @@ describe('Contests projection lifecycle', () => {
         name: schemas.EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
-          contest_address: recurring,
+          contest_address: 'new-address',
           interval: 10,
           created_at,
         },

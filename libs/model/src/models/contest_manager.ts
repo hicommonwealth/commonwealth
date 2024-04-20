@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
-import { syncHooks } from './utils';
 
 type ContestManager = ModelInstance<
   z.infer<typeof schemas.projections.ContestManager>
@@ -29,8 +28,8 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
       },
       funding_token_address: { type: Sequelize.STRING },
-      prize_percentage: { type: Sequelize.NUMBER },
-      payout_structure: { type: Sequelize.ARRAY(Sequelize.NUMBER) },
+      prize_percentage: { type: Sequelize.FLOAT },
+      payout_structure: { type: Sequelize.ARRAY(Sequelize.FLOAT) },
       interval: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -43,6 +42,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'ContestManagers',
       timestamps: false,
       indexes: [],
-      hooks: syncHooks,
     },
   );

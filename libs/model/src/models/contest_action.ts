@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
-import { syncHooks } from './utils';
 
 type ContestAction = ModelInstance<
   z.infer<typeof schemas.projections.ContestAction>
@@ -46,6 +45,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'ContestActions',
       timestamps: false,
       indexes: [],
-      hooks: syncHooks,
     },
   );

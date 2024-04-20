@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
-import { syncHooks } from './utils';
 
 type ContestTopic = ModelInstance<
   z.infer<typeof schemas.projections.ContestTopic>
@@ -10,7 +9,7 @@ type ContestTopic = ModelInstance<
 
 export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestTopic>>sequelize.define<ContestTopic>(
-    'ContestAction',
+    'ContestTopic',
     {
       contest_address: {
         type: Sequelize.STRING,
@@ -23,6 +22,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'ContestTopics',
       timestamps: false,
       indexes: [],
-      hooks: syncHooks,
     },
   );

@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
-import { syncHooks } from './utils';
 
 type Contest = ModelInstance<z.infer<typeof schemas.projections.Contest>>;
 
@@ -34,6 +33,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'Contests',
       timestamps: false,
       indexes: [{ fields: ['start_time'] }], // TODO: can we enforce typings in indexes?
-      hooks: syncHooks,
     },
   );

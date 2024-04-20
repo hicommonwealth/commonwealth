@@ -203,17 +203,9 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.Thread.belongsToMany(models.Address, {
-      through: models.Collaboration,
-      as: 'collaborators',
-      foreignKey: { name: 'thread_id', allowNull: false },
-    });
     models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
-    });
-    models.Thread.hasMany(models.Collaboration, {
-      foreignKey: 'thread_id',
     });
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
