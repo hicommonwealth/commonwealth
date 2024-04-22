@@ -5,7 +5,7 @@ import './CreateAccountModal.scss';
 import { Option } from './Option';
 
 const CreateAccountModal = ({ onClose }: CreateAccountModal) => {
-  const [showWallets, setShowWallets] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'wallets' | 'sso' | undefined>();
 
   return (
     <ModalBase
@@ -13,23 +13,18 @@ const CreateAccountModal = ({ onClose }: CreateAccountModal) => {
       // TODO: will be replaced with post-account creation flow
       onAuthenticated={(isNewlyCreated) => console.log({ isNewlyCreated })}
       layoutType="create-account"
-      hideDescription={showWallets}
-      {...(showWallets && {
-        showAuthenticationOptionsFor: ['wallets'],
+      hideDescription={!!authMethod}
+      {...(authMethod && {
+        showAuthenticationOptionsFor: [authMethod],
       })}
       customBody={
-        !showWallets && (
+        !authMethod && (
           <>
             <Option
               type="existing-wallet"
-              onClick={() => setShowWallets(true)}
+              onClick={() => setAuthMethod('wallets')}
             />
-            <Option
-              type="new-wallet"
-              onClick={() => {
-                /** TODO */
-              }}
-            />
+            <Option type="new-wallet" onClick={() => setAuthMethod('sso')} />
           </>
         )
       }

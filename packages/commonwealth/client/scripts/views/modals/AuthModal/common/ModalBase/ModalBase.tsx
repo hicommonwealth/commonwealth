@@ -12,7 +12,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import clsx from 'clsx';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
@@ -74,6 +74,15 @@ const ModalBase = ({
       ? 1
       : 0,
   );
+  useEffect(() => {
+    setActiveTabIndex(
+      showAuthenticationOptionsFor?.includes('sso') &&
+        showAuthenticationOptionsFor.length === 1
+        ? 1
+        : 0,
+    );
+  }, [showAuthenticationOptionsFor]);
+
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
