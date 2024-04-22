@@ -9,6 +9,7 @@ import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
+import { getCosmosChains } from './utils';
 
 declare global {
   interface Window {
@@ -34,6 +35,7 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   public readonly label;
   public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly specificChains = getCosmosChains();
 
   constructor(walletName: WalletId, label: string) {
     this.name = walletName;

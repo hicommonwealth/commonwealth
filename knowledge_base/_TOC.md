@@ -38,11 +38,6 @@
 - [Unleash](Feature-Flags.md)
 - [Wallet Support](Wallet-Support.md)
 
-### React
-
-- [React Notes](React-Notes.md)
-- [React Best Practices](React-Best-Practices-And-Improvements.md)
-
 ### RabbitMQ
 
 - [Overview](RabbitMQ-Overview.md)

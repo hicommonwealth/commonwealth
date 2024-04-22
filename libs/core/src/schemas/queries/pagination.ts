@@ -1,4 +1,5 @@
 import z from 'zod';
+import { PG_INT } from '../utils.schemas';
 
 export const PaginationParamsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().default(10),
@@ -24,10 +25,10 @@ export type TypedPaginatedResult<T> = {
 };
 
 export const PaginatedResultSchema = z.object({
-  limit: z.number().int(),
-  page: z.number().int(),
-  totalPages: z.number().int(),
-  totalResults: z.number().int(),
+  limit: PG_INT,
+  page: PG_INT,
+  totalPages: PG_INT,
+  totalResults: PG_INT,
 });
 
 /*

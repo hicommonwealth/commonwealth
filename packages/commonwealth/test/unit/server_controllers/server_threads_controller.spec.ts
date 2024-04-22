@@ -554,7 +554,7 @@ describe('ServerThreadsController', () => {
         });
 
       expect(newComment).to.include({
-        thread_id: String(threadId),
+        thread_id: threadId,
         text,
         address_id: address.id,
         community_id: 'ethereum',

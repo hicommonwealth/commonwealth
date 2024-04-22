@@ -33,6 +33,10 @@ class Account {
     return this._profile;
   }
 
+  public set profile(profile) {
+    this._profile = profile;
+  }
+
   constructor({
     community,
     address,

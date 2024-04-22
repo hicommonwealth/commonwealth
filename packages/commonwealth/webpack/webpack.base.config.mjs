@@ -80,11 +80,6 @@ const baseConfig = {
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_MY_COMMUNITY_STAKE_PAGE_ENABLED': JSON.stringify(
-        process.env.FLAG_MY_COMMUNITY_STAKE_PAGE_ENABLED,
-      ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
         process.env.FLAG_COMMUNITY_STAKE,
       ),
@@ -94,6 +89,11 @@ const baseConfig = {
         JSON.stringify(
           process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
         ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_USER_ONBOARDING_ENABLED': JSON.stringify(
+        process.env.FLAG_USER_ONBOARDING_ENABLED,
+      ),
     }),
     new webpack.DefinePlugin({
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),

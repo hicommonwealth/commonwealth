@@ -27,6 +27,7 @@ const ContractInfo = ({
           <CWIcon
             className="copy-icon"
             iconName="copyNew"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClick={async () => await saveToClipboard(contractAddress, true)}
           />
         </CWText>
@@ -39,6 +40,7 @@ const ContractInfo = ({
             <CWIcon
               className="copy-icon"
               iconName="copyNew"
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={async () =>
                 await saveToClipboard(smartContractAddress, true)
               }
@@ -54,10 +56,11 @@ const ContractInfo = ({
         label="Learn more about community stake"
         iconRight="externalLink"
         buttonType="tertiary"
-        onClick={() =>
-          (window.location.href =
-            'https://docs.common.xyz/commonwealth/community-overview/community-stake')
-        }
+        onClick={() => {
+          window.open(
+            'https://docs.common.xyz/commonwealth/community-overview/community-stake',
+          );
+        }}
       />
     </section>
   );

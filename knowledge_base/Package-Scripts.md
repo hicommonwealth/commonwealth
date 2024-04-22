@@ -6,72 +6,68 @@ If you add a script to the `package.json` file, please add documentation for it 
 
 ## Contents
 
-- [Build Scripts](#build-scripts)
-  - [build](#build)
-  - [build-ci](#build-ci)
-- [Build Heroku](#build-heroku)
-  - [heroku-postbuild](#heroku-postbuild)
-  - [heroku-prebuild](#heroku-prebuild)
-- [CI/CD](#cicd)
-  - [wait-server](#wait-server)
-- [Database](#database)
-  - [clean-db](#clean-db)
-  - [create-migration](#create-migration)
-  - [db-all](#db-all)
-  - [dump-db](#dump-db)
-  - [dump-db-limit](#dump-db-limit)
-  - [load-db](#load-db)
-  - [load-db-limit](#load-db-limit)
-  - [migrate-db](#migrate-db)
-  - [migrate-db-down](#migrate-db-down)
-  - [psql](#psql)
-  - [reset-db](#reset-db)
-  - [reset-frack-db](#reset-frack-db)
-- [Devnets](#devnets)
-  - [cosmos:build](#cosmosbuild)
-  - [cosmos:start](#cosmosstart)
-  - [cosmos:stop](#cosmosstop)
-- [Linting & Formatting](#linting--formatting)
-  - [format](#format)
-  - [lint-all](#lint-all)
-  - [lint-branch](#lint-branch)
-  - [lint-branch-warnings](#lint-branch-warnings)
-  - [style-lint](#style-lint)
-- [Other Services](#other-services)
-  - [send-cosmos-notifs](#send-cosmos-notifs)
-  - [send-notification-digest-emails](#send-notification-digest-emails)
-- [Playwright](#playwright)
-  - [e2e-start-server](#e2e-start-server)
-  - [test-e2e](#test-e2e)
-  - [test-e2e-serial](#test-e2e-serial)
-- [Testing](#testing)
-  - [integration-test](#integration-test)
-  - [test](#test)
-  - [test-api](#test-api)
-  - [test-devnet](#test-devnet)
-  - [test-emit-notif](#test-emit-notif)
-  - [test-integration-util](#test-integration-util)
-  - [test-select](#test-select)
-  - [test-suite](#test-suite)
-  - [unit-test](#unit-test)
-  - [unit-test:watch](#unit-testwatch)
-- [TypeScript](#typescript)
-  - [check-types](#check-types)
-  - [sanity](#sanity)
-- [Webpack & TSNode](#webpack--tsnode)
-  - [bundle-report](#bundle-report)
-  - [listen](#listen)
-  - [start](#start)
-  - [start-all](#start-all)
-  - [start-consumer](#start-consumer)
-  - [start-evm-ce](#start-evm-ce)
-- [Devnets](#devnets)
-  - [cosmos:build](#cosmos:build)
-  - [cosmos:start](#cosmos:start)
-  - [cosmos:stop](#cosmos:stop)
-- [Util scripts](#util-scripts)
-  - [add-components-showcase](#add-component-showcase)
-  - [set-super-admin](#set-super-admin)
+* [Build Scripts](#build-scripts)
+  + [build](#build)
+  + [build-ci](#build-ci)
+  + [heroku-prebuild](#heroku-prebuild)
+  + [heroku-postbuild](#heroku-postbuild)
+* [CI/CD](#cicd)
+  + [wait-server](#wait-server)
+* [Database](#database)
+  + [clean-db](#clean-db)
+  + [create-migration](#create-migration)
+  + [db-all](#db-all)
+  + [db-doc](#db-doc)
+  + [dump-db](#dump-db)
+  + [load-db](#load-db)
+  + [migrate-db](#migrate-db)
+  + [migrate-db-down](#migrate-db-down)
+  + [psql](#psql)
+  + [reset-db](#reset-db)
+  + [reset-frack-db](#reset-frack-db)
+  + [set-super-admin](#set-super-admin)
+* [Devnets](#devnets)
+  + [cosmos:build](#cosmosbuild)
+  + [cosmos:start](#cosmosstart)
+  + [cosmos:stop](#cosmosstop)
+* [Docker](#docker)
+  + [start-containers](#start-containers)
+  + [start-docker-setup](#start-docker-setup)
+* [Linting & Formatting](#linting--formatting)
+  + [format](#format)
+  + [lint-all](#lint-all)
+  + [lint-branch](#lint-branch)
+  + [lint-branch-warnings](#lint-branch-warnings)
+  + [style-lint](#style-lint)  
+* [Playwright](#playwright)
+  + [e2e-start-server](#e2e-start-server)
+  + [emit-notification](#emit-notification)
+  + [test-e2e](#test-e2e)
+  + [test-e2e-serial](#test-e2e-serial)
+* [Testing](#testing)
+  + [integration-test](#integration-test)
+  + [test](#test)
+  + [test-api](#test-api)
+  + [test-devnet](#test-devnet)
+  + [test-emit-notif](#test-emit-notif)
+  + [test-integration-util](#test-integration-util)
+  + [test-select](#test-select)
+  + [test-suite](#test-suite)
+  + [unit-test](#unit-test)
+  + [unit-test:watch](#unit-testwatch)
+* [TypeScript](#typescript)
+  + [check-types](#check-types)
+  + [sanity](#sanity)
+* [Webpack && TSNode](#webpack--tsnode)
+  + [bundle-report](#bundle-report)
+  + [start](#start)
+  + [start-all](#start-all)
+  + [start-consumer](#start-consumer)
+  + [start-evm-ce](#start-evm-ce)
+* [Utils & Services](#utils--services)
+  + [add-component-showcase](#add-component-showcase)
+  + [send-cosmos-notifs](#send-cosmos-notifs)
+  + [send-notification-digest-emails](#send-notification-digest-emails)
 
 ## Build Scripts
 
@@ -95,8 +91,6 @@ Description:
 - Installs node modules, ignoring engine errors
 - Runs the default application build script (above)
 - Runs db migrations
-
-## Build Heroku
 
 ### heroku-prebuild
 
@@ -149,6 +143,20 @@ Description: Resets, loads, and migrates db (composite script).
 
 Contributor: Kurtis Assad
 
+### db-doc
+
+Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
+
+Description: This pulls the schema from a local Postgres instance and generates a Mermaid ERD, updating `/knowledge_base/wiki/Database-ERD.md`
+
+Considerations:
+
+- Using a local PG instance with the default configuration. Developers must ensure it has the latest schema
+- Recommended after major database migrations (adding/removing tables/fields/relationships)
+- Not integrated (CI) yet, need to review how we incorporate file changes from GH actions back to the repo
+
+Contributor: Roger Torres
+
 ### dump-db
 
 Definition: `pg_dump $(heroku config:get HEROKU_POSTGRESQL_MAROON_URL -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
@@ -191,19 +199,24 @@ Definition: `heroku pg:copy commonwealth-beta::HEROKU_POSTGRESQL_MAROON_URL DATA
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
 
-### db-doc
+### set-super-admin
 
-Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
+Definition: `chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh`
 
-Description: This pulls the schema from a local Postgres instance and generates a Mermaid ERD, updating `/knowledge_base/wiki/Database-ERD.md`
+Description: It sets whether a user is a super admin or not. The script accepts 2 optional arguments that indicate the environment in which to set the super admin and whether to enable or disable the super admin. The script enables the super admin by default.
 
-Considerations:
+Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
 
-- Using a local PG instance with the default configuration. Developers must ensure it has the latest schema
-- Recommended after major database migrations (adding/removing tables/fields/relationships)
-- Not integrated (CI) yet, need to review how we incorporate file changes from GH actions back to the repo
+Examples:
 
-Contributor: Roger Torres
+- `yarn set-super-admin`
+  - This sets the local user specified by the environment variables to a super admin.
+- `yarn set-super-admin false`
+  - This disables super admin for the local user.
+- `yarn set-super-admin [frick | frack | beta | demo]`
+  - This enables super admin for the specified user on the specified app.
+- `yarn set-super-admin [frick | frack | beta | demo] false`
+  - This disables super admin for the specified user on the specified app.
 
 ## Docker
 
@@ -254,22 +267,6 @@ Definition: `stylelint client/styles/*`
 Description: Lints SCSS files.
 
 Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint-branch](#lint-branch) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
-
-## Other services
-
-### send-cosmos-notifs
-
-Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
-
-Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
-
-Contributor: Timothee Legros
-
-### send-notification-digest-emails
-
-Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
-
-Description: Schedules a daily task for sending notification email digests.
 
 ## Playwright
 
@@ -456,28 +453,24 @@ Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/
 
 Description: Stop all Cosmos devnet containers.
 
-# Util scripts
+## Utils & Services
 
-## add-component-showcase
+### add-component-showcase
 
 Definition: `add-component-showcase`
 
-Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.
+Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. For more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.
 
-## set-super-admin
+### send-cosmos-notifs
 
-Definition: `chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh`
+Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
 
-Description: It sets whether a user is a super admin or not. The script accepts 2 optional arguments that indicate the environment in which to set the super admin and whether to enable or disable the super admin. The script enables the super admin by default.
+Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
 
-Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
+Contributor: Timothee Legros
 
-Examples:
-- `yarn set-super-admin`
-  - This sets the local user specified by the environment variables to a super admin.
-- `yarn set-super-admin false`
-  - This disables super admin for the local user.
-- `yarn set-super-admin [frick | frack | beta | demo]`
-  - This enables super admin for the specified user on the specified app.
-- `yarn set-super-admin [frick | frack | beta | demo] false`
-  - This disables super admin for the specified user on the specified app.
+### send-notification-digest-emails
+
+Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
+
+Description: Schedules a daily task for sending notification email digests.
