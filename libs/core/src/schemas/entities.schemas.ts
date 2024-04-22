@@ -312,14 +312,15 @@ export const ContestManager = z
       .optional()
       .describe('Percentage of pool used for prizes in recurring contests'),
     payout_structure: z
-      .array(z.number())
+      .array(z.number().min(0).max(1))
       .describe(
         'Sorted array of percentages for prize, from first to last, adding up to 1',
       ),
     interval: z
       .number()
       .int()
-      .positive()
+      .min(0)
+      .max(100)
       .describe('Recurring contest interval, 0 when one-off'),
     created_at: z.date(),
     paused: z
@@ -334,7 +335,7 @@ export const ContestManager = z
 export const ContestTopic = z
   .object({
     contest_address: z.string(),
-    topic_id: z.number().int(),
+    topic_id: PG_INT,
     created_at: z.date(),
   })
   .describe('X-Ref to topics in contest');

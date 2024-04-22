@@ -31,6 +31,7 @@ describe('Community alerts lifecycle', () => {
       CommunityStakes: [],
       topics: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
     [communityTwo] = await seed('Community', {
@@ -39,6 +40,7 @@ describe('Community alerts lifecycle', () => {
       CommunityStakes: [],
       topics: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
     actor = {
@@ -77,6 +79,7 @@ describe('Community alerts lifecycle', () => {
       community_id: community.id,
     });
     const payload = {
+      community_ids: [community.id],
       ids: [alert.id],
     };
     const res = await command(DeleteCommunityAlerts(), {
@@ -96,6 +99,7 @@ describe('Community alerts lifecycle', () => {
       community_id: communityTwo.id,
     });
     const payload = {
+      community_ids: [community.id, communityTwo.id],
       ids: [alertOne.id, alertTwo.id],
     };
     const res = await command(DeleteCommunityAlerts(), {

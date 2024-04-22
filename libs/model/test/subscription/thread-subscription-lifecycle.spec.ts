@@ -35,6 +35,7 @@ describe('Thread subscription lifecycle', () => {
       ],
       CommunityStakes: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
 
