@@ -136,7 +136,7 @@
     "dotenv": "^16.0.3",
     "ethereumjs-util": "7.1.0",
     "ethereumjs-wallet": "^1.0.2",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-http-to-https": "^1.1.4",
     "express-session": "^1.17.0",
