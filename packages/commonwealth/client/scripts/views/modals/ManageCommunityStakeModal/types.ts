@@ -1,5 +1,4 @@
 import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
 export type ManageCommunityStakeModalMode = 'buy' | 'sell';
 
@@ -7,7 +6,7 @@ export interface ManageCommunityStakeModalProps {
   onModalClose: () => void;
   mode: ManageCommunityStakeModalMode;
   denomination: string;
-  community?: ChainInfo | CommunityData;
+  community?: ChainInfo;
 }
 
 export enum ManageCommunityStakeModalState {
