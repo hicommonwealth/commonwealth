@@ -388,7 +388,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     try {
       const parsedMeta = JSON.parse(meta);
       if (getTextFromDelta(parsedMeta)) {
-        return getTextFromDelta(parsedMeta);
+        return getTextFromDelta(parsedMeta) || meta;
       } else {
         return meta;
       }
