@@ -117,7 +117,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
 
-  const communityImage = app.config.chains.getById(app.activeChainId()).iconUrl;
   const thread = data?.[0];
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -398,31 +397,56 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
 
+  const ogTitle =
+    thread?.title?.length > 60
+      ? `${thread?.title?.slice?.(0, 52)}...`
+      : thread?.title;
+  const ogDescription =
+    getMetaDescription(thread?.body || '')?.length > 155
+      ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
+      : getMetaDescription(thread?.body || '');
+  const ogImageUrl = app?.chain?.meta?.iconUrl;
+
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
       <Helmet defaultTitle="Common">
         {/* Default sharing */}
-        <meta name="title" content={thread.title} />
-        <meta name="description" content={getMetaDescription(thread.body)} />
-        <meta name="author" content={thread.author} />
+        {ogTitle && <meta name="title" content={ogTitle} />}
+        {ogDescription && <meta name="description" content={ogDescription} />}
+        {thread?.author && <meta name="author" content={thread.author} />}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        {ogTitle && <meta name="twitter:title" content={ogTitle} />}
+        <meta name="twitter:site" content="@hicommonwealth" />
+        {ogDescription && (
+          <meta name="twitter:description" content={ogDescription} />
+        )}
+        {ogImageUrl && <meta name="twitter:image:src" content={ogImageUrl} />}
+        {ogTitle && (
+          <meta
+            name="twitter:image:alt"
+            content={`Image for thread - ${ogTitle}`}
+          />
+        )}
+        <meta property="twitter:url" content={window.location.href} />
+        {ogImageUrl && <meta name="twitter:image:src" content={ogImageUrl} />}
 
         {/* Open Graph */}
-        <meta property="og:title" content={thread.title} />
-        <meta
-          property="og:description"
-          content={getMetaDescription(thread.body)}
-        />
-        <meta property="og:image" content={communityImage} />
-        {/* Twitter */}
-        <meta name="twitter:title" content={thread.title} />
-        <meta name="twitter:site" content="@hicommonwealth" />
-        <meta
-          name="twitter:description"
-          content={getMetaDescription(thread.body)}
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image:src" content={communityImage} />
+        {ogTitle && <meta property="og:title" content={ogTitle} />}
+        {ogDescription && (
+          <meta property="og:description" content={ogDescription} />
+        )}
+        {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+        {ogTitle && (
+          <meta
+            property="og:image:alt"
+            content={`Image for thread - ${ogTitle}`}
+          />
+        )}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={window.location.href} />
       </Helmet>
       <CWPageLayout>
         <CWContentPage
