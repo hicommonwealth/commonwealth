@@ -30,7 +30,7 @@ const OPTION_COPY = {
 
 type OptionProps = {
   type: 'existing-wallet' | 'new-wallet';
-  onClick: () => any;
+  onClick: () => void;
 };
 
 const Option = ({ type, onClick }: OptionProps) => {
