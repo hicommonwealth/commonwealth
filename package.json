@@ -164,8 +164,7 @@
     "webpack-merge": "^5.8.0",
     "eslint-plugin-diff": "^2.0.3",
     "eslint-plugin-functional": "^6.1.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "suppress-eslint-errors": "^3.0.1"
+    "eslint-plugin-promise": "^6.1.1"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"
