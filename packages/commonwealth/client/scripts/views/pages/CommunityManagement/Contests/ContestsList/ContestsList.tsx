@@ -3,33 +3,44 @@ import React from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import Permissions from 'utils/Permissions';
-import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 
 import EmptyContestsList from '../EmptyContestsList';
+import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
 const mockedContests = [
-  { title: 'Contest 1', id: 1 },
-  { title: 'Contest 2', id: 2 },
+  {
+    id: 1,
+    name: 'Degens divided',
+    imageUrl: 'https://fakeimg.pl/1200x400',
+    finishDate: '2022-01-01',
+    topics: ['General', 'Proposals', 'Announcements'],
+    payouts: [0.00444, 0.00333, 0.00222, 0.00111, 0.00011, 0.00222],
+  },
+  {
+    id: 2,
+    name: 'Hello world',
+    finishDate: '2022-01-01',
+    topics: ['General', 'Proposals', 'Announcements'],
+    payouts: [0.00444, 0.00333, 0.00222, 0.00111],
+  },
 ];
 
 const ContestsList = () => {
   const navigate = useCommonNavigate();
 
-  if (
-    !app.isLoggedIn() ||
-    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
-  ) {
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isStakeEnabled = true;
+  const isContestAvailable = true;
+
+  if (!app.isLoggedIn() || !isAdmin) {
     return <PageNotFound />;
   }
-
-  const isStakeEnabled = false;
-  const isContestAvailable = false;
 
   return (
     <CWPageLayout>
@@ -48,15 +59,20 @@ const ContestsList = () => {
               label="Create contest"
               onClick={() => navigate('/manage/contests/launch')}
             />
-            {mockedContests.map((contest) => (
-              <CWCard key={contest.id}>
-                <CWText>{contest.title}</CWText>
-                <CWButton
-                  label="Edit contest"
-                  onClick={() => navigate(`/manage/contests/${contest.id}`)}
+            {mockedContests.map(
+              ({ id, name, imageUrl, finishDate, topics, payouts }) => (
+                <ContestCard
+                  key={id}
+                  isAdmin={isAdmin}
+                  id={id}
+                  name={name}
+                  imageUrl={imageUrl}
+                  topics={topics}
+                  payouts={payouts}
+                  finishDate={finishDate}
                 />
-              </CWCard>
-            ))}
+              ),
+            )}
           </>
         )}
       </div>
