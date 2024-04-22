@@ -1,29 +1,36 @@
-import React from 'react';
-import { ModalLayout } from '../common/ModalLayout';
+import React, { useState } from 'react';
+import { ModalBase } from '../common/ModalBase';
 import { CreateAccountModal } from '../types';
 import './CreateAccountModal.scss';
 import { Option } from './Option';
 
 const CreateAccountModal = ({ onClose }: CreateAccountModal) => {
+  const [showWallets, setShowWallets] = useState(false);
+
   return (
-    <ModalLayout
+    <ModalBase
       onClose={onClose}
-      type="create-account"
-      body={
-        <>
-          <Option
-            type="existing-wallet"
-            onClick={() => {
-              /** TODO */
-            }}
-          />
-          <Option
-            type="new-wallet"
-            onClick={() => {
-              /** TODO */
-            }}
-          />
-        </>
+      onAuthenticated={(isNewlyCreated) => console.log({ isNewlyCreated })} // TODO: will be replaced with post-account creation flow
+      layoutType="create-account"
+      hideDescription={showWallets}
+      {...(showWallets && {
+        showAuthenticationOptionsFor: ['wallets'],
+      })}
+      customBody={
+        !showWallets && (
+          <>
+            <Option
+              type="existing-wallet"
+              onClick={() => setShowWallets(true)}
+            />
+            <Option
+              type="new-wallet"
+              onClick={() => {
+                /** TODO */
+              }}
+            />
+          </>
+        )
       }
       bodyClassName="CreateAccountModal"
     />
