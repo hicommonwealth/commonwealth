@@ -75,6 +75,10 @@
       }
     }
 
+    &.tipBottomSidebarHidden {
+      @include tip(-4px, auto, auto, calc(20% - 8px / 2));
+    }
+
     &.tipLeft {
       @include tip(calc(50% - 8px / 2), -4px, auto, auto);
     }

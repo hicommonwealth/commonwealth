@@ -28,7 +28,7 @@
 psql $DATABASE_URL -c "SELECT * FROM \"Threads\" LIMIT 1"
 ```
 
-![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/f6ca8c80-b73e-4b19-87a0-02ce98030841)
+![image](./assets/Background-Scheduler-1.png)
 
 ### Best Practice
 
@@ -75,12 +75,13 @@ heroku logs -a commonwealth-frick -t
 heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
 ```
 
-![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/a372876a-0f79-45b6-8828-557245f3a25c)
+![image](./assets/Background-Scheduler-2.png)
 
 ### Scheduling Options
 
 - **Frequency**: Options include every 10 minutes, hourly, or daily.
-  ![Scheduling UI](https://github.com/hicommonwealth/commonwealth/assets/4791635/492ef824-c5df-4389-bd9b-aa32db048608)
+
+![Scheduling UI](./assets/Background-Scheduler-3.png)
 
 ### Deployment
 

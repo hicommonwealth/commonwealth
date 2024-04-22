@@ -93,7 +93,7 @@ const getNewProfile = async (
   });
 
   const commentThreadIds = [
-    ...new Set<number>(comments.map((c) => parseInt(c.thread_id, 10))),
+    ...new Set<number>(comments.map((c) => c.thread_id, 10)),
   ];
   const commentThreads = await models.Thread.findAll({
     where: {

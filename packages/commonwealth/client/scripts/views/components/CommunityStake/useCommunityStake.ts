@@ -37,12 +37,15 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const activeAccountAddress = app?.user?.activeAccount?.address;
   const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
 
-  const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
-    useFetchCommunityStakeQuery({
-      communityId: activeCommunityId,
-      stakeId,
-      apiEnabled: communityStakeEnabled && !!activeCommunityId,
-    });
+  const {
+    isInitialLoading: communityStakeLoading,
+    data: stakeResponse,
+    refetch: refetchStakeQuery,
+  } = useFetchCommunityStakeQuery({
+    communityId: activeCommunityId,
+    stakeId,
+    apiEnabled: communityStakeEnabled && !!activeCommunityId,
+  });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
@@ -95,6 +98,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     stakeValue,
     isLoading,
     activeChainId,
+    refetchStakeQuery,
   };
 };
 
