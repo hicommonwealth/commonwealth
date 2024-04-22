@@ -461,7 +461,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
       evm_test_app:
-        image: irowan/common_chain_tests
+        image: irowan/common_chain_tests_new
         ports:
          - 3000:3000
       cosmos_test_app:
