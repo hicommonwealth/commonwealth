@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
@@ -120,3 +121,5 @@ class Contest extends ContractBase {
     return txReceipt;
   }
 }
+
+export default Contest;
