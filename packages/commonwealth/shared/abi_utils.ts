@@ -1,23 +1,17 @@
-import type {
-  AbiInput,
-  AbiItem,
-  AbiOutput,
-  AbiType,
-  StateMutabilityType,
-} from 'web3-utils/types';
+import { AbiEventFragment, AbiFunctionFragment, AbiParameter } from 'web3';
 
 export function parseAbiItemsFromABI(
-  abi: Array<Record<string, unknown>>
-): AbiItem[] {
+  abi: Array<Record<string, unknown>>,
+): AbiFunctionFragment[] {
   try {
     return abi.map((item) => {
       const { name, type, inputs, outputs, stateMutability } = item;
-      const abiItem: AbiItem = {
+      const abiItem: AbiFunctionFragment = {
         name: name as string,
-        type: type as AbiType,
-        inputs: inputs as AbiInput[],
-        outputs: outputs as AbiOutput[],
-        stateMutability: stateMutability as StateMutabilityType,
+        type: type as string,
+        inputs: inputs as ReadonlyArray<AbiParameter>,
+        outputs: outputs as ReadonlyArray<AbiParameter>,
+        stateMutability: stateMutability as string,
       };
       return abiItem;
     });
@@ -28,9 +22,9 @@ export function parseAbiItemsFromABI(
 }
 
 export function parseFunctionsFromABI(
-  abi: Array<Record<string, unknown>>
-): AbiItem[] {
-  let fns: AbiItem[] = [];
+  abi: Array<Record<string, unknown>>,
+): AbiFunctionFragment[] {
+  let fns: AbiFunctionFragment[] = [];
   if (abi) {
     const abiItems = parseAbiItemsFromABI(abi);
     fns = abiItems
@@ -41,9 +35,9 @@ export function parseFunctionsFromABI(
 }
 
 export function parseWriteFunctionsFromABI(
-  abi: Array<Record<string, unknown>>
-): AbiItem[] {
-  let fns: AbiItem[] = [];
+  abi: Array<Record<string, unknown>>,
+): AbiFunctionFragment[] {
+  let fns: AbiFunctionFragment[] = [];
   if (abi) {
     const abiItems = parseAbiItemsFromABI(abi);
     fns = abiItems
@@ -52,7 +46,7 @@ export function parseWriteFunctionsFromABI(
           x.type === 'function' &&
           x.stateMutability !== 'view' &&
           x.stateMutability !== 'pure' &&
-          x.constant !== true
+          x.constant !== true,
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -61,11 +55,11 @@ export function parseWriteFunctionsFromABI(
 
 export function parseFunctionFromABI(
   abi: Array<Record<string, unknown>>,
-  functionName: string
-): AbiItem {
+  functionName: string,
+): AbiFunctionFragment {
   const abiFunctions = parseFunctionsFromABI(abi);
   const functionItem = abiFunctions.find(
-    (abiItem) => abiItem.name === functionName
+    (abiItem) => abiItem.name === functionName,
   );
   if (!functionItem) {
     throw new Error(`Could not find function ${functionName} in ABI`);
@@ -74,9 +68,9 @@ export function parseFunctionFromABI(
 }
 
 export function parseEventsFromABI(
-  abi: Array<Record<string, unknown>>
-): AbiItem[] {
-  let events: AbiItem[] = [];
+  abi: Array<Record<string, unknown>>,
+): AbiEventFragment[] {
+  let events: AbiEventFragment[] = [];
   if (abi) {
     const abiItems = parseAbiItemsFromABI(abi);
     events = abiItems
@@ -88,8 +82,8 @@ export function parseEventsFromABI(
 
 export function parseEventFromABI(
   abi: Array<Record<string, unknown>>,
-  eventName: string
-): AbiItem {
+  eventName: string,
+): AbiEventFragment {
   const abiEvents = parseEventsFromABI(abi);
   const eventItem = abiEvents.find((abiItem) => abiItem.name === eventName);
   if (!eventItem) {

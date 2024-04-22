@@ -213,6 +213,9 @@ export default (
     models.Thread.hasMany(models.Notification, {
       foreignKey: 'thread_id',
     });
+    models.Thread.hasMany(models.ThreadSubscription, {
+      foreignKey: 'thread_id',
+    });
   };
 
   return Thread;

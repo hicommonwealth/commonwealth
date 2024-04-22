@@ -70,8 +70,9 @@ async function _seed(
       ...values,
     };
   }
-  options.log && console.log(model.name, values);
-  const record = (await model.create(values)).toJSON();
+  const record = (
+    await model.create(values, { logging: options.log ? console.log : false })
+  ).toJSON();
   records.push(record);
 
   if (typeof values === 'object') {

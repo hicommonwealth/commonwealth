@@ -26,7 +26,7 @@ describe('getCommentDepth', () => {
     for (let i = 0; i < maxDepth; i++) {
       const result = await models.Comment.create({
         community_id,
-        thread_id: String(thread.id),
+        thread_id: thread.id,
         parent_id: comment ? String(comment.id) : undefined,
         address_id: address.id,
         text: String(i),

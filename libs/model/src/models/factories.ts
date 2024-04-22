@@ -3,7 +3,9 @@ import Ban from './ban';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
+import CommentSubscription from './comment_subscriptions';
 import Community from './community';
+import CommunityAlert from './community_alerts';
 import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityContractTemplate from './community_contract_template';
@@ -35,8 +37,10 @@ import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
 import Subscription from './subscription';
+import SubscriptionPreference from './subscription_preference';
 import Template from './template';
 import Thread from './thread';
+import ThreadSubscription from './thread_subscriptions';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
@@ -48,7 +52,9 @@ export const Factories = {
   ChainNode,
   Collaboration,
   Comment,
+  CommentSubscription,
   Community,
+  CommunityAlert,
   CommunityBanner,
   CommunityContract,
   CommunityContractTemplate,
@@ -80,8 +86,10 @@ export const Factories = {
   StakeTransaction,
   StarredCommunity,
   Subscription,
+  SubscriptionPreference,
   Template,
   Thread,
+  ThreadSubscription,
   Topic,
   User,
   Vote,
