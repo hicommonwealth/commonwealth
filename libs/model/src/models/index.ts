@@ -1,197 +1,72 @@
 import { DataTypes, Sequelize } from 'sequelize';
+import { Factories } from './factories';
+import type { Models } from './types';
+import { createFk, dropFk, mapFk, oneToMany } from './utils';
 
-import AddressFactory, { type AddressModelStatic } from './address';
-import BanFactory, { type BanModelStatic } from './ban';
-import ChainNodeFactory, { type ChainNodeModelStatic } from './chain_node';
-import CollaborationFactory, {
-  type CollaborationModelStatic,
-} from './collaboration';
-import CommentFactory, { type CommentModelStatic } from './comment';
-import CommunityFactory, { type CommunityModelStatic } from './community';
-import CommunityBannerFactory, {
-  type CommunityBannerModelStatic,
-} from './community_banner';
-import CommunityContractFactory, {
-  type CommunityContractModelStatic,
-} from './community_contract';
-import CommunityContractTemplateFactory, {
-  type CommunityContractTemplateStatic,
-} from './community_contract_template';
-import CommunityContractTemplateMetadataFactory, {
-  type CommunityContractTemplateMetadataStatic,
-} from './community_contract_template_metadata';
-import CommunitySnapshotSpaceFactory, {
-  type CommunitySnapshotSpaceModelStatic,
-} from './community_snapshot_spaces';
-import CommunityStakeFactory, {
-  type CommunityStakeModelStatic,
-} from './community_stake';
-import ContractFactory, { type ContractModelStatic } from './contract';
-import ContractAbiFactory, {
-  type ContractAbiModelStatic,
-} from './contract_abi';
-import DiscordBotConfigFactory, {
-  type DiscordBotConfigModelStatic,
-} from './discord_bot_config';
-import EvmEventSourceFactory, {
-  type EvmEventSourceModelStatic,
-} from './evmEventSource';
-import GroupFactory, { type GroupModelStatic } from './group';
-import LastProcessedEvmBlockFactory, {
-  type LastProcessedEvmBlockModelStatic,
-} from './lastProcessedEvmBlock';
-import LoginTokenFactory, { type LoginTokenModelStatic } from './login_token';
-import MembershipFactory, { type MembershipModelStatic } from './membership';
-import NotificationFactory, {
-  type NotificationModelStatic,
-} from './notification';
-import NotificationCategoryFactory, {
-  type NotificationCategoryModelStatic,
-} from './notification_category';
-import NotificationsReadFactory, {
-  type NotificationsReadModelStatic,
-} from './notifications_read';
-// import OutboxFactory, { type OutboxModelStatic } from './outbox';
-import PollFactory, { type PollModelStatic } from './poll';
-import ProfileFactory, { type ProfileModelStatic } from './profile';
-import ReactionFactory, { type ReactionModelStatic } from './reaction';
-import SnapshotProposalFactory, {
-  type SnapshotProposalModelStatic,
-} from './snapshot_proposal';
-import SnapshotSpaceFactory, {
-  type SnapshotSpaceModelStatic,
-} from './snapshot_spaces';
-import SsoTokenFactory, { type SsoTokenModelStatic } from './sso_token';
-import StakeTransactionFactory, {
-  type StakeTransactionModelStatic,
-} from './stake_transaction';
-import StarredCommunityFactory, {
-  type StarredCommunityModelStatic,
-} from './starred_community';
-import SubscriptionFactory, {
-  type SubscriptionModelStatic,
-} from './subscription';
-import TemplateFactory, { type TemplateModelStatic } from './template';
-import ThreadFactory, { type ThreadModelStatic } from './thread';
-import TopicFactory, { type TopicModelStatic } from './topic';
-import UserFactory, { type UserModelStatic } from './user';
-import VoteFactory, { type VoteModelStatic } from './vote';
-import WebhookFactory, { type WebhookModelStatic } from './webhook';
-
-export type Models = {
-  Address: AddressModelStatic;
-  Ban: BanModelStatic;
-  Community: CommunityModelStatic;
-  ChainNode: ChainNodeModelStatic;
-  Contract: ContractModelStatic;
-  ContractAbi: ContractAbiModelStatic;
-  CommunityContract: CommunityContractModelStatic;
-  CommunityContractTemplate: CommunityContractTemplateStatic;
-  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
-  CommunityStake: CommunityStakeModelStatic;
-  Template: TemplateModelStatic;
-  CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
-  Collaboration: CollaborationModelStatic;
-  CommunityBanner: CommunityBannerModelStatic;
-  DiscordBotConfig: DiscordBotConfigModelStatic;
-  EvmEventSource: EvmEventSourceModelStatic;
-  LastProcessedEvmBlock: LastProcessedEvmBlockModelStatic;
-  LoginToken: LoginTokenModelStatic;
-  Notification: NotificationModelStatic;
-  NotificationCategory: NotificationCategoryModelStatic;
-  NotificationsRead: NotificationsReadModelStatic;
-  Comment: CommentModelStatic;
-  Poll: PollModelStatic;
-  Group: GroupModelStatic;
-  Membership: MembershipModelStatic;
-  Reaction: ReactionModelStatic;
-  Thread: ThreadModelStatic;
-  Topic: TopicModelStatic;
-  Vote: VoteModelStatic;
-  Profile: ProfileModelStatic;
-  SsoToken: SsoTokenModelStatic;
-  StarredCommunity: StarredCommunityModelStatic;
-  SnapshotProposal: SnapshotProposalModelStatic;
-  StakeTransaction: StakeTransactionModelStatic;
-  Subscription: SubscriptionModelStatic;
-  SnapshotSpace: SnapshotSpaceModelStatic;
-  User: UserModelStatic;
-  Webhook: WebhookModelStatic;
-  // Outbox: OutboxModelStatic;
-};
-
-export type DB = Models & {
+export type DB = Models<typeof Factories> & {
   sequelize: Sequelize;
   Sequelize: typeof Sequelize;
 };
 
+/**
+ * Wraps sequelize sync with the process of building composite foreign key constraints
+ * - This is not yet supported by sequelize
+ */
+export const syncDb = async (db: DB, log = false) => {
+  // TODO: build this map when creating one to many associations with composite keys
+  const compositeKeys = [
+    mapFk(db.Contest, db.ContestAction, ['contest_address', 'contest_id']),
+    mapFk(db.ContestManager, db.Contest, ['contest_address']),
+  ];
+
+  compositeKeys.forEach(({ parent, child }) =>
+    dropFk(db.sequelize, parent.tableName, child.tableName),
+  );
+  await db.sequelize.sync({
+    force: true,
+    logging: log ? console.log : false,
+  });
+  compositeKeys.forEach(({ parent, child, key }) =>
+    createFk(db.sequelize, parent.tableName, child.tableName, key),
+  );
+};
+
+/**
+ * Builds sequelize models by invoking factories with a sequelize instance, and linking associations
+ * @param sequelize sequelize instance
+ * @returns built db model
+ */
 export const buildDb = (sequelize: Sequelize): DB => {
-  const entities = {
-    Address: AddressFactory(sequelize, DataTypes),
-    Ban: BanFactory(sequelize, DataTypes),
-    Community: CommunityFactory(sequelize, DataTypes),
-    ChainNode: ChainNodeFactory(sequelize, DataTypes),
-    Collaboration: CollaborationFactory(sequelize, DataTypes),
-    Contract: ContractFactory(sequelize, DataTypes),
-    ContractAbi: ContractAbiFactory(sequelize, DataTypes),
-    CommunityContract: CommunityContractFactory(sequelize, DataTypes),
-    CommunityContractTemplate: CommunityContractTemplateFactory(
-      sequelize,
-      DataTypes,
-    ),
-    CommunityContractTemplateMetadata: CommunityContractTemplateMetadataFactory(
-      sequelize,
-      DataTypes,
-    ),
-    Template: TemplateFactory(sequelize, DataTypes),
-    CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
-    CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(
-      sequelize,
-      DataTypes,
-    ),
-    DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
-    EvmEventSource: EvmEventSourceFactory(sequelize, DataTypes),
-    LastProcessedEvmBlock: LastProcessedEvmBlockFactory(sequelize, DataTypes),
-    LoginToken: LoginTokenFactory(sequelize, DataTypes),
-    Notification: NotificationFactory(sequelize, DataTypes),
-    NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
-    NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-    Comment: CommentFactory(sequelize, DataTypes),
-    Poll: PollFactory(sequelize, DataTypes),
-    Group: GroupFactory(sequelize, DataTypes),
-    Membership: MembershipFactory(sequelize, DataTypes),
-    Reaction: ReactionFactory(sequelize, DataTypes),
-    Thread: ThreadFactory(sequelize, DataTypes),
-    Topic: TopicFactory(sequelize, DataTypes),
-    Vote: VoteFactory(sequelize, DataTypes),
-    Profile: ProfileFactory(sequelize, DataTypes),
-    SsoToken: SsoTokenFactory(sequelize, DataTypes),
-    StakeTransaction: StakeTransactionFactory(sequelize, DataTypes),
-    StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
-    SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
-    SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
-    Subscription: SubscriptionFactory(sequelize, DataTypes),
-    User: UserFactory(sequelize, DataTypes),
-    Webhook: WebhookFactory(sequelize, DataTypes),
-    CommunityStake: CommunityStakeFactory(sequelize, DataTypes),
-    // Outbox: OutboxFactory(sequelize, DataTypes),
-  };
+  const models = Object.fromEntries(
+    Object.entries(Factories).map(([key, factory]) => {
+      const model = factory(sequelize, DataTypes);
+      model.withMany = oneToMany as any; // TODO: can we make this work without any?
+      return [key, model];
+    }),
+  ) as Models<typeof Factories>;
 
-  const db = {
-    sequelize,
-    Sequelize,
-    ...entities,
-  };
-
-  // setup associations
-  Object.keys(entities).forEach((key) => {
-    const model = entities[key as keyof Models];
+  const db = { sequelize, Sequelize, ...models };
+  Object.keys(models).forEach((key) => {
+    const model = models[key as keyof typeof Factories];
     'associate' in model && model.associate(db);
   });
+
+  // Proposed pattern to associate models with type safety
+  db.Community.withMany(db.CommunityStake, 'community_id').withMany(
+    db.ContestManager,
+    'community_id',
+  );
+  db.ContestManager.withMany(db.Contest, 'contest_address');
+  db.Contest.withMany(db.ContestAction, 'contest_address', { as: 'actions' });
+  db.CommunityStake.withMany(db.StakeTransaction, 'community_id').withMany(
+    db.StakeTransaction,
+    'stake_id',
+  );
 
   return db;
 };
 
+// FIXME: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
 export * from './ban';
 export * from './chain_node';

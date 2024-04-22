@@ -2,7 +2,6 @@ import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import { z } from 'zod';
-import type { DB } from '.';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -41,7 +40,6 @@ export type UserInstance = ModelInstance<UserAttributes> & {
 
 export type UserCreationAttributes = UserAttributes & {
   createWithProfile?: (
-    models: DB,
     attrs: UserAttributes,
     options?: CreateOptions,
   ) => Promise<UserInstance>;
@@ -100,22 +98,6 @@ export default (
     },
   );
 
-  User.createWithProfile = async (
-    models: DB,
-    attrs: UserAttributes,
-    options?: CreateOptions,
-  ): Promise<UserInstance> => {
-    const newUser = await User.create(attrs, options);
-    const profile = await models.Profile.create(
-      {
-        user_id: newUser.id!,
-      },
-      options,
-    );
-    newUser.Profiles = [profile];
-    return newUser;
-  };
-
   User.associate = (models) => {
     models.User.belongsTo(models.Community, {
       as: 'selectedCommunity',
@@ -132,6 +114,21 @@ export default (
       foreignKey: 'user_id',
       sourceKey: 'id',
     });
+
+    User.createWithProfile = async (
+      attrs: UserAttributes,
+      options?: CreateOptions,
+    ): Promise<UserInstance> => {
+      const newUser = await User.create(attrs, options);
+      const profile = await models.Profile.create(
+        {
+          user_id: newUser.id!,
+        },
+        options,
+      );
+      newUser.Profiles = [profile];
+      return newUser;
+    };
   };
 
   return User;

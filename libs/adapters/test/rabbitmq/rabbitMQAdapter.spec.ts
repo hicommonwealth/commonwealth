@@ -2,11 +2,11 @@ import {
   BrokerTopics,
   delay,
   EventContext,
-  ILogger,
   InvalidInput,
   Policy,
   schemas,
 } from '@hicommonwealth/core';
+import type { ILogger } from '@hicommonwealth/logging';
 import chai from 'chai';
 import { AckOrNack } from 'rascal';
 import { getRabbitMQConfig, RascalConfigServices } from '../../src';
@@ -74,7 +74,7 @@ describe('RabbitMQ', () => {
     });
 
     after(async () => {
-      await rmqAdapter.broker.purge();
+      await rmqAdapter.broker?.purge();
     });
 
     it('should return false if a publication cannot be found', async () => {
@@ -118,9 +118,9 @@ describe('RabbitMQ', () => {
 
     afterEach(async () => {
       console.log('After...');
-      await rmqAdapter.broker.unsubscribeAll();
+      await rmqAdapter.broker?.unsubscribeAll();
       console.log('Unsubscribed from all');
-      await rmqAdapter.broker.purge();
+      await rmqAdapter.broker?.purge();
       console.log('Purged all queues');
     });
 
