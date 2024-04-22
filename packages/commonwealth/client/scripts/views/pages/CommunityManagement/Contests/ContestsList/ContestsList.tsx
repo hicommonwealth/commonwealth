@@ -111,7 +111,14 @@ const ContestsList = () => {
   return (
     <CWPageLayout>
       <div className="ContestsList">
-        <CWText type="h2">Contests</CWText>
+        <div className="header-row">
+          <CWText type="h2">Contests</CWText>
+          <CWButton
+            iconLeft="plusPhosphor"
+            label="Create contest"
+            onClick={() => navigate('/manage/contests/launch')}
+          />
+        </div>
 
         {!isStakeEnabled || !isContestAvailable ? (
           <EmptyContestsList
@@ -119,12 +126,7 @@ const ContestsList = () => {
             isContestAvailable={isContestAvailable}
           />
         ) : (
-          <>
-            <CWButton
-              iconLeft="plusPhosphor"
-              label="Create contest"
-              onClick={() => navigate('/manage/contests/launch')}
-            />
+          <div className="list-container">
             {mockedContests.map(
               ({
                 id,
@@ -148,7 +150,7 @@ const ContestsList = () => {
                 />
               ),
             )}
-          </>
+          </div>
         )}
       </div>
     </CWPageLayout>

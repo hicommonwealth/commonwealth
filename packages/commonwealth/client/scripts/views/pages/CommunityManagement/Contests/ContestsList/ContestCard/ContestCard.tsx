@@ -46,16 +46,21 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
+    // Leaderboard Button takes user to the Thread Listing Page, filtered by Contest + sorted by Upvote.
     // TODO open threads view with proper filter
     // navigate('/discussions');
+    console.log('navigate to discussions');
   };
 
   const handleWinnersClick = () => {
+    // Previous Winners button takes user to the Thread Listing Page, filtered by Contest.
     // TODO open threads view with proper filter
     // navigate('/discussions');
+    console.log('navigate to discussions');
   };
 
   const handleShareClick = () => {
+    // TODO open share popover
     navigate('/manage/contests');
   };
 
