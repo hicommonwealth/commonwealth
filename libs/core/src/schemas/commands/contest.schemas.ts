@@ -16,8 +16,7 @@ export const CreateContestManagerMetadata = {
 
 export const UpdateContestManagerMetadata = {
   input: z.object({
-    contest_address: z.string(),
-    community_id: z.string(),
+    id: z.string().describe('contest address'),
     name: z.string(),
     image_url: z.string(),
   }),
@@ -26,16 +25,14 @@ export const UpdateContestManagerMetadata = {
 
 export const PauseContestManagerMetadata = {
   input: z.object({
-    contest_address: z.string(),
-    community_id: z.string(),
+    id: z.string().describe('contest address'),
   }),
   output: ContestManager,
 };
 
 export const ResumeContestManagerMetadata = {
   input: z.object({
-    contest_address: z.string(),
-    community_id: z.string(),
+    id: z.string().describe('contest address'),
   }),
   output: ContestManager,
 };
