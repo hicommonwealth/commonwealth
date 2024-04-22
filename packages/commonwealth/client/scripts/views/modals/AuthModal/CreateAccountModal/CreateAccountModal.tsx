@@ -10,7 +10,8 @@ const CreateAccountModal = ({ onClose }: CreateAccountModal) => {
   return (
     <ModalBase
       onClose={onClose}
-      onAuthenticated={(isNewlyCreated) => console.log({ isNewlyCreated })} // TODO: will be replaced with post-account creation flow
+      // TODO: will be replaced with post-account creation flow
+      onAuthenticated={(isNewlyCreated) => console.log({ isNewlyCreated })}
       layoutType="create-account"
       hideDescription={showWallets}
       {...(showWallets && {
