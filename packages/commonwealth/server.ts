@@ -1,19 +1,18 @@
 import {
   HotShotsStats,
   MixpanelAnalytics,
-  PinoLogger,
   RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { analytics, cache, logger, stats } from '@hicommonwealth/core';
+import { analytics, cache, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import express from 'express';
 import {
   DATABASE_CLEAN_HOUR,
   PORT,
+  PRERENDER_TOKEN,
   REDIS_URL,
-  SERVER_URL,
-  PRERENDER_TOKEN
 } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
@@ -22,7 +21,7 @@ const SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
 
 // bootstrap production adapters
-const log = logger(PinoLogger()).getLogger(__filename);
+const log = logger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 REDIS_URL && cache(new RedisCache(REDIS_URL));
@@ -54,7 +53,7 @@ const start = async () => {
     withLoggingMiddleware: true,
     withStatsMiddleware: true,
     withFrontendBuild: !NO_CLIENT,
-    withPrerender: !!PRERENDER_TOKEN
+    withPrerender: !!PRERENDER_TOKEN,
   })
     .then(() => {
       isServiceHealthy = true;

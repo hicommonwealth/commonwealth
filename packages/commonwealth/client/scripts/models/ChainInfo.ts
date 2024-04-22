@@ -1,5 +1,5 @@
-import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
@@ -341,6 +341,7 @@ class ChainInfo {
       discords: [],
       githubs: [],
       telegrams: [],
+      twitters: [],
       elements: [],
       remainingLinks: [],
     };
@@ -356,6 +357,8 @@ class ChainInfo {
           categorizedLinks.telegrams.push(link);
         } else if (link.includes('://matrix.to')) {
           categorizedLinks.elements.push(link);
+        } else if (link.includes('://twitter.com')) {
+          categorizedLinks.twitters.push(link);
         } else {
           categorizedLinks.remainingLinks.push(link);
         }
@@ -369,6 +372,7 @@ export type CategorizedSocialLinks = {
   discords: string[];
   githubs: string[];
   telegrams: string[];
+  twitters: string[];
   elements: string[];
   remainingLinks: string[];
 };

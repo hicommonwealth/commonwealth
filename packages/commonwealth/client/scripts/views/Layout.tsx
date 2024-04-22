@@ -1,5 +1,5 @@
 import 'Layout.scss';
-import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
+import { deinitChainOrCommunity, selectCommunity } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -48,7 +48,7 @@ const LayoutComponent = ({
     }
   }, [selectedScope]);
 
-  const scopeMatchesChain = app.config.chains.getById(selectedScope);
+  const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
 
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is
@@ -57,14 +57,14 @@ const LayoutComponent = ({
     selectedScope &&
     selectedScope !== app.activeChainId() &&
     selectedScope !== scopeToLoad &&
-    scopeMatchesChain;
+    scopeMatchesCommunity;
 
   useNecessaryEffect(() => {
     (async () => {
       if (shouldSelectChain) {
         setIsLoading(true);
         setScopeToLoad(selectedScope);
-        await selectChain(scopeMatchesChain);
+        await selectCommunity(scopeMatchesCommunity);
         setIsLoading(false);
       }
     })();
@@ -119,7 +119,7 @@ const LayoutComponent = ({
     if (shouldShowLoadingState) return Bobber;
 
     // If attempting to navigate to a community not fetched by the /status query, return a 404
-    const pageNotFound = selectedScope && !scopeMatchesChain;
+    const pageNotFound = selectedScope && !scopeMatchesCommunity;
     return (
       <Suspense fallback={Bobber}>
         {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}

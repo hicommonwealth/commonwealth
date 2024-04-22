@@ -1,4 +1,4 @@
-import { SearchContentType } from '@hicommonwealth/core';
+import { SearchContentType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import Thread from 'models/Thread';
 import moment from 'moment';

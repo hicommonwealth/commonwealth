@@ -28,7 +28,11 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
-      stake_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      stake_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
       stake_token: { type: dataTypes.STRING, allowNull: false },
       vote_weight: { type: dataTypes.INTEGER, allowNull: false },
       stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
@@ -47,7 +51,7 @@ export default (
 
   CommunityStake.associate = (models) => {
     models.CommunityStake.belongsTo(models.Community, {
-      foreignKey: 'community_id',
+      foreignKey: { name: 'community_id' },
       targetKey: 'id',
     });
   };

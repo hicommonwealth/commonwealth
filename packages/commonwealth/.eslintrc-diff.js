@@ -12,7 +12,7 @@ const path = require('path');
  * git push origin my_branch
  *
  */
-process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/MASTER_CIRCA_2024_03_26';
+process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/MASTER_CIRCA_2024_04_09';
 
 const ENABLE_ESLINT_DIFF_PLUGIN =
   process.env.ENABLE_ESLINT_DIFF_PLUGIN || 'true';
@@ -42,7 +42,6 @@ module.exports = {
     'import/no-cycle': 'off',
     'import/named': 'off',
     'no-underscore-dangle': 0,
-    'no-param-reassign': 0,
     'no-console': 0,
     camelcase: 0,
     'no-else-return': 0,
@@ -148,6 +147,11 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'error',
     '@typescript-eslint/await-thenable': 'error',
 
+    'no-warning-comments': [
+      'error',
+      { terms: ['FIXME', 'eslint-disable '], location: 'anywhere' },
+    ],
+
     // ** 'any' issues...
     // '@typescript-eslint/no-explicit-any': 'error',
     // '@typescript-eslint/no-unsafe-argument': 'error',
@@ -155,6 +159,19 @@ module.exports = {
     // '@typescript-eslint/no-unsafe-call': 'error',
     // '@typescript-eslint/no-unsafe-member-access': 'error',
     // '@typescript-eslint/no-unsafe-return': 'error',
+
+    // ** type immutability
+    'no-param-reassign': 'error',
+    'no-var': 'error',
+    // "prefer-const": "error",
+    // "@typescript-eslint/prefer-readonly": "error",
+    // "@typescript-eslint/prefer-readonly-parameter-types": "error",
+    //
+    // // https://www.npmjs.com/package/eslint-plugin-functional
+    // "functional/immutable-data": "error",
+    // "functional/no-let": "error",
+    // "functional/no-method-signature": "error",
+    // "functional/prefer-readonly-type": "error"
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [

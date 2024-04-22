@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './IOSPrompt.scss';
 
 interface IOSPromptProps {

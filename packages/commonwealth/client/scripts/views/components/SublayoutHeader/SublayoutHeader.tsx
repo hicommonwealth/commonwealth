@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import useSidebarStore from 'state/ui/sidebar';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { AuthModal } from 'views/modals/AuthModal';

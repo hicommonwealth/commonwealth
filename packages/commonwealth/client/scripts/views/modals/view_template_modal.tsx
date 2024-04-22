@@ -6,12 +6,12 @@ import app from '../../state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { User } from '../components/user/user';
 
 import '../../../styles/modals/view_template_modal.scss';

@@ -7,12 +7,12 @@ import {
   notifySuccess,
 } from '../../controllers/app/notifications';
 import app from '../../state';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -20,10 +20,7 @@ type BanUserModalAttrs = {
 };
 
 export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
-  const { mutateAsync: banUser } = useBanProfileByAddressMutation({
-    chainId: app.activeChainId(),
-    address: address,
-  });
+  const { mutateAsync: banUser } = useBanProfileByAddressMutation();
 
   const handleModalClose = (e) => {
     e.stopPropagation();
@@ -41,7 +38,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
       handleModalClose(event);
       await banUser({
         address,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
       });
       notifySuccess('Banned Address');
     } catch (err) {

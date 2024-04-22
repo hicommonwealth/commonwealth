@@ -36,9 +36,17 @@ export default (
   const Membership = <MembershipModelStatic>sequelize.define(
     'Membership',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       group_id: { type: dataTypes.INTEGER, allowNull: false },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+      },
       reject_reason: { type: dataTypes.JSONB, allowNull: true },
       last_checked: { type: dataTypes.DATE, allowNull: false },
     },
@@ -49,6 +57,7 @@ export default (
       updatedAt: false,
       tableName: 'Memberships',
       indexes: [
+        { fields: ['address_id'] },
         { fields: ['group_id'] },
         { fields: ['address_id', 'group_id'], unique: true },
       ],
