@@ -24,7 +24,12 @@
     .header-row {
       display: flex;
       justify-content: space-between;
+      align-items: start;
       gap: 32px;
+
+      & > .Text {
+        word-break: break-word;
+      }
 
       @include extraSmall {
         flex-direction: column;

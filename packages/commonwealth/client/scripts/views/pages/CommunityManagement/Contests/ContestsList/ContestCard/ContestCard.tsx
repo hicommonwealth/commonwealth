@@ -8,6 +8,9 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+
+import ContestCountdown from '../ContestCountdown';
+
 import './ContestCard.scss';
 
 interface ContestCardProps {
@@ -18,6 +21,7 @@ interface ContestCardProps {
   topics: string[];
   payouts: number[];
   isAdmin: boolean;
+  isActive: boolean;
 }
 
 const ContestCard = ({
@@ -28,6 +32,7 @@ const ContestCard = ({
   topics,
   payouts,
   isAdmin,
+  isActive,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
 
@@ -67,7 +72,7 @@ const ContestCard = ({
       <div className="contest-body">
         <div className="header-row">
           <CWText type="h3">{name}</CWText>
-          <div>{finishDate} 6 days</div>
+          <ContestCountdown finishTime={finishDate} isActive={isActive} />
         </div>
         <CWText className="topics">Topics: {topics.join(', ')}</CWText>
         <CWText className="prizes-header" fontWeight="bold">
@@ -115,11 +120,13 @@ const ContestCard = ({
               label="Cancel contest"
               buttonType="destructive"
               onClick={handleCancelContest}
+              disabled={!isActive}
             />
             <CWButton
               containerClassName="cta-btn"
               label="Edit contest"
               onClick={handleEditContest}
+              disabled={!isActive}
             />
           </div>
         </div>
