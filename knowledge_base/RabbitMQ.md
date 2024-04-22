@@ -16,12 +16,12 @@ The implemented system utilizes an event-based architecture which means that the
 A proper data flow between the services requires 3 essential parts:
 
 1. A message producer.
-    1. The producers use the `publish` or `safePublish` RabbitMQController methods to push messages to a queue.
+    1. The producers use the `publish`  RabbitMQController method to push messages to a queue.
     2. See the RabbitMQ [README][5] for examples of producers
 2. A queue.
     1. A queue linked to an exchange. See the RabbitMQ [README][5] for a description of the queues
 3. A message consumer.
-    1. The consumers subscribe to a queue or in our case a Rascal Subscription using the `startSubscription` RabbitMQController method.
+    1. The consumers subscribe to a queue or in our case a Rascal Subscription using the `subscribe` RabbitMQController method.
     2. ALL of the consumer functions can be found in MessageProcessor directories.
     3. See the RabbitMQ [README][5] for examples of consumers
 
@@ -99,7 +99,7 @@ Consume a message from a queue and execute the processor function. If the proces
 
 ### Preventing data loss in the queue itself
 
-While we could replicate RabbitMQ memory the method is complex, expensive, and unnecessary considering that total memory failure is extremely unlikely. Instead, our system implements a recovery mechanism for recovering from a 'worst-case' scenario. In the event of a total RabbitMQ service failure, developers can run a script that compares the service database and fills in any missing info. For example, the script would query all chain-event-types on the chain-events service and then checks whether the IDs of every single one of those appear in the main service database.
+While we could replicate RabbitMQ memory the method is complex, expensive, and unnecessary considering that total memory failure is extremely unlikely. Instead, our system implements a recovery mechanism for recovering from a 'worst-case' scenario. In the event of a total RabbitMQ service failure, developers can run a script that compares the service database and fills in any missing info.
 
 ### Preventing data inconsistencies across deployments and migrations
 
