@@ -16,8 +16,6 @@ export class MissingContestManager extends Error {
 }
 
 const inputs = {
-  ContestManagerMetadataCreated: schemas.events.ContestManagerMetadataCreated,
-  ContestManagerMetadataUpdated: schemas.events.ContestManagerMetadataUpdated,
   RecurringContestManagerDeployed:
     schemas.events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: schemas.events.OneOffContestManagerDeployed,
@@ -59,7 +57,7 @@ async function updateOrCreateWithAlert(
         created_at: new Date(),
         name: community.name,
         image_url: 'http://default.image', // TODO: can we have a default image for this?
-        payout_structure: [], // empty payout structure until fixed
+        payout_structure: [], // empty payout structure by default
       });
   }
 }
@@ -67,34 +65,6 @@ async function updateOrCreateWithAlert(
 export const Contests: Projection<typeof inputs> = () => ({
   inputs,
   body: {
-    ContestManagerMetadataCreated: async ({ payload }) => {
-      // off-chain genesis event
-      const community = await models.Community.findOne({
-        where: { id: payload.community_id },
-        raw: true,
-      });
-      if (mustExist(`Community: ${payload.community_id}`, community))
-        await models.ContestManager.create({
-          ...payload,
-          interval: 0, // TODO: @masvelio should we pass interval?
-        });
-    },
-
-    ContestManagerMetadataUpdated: async ({ payload }) => {
-      await models.ContestManager.update(
-        {
-          name: payload.name,
-          image_url: payload.image_url,
-        },
-        {
-          where: {
-            contest_address: payload.contest_address,
-          },
-        },
-      );
-      // TODO: add/remove topics
-    },
-
     RecurringContestManagerDeployed: async ({ payload }) => {
       // on-chain genesis event
       await updateOrCreateWithAlert(
@@ -121,29 +91,45 @@ export const Contests: Projection<typeof inputs> = () => ({
     },
 
     ContestContentAdded: async ({ payload }) => {
-      // TODO: link thread
+      // TODO: can we make this just one sql statement using subqueries?
+      const thread = await models.Thread.findOne({
+        where: { url: payload.content_url },
+        attributes: ['id'],
+        raw: true,
+      });
       await models.ContestAction.create({
         ...payload,
         contest_id: payload.contest_id || 0,
         actor_address: payload.creator_address,
         action: 'added',
         content_url: payload.content_url,
+        thread_id: thread?.id,
         voting_power: 0,
       });
     },
 
     ContestContentUpvoted: async ({ payload }) => {
-      // TODO: link thread
+      // TODO: can we make this just one sql statement using subqueries?
+      const add_action = await models.ContestAction.findOne({
+        where: {
+          contest_address: payload.contest_address,
+          contest_id: payload.contest_id || 0,
+          content_id: payload.content_id,
+          action: 'added',
+        },
+        attributes: ['thread_id'],
+        raw: true,
+      });
       await models.ContestAction.create({
         ...payload,
         contest_id: payload.contest_id || 0,
         actor_address: payload.voter_address,
         action: 'upvoted',
+        thread_id: add_action?.thread_id,
       });
     },
 
     ContestWinnersRecorded: async ({ payload }) => {
-      // TODO: set prizes
       await models.Contest.update(
         {
           winners: payload.winners,

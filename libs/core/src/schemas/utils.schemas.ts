@@ -46,8 +46,6 @@ export enum EventNames {
   DiscordMessageCreated = 'DiscordMessageCreated',
 
   // Contests
-  ContestManagerMetadataCreated = 'ContestManagerMetadataCreated',
-  ContestManagerMetadataUpdated = 'ContestManagerMetadataUpdated',
   RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
   OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
   ContestStarted = 'ContestStarted',

@@ -11,6 +11,7 @@ import z from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { BalanceSourceType, NodeHealth } from '../types';
 import * as events from './events.schemas';
+import { Contest } from './projections';
 import { EventNames, discordMetaSchema, linksSchema } from './utils.schemas';
 
 export const User = z.object({
@@ -292,6 +293,50 @@ export const Topic = z.object({
   default_offchain_template_backup: z.string().optional().nullable(),
 });
 
+export const ContestManager = z
+  .object({
+    contest_address: z.string().describe('On-Chain contest manager address'),
+    community_id: z.string(),
+    name: z.string(),
+    image_url: z.string(),
+    funding_token_address: z
+      .string()
+      .optional()
+      .describe('Provided by admin on creation when stake funds are not used'),
+    prize_percentage: z
+      .number()
+      .min(0)
+      .max(1)
+      .optional()
+      .describe('Percentage of pool used for prizes in recurring contests'),
+    payout_structure: z
+      .array(z.number())
+      .describe(
+        'Sorted array of percentages for prize, from first to last, adding up to 1',
+      ),
+    interval: z
+      .number()
+      .int()
+      .positive()
+      .describe('Recurring contest interval, 0 when one-off'),
+    created_at: z.date(),
+    paused: z
+      .boolean()
+      .optional()
+      .describe('Flags when contest policy is paused by admin'),
+    topics: z.array(Topic).optional(),
+    contests: z.array(Contest).optional(),
+  })
+  .describe('On-Chain Contest Manager');
+
+export const ContestTopic = z
+  .object({
+    contest_address: z.string(),
+    topic_id: z.number().int(),
+    created_at: z.date(),
+  })
+  .describe('X-Ref to topics in contest');
+
 export const Community = z.object({
   name: z.string(),
   chain_node_id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
@@ -351,6 +396,7 @@ export const Community = z.object({
   CommunityStakes: z.array(CommunityStake).optional(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
+  contest_managers: z.array(ContestManager).optional(),
 });
 
 export const CommunityContract = z.object({

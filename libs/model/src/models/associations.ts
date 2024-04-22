@@ -7,13 +7,13 @@ export const buildAssociations = (db: DB) => {
   db.Community.withMany(db.CommunityStake, 'community_id').withMany(
     db.ContestManager,
     'community_id',
+    { as: 'contest_managers' },
   );
 
   // Contest manager associations
-  db.ContestManager.withMany(db.Contest, 'contest_address').withMany(
-    db.ContestTopic,
-    'contest_address',
-  );
+  db.ContestManager.withMany(db.Contest, 'contest_address', {
+    as: 'contests',
+  }).withMany(db.ContestTopic, 'contest_address', { as: 'topics' });
   db.Contest.withMany(db.ContestAction, 'contest_address', { as: 'actions' });
   db.Thread.withMany(db.ContestAction, 'thread_id', { optional: true });
   db.Topic.withMany(db.ContestTopic, 'topic_id');

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
 type ContestManager = ModelInstance<
-  z.infer<typeof schemas.projections.ContestManager>
+  z.infer<typeof schemas.entities.ContestManager>
 >;
 
 export default (sequelize: Sequelize.Sequelize) =>
