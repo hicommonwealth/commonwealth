@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "esnext",
-    "moduleResolution": "node16",
+    "moduleResolution": "node10",
     "module": "node16",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
