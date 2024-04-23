@@ -85,7 +85,7 @@ artillery run -o output_dir/report.json --environment frick app/scenarios/common
 - We encourage you to include load testing in your PR test workflow.
 - The load testing tool can be run against improvements proposed in your PR. You can deploy the PR on Frick & Frack, and run load testing to measure average runtimes against your PR. This will help confirm the performance improvements provided by your PR.
 
-![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/67b264d9-f051-4b69-86c4-556f8fce10d2)
+![image](./assets/Benchmark-PR-Improvements.png)
 
 ### Datadog Dashboards
 

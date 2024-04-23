@@ -26,13 +26,12 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
       },
       winners: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
+        type: Sequelize.ARRAY(Sequelize.JSONB),
       },
     },
     {
       tableName: 'Contests',
       timestamps: false,
       indexes: [{ fields: ['start_time'] }], // TODO: can we enforce typings in indexes?
-      // hooks: syncHooks,
     },
   );

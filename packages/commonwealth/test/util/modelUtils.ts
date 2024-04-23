@@ -31,7 +31,7 @@ import { ethers } from 'ethers';
 import type { Application } from 'express';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import * as siwe from 'siwe';
-import Web3 from 'web3-utils';
+import Web3 from 'web3';
 import { createRole, findOneRole } from '../../server/util/roles';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
@@ -168,7 +168,7 @@ const sortedStringify = configureStableStringify({
 const generateEthAddress = () => {
   const keypair = wallet.generate();
   const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
-  const address = Web3.toChecksumAddress(lowercaseAddress);
+  const address = Web3.utils.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
 

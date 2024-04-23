@@ -34,7 +34,18 @@ export const mapFk = <Parent extends State, Child extends State>(
   parent: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   key: CompositeKey<Parent, Child>,
-) => ({ parent, child, key: key.map((k) => parent.getAttributes()[k].field!) });
+) => ({
+  parent,
+  child,
+  key: key.map((k) =>
+    Array.isArray(k)
+      ? [
+          parent.getAttributes()[k[0]].field!,
+          child.getAttributes()[k[1]].field!,
+        ]
+      : parent.getAttributes()[k].field!,
+  ) as Array<string | [string, string]>,
+});
 
 /**
  * Creates composite FK constraints (not supported by sequelize)
@@ -43,14 +54,15 @@ export const createFk = (
   sequelize: Sequelize,
   parentTable: string,
   childTable: string,
-  key: string[],
+  key: Array<string | [string, string]>,
 ) => {
   const fkName = `${childTable}_${parentTable.toLowerCase()}_fkey`;
-  const fk = key.map((k) => k).join(',');
+  const pk = key.map((k) => (Array.isArray(k) ? k[0] : k)).join(',');
+  const fk = key.map((k) => (Array.isArray(k) ? k[1] : k)).join(',');
   sequelize?.query(
     `
     ALTER TABLE "${childTable}" ADD CONSTRAINT "${fkName}"
-    FOREIGN KEY (${fk}) REFERENCES "${parentTable}"(${fk});
+    FOREIGN KEY (${fk}) REFERENCES "${parentTable}"(${pk});
     `,
   );
 };

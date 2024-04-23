@@ -4,6 +4,7 @@ export * as Community from './community';
 export * as Contest from './contest';
 export * as Feed from './feed';
 export * as Reaction from './reaction';
+export * as Subscription from './subscription';
 export * as Thread from './thread';
 export * as User from './user';
 

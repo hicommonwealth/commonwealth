@@ -33,6 +33,7 @@ export const CommunityStakeBanner = ({
           buttonType: 'secondary',
           buttonAlt: 'green',
           buttonWidth: 'wide',
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick: handleBuyStakeClick,
         },
         {
