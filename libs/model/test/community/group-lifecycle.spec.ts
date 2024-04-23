@@ -52,6 +52,7 @@ describe('Group lifecycle', () => {
         CommunityStakes: [],
         topics: [],
         groups: [],
+        contest_managers: [],
         discord_config_id: null,
       },
       // { mock: true, log: true },
