@@ -9,7 +9,7 @@ import {
 } from '../../src/subscription';
 import { seed } from '../../src/tester';
 
-describe.only('Comment subscription lifecycle', () => {
+describe('Comment subscription lifecycle', () => {
   let actor: Actor;
   let commentOne, commentTwo;
   before(async () => {
@@ -35,28 +35,29 @@ describe.only('Comment subscription lifecycle', () => {
       ],
       CommunityStakes: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
 
     const [thread] = await seed('Thread', {
-      address_id: community.Addresses[0].id,
+      address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      topic_id: community.topics[0].id,
+      topic_id: community?.topics?.at(0)?.id,
     });
 
     [commentOne] = await seed('Comment', {
-      address_id: community.Addresses[0].id,
+      address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      thread_id: thread.id,
+      thread_id: thread?.id,
     });
     [commentTwo] = await seed('Comment', {
-      address_id: community.Addresses[0].id,
+      address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      thread_id: thread.id,
+      thread_id: thread?.id,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: null,
+      address_id: undefined,
     };
   });
 
