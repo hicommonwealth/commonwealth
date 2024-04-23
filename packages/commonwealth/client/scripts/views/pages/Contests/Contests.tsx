@@ -3,13 +3,14 @@ import { Navigate } from 'react-router-dom';
 
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import './Contests.scss';
 
 const Contests = () => {
-  const contestsItemVisible = false;
+  const { stakeEnabled, isContestAvailable } = useCommunityContests();
 
-  if (!contestsItemVisible) {
+  if (!stakeEnabled || !isContestAvailable) {
     return <Navigate replace to={`/${app.activeChainId()}`} />;
   }
 

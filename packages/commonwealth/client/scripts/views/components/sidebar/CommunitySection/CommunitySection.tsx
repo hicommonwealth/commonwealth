@@ -13,6 +13,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { useFlag } from '../../../../hooks/useFlag';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
@@ -55,8 +56,10 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     ...(selectedAddress &&
       !app?.user?.activeAccount && { walletAddress: selectedAddress }),
   });
+  const { isContestAvailable, isContestDataLoading } = useCommunityContests();
 
-  if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
+  if (showSkeleton || isLoading || isContestDataLoading)
+    return <CommunitySectionSkeleton />;
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -104,7 +107,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         )}
 
         <CWDivider />
-        <DiscussionSection />
+        <DiscussionSection
+          isContestAvailable={stakeEnabled && isContestAvailable}
+        />
         <CWDivider />
         <GovernanceSection />
         <CWDivider />
