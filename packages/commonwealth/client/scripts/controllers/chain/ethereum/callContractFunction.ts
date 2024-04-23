@@ -6,7 +6,6 @@ import type IWebWallet from 'models/IWebWallet';
 import app from 'state';
 import type Web3 from 'web3';
 import { AbiFunctionFragment, Transaction, Web3BaseProvider } from 'web3';
-import type { TransactionReceipt } from 'web3-core/types';
 import WebWalletController from '../../app/web_wallets';
 
 async function sendFunctionCall({
@@ -24,7 +23,6 @@ async function sendFunctionCall({
   web3: Web3;
   tx_options?: any;
 }) {
-  let txReceipt: TransactionReceipt | any;
   if (
     fn.stateMutability !== 'view' &&
     fn.stateMutability !== 'pure' &&
@@ -41,19 +39,18 @@ async function sendFunctionCall({
 
     const estimate = await web3.eth.estimateGas(tx);
     tx.gas = estimate;
-    txReceipt = await web3.eth.sendTransaction(tx);
+    return await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
     const tx: Transaction = {
       to: contract.address,
       data: functionTx,
     };
-    txReceipt = await (web3.givenProvider as Web3BaseProvider).request({
+    return await (web3.givenProvider as Web3BaseProvider).request({
       method: 'eth_call',
       params: [tx, 'latest'],
     });
   }
-  return txReceipt;
 }
 
 /**
@@ -76,7 +73,7 @@ export async function callContractFunction({
   fn: AbiFunctionFragment;
   inputArgs: string[];
   tx_options?: any;
-}): Promise<TransactionReceipt | any> {
+}) {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
@@ -107,10 +104,7 @@ export async function callContractFunction({
     web3,
     tx_options,
   };
-  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
-    functionConfig,
-  );
-  return txReceipt;
+  return await sendFunctionCall(functionConfig);
 }
 
 export function encodeParameters(types, values) {
