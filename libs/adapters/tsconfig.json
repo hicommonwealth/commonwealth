@@ -5,7 +5,7 @@
     "tsBuildInfoFile": "build/.tsbuildinfo",
     "strict": true
   },
-  "include": ["src", "test"],
+  "include": ["src"],
   "references": [
     { "path": "../core/tsconfig.build.json" },
     { "path": "../logging/tsconfig.build.json" }
