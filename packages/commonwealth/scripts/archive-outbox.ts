@@ -20,7 +20,7 @@ function dumpTablesSync(table: string, outputFile: string): boolean {
     return false;
   }
 
-  const cmd = `pg_dump sslmode=allow -t ${table} -f ${outputFile} -d ${databaseUrl}`;
+  const cmd = `PGSSLMODE=allow pg_dump -t ${table} -f ${outputFile} -d ${databaseUrl}`;
 
   try {
     // execSync returns stdout as Buffer by default, convert it to string if needed
