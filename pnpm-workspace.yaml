@@ -1,5 +1,5 @@
 packages:
   - 'packages/commonwealth'
   - 'packages/discord-bot'
-  #  - 'packages/snapshot-listener'
+  - 'packages/snapshot-listener'
   - 'libs/*'
