@@ -15,7 +15,6 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -40,6 +39,7 @@ import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import MetaTags from '../../components/MetaTags';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
@@ -410,44 +410,62 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
-      <Helmet defaultTitle="Common">
-        {/* Default sharing */}
-        {ogTitle && <meta name="title" content={ogTitle} />}
-        {ogDescription && <meta name="description" content={ogDescription} />}
-        {thread?.author && <meta name="author" content={thread.author} />}
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        {ogTitle && <meta name="twitter:title" content={ogTitle} />}
-        <meta name="twitter:site" content="@hicommonwealth" />
-        {ogDescription && (
-          <meta name="twitter:description" content={ogDescription} />
-        )}
-        {ogImageUrl && <meta name="twitter:image:src" content={ogImageUrl} />}
-        {ogTitle && (
-          <meta
-            name="twitter:image:alt"
-            content={`Image for thread - ${ogTitle}`}
-          />
-        )}
-        <meta property="twitter:url" content={window.location.href} />
-        {ogImageUrl && <meta name="twitter:image:src" content={ogImageUrl} />}
-
-        {/* Open Graph */}
-        {ogTitle && <meta property="og:title" content={ogTitle} />}
-        {ogDescription && (
-          <meta property="og:description" content={ogDescription} />
-        )}
-        {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-        {ogTitle && (
-          <meta
-            property="og:image:alt"
-            content={`Image for thread - ${ogTitle}`}
-          />
-        )}
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={window.location.href} />
-      </Helmet>
+      <MetaTags
+        customMeta={[
+          {
+            name: 'title',
+            content: ogTitle,
+          },
+          {
+            name: 'description',
+            content: ogDescription,
+          },
+          {
+            name: 'author',
+            content: thread.author,
+          },
+          {
+            name: 'twitter:card',
+            content: 'summary_large_image',
+          },
+          {
+            name: 'twitter:title',
+            content: ogTitle,
+          },
+          {
+            name: 'twitter:description',
+            content: ogDescription,
+          },
+          {
+            name: 'twitter:image',
+            content: ogImageUrl,
+          },
+          {
+            name: 'twitter:url',
+            content: window.location.href,
+          },
+          {
+            name: 'og:title',
+            content: ogTitle,
+          },
+          {
+            name: 'og:description',
+            content: ogDescription,
+          },
+          {
+            name: 'og:image',
+            content: ogImageUrl,
+          },
+          {
+            name: 'og:type',
+            content: 'article',
+          },
+          {
+            name: 'og:url',
+            content: window.location.href,
+          },
+        ]}
+      />
       <CWPageLayout>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}

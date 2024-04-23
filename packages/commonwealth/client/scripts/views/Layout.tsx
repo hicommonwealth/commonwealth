@@ -3,13 +3,13 @@ import { deinitChainOrCommunity, selectCommunity } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import app from 'state';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import SubLayout from './Sublayout';
+import MetaTags from './components/MetaTags';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
 import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -131,38 +131,7 @@ const LayoutComponent = ({
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
-      <Helmet>
-        <meta name="title" content="Common" />
-        <meta
-          name="description"
-          content="Discuss, organize, and grow decentralized communities"
-        />
-        <meta name="author" content="" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Common" />
-        <meta name="twitter:site" content="@hicommonwealth" />
-        <meta
-          name="twitter:description"
-          content="Discuss, organize, and grow decentralized communities"
-        />
-        <meta
-          name="twitter:image:src"
-          content="https://commonwealth.im/static/img/branding/common.png"
-        />
-
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Common" />
-        <meta property="og:url" content="https://commonwealth.im" />
-        <meta property="og:title" content="Common" />
-        <meta
-          property="og:description"
-          content="Discuss, organize, and grow decentralized communities"
-        />
-        <meta
-          property="og:image"
-          content="https://commonwealth.im/static/img/branding/common.png"
-        />
-      </Helmet>
+      <MetaTags />
       <div className="Layout">
         {type === 'blank' ? (
           childToRender()
