@@ -1,26 +1,23 @@
-# Devnet
+# Cosmos Devnets
 
-To develop and test new features for different chains, we use containerized testnet deployments (AKA devnets).
-
-## Contents
-
-- [Cosmos](#cosmos)
-  * [Deploying Updates to a Sandbox](#deploying-updates-to-a-sandbox)
-  * [Deploying Updates to a CI Deployment](#deploying-updates-to-a-ci-deployment)
-  * [Local Development](#local-development)
-  * [Manually Testing Transactions on the csdk or csdk-beta sandbox community](#manually-testing-transactions-on-the-csdk-or-csdk-beta-sandbox-community)
-  * [Manually Testing evmos-dev (ethermint sandbox)](#manually-testing-evmos-dev-ethermint-sandbox)
-  * [Quick Links](#quick-links)
-    + [Version 0.46.11 (`gov` module v1)](#version-04611-gov-module-v1)
-    + [Version 0.45.0 (`gov` module v1beta1)](#version-0450-gov-module-v1beta1)
-    + [Ethermint / Evmos v13.0.2 (`gov` module v1beta1)](#ethermint--evmos-v1302-gov-module-v1beta1)
-- [Change Log](#change-log)
-
-## Cosmos
+To develop and test new features for Cosmos chains, we use containerized testnet deployments (AKA devnets).
 
 Note: Currently, the sandbox communities csdk, csdk-beta, and evmos-dev are on a minimal heroku plan, so they restart intermittently. This means they work fine for manual testing, but created proposals will only persist until the heroku app resets.
 
-### Deploying Updates to a Sandbox
+## Contents
+
+- [Deploying Updates to a Sandbox](#deploying-updates-to-a-sandbox)
+- [Deploying Updates to a CI Deployment](#deploying-updates-to-a-ci-deployment)
+- [Local Development](#local-development)
+- [Manually Testing Transactions on the csdk or csdk-beta sandbox community](#manually-testing-transactions-on-the-csdk-or-csdk-beta-sandbox-community)
+- [Manually Testing evmos-dev (ethermint sandbox)](#manually-testing-evmos-dev-ethermint-sandbox)
+- [Quick Links](#quick-links)
+  * [Version 0.46.11 (`gov` module v1)](#version-04611-gov-module-v1)
+  * [Version 0.45.0 (`gov` module v1beta1)](#version-0450-gov-module-v1beta1)
+  * [Ethermint / Evmos v13.0.2 (`gov` module v1beta1)](#ethermint--evmos-v1302-gov-module-v1beta1)
+- [Change Log](#change-log)
+
+## Deploying Updates to a Sandbox
 
 (v1 for example)
 
@@ -35,7 +32,7 @@ See: <https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container>
 
 Note: If you get error "No images to push," make sure Dockerfile is capitalized
 
-### Deploying Updates to a CI Deployment
+## Deploying Updates to a CI Deployment
 
 1. Create a remote Docker Hub repo called (for ex) "csdk-v1"
 2. In terminal go to packages/commonwealth/test/util/cosmos-chain-testing/v1 directory
@@ -43,7 +40,7 @@ Note: If you get error "No images to push," make sure Dockerfile is capitalized
 4. `docker push {your-docker-remote-hub}/csdk-v1`
 5. If you use a new docker remote, update the reference for tests in CI.yml
 
-### Local Development
+## Local Development
 
 If you ever need to run devnets locally on your machine, there are three helper scripts
 
@@ -64,7 +61,7 @@ Browse to these to confirm node is running locally:
 * <http://localhost:5052/rpc>
 * <http://localhost:5052/lcd/>
 
-### Manually Testing Transactions on the csdk or csdk-beta sandbox community
+## Manually Testing Transactions on the csdk or csdk-beta sandbox community
 
 To create a proposal or vote, you will need an account with staked tokens. We have a shared address for this purpose.
 
@@ -79,7 +76,7 @@ To create a proposal or vote, you will need an account with staked tokens. We ha
 
 - Go to <http://localhost:8080/csdk-beta> or <http://localhost:8080/csdk> and join community. You should be able to create proposals and vote.
 
-### Manually Testing evmos-dev (ethermint sandbox)
+## Manually Testing evmos-dev (ethermint sandbox)
 
 - Add this mnemonic to Keplr:
     `extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof`
@@ -88,9 +85,9 @@ To create a proposal or vote, you will need an account with staked tokens. We ha
 
 - Note: Set gas to zero. There is an issue with displaying tokens correctly, but this address should have tokens. See <https://github.com/hicommonwealth/commonwealth/issues/4909s>
 
-### Quick Links
+## Quick Links
 
-#### Version 0.46.11 (`gov` module v1)
+### Version 0.46.11 (`gov` module v1)
 
 Live Node Endpoints:
 
@@ -110,7 +107,7 @@ CI community (ephemeral spin-up for automated tests):
 * <http://localhost:8080/csdk-v1>
 * CI tests reference Docker image at <https://hub.docker.com/repository/docker/mhagel1/csdk-v1>
 
-#### Version 0.45.0 (`gov` module v1beta1)
+### Version 0.45.0 (`gov` module v1beta1)
 
 Live Node Endpoints:
 
@@ -130,7 +127,7 @@ CI community (ephemeral spin-up for automated tests):
 * <http://localhost:8080/csdk-beta-ci>
 * CI tests reference Docker image at <https://hub.docker.com/repository/docker/mhagel1/csdk-beta>
 
-#### Ethermint / Evmos v13.0.2 (`gov` module v1beta1)
+### Ethermint / Evmos v13.0.2 (`gov` module v1beta1)
 
 Live Node Endpoints:
 
