@@ -1,4 +1,5 @@
-import { BalanceSourceType, logger, stats } from '@hicommonwealth/core';
+import { BalanceSourceType, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { getCosmosBalances, getEvmBalances } from './providers';
 import {
   Balances,
@@ -8,7 +9,7 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * This is the main function through which all balances should be fetched.
@@ -25,6 +26,7 @@ export async function getBalances(
   try {
     if (
       options.balanceSourceType === BalanceSourceType.CosmosNative ||
+      options.balanceSourceType === BalanceSourceType.CW20 ||
       options.balanceSourceType === BalanceSourceType.CW721
     ) {
       balances = await getCosmosBalances(options, ttl);
@@ -32,27 +34,26 @@ export async function getBalances(
       balances = await getEvmBalances(options, ttl);
     }
   } catch (e) {
-    let chainId: string;
-    if ((options as GetEvmBalancesOptions).sourceOptions.evmChainId) {
-      chainId = `evm chain id ${
-        (options as GetEvmBalancesOptions).sourceOptions.evmChainId
-      }`;
-    } else {
-      chainId = `cosmos chain id ${
-        (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId
-      }`;
-    }
-
-    let contractAddress: string = '';
-    if ((options as GetErcBalanceOptions).sourceOptions.contractAddress) {
-      contractAddress = ` for contract address ${
-        (options as GetErcBalanceOptions).sourceOptions.contractAddress
-      }`;
-    }
+    const chainId =
+      (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
+      (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
+    const contractAddress = (options as GetErcBalanceOptions).sourceOptions
+      .contractAddress;
     const msg =
-      `Failed to fetch balance(s) for ${options.addresses.length}` +
-      ` address(es) on ${chainId}${contractAddress}`;
-    log.error(msg, e instanceof Error ? e : undefined);
+      `Failed to fetch balance(s) for ${options.addresses.length} address(es)` +
+      `on chain ${chainId}${contractAddress && ' for contract '}${
+        contractAddress || ''
+      }`;
+
+    log.error(msg, e instanceof Error ? e : undefined, {
+      fingerprint: `TBC: ${chainId} - ${contractAddress}`,
+      addresses: options.addresses.slice(0, 5),
+      contractAddress: (options as GetErcBalanceOptions).sourceOptions
+        .contractAddress,
+      evmChainId: (options as GetEvmBalancesOptions).sourceOptions.evmChainId,
+      cosmosChainId: (options as GetCosmosBalancesOptions).sourceOptions
+        .cosmosChainId,
+    });
   }
 
   stats().incrementBy(

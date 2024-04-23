@@ -1,12 +1,12 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
 import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import app from 'state';
 import type Web3 from 'web3';
-import type { TransactionConfig, TransactionReceipt } from 'web3-core/types';
-import type { AbiItem } from 'web3-utils';
+import { AbiFunctionFragment, Transaction, Web3BaseProvider } from 'web3';
+import type { TransactionReceipt } from 'web3-core/types';
 import WebWalletController from '../../app/web_wallets';
 
 async function sendFunctionCall({
@@ -17,7 +17,7 @@ async function sendFunctionCall({
   web3,
   tx_options,
 }: {
-  fn: AbiItem;
+  fn: AbiFunctionFragment;
   signingWallet: IWebWallet<any>;
   contract: Contract;
   functionTx: any;
@@ -31,7 +31,7 @@ async function sendFunctionCall({
     fn.constant !== true
   ) {
     // Sign Tx with PK if this is write function
-    let tx: TransactionConfig = {
+    let tx: Transaction = {
       from: signingWallet.accounts[0],
       to: contract.address,
       data: functionTx,
@@ -44,11 +44,11 @@ async function sendFunctionCall({
     txReceipt = await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
-    const tx: TransactionConfig = {
+    const tx: Transaction = {
       to: contract.address,
       data: functionTx,
     };
-    txReceipt = await web3.givenProvider.request({
+    txReceipt = await (web3.givenProvider as Web3BaseProvider).request({
       method: 'eth_call',
       params: [tx, 'latest'],
     });
@@ -73,7 +73,7 @@ export async function callContractFunction({
   tx_options,
 }: {
   contract: Contract;
-  fn: AbiItem;
+  fn: AbiFunctionFragment;
   inputArgs: string[];
   tx_options?: any;
 }): Promise<TransactionReceipt | any> {
@@ -93,7 +93,7 @@ export async function callContractFunction({
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
   const functionConfig: {
-    fn: AbiItem;
+    fn: AbiFunctionFragment;
     signingWallet: IWebWallet<any>;
     contract: Contract;
     functionTx: any;

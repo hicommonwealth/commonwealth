@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/core';
+import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
 
@@ -89,7 +89,7 @@ export const updateSiteAdmin = async ({
 
 export const getCSVContent = async ({ id }: { id: string }) => {
   const res = await axios.post(`${app.serverUrl()}/exportMembersList`, {
-    chainId: id,
+    communityId: id,
     jwt: app.user.jwt,
   });
 

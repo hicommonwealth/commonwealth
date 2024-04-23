@@ -1,5 +1,4 @@
-import type { ContractType } from '@hicommonwealth/core';
-import { AbiType, AppError } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   ChainNodeAttributes,
   ContractAbiInstance,
@@ -8,6 +7,8 @@ import type {
   DB,
 } from '@hicommonwealth/model';
 import { hashAbi } from '@hicommonwealth/model';
+import type { ContractType } from '@hicommonwealth/shared';
+import { AbiType } from '@hicommonwealth/shared';
 import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
@@ -15,26 +16,10 @@ import validateAbi from '../../util/abiValidation';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
-  NoType: 'Must provide contract type',
-  NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidAddress: 'Address is invalid',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
-  InvalidNode: 'Node url returned invalid response',
   InvalidABI: 'Invalid ABI passed in',
-  NoAbiNickname: 'Must provide ABI nickname',
-  MustBeWs: 'Node must support websockets on ethereum',
-  InvalidBalanceType: 'Must provide balance type',
-  InvalidChainId: 'Ethereum chain ID not provided or unsupported',
-  InvalidChainIdOrUrl:
-    'Could not determine a valid endpoint for provided chain',
-  InvalidDecimal: 'Invalid decimal',
-  ContractAddressExists: 'The address already exists',
-  ChainIDExists:
-    'The id for this chain already exists, please choose another id',
-  ChainNameExists:
-    'The name for this chain already exists, please choose another name',
-  NotAdmin: 'Must be admin',
 };
 
 export type CreateContractReq = ContractAttributes &
@@ -45,7 +30,7 @@ export type CreateContractReq = ContractAttributes &
     abi?: string;
     abiNickname?: string;
     contractType: ContractType;
-    chain_id: string;
+    community_id: string;
   };
 
 export type CreateContractResp = {
@@ -93,7 +78,7 @@ const createContract = async (
     token_name = '',
     decimals = 0,
     chain_node_id,
-    chain_id,
+    community_id,
   } = req.body;
 
   if (!req.user) {
@@ -103,7 +88,7 @@ const createContract = async (
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    communityId: chain_id,
+    communityId: community_id,
     allowAdmin: true,
     allowSuperAdmin: true,
   });
@@ -142,7 +127,7 @@ const createContract = async (
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
-        community_id: chain_id,
+        community_id,
         contract_id: oldContract.id,
       },
     });
@@ -190,7 +175,7 @@ const createContract = async (
 
       await models.CommunityContract.create(
         {
-          community_id: chain_id,
+          community_id,
           contract_id: contract.id,
         },
         { transaction: t },
@@ -223,7 +208,7 @@ const createContract = async (
       });
       await models.CommunityContract.create(
         {
-          community_id: chain_id,
+          community_id,
           contract_id: contract.id,
         },
         { transaction: t },

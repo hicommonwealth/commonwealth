@@ -1,28 +1,10 @@
-import type {
-  BalanceType,
-  CosmosGovernanceVersion,
-  NodeHealth,
-} from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type ChainNodeAttributes = {
-  url: string;
-  id?: number;
-  eth_chain_id?: number;
-  cosmos_chain_id?: string;
-  alt_wallet_url?: string;
-  private_url?: string;
-  balance_type: BalanceType;
-  bech32?: string;
-  cosmos_gov_version?: CosmosGovernanceVersion;
-  ss58?: number;
-  name: string;
-  description?: string;
-  health?: NodeHealth;
-  updated_at?: Date;
-};
+export type ChainNodeAttributes = z.infer<typeof schemas.entities.ChainNode>;
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
@@ -36,7 +18,7 @@ export default (
     'ChainNode',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: dataTypes.STRING, allowNull: false },
+      url: { type: dataTypes.STRING, allowNull: false, unique: true },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true, unique: true },
       cosmos_chain_id: {
         type: dataTypes.STRING,
@@ -47,11 +29,13 @@ export default (
       private_url: { type: dataTypes.STRING, allowNull: true },
       balance_type: { type: dataTypes.STRING, allowNull: false },
       name: { type: dataTypes.STRING, allowNull: false },
-      description: { type: dataTypes.TEXT, allowNull: true },
+      description: { type: dataTypes.STRING, allowNull: true },
       health: { type: dataTypes.STRING, allowNull: true },
       ss58: { type: dataTypes.INTEGER, allowNull: true },
       bech32: { type: dataTypes.STRING, allowNull: true },
-      cosmos_gov_version: { type: dataTypes.STRING, allowNull: true },
+      cosmos_gov_version: { type: dataTypes.STRING(64), allowNull: true },
+      block_explorer: { type: dataTypes.STRING, allowNull: true },
+      slip44: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -74,6 +58,10 @@ export default (
 
   ChainNode.associate = (models) => {
     models.ChainNode.hasMany(models.Community, { foreignKey: 'chain_node_id' });
+    models.ChainNode.hasMany(models.Contract, {
+      foreignKey: 'chain_node_id',
+      as: 'contracts',
+    });
   };
 
   return ChainNode;

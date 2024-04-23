@@ -1,6 +1,5 @@
-import { AbiType } from '@hicommonwealth/core';
-import type { Response } from 'express';
-import $ from 'jquery';
+import { AbiType } from '@hicommonwealth/shared';
+import axios from 'axios';
 import app from 'state';
 import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
@@ -56,20 +55,20 @@ class ContractsController {
   }
 
   public async checkFetchEtherscanForAbi(address: string) {
-    const response: Response = await $.post(
+    const response = await axios.post(
       `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
       {
         address,
         jwt: app.user.jwt,
       },
     );
-    const resultContract = response['result']['contract'];
-    const resultAbi = response['result']['contractAbi'];
+    const resultContract = response.data.result.contract;
+    const resultAbi = response.data.result.contractAbi;
     this.update(resultAbi.abi, resultContract);
   }
 
   public async getAbiFromEtherscan(address: string): Promise<AbiType> {
-    const response: Response = await $.post(
+    const response = await axios.post(
       `${app.serverUrl()}/etherscanAPI/fetchEtherscanContractAbi`,
       {
         address,
@@ -77,9 +76,8 @@ class ContractsController {
         jwt: app.user.jwt,
       },
     );
-    const resultAbi = response['result']['contractAbi'];
 
-    return resultAbi;
+    return response.data.result.contractAbi;
   }
 
   public async update(
@@ -192,15 +190,15 @@ class ContractsController {
     abi?: string;
   }) {
     try {
-      const response = await $.post(`${app.serverUrl()}/contract`, {
-        chain_id: app.activeChainId(),
+      const response = await axios.post(`${app.serverUrl()}/contract`, {
+        community_id: app.activeChainId(),
         chain_node_id,
         jwt: app.user.jwt,
         address,
         abi,
       });
 
-      const responseContract = response.result.contract;
+      const responseContract = response.data.result.contract;
       const { id, type, is_factory } = responseContract;
 
       const result = new Contract({
@@ -210,7 +208,7 @@ class ContractsController {
         type,
         abi: JSON.parse(abi),
         isFactory: is_factory,
-        hasGlobalTemplate: response.result.hasGlobalTemplate,
+        hasGlobalTemplate: response.data.result.hasGlobalTemplate,
       });
 
       if (this._store.getById(result.id)) {
@@ -238,21 +236,24 @@ class ContractsController {
     community: string;
   }) {
     try {
-      const response = await $.post(`${app.serverUrl()}/contract/template`, {
-        jwt: app.user.jwt,
-        chain_id: app.activeChainId(),
-        name,
-        template,
-        contract_id,
-        description,
-        created_by: app.user.activeAccount.address,
-        created_for_community: community,
-      });
+      const response = await axios.post(
+        `${app.serverUrl()}/contract/template`,
+        {
+          jwt: app.user.jwt,
+          community_id: app.activeChainId(),
+          name,
+          template,
+          contract_id,
+          description,
+          created_by: app.user.activeAccount.address,
+          created_for_community: community,
+        },
+      );
 
       const contract = this._store.getById(contract_id);
       this._store.remove(this._store.getById(contract_id));
       this._store.add(new Contract({ ...contract, hasGlobalTemplate: true }));
-      return response.result.template_id;
+      return response.data.result.template_id;
     } catch (err) {
       console.log(err);
       throw new Error('Failed to create template');
@@ -261,13 +262,11 @@ class ContractsController {
 
   public async deleteTemplate({ templateId }: { templateId: string }) {
     try {
-      await $.ajax({
-        url: `${app.serverUrl()}/contract/template`,
-        data: {
+      await axios.delete(`${app.serverUrl()}/contract/template`, {
+        params: {
           jwt: app.user.jwt,
           template_id: templateId,
         },
-        type: 'DELETE',
       });
     } catch (err) {
       console.log(err);
@@ -277,11 +276,13 @@ class ContractsController {
 
   public async getTemplatesForContract(contractId: number) {
     try {
-      const res = await $.get(`${app.serverUrl()}/contract/template`, {
-        jwt: app.user.jwt,
-        contract_id: contractId,
+      const res = await axios.get(`${app.serverUrl()}/contract/template`, {
+        params: {
+          jwt: app.user.jwt,
+          contract_id: contractId,
+        },
       });
-      return res.result.templates;
+      return res.data.result.templates;
     } catch (e) {
       console.log(e);
       throw new Error('Failed to get templates');
@@ -292,19 +293,19 @@ class ContractsController {
     communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes,
   ) {
     try {
-      const newContract = await $.post(
+      const newContract = await axios.post(
         `${app.serverUrl()}/contract/community_template_and_metadata`,
         {
           ...communityContractTemplateAndMetadata,
-          chain_id: app.activeChainId(),
+          community_id: app.activeChainId(),
           jwt: app.user.jwt,
         },
       );
 
       this.updateTemplate({
         contract_id: communityContractTemplateAndMetadata.contract_id,
-        cct_id: newContract.result.cct.id,
-        cctmd: newContract.result.metadata,
+        cct_id: newContract.data.result.cct.id,
+        cctmd: newContract.data.result.metadata,
         isNewCCT: true,
         template_id: communityContractTemplateAndMetadata.template_id,
       });
@@ -318,19 +319,21 @@ class ContractsController {
     communityContractTemplateMetadata: EditCommunityContractTemplateAttributes,
   ) {
     try {
-      const updateContract = await $.ajax({
-        url: `${app.serverUrl()}/contract/community_template`,
-        data: {
-          ...communityContractTemplateMetadata,
-          jwt: app.user.jwt,
+      const updateContract = await axios.put(
+        `${app.serverUrl()}/contract/community_template`,
+        {
+          params: {
+            ...communityContractTemplateMetadata,
+            community_id: app.activeChainId(),
+            jwt: app.user.jwt,
+          },
         },
-        type: 'PUT',
-      });
+      );
 
       this.updateTemplate({
         contract_id: communityContractTemplateMetadata.contract_id,
-        cct_id: updateContract.result.cct.id,
-        cctmd: updateContract.result.metadata,
+        cct_id: updateContract.data.result.cct.id,
+        cctmd: updateContract.data.result.metadata,
         isNewCCT: false,
       });
     } catch (err) {
@@ -345,23 +348,24 @@ class ContractsController {
     cctmd_id: number;
   }) {
     try {
-      const res = await $.ajax({
-        url: `${app.serverUrl()}/contract/community_template`,
-        data: {
-          ...contract,
-          jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
+      const res = await axios.delete(
+        `${app.serverUrl()}/contract/community_template`,
+        {
+          params: {
+            ...contract,
+            jwt: app.user.jwt,
+            community_id: app.activeChainId(),
+          },
         },
-        type: 'DELETE',
-      });
+      );
 
-      if (res.result.deletedContract) {
+      if (res.data.result.deletedContract) {
         this._store.remove(this._store.getById(contract.contract_id));
       } else {
         this.updateTemplate({
           contract_id: contract.contract_id,
-          cct_id: res.result.cct.id,
-          cctmd: res.result.metadata,
+          cct_id: res.data.result.cct.id,
+          cctmd: res.data.result.metadata,
           isNewCCT: false,
           isDeletion: true,
         });
@@ -379,15 +383,16 @@ class ContractsController {
     try {
       const contractToDelete = this._store.getById(contract.contract_id);
 
-      await $.ajax({
-        url: `${app.serverUrl()}/contract/community_template?community_contract=true`,
-        data: {
-          ...contract,
-          jwt: app.user.jwt,
-          chain_id: app.activeChainId(),
+      await axios.delete(
+        `${app.serverUrl()}/contract/community_template?community_contract=true`,
+        {
+          params: {
+            ...contract,
+            jwt: app.user.jwt,
+            community_id: app.activeChainId(),
+          },
         },
-        type: 'DELETE',
-      });
+      );
 
       this._store.remove(contractToDelete);
     } catch (err) {

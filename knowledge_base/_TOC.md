@@ -21,6 +21,7 @@
 - [Database Monitoring](Database-Monitoring.md)
 - [Database Migration Best Practices](Database-Migrations.md)
 - [Database Optimization](Database-Optimization.md)
+- [Enabling Community Governance](Enabling-Community-Governance.md)
 - [Sequelize](Sequelize.md)
 
 ## Services & Tooling
@@ -36,11 +37,6 @@
 - [Testing Environments](Testing-Environments.md)
 - [Unleash](Feature-Flags.md)
 - [Wallet Support](Wallet-Support.md)
-
-### React
-
-- [React Notes](React-Notes.md)
-- [React Best Practices](React-Best-Practices-And-Improvements.md)
 
 ### RabbitMQ
 

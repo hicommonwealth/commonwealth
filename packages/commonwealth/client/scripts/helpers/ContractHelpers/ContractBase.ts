@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
 import Web3 from 'web3';
@@ -58,10 +58,6 @@ abstract class ContractBase {
         'Contract not initialzed. Call Contract.initialize() first.',
       );
     }
-  }
-
-  protected toBN(number: string | number) {
-    return this.web3.utils.toBN(number);
   }
 }
 

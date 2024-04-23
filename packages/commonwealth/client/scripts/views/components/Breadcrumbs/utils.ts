@@ -46,11 +46,17 @@ export const generateBreadcrumbs = (
   locationPath: string,
   profileId: number,
   navigate: (val: To) => void,
+  customDomain: string,
   currentDiscussion?: currentDiscussion,
 ) => {
   let link: string;
   let label: string;
   let isParent: boolean;
+
+  if (customDomain) {
+    locationPath = `${customDomain}${locationPath}`;
+  }
+
   const pathSegments = locationPath
     .split('/')
     .filter((segment) => segment.length > 0);
@@ -66,10 +72,14 @@ export const generateBreadcrumbs = (
       case 'profile':
         link = `profile/id/${profileId}`;
         break;
+      case 'members':
+        link = 'members';
+        break;
       case 'snapshot':
         //Match the header on the snapshots page
         pathSegments.splice(index + 1, 1);
         pathSegments[index] = 'snapshots';
+        link = 'snapshots';
         break;
       case 'proposal':
         link = 'proposals';

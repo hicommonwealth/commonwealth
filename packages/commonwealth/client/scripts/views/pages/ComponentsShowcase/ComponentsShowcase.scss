@@ -2,13 +2,12 @@
 
 .ComponentsShowcase {
   display: flex;
-  height: calc(100vh - #{$global-header-height});
+  height: calc(100vh - #{$global-header-height} - 88px);
 
   .page-sidebar {
     width: 224px;
-    padding: 24px;
+    padding-right: 24px;
     overflow-y: auto;
-    box-shadow: 0 0 10px 0 $neutral-200;
 
     @include extraSmall {
       display: none;
@@ -28,7 +27,6 @@
 
   .page-body {
     flex: 1;
-    padding: 24px;
     overflow-y: auto;
     scroll-behavior: smooth;
 

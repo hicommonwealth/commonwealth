@@ -1,7 +1,6 @@
-import { TypescriptLoggingLogger } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 
-const log = logger(TypescriptLoggingLogger()).getLogger(__filename);
+const log = logger(__filename);
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from

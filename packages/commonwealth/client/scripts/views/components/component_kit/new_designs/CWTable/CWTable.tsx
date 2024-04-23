@@ -85,33 +85,36 @@ import {
 } from '@tanstack/react-table';
 import { getRelativeTimestamp } from 'client/scripts/helpers/dates';
 import clsx from 'clsx';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { ComponentType } from '../../types';
 import './CWTable.scss';
 
-type ColumnDescriptor = {
+export type CWTableColumnInfo = {
   key: string;
-  header: string;
+  header: string | (() => ReactNode);
   numeric: boolean;
   sortable: boolean;
   chronological?: boolean;
   customElementKey?: string;
   hasCustomSortValue?: boolean;
+  hidden?: boolean;
 };
 
 type RowData = {
   avatars?: object;
 };
 
+export type CWTableSorting = SortingState;
+
 type TableProps = {
-  columnInfo: ColumnDescriptor[];
+  columnInfo: CWTableColumnInfo[];
   rowData: any[];
   isLoadingMoreRows?: boolean;
   onScrollEnd?: () => any;
-  defaultSortColumnKey?: string;
-  defaultSortDesc?: boolean;
+  sortingState?: CWTableSorting;
+  setSortingState?: (sortingState: CWTableSorting) => void;
 };
 
 export const CWTable = ({
@@ -119,72 +122,72 @@ export const CWTable = ({
   rowData,
   onScrollEnd,
   isLoadingMoreRows,
-  defaultSortColumnKey = columnInfo[0].key,
-  defaultSortDesc = true,
+  sortingState = columnInfo
+    ? [{ id: columnInfo[0].key, desc: true }]
+    : undefined,
+  setSortingState = () => {
+    console.warn('setSortingState not implemented');
+  },
 }: TableProps) => {
   const tableRef = useRef();
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: defaultSortColumnKey,
-      desc: defaultSortDesc,
-    },
-  ]);
 
   const columns = useMemo<ColumnDef<unknown, any>[]>(
     () =>
-      columnInfo.map((col) => {
-        return {
-          accessorKey: col.key,
-          header: col.header,
-          ...(col?.hasCustomSortValue && {
-            // implement custom sorting function, if we have custom sorting value.
-            sortingFn: (rowA, rowB, columnId) => {
-              return rowA.original[columnId].sortValue <
-                rowB.original[columnId].sortValue
-                ? 1
-                : -1;
+      columnInfo
+        .filter((col) => !col.hidden)
+        .map((col) => {
+          return {
+            accessorKey: col.key,
+            header: col.header,
+            ...(col?.hasCustomSortValue && {
+              // implement custom sorting function, if we have custom sorting value.
+              sortingFn: (rowA, rowB, columnId) => {
+                return rowA.original[columnId].sortValue <
+                  rowB.original[columnId].sortValue
+                  ? 1
+                  : -1;
+              },
+            }),
+            cell: (info) => {
+              const currentRow = info.row.original as RowData;
+              const avatarInfo = currentRow.avatars?.[col.key];
+              const avatarUrl = avatarInfo?.avatarUrl;
+              const avatarAddress = avatarInfo?.address;
+
+              if (currentRow[col.key]?.customElement) {
+                return currentRow[col.key].customElement;
+              }
+
+              if (col.customElementKey) {
+                return currentRow[col.customElementKey];
+              }
+
+              const numericColVal = col.chronological
+                ? info.getValue()
+                  ? getRelativeTimestamp(info.getValue())
+                  : 'N/A'
+                : info.getValue();
+
+              if (col.numeric) {
+                return <div className="numeric">{numericColVal}</div>;
+              }
+
+              if (avatarUrl || avatarAddress) {
+                return (
+                  <div className="avatar-cell">
+                    <Avatar url={avatarUrl} address={avatarAddress} size={20} />
+                    <div className="text">{info.getValue()}</div>
+                  </div>
+                );
+              }
+
+              return info.getValue();
             },
-          }),
-          cell: (info) => {
-            const currentRow = info.row.original as RowData;
-            const avatarInfo = currentRow.avatars?.[col.key];
-            const avatarUrl = avatarInfo?.avatarUrl;
-            const avatarAddress = avatarInfo?.address;
-
-            if (currentRow[col.key]?.customElement) {
-              return currentRow[col.key].customElement;
-            }
-
-            if (col.customElementKey) {
-              return currentRow[col.customElementKey];
-            }
-
-            const numericColVal = col.chronological
-              ? info.getValue()
-                ? getRelativeTimestamp(info.getValue())
-                : 'N/A'
-              : info.getValue();
-
-            if (col.numeric) {
-              return <div className="numeric">{numericColVal}</div>;
-            }
-
-            if (avatarUrl || avatarAddress) {
-              return (
-                <div className="avatar-cell">
-                  <Avatar url={avatarUrl} address={avatarAddress} size={20} />
-                  <div className="text">{info.getValue()}</div>
-                </div>
-              );
-            }
-
-            return info.getValue();
-          },
-          footer: (footerProps) => footerProps.column.id,
-          enableSorting: col.sortable,
-          isNumeric: col.numeric,
-        };
-      }),
+            footer: (footerProps) => footerProps.column.id,
+            enableSorting: col.sortable,
+            isNumeric: col.numeric,
+          };
+        }),
     [columnInfo],
   );
 
@@ -192,12 +195,11 @@ export const CWTable = ({
     data: rowData,
     columns,
     state: {
-      sorting,
+      sorting: sortingState,
     },
-    onSortingChange: setSorting,
+    onSortingChange: setSortingState,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    debugTable: true,
   });
 
   const displaySortIcon = (

@@ -205,23 +205,25 @@ export type MemberResult = {
   avatar_url: string;
   addresses: {
     id: number;
-    chain: string;
+    community_id: string;
     address: string;
+    stake_balance?: string;
   }[];
   group_ids?: [];
   roles?: any[];
+  last_active: string;
 };
 type MemberResultRowProps = {
   addr: MemberResult;
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const { chain: community, address } = addr.addresses[0];
+  const { community_id, address } = addr.addresses[0];
   const { data: users } = useFetchProfilesByAddressesQuery({
-    profileChainIds: [community],
+    profileChainIds: [community_id],
     profileAddresses: [address],
     currentChainId: app.activeChainId(),
-    apiCallEnabled: !!(community && address),
+    apiCallEnabled: !!(community_id && address),
   });
   const profile: MinimumProfile = users?.[0];
 
@@ -229,7 +231,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     setRoute(`/profile/id/${profile?.id}`, {}, null);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== community) {
+  if (app.isCustomDomain() && app.customDomainId() !== community_id) {
     return null;
   }
 
@@ -237,7 +239,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     <div key={address} className="member-result-row" onClick={handleClick}>
       <User
         userAddress={address}
-        userCommunityId={community}
+        userCommunityId={community_id}
         shouldShowRole
         shouldLinkProfile
         avatarSize={32}

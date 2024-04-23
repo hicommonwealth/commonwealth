@@ -12,7 +12,7 @@ const editCommunityBanner = async ({
   bannerText,
 }: EditCommunityBannerProps) => {
   const response = await axios.post(`${app.serverUrl()}/updateBanner`, {
-    chain_id: communityId,
+    community_id: communityId,
     banner_text: bannerText,
     auth: true,
     jwt: app.user.jwt,

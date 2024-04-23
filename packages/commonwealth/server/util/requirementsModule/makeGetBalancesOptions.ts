@@ -6,10 +6,9 @@ import {
   NativeSource,
 } from '@hicommonwealth/core';
 import {
-  AddressAttributes,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
-  GetCw721BalanceOptions,
+  GetCwBalancesOptions,
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
@@ -18,11 +17,9 @@ import {
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],
-  addresses: AddressAttributes[],
+  addresses: string[],
 ): GetBalancesOptions[] {
   const allOptions: GetBalancesOptions[] = [];
-
-  const addressStrings = addresses.map((a) => a.address);
 
   for (const group of groups) {
     for (const requirement of group.requirements) {
@@ -50,7 +47,7 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   evmChainId: castedSource.evm_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -78,7 +75,7 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   tokenId: parseInt(castedSource.token_id, 10),
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -99,7 +96,7 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   evmChainId: castedSource.evm_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
@@ -122,17 +119,18 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;
           }
           // CosmosContractSource
+          case BalanceSourceType.CW20:
           case BalanceSourceType.CW721: {
             const castedSource = requirement.data
               .source as CosmosContractSource;
             const existingOptions = allOptions.find((opt) => {
-              const castedOpt = opt as GetCw721BalanceOptions;
+              const castedOpt = opt as GetCwBalancesOptions;
               return (
                 castedOpt.balanceSourceType === castedSource.source_type &&
                 castedOpt.sourceOptions.cosmosChainId ===
@@ -143,12 +141,12 @@ export function makeGetBalancesOptions(
             });
             if (!existingOptions) {
               allOptions.push({
-                balanceSourceType: BalanceSourceType.CW721,
+                balanceSourceType: castedSource.source_type as any,
                 sourceOptions: {
                   contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
-                addresses: addressStrings,
+                addresses,
               });
             }
             break;

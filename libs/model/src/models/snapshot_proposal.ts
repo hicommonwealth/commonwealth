@@ -1,4 +1,4 @@
-import type { SnapshotProposalAttributes } from '@hicommonwealth/core';
+import type { SnapshotProposalAttributes } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
@@ -51,7 +51,7 @@ export default (
         allowNull: true,
       },
       is_upstream_deleted: {
-        type: dataTypes.STRING,
+        type: dataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },

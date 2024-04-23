@@ -1,13 +1,13 @@
-import { AppError, Requirement } from '@hicommonwealth/core';
+import { AppError, Requirement, schemas } from '@hicommonwealth/core';
 import {
   AddressInstance,
   GroupAttributes,
-  GroupMetadata,
   TopicInstance,
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
+import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
@@ -21,13 +21,14 @@ const Errors = {
   Unauthorized: 'Unauthorized',
   GroupNotFound: 'Group not found',
   InvalidTopics: 'Invalid topics',
+  SystemManaged: 'Cannot update group that is system-managed',
 };
 
 export type UpdateGroupOptions = {
   user: UserInstance;
   address: AddressInstance;
   groupId: number;
-  metadata?: GroupMetadata;
+  metadata?: z.infer<typeof schemas.entities.GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
 };
@@ -53,6 +54,10 @@ export async function __updateGroup(
   });
   if (!isAdmin) {
     throw new AppError(Errors.Unauthorized);
+  }
+
+  if (group.is_system_managed) {
+    throw new AppError(Errors.SystemManaged);
   }
 
   // allow metadata and requirements to be omitted

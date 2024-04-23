@@ -1,5 +1,4 @@
-import { WalletId } from '@hicommonwealth/core';
-import axios from 'axios';
+import { WalletId } from '@hicommonwealth/shared';
 import Near from '../controllers/chain/near/adapter';
 import IWebWallet from '../models/IWebWallet';
 
@@ -32,7 +31,6 @@ const getWalletName = (walletId: WalletId) => {
     [WalletId.TerraWalletConnect]: 'Terra WalletConnect',
     [WalletId.CosmosEvmMetamask]: 'Metamask',
     [WalletId.Phantom]: 'Phantom',
-    [WalletId.Ronin]: 'Ronin Wallet',
   };
   return lookups[walletId];
 };
@@ -67,19 +65,6 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
   return selectedAddress;
 };
 
-const loginToAxie = async (loginUrl = '') => {
-  try {
-    const response = await axios.post(loginUrl, {
-      issuer: 'AxieInfinity',
-    });
-
-    const stateId = response.data.stateId;
-    window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
-  } catch (error) {
-    console.log(error || 'Could not sign in');
-  }
-};
-
 const loginToNear = async (activeChain: Near, isCustomDomain: boolean) => {
   const WalletAccount = (await import('near-api-js')).WalletAccount;
   if (!activeChain.apiInitialized) {
@@ -106,4 +91,4 @@ const loginToNear = async (activeChain: Near, isCustomDomain: boolean) => {
   });
 };
 
-export { getAddressFromWallet, getWalletName, loginToAxie, loginToNear };
+export { getAddressFromWallet, getWalletName, loginToNear };

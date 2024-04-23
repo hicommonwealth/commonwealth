@@ -1,5 +1,5 @@
-import { ZodError, ZodSchema } from 'zod';
-import { events } from '../schemas';
+import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
+import { Events } from '../schemas';
 import {
   InvalidInput,
   type EventContext,
@@ -8,7 +8,7 @@ import {
 } from './types';
 
 /**
- * Generic event handler that adapts external protocols to conventional event context flows
+ * Generic utility that adapts external protocols to conventional event handling flows
  * - Protocol adapters should use this handler to enter the model
  * @param md event metadata
  * @param payload event payload
@@ -16,15 +16,19 @@ import {
  * @returns side effects
  * @throws {@link InvalidInput} when user invokes event with invalid payload, or rethrows internal domain errors
  */
-export const event = async <
-  Name extends events.Events,
+export const handleEvent = async <
+  Name extends Events,
   Input extends EventSchemas,
-  Output extends ZodSchema,
+  Output extends ZodSchema | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
-  { name, payload }: EventContext<Name, typeof events.schemas[Name]>,
+  { name, payload }: EventContext<Name>,
   validate = true,
-): Promise<Partial<Output> | undefined> => {
+): Promise<Partial<z.infer<Output>> | undefined> => {
+  if (!body[name])
+    throw new InvalidInput(
+      `Unhandled event: ${name} not found in ${Object.keys(body)}`,
+    );
   try {
     return (
       (await body[name]({

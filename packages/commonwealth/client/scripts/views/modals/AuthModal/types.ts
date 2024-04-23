@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { AuthSSOs, AuthWallets } from '../../components/AuthButton/types';
 
 export type AuthModalTabs = {
@@ -6,7 +6,11 @@ export type AuthModalTabs = {
   options: AuthWallets[] | AuthSSOs[];
 };
 
-export type BaseModalProps = {
+export type CreateAccountModal = {
+  onClose: () => void;
+};
+
+export type SignInModalProps = {
   onClose: () => any;
   onSuccess?: () => any;
   showWalletsFor?:
@@ -18,4 +22,5 @@ export type BaseModalProps = {
 
 export type AuthModalProps = {
   isOpen: boolean;
-} & BaseModalProps;
+  type?: 'create-account' | 'sign-in';
+} & SignInModalProps;

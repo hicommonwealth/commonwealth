@@ -5,12 +5,12 @@ import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
 
+import { logger } from '@hicommonwealth/logging';
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
-  logger,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
@@ -29,7 +29,7 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -293,7 +293,7 @@ const verifySessionSignature = async (
     //
 
     // both in base64 encoding
-    const nacl = await import('tweetnacl');
+    const nacl = (await import('tweetnacl')).default;
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
 
     isValid = nacl.sign.detached.verify(
@@ -310,7 +310,7 @@ const verifySessionSignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
-        const nacl = await import('tweetnacl');
+        const nacl = (await import('tweetnacl')).default;
         isValid = nacl.sign.detached.verify(
           Buffer.from(sortedStringify(canvasSessionPayload)),
           bs58.decode(signatureString),
@@ -345,7 +345,7 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        const user = await models.User.createWithProfile(models, {
+        const user = await models.User.createWithProfile({
           email: null,
         });
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;

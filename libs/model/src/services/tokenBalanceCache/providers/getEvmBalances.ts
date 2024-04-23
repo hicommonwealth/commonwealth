@@ -1,4 +1,5 @@
-import { BalanceSourceType, logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import Web3 from 'web3';
 import { models } from '../../../database';
 import { Balances, GetEvmBalancesOptions } from '../types';
@@ -8,7 +9,7 @@ import { __getErc20Balances } from './get_erc20_balances';
 import { __getErc721Balances } from './get_erc721_balances';
 import { __getEthBalances } from './get_eth_balances';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export async function getEvmBalances(
   options: GetEvmBalancesOptions,
@@ -34,8 +35,8 @@ export async function getEvmBalances(
   });
 
   if (!chainNode) {
-    const msg = `ChainNode with eth_chain_id ${options.sourceOptions.evmChainId} does not exist`;
-    log.error(msg);
+    const msg = `ChainNode with evmChainId ${options.sourceOptions.evmChainId} does not exist`;
+    log.error(msg, undefined, { evmChainId: options.sourceOptions.evmChainId });
     return {};
   }
 

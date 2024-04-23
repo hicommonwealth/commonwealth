@@ -16,6 +16,7 @@ export const ApiEndpoints = {
   FETCH_COMMUNITY_STAKES: '/communityStakes',
   FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
+  FETCH_ACTIVE_COMMUNITIES: '/communities',
   FETCH_THREADS: '/threads',
   FETCH_PROFILES: '/getAddressProfile',
   DISCORD_CHANNELS: '/getDiscordChannels',
@@ -28,6 +29,7 @@ export const ApiEndpoints = {
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
+  REMOVE_DISCORD_BOT_CONFIG: '/removeDiscordBotConfig',
 };
 
 export const ContractMethods = {

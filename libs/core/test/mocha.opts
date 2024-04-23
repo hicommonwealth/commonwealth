@@ -1,0 +1,5 @@
+# mocha.opts
+  --require tsconfig-paths/register
+  --require source-map-support/register
+  --timeout 20000
+  --exit

@@ -1,4 +1,4 @@
-import { SupportedNetwork } from '@hicommonwealth/core';
+import { SupportedNetwork } from '@hicommonwealth/shared';
 import { IEventData as AaveEventData } from '../../../shared/chain/types/aave';
 import { IEventData as CompoundEventData } from '../../../shared/chain/types/compound';
 import { IEventData as CosmosEventData } from '../../../shared/chain/types/cosmos';

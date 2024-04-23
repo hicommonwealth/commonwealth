@@ -2,32 +2,32 @@ import React, { useState } from 'react';
 
 import 'components/component_kit/cw_socials.scss';
 
-import { ComponentType } from './types';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
-import { CWIconButton } from './cw_icon_button';
-import type { IconName } from './cw_icons/cw_icon_lookup';
-import { CWIcon } from './cw_icons/cw_icon';
+import { ComponentType } from './types';
 
 type SocialsProps = {
   socials: string[];
   handleInputChange?: (value: string[]) => void;
 };
 
-export const CWSocials = (props: SocialsProps) => {
-  const [socials, setSocials] = useState(props.socials ?? []);
+export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
+  const [propSocials, setPropSocials] = useState(socials ?? []);
 
   const addInputRow = () => {
-    setSocials([...socials, '']);
+    setPropSocials([...propSocials, '']);
   };
 
   const deleteInputRow = (index: number) => {
-    const newSocials = socials.filter((_, i) => i !== index);
-    setSocials(newSocials);
-    props.handleInputChange(newSocials);
+    const newSocials = propSocials.filter((_, i) => i !== index);
+    setPropSocials(newSocials);
+    handleInputChange(newSocials);
   };
 
-  const socialsList = socials?.map((social, i) => {
+  const socialsList = propSocials?.map((social, i) => {
     let name: string;
     let icon: IconName;
     let placeholder: string;
@@ -37,10 +37,14 @@ export const CWSocials = (props: SocialsProps) => {
       icon = 'discord';
       placeholder = 'https://discord.com/...';
     } else if (social.includes('twitter.com/')) {
-      name = 'twitter';
-      icon = 'twitter';
+      name = 'X (Twitter)';
+      icon = 'twitterX';
       placeholder = 'https://twitter.com/...';
     } else if (social.includes('telegram.org/')) {
+      name = 'telegram';
+      icon = 'telegram';
+      placeholder = 'https://telegram.org/...';
+    } else if (social.includes('t.me/')) {
       name = 'telegram';
       icon = 'telegram';
       placeholder = 'https://telegram.org/...';
@@ -69,10 +73,10 @@ export const CWSocials = (props: SocialsProps) => {
           iconRight={icon}
           placeholder={placeholder}
           onInput={(e) => {
-            const newSocials = [...socials];
+            const newSocials = [...propSocials];
             newSocials[i] = e.target.value;
-            setSocials(newSocials);
-            props.handleInputChange(newSocials);
+            setPropSocials(newSocials);
+            handleInputChange(newSocials);
           }}
         />
         <CWIconButton

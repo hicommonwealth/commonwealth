@@ -2,7 +2,7 @@ import { ServerControllers } from '../../routing/router';
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
 
 type GetProposalVotesRequestParams = {
-  chainId: string;
+  communityId: string;
   proposalId: string;
 };
 
@@ -13,9 +13,9 @@ type GetProposalVotesResponse = {
 export const getProposalVotesHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetProposalVotesRequestParams>,
-  res: TypedResponse<GetProposalVotesResponse>
+  res: TypedResponse<GetProposalVotesResponse>,
 ) => {
-  const { chainId: communityId, proposalId } = req.query;
+  const { communityId, proposalId } = req.query;
 
   const votes = await controllers.proposals.getProposalVotes({
     communityId,

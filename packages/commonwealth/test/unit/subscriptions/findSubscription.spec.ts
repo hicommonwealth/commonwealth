@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
@@ -10,7 +10,7 @@ import Thread from 'models/Thread';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-const chainId = 'ethereum';
+const communityId = 'ethereum';
 const snapshotId = 'snapshot_space';
 const commentId = 1,
   threadId = 1;
@@ -24,9 +24,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    {
-      id: 'randomChain',
-    },
+    'randomChain',
   ),
   new NotificationSubscription(
     2,
@@ -34,9 +32,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    {
-      id: chainId,
-    },
+    communityId,
   ),
   new NotificationSubscription(
     3,
@@ -44,9 +40,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    {
-      id: 'randomChain2',
-    },
+    'randomChain2',
   ),
   new NotificationSubscription(
     4,
@@ -54,9 +48,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
-    {
-      id: chainId,
-    },
+    communityId,
   ),
   new NotificationSubscription(
     5,
@@ -225,13 +217,13 @@ describe('findSubscription tests', () => {
     it('should return the correct subscription if a chainId is provided', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.ChainEvent,
-        options: { chainId },
+        options: { communityId },
       };
 
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(findOptions, notifSubscriptions);
       expect(result).to.be.not.undefined;
-      expect(result.chainId).to.equal(chainId);
+      expect(result.communityId).to.equal(communityId);
       expect(result.id).to.equal(2);
     });
   });
@@ -254,13 +246,13 @@ describe('findSubscription tests', () => {
     it('should return the correct subscription if a chainId', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewThread,
-        options: { chainId },
+        options: { communityId },
       };
 
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(findOptions, notifSubscriptions);
       expect(result).to.be.not.undefined;
-      expect(result.chainId).to.equal(chainId);
+      expect(result.communityId).to.equal(communityId);
       expect(result.id).to.equal(4);
     });
   });

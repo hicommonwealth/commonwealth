@@ -9,7 +9,7 @@ import BN from 'bn.js';
 
 import type { GovernorCompatibilityBravo } from '@hicommonwealth/chains';
 import { GovernorMock__factory } from '@hicommonwealth/chains';
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import type { ContractTransaction } from 'ethers';
 import { BigNumber, utils } from 'ethers';
 
@@ -271,7 +271,7 @@ export default class CompoundProposal extends Proposal<
       `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSAL_VOTES}`,
       {
         params: {
-          chainId: meta.id,
+          communityId: meta.id,
           proposalId,
         },
       },

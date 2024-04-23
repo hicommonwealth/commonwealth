@@ -1,30 +1,29 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
-import { sequelize } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import { groupBy } from 'lodash';
 import { QueryTypes } from 'sequelize';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 type UniqueAddresses = {
   thread_id: number;
   address_id: number;
   address: string;
-  chain;
+  community_id: string;
 };
 
 const fetchUniqueAddressesByThreadIds = async (
   models: DB,
-  { chain, thread_ids },
+  { community_id, thread_ids },
 ) => {
-  return sequelize.query<UniqueAddresses>(
+  return models.sequelize.query<UniqueAddresses>(
     `
     SELECT distinct cts.address_id, address, thread_id, cts.community_id
     FROM "Comments" cts INNER JOIN "Addresses" adr
     ON adr.id = cts.address_id
     WHERE thread_id = ANY($thread_ids)
-    AND cts.community_id = $chain
+    AND cts.community_id = $community_id
     AND deleted_at IS NULL
     ORDER BY thread_id
   `,
@@ -32,7 +31,7 @@ const fetchUniqueAddressesByThreadIds = async (
       type: QueryTypes.SELECT,
       bind: {
         thread_ids,
-        chain,
+        community_id,
       },
     },
   );
@@ -51,13 +50,13 @@ const threadsUsersCountAndAvatar = async (
   req: Request,
   res: Response,
 ) => {
-  const { chain, threads = [] } = req.body;
+  const { community_id, threads = [] } = req.body;
   try {
-    if (chain && threads.length) {
+    if (community_id && threads.length) {
       const thread_ids = threads.map(({ thread_id }) => thread_id);
       const uniqueAddressesByRootIds = await fetchUniqueAddressesByThreadIds(
         models,
-        { chain, thread_ids },
+        { community_id, thread_ids },
       );
       const uniqueAddressesByThread = groupBy<UniqueAddresses>(
         uniqueAddressesByRootIds,
@@ -74,7 +73,7 @@ const threadsUsersCountAndAvatar = async (
               thread_id: thread_id,
               address: authorAddress,
               address_id: null,
-              chain,
+              community_id,
             })
             .slice(0, 2);
           return {

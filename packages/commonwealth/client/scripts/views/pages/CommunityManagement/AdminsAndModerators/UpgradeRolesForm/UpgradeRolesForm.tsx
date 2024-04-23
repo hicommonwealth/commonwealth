@@ -1,12 +1,12 @@
-import { AccessLevel } from '@hicommonwealth/core';
+import { AccessLevel } from '@hicommonwealth/shared';
+import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
-import $ from 'jquery';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
-import type RoleInfo from '../../../../../models/RoleInfo';
+import RoleInfo from '../../../../../models/RoleInfo';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
-import { CWButton } from '../../../../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../../../components/members_search_bar';
 import './UpgradeRolesForm.scss';
@@ -54,8 +54,6 @@ export const UpgradeRolesForm = ({
     return fullText;
   });
 
-  const communityObj = { chain: app.activeChainId() };
-
   const options = useMemo(() => {
     return nonAdminNames.map((n) => ({ label: n, value: n }));
   }, [nonAdminNames]);
@@ -71,6 +69,44 @@ export const UpgradeRolesForm = ({
       checked: radioButton.id === id,
     }));
     setRadioButtons(updatedRadioButtons);
+  };
+
+  const handleUpgradeMember = async () => {
+    const indexOfName = nonAdminNames.indexOf(user);
+    const _user = nonAdmins[indexOfName];
+    const newRole =
+      role === 'Admin' ? 'admin' : role === 'Moderator' ? 'moderator' : '';
+
+    try {
+      const response = await axios.post(`${app.serverUrl()}/upgradeMember`, {
+        new_role: newRole,
+        address: _user.Address.address,
+        community_id: app.activeChainId(),
+        jwt: app.user.jwt,
+      });
+
+      if (response.data.status === 'Success') {
+        notifySuccess('Member upgraded');
+        const createdRole = new RoleInfo({
+          id: response.data.result.id,
+          address_id: response.data.result.address_id,
+          address_chain: response.data.result.community_id,
+          address: response.data.result.address,
+          community_id: response.data.result.community_id,
+          permission: response.data.result.permission,
+          allow: response.data.result.allow,
+          deny: response.data.result.deny,
+          is_user_default: response.data.result.is_user_default,
+        });
+        onRoleUpdate(_user, createdRole);
+        zeroOutRadioButtons();
+      } else {
+        notifyError('Upgrade failed');
+      }
+    } catch (error) {
+      console.error('Error upgrading member:', error);
+      notifyError('Upgrade failed');
+    }
   };
 
   return (
@@ -108,34 +144,7 @@ export const UpgradeRolesForm = ({
         <CWButton
           label="Upgrade Member"
           disabled={!role || !user}
-          onClick={() => {
-            const indexOfName = nonAdminNames.indexOf(user);
-
-            const _user = nonAdmins[indexOfName];
-
-            const newRole =
-              role === 'Admin'
-                ? 'admin'
-                : role === 'Moderator'
-                ? 'moderator'
-                : '';
-
-            $.post(`${app.serverUrl()}/upgradeMember`, {
-              new_role: newRole,
-              address: _user.Address.address,
-              ...communityObj,
-              jwt: app.user.jwt,
-            }).then((r) => {
-              if (r.status === 'Success') {
-                notifySuccess('Member upgraded');
-              } else {
-                notifyError('Upgrade failed');
-              }
-
-              onRoleUpdate(_user, r.result);
-            });
-            zeroOutRadioButtons();
-          }}
+          onClick={handleUpgradeMember}
         />
       </div>
     </div>

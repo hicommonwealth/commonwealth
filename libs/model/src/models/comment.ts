@@ -1,4 +1,5 @@
-import { IDiscordMeta, logger, stats } from '@hicommonwealth/core';
+import { IDiscordMeta, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
@@ -6,10 +7,10 @@ import type { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export type CommentAttributes = {
-  thread_id: string;
+  thread_id: number;
   address_id: number;
   text: string;
   plaintext: string;
@@ -106,7 +107,7 @@ export default (
                 transaction: options.transaction,
               });
               stats().increment('cw.hook.comment-count', {
-                thread_id,
+                thread_id: String(thread_id),
               });
             }
           } catch (error) {
@@ -127,7 +128,7 @@ export default (
                 transaction: options.transaction,
               });
               stats().decrement('cw.hook.comment-count', {
-                thread_id,
+                thread_id: String(thread_id),
               });
             }
           } catch (error) {
@@ -135,7 +136,7 @@ export default (
               `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
             );
             stats().increment('cw.hook.comment-count-error', {
-              thread_id,
+              thread_id: String(thread_id),
             });
           }
         },
@@ -174,6 +175,9 @@ export default (
     models.Comment.hasMany(models.Reaction, {
       foreignKey: 'comment_id',
       as: 'reactions',
+    });
+    models.Comment.hasMany(models.CommentSubscription, {
+      foreignKey: 'comment_id',
     });
   };
 

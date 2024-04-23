@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
+import axios from 'axios';
 import { EventEmitter } from 'events';
-import $ from 'jquery';
 
 import NotificationSubscription, {
   modelFromServer,
@@ -8,36 +8,40 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import { NotificationCategories } from '@hicommonwealth/core';
 import type { SubscriptionInstance } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
 
-const post = (route, args, callback) => {
-  args['jwt'] = app.user.jwt;
-  return $.post(app.serverUrl() + route, args)
-    .then((resp) => {
-      if (resp.status === 'Success') {
-        callback(resp.result);
-      } else {
-        console.error(resp);
-      }
-    })
-    .catch((e) => console.error(e));
+const post = async (route, args, callback) => {
+  try {
+    args['jwt'] = app.user.jwt;
+    const response = await axios.post(app.serverUrl() + route, args);
+
+    if (response.data.status === 'Success') {
+      callback(response.data.result);
+    } else {
+      console.error(response.data);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-const get = (route, args, callback) => {
-  args['jwt'] = app.user.jwt;
-  return $.get(app.serverUrl() + route, args)
-    .then((resp) => {
-      if (resp.status === 'Success') {
-        callback(resp.result);
-      } else {
-        console.error(resp);
-      }
-    })
-    .catch((e) => console.error(e));
+const get = async (route, args, callback) => {
+  try {
+    args['jwt'] = app.user.jwt;
+    const response = await axios.get(app.serverUrl() + route, { params: args });
+
+    if (response.data.status === 'Success') {
+      callback(response.data.result);
+    } else {
+      console.error(response.data);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 interface NotifOptions {
@@ -106,14 +110,14 @@ class NotificationsController {
       const untypedData: {
         categoryId: NotificationCategories;
         options?: {
-          chainId?: string;
+          communityId?: string;
           threadId?: number;
           commentId?: number;
           snapshotId?: string;
         };
       } = data;
       const requestData = {
-        chain_id: untypedData.options?.chainId,
+        community_id: untypedData.options?.communityId,
         thread_id: untypedData.options?.threadId,
         comment_id: untypedData.options?.commentId,
         snapshot_id: untypedData.options?.snapshotId,
@@ -217,8 +221,10 @@ class NotificationsController {
     // TODO: Change to PUT /notificationsRead
     const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
     const unreadNotifications = notifications.filter((notif) => !notif.isRead);
-    if (unreadNotifications.length === 0)
-      return $.Deferred().resolve().promise();
+    if (unreadNotifications.length === 0) {
+      return Promise.resolve();
+    }
+
     return post(
       '/markNotificationsRead',
       {

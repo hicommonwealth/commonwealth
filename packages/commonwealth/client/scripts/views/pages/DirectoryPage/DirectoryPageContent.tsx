@@ -1,9 +1,14 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import NodeInfo from 'models/NodeInfo';
 import React from 'react';
+import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import './DirectoryPageContent.scss';
 
 type RowType = {
@@ -17,7 +22,7 @@ type RowType = {
   id: string;
 };
 
-type CommunityData = {
+export type CommunityData = {
   name: string;
   nameLower: string;
   description: string;
@@ -25,6 +30,8 @@ type CommunityData = {
   threads: string;
   iconUrl: string;
   id: string;
+  namespace: string;
+  ChainNode: NodeInfo;
 };
 
 interface DirectoryPageContentProps {
@@ -38,7 +45,7 @@ interface DirectoryPageContentProps {
   filteredRelatedCommunitiesData: CommunityData[];
 }
 
-const columnInfo = [
+const columns: CWTableColumnInfo[] = [
   {
     key: 'name',
     customElementKey: 'community',
@@ -76,6 +83,12 @@ const DirectoryPageContent = ({
   tableData,
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'members',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   if (isLoading) {
     return (
       <div className="directory-loader-container">
@@ -102,23 +115,31 @@ const DirectoryPageContent = ({
 
   return selectedViewType === ViewType.Rows ? (
     <CWTable
-      columnInfo={columnInfo}
+      columnInfo={tableState.columns}
+      sortingState={tableState.sorting}
+      setSortingState={tableState.setSorting}
       rowData={tableData}
-      defaultSortColumnKey="members"
     />
   ) : (
     <div className="directory-tiles-container">
-      {filteredRelatedCommunitiesData.map((community) => (
-        <CWRelatedCommunityCard
-          key={community.id}
-          id={community.id}
-          communityName={community.name}
-          communityDescription={community.description}
-          communityIconUrl={community.iconUrl}
-          memberCount={community.members}
-          threadCount={community.threads}
-        />
-      ))}
+      {filteredRelatedCommunitiesData.map((community) => {
+        const chain = app.config.chains.getById(community.id);
+
+        // allow user to buy stake if they have a connected address that matches active community base chain
+        const canBuyStake = !!app?.user?.addresses?.find?.(
+          (address) => address?.community?.base === chain?.base,
+        );
+
+        return (
+          <CWRelatedCommunityCard
+            key={community.id}
+            community={chain}
+            canBuyStake={canBuyStake}
+            memberCount={community.members}
+            threadCount={community.threads}
+          />
+        );
+      })}
     </div>
   );
 };

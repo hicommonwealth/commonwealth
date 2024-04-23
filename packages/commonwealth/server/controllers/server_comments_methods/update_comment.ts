@@ -1,15 +1,12 @@
 import moment from 'moment';
 
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';

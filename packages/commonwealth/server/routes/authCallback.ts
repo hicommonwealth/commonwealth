@@ -1,11 +1,12 @@
-import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 export const Errors = {
   // TODO: write unit tests
@@ -76,7 +77,7 @@ const authCallback = async (
   }
 
   // 4. construct object containing CB data
-  // TODO: filter addresses by base/chain/etc, if provided by CMN Bot
+  // TODO: filter addresses by base/community/etc, if provided by CMN Bot
   const allAddresses = await models.Address.findAll({
     where: {
       profile_id: profile.id,

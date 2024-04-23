@@ -2,11 +2,12 @@ import {
   CommunityInstance,
   CommunitySnapshotSpaceWithSpaceAttached,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { Includeable, Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {
   hasGroups?: boolean; // only return communities with associated groups
+  includeStakes?: boolean; // include community stakes
 };
 export type GetCommunitiesResult = {
   community: CommunityInstance;
@@ -17,10 +18,15 @@ export async function __getCommunities(
   this: ServerCommunitiesController,
   { hasGroups }: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
-  const communitiesInclude = [];
+  const communitiesInclude: Includeable[] = [
+    {
+      model: this.models.CommunityStake,
+    },
+  ];
   if (hasGroups) {
     communitiesInclude.push({
       model: this.models.Group,
+      as: 'groups',
       required: true,
     });
   }
