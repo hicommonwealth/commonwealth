@@ -15,7 +15,7 @@ To install dependencies using Docker, navigate into the `packages/commonwealth` 
 If you are not using Docker, you will need to manually install Postgres. Run the following commands in bash:
 
 ```bash
-brew install node yarn postgresql
+brew install node pnpm postgresql
 
 brew services start postgresql
 
@@ -28,7 +28,7 @@ This should start a new Postgres server with superuser `commonwealth` and passwo
 
 To get a fresh production database dump from Heroku, run `yarn dump-db`. To reset, seed, and migrate your local database using the obtained dump file, run `yarn db-all`. Enter `edgeware` if prompted for a password.
 
-To start the app, run `yarn start`.
+To start the app, run `pnpm run start`.
 
 ## Environment Variables
 

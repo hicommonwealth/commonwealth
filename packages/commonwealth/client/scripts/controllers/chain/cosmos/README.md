@@ -131,13 +131,13 @@ osmosisd tx gov submit-proposal cancel-software-upgrade --description test --tit
 ### Link with Commonwealth Site
 
 - Ensure you have a fresh DB, and run the migrations via `npx sequelize db:migrate`.
-- Use `yarn psql` to access the DB, and set the osmosis-local chain to active via the following SQL command:
+- Use `pnpm run psql` to access the DB, and set the osmosis-local chain to active via the following SQL command:
 
 ```
 UPDATE "Communities" SET "active" = true WHERE id = 'osmosis-local';
 ```
 
-- Run the Commonwealth server via `yarn start`.
+- Run the Commonwealth server via `pnpm run start`.
 - Navigate to `http://localhost:8080/osmosis-local` and wait for the page to load.
 - Open Keplr and add an account using the mnemonic for the second key you created earlier.
     - **NOTE: IT IS VERY IMPORTANT YOU DO NOT USE THE FIRST KEY, AS IT WILL HAVE "account-number" SET TO 0, WHICH WILL

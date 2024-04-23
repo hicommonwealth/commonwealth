@@ -6,7 +6,7 @@
     "build": "tsc -b && tsc-alias",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'yarn start' 'yarn start-consumer'",
+    "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'pnpm run start' 'pnpm run start-consumer'",
     "start": "tsx src/discord-listener/discordListener.ts",
     "start-consumer": "tsx src/discord-consumer/discordConsumer.ts",
     "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
