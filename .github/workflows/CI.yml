@@ -53,6 +53,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -144,6 +148,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -234,6 +242,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -288,6 +300,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
+
       - name: Add node-gyp
         run: npm install -g node-gyp
 
@@ -324,6 +340,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
 
       - name: Cache dependencies
         id: cache
@@ -413,6 +433,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -489,6 +513,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
 
       - name: Cache dependencies
         id: cache
@@ -572,6 +600,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.2
 
       - name: Cache dependencies
         id: cache
