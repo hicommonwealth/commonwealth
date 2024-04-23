@@ -1,20 +1,22 @@
-# Chain Testing Overview
+# EVM Testing
 
 ## Contents
 
-- [EVM Chain Testing Tools](#evm-chain-testing-tools)
-  * [Setup](#setup)
-  * [API](#api)
-    - [Chain Info/Interaction](#chain-info-interaction)
-    - [Token](#token)
-    - [Governance Routes](#governance-routes)
-  * [SDK](#sdk)
-    - [Methods](#methods)
-  * [Private Chain Customization](#private-chain-customization)
-    - [Potential Modifications](#potential-modifications)
+- [EVM Testing Tools](#evm-testing-tools)
+- [Setup](#setup)
+- [API](#api)
+  * [Chain Info/Interaction](#chain-infointeraction)
+  * [Token](#token)
+  * [Governance Routes](#governance-routes)
+- [SDK](#sdk)
+  * [Methods](#methods)
+- [Private Chain Customization](#private-chain-customization)
+  * [Potential Modifications](#potential-modifications)
 - [Change Log](#change-log)
 
-# EVM Chain Testing Tools
+- [Change Log](#change-log)
+
+## EVM Testing Tools
 
 The EVM testing tools provide an out of the box environment for testing various EVM funcitonalities. The following tools are provided:
 
@@ -49,13 +51,14 @@ To run each service locally the follow this process from the chain-testing dir:
 
 ## API
 
-The following API routes are available(descriptions coming soon):
+The following API routes are available.
+
 Post request types can be found in `src/types.ts`
 
-#### Chain Info/Interaction
+### Chain Info/Interaction
 
 <details>
- <summary><code>GET /chain/accounts</code></summary>
+<summary>GET /chain/accounts</summary>
 
 **Response**
 
@@ -69,7 +72,7 @@ Post request types can be found in `src/types.ts`
 </details>
 
 <details>
- <summary><code>GET /chain/block</code></summary>
+<summary>GET /chain/block</summary>
 
 **Response**
 
@@ -78,7 +81,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /chain/advanceTime</code></summary>
+ <summary>POST /chain/advanceTime</summary>
 
 **Request**
 
@@ -100,7 +103,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /chain/getEth</code></summary>
+ <summary>POST /chain/getEth</summary>
 
 **Request**
 
@@ -113,10 +116,10 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 
 </details>
 
-#### Token
+### Token
 
 <details>
- <summary><code>POST /erc20/balance</code></summary>
+ <summary>POST /erc20/balance</summary>
 
 **Request**
 
@@ -139,7 +142,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /erc20/transfer</code></summary>
+ <summary>POST /erc20/transfer</summary>
 
 **Request**
 
@@ -159,7 +162,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /erc20/approve</code></summary
+ <summary>POST /erc20/approve</summary
 
 **Request**
 
@@ -179,7 +182,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /erc20/dex/getTokens</code></summary>
+ <summary>POST /erc20/dex/getTokens</summary>
 
 **Request**
 
@@ -196,10 +199,10 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 
 </details>
 
-#### Governance Routes
+### Governance Routes
 
 <details>
- <summary><code>POST /gov/compound/createProposal</code></summary>
+ <summary>POST /gov/compound/createProposal</summary>
 
 **Request**
 
@@ -220,7 +223,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /gov/compound/cancelProposal</code></summary>
+ <summary>POST /gov/compound/cancelProposal</summary>
 
 **Request**
 
@@ -237,7 +240,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /gov/compound/castVote</code></summary>
+ <summary>POST /gov/compound/castVote</summary>
 
 **Request**
 
@@ -256,7 +259,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /gov/compound/proposalDetails</code></summary>
+ <summary>POST /gov/compound/proposalDetails</summary>
 
 **Request**
 
@@ -286,7 +289,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /gov/compound/getVotes</code></summary>
+ <summary>POST /gov/compound/getVotes</summary>
 
 **Request**
 
@@ -304,7 +307,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /gov/compound/queue</code></summary>
+ <summary>POST /gov/compound/queue</summary>
 
 **Request**
 
@@ -321,7 +324,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>POST /gov/compound/execute</code></summary>
+ <summary>POST /gov/compound/execute</summary>
 
 **Request**
 
@@ -338,7 +341,7 @@ See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 </details>
 
 <details>
- <summary><code>GET /gov/compound/runFullCylce</code></summary>
+ <summary>GET /gov/compound/runFullCylce</summary>
 
 **Response**
 
@@ -364,10 +367,10 @@ sdk.getErc20(
 sdk.createProposal(0); // Create a Compound proposal
 ```
 
-#### Methods
+### Methods
 
 <details>
-<summary><code>constructor(host: string)</code>
+<summary>constructor(host: string)
 Creates a ChainTesting SDK instance.</summary>
 
 **Arguments**
@@ -377,7 +380,7 @@ Creates a ChainTesting SDK instance.</summary>
 </details>
 
 <details>
-<summary><code>getBalance(tokenAddress: string, address: string, convert?: boolean)</code>
+<summary>getBalance(tokenAddress: string, address: string, convert?: boolean)
 Get the balance of a given wallet for any ERC20.</summary>
 
 **Arguments**
@@ -392,7 +395,7 @@ Get the balance of a given wallet for any ERC20.</summary>
 </details>
 
 <details>
-<summary><code>transferErc20(tokenAddress: string, to: string, amount: string, from?: string, accountIndex?: number)</code>
+<summary>transferErc20(tokenAddress: string, to: string, amount: string, from?: string, accountIndex?: number)
 Transfer an ERC20 token between addresses.</summary>
 
 **Arguments**
@@ -406,7 +409,7 @@ Transfer an ERC20 token between addresses.</summary>
 </details>
 
 <details>
-<summary><code>getErc20(tokenAddress: string, to: string, amount: string)</code>
+<summary>getErc20(tokenAddress: string, to: string, amount: string)
 Gets ERC20 tokens from a 'Bank Wallet'.</summary>
 
 **Arguments**
@@ -418,7 +421,7 @@ Gets ERC20 tokens from a 'Bank Wallet'.</summary>
 </details>
 
 <details>
-<summary><code>getVotingPower(accountIndex: number, numberOfVotes: string)</code>
+<summary>getVotingPower(accountIndex: number, numberOfVotes: string)
 Get voting power via ERC20 token for a given wallet.</summary>
 
 **Arguments**
@@ -429,7 +432,7 @@ Get voting power via ERC20 token for a given wallet.</summary>
 </details>
 
 <details>
-<summary><code>createProposal(accountIndex: number)</code>
+<summary>createProposal(accountIndex: number)
 Creates an arbitrary Compound proposal.</summary>
 
 **Arguments**
@@ -442,7 +445,7 @@ Creates an arbitrary Compound proposal.</summary>
 </details>
 
 <details>
-<summary><code>cancelProposal(proposalId: string)</code>
+<summary>cancelProposal(proposalId: string)
 Cancel a proposal.</summary>
 
 **Arguments**
@@ -455,7 +458,7 @@ Cancel a proposal.</summary>
 </details>
 
 <details>
-<summary><code>castVote(proposalId: string, accountIndex: number, forAgainst: boolean)</code>
+<summary>castVote(proposalId: string, accountIndex: number, forAgainst: boolean)
 Cast a vote for an account on a proposal.</summary>
 
 **Arguments**
@@ -467,7 +470,7 @@ Cast a vote for an account on a proposal.</summary>
 </details>
 
 <details>
-<summary><code>queueProposal(proposalId: string)</code>
+<summary>queueProposal(proposalId: string)
 Queue a proposal for execution.</summary>
 
 **Arguments**
@@ -477,7 +480,7 @@ Queue a proposal for execution.</summary>
 </details>
 
 <details>
-<summary><code>executeProposal(proposalId: string)</code>
+<summary>executeProposal(proposalId: string)
 Execute a passed proposal.</summary>
 
 **Arguments**
@@ -490,7 +493,7 @@ Execute a passed proposal.</summary>
 Runs a full proposal cycle from getting voting power to execution.
 
 <details>
-<summary><code>getProposalDetails(proposalId: string)</code>
+<summary>getProposalDetails(proposalId: string)
 Gets proposal Details from contract</summary>
 
 **Arguments**
@@ -504,11 +507,11 @@ JSON formatted proposal Details
 </details>
 
 <details>
-<summary><code>getBlock()</code>Gets the latest block details</summary>
+<summary>getBlock()Gets the latest block details</summary>
 </details>
 
 <details>
-<summary><code>getETH(toAddress: string, amount: string)</code>Get ETH to a given account</summary>
+<summary>getETH(toAddress: string, amount: string)Get ETH to a given account</summary>
 
 **Arguments**
 
@@ -518,7 +521,7 @@ JSON formatted proposal Details
 </details>
 
 <details>
-<summary><code>getProvider()</code>Gets a web3 provider instance for the running test chain</summary>
+<summary>getProvider()Gets a web3 provider instance for the running test chain</summary>
 Returns an instance of a web3.js provider for the current test chain(HTTP)
 </details>
 
@@ -534,7 +537,7 @@ Here the following params can be defined as
 * miner.blockTime - the time between mining each block
 * wallet.unlockedAccounts - This unlocks the following address for use in the 'from' field of an eth tx. ie allows user to access this wallet.
 
-#### Potential Modifications
+### Potential Modifications
 
 1. fork from a block or other evm network
    * Any ETH block can be selected as the starting block via `--fork [blockNumber]`

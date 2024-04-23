@@ -1,4 +1,4 @@
-# Analytics
+# Mixpanel
 
 Our analytics tracking scripts live in `packages/commonwealth/shared/analytics`. Currently, we have only Mixpanel configured to collect usage analytics, but the scripts can be extended by simply a new payload interface like `BaseMixpanelPayload` and updating the tracking scripts to work with the other providers.
 

@@ -1,4 +1,8 @@
-### Requirement/s
+# Snapshot
+
+## Setting up Snapshot Spaces
+
+### Requirements
 
 - The Ethereum wallet you use must have an ENS (Ethereum Name Service) domain ([see how to create one](https://github.com/hicommonwealth/commonwealth/wiki/Setup-ENS))
 - Snapshots only work with Ethereum communities, you must be an admin of an Ethereum-based community to work with the new snapshot space
@@ -37,5 +41,6 @@ Now you should be able to create snapshot proposals with this test space.
 
 ## Change Log
 
+- 240415: Renamed and generalized by Graham Johnson from `Setup-Snapshot-Space.md` to `Snapshot.md`.
 - 231012: Flagged by Graham Johnson for asset transfer.
 - 230712: Authored by Malik Zulqurnain.
