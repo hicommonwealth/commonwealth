@@ -70,8 +70,8 @@ export async function generateCosmosGovNotifications() {
 if (require.main === module) {
   generateCosmosGovNotifications()
     .then(() => {
-      process.exit(0);
       stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');
+      process.exit(0);
     })
     .catch((err) => {
       log.error(err);
