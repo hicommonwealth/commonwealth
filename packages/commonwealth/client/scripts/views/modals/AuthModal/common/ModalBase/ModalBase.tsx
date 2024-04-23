@@ -12,7 +12,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import clsx from 'clsx';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
@@ -20,7 +20,7 @@ import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
-import { AuthModalTabs } from '../../types';
+import { ModalBaseProps, ModalBaseTabs } from '../../types';
 import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
@@ -39,25 +39,9 @@ const MODAL_COPY = {
   },
 };
 
-export type ModalBaseProps = {
-  onClose: () => void;
-  onAuthenticated?: (isNewAccount: boolean) => void;
-  layoutType: 'create-account' | 'sign-in';
-  hideDescription?: boolean;
-  customBody?: ReactNode;
-  showAuthenticationOptionsFor?: ('wallets' | 'sso')[];
-  showWalletsFor?:
-    | ChainBase.Ethereum
-    | ChainBase.CosmosSDK
-    | ChainBase.Solana
-    | ChainBase.Substrate;
-  bodyClassName?: string;
-  onSignInClick?: () => void;
-};
-
 const ModalBase = ({
   onClose,
-  onAuthenticated,
+  onSuccess,
   layoutType,
   hideDescription,
   customBody,
@@ -96,7 +80,7 @@ const ModalBase = ({
   };
 
   const handleSuccess = async (_, isNewlyCreated) => {
-    await onAuthenticated?.(isNewlyCreated);
+    await onSuccess?.(isNewlyCreated);
     await handleClose();
   };
 
@@ -171,7 +155,7 @@ const ModalBase = ({
     return [];
   };
 
-  const tabsList: AuthModalTabs[] = [
+  const tabsList: ModalBaseTabs[] = [
     {
       name: 'Wallet',
       options: getWalletNames() as AuthWallets[],

@@ -1,18 +1,18 @@
 import React from 'react';
 import { ModalBase } from '../common/ModalBase';
-import { SignInModalProps } from '../types';
+import { ModalVariantProps } from '../types';
 import './SignInModal.scss';
 
 const SignInModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
-}: SignInModalProps) => {
+}: ModalVariantProps) => {
   return (
     <ModalBase
       onClose={onClose}
       layoutType="sign-in"
-      onAuthenticated={() => onSuccess()}
+      onSuccess={onSuccess}
       showAuthenticationOptionsFor={['wallets', 'sso']}
       showWalletsFor={showWalletsFor}
       bodyClassName="SignInModal"

@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
 import { ModalBase } from '../common/ModalBase';
-import { CreateAccountModal } from '../types';
+import { ModalVariantProps } from '../types';
 import './CreateAccountModal.scss';
 import { Option } from './Option';
 
-const CreateAccountModal = ({ onClose }: CreateAccountModal) => {
+const CreateAccountModal = ({
+  onClose,
+  onSuccess,
+  showWalletsFor,
+}: ModalVariantProps) => {
   const [authMethod, setAuthMethod] = useState<'wallets' | 'sso' | undefined>();
 
   return (
     <ModalBase
       onClose={onClose}
-      // TODO: will be replaced with post-account creation flow
-      onAuthenticated={(isNewlyCreated) => console.log({ isNewlyCreated })}
+      // TODO: handle post-account creation flow on new acc creation
+      onSuccess={onSuccess}
       layoutType="create-account"
       hideDescription={!!authMethod}
       {...(authMethod && {
         showAuthenticationOptionsFor: [authMethod],
       })}
+      showWalletsFor={showWalletsFor}
       customBody={
         !authMethod && (
           <>
