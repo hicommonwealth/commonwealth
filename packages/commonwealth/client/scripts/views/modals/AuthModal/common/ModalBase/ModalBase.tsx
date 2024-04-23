@@ -75,7 +75,8 @@ const ModalBase = ({
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
     setIsEVMWalletsModalVisible(false);
-    isWalletConnectEnabled && (await onResetWalletConnect().catch(() => null));
+    isWalletConnectEnabled &&
+      (await onResetWalletConnect().catch(console.error));
     await onClose();
   };
 

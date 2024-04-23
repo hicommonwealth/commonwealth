@@ -15,6 +15,7 @@ export type ModalVariantProps = {
     | ChainBase.CosmosSDK
     | ChainBase.Solana
     | ChainBase.Substrate;
+  onSignInClick?: () => void;
 };
 
 export type ModalBaseProps = {
@@ -23,7 +24,6 @@ export type ModalBaseProps = {
   customBody?: ReactNode;
   showAuthenticationOptionsFor?: ('wallets' | 'sso')[];
   bodyClassName?: string;
-  onSignInClick?: () => void;
 } & ModalVariantProps;
 
 export type AuthModalProps = {
