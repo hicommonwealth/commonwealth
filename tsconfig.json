@@ -9,10 +9,7 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "traceResolution": false,
-    "baseUrl": ".",
-    "paths": {
-      "@hicommonwealth/*": ["libs/*/src"]
-    }
+    "baseUrl": "."
   },
   "include": ["**/src"],
   "exclude": ["**/node_modules", "**/build"]
