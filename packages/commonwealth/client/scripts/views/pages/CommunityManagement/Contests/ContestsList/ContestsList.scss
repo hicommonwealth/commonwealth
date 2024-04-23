@@ -1,20 +1,13 @@
 @import '../../../../../../styles/shared';
 
+.ContestsListSkeleton {
+  max-width: 600px;
+  height: 200px;
+  margin-bottom: 16px;
+}
+
 .ContestsList {
-  .header-row {
-    display: flex;
-    justify-content: space-between;
-    max-width: 600px;
-    margin-bottom: 24px;
-
-    @include extraSmall {
-      align-items: center;
-    }
-  }
-
-  .list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
