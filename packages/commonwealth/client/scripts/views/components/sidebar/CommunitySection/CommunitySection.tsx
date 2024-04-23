@@ -1,4 +1,5 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
+import { findDenominationString } from 'helpers/findDenomination';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -50,6 +51,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
+    activeChainId,
   } = useCommunityStake({
     // if user is not a community member but logged in, use an address that matches community chain base
     ...(selectedAddress &&
@@ -78,7 +80,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
-                denomination="ETH"
+                denomination={findDenominationString(activeChainId) || 'ETH'}
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
@@ -134,6 +136,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            denomination={findDenominationString(activeChainId) || 'ETH'}
             {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
