@@ -280,7 +280,7 @@ Contributor: Kurtis Assad
 
 ### email-digest-cron
 
-Definition: `ts-node -r tsconfig-paths/register server/scripts/emitTestNotification.ts`
+Definition: `tsx -r tsconfig-paths/register server/scripts/emitTestNotification.ts`
 
 Description: Runs the emailDigest script. Ran once a week, used in the heroku scheduler.
 
