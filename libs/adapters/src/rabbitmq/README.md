@@ -2,7 +2,7 @@
 
 ## Locally via Docker
 
-- Simply run `yarn start-rmq` from the root of the repo. This will download and run a rabbitmq image on your local machine inside a docker container. Make sure you have docker installed locally before running and that rabbitmq, as configured below, is NOT running simultaneously.
+- Simply run `pnpm run start-rmq` from the root of the repo. This will download and run a rabbitmq image on your local machine inside a docker container. Make sure you have docker installed locally before running and that rabbitmq, as configured below, is NOT running simultaneously.
 
 ## Locally
 

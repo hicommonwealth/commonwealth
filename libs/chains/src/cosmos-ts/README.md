@@ -21,7 +21,7 @@ Use the generate command to create a new package.
 ```
 telescope generate
 cd ./your-new-project
-yarn 
+pnpm install 
 ```
 
 Add Protobufs
@@ -96,7 +96,7 @@ telescope({
 ```
 
 then,
-`yarn codegen`
+`pnpm run codegen`
 
 You should now seem some .ts files generated in ./src/codegen. These are the real source files used in your application.
 
