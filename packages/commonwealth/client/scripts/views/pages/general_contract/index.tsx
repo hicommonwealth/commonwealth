@@ -16,7 +16,8 @@ import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
+import { AbiFunctionFragment, AbiOutput, AbiParameter } from 'web3';
+import { AbiItem } from 'web3-utils';
 import type Contract from '../../../models/Contract';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from '../404';
@@ -58,7 +59,10 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
     loadContractAbi().then(setAbiItems);
   }, [contractAddress, app.contracts]);
 
-  const callFunction = async (_contractAddress: string, fn: AbiItem) => {
+  const callFunction = async (
+    _contractAddress: string,
+    fn: AbiFunctionFragment,
+  ) => {
     try {
       setLoading(true);
 
@@ -134,13 +138,13 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
           <CWText>Outputs</CWText>
           <CWText>Call Function</CWText>
         </div>
-        {abiItems.map((fn: AbiItem) => {
+        {abiItems.map((fn: AbiFunctionFragment) => {
           return (
             <div className="function-row">
               <CWText>{fn.name}</CWText>
               <CWText>{fn.stateMutability}</CWText>
               <div className="functions-input-container">
-                {fn.inputs.map((input: AbiInput, inputIdx: number) => {
+                {fn.inputs.map((input: AbiParameter, inputIdx: number) => {
                   return (
                     <div>
                       <div className="function-inputs">

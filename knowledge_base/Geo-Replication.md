@@ -177,7 +177,7 @@ heroku domains:remove $CUSTOM_DOMAIN --app $SOURCE_APP_NAME
 
 ## Add CNAME entry for region-specific app
 
-![CDN Architecture](https://github.com/hicommonwealth/commonwealth/assets/4791635/b9e9787f-d4cb-49cc-b6ba-f69aae7719b2)
+![CDN Architecture](./assets/CDN-Architecture.png)
 
 ## App geo-steering load balancing for root domain
 

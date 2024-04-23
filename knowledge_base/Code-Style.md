@@ -79,14 +79,20 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 - Datestamps, when used, should be formatted YYMMDD.
 
 ### Backend Errors
+
 Backend errors currently come in two varieties:
-- Errors instructive for the end user
-- Errors instructive for the client
+
+1. Errors instructive for the end user.
+2. Errors instructive for the client.
 
 Errors instructive for the user should be formatted with formatErrorPretty from the errorUtils. These will be displayed
 on the front end directly in the modal.
 Errors instructive for the client should be directly passed to the backend. These should be handled by the backend for
 the possibility of taking recovery actions.
+
+### Function declarations
+
+Functions should be declared using const-based arrow syntax: `const x = () => {}` is preferred to `function x() {}`.
 
 ## Change Log
 

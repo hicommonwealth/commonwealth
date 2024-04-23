@@ -1,4 +1,5 @@
 import { DataTypes, Sequelize } from 'sequelize';
+import { buildAssociations } from './associations';
 import { Factories } from './factories';
 import type { Models } from './types';
 import { createFk, dropFk, mapFk, oneToMany } from './utils';
@@ -17,6 +18,7 @@ export const syncDb = async (db: DB, log = false) => {
   const compositeKeys = [
     mapFk(db.Contest, db.ContestAction, ['contest_address', 'contest_id']),
     mapFk(db.ContestManager, db.Contest, ['contest_address']),
+    mapFk(db.Topic, db.ContestTopic, [['id', 'topic_id']]),
   ];
 
   compositeKeys.forEach(({ parent, child }) =>
@@ -37,35 +39,24 @@ export const syncDb = async (db: DB, log = false) => {
  * @returns built db model
  */
 export const buildDb = (sequelize: Sequelize): DB => {
-  // build models
   const models = Object.fromEntries(
-    Object.entries(Factories).map(([key, factory]) => [
-      key,
-      factory(sequelize, DataTypes),
-    ]),
+    Object.entries(Factories).map(([key, factory]) => {
+      const model = factory(sequelize, DataTypes);
+      model.withMany = oneToMany as any; // TODO: can we make this work without any?
+      return [key, model];
+    }),
   ) as Models<typeof Factories>;
 
   const db = { sequelize, Sequelize, ...models };
 
-  // setup associations
+  // associate hook
   Object.keys(models).forEach((key) => {
     const model = models[key as keyof typeof Factories];
     'associate' in model && model.associate(db);
   });
 
-  // TODO: proposed pattern to associate models with type safety
-  /**
-   * Find a way to write this as:
-   *
-   * db.Community
-   *    .toMany(db.ContestManager, 'community_id')
-   *    .toMany(db.Topic, 'community_id')...
-   */
-  oneToMany(db.Community, db.ContestManager, 'community_id');
-  oneToMany(db.ContestManager, db.Contest, 'contest_address');
-  oneToMany(db.Contest, db.ContestAction, 'contest_address', {
-    as: 'actions',
-  });
+  // proposed association builder
+  buildAssociations(db);
 
   return db;
 };

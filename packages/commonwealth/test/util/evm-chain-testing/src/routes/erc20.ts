@@ -18,12 +18,12 @@ export const getBalance = async (req: Request, res: Response) => {
       .call();
     if (request.convert) {
       //TODO: dynamic
-      balance = Web3.utils.fromWei(balance);
+      balance = Web3.utils.fromWei(balance, 'ether');
     }
     res
       .status(200)
       .json({
-        balance: balance,
+        balance: balance.toString(),
       })
       .send();
   } catch (err) {
@@ -53,15 +53,18 @@ export const transfer = async (req: Request, res: Response) => {
         .transferFrom(
           request.to,
           request.from,
-          Web3.utils.toWei(request.amount)
+          Web3.utils.toWei(request.amount, 'ether'),
         )
-        .send({ from: account, gasLimit: 400000 });
+        .send({ from: account, gas: '400000' });
     } else {
       txReceipt = await contract.methods
-        .transfer(request.to, Web3.utils.toWei(request.amount))
-        .send({ from: account, gasLimit: 400000 });
+        .transfer(request.to, Web3.utils.toWei(request.amount, 'ether'))
+        .send({ from: account, gas: '400000' });
     }
-    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
+    res
+      .status(200)
+      .json({ block: Number(txReceipt['blockNumber']) })
+      .send();
   } catch (err) {
     console.error(err);
     res
@@ -83,7 +86,10 @@ export const approve = async (req: Request, res: Response) => {
     const txReceipt = await contract.methods
       .approve(request.spender, request.amount)
       .send({ from: accounts[request.accountIndex ?? 0] });
-    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
+    res
+      .status(200)
+      .json({ block: Number(txReceipt['blockNumber']) })
+      .send();
   } catch (err) {
     console.error(err);
     res
@@ -105,7 +111,7 @@ export const getTokens = async (req: Request, res: Response) => {
     ];
     const contract = uniswapV2(
       '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      provider
+      provider,
     );
     const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
     request.tokens.forEach(async (token, i) => {
@@ -114,9 +120,9 @@ export const getTokens = async (req: Request, res: Response) => {
           0,
           [WETH, token],
           account,
-          Math.floor(Date.now() / 1000) + 60 * 200
+          Math.floor(Date.now() / 1000) + 60 * 200,
         )
-        .send({ from: account, value: request.value[i], gasLimit: 500000 });
+        .send({ from: account, value: request.value[i], gas: '500000' });
     });
     res.status(200).send();
   } catch (err) {
