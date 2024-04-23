@@ -6,7 +6,7 @@
     "skipLibCheck": true,
     "rootDir": "."
   },
-  "include": ["src", "test"],
+  "include": ["src"],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
     { "path": "../../libs/core/tsconfig.build.json" },
