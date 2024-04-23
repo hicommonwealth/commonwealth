@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
+import FundContestDrawer from '../FundContestDrawer';
 import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
@@ -16,6 +17,7 @@ interface ContestsListProps {
     topics: string[];
     payouts: number[];
     isActive: boolean;
+    address: string;
   }[];
   isAdmin: boolean;
   isLoading: boolean;
@@ -29,6 +31,8 @@ const ContestsList = ({
   stakeEnabled,
   isContestAvailable,
 }: ContestsListProps) => {
+  const [fundDrawerAddress, setFundDrawerAddress] = useState('');
+
   if (isLoading) {
     return (
       <div>
@@ -40,30 +44,47 @@ const ContestsList = ({
   }
 
   return (
-    <div className="ContestsList">
-      {isAdmin && (!stakeEnabled || !isContestAvailable) ? (
-        <EmptyContestsList
-          isStakeEnabled={stakeEnabled}
-          isContestAvailable={isContestAvailable}
-        />
-      ) : (
-        contests.map(
-          ({ id, name, imageUrl, finishDate, topics, payouts, isActive }) => (
-            <ContestCard
-              key={id}
-              isAdmin={isAdmin}
-              id={id}
-              name={name}
-              imageUrl={imageUrl}
-              topics={topics}
-              payouts={payouts}
-              finishDate={finishDate}
-              isActive={isActive}
-            />
-          ),
-        )
-      )}
-    </div>
+    <>
+      <div className="ContestsList">
+        {isAdmin && (!stakeEnabled || !isContestAvailable) ? (
+          <EmptyContestsList
+            isStakeEnabled={stakeEnabled}
+            isContestAvailable={isContestAvailable}
+          />
+        ) : (
+          contests.map(
+            ({
+              id,
+              name,
+              imageUrl,
+              finishDate,
+              topics,
+              payouts,
+              isActive,
+              address,
+            }) => (
+              <ContestCard
+                key={id}
+                isAdmin={isAdmin}
+                id={id}
+                name={name}
+                imageUrl={imageUrl}
+                topics={topics}
+                payouts={payouts}
+                finishDate={finishDate}
+                isActive={isActive}
+                onFund={() => setFundDrawerAddress(address)}
+              />
+            ),
+          )
+        )}
+      </div>
+      <FundContestDrawer
+        onClose={() => setFundDrawerAddress('')}
+        isOpen={!!fundDrawerAddress}
+        contestAddress={fundDrawerAddress}
+      />
+    </>
   );
 };
 

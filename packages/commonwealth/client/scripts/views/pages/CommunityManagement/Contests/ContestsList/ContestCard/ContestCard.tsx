@@ -22,6 +22,7 @@ interface ContestCardProps {
   payouts: number[];
   isAdmin: boolean;
   isActive: boolean;
+  onFund: () => void;
 }
 
 const ContestCard = ({
@@ -33,6 +34,7 @@ const ContestCard = ({
   payouts,
   isAdmin,
   isActive,
+  onFund,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
 
@@ -61,12 +63,10 @@ const ContestCard = ({
 
   const handleShareClick = () => {
     // TODO open share popover
-    navigate('/manage/contests');
   };
 
   const handleFundClick = () => {
-    // TODO open funding drawer
-    console.log('open funding drawer');
+    onFund();
   };
 
   return (
@@ -109,11 +109,13 @@ const ContestCard = ({
             action="share"
             onClick={handleShareClick}
           />
-          <CWThreadAction
-            label="Fund"
-            action="fund"
-            onClick={handleFundClick}
-          />
+          {isActive && (
+            <CWThreadAction
+              label="Fund"
+              action="fund"
+              onClick={handleFundClick}
+            />
+          )}
         </div>
       </div>
       {isAdmin && (
