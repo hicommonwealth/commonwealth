@@ -422,7 +422,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'author',
-            content: thread.author,
+            content: thread?.author,
           },
           {
             name: 'twitter:card',

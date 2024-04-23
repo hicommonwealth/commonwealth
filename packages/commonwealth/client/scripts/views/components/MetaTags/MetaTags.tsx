@@ -113,11 +113,11 @@ const MetaTags = ({ customMeta }: MetaTagsProps) => {
     const tempMeta = { ...defaultMeta };
 
     customMeta?.map((meta) => {
-      if (meta.name) {
+      if (meta.name && typeof meta.content === 'string') {
         tempMeta[meta.name] = meta;
       }
 
-      if (meta.property) {
+      if (meta.property && typeof meta.content === 'string') {
         tempMeta[meta.property] = meta;
       }
     });
