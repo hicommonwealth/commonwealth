@@ -111,7 +111,7 @@ See [models/membership.ts](../libs/model/src/models/membership.ts).
 
 ### Notification
 
-*Related Terms:* [Subscription](#subscription)
+_Related Terms:_ [Subscription](#subscription)
 
 Notifications are messages emitted to users who are SUBSCRIBED to a given category of activity atop a given forum entity (e.g. a THREAD or COMMUNITY).
 
@@ -163,7 +163,7 @@ See [models/community_stake.ts](../libs/model/src/models/community_stake.ts).
 
 ### Subscription
 
-*Related Terms:* [Notification](#notification)
+_Related Terms:_ [Notification](#notification)
 
 USERS subscribe (and are autosubscribed) to new events, e.g. in COMMUNITIES they join or on THREADS and COMMENTS they author. Users receive all NOTIFICATION objects which match the entity and category  ids of their subscriptions.
 
@@ -229,7 +229,13 @@ Fast-follow tickets are change requests tethered to new feature projects, intend
 
 ### Issues, Tickets, & Stories
 
-<!-- Blocked pending meeting with Forest -->
+While "issue," "ticket," and "story" are often used interchangeably on the Common team, there are subtle distinctions that may be worth attending to.
+
+"Ticket" refers to a "physical" location in Github which holds the current status and discussion of a given issue.
+
+"Issue" refers to the substantive content of a ticket, which exists in the abstract, apart from the ticket. E.g. "The issue is that sign-in with Magic is broken upstream."
+
+"Story" refers to an issue in story format, that is, one presumed ready for execution and generally taking the form of "As a [role] I am able to..." Stories represent the actual UX problem the user needs us to solve for them.
 
 ## Change Log
 
