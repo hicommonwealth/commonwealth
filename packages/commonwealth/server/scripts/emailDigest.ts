@@ -2,15 +2,14 @@ import { HotShotsStats } from '@hicommonwealth/adapters';
 import { stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { DynamicTemplate } from '@hicommonwealth/shared';
+import sgMail from '@sendgrid/mail';
 import * as dotenv from 'dotenv';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { formatAddressShort } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 dotenv.config();
-const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export type ThreadData = {
