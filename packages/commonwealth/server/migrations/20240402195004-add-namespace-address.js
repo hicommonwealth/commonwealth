@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const Web3 = require('web3');
+const { Web3 } = require('web3');
 
 const factoryContracts = {
   11155111: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
@@ -35,9 +35,10 @@ async function getNamespace(web3, namespace, factoryAddress) {
     ],
     factoryAddress,
   );
-
   const hexString = web3.utils.utf8ToHex(namespace);
-  const activeNamespace = await factory.methods.getNamespace(hexString).call();
+  const activeNamespace = await factory.methods
+    .getNamespace(hexString.padEnd(66, '0'))
+    .call();
   return activeNamespace;
 }
 
@@ -63,6 +64,7 @@ module.exports = {
         if (!web3Providers[community.eth_chain_id]) {
           web3Providers[community.eth_chain_id] = new Web3(community.url);
         }
+
         const web3 = web3Providers[community.eth_chain_id];
 
         const namespaceAddress = await getNamespace(
