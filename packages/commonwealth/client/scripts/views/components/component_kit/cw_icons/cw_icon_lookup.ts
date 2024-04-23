@@ -237,6 +237,8 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
+  base: CustomIcons.CWBase,
+  blast: CustomIcons.CWBlast,
   email: CustomIcons.CWEmail,
   eth: CustomIcons.CWEth,
   cosmos: CustomIcons.CWCosmos,

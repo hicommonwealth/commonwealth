@@ -11,6 +11,17 @@
     "traceResolution": false,
     "baseUrl": "."
   },
-  "include": ["**/src"],
-  "exclude": ["**/node_modules", "**/build"]
+  "files": [],
+  "references": [
+    { "path": "libs/adapters" },
+    { "path": "libs/chains" },
+    { "path": "libs/core" },
+    { "path": "libs/logging" },
+    { "path": "libs/model" },
+    { "path": "libs/shared" },
+    { "path": "packages/commonwealth" },
+    { "path": "packages/discord-bot" },
+    { "path": "packages/scripts" },
+    { "path": "packages/snapshot-listener" }
+  ]
 }
