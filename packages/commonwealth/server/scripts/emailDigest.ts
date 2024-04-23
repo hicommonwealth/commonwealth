@@ -1,5 +1,5 @@
-import { HotShotsStats } from '@hicommonwealth/adapters/build/index';
-import { stats } from '@hicommonwealth/core/build/index';
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { DynamicTemplate } from '@hicommonwealth/shared';
 import * as dotenv from 'dotenv';
