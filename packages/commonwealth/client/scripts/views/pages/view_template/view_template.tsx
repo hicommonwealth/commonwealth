@@ -399,7 +399,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
                 tx_options: txParams,
               });
 
-              if (res.status) {
+              if ((res as any).status) {
                 notifySuccess('Transaction successful!');
               } else {
                 notifyError('Transcation Failed. Try again.');

@@ -4,7 +4,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { parseFunctionsFromABI } from 'abi_utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
-import { ethers } from 'ethers';
+import { BytesLike, ethers } from 'ethers';
 import type { Result } from 'ethers/lib/utils';
 import {
   handleMappingAbiInputs,
@@ -89,7 +89,10 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
 
       functionNameToFunctionOutput.current.set(
         fn.name,
-        ethersInterface.decodeFunctionResult(fn.name, result),
+        ethersInterface.decodeFunctionResult(
+          fn.name,
+          result as unknown as BytesLike,
+        ),
       );
       setSaving(false);
       setLoaded(true);
