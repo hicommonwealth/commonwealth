@@ -58,10 +58,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yml') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: pnpm run build-ci
 
       - name: Cache browsers
         id: playwright-cache
@@ -80,7 +80,7 @@ jobs:
       - name: Add custom domain to /etc/hosts
         run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
 
-      - name: Run e2e tests (yarn test-e2e)
+      - name: Run e2e tests (pnpm run test-e2e)
         env:
           PORT: 8080
           IS_CI: true
@@ -89,8 +89,8 @@ jobs:
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
-          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e --forbid-only
+          (cd packages/commonwealth && pnpm run e2e-start-server --forbid-only) &
+          (cd packages/commonwealth && pnpm run wait-server) && (cd packages/commonwealth && pnpm run test-e2e --forbid-only)
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -149,10 +149,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: pnpm run build-ci
 
       - name: Cache browsers
         id: playwright-cache
@@ -171,7 +171,7 @@ jobs:
       - name: Add custom domain to /etc/hosts
         run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
 
-      - name: Run e2e tests (yarn test-e2e)
+      - name: Run e2e tests (pnpm run test-e2e)
         env:
           PORT: 8080
           IS_CI: true
@@ -180,8 +180,8 @@ jobs:
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
-          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-mature --forbid-only
+          (cd packages/commonwealth && pnpm run e2e-start-server --forbid-only) &
+          (cd packages/commonwealth && pnpm run wait-server) && (cd packages/commonwealth && pnpm run test-e2e-mature --forbid-only)
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -239,10 +239,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: pnpm run build-ci
 
       - name: Cache browsers
         id: playwright-cache
@@ -255,8 +255,8 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
-      - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
+      - name: Run serial e2e tests (pnpm run test-e2e-serial)
+        run: (cd packages/commonwealth && pnpm run e2e-start-server) & ((cd packages/commonwealth && pnpm run wait-server) && (cd packages/commonwealth && pnpm run test-e2e-serial --forbid-only))
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
@@ -289,22 +289,22 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Add node-gyp
-        run: yarn global add node-gyp
+        run: npm install -g node-gyp
 
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: pnpm install
 
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: yarn lint-branch-warnings
+        run: pnpm run lint-branch-warnings
 
   # Lint and Typecheck
   commonwealth-code-quality:
@@ -330,13 +330,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Add node-gyp
-        run: yarn global add node-gyp
+        run: npm install -g node-gyp
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: pnpm install
 
       - name: Assert yarn.lock is correct
         run: |
@@ -346,28 +346,28 @@ jobs:
           fi
 
       - name: Build
-        run: yarn build
+        run: pnpm run build
 
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: yarn lint-branch
+        run: pnpm run lint-branch
 
       # To disable eslint-diff just comment the following two lines
       #- name: Run eslint-diff
       #  run: yarn workspace commonwealth run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
-        run: yarn workspace commonwealth run lint-diff-canary
+        run: cd packages/commonwealth && pnpm run lint-diff-canary
 
       - name: Commonwealth Typecheck
-        run: yarn --cwd packages/commonwealth check-types
+        run: cd packages/commonwealth && pnpm run check-types
 
       - name: Discord-Bot Typecheck
-        run: yarn --cwd packages/discord-bot check-types
+        run: cd packages/discord-bot && pnpm run check-types
 
       - name: Snapshot-listener Typecheck
-        run: yarn --cwd packages/snapshot-listener check-types
+        run: cd packages/snapshot-listener && pnpm run check-types
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
@@ -418,21 +418,21 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: pnpm run build-ci
 
       - name: Run unit tests
-        run: yarn workspaces run test
+        run: pnpm m run test
 
       - name: Run API tests
-        run: yarn --cwd packages/commonwealth test-api --forbid-only
+        run: cd packages/commonwealth && pnpm run test-api --forbid-only
         env:
           NO_CLIENT: true
 
       - name: Run util integration tests
-        run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
+        run: cd packages/commonwealth && pnpm run test-integration-util --forbid-only
         env:
           NO_CLIENT: true
 
@@ -495,10 +495,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: pnpm run build-ci
 
       ## EVM Section:
       - name: Start EVM Testnet
@@ -509,7 +509,7 @@ jobs:
           /usr/bin/docker run -d --name chain --network $network_name --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
 
       - name: Run EVM Devnet tests
-        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
+        run: cd packages/commonwealth && pnpm run test-devnet evm --forbid-only
 
       - name: Stop EVM Chain
         run: docker stop chain
@@ -537,7 +537,7 @@ jobs:
 
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet cosmos --forbid-only)
+        run: (cd packages/commonwealth && pnpm run start) & ((cd packages/commonwealth && pnpm run wait-server) && (cd packages/commonwealth && pnpm run test-devnet cosmos --forbid-only))
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
@@ -578,13 +578,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install dependencies
-        run: yarn global add node-gyp && yarn --ignore-engines
+        run: npm install -g node-gyp && pnpm install
 
       - name: Build
-        run: yarn --cwd packages/snapshot-listener build
+        run: cd packages/snapshot-listener && pnpm run build
 
       - name: Run API tests
-        run: yarn --cwd packages/snapshot-listener test --forbid-only
+        run: cd packages/snapshot-listener && pnpm run test --forbid-only
