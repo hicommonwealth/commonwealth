@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node16",
-    "module": "node16",
+    "module": "CommonJS",
     "target": "ESNext",
     "baseUrl": ".",
     "composite": true,
