@@ -28,8 +28,8 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
       },
       funding_token_address: { type: Sequelize.STRING },
-      prize_percentage: { type: Sequelize.FLOAT },
-      payout_structure: { type: Sequelize.ARRAY(Sequelize.FLOAT) },
+      prize_percentage: { type: Sequelize.DOUBLE },
+      payout_structure: { type: Sequelize.ARRAY(Sequelize.DOUBLE) },
       interval: {
         type: Sequelize.INTEGER,
         allowNull: false,

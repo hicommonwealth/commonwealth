@@ -12,7 +12,7 @@ ALTER TABLE ONLY public."ContestManagers" ADD COLUMN "prize_percentage" double p
 ALTER TABLE ONLY public."ContestManagers" ADD COLUMN "payout_structure" double precision[];
 ALTER TABLE ONLY public."ContestManagers" ADD COLUMN "paused" boolean;
 
-ALTER TABLE ONLY public."Contests" ALTER COLUMN "winners" TYPE JSON[] USING NULL;
+ALTER TABLE ONLY public."Contests" ALTER COLUMN "winners" TYPE JSONB[] USING NULL;
 
 ALTER TABLE ONLY public."ContestActions" ADD COLUMN "thread_id" integer; 
 ALTER TABLE ONLY public."ContestActions" ADD CONSTRAINT "ContestActions_threads_fkey" 

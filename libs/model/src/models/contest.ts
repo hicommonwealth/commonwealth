@@ -26,7 +26,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
       },
       winners: {
-        type: Sequelize.ARRAY(Sequelize.JSON),
+        type: Sequelize.ARRAY(Sequelize.JSONB),
       },
     },
     {
