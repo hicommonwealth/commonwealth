@@ -35,6 +35,8 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
         validate: { min: 0 },
       },
+      ticker: {},
+      decimals: {},
       created_at: { type: Sequelize.DATE, allowNull: false },
       paused: { type: Sequelize.BOOLEAN },
     },

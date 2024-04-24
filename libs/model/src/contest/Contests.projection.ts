@@ -1,5 +1,6 @@
 import { Projection, schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
@@ -34,9 +35,15 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
 ) {
+  // TODO: get ticker and decimals from contest
+  const ticker = commonProtocol.Denominations.ETH;
+  const decimals = commonProtocol.WeiDecimals[ticker];
+
   const [updated] = await models.ContestManager.update(
     {
       interval,
+      ticker,
+      decimals,
     },
     { where: { contest_address }, returning: true },
   );
@@ -54,6 +61,8 @@ async function updateOrCreateWithAlert(
         contest_address,
         community_id: community.id!,
         interval,
+        ticker,
+        decimals,
         created_at: new Date(),
         name: community.name,
         image_url: 'http://default.image', // TODO: can we have a default image for this?
