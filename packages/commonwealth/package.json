@@ -25,7 +25,6 @@
     "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.js client/\\**/*.{ts,tsx} server/\\**/*.ts scripts/\\**/*.ts shared/\\**/*.ts test/\\**/*.ts",
     "lint-diff-canary": "cp test/canary/eslint_canary.ts.disabled test/canary/eslint_canary.ts && (NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.js test/canary/eslint_canary.ts | tail +2; true) > test/canary/eslint_canary.log ; diff -u test/canary/eslint_canary.log test/canary/eslint_canary.snap",
     "lint-branch": "tsx ./scripts/temp.ts",
-    "lint-branch2": "TEMP=helloworld ./scripts/temp.sh",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
