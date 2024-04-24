@@ -15,6 +15,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
 import {
@@ -156,8 +157,24 @@ const DetailsFormStep = ({
   };
 
   const handleCancel = () => {
-    // TODO show warning that prevents quitting
-    goBack();
+    openConfirmation({
+      title: 'You have unsaved changes',
+      description:
+        'Are you sure you want to exit? Your contest will not be launched and your changes will not be saved.',
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
+          label: 'Exit',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: goBack,
+        },
+      ],
+    });
   };
 
   const handleSubmit = (values: ContestFormValidationSubmitValues) => {
@@ -175,8 +192,6 @@ const DetailsFormStep = ({
       payoutStructure,
       toggledTopicList,
     };
-
-    console.log('toggledTopicList', toggledTopicList);
 
     if (editMode) {
       // TODO save edit API call
@@ -477,6 +492,7 @@ const DetailsFormStep = ({
                   label="Cancel"
                   buttonType="secondary"
                   onClick={handleCancel}
+                  type="button"
                 />
                 <CWButton
                   label={editMode ? 'Save changes' : 'Save & continue'}

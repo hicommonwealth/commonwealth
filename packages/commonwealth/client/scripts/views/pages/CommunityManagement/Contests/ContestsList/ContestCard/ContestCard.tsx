@@ -2,12 +2,14 @@ import React from 'react';
 
 import { CWCard } from 'views/components/component_kit/cw_card';
 
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { SharePopover } from 'views/components/share_popover';
 
 import ContestCountdown from '../ContestCountdown';
 
@@ -37,6 +39,7 @@ const ContestCard = ({
   onFund,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const handleCancelContest = () => {
     // TODO open warning modal
@@ -59,10 +62,6 @@ const ContestCard = ({
     // TODO open threads view with proper filter
     // navigate('/discussions');
     console.log('navigate to discussions');
-  };
-
-  const handleShareClick = () => {
-    // TODO open share popover
   };
 
   const handleFundClick = () => {
@@ -106,12 +105,19 @@ const ContestCard = ({
             action="winners"
             onClick={handleWinnersClick}
           />
-          <CWThreadAction
-            label="Share"
-            action="share"
-            onClick={handleShareClick}
+
+          <SharePopover
+            customUrl={'/contests'}
+            renderTrigger={(handleInteraction) => (
+              <CWThreadAction
+                action="share"
+                label="Share"
+                onClick={handleInteraction}
+              />
+            )}
           />
-          {isActive && (
+
+          {isActive && hasJoinedCommunity && (
             <CWThreadAction
               label="Fund"
               action="fund"

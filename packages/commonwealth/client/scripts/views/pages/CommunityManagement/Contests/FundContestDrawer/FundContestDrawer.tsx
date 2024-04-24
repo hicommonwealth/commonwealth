@@ -40,14 +40,14 @@ const FundContestDrawer = ({
   onClose,
   contestAddress,
 }: FundContestDrawerProps) => {
-  const addressOptions = app.user.activeAccounts.map((account) => ({
+  const addressOptions = app?.user?.activeAccounts?.map((account) => ({
     value: String(account.address),
     label: account.address,
   }));
 
   const activeAccountOption = {
-    value: String(app.user.activeAccount.address),
-    label: app.user.activeAccount.address,
+    value: String(app.user?.activeAccount?.address),
+    label: app?.user?.activeAccount?.address,
   };
 
   const [fundContestDrawerStep, setFundContestDrawerStep] =

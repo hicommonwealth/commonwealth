@@ -40,7 +40,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     name: 'contest name 2',
     image_url: '',
     funding_token_address: null,
-    prize_percentage: 0.2,
+    prize_percentage: 20,
     payout_structure: [60, 30, 10],
     interval: 1,
     created_at: new Date(),
