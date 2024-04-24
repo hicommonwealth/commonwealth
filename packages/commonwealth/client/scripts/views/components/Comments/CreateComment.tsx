@@ -61,7 +61,7 @@ export const CreateComment = ({
     apiCallEnabled: !!app.user.activeAccount?.profile,
   });
 
-  app.user.activeAccount.profile = profile[0];
+  app.user.activeAccount.profile = profile?.[0];
   const author = app.user.activeAccount;
 
   const {
