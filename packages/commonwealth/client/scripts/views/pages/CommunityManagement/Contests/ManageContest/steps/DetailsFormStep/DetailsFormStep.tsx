@@ -19,7 +19,8 @@ import CommunityManagementLayout from 'views/pages/CommunityManagement/common/Co
 
 import {
   ContestFeeType,
-  ContestFormSubmitValues,
+  ContestFormData,
+  ContestFormValidationSubmitValues,
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
@@ -36,29 +37,30 @@ import { detailsFormValidationSchema } from './validation';
 import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
-  contestId?: string;
+  contestAddress?: string;
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
+  contestFormData: ContestFormData;
+  onSetContestFormData: (data: ContestFormData) => void;
 }
 
 const DetailsFormStep = ({
-  contestId,
+  contestAddress,
   onSetLaunchContestStep,
+  contestFormData,
+  onSetContestFormData,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
 
-  const [payoutStructure, setPayoutStructure] = useState<number[]>(
-    initialPayoutStructure,
-  );
-  const [prizePercentage, setPrizePercentage] = useState(
-    INITIAL_PERCENTAGE_VALUE,
-  );
+  const [payoutStructure, setPayoutStructure] = useState<
+    ContestFormData['payoutStructure']
+  >(contestFormData?.payoutStructure || initialPayoutStructure);
+  const [prizePercentage, setPrizePercentage] = useState<
+    ContestFormData['prizePercentage']
+  >(contestFormData?.prizePercentage || INITIAL_PERCENTAGE_VALUE);
   const [toggledTopicList, setToggledTopicList] = useState<
-    {
-      name: string;
-      id: number;
-      checked: boolean;
-    }[]
+    ContestFormData['toggledTopicList']
   >([]);
+
   const [allTopicsToggled, setAllTopicsToggled] = useState(true);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
@@ -67,7 +69,7 @@ const DetailsFormStep = ({
     communityId: app.activeChainId(),
   });
 
-  const editMode = !!contestId;
+  const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
   const topicsEnabledError = toggledTopicList.every(({ checked }) => !checked);
   const totalPayoutPercentage = payoutStructure.reduce(
@@ -91,17 +93,30 @@ const DetailsFormStep = ({
       const mappedTopics = topicsData.map(({ name, id }) => ({
         name,
         id,
-        checked: true,
+        checked: editMode
+          ? !!contestFormData?.toggledTopicList.find((t) => t.id === id)
+          : true,
       }));
       setToggledTopicList(mappedTopics);
+      setAllTopicsToggled(mappedTopics.every(({ checked }) => checked));
     }
-  }, [toggledTopicList.length, topicsData]);
+  }, [
+    contestFormData?.toggledTopicList,
+    editMode,
+    toggledTopicList.length,
+    topicsData,
+  ]);
 
-  const getInitialValues = () => ({
-    feeType: ContestFeeType.CommunityStake,
-    contestRecurring: ContestRecurringType.Yes,
-    prizePercentage,
-  });
+  const getInitialValues = () => {
+    return {
+      contestName: contestFormData?.contestName,
+      contestImage: contestFormData?.contestImage,
+      feeType: contestFormData?.feeType || ContestFeeType.CommunityStake,
+      fundingTokenAddress: contestFormData?.fundingTokenAddress,
+      contestRecurring:
+        contestFormData?.contestRecurring || ContestRecurringType.Yes,
+    };
+  };
 
   const handleAddWinner = () => {
     setPayoutStructure((prevState) => [...prevState, 0]);
@@ -128,7 +143,8 @@ const DetailsFormStep = ({
 
   const handleToggleAllTopics = () => {
     const mappedTopics = sortedTopics?.map((topic) => ({
-      ...topic,
+      name: topic.name,
+      id: topic.id,
       checked: !allTopicsToggled,
     }));
     setToggledTopicList(mappedTopics);
@@ -144,30 +160,55 @@ const DetailsFormStep = ({
     goBack();
   };
 
-  const handleSubmit = (values: ContestFormSubmitValues) => {
-    console.log('values', values);
+  const handleSubmit = (values: ContestFormValidationSubmitValues) => {
     if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
       return;
     }
 
+    const formData = {
+      contestName: values.contestName,
+      contestImage: values.contestImage,
+      feeType: values.feeType,
+      fundingTokenAddress: values.fundingTokenAddress,
+      contestRecurring: values.contestRecurring,
+      prizePercentage,
+      payoutStructure,
+      toggledTopicList,
+    };
+
+    console.log('toggledTopicList', toggledTopicList);
+
     if (editMode) {
       // TODO save edit API call
-      return goBack();
+      goBack();
+    } else {
+      onSetContestFormData(formData);
+      onSetLaunchContestStep('SignTransactions');
     }
-
-    onSetLaunchContestStep('SignTransactions');
   };
 
   return (
     <CommunityManagementLayout
-      title="Launch a contest"
+      title={editMode ? 'Edit your contest' : 'Launch a Contest'}
       description={
-        <CWText className="contest-description">
-          Launch a contest using the funds from your community wallet to create
-          engagement incentives.{' '}
-          <CWText fontWeight="medium">Contests last 7 days</CWText> in
-          blockchain time. <a href="https://blog.commonwealth.im">Learn more</a>
-        </CWText>
+        editMode ? (
+          <>
+            <CWText className="contest-description">
+              Your contest is live and the smart contract settings cannot be
+              changed. <a href="https://blog.commonwealth.im">Learn more</a>
+            </CWText>
+          </>
+        ) : (
+          <>
+            <CWText className="contest-description">
+              Launch a contest using the funds from your community wallet to
+              create engagement incentives.{' '}
+              <CWText fontWeight="medium">Contests last 7 days</CWText> in
+              blockchain time.{' '}
+              <a href="https://blog.commonwealth.im">Learn more</a>
+            </CWText>
+          </>
+        )
       }
       featureHint={{
         title: 'How do I fund my contest?',
@@ -236,6 +277,7 @@ const DetailsFormStep = ({
                     value={ContestFeeType.CommunityStake}
                     name="feeType"
                     hookToForm
+                    disabled={editMode}
                     onChange={() =>
                       setValue('contestRecurring', ContestRecurringType.Yes)
                     }
@@ -245,6 +287,7 @@ const DetailsFormStep = ({
                     value={ContestFeeType.DirectDeposit}
                     name="feeType"
                     hookToForm
+                    disabled={editMode}
                   />
                 </div>
                 {watch('feeType') === ContestFeeType.DirectDeposit && (
@@ -260,6 +303,7 @@ const DetailsFormStep = ({
                       placeholder="Enter funding token address"
                       fullWidth
                       label="Token Address"
+                      disabled={editMode}
                     />
                   </>
                 )}
@@ -286,6 +330,7 @@ const DetailsFormStep = ({
                     value={ContestRecurringType.Yes}
                     name="contestRecurring"
                     hookToForm
+                    disabled={editMode}
                   />
                   <CWRadioButton
                     label="No"
@@ -293,6 +338,7 @@ const DetailsFormStep = ({
                     name="contestRecurring"
                     hookToForm
                     disabled={
+                      editMode ||
                       watch('feeType') === ContestFeeType.CommunityStake
                     }
                   />
@@ -308,6 +354,7 @@ const DetailsFormStep = ({
                     <div className="percentage-buttons">
                       {prizePercentageOptions.map(({ value, label }) => (
                         <CWButton
+                          disabled={editMode}
                           type="button"
                           key={value}
                           label={label}
@@ -341,6 +388,7 @@ const DetailsFormStep = ({
                       payoutNumber={payoutNumber}
                       payoutStructure={payoutStructure}
                       onSetPayoutStructure={setPayoutStructure}
+                      disabled={editMode}
                     />
                   ))}
                 </div>
@@ -362,14 +410,18 @@ const DetailsFormStep = ({
                     label="Remove Winner"
                     buttonType="secondary"
                     buttonHeight="sm"
-                    disabled={payoutStructure.length === MIN_WINNERS}
+                    disabled={
+                      editMode || payoutStructure.length === MIN_WINNERS
+                    }
                     type="button"
                     onClick={handleRemoveWinner}
                   />
                   <CWButton
                     label="Add Winner"
                     buttonHeight="sm"
-                    disabled={payoutStructure.length === MAX_WINNERS}
+                    disabled={
+                      editMode || payoutStructure.length === MAX_WINNERS
+                    }
                     type="button"
                     onClick={handleAddWinner}
                   />

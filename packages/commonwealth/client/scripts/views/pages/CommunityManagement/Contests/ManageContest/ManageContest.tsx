@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import Permissions from 'utils/Permissions';
@@ -11,7 +11,12 @@ import {
   DetailsFormStep,
   SignTransactionsStep,
 } from './steps';
-import { ContestFormData, LaunchContestStep } from './types';
+import {
+  ContestFeeType,
+  ContestFormData,
+  ContestRecurringType,
+  LaunchContestStep,
+} from './types';
 
 import './ManageContest.scss';
 
@@ -20,33 +25,57 @@ interface ManageContestProps {
 }
 
 const ManageContest = ({ contestAddress }: ManageContestProps) => {
-  const [contestFormData, setContestFormData] = useState<ContestFormData>({});
+  const [contestFormData, setContestFormData] =
+    useState<ContestFormData | null>(null);
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
 
   const { getContestByAddress, stakeEnabled, isContestDataLoading } =
     useCommunityContests();
 
-  // useEffect(() => {
-  //   if (contestAddress) {
-  // const contestData = getContestByAddress(contestAddress);
-  // setContestFormData({
-  //   contestName: contestData.name,
-  //   contestImage: contestData.imageUrl,
-  //   feeType: contestData.feeType,
-  //   fundingTokenAddress: contestData.fundingTokenAddress,
-  //   contestRecurring: contestData.contestRecurring,
-  //   prizePercentage: contestData.prizePercentage,
-  //   payoutStructure: contestData.payoutStructure,
-  //   toggledTopicList: contestData.toggledTopicList,
-  // });
-  // }
-  // }, [contestAddress, getContestByAddress]);
+  useEffect(() => {
+    if (contestAddress && !contestFormData && !isContestDataLoading) {
+      const contestData = getContestByAddress(contestAddress);
+
+      if (!contestData) {
+        return;
+      }
+
+      setContestFormData({
+        contestName: contestData.name,
+        contestImage: contestData.image_url,
+        feeType: contestData.funding_token_address
+          ? ContestFeeType.DirectDeposit
+          : ContestFeeType.CommunityStake,
+        fundingTokenAddress: contestData.funding_token_address,
+        contestRecurring:
+          contestData.interval === 0
+            ? ContestRecurringType.No
+            : ContestRecurringType.Yes,
+        prizePercentage: contestData.prize_percentage,
+        payoutStructure: contestData.payout_structure,
+        toggledTopicList: contestData.topics.map((topic) => ({
+          name: topic.name,
+          id: topic.id,
+          checked: true,
+        })),
+      });
+    }
+  }, [
+    contestAddress,
+    contestFormData,
+    getContestByAddress,
+    isContestDataLoading,
+  ]);
+
+  const contestNotFound =
+    contestAddress && !isContestDataLoading && !contestFormData;
 
   if (
     !app.isLoggedIn() ||
     !stakeEnabled ||
-    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
+    contestNotFound
   ) {
     return <PageNotFound />;
   }
@@ -76,9 +105,13 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     }
   };
 
+  const shouldDetailsFormStepLoading =
+    launchContestStep === 'DetailsForm' && contestAddress && !contestFormData;
+  const isLoading = shouldDetailsFormStepLoading || isContestDataLoading;
+
   return (
     <div className="ManageContest">
-      {isContestDataLoading ? <CWCircleMultiplySpinner /> : getCurrentStep()}
+      {isLoading ? <CWCircleMultiplySpinner /> : getCurrentStep()}
     </div>
   );
 };
