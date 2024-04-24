@@ -14,24 +14,24 @@ import ContestCountdown from '../ContestCountdown';
 import './ContestCard.scss';
 
 interface ContestCardProps {
-  id: number;
+  address: string;
   name: string;
   imageUrl?: string;
   finishDate: string;
-  topics: string[];
-  payouts: number[];
+  topics: { id?: number; name?: string }[];
+  winners: { prize?: number; creator_address?: string }[];
   isAdmin: boolean;
   isActive: boolean;
   onFund: () => void;
 }
 
 const ContestCard = ({
-  id,
+  address,
   name,
   imageUrl,
   finishDate,
   topics,
-  payouts,
+  winners,
   isAdmin,
   isActive,
   onFund,
@@ -44,7 +44,7 @@ const ContestCard = ({
   };
 
   const handleEditContest = () => {
-    navigate(`/manage/contests/${id}`);
+    navigate(`/manage/contests/${address}`);
   };
 
   const handleLeaderboardClick = () => {
@@ -79,17 +79,19 @@ const ContestCard = ({
           <CWText type="h3">{name}</CWText>
           <ContestCountdown finishTime={finishDate} isActive={isActive} />
         </div>
-        <CWText className="topics">Topics: {topics.join(', ')}</CWText>
+        <CWText className="topics">
+          Topics: {topics.map(({ name: topicName }) => topicName).join(', ')}
+        </CWText>
         <CWText className="prizes-header" fontWeight="bold">
           Current Prizes
         </CWText>
         <div className="prizes">
-          {payouts.map((payout, index) => (
-            <div className="prize-row" key={index}>
+          {winners.map((winner, index) => (
+            <div className="prize-row" key={winner.creator_address}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{payout} ETH</CWText>
+              <CWText fontWeight="bold">{winner.prize} ETH</CWText>
             </div>
           ))}
         </div>

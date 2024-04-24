@@ -475,8 +475,8 @@ const CommonDomainRoutes = ({
           })}
         />,
         <Route
-          key="/:scope/manage/contests/:contestId"
-          path="/:scope/manage/contests/:contestId"
+          key="/:scope/manage/contests/:contestAddress"
+          path="/:scope/manage/contests/:contestAddress"
           element={withLayout(ManageContest, {
             scoped: true,
           })}
