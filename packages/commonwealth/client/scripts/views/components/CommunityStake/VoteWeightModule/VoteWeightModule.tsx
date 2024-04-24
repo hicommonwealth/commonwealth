@@ -1,6 +1,6 @@
+import { findDenominationIcon } from 'helpers/findDenomination';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
-
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -77,7 +77,11 @@ export const VoteWeightModule = ({
               You have {stakeNumber || 0} stake
             </CWText>
             <CWText type="caption" className="stake-value">
-              valued at {capDecimals(String(stakeValue))} {denomination}
+              valued at
+              <span className="denominationIcon">
+                {findDenominationIcon(denomination)}
+              </span>
+              {capDecimals(String(stakeValue))} {denomination}
             </CWText>
           </div>
           {stakeNumber >= 1 ? (

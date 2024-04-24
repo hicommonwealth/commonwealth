@@ -1,0 +1,105 @@
+@import '../../../../../../styles/shared';
+
+.ModalBase {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 16px;
+  padding-top: 48px;
+
+  @include extraSmall {
+    padding-top: 32px;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 0;
+    top: 16px;
+    margin-right: 16px;
+    cursor: pointer;
+  }
+
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+
+  .header {
+    text-align: center;
+    padding: 0px 12px;
+  }
+
+  .description {
+    text-align: center;
+    color: $neutral-600;
+    margin-top: -12px;
+    padding: 0px 12px;
+  }
+
+  .content {
+    padding: 0 48px;
+
+    @include extraSmall {
+      padding: 0 32px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      .Tab {
+        .Text {
+          width: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+
+    .auth-options {
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+      gap: 12px;
+      width: 100%;
+      max-height: 430px;
+    }
+  }
+
+  .footer {
+    padding-bottom: 48px;
+
+    @include extraSmall {
+      padding-bottom: 32px;
+    }
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .Text {
+      display: initial;
+    }
+
+    a,
+    a:visited,
+    a:active,
+    a:hover,
+    button {
+      color: $primary-600;
+    }
+
+    button {
+      text-decoration: none;
+      outline: none;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      cursor: pointer;
+    }
+  }
+}

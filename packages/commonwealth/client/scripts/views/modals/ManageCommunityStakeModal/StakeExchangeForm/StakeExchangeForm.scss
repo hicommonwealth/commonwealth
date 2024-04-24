@@ -47,13 +47,26 @@
   }
 
   .stake-valued-row {
+    .container {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+    }
+
     .Text {
       display: inline;
     }
 
     .valued {
+      display: flex;
+      align-items: center;
       color: $neutral-400;
       margin-left: 4px;
+    }
+    .denominationIcon {
+      display: inline-flex;
+      padding: 0 4px;
+      padding-top: 2px;
     }
 
     .vote-weight {

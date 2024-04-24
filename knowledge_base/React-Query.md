@@ -1,10 +1,12 @@
+# React-Query
+
 The purpose of this doc is to present react-query as a tool that will help us handling application state - to be more specific - not a UI state, but the data coming from the backend server.
 
-**Contents**
+## Contents
 
 - [What is React-Query](#what-is-react-query)
-- [How **React-Query works in a nutshell**](#how---react-query-works-in-a-nutshell--)
-- [Why do we even consider React-Query?](#why-do-we-even-consider-react-query-)
+- [How React-Query works in a nutshell](#how-react-query-works-in-a-nutshell)
+- [Why do we even consider React-Query?](#why-do-we-even-consider-react-query)
 - [Advantages and drawbacks](#advantages-and-drawbacks)
   * [Pros](#pros)
   * [Cons](#cons)
@@ -15,7 +17,7 @@ The purpose of this doc is to present react-query as a tool that will help us ha
 
 React-Query is a popular open-source library that offers a data-fetching and caching solution for React applications. It simplifies the process of making asynchronous API calls and managing the data received from these calls. React-Query provides an elegant way to manage complex data-fetching requirements that typically involve network requests, caching, and refetching.
 
-## How **React-Query works in a nutshell**
+## How React-Query works in a nutshell
 
 React-Query works by separating the data-fetching and data-management concerns from the component tree. It does this by providing a set of hooks that can be used to fetch and manage data. These hooks can be called from anywhere in the application, not just from within the component tree.
 

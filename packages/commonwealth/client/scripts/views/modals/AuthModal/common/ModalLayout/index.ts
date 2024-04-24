@@ -1,1 +1,0 @@
-export { ModalLayout } from './ModalLayout';

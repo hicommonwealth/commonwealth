@@ -1,3 +1,7 @@
+# Twitter
+
+## Link Previews
+
 Link previews are used as little cards when posting a link on Twitter.
 
 Link Previews are implemented using the Open Graph Standard: [https://ogp.me/](https://ogp.me/). Our implementation lives at `setupAppRoutes.ts` and queries the DB against the provided slugs to generate opengraph metadata.
@@ -17,4 +21,5 @@ To get link previews, you will need to do the following:
 
 ## Change Log
 
+- 240415: Generalized and renamed by Graham Johnson (from `Link-Previews.md` to `Twitter.md`).
 - 230426: Authored by Jake Naviasky.

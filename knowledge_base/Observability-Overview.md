@@ -1,4 +1,4 @@
-# Observability
+# Observability Overview
 
 Here are some commonly used types of **observability metrics**:
 
