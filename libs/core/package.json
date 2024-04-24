@@ -10,7 +10,7 @@
   "types": "src/index",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "clean": "rm -rf build",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
   },
