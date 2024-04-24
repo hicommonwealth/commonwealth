@@ -43,6 +43,7 @@ describe.skip('Stake Historical Price', () => {
       ],
       topics: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
 

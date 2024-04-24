@@ -15,6 +15,7 @@ import CommunityStake from './community_stake';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
+import ContestTopic from './contest_topic';
 import Contract from './contract';
 import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
@@ -63,6 +64,7 @@ export const Factories = {
   Contest,
   ContestAction,
   ContestManager,
+  ContestTopic,
   Contract,
   ContractAbi,
   DiscordBotConfig,
