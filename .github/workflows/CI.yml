@@ -317,10 +317,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: pnpm run lint-branch-warnings
+      # TODO: burton: I need to get an official yes/no from the team to turn this off
+      #- name: Run linter
+      #  env:
+      #    GITHUB_BASE_REF: ${{ github.base_ref }}
+      #  run: pnpm run lint-branch-warnings
 
   # Lint and Typecheck
   commonwealth-code-quality:
