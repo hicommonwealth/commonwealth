@@ -55,10 +55,10 @@ export const CreateComment = ({
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
   const { data: profile } = useFetchProfilesByAddressesQuery({
-    profileChainIds: [app.user.activeAccount.community.id],
-    profileAddresses: [app.user.activeAccount.address],
+    profileChainIds: [app.user.activeAccount?.community?.id],
+    profileAddresses: [app.user.activeAccount?.address],
     currentChainId: app.activeChainId(),
-    apiCallEnabled: !!app.user.activeAccount.profile,
+    apiCallEnabled: !!app.user.activeAccount?.profile,
   });
 
   app.user.activeAccount.profile = profile[0];
