@@ -4,6 +4,7 @@
     "target": "ESNext",
     "baseUrl": ".",
     "composite": true,
+    "strict": true,
 
     "forceConsistentCasingInFileNames": true,
     "preserveConstEnums": true,
