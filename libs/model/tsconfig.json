@@ -5,7 +5,6 @@
     "strict": true,
     "tsBuildInfoFile": "build/.tsbuildinfo"
   },
-  "include": ["src"],
   "references": [
     { "path": "../core/tsconfig.build.json" },
     { "path": "../chains/tsconfig.build.json" },
