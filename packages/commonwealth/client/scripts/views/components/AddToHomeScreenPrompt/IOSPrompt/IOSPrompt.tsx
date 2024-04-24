@@ -11,11 +11,7 @@ interface IOSPromptProps {
   setShowPrompt: (showPrompt: boolean) => void;
 }
 
-export const IOSPrompt = ({
-  hidePromptAction,
-  showPrompt,
-  setShowPrompt,
-}: IOSPromptProps) => {
+export const IOSPrompt = ({ hidePromptAction }: IOSPromptProps) => {
   const { animationStyles } = useAnimation();
   return (
     <div className="IOSPrompt" style={animationStyles}>
