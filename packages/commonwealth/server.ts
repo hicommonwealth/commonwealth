@@ -11,14 +11,15 @@ import express from 'express';
 import {
   DATABASE_CLEAN_HOUR,
   PORT,
-  PRERENDER_TOKEN,
   REDIS_URL,
+  SERVER_URL,
 } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
+const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT;
 
 // bootstrap production adapters
 const log = logger(__filename);
@@ -53,7 +54,8 @@ const start = async () => {
     withLoggingMiddleware: true,
     withStatsMiddleware: true,
     withFrontendBuild: !NO_CLIENT,
-    withPrerender: !!PRERENDER_TOKEN,
+    withPrerender:
+      PRODUCTION && !NO_PRERENDER && SERVER_URL.includes('commonwealth.im'),
   })
     .then(() => {
       isServiceHealthy = true;
