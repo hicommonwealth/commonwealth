@@ -1,8 +1,8 @@
 import { Projection, schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { commonProtocol } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
+import { contractHelpers } from '../services/commonProtocol';
 
 const log = logger(__filename);
 export class MissingContestManager extends Error {
@@ -35,9 +35,10 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
 ) {
-  // TODO: get ticker and decimals from contest
-  const ticker = commonProtocol.Denominations.ETH;
-  const decimals = commonProtocol.WeiDecimals[ticker];
+  const { ticker, decimals } = await contractHelpers.getTokenAttributes(
+    contest_address,
+  );
+  // TODO: evaluate errors from contract helpers and how to drive the event queue
 
   const [updated] = await models.ContestManager.update(
     {

@@ -1,4 +1,5 @@
 import { BalanceSourceType } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { ChainNodeInstance } from '../../models/chain_node';
 
 export type Balances = { [address: string]: string };
@@ -96,4 +97,9 @@ export type GetBalancesOptions =
 export type GetTendermintClientOptions = {
   chainNode: ChainNodeInstance;
   batchSize?: number;
+};
+
+export type TokenAttributes = {
+  ticker: string | commonProtocol.Denominations;
+  decimals: number;
 };
