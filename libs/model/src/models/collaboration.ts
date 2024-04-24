@@ -52,13 +52,6 @@ export default (sequelize: Sequelize.Sequelize, dataTypes: DataTypes) => {
     },
   );
 
-  Collaboration.associate = (models) => {
-    models.Collaboration.belongsTo(models.Address, {
-      foreignKey: { name: 'thread_id' },
-    });
-    models.Collaboration.belongsTo(models.Thread);
-  };
-
   // sequelize requires a PK on "id" column when defnining a model
   Collaboration.removeAttribute('id');
 

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type CommentSubscriptionAttributes = z.infer<
-  typeof schemas.entities.CommentSubscriptions
+  typeof schemas.entities.CommentSubscription
 >;
 
 export type CommentSubscriptionInstance =

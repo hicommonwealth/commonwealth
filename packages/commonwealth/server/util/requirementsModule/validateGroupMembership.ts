@@ -8,7 +8,7 @@ import {
   MembershipRejectReason,
   OptionsWithBalances,
 } from '@hicommonwealth/model';
-import { ethers } from 'ethers';
+import { toBigInt } from 'web3-utils';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -180,9 +180,7 @@ function _thresholdCheck(
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = ethers.BigNumber.from(balance).gt(
-      ethers.BigNumber.from(thresholdData.threshold),
-    );
+    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
     return {
       result,
       message: !result
