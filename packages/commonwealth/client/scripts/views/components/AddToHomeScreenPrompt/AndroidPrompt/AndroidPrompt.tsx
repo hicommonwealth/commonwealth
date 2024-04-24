@@ -15,7 +15,6 @@ interface AndroidPromptProps {
 
 export const AndroidPrompt = ({
   hidePromptAction,
-  showPrompt,
   setShowPrompt,
 }: AndroidPromptProps) => {
   const { animationStyles } = useAnimation();
