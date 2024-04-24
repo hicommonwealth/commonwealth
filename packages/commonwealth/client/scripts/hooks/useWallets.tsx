@@ -71,7 +71,7 @@ type IuseWalletProps = {
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
-  onSuccess?: (address?: string | undefined) => void;
+  onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
   useSessionKeyLoginFlow?: boolean;
 };
@@ -215,7 +215,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
       });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+      if (walletProps.onSuccess)
+        walletProps.onSuccess(magicAddress, isNewlyCreated);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         await walletProps?.onModalClose?.();
@@ -253,7 +254,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
       });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+      if (walletProps.onSuccess)
+        walletProps.onSuccess(magicAddress, isNewlyCreated);
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         await walletProps?.onModalClose?.();
@@ -310,7 +312,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     if (exitOnComplete) {
       await walletProps?.onModalClose?.();
-      if (walletProps.onSuccess) walletProps.onSuccess(account.address);
+      if (walletProps.onSuccess)
+        walletProps.onSuccess(account.address, isNewlyCreated);
     }
   };
 
@@ -322,7 +325,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     currentWallet?: IWebWallet<any>,
   ) => {
     if (walletProps.useSessionKeyLoginFlow) {
-      walletProps.onSuccess?.(account.address);
+      walletProps.onSuccess?.(account.address, isNewlyCreated);
       return;
     }
 
@@ -394,7 +397,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setCachedTimestamp(timestamp);
           setCachedChainId(chainId);
           setCachedSessionPayload(sessionPayload);
-          walletProps.onSuccess?.(account.address);
+          walletProps.onSuccess?.(account.address, isNewlyCreated);
           setSidebarType('newOrReturning');
           setActiveStep('selectAccountType');
 
@@ -535,7 +538,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
       if (walletProps.onSuccess)
-        walletProps.onSuccess(primaryAccountToUse.profile.address);
+        walletProps.onSuccess(
+          primaryAccountToUse.profile.address,
+          isNewlyCreated,
+        );
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
       await walletProps?.onModalClose?.();
     } catch (e) {
