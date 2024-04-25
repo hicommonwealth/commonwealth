@@ -1,3 +1,5 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useWelcomeOnboardModal } from 'client/scripts/state/ui/modals';
 import React, { useEffect, useState } from 'react';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
@@ -15,6 +17,9 @@ const AuthModal = ({
 }: AuthModalProps) => {
   const [modalType, setModalType] = useState(type);
 
+  const { setIsWelcomeOnboardModalOpen } = useWelcomeOnboardModal();
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
   useEffect(() => {
     // reset `modalType` state whenever modal is opened
     isOpen && setModalType(type);
@@ -29,6 +34,16 @@ const AuthModal = ({
     onSignInClick();
   };
 
+  const handleSuccess = (isNewlyCreated) => {
+    if (userOnboardingEnabled && isNewlyCreated) {
+      // using timeout to make the modal transition smooth
+      setTimeout(() => {
+        setIsWelcomeOnboardModalOpen(true);
+      }, 1000);
+    }
+    onSuccess(isNewlyCreated);
+  };
+
   return (
     <CWModal
       key={type}
@@ -40,13 +55,14 @@ const AuthModal = ({
         modalType === 'sign-in' ? (
           <SignInModal
             onClose={onClose}
-            onSuccess={onSuccess}
+            onSuccess={handleSuccess}
             showWalletsFor={showWalletsFor}
             onSignInClick={handleOnSignInClick}
           />
         ) : (
           <CreateAccountModal
             onClose={onClose}
+            onSuccess={handleSuccess}
             onSignInClick={handleOnSignInClick}
           />
         )

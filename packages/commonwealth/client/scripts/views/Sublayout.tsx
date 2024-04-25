@@ -9,6 +9,8 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { useFlag } from '../hooks/useFlag';
+import { useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
@@ -16,6 +18,7 @@ import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import { UserSurveyGrowl } from './components/UserSurveyGrowl/UserSurveyGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -34,6 +37,10 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+
+  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
+    useWelcomeOnboardModal();
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
 
   const location = useLocation();
 
@@ -118,6 +125,14 @@ const Sublayout = ({
           </div>
         </div>
         <UserSurveyGrowl />
+        {userOnboardingEnabled && (
+          <WelcomeOnboardModal
+            isOpen={isWelcomeOnboardModalOpen}
+            onClose={() =>
+              setIsWelcomeOnboardModalOpen(!isWelcomeOnboardModalOpen)
+            }
+          />
+        )}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>
