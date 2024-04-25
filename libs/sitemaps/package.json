@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "rm -rf build",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "aws-sdk": "^2.814.0"
