@@ -26,15 +26,13 @@ export type CommunityContractModelStatic =
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): CommunityContractModelStatic => {
-  const CommunityContract = <CommunityContractModelStatic>sequelize.define(
+): CommunityContractModelStatic =>
+  <CommunityContractModelStatic>sequelize.define<CommunityContractInstance>(
     'CommunityContract',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       community_id: { type: dataTypes.STRING, allowNull: false },
       contract_id: { type: dataTypes.INTEGER, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'CommunityContracts',
@@ -45,17 +43,3 @@ export default (
       indexes: [{ fields: ['community_id'], unique: true }],
     },
   );
-
-  CommunityContract.associate = (models) => {
-    models.CommunityContract.belongsTo(models.Contract, {
-      foreignKey: 'contract_id',
-      targetKey: 'id',
-    });
-    models.CommunityContract.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return CommunityContract;
-};
