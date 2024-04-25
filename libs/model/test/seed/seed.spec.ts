@@ -29,12 +29,13 @@ async function testSeed<T extends schemas.Aggregates>(
   // perform schema validation on created entity (throws)
   const schema = schemas.entities[name];
   const model = models[name];
-  const data = await schema.parse(record);
+  const data: ReturnType<typeof schema.parse> = schema.parse(record);
 
   // attempt to find entity that was created
   const existingEntity = await (model as ModelStatic<Model>).findOne({
     where: {
-      [model.primaryKeyAttribute]: data[model.primaryKeyAttribute],
+      [model.primaryKeyAttribute]:
+        data[model.primaryKeyAttribute as keyof typeof data],
     },
   });
   expect(existingEntity, 'failed to find created entity after creation').not.to

@@ -67,7 +67,7 @@ const generateSchemas = async () => {
 };
 
 describe('Model schema', () => {
-  let schemas;
+  let schemas: { [x: string]: { model: any; migration: any } };
 
   before(async () => {
     schemas = await generateSchemas();

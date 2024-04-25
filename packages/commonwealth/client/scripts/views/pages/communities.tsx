@@ -296,7 +296,7 @@ const CommunitiesPage = () => {
               onModalClose={() => setModeOfManageCommunityStakeModal(null)}
               community={selectedCommunity}
               denomination={
-                findDenominationString(selectedCommunity.id) || 'ETH'
+                findDenominationString(selectedCommunity?.id) || 'ETH'
               }
             />
           }
