@@ -3,7 +3,7 @@ import {
   ProfileAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
-import { getThreadUrl } from '@hicommonwealth/shared/build';
+import { getThreadUrl } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 
 export interface Link {
@@ -57,10 +57,10 @@ function createThreadsTableAdapter(): TableAdapter {
     'id' | 'updated_at' | 'title' | 'community_id'
   >;
 
-  function toRecord(obj: object) {
+  function toRecord(obj: object): Link | undefined {
     const thread = obj as ThreadInstancePartial;
 
-    if (!thread.updated_at) {
+    if (!thread.updated_at || !thread.id) {
       return undefined;
     }
 
