@@ -103,7 +103,6 @@ describe('API Tests', () => {
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
         });
-
       res = await chai
         .request(server.app)
         .post('/api/verifyAddress')

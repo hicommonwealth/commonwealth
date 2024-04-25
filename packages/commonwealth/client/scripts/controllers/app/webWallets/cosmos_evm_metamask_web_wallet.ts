@@ -6,11 +6,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
-import type {
-  RLPEncodedTransaction,
-  TransactionConfig,
-  provider,
-} from 'web3-core';
+import { Transaction, Web3BaseProvider } from 'web3';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';
 
@@ -30,7 +26,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   private _chainId: string;
   private _accounts: string[] = [];
   private _ethAccounts: string[];
-  private _provider: provider;
+  private _provider: Web3BaseProvider;
   private _web3: Web3;
 
   public readonly name = WalletId.CosmosEvmMetamask;
@@ -98,9 +94,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     });
   }
 
-  public async signTransaction(
-    tx: TransactionConfig,
-  ): Promise<RLPEncodedTransaction> {
+  public async signTransaction(tx: Transaction): Promise<string> {
     const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
     return rlpEncodedTx;
   }
@@ -119,8 +113,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
       // (this needs to be called first, before other requests)
       const Web3 = (await import('web3')).default;
-      this._web3 = new Web3(ethereum);
-      await this._web3.givenProvider.enable();
+      this._web3 = new Web3((window as any).ethereum);
 
       this._ethAccounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;
@@ -153,7 +146,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async initAccountsChanged() {
-    await this._web3.givenProvider.on(
+    await (this._web3.givenProvider as Web3BaseProvider).on(
       'accountsChanged',
       async (accounts: string[]) => {
         const encodedAccounts = accounts.map((a) =>

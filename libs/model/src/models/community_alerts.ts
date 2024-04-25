@@ -1,8 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type CommunityAlertAttributes = z.infer<
   typeof schemas.entities.CommunityAlert
@@ -14,7 +13,7 @@ export type CommunityAlertModelStatic = ModelStatic<CommunityAlertInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): CommunityAlertModelStatic => {
   const CommunityAlert = <CommunityAlertModelStatic>(
     sequelize.define<CommunityAlertInstance>(

@@ -1,8 +1,7 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;
@@ -29,10 +28,7 @@ export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
 
 export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-) => {
+export default (sequelize: Sequelize.Sequelize, dataTypes: DataTypes) => {
   const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration',
     {
@@ -55,13 +51,6 @@ export default (
       underscored: true,
     },
   );
-
-  Collaboration.associate = (models) => {
-    models.Collaboration.belongsTo(models.Address, {
-      foreignKey: { name: 'thread_id' },
-    });
-    models.Collaboration.belongsTo(models.Thread);
-  };
 
   // sequelize requires a PK on "id" column when defnining a model
   Collaboration.removeAttribute('id');

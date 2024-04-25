@@ -10,7 +10,7 @@ import { BalanceType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
-import Web3Utils from 'web3-utils';
+import { toWei } from 'web3-utils';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
@@ -112,7 +112,7 @@ describe('Token Balance Cache EVM Tests', function () {
       );
       await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
       await sdk.getErc20(chainLinkAddress, addressTwo, transferAmount);
-      const transferAmountBN = new BN(Web3Utils.toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -296,11 +296,15 @@ describe('Token Balance Cache EVM Tests', function () {
       const web3 = new Web3(
         new Web3.providers.HttpProvider('http://localhost:8545'),
       );
-      originalAddressOneBalance = await web3.eth.getBalance(addressOne);
-      originalAddressTwoBalance = await web3.eth.getBalance(addressTwo);
+      originalAddressOneBalance = (
+        await web3.eth.getBalance(addressOne)
+      ).toString();
+      originalAddressTwoBalance = (
+        await web3.eth.getBalance(addressTwo)
+      ).toString();
       await sdk.getETH(addressOne, transferAmount);
       await sdk.getETH(addressTwo, transferAmount);
-      const transferAmountBN = new BN(Web3Utils.toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -761,7 +765,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
       await delay(20000);
 
-      const transferAmountBN = new BN(Web3Utils.toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       const finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);

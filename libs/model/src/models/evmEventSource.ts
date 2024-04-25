@@ -1,7 +1,7 @@
-import Sequelize, { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
 import { ContractAttributes } from './contract';
-import { ModelInstance, ModelStatic } from './types';
+import { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type EvmEventSourceAttributes = {
   id: number;
@@ -20,7 +20,7 @@ export type EvmEventSourceModelStatic = ModelStatic<EvmEventSourceInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): EvmEventSourceModelStatic => {
   const EvmEventSource: EvmEventSourceModelStatic = <EvmEventSourceModelStatic>(
     sequelize.define(

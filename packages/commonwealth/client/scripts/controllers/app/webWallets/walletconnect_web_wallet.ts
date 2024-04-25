@@ -57,9 +57,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     });
 
     return {
-      number: hexToNumber(block.number),
+      number: Number(hexToNumber(block.number)),
       hash: block.hash,
-      timestamp: hexToNumber(block.timestamp),
+      timestamp: Number(hexToNumber(block.timestamp)),
     };
   }
 

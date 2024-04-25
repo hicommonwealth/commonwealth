@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { SnapshotSpaceAttributes } from './snapshot_spaces';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type CommunitySnapshotSpacesAttributes = {
   id: number;
@@ -24,7 +23,7 @@ export type CommunitySnapshotSpaceModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): CommunitySnapshotSpaceModelStatic => {
   const CommunitySnapshotSpaces = <CommunitySnapshotSpaceModelStatic>(
     sequelize.define(

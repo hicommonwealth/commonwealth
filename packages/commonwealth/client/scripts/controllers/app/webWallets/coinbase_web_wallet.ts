@@ -6,20 +6,19 @@ import type Web3 from 'web3';
 import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import type { provider } from 'web3-core';
-import { hexToNumber } from 'web3-utils';
-
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
+import { Web3BaseProvider } from 'web3';
+import { hexToNumber } from 'web3-utils';
 
 class CoinbaseWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
-  private _provider: provider;
+  private _provider: Web3BaseProvider;
   private _web3: Web3 | any;
 
   public readonly name = WalletId.Coinbase;
@@ -65,9 +64,9 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     });
 
     return {
-      number: hexToNumber(block.number),
+      number: Number(hexToNumber(block.number)),
       hash: block.hash,
-      timestamp: hexToNumber(block.timestamp),
+      timestamp: Number(hexToNumber(block.timestamp)),
     };
   }
 

@@ -1,12 +1,11 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
@@ -53,7 +52,7 @@ export type AddressModelStatic = ModelStatic<AddressInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): AddressModelStatic => {
   const Address: AddressModelStatic = <AddressModelStatic>sequelize.define(
     'Address',
@@ -204,14 +203,6 @@ export default (
     models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Thread, {
       foreignKey: 'address_id',
-    });
-    models.Address.belongsToMany(models.Thread, {
-      through: models.Collaboration,
-      as: 'collaboration',
-      foreignKey: { name: 'address_id', allowNull: false },
-    });
-    models.Address.hasMany(models.Collaboration, {
-      foreignKey: { name: 'address_id', allowNull: false },
     });
     models.Address.hasMany(models.Membership, {
       foreignKey: 'address_id',

@@ -1,6 +1,11 @@
-import { DataTypes, Model, Sequelize, type BuildOptions } from 'sequelize';
+import {
+  Model,
+  Sequelize,
+  DataTypes as SequelizeDataTypes,
+  type BuildOptions,
+} from 'sequelize';
 
-type ModelFactory<T> = (sequelize: Sequelize, dataTypes: typeof DataTypes) => T;
+type ModelFactory<T> = (sequelize: Sequelize, dataTypes: DataTypes) => T;
 type ModelFactories = Record<string, ModelFactory<unknown>>;
 export type Models<T extends ModelFactories> = {
   [K in keyof T]: ReturnType<T[K]>;
@@ -23,11 +28,27 @@ export type ModelStatic<ParentModel extends Model> =
 /**
  * Composite key mappings (must match field names in parent and child)
  */
+export type KeyMap<Parent extends State, Child extends State> =
+  | (keyof Parent & keyof Child & string)
+  | [keyof Parent & string, keyof Child & string];
 export type CompositeKey<Parent extends State, Child extends State> = Array<
-  keyof Parent & keyof Child & string
+  KeyMap<Parent, Child>
 >;
 export type CompositeMap<Parent extends State, Child extends State> = {
   parent: ModelStatic<Model<Parent>>;
   child: ModelStatic<Model<Child>>;
   key: CompositeKey<Parent, Child>;
+};
+
+export type DataTypes = {
+  STRING: typeof SequelizeDataTypes.STRING;
+  INTEGER: typeof SequelizeDataTypes.INTEGER;
+  TEXT: typeof SequelizeDataTypes.TEXT;
+  BOOLEAN: typeof SequelizeDataTypes.BOOLEAN;
+  DATE: typeof SequelizeDataTypes.DATE;
+  ARRAY: typeof SequelizeDataTypes.ARRAY;
+  JSON: typeof SequelizeDataTypes.JSON;
+  JSONB: typeof SequelizeDataTypes.JSONB;
+  BIGINT: typeof SequelizeDataTypes.BIGINT;
+  ENUM: typeof SequelizeDataTypes.ENUM;
 };

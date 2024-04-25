@@ -102,6 +102,11 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
 
 export const ContestWinnersRecorded = ContestManagerEvent.extend({
   winners: z
-    .array(z.string())
-    .describe('Ranked contest-winning creator addresses'),
+    .array(
+      z.object({
+        creator_address: z.string(),
+        prize: z.number().int().positive(),
+      }),
+    )
+    .describe('Contest winners from first to last'),
 }).describe('When contest winners are recorded and contest ends');
