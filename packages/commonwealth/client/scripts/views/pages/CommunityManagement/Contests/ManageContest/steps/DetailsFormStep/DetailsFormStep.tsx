@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
-import { useFetchTopicsQuery } from 'state/api/topics';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -35,6 +33,7 @@ import {
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
 
+import useContestTopics from 'views/pages/CommunityManagement/Contests/ManageContest/steps/DetailsFormStep/useContestTopics';
 import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
@@ -58,53 +57,28 @@ const DetailsFormStep = ({
   const [prizePercentage, setPrizePercentage] = useState<
     ContestFormData['prizePercentage']
   >(contestFormData?.prizePercentage || INITIAL_PERCENTAGE_VALUE);
-  const [toggledTopicList, setToggledTopicList] = useState<
-    ContestFormData['toggledTopicList']
-  >(contestFormData?.toggledTopicList || []);
 
-  const [allTopicsToggled, setAllTopicsToggled] = useState(
-    contestFormData?.toggledTopicList?.every(({ checked }) => checked),
-  );
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
 
-  const { data: topicsData } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+  const {
+    allTopicsToggled,
+    handleToggleAllTopics,
+    toggledTopicList,
+    handleToggleTopic,
+    sortedTopics,
+    topicsEnabledError,
+  } = useContestTopics({
+    initialToggledTopicList: contestFormData?.toggledTopicList,
   });
 
   const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
-  const topicsEnabledError = toggledTopicList.every(({ checked }) => !checked);
   const totalPayoutPercentage = payoutStructure.reduce(
     (acc, val) => acc + val,
     0,
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
-
-  const sortedTopics = [...topicsData]?.sort((a, b) => {
-    if (!a.order || !b.order) {
-      return 1;
-    }
-
-    // if order is not defined, push topic to the end of the list
-    return a.order - b.order;
-  });
-
-  // we need separate state to handle topic toggling
-  useEffect(() => {
-    if (topicsData) {
-      const mappedTopics = topicsData.map(({ name, id }) => ({
-        name,
-        id,
-        checked: contestFormData
-          ? !!contestFormData?.toggledTopicList?.find((t) => t.id === id)
-              ?.checked
-          : true,
-      }));
-      setToggledTopicList(mappedTopics);
-      setAllTopicsToggled(mappedTopics.every(({ checked }) => checked));
-    }
-  }, [contestFormData, topicsData]);
 
   const getInitialValues = () => {
     return {
@@ -123,35 +97,6 @@ const DetailsFormStep = ({
 
   const handleRemoveWinner = () => {
     setPayoutStructure((prevState) => [...prevState.slice(0, -1)]);
-  };
-
-  const handleToggleTopic = (topicId: number) => {
-    const isChecked = toggledTopicList.find(
-      (topic) => topic.id === topicId,
-    )?.checked;
-
-    const mappedTopics = toggledTopicList.map((topic) => {
-      if (topic.id === topicId) {
-        return {
-          ...topic,
-          checked: !isChecked,
-        };
-      }
-      return topic;
-    });
-
-    const allChecked = mappedTopics.every(({ checked }) => checked);
-    setToggledTopicList(mappedTopics);
-    setAllTopicsToggled(allChecked);
-  };
-  const handleToggleAllTopics = () => {
-    const mappedTopics = toggledTopicList?.map((topic) => ({
-      name: topic.name,
-      id: topic.id,
-      checked: !allTopicsToggled,
-    }));
-    setToggledTopicList(mappedTopics);
-    setAllTopicsToggled((prevState) => !prevState);
   };
 
   const goBack = () => {
