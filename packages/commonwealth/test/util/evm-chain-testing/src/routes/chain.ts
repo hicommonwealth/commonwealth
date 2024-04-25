@@ -30,6 +30,7 @@ export const getAccounts = async (req: Request, res: Response) => {
 };
 
 export const getBlock = async (req: Request, res: Response) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function getJsonStringifiableValue(value: any): any {
     if (typeof value === 'bigint') {
       return Number(value);
