@@ -15,7 +15,16 @@ export class MissingContestManager extends Error {
   }
 }
 
-const inputs = {
+type TInputs = {
+  RecurringContestManagerDeployed: typeof schemas.events.RecurringContestManagerDeployed;
+  OneOffContestManagerDeployed: typeof schemas.events.OneOffContestManagerDeployed;
+  ContestStarted: typeof schemas.events.ContestStarted;
+  ContestContentAdded: typeof schemas.events.ContestContentAdded;
+  ContestContentUpvoted: typeof schemas.events.ContestContentUpvoted;
+  ContestWinnersRecorded: typeof schemas.events.ContestWinnersRecorded;
+};
+
+const inputs: TInputs = {
   RecurringContestManagerDeployed:
     schemas.events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: schemas.events.OneOffContestManagerDeployed,

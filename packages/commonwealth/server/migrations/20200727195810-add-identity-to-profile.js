@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      // data will be populated later, via `yarn migrate-identities`.
+      // data will be populated later, via `pnpm run migrate-identities`.
       await queryInterface.addColumn(
         'OffchainProfiles',
         'identity',
@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'OffchainProfiles',
@@ -20,7 +20,7 @@ module.exports = {
           type: Sequelize.JSONB,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -14,10 +14,7 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
-    "paths": {
-      "@hicommonwealth/*": ["libs/*/src"]
-    }
+    "preserveWatchOutput": true
   },
   "exclude": ["**/node_modules", "**/build", "**/test", "**/__mocks__"]
 }

@@ -10,6 +10,7 @@
   "types": "src/index",
   "scripts": {
     "build": "tsc -b",
+    "tsc-watch": "tsc --watch",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "echo No tests to run"
@@ -17,7 +18,9 @@
   "dependencies": {
     "pino": "^8.19.0",
     "pino-http": "^9.0.0",
-    "pino-http-print": "^3.1.0"
+    "pino-http-print": "^3.1.0",
+    "dotenv": "^16.0.3",
+    "rollbar": "^2.6.1"
   },
   "devDependencies": {
     "pino-pretty": "^10.3.1"

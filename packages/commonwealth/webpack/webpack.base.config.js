@@ -203,6 +203,8 @@ module.exports = {
       vm: require.resolve('vm-browserify'),
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
+      events: require.resolve('events'),
+      buffer: require.resolve('buffer'),
     },
   },
   module: {

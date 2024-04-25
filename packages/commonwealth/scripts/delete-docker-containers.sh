@@ -3,7 +3,7 @@
 # This script deletes all of the existing docker containers. For use only under extreme circumstances where a hard
 # reset is required. Requires the private key to run.
 
-# In order to avoid confusion, this script is not registered as a yarn command therefore, to run this script the
+# In order to avoid confusion, this script is not registered as a pnpm command therefore, to run this script the
 # following command:
 # chmod +rx ./scripts/delete-docker-containers.sh && VULTR_IP=XXXXXXXXX ./scripts/delete-docker-containers.sh
 

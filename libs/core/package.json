@@ -10,11 +10,14 @@
   "types": "src/index",
   "scripts": {
     "build": "tsc -b",
+    "tsc-watch": "tsc --watch",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@hicommonwealth/logging": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*"
   }
 }

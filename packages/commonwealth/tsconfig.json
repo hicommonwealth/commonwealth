@@ -8,7 +8,11 @@
     "outDir": "build",
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
+      "@hicommonwealth/core": ["../../libs/core/src"],
+      "@hicommonwealth/shared": ["../../libs/shared/src"],
+      "@hicommonwealth/model": ["../../libs/model/src"],
+      "@hicommonwealth/chains": ["../../libs/chains/src"],
+      "@hicommonwealth/adapters": ["../../libs/adapters/src"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },

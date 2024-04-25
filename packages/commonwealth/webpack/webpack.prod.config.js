@@ -16,6 +16,12 @@ module.exports = merge(common, {
     filename: 'js/[name].[contenthash:8].js',
     chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
+  resolve: {
+    fallback: {
+      events: require.resolve('events'),
+      buffer: require.resolve('buffer'),
+    },
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),

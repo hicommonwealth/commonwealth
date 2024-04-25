@@ -6,39 +6,33 @@
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
-  "workspaces": [
-    "packages/commonwealth",
-    "packages/discord-bot",
-    "packages/snapshot-listener",
-    "libs/*"
-  ],
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "build-ci": "yarn global add node-gyp && yarn --ignore-engines && yarn build",
+    "build-ci": "npm install -g node-gyp && pnpm install && pnpm run build",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
+    "clean": "find . -name node_modules -exec rm -rf {} \\;; pnpm install",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
-    "dump-db": "yarn --cwd packages/commonwealth dump-db",
+    "dump-db": "(cd packages/commonwealth && pnpm run dump-db)",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "heroku-postbuild": "chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh",
-    "heroku-prebuild": "yarn global add node-gyp",
+    "heroku-prebuild": "npm install -g node-gyp",
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
-    "load-db": "yarn --cwd packages/commonwealth load-db",
-    "migrate-db": "yarn --cwd packages/commonwealth migrate-db",
+    "load-db": "(cd packages/commonwealth && pnpm run load-db)",
+    "migrate-db": "(cd packages/commonwealth && pnpm run migrate-db)",
     "prepare": "husky install",
-    "psql": "yarn --cwd packages/commonwealth psql",
-    "reset-db": "yarn --cwd packages/commonwealth reset-db",
+    "psql": "(cd packages/commonwealth && pnpm run psql)",
+    "reset-db": "(cd packages/commonwealth && pnpm run reset-db)",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
-    "start": "concurrently -k -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
+    "start": "concurrently -k -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' '(cd packages/commonwealth && pnpm run start)'",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",
     "start-rmq": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh rmq",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
-    "test-api": "yarn --cwd packages/commonwealth test-api"
+    "test-api": "(cd packages/commonwealth && pnpm run test-api)"
   },
   "resolutions": {
     "js-sha3": "^0.8.0",
@@ -81,7 +75,6 @@
     "@types/lodash": "^4.14.123",
     "@types/marked": "^4.0.1",
     "@types/mocha": "^10.0.1",
-    "@types/moment": "^2.13.0",
     "@types/morgan": "^1.9.4",
     "@types/node": "^20.11.25",
     "@types/node-fetch": "2.x",
@@ -154,7 +147,7 @@
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "tslint": "^5.13.0",
-    "typescript": "^5.0.0",
+    "typescript": "=5.1.3",
     "webpack": "^5.75.0",
     "webpack-bundle-analyzer": "^4.4.0",
     "webpack-cli": "^4.10.0",
@@ -164,7 +157,9 @@
     "webpack-merge": "^5.8.0",
     "eslint-plugin-diff": "^2.0.3",
     "eslint-plugin-functional": "^6.1.1",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "events": "^3.3.0",
+    "buffer": "^6.0.3"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"

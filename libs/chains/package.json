@@ -10,6 +10,7 @@
   "types": "src/index",
   "scripts": {
     "build": "tsc -b",
+    "tsc-watch": "tsc --watch",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
@@ -30,8 +31,12 @@
     "@ethersproject/strings": "^5.7.0",
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
     "@osmonauts/lcd": "^0.10.0",
-    "ethers": "5.7.2"
+    "ethers": "5.7.2",
+    "protobufjs": "^6.1.13",
+    "web3": "1.8.2",
+    "long": "^4.0.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -39,6 +44,7 @@
     "hardhat": "^2.3.0",
     "hardhat-typechain": "^0.3.5",
     "ts-generator": "^0.1.1",
-    "typechain": "^4.0.1"
+    "typechain": "^4.0.1",
+    "@types/long": "^4.0.0"
   }
 }
