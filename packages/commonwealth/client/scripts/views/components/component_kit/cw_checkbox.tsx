@@ -5,6 +5,7 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
 import clsx from 'clsx';
+import { useFormContext } from 'react-hook-form';
 import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
@@ -15,14 +16,22 @@ type CheckboxStyleProps = {
   indeterminate?: boolean;
 } & BaseStyleProps;
 
+type CheckboxFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
 type CheckboxProps = {
   groupName?: string;
   onChange?: (e?: any) => void;
   labelClassName?: string;
 } & CheckboxType &
-  CheckboxStyleProps;
+  CheckboxStyleProps &
+  CheckboxFormValidationProps;
 
 export const CWCheckbox = ({
+  name,
+  hookToForm,
   className,
   disabled = false,
   indeterminate = false,
@@ -33,12 +42,22 @@ export const CWCheckbox = ({
   labelClassName,
 }: CheckboxProps) => {
   const params = {
+    name,
     disabled,
     onChange,
     checked,
     type: 'checkbox',
     value,
   };
+
+  const formContext = useFormContext();
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
+    : ({} as any);
+
+  // TODO: this message is not needed now, but when its needed it should be coming from the radio group
+  // const formFieldErrorMessage =
+  //   hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
     <label
@@ -53,7 +72,15 @@ export const CWCheckbox = ({
       )}
     >
       <div className="check">
-        <input className="checkbox-input" {...params} />
+        <input
+          className={clsx('checkbox-input', { disabled })}
+          {...params}
+          {...formFieldContext}
+          onChange={async (e) => {
+            hookToForm && name && (await formFieldContext?.onChange(e));
+            await onChange?.(e);
+          }}
+        />
         <div className="checkbox-control" />
       </div>
       <CWText className={clsx('checkbox-label', labelClassName)}>
