@@ -6,11 +6,14 @@ import {
   query,
   schemas,
 } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import Sinon from 'sinon';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
+import { contractHelpers } from '../../src/services/commonProtocol';
 import { bootstrap_testing, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -35,7 +38,7 @@ describe('Contests projection lifecycle', () => {
   const start_time = created_at;
   const end_time = new Date(start_time.getTime() + 1000);
   const paused = false;
-  const payout_structure = [0.9, 0.1];
+  const payout_structure = [90, 10];
   const prize_percentage = 1;
   const funding_token_address = 'funding-address';
   const image_url = 'url';
@@ -47,6 +50,13 @@ describe('Contests projection lifecycle', () => {
   const community_id = 'community-with-contests';
   const thread_id = 1;
   const thread_title = 'thread-in-contest';
+  const ticker = commonProtocol.Denominations.ETH;
+  const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
+  getTokenAttributes.resolves({
+    ticker,
+    decimals,
+  });
 
   before(async () => {
     await bootstrap_testing();
@@ -130,6 +140,7 @@ describe('Contests projection lifecycle', () => {
   });
 
   after(async () => {
+    Sinon.restore();
     await dispose()();
   });
 
@@ -263,6 +274,8 @@ describe('Contests projection lifecycle', () => {
         funding_token_address,
         image_url,
         interval,
+        ticker,
+        decimals,
         paused,
         created_at,
         topics: [],
@@ -271,7 +284,10 @@ describe('Contests projection lifecycle', () => {
             contest_id,
             start_time,
             end_time,
-            winners,
+            winners: winners.map((w) => ({
+              ...w,
+              prize: w.prize / 10 ** decimals,
+            })),
             actions: [
               {
                 action: 'added',
@@ -322,5 +338,22 @@ describe('Contests projection lifecycle', () => {
         },
       }),
     ).to.eventually.be.rejectedWith(InvalidState);
+  });
+
+  it('should raise retryable error when protocol helper fails', async () => {
+    // TODO: define retryable error @rbennettcw
+    getTokenAttributes.rejects(new Error());
+    expect(
+      handleEvent(Contests(), {
+        name: schemas.EventNames.RecurringContestManagerDeployed,
+        payload: {
+          namespace: 'not-found',
+          contest_address: 'new-address',
+          interval: 10,
+          created_at,
+        },
+      }),
+    ).to.eventually.be.rejectedWith(Error);
+    getTokenAttributes.reset();
   });
 });
