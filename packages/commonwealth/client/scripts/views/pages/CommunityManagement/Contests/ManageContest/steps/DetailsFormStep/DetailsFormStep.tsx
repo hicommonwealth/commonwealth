@@ -60,9 +60,11 @@ const DetailsFormStep = ({
   >(contestFormData?.prizePercentage || INITIAL_PERCENTAGE_VALUE);
   const [toggledTopicList, setToggledTopicList] = useState<
     ContestFormData['toggledTopicList']
-  >([]);
+  >(contestFormData?.toggledTopicList || []);
 
-  const [allTopicsToggled, setAllTopicsToggled] = useState(true);
+  const [allTopicsToggled, setAllTopicsToggled] = useState(
+    contestFormData?.toggledTopicList?.every(({ checked }) => checked),
+  );
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
 
@@ -90,23 +92,19 @@ const DetailsFormStep = ({
 
   // we need separate state to handle topic toggling
   useEffect(() => {
-    if (topicsData && toggledTopicList.length === 0) {
+    if (topicsData) {
       const mappedTopics = topicsData.map(({ name, id }) => ({
         name,
         id,
-        checked: editMode
-          ? !!contestFormData?.toggledTopicList.find((t) => t.id === id)
+        checked: contestFormData
+          ? !!contestFormData?.toggledTopicList?.find((t) => t.id === id)
+              ?.checked
           : true,
       }));
       setToggledTopicList(mappedTopics);
       setAllTopicsToggled(mappedTopics.every(({ checked }) => checked));
     }
-  }, [
-    contestFormData?.toggledTopicList,
-    editMode,
-    toggledTopicList.length,
-    topicsData,
-  ]);
+  }, [contestFormData, topicsData]);
 
   const getInitialValues = () => {
     return {
@@ -127,23 +125,27 @@ const DetailsFormStep = ({
     setPayoutStructure((prevState) => [...prevState.slice(0, -1)]);
   };
 
-  const handleToggleTopic = (topicId: number) =>
-    setToggledTopicList((prevState) => {
-      const isChecked = prevState.find((topic) => topic.id === topicId).checked;
+  const handleToggleTopic = (topicId: number) => {
+    const isChecked = toggledTopicList.find(
+      (topic) => topic.id === topicId,
+    )?.checked;
 
-      return prevState.map((topic) => {
-        if (topic.id === topicId) {
-          return {
-            ...topic,
-            checked: !isChecked,
-          };
-        }
-        return topic;
-      });
+    const mappedTopics = toggledTopicList.map((topic) => {
+      if (topic.id === topicId) {
+        return {
+          ...topic,
+          checked: !isChecked,
+        };
+      }
+      return topic;
     });
 
+    const allChecked = mappedTopics.every(({ checked }) => checked);
+    setToggledTopicList(mappedTopics);
+    setAllTopicsToggled(allChecked);
+  };
   const handleToggleAllTopics = () => {
-    const mappedTopics = sortedTopics?.map((topic) => ({
+    const mappedTopics = toggledTopicList?.map((topic) => ({
       name: topic.name,
       id: topic.id,
       checked: !allTopicsToggled,
@@ -182,7 +184,7 @@ const DetailsFormStep = ({
       return;
     }
 
-    const formData = {
+    const formData: ContestFormData = {
       contestName: values.contestName,
       contestImage: values.contestImage,
       feeType: values.feeType,
@@ -464,7 +466,7 @@ const DetailsFormStep = ({
                         <CWToggle
                           checked={
                             toggledTopicList.find((t) => t.id === topic.id)
-                              .checked
+                              ?.checked
                           }
                           size="small"
                           onChange={() => handleToggleTopic(topic.id)}

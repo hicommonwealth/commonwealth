@@ -17,7 +17,7 @@ const useManageContestForm = ({
     useCommunityContests();
 
   // if in edit mode (when contestAddress exists), load specific contest data and
-  // use it as a initial state for ManageContest form
+  // use it as a initial state for DetailsFormStep
   useEffect(() => {
     if (contestAddress && !contestFormData && !isContestDataLoading) {
       const contestData = getContestByAddress(contestAddress);
