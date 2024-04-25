@@ -5,11 +5,19 @@
     "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
     "rootDir": "src",
-    "outDir": "build"
+    "outDir": "build",
+    "paths": {
+      "@hicommonwealth/adapters": ["../../libs/adapters/src"],
+      "@hicommonwealth/sitemaps": ["../../libs/sitemaps/src"],
+      "@hicommonwealth/core": ["../../libs/core/src"],
+      "@hicommonwealth/model": ["../../libs/model/src"],
+      "@hicommonwealth/logging": ["../../libs/logging/src"]
+    }
   },
   "include": ["src"],
   "references": [
     { "path": "../../libs/adapters" },
+    { "path": "../../libs/sitemaps" },
     { "path": "../../libs/core" },
     { "path": "../../libs/model" },
     { "path": "../../libs/logging" }

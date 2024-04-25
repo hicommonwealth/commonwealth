@@ -3,7 +3,7 @@ import {
   ProfileAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
-import { getThreadUrl } from '@hicommonwealth/shared';
+import { getThreadUrl } from '@hicommonwealth/shared/build';
 import { Op } from 'sequelize';
 
 export interface Link {
@@ -31,7 +31,10 @@ export interface Paginator {
 }
 
 interface TableAdapter {
-  toRecord: (obj: object) => Link;
+  /**
+   * Covert the object to a record or undefined if we can't use it with the sitemaps.
+   */
+  toRecord: (obj: object) => Link | undefined;
   executeQuery: (ptr: number, limit: number) => Promise<ReadonlyArray<object>>;
 }
 
@@ -56,6 +59,11 @@ function createThreadsTableAdapter(): TableAdapter {
 
   function toRecord(obj: object) {
     const thread = obj as ThreadInstancePartial;
+
+    if (!thread.updated_at) {
+      return undefined;
+    }
+
     const url = getThreadUrl({
       chain: thread.community_id,
       id: thread.id,
@@ -90,6 +98,11 @@ function createProfilesTableAdapter(): TableAdapter {
 
   function toRecord(obj: object) {
     const profile = obj as ProfileInstancePartial;
+
+    if (!profile.updated_at) {
+      return undefined;
+    }
+
     const url = `https://commonwealth.im/profile/id/${profile.id}`;
     return {
       id: profile.id,
@@ -133,7 +146,10 @@ export function createDatabasePaginatorWithAdapter(
     ++idx;
 
     const raw = await adapter.executeQuery(ptr, limit);
-    records = raw.map(adapter.toRecord);
+    records = raw
+      .map(adapter.toRecord)
+      .filter((current) => !!current)
+      .map((current) => current!);
 
     if (records.length > 0) {
       ptr = records[records.length - 1].id;

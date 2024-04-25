@@ -23,7 +23,7 @@ export function createSitemapGenerator(
   async function exec(): Promise<SitemapManifest> {
     let idx = 0;
 
-    const children = [];
+    const children: SitemapFile[] = [];
     for (const paginator of paginators) {
       while (await paginator.hasNext()) {
         const page = await paginator.next();

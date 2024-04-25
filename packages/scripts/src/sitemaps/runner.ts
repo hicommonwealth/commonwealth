@@ -1,7 +1,9 @@
 import { logger } from '@hicommonwealth/logging';
-import { createAsyncWriterS3 } from './createAsyncWriter';
-import { createDatabasePaginatorDefault } from './createDatabasePaginator';
-import { createSitemapGenerator } from './createSitemapGenerator';
+import {
+  createAsyncWriterS3,
+  createDatabasePaginatorDefault,
+  createSitemapGenerator,
+} from '@hicommonwealth/sitemaps';
 
 const log = logger(__filename);
 
