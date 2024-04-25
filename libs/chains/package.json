@@ -9,7 +9,7 @@
   "main": "build/index",
   "types": "src/index",
   "scripts": {
-    "build": "tsc --version ; tsc -b",
+    "build": "tsc -b",
     "tsc-watch": "tsc --watch",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
