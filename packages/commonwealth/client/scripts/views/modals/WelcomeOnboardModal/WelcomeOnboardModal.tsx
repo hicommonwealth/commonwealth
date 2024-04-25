@@ -41,7 +41,6 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
               <span
                 key={step}
                 className={clsx({ completed: activeStep >= step })}
-                onClick={() => setActiveStep(step)}
               />
             ))}
           </div>
