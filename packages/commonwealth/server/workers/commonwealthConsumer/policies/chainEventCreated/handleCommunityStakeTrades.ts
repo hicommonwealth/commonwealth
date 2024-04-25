@@ -73,17 +73,17 @@ export async function handleCommunityStakeTrades(
 
   const { 0: stakeId, 1: stakeAmount } = web3.eth.abi.decodeParameters(
     ['uint256', 'uint256'],
-    tradeTxReceipt.logs[0].data,
+    String(tradeTxReceipt.logs[0].data),
   );
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,
     community_id: community.id,
-    stake_id: parseInt(stakeId),
-    stake_amount: parseInt(stakeAmount),
+    stake_id: parseInt(stakeId as string),
+    stake_amount: parseInt(stakeAmount as string),
     stake_price: BigNumber.from(ethAmount).toString(),
     address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
-    timestamp: block.timestamp as number,
+    timestamp: Number(block.timestamp),
   });
 }
