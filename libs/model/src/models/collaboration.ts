@@ -52,7 +52,7 @@ export default (sequelize: Sequelize.Sequelize, dataTypes: DataTypes) => {
     },
   );
 
-  // sequelize requires a PK on "id" column when defnining a model
+  // sequelize requires a PK on "id" column when defining a model
   Collaboration.removeAttribute('id');
 
   return Collaboration;
