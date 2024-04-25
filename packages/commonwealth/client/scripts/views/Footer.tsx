@@ -58,6 +58,18 @@ export const Footer = () => {
             </a>
           );
         })}
+
+        {/*Mava Widget*/}
+        <script
+          defer
+          src="https://widget.mava.app"
+          // eslint-disable-next-line react/no-unknown-property
+          widget-version="v2"
+          id="MavaWebChat"
+          // eslint-disable-next-line react/no-unknown-property
+          enable-sdk="false"
+          data-token="28672714d1690a96717516beafd198d5dcacf85b19fde51e88b05ed8831640c9"
+        ></script>
       </div>
     </div>
   );
