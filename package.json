@@ -32,7 +32,7 @@
     "psql": "yarn --cwd packages/commonwealth psql",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
-    "start": "concurrently -k -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
+    "start": "yarn workspace commonwealth start",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",
