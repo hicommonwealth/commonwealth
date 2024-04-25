@@ -1,10 +1,10 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "skipLibCheck": true,
-    "rootDir": "."
+    "rootDir": "src",
+    "outDir": "build"
   },
-  "exclude": ["build", "node_modules"],
+  "include": ["src"],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
     { "path": "../../libs/core/tsconfig.build.json" },

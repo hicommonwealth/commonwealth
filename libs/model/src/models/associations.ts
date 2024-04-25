@@ -24,25 +24,13 @@ export const buildAssociations = (db: DB) => {
     'stake_id',
   );
 
-  // TODO: build many-to-many utility
-  db.Address.hasMany(db.Collaboration, {
-    foreignKey: { name: 'address_id', allowNull: false },
-  });
-  db.Thread.hasMany(db.Collaboration, {
-    foreignKey: 'thread_id',
-  });
-  db.Collaboration.belongsTo(db.Address, {
-    foreignKey: { name: 'thread_id' },
-  });
-  db.Collaboration.belongsTo(db.Thread);
-  db.Address.belongsToMany(db.Thread, {
-    through: db.Collaboration,
-    as: 'collaboration',
-    foreignKey: { name: 'address_id', allowNull: false },
-  });
-  db.Thread.belongsToMany(db.Address, {
-    through: db.Collaboration,
-    as: 'collaborators',
-    foreignKey: { name: 'thread_id', allowNull: false },
-  });
+  // Many-to-many associations (cross-references)
+  db.Collaboration.withManyToMany(
+    [db.Address, 'address_id', 'collaborators'],
+    [db.Thread, 'thread_id', 'collaborations'],
+  );
+  db.CommunityContract.withManyToMany(
+    [db.Community, 'community_id', 'communities'],
+    [db.Contract, 'contract_id', 'contracts'],
+  );
 };
