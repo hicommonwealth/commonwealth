@@ -10,6 +10,8 @@ import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import { useFlag } from '../hooks/useFlag';
+import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
@@ -30,6 +32,7 @@ const Sublayout = ({
   hideFooter = true,
   isInsideCommunity,
 }: SublayoutProps) => {
+  const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
@@ -41,6 +44,27 @@ const Sublayout = ({
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
+  useNecessaryEffect(() => {
+    if (isLoggedIn && userOnboardingEnabled && !isWelcomeOnboardModalOpen) {
+      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
+      const hasUsername = app?.user?.addresses?.find(
+        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
+      );
+
+      // open welcome modal if user is not onboarded
+      if (!hasUsername) {
+        setIsWelcomeOnboardModalOpen(true);
+      }
+    } else {
+      setIsWelcomeOnboardModalOpen(false);
+    }
+  }, [
+    userOnboardingEnabled,
+    isWelcomeOnboardModalOpen,
+    setIsWelcomeOnboardModalOpen,
+    isLoggedIn,
+  ]);
 
   const location = useLocation();
 
