@@ -72,10 +72,6 @@ export default (
   );
 
   Contract.associate = (models) => {
-    models.Contract.belongsToMany(models.Community, {
-      through: models.CommunityContract,
-      foreignKey: 'community_id',
-    });
     models.Contract.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
       targetKey: 'id',

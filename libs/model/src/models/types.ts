@@ -1,4 +1,10 @@
-import { DataTypes, Model, Sequelize, type BuildOptions } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  Sequelize,
+  type Attributes,
+  type BuildOptions,
+} from 'sequelize';
 
 type ModelFactory<T> = (sequelize: Sequelize, dataTypes: typeof DataTypes) => T;
 type ModelFactories = Record<string, ModelFactory<unknown>>;
@@ -15,6 +21,18 @@ export type ModelStatic<ParentModel extends Model> =
       child: ModelStatic<Model<Child>>,
       foreignKey: keyof Child & string,
       options?: { as?: string; optional?: boolean },
+    ) => ModelStatic<ParentModel>;
+    withManyToMany: <A extends State, B extends State>(
+      a: [
+        ModelStatic<Model<A>>,
+        keyof Attributes<ParentModel> & string,
+        string,
+      ],
+      b: [
+        ModelStatic<Model<B>>,
+        keyof Attributes<ParentModel> & string,
+        string,
+      ],
     ) => ModelStatic<ParentModel>;
   } & {
     new (values?: State, options?: BuildOptions): ParentModel;

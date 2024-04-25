@@ -362,14 +362,20 @@ export const seedDb = async () => {
       {
         community_id: alex.id!,
         contract_id: alexContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         community_id: yearn.id!,
         contract_id: yearnContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         community_id: sushi.id!,
         contract_id: sushiContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ]);
 
