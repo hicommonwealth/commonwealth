@@ -56,7 +56,9 @@ const Sublayout = ({
       if (!hasUsername) {
         setIsWelcomeOnboardModalOpen(true);
       }
-    } else {
+    }
+
+    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
