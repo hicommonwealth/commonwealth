@@ -196,10 +196,7 @@ export const addressSwapper = (options: {
   }
 
   // check if it is valid with the current prefix & reencode if needed
-  const [valid, errorMsg] = checkAddress(
-    options.address,
-    options.currentPrefix,
-  );
+  const [valid] = checkAddress(options.address, options.currentPrefix);
 
   if (!valid) {
     try {
