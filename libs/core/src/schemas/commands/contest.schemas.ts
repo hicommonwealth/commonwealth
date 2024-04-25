@@ -3,7 +3,7 @@ import { ContestManager } from '../entities.schemas';
 
 export const CreateContestManagerMetadata = {
   input: z.object({
-    community_id: z.string(),
+    contest_address: z.string(),
     name: z.string(),
     image_url: z.string(),
     funding_token_address: z.string(),
@@ -13,23 +13,36 @@ export const CreateContestManagerMetadata = {
     paused: z.boolean(),
     created_at: z.date(),
   }),
-  output: ContestManager,
+  output: z.object({
+    contest_managers: z.array(ContestManager),
+  }),
 };
 
 export const UpdateContestManagerMetadata = {
   input: z.object({
+    contest_address: z.string(),
     name: z.string().optional(),
     image_url: z.string().optional(),
   }),
-  output: ContestManager,
+  output: z.object({
+    contest_managers: z.array(ContestManager),
+  }),
 };
 
 export const PauseContestManagerMetadata = {
-  input: z.object({}),
-  output: ContestManager,
+  input: z.object({
+    contest_address: z.string(),
+  }),
+  output: z.object({
+    contest_managers: z.array(ContestManager),
+  }),
 };
 
 export const ResumeContestManagerMetadata = {
-  input: z.object({}),
-  output: ContestManager,
+  input: z.object({
+    contest_address: z.string(),
+  }),
+  output: z.object({
+    contest_managers: z.array(ContestManager),
+  }),
 };

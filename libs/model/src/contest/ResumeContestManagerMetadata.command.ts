@@ -8,16 +8,19 @@ export const ResumeContestManagerMetadata: Command<
 > = () => ({
   ...schemas.commands.ResumeContestManagerMetadata,
   auth: [],
-  body: async ({ id }) => {
+  body: async ({ id, payload }) => {
     const contestManager = await models.ContestManager.findOne({
       where: {
-        contest_address: id,
+        community_id: id,
+        contest_address: payload.contest_address,
       },
     });
     if (mustExist('ContestManager', contestManager)) {
       contestManager.paused = false;
       await contestManager.save();
-      return contestManager.get({ plain: true });
+      return {
+        contest_managers: [contestManager.get({ plain: true })],
+      };
     }
   },
 });

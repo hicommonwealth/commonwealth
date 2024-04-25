@@ -11,12 +11,15 @@ export const UpdateContestManagerMetadata: Command<
   body: async ({ id, payload }) => {
     const contestManager = await models.ContestManager.findOne({
       where: {
-        contest_address: id,
+        community_id: id,
+        contest_address: payload.contest_address,
       },
     });
     if (mustExist('ContestManager', contestManager)) {
       const result = await contestManager.update({ ...payload });
-      return result.get({ plain: true });
+      return {
+        contest_managers: [result.get({ plain: true })],
+      };
     }
   },
 });
