@@ -1,11 +1,17 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "strict": true,
     "lib": ["es2020"],
     "typeRoots": ["./node_modules/@types"],
-    "skipLibCheck": true,
     "rootDir": "src",
-    "outDir": "build"
+    "outDir": "build",
+    "paths": {
+      "@hicommonwealth/adapters": ["../../libs/adapters"],
+      "@hicommonwealth/core": ["../../libs/core"],
+      "@hicommonwealth/model": ["../../libs/model"],
+      "@hicommonwealth/logging": ["../../libs/logging"]
+    }
   },
   "include": ["src"],
   "references": [

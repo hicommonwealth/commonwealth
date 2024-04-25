@@ -1,25 +1,28 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "jsx": "react",
-    "skipLibCheck": true,
-    "sourceMap": true,
     "rootDir": ".",
-    "baseUrl": ".",
+    "jsx": "react",
+    "sourceMap": true,
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
-      "*": ["./*", "shared/*", "client/scripts/*"]
+      "@hicommonwealth/adapters": ["../../libs/adapters"],
+      "@hicommonwealth/chains": ["../../libs/chains"],
+      "@hicommonwealth/core": ["../../libs/core"],
+      "@hicommonwealth/model": ["../../libs/model"],
+      "@hicommonwealth/logging": ["../../libs/logging"],
+      "@hicommonwealth/shared": ["../../libs/shared"],
+      "*": ["./*", "./shared/*", "./client/scripts/*"]
     }
   },
   "include": [
-    "./client",
-    "./shared",
-    "./test",
-    "./globals.d.ts",
-    "./server",
-    "./server.ts",
-    "./server-test.ts",
-    "./scripts"
+    "client",
+    "globals.d.ts",
+    "server",
+    "server.ts",
+    "server-test.ts",
+    "scripts",
+    "shared",
+    "test"
   ],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
