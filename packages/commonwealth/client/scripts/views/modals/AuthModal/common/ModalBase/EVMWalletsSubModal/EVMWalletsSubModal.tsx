@@ -47,7 +47,7 @@ const EVMWalletsSubModal = ({
                   rounded
                   variant="dark"
                   showDescription={false}
-                  onClick={async () => await onWalletSelect(wallet)}
+                  onClick={() => onWalletSelect(wallet)}
                   disabled={disabled}
                 />
                 {/* Show reset button for wallet connect, if its auth flow session is active */}
