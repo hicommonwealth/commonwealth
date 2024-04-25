@@ -113,7 +113,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
       // (this needs to be called first, before other requests)
       const Web3 = (await import('web3')).default;
-      this._web3 = new Web3((window as any).ethereum);
+      this._web3 = new Web3(ethereum);
 
       this._ethAccounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;
