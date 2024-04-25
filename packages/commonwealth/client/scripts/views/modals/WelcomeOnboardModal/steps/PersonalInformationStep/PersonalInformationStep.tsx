@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import app from 'state';
+import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -16,9 +18,31 @@ type PersonalInformationStepProps = {
 const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
+  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
+    useUpdateProfileByAddressMutation();
   const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (
+    values: z.infer<typeof personalInformationFormValidation>,
+  ) => {
+    await updateProfile({
+      address: app.user.activeAccount.profile.address,
+      chain: app.user.activeAccount.profile.chain,
+      name: values.username,
+      ...(values.email && {
+        email: values.email,
+      }),
+    });
+
+    // set email for notifications
+    if (values.email) {
+      app.user.updateEmail(values.email);
+    }
+
+    // TODO: update notification preferences here for
+    // values.enableAccountNotifications - does this mean all account notifications?
+    // values.enableProductUpdates - ?
+
     onComplete();
   };
 
@@ -100,7 +124,7 @@ const PersonalInformationStep = ({
             label="Next"
             buttonWidth="full"
             type="submit"
-            disabled={!formState.isDirty}
+            disabled={isUpdatingProfile || !formState.isDirty}
           />
 
           <CWText isCentered className="footer">
