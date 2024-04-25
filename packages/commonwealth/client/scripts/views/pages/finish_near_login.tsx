@@ -81,6 +81,7 @@ const FinishNearLogin = () => {
 
       // create canvas thing
       const chainId = 'mainnet';
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
@@ -98,6 +99,7 @@ const FinishNearLogin = () => {
         null,
       );
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const canvasSessionPayload = createCanvasSessionPayload(
         'near' as ChainBase,
@@ -118,6 +120,7 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         canvas.serializeSessionPayload(canvasSessionPayload),
       );
@@ -125,6 +128,7 @@ const FinishNearLogin = () => {
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         chainId,
       );
