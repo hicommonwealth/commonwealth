@@ -18,6 +18,7 @@ export type Aggregates = Extract<
   | 'StakeTransaction'
   | 'SubscriptionPreference'
   | 'CommunityAlert'
+  | 'ContestManager'
 >;
 export { entities };
 

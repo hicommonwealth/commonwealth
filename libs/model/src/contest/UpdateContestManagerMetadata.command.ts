@@ -15,8 +15,8 @@ export const UpdateContestManagerMetadata: Command<
       },
     });
     if (mustExist('ContestManager', contestManager)) {
-      await contestManager.update({ ...payload });
-      return contestManager.get({ plain: true });
+      const result = await contestManager.update({ ...payload });
+      return result.get({ plain: true });
     }
   },
 });

@@ -12,8 +12,11 @@ export const CreateContestManagerMetadata: Command<
     const community = await models.Community.findByPk(payload.community_id);
     mustExist('Community', community);
     const contestManager = await models.ContestManager.create({
+      contest_address: id!,
       ...payload,
     });
-    return contestManager?.get({ plain: true });
+    if (mustExist('ContestManager', contestManager)) {
+      return contestManager.get({ plain: true });
+    }
   },
 });
