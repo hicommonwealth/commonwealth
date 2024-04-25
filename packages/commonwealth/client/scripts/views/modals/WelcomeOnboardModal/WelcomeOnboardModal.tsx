@@ -37,9 +37,13 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           />
           <CWText type="h2">Welcome to Common!</CWText>
           <div className="progress">
-            <span className={clsx({ completed: activeStep > 0 })} />
-            <span className={clsx({ completed: activeStep > 1 })} />
-            <span className={clsx({ completed: activeStep > 2 })} />
+            {[1, 2, 3].map((step) => (
+              <span
+                key={step}
+                className={clsx({ completed: activeStep >= step })}
+                onClick={() => setActiveStep(step)}
+              />
+            ))}
           </div>
           {activeStep === 1 && (
             <PersonalInformationStep onComplete={() => setActiveStep(2)} />
