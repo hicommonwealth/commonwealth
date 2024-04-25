@@ -8,26 +8,32 @@ import erc_1155_abi from './abi/erc1155';
 import erc20_abi from './abi/erc20';
 import erc_721_abi from './abi/erc721';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const erc20 = (address: string, provider: Web3): Contract<any> => {
   return new provider.eth.Contract(erc20_abi as AbiItem[], address);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const uniswapV2 = (address: string, provider: Web3): Contract<any> => {
   return new provider.eth.Contract(dex_abi as AbiItem[], address);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const comp_gov = (address: string, provider: Web3): Contract<any> => {
   return new provider.eth.Contract(comp_gov_abi as AbiItem[], address);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const aave_gov = (address: string, provider: Web3): Contract<any> => {
   return new provider.eth.Contract(aave_gov_abi as AbiItem[], address);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const erc_721 = (address: string, provider: Web3): Contract<any> => {
   return new provider.eth.Contract(erc_721_abi as AbiItem[], address);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const erc_1155 = (address: string, provider: Web3): Contract<any> => {
   return new provider.eth.Contract(erc_1155_abi as AbiItem[], address);
 };
