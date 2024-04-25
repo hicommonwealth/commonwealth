@@ -26,8 +26,8 @@ const PersonalInformationStep = ({
     values: z.infer<typeof personalInformationFormValidation>,
   ) => {
     await updateProfile({
-      address: app.user.activeAccount.profile.address,
-      chain: app.user.activeAccount.profile.chain,
+      address: app.user.activeAccount?.profile?.address,
+      chain: app.user.activeAccount?.profile?.chain,
       name: values.username,
       ...(values.email && {
         email: values.email,
