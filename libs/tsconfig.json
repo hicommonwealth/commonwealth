@@ -4,6 +4,7 @@
     "target": "ESNext",
     "baseUrl": ".",
     "composite": true,
+    "strict": true,
 
     "forceConsistentCasingInFileNames": true,
     "preserveConstEnums": true,
@@ -19,5 +20,5 @@
       "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "exclude": ["**/node_modules", "**/build", "**/test", "**/__mocks__"]
+  "exclude": ["**/node_modules", "**/build"]
 }
