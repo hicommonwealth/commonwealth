@@ -1,3 +1,3 @@
 export * as commonProtocol from './commonProtocol';
 export * from './shared-types';
-export * as utils from './utils';
+export * from './utils';

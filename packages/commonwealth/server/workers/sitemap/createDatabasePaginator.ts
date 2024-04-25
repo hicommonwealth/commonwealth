@@ -3,8 +3,8 @@ import {
   ProfileAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
+import { getThreadUrl } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { getThreadUrl } from '../../../shared/utils';
 
 export interface Link {
   readonly id: number;

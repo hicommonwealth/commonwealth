@@ -1,14 +1,13 @@
 import { logger } from '@hicommonwealth/logging';
 import type { UserAttributes } from '@hicommonwealth/model';
 import { AddressAttributes, DB } from '@hicommonwealth/model';
-import type {
+import {
+  DynamicTemplate,
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '@hicommonwealth/shared';
-import {
-  DynamicTemplate,
   NotificationCategories,
+  getThreadUrl,
 } from '@hicommonwealth/shared';
 import { capitalize } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
@@ -16,7 +15,6 @@ import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 import {
   formatAddressShort,
-  getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
