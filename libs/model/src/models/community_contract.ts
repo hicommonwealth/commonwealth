@@ -8,6 +8,8 @@ export type CommunityContractAttributes = {
   id?: number;
   community_id: string;
   contract_id: number;
+  created_at: Date;
+  updated_at: Date;
 
   // Associations
   Contract?: ContractAttributes;
@@ -33,6 +35,8 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       community_id: { type: dataTypes.STRING, allowNull: false },
       contract_id: { type: dataTypes.INTEGER, allowNull: false },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'CommunityContracts',
