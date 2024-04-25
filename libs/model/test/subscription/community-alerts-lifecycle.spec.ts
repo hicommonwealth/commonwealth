@@ -1,6 +1,7 @@
-import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import { Actor, command, dispose, query, schemas } from '@hicommonwealth/core';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import z from 'zod';
 import { models } from '../../src/database';
 import {
   CreateCommunityAlert,
@@ -11,7 +12,8 @@ import { seed } from '../../src/tester';
 
 describe('Community alerts lifecycle', () => {
   let actor: Actor;
-  let community, communityTwo;
+  let community: z.infer<typeof schemas.entities.Community> | undefined;
+  let communityTwo: z.infer<typeof schemas.entities.Community> | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
@@ -45,7 +47,7 @@ describe('Community alerts lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: null,
+      address_id: '0x',
     };
   });
 
@@ -59,7 +61,7 @@ describe('Community alerts lifecycle', () => {
 
   it('should create a new community alert', async () => {
     const payload = {
-      community_id: community.id,
+      community_id: community!.id!,
     };
 
     const res = await command(CreateCommunityAlert(), {
@@ -69,18 +71,18 @@ describe('Community alerts lifecycle', () => {
 
     expect(res).to.deep.contains({
       user_id: actor.user.id,
-      community_id: community.id,
+      community_id: community!.id!,
     });
   });
 
   it('should delete a single community alert via id', async () => {
     const [alert] = await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: community.id,
+      community_id: community!.id!,
     });
     const payload = {
-      community_ids: [community.id],
-      ids: [alert.id],
+      community_ids: [community!.id!],
+      ids: [alert!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
@@ -92,15 +94,15 @@ describe('Community alerts lifecycle', () => {
   it('should delete multiple community alerts via ids', async () => {
     const [alertOne] = await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: community.id,
+      community_id: community!.id!,
     });
     const [alertTwo] = await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: communityTwo.id,
+      community_id: communityTwo!.id!,
     });
     const payload = {
-      community_ids: [community.id, communityTwo.id],
-      ids: [alertOne.id, alertTwo.id],
+      community_ids: [community!.id!, communityTwo!.id!],
+      ids: [alertOne!.id!, alertTwo!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
@@ -112,10 +114,10 @@ describe('Community alerts lifecycle', () => {
   it('should delete a single community alert via community id', async () => {
     await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: community.id,
+      community_id: community!.id!,
     });
     const payload = {
-      community_ids: [community.id],
+      community_ids: [community!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
@@ -127,14 +129,14 @@ describe('Community alerts lifecycle', () => {
   it('should delete multiple community alerts via community ids', async () => {
     await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: community.id,
+      community_id: community!.id!,
     });
     await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: communityTwo.id,
+      community_id: communityTwo!.id!,
     });
     const payload = {
-      community_ids: [community.id, communityTwo.id],
+      community_ids: [community!.id!, communityTwo!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
@@ -146,11 +148,11 @@ describe('Community alerts lifecycle', () => {
   it('should get community alerts', async () => {
     const [alertOne] = await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: community.id,
+      community_id: community!.id!,
     });
     const [alertTwo] = await seed('CommunityAlert', {
       user_id: actor.user.id,
-      community_id: communityTwo.id,
+      community_id: communityTwo!.id!,
     });
 
     const res = await query(GetCommunityAlerts(), {
