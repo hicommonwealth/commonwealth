@@ -2,8 +2,8 @@ import React from 'react';
 import AuthButton from 'views/components/AuthButton';
 import { EVMWallets } from 'views/components/AuthButton/types';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
-import { CWModal } from '../../../components/component_kit/new_designs/CWModal';
+import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
+import { CWModal } from '../../../../../components/component_kit/new_designs/CWModal';
 import './EVMWalletsSubModal.scss';
 
 type EVMWalletsSubModalProps = {
