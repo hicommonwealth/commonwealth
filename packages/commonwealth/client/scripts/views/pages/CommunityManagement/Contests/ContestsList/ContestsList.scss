@@ -1,2 +1,13 @@
+@import '../../../../../../styles/shared';
+
+.ContestsListSkeleton {
+  max-width: 600px;
+  height: 200px;
+  margin-bottom: 16px;
+}
+
 .ContestsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
