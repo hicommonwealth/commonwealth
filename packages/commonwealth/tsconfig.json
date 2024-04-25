@@ -8,7 +8,12 @@
     "outDir": "build",
     "baseUrl": ".",
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
+      "@hicommonwealth/adapters": ["../../libs/adapters/src"],
+      "@hicommonwealth/chains": ["../../libs/chains/src"],
+      "@hicommonwealth/core": ["../../libs/core/src"],
+      "@hicommonwealth/model": ["../../libs/model/src"],
+      "@hicommonwealth/logging": ["../../libs/logging/src"],
+      "@hicommonwealth/shared": ["../../libs/shared/src"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
