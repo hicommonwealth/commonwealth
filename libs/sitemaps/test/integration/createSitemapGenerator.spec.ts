@@ -1,11 +1,15 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { createAsyncWriterMock } from '../../../../../../libs/sitemaps/src/createAsyncWriter';
-import { createDatabasePaginatorDefault } from '../../../../../../libs/sitemaps/src/createDatabasePaginator';
-import { createSitemapGenerator } from '../../../../../../libs/sitemaps/src/createSitemapGenerator';
+import {
+  createAsyncWriterMock,
+  createDatabasePaginatorDefault,
+  createSitemapGenerator,
+} from '../../src';
 
 describe('createSitemapGenerator', function () {
+  this.timeout(10000);
+
   before(async () => {
     const [user] = await tester.seed('User', {
       isAdmin: true,

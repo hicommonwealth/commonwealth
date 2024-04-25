@@ -12,9 +12,13 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "yarn build && NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
+    "integration-test": "NODE_ENV=test nyc ts-mocha -r tsconfig-paths/register './test/integration/**/*.spec.ts'"
   },
   "dependencies": {
     "aws-sdk": "^2.814.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-mocha": "^6.0.0"
   }
 }

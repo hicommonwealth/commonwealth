@@ -6,5 +6,5 @@
     "tsBuildInfoFile": "build/.tsbuildinfo",
     "strict": true
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }
