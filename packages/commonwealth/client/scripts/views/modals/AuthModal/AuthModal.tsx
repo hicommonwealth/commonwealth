@@ -41,7 +41,7 @@ const AuthModal = ({
         setIsWelcomeOnboardModalOpen(true);
       }, 1000);
     }
-    onSuccess(isNewlyCreated);
+    onSuccess?.(isNewlyCreated);
   };
 
   return (
