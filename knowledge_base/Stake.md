@@ -8,7 +8,7 @@ The received tokens are used for moderating and gating community content and fea
 
 ## Enabling stake for local development
 
-The following env variables must be present. (The AWS keys are for )
+The following env variables must be present. (The AWS keys are for uploading images, in the create community flow.) For more thorough documentation on env vars, see [Environment-Variables.md](./Environment-Variables.md).
 
 ```txt
 FLAG_NEW_CREATE_COMMUNITY=true
@@ -27,6 +27,8 @@ INSERT INTO public."ChainNodes" (url, eth_chain_id, alt_wallet_url, balance_type
 
 Then migrate the database (`yarn migrate-db`) and create a new community, and in the `Select chain` dropdown select `Sepolia`. Make sure you have Sepolia testnet enabled in your wallet as well as some Sepolia to pay for gas fees. If you don’t have any, here is a Sepolia faucet. <https://sepoliafaucet.com/>
 
-I think that should be all, let me know if you have any problems.
+For any issues, reach out to Ian Rowan.
 
 ## Change Log
+
+- 240424: Authored by Israel Lund; added by Graham Johnson (#).
