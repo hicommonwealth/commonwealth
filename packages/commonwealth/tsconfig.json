@@ -5,12 +5,6 @@
     "jsx": "react",
     "sourceMap": true,
     "paths": {
-      "@hicommonwealth/adapters": ["../../libs/adapters"],
-      "@hicommonwealth/chains": ["../../libs/chains"],
-      "@hicommonwealth/core": ["../../libs/core"],
-      "@hicommonwealth/model": ["../../libs/model"],
-      "@hicommonwealth/logging": ["../../libs/logging"],
-      "@hicommonwealth/shared": ["../../libs/shared"],
       "*": ["./*", "./shared/*", "./client/scripts/*"]
     }
   },

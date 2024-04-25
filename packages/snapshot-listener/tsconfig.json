@@ -1,10 +1,8 @@
 {
   "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "paths": {
-      "@hicommonwealth/adapters": ["../../libs/adapters"],
-      "@hicommonwealth/core": ["../../libs/core"],
-      "@hicommonwealth/logging": ["../../libs/logging"]
-    }
-  }
+  "references": [
+    { "path": "../../libs/adapters/tsconfig.build.json" },
+    { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" }
+  ]
 }
