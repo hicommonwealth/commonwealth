@@ -1,10 +1,11 @@
-**Contents**
+# Webhooks
 
-- [Overview](#overview)
-  * [Production](#production)
-  * [Development](#development)
-    + [Testing Script](#testing-script)
-    + [Pattern](#pattern)
+## Contents
+
+- [Production](#production)
+- [Development](#development)
+  * [Testing Script](#testing-script)
+  * [Pattern](#pattern)
 - [Destinations](#destinations)
   * [Telegram](#telegram)
     + [Production](#production-1)
@@ -15,8 +16,7 @@
     + [Development](#development-3)
   * [Zapier](#zapier)
     + [Development](#development-4)
-
-# Overview
+- [Change Log](#change-log)
 
 ## Production
 
@@ -32,7 +32,7 @@ For information on how to use this script, run `yarn emit-webhook --help`.
 
 Example - emit a new thread notification to `webhook-testing` Discord channel:
 
-```
+```bash
 yarn emit-webhook -c new-thread-creation -d discord
 ```
 
@@ -49,21 +49,21 @@ The `getWebhookData.ts` file contains a function which transforms a Notification
 
 Finally, the `dispatchWebhook.ts` file contains a function which given a NotificationDataAndCategory will emit all necessary webhooks. This is the root function for all webhook emission.
 
-# Destinations
+## Destinations
 
-## Telegram
+### Telegram
 
 In order for users to receive Telegram webhooks, they must add the production bot to their channel
 and then provide a Telegram API url to their Telegram channel.
 
-### Production
+#### Production
 
 We have a Telegram bot that goes by the name `@CommonWebhooksBot`. The owner of this
 bot is Dillon Chen. The bot's token is found in the `commonwealthapp` Heroku app
 environment variables as `TELEGRAM_BOT_TOKEN`. The token can also be retrieved
 by Dillon by interacting with [@BotFather](https://t.me/botfather) on Telegram.
 
-### Development
+#### Development
 
 We have a Telegram bot that goes by the name `@CommonWebhooksDevBot`. The owner of this
 bot is also Dillon Chen. The token can be retrieved by Dillon by interacting with
@@ -77,9 +77,9 @@ test Telegram webhooks.
 
 `TELEGRAM_BOT_TOKEN_DEV` environment variable required to use the `emit-webhook` script to send Telegram webhooks.
 
-## Discord
+### Discord
 
-### Development
+#### Development
 
 There is a webhook testing channel on the Common Protocol Discord server. Here is an
 invitation link to the server: <https://discord.gg/commonwealth>. To access the `webhook-testing`
@@ -88,19 +88,19 @@ in the channel's 'integration' settings.
 
 `DISCORD_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Discord webhooks.
 
-## Slack
+### Slack
 
-### Development
+#### Development
 
 There is a webhook testing channel named `#testing-webhooks` on the Common Slack workspace. Contact Timothee Legros for an invitation to the channel. The `#testing-webhooks` channel has a Slack app called `Common Webhooks Dev` installed in it. This app contains the webhook url used to send messages to the channel. This webhook url can be found here: <https://api.slack.com/apps/A05UQUGRWGH/install-on-team>.
 
 `SLACK_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Slack webhooks.
 
-## Zapier
+### Zapier
 
 Zapier webhook payload format is found in `packages/commonwealth/server/util/webhooks/destinations/zapier.ts`.
 
-### Development
+#### Development
 
 There is a Zapier Zap called Common Webhook Dev which is on the `ops@commonwealth.im` Zapier account. This Zap receives webhook payloads in step 1 and sends a formatted message to the `testing-webhooks` Slack channel in step 2.
 

@@ -25,7 +25,6 @@
   * [Notifications](#notifications-2)
 - [Chain Event](#chain-event)
   * [Subscriptions](#subscriptions-3)
-  * [Notifications](#notifications-3)
 - [Change Log](#change-log
 
 ## Prerequisites
@@ -162,7 +161,7 @@ This section picks up exactly where the previous New Comments section left off (
 
 #### New Mention
 
-**As of 230803, not working due to [known bug #4690][11]**
+*As of 230803, not working due to known bug #4690*.
 
 This section picks up exactly where the previous New Reactions section left off (from the threads page).
 
@@ -200,16 +199,16 @@ This section picks up exactly where the previous New Mention section left off (f
 
 ### Notifications
 
-Cannot QA Snapshot notifications until [#4667][10] is completed.
+Cannot QA Snapshot notifications until #4667 is completed.
 
 ## Chain Event
 
 ### Subscriptions
 
-1. Navigate to your [notifications settings page][2].
+1. Navigate to your notifications settings page.
     - Assuming you haven't joined any communities, the `Chain Events` section will be empty.
 2. Join one of these communities (pick one you haven't joined before): osmosis, dydx, tribe, aave, moola-market, impactmarket, autonomies-testnet-dao.
-3. Navigate back to your [notifications settings page][2].
+3. Navigate back to your notifications settings page.
     - The community you just joined should appear under the `Chain Events` section.
     - The subscription toggle for that community should be set to "off".
 4. Click the toggle to enable chain-event subscription for the community you just joined. Note that if the subscription reorders itself it is known bug #4650.

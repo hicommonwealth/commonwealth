@@ -1,4 +1,6 @@
-**Contents**
+# Notifications
+
+## Contents
 
 - [Current Setup](#current-setup)
   * [Supported User Scenarios](#supported-user-scenarios)
@@ -13,16 +15,16 @@
 - [Proposed Architecture](#proposed-architecture)
   * [Highlights of the new architecture](#highlights-of-the-new-architecture)
 - [Implementation](#implementation)
-  * [Kafka as a pub/sub queuing solution](#kafka-as-a-pub-sub-queuing-solution)
+  * [Kafka as a pub/sub queuing solution](#kafka-as-a-pubsub-queuing-solution)
   * [Apache Beam - Flink Runner](#apache-beam---flink-runner)
-  * [High-Level Pipeline with Kafka & Beam](#high-level-pipeline-with-kafka---beam)
+  * [High-Level Pipeline with Kafka & Beam](#high-level-pipeline-with-kafka--beam)
   * [Proposed Schema](#proposed-schema)
   * [SQL Data Types](#sql-data-types)
 - [Change Log](#change-log)
 
-# Current Setup
+## Current Setup
 
-## Supported User Scenarios
+### Supported User Scenarios
 
 The current setup supports the following user scenarios:
 
@@ -34,7 +36,7 @@ The current setup supports the following user scenarios:
 - **Automatic system subscriptions:** For instance, when a new entity/object is created, based on the user's associated communities and roles, such as being an administrator, the user is subscribed to the new object.
 - **Automatic system un-subscriptions:** This occurs when a user's role changes, such as no longer being an administrator, which would mean the user should no longer receive admin-level notifications.
 
-## Current Database Schema
+### Current Database Schema
 
 Upon the creation of a new entity/object within the system, such as a new thread, comment, or reaction, a unique object id is assigned to that entity/object. This setup involves:
 
@@ -43,9 +45,9 @@ Upon the creation of a new entity/object within the system, such as a new thread
 - **Notifications**, which store all events that should be notified to platform users if they are subscribed
 - **NotificationsRead**, which maps notifications to subscriptions and users and tracks read/unread notifications per user
 
-# Current Implementation
+## Current Implementation
 
-## Creation of New Objects within the System
+### Creation of New Objects within the System
 
 Here is an example of the steps taken to create a new thread:
 
@@ -55,11 +57,11 @@ Here is an example of the steps taken to create a new thread:
 ...emit notification
 ```
 
-## Subscriptions
+### Subscriptions
 
 - The subscription logic is integrated with the business logic of the app. In some cases, this co-location can affect performance if executed in a blocking manner.
 
-## Notification Emission - emitNotification
+### Notification Emission - emitNotification
 
 This process typically involves three to four steps:
 
@@ -68,15 +70,15 @@ This process typically involves three to four steps:
 - Sending emails to the users identified in step two
 - Pushing notifications to online users
 
-## Websocket - Push Notification for Online Users
+### Websocket - Push Notification for Online Users
 
 - The system uses socket.io to broadcast messages to users
 - A new room is created for every existing/new object in the system
 - Notifications are pushed to online users via websockets, wherein each online user is subscribed to objects, based on which a room is subscribed for that object_id. A message is published to the room and is broadcasted to all subscribed users in the room.
 
-# Limitations
+## Limitations
 
-## Current Limitations and Proposed Solutions
+### Current Limitations and Proposed Solutions
 
 - **Managing subscriptions at a low level:** The current implementation directly interacts with subscriptions rather than a subscription manager, which is inefficient.
   - **Proposed Solution:** Develop a high-level subscription manager to handle subscriptions, which will be configurable and provide reusable functionality between events. This could potentially be offloaded to a separate worker.
@@ -95,11 +97,11 @@ This process typically involves three to four steps:
 - **Maintaining offsets for users in NotificationsRead:** This process results in slow and messy insert queries and is prone to race conditions, leading to duplicates in the database.
   - **Proposed Solution:** Given the limited benefits, an offset strategy could be abandoned in favor of a robust archiving strategy, which would make the table smaller and queries faster.
 
-# Proposed Architecture
+## Proposed Architecture
 
 <img width="522" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/22185fdd-77f8-44d1-b022-70a05e203ce3">
 
-## Highlights of the new architecture
+### Highlights of the new architecture
 
 - **Subscription Management Enhancement:** In the new architecture, the subscription management has been extracted from the current application and turned into an initial service that consumes events. This modification reduces the load on the current system. It generates new subscription objects and manages other subscription related activities, including the fanout process which will be handled by stored procedure in Database.
 
@@ -107,24 +109,24 @@ This process typically involves three to four steps:
 
 - **Plug-in Architecture:** Using Kafka Topics to allows the subscription of new delivery methods and services by adding new consumers to the Kafka topic as needed.
 
-# Implementation
+## Implementation
 
 The implementation will involve two elements:
 
 - Event (current notification)
 - Notification (current NotificationRead)
 
-## Kafka as a pub/sub queuing solution
+### Kafka as a pub/sub queuing solution
 
 A comparison of RabbitMQ and Kafka can be found here: <https://www.cloudamqp.com/blog/when-to-use-rabbitmq-or-apache-kafka.html>. In summary, RabbitMQ messages are not available for another consumer/subscriber once read, whereas Kafka preserves messages and maintains offsets for each type of consumer. Kafka is natively supported on Heroku and can be shared between projects. In a simplified design, only two Kafka topics are needed: one for CDC Event (Notification) and the other for Notification (NotificationRead).
 
-## Apache Beam - Flink Runner
+### Apache Beam - Flink Runner
 
 - It can be used to offload worker nodes logic.
 - They provide scalable computing power so messages can be read once off the queue and processed via a beam DAG.
 - The Beam DAG reads the message, sends emails, pushes notifications, and pushes the main server for websockets.
 
-## High-Level Pipeline with Kafka & Beam
+### High-Level Pipeline with Kafka & Beam
 
 The flow of data can be described as follows:
 
@@ -133,7 +135,7 @@ The flow of data can be described as follows:
 - **Reliability:** It offers reliability to the system in case of beam failure
 - **Extensibility:** It offers extensibility as it can be subscribed by internal & external services interested in the events eg discobot.
 
-## Proposed Schema
+### Proposed Schema
 
 One of the main objectives of implementing the new schema is to **enhance its configurability for third-party developers.**
 This modification will enable developers (both internal & third party developers) to effortlessly incorporate new events into the system.
@@ -163,7 +165,7 @@ This modification will enable developers (both internal & third party developers
   - Notifications per user
   - It will track read/unread notifications
 
-## SQL Data Types
+### SQL Data Types
 
 **Event Category:**  
 category_id: INTEGER or BIGINT (Primary Key, Auto-Increment)  
