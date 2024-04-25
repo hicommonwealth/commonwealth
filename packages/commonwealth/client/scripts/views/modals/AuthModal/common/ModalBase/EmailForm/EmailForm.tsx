@@ -7,8 +7,8 @@ import './EmailForm.scss';
 import { emailValidationSchema } from './validation';
 
 type EmailFormProps = {
-  onCancel: () => any;
-  onSubmit: (values: { email: string }) => any;
+  onCancel: () => void;
+  onSubmit: (values: { email: string }) => void;
   isLoading?: boolean;
 };
 

@@ -311,7 +311,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (exitOnComplete) {
-      await walletProps?.onModalClose?.();
+      walletProps?.onModalClose?.();
       if (walletProps.onSuccess)
         walletProps.onSuccess(account.address, isNewlyCreated);
     }

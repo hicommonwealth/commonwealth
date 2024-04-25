@@ -8,12 +8,12 @@ import './EVMWalletsSubModal.scss';
 
 type EVMWalletsSubModalProps = {
   isOpen: boolean;
-  onClose: () => any;
+  onClose: () => void;
   disabled?: boolean;
   availableWallets?: EVMWallets[];
-  onWalletSelect?: (wallet: EVMWallets) => any;
+  onWalletSelect?: (wallet: EVMWallets) => void;
   canResetWalletConnect?: boolean;
-  onResetWalletConnect?: () => any;
+  onResetWalletConnect?: () => void;
 };
 
 const EVMWalletsSubModal = ({

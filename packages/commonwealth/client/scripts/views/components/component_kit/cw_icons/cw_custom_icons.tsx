@@ -289,7 +289,6 @@ export const CWBlast = ({
 export const CWBase = ({
   componentType,
   iconSize,
-  className,
   ...otherProps
 }: CustomIconProps) => {
   return (

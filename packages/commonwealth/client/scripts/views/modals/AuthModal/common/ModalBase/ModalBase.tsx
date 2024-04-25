@@ -96,7 +96,9 @@ const ModalBase = ({
     onSocialLogin,
     onVerifyMobileWalletSignature,
   } = useWallets({
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
   });
 
@@ -306,7 +308,9 @@ const ModalBase = ({
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal
         isOpen={isMobileWalletVerificationStep}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClose={handleClose}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSignatureConfirmation={onVerifyMobileWalletSignature}
       />
     </>
