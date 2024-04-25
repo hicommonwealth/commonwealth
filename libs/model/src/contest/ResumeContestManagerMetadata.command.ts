@@ -8,7 +8,7 @@ export const ResumeContestManagerMetadata: Command<
 > = () => ({
   ...schemas.commands.ResumeContestManagerMetadata,
   auth: [],
-  body: async ({ id, payload }) => {
+  body: async ({ id }) => {
     const contestManager = await models.ContestManager.findOne({
       where: {
         contest_address: id,
