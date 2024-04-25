@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { Daemons } from '../../src/daemon';
 
 describe('Daemon', () => {
-  let clock;
+  let clock: sinon.SinonFakeTimers;
 
   before(function () {
     clock = sinon.useFakeTimers();

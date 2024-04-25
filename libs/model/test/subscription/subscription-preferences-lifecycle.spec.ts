@@ -1,5 +1,6 @@
-import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import { Actor, command, dispose, query, schemas } from '@hicommonwealth/core';
 import { expect } from 'chai';
+import z from 'zod';
 import { models } from '../../src/database';
 import {
   GetSubscriptionPreferences,
@@ -9,7 +10,9 @@ import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
-  let subPreferences;
+  let subPreferences:
+    | z.infer<typeof schemas.entities.SubscriptionPreference>
+    | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
@@ -17,7 +20,7 @@ describe('Subscription preferences lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: null,
+      address_id: '0x',
     };
   });
 
@@ -52,7 +55,7 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      id: subPreferences.id,
+      id: subPreferences!.id,
       user_id: actor.user.id,
       digest_email_enabled: false,
       recap_email_enabled: false,
@@ -75,7 +78,7 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      id: subPreferences.id,
+      id: subPreferences!.id,
       user_id: actor.user.id,
       recap_email_enabled: false,
       mobile_push_notifications_enabled: false,
@@ -92,7 +95,7 @@ describe('Subscription preferences lifecycle', () => {
     });
 
     expect(res).to.deep.contains({
-      id: subPreferences.id,
+      id: subPreferences!.id,
       user_id: actor.user.id,
       email_notifications_enabled: false,
       digest_email_enabled: false,

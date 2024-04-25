@@ -34,6 +34,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       content_url: {
         type: Sequelize.STRING,
       },
+      thread_id: { type: Sequelize.INTEGER },
       voting_power: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -44,6 +45,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'ContestActions',
       timestamps: false,
       indexes: [],
-      // hooks: syncHooks,
     },
   );

@@ -5,7 +5,7 @@
   "scripts": {
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
-    "build": "tsc -b && tsc-alias",
+    "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "bundle": "webpack --config webpack/webpack.prod.config.js --progress",
@@ -19,7 +19,6 @@
     "emit-notification": "tsx -r tsconfig-paths/register server/scripts/emitTestNotification.ts",
     "emit-webhook": "tsx -r tsconfig-paths/register server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
-    "heroku-postbuild": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "integration-test": "NODE_ENV=test nyc ts-mocha -r tsconfig-paths/register './test/integration/**/*.spec.ts'",
     "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",
     "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.js client/\\**/*.{ts,tsx} server/\\**/*.ts scripts/\\**/*.ts shared/\\**/*.ts test/\\**/*.ts",

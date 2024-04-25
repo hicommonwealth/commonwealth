@@ -1,4 +1,10 @@
-import { DataTypes, Model, Sequelize, type BuildOptions } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  Sequelize,
+  type Attributes,
+  type BuildOptions,
+} from 'sequelize';
 
 type ModelFactory<T> = (sequelize: Sequelize, dataTypes: typeof DataTypes) => T;
 type ModelFactories = Record<string, ModelFactory<unknown>>;
@@ -16,6 +22,18 @@ export type ModelStatic<ParentModel extends Model> =
       foreignKey: keyof Child & string,
       options?: { as?: string; optional?: boolean },
     ) => ModelStatic<ParentModel>;
+    withManyToMany: <A extends State, B extends State>(
+      a: [
+        ModelStatic<Model<A>>,
+        keyof Attributes<ParentModel> & string,
+        string,
+      ],
+      b: [
+        ModelStatic<Model<B>>,
+        keyof Attributes<ParentModel> & string,
+        string,
+      ],
+    ) => ModelStatic<ParentModel>;
   } & {
     new (values?: State, options?: BuildOptions): ParentModel;
   };
@@ -23,8 +41,11 @@ export type ModelStatic<ParentModel extends Model> =
 /**
  * Composite key mappings (must match field names in parent and child)
  */
+export type KeyMap<Parent extends State, Child extends State> =
+  | (keyof Parent & keyof Child & string)
+  | [keyof Parent & string, keyof Child & string];
 export type CompositeKey<Parent extends State, Child extends State> = Array<
-  keyof Parent & keyof Child & string
+  KeyMap<Parent, Child>
 >;
 export type CompositeMap<Parent extends State, Child extends State> = {
   parent: ModelStatic<Model<Parent>>;

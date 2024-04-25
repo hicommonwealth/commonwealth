@@ -205,14 +205,6 @@ export default (
     models.Address.hasMany(models.Thread, {
       foreignKey: 'address_id',
     });
-    models.Address.belongsToMany(models.Thread, {
-      through: models.Collaboration,
-      as: 'collaboration',
-      foreignKey: { name: 'address_id', allowNull: false },
-    });
-    models.Address.hasMany(models.Collaboration, {
-      foreignKey: { name: 'address_id', allowNull: false },
-    });
     models.Address.hasMany(models.Membership, {
       foreignKey: 'address_id',
       as: 'Memberships',

@@ -6,11 +6,13 @@ import {
   CosmosGovernanceVersion,
   DefaultPage,
   NotificationCategories,
+  commonProtocol,
 } from '@hicommonwealth/shared';
 import z from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { BalanceSourceType, NodeHealth } from '../types';
 import * as events from './events.schemas';
+import { Contest } from './projections';
 import {
   EventNames,
   PG_INT,
@@ -294,6 +296,54 @@ export const Topic = z.object({
   default_offchain_template_backup: z.string().optional().nullable(),
 });
 
+export const ContestManager = z
+  .object({
+    contest_address: z.string().describe('On-Chain contest manager address'),
+    community_id: z.string(),
+    name: z.string(),
+    image_url: z.string(),
+    funding_token_address: z
+      .string()
+      .optional()
+      .describe('Provided by admin on creation when stake funds are not used'),
+    prize_percentage: z
+      .number()
+      .int()
+      .min(0)
+      .max(100)
+      .optional()
+      .describe('Percentage of pool used for prizes in recurring contests'),
+    payout_structure: z
+      .array(z.number().int().min(0).max(100))
+      .describe('Sorted array of percentages for prize, from first to last'),
+    interval: z
+      .number()
+      .int()
+      .min(0)
+      .max(100)
+      .describe('Recurring contest interval, 0 when one-off'),
+    ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
+    decimals: PG_INT.optional().default(
+      commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
+    ),
+    created_at: z.date(),
+    paused: z
+      .boolean()
+      .optional()
+      .describe('Flags when contest policy is paused by admin'),
+    topics: z.array(Topic).optional(),
+    contests: z.array(Contest).optional(),
+  })
+  .describe('On-Chain Contest Manager');
+
+export const ContestTopic = z
+  .object({
+    contest_address: z.string(),
+    topic_id: PG_INT,
+    created_at: z.date(),
+  })
+  .describe('X-Ref to topics in contest');
+
 export const Community = z.object({
   name: z.string(),
   chain_node_id: PG_INT,
@@ -353,6 +403,7 @@ export const Community = z.object({
   CommunityStakes: z.array(CommunityStake).optional(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
+  contest_managers: z.array(ContestManager).optional(),
 });
 
 export const CommunityContract = z.object({
@@ -509,19 +560,19 @@ export const SubscriptionPreference = z.object({
 });
 
 export const ThreadSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommentSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   comment_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommunityAlert = z.object({

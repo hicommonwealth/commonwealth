@@ -1,6 +1,7 @@
-import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import { Actor, command, dispose, query, schemas } from '@hicommonwealth/core';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import z from 'zod';
 import { models } from '../../src/database';
 import {
   CreateCommentSubscription,
@@ -9,9 +10,10 @@ import {
 } from '../../src/subscription';
 import { seed } from '../../src/tester';
 
-describe.only('Comment subscription lifecycle', () => {
+describe('Comment subscription lifecycle', () => {
   let actor: Actor;
-  let commentOne, commentTwo;
+  let commentOne: z.infer<typeof schemas.entities.Comment> | undefined;
+  let commentTwo: z.infer<typeof schemas.entities.Comment> | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
@@ -35,28 +37,29 @@ describe.only('Comment subscription lifecycle', () => {
       ],
       CommunityStakes: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
 
     const [thread] = await seed('Thread', {
-      address_id: community.Addresses[0].id,
+      address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      topic_id: community.topics[0].id,
+      topic_id: community?.topics?.at(0)?.id,
     });
 
     [commentOne] = await seed('Comment', {
-      address_id: community.Addresses[0].id,
+      address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      thread_id: thread.id,
+      thread_id: thread?.id,
     });
     [commentTwo] = await seed('Comment', {
-      address_id: community.Addresses[0].id,
+      address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      thread_id: thread.id,
+      thread_id: thread?.id,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address_id: null,
+      address_id: undefined,
     };
   });
 
@@ -70,7 +73,7 @@ describe.only('Comment subscription lifecycle', () => {
 
   it('should create a new comment subscription', async () => {
     const payload = {
-      comment_id: commentOne.id,
+      comment_id: commentOne!.id!,
     };
     const res = await command(CreateCommentSubscription(), {
       payload,
@@ -78,15 +81,15 @@ describe.only('Comment subscription lifecycle', () => {
     });
     expect(res).to.deep.contains({
       user_id: actor.user.id,
-      comment_id: commentOne.id,
+      comment_id: commentOne!.id,
     });
   });
 
   it('should get comment subscriptions', async () => {
     const [commentSubOne, commentSubTwo] =
       await models.CommentSubscription.bulkCreate([
-        { user_id: actor.user.id, comment_id: commentOne.id },
-        { user_id: actor.user.id, comment_id: commentTwo.id },
+        { user_id: actor.user.id!, comment_id: commentOne!.id! },
+        { user_id: actor.user.id!, comment_id: commentTwo!.id! },
       ]);
 
     const res = await query(GetCommentSubscriptions(), {
@@ -109,12 +112,12 @@ describe.only('Comment subscription lifecycle', () => {
 
   it('should delete a comment subscriptions', async () => {
     await models.CommentSubscription.bulkCreate([
-      { user_id: actor.user.id, comment_id: commentOne.id },
-      { user_id: actor.user.id, comment_id: commentTwo.id },
+      { user_id: actor.user.id!, comment_id: commentOne!.id! },
+      { user_id: actor.user.id!, comment_id: commentTwo!.id! },
     ]);
 
     const payload = {
-      comment_ids: [commentOne.id, commentTwo.id],
+      comment_ids: [commentOne!.id!, commentTwo!.id!],
     };
 
     const res = await command(DeleteCommentSubscription(), {

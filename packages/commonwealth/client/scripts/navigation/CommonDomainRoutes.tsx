@@ -84,8 +84,8 @@ const CommunityStakeIntegration = lazy(
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
-const CommunityContests = lazy(
-  () => import('views/pages/CommunityManagement/Contests/ContestsList'),
+const AdminContestsPage = lazy(
+  () => import('views/pages/CommunityManagement/Contests/AdminContestsPage'),
 );
 const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
@@ -463,7 +463,7 @@ const CommonDomainRoutes = ({
         <Route
           key="/:scope/manage/contests"
           path="/:scope/manage/contests"
-          element={withLayout(CommunityContests, {
+          element={withLayout(AdminContestsPage, {
             scoped: true,
           })}
         />,
