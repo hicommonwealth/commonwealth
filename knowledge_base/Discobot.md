@@ -25,7 +25,7 @@
 4. Commonwealth Manage Community Page (`/packages/commonwealth/…/community_metadata_rows.tsx`), where admins are able to add a bot connection and connect Forum Channels (in a connected Discord Server) to Topics (in the CW forum).
 
 The basic flow here:
-![image (4)](https://github.com/hicommonwealth/commonwealth/assets/31940965/aaf5719a-4ea1-46be-bbbf-3cce55ba7528)
+![image (4)](./assets/Discobot-2.png)
 
 ## Deployments
 

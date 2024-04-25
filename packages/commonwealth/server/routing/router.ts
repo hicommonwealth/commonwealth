@@ -182,6 +182,7 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
+import { failure } from '../types';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -1308,6 +1309,10 @@ function setupRouter(
   app.use(endpoint, router);
 
   app.use(methodNotAllowedMiddleware());
+  app.use('/api/*', function (_req, res) {
+    res.status(404);
+    return failure(res, 'Not Found');
+  });
 }
 
 export default setupRouter;

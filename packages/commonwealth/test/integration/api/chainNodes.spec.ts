@@ -115,6 +115,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Osmosis',
         url: 'https://osmosis-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -141,6 +142,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Cosmos1',
         url: 'https://cosmos-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -151,6 +153,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Cosmos2',
           url: 'https://cosmos-mainnet.g.com/3',
+          slip44: 118,
         },
       });
 
@@ -226,6 +229,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Osmosis',
           url: 'https://osmosis-mainnet.g.com/2',
+          slip44: 118,
         },
       });
 
@@ -235,6 +239,7 @@ describe('ChainNode Tests', () => {
         url: 'https://cosmos-mainnet.g.com/4',
         name: 'mmm',
         cosmos_chain_id,
+        slip44: 118,
       });
 
       const updatedNode = await models.ChainNode.findOne({
@@ -244,6 +249,7 @@ describe('ChainNode Tests', () => {
       assert.equal(updatedNode.name, 'mmm');
       assert.equal(updatedNode.balance_type, 'cosmos');
       assert.equal(updatedNode.cosmos_chain_id, 'osmosiz');
+      assert.equal(updatedNode.slip44, 118);
     });
   });
 });

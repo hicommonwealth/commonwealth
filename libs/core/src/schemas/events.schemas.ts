@@ -46,3 +46,67 @@ export const DiscordMessageCreated = z.object({
     z.literal('comment-create'),
   ]),
 });
+
+// All events should carry this common metadata
+export const EventMetadata = z.object({
+  created_at: z.date().describe('When the event was emitted'),
+  // TODO: TBD
+  // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
+  // aggregateId: z.string().describe("Event emitter aggregate id")
+  // correlation: z.string().describe("Event correlation key")
+  // causation: z.object({}).describe("Event causation")
+});
+
+// on-chain contest manager events
+export const RecurringContestManagerDeployed = EventMetadata.extend({
+  namespace: z.string().describe('Community namespace'),
+  contest_address: z.string().describe('Contest manager address'),
+  interval: z.number().int().positive().describe('Recurring constest interval'),
+}).describe('When a new recurring contest manager gets deployed');
+
+export const OneOffContestManagerDeployed = EventMetadata.extend({
+  namespace: z.string().describe('Community namespace'),
+  contest_address: z.string().describe('Contest manager address'),
+  length: z.number().int().positive().describe('Length of contest in days'),
+}).describe('When a new one-off contest manager gets deployed');
+
+const ContestManagerEvent = EventMetadata.extend({
+  contest_address: z.string().describe('Contest manager address'),
+  contest_id: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Recurring contest id'),
+});
+
+export const ContestStarted = ContestManagerEvent.extend({
+  start_time: z.date().describe('Contest start time'),
+  end_time: z.date().describe('Contest end time'),
+}).describe('When a contest instance gets started');
+
+export const ContestContentAdded = ContestManagerEvent.extend({
+  content_id: z.number().int().positive().describe('New content id'),
+  creator_address: z.string().describe('Address of content creator'),
+  content_url: z.string(),
+}).describe('When new content is added to a running contest');
+
+export const ContestContentUpvoted = ContestManagerEvent.extend({
+  content_id: z.number().int().positive().describe('Content id'),
+  voter_address: z.string().describe('Address upvoting on content'),
+  voting_power: z
+    .number()
+    .int()
+    .describe('Voting power of address upvoting on content'),
+}).describe('When users upvote content on running contest');
+
+export const ContestWinnersRecorded = ContestManagerEvent.extend({
+  winners: z
+    .array(
+      z.object({
+        creator_address: z.string(),
+        prize: z.number(),
+      }),
+    )
+    .describe('Ranked contest-winning creator addresses'),
+}).describe('When contest winners are recorded and contest ends');

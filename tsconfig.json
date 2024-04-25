@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "esnext",
-    "moduleResolution": "node",
-    "module": "commonjs",
+    "moduleResolution": "node10",
+    "module": "node16",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -14,9 +14,17 @@
       "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "include": ["**/src"],
-  "exclude": ["**/node_modules", "**/build"],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"]
-  }
+  "files": [],
+  "references": [
+    { "path": "libs/adapters" },
+    { "path": "libs/chains" },
+    { "path": "libs/core" },
+    { "path": "libs/logging" },
+    { "path": "libs/model" },
+    { "path": "libs/shared" },
+    { "path": "packages/commonwealth" },
+    { "path": "packages/discord-bot" },
+    { "path": "packages/scripts" },
+    { "path": "packages/snapshot-listener" }
+  ]
 }

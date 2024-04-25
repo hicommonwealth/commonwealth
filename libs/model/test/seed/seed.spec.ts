@@ -124,6 +124,7 @@ describe('Seed functions', () => {
         ],
         CommunityStakes: [],
         discord_config_id: null,
+        contest_managers: [],
       });
 
       const community = await testSeed('Community', {
@@ -160,6 +161,7 @@ describe('Seed functions', () => {
           },
         ],
         topics: [{}, {}],
+        contest_managers: [],
         discord_config_id: null,
       });
 
