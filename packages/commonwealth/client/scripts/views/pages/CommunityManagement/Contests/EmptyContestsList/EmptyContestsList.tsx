@@ -29,7 +29,7 @@ const EmptyContestsList = ({
             handler: () => navigate('/manage/integrations'),
           }}
         />
-      ) : isContestAvailable ? (
+      ) : !isContestAvailable ? (
         <EmptyCard
           img="/static/img/shapes/shape1.svg"
           title="You haven’t launched any contests yet"

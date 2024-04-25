@@ -59,6 +59,8 @@ const FundContestForm = ({
   transferFeesInUsd,
   handleTransferFunds,
 }: FundContestFormProps) => {
+  const amountEthValue = amountEth ? Number(amountEth) : '';
+
   return (
     <div className="FundContestForm">
       <div>
@@ -104,7 +106,7 @@ const FundContestForm = ({
 
         <CWTextInput
           placeholder="0.00"
-          value={Number(amountEth)}
+          value={amountEthValue}
           onInput={handleChangeEthAmount}
           label="Amount"
           type="number"

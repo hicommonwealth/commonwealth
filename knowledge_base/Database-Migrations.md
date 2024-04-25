@@ -1,4 +1,4 @@
-# Best Practices
+# Database Migrations Best Practices
 
 - Each migration should be an atomic change set, meaning no intermediate states, so that errors don't leave the database in a broken state.
 - To ensure atomicity, migration should be transactionalized, so that the entire change set can roll back on error.
@@ -9,5 +9,5 @@
 
 ## Change Log
 
-- 230320: Ownership transferred to Jake Naviaski.
+- 230320: Ownership transferred to Jake Naviasky.
 - 230308: Authored by Alex Young.
