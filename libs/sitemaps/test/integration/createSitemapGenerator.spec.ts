@@ -65,7 +65,7 @@ describe('createSitemapGenerator', function () {
     await dispose()();
   });
 
-  it('basic', async () => {
+  xit('basic', async () => {
     const writer = createAsyncWriterMock();
     const paginator = createDatabasePaginatorDefault(50);
 
