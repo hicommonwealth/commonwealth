@@ -97,6 +97,8 @@ describe('EVM Chain Events End to End Tests', () => {
     expect(event.eventSource).to.deep.equal({
       kind: 'proposal-created',
       chainNodeId: chainNode.id,
+      eventSignature:
+        '0x7d84a6263ae0d98d3329bd7b46bb4e8d6f98cd35a7adb45c274c8b7fd5ebd5e0',
     });
     expect(event.parsedArgs).to.exist;
     expect(event.rawLog).to.exist;

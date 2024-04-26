@@ -1,14 +1,10 @@
 import { EventHandler, Policy, schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { commonProtocol } from '@hicommonwealth/shared';
-import Web3 from 'web3';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleGovernanceProposalEvents } from './handleGovnernanceProposalEvents';
 
 const log = logger(__filename);
-
-const genericWeb3 = new Web3();
 
 const deployedNamespaceEventSignature =
   '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';
@@ -24,22 +20,12 @@ const proposalEventSignatures = [
   '0xd272d67d2c8c66de43c1d2515abb064978a5020c173e15903b6a2ab3bf7440ec',
 ];
 
-const communityStakeContractAddresses = Object.values(
-  commonProtocol.factoryContracts,
-).map((c) => c.communityStake);
-const namespaceFactoryContractAddresses = Object.values(
-  commonProtocol.factoryContracts,
-).map((c) => c.factory);
-
 export const processChainEventCreated: EventHandler<
   'ChainEventCreated',
   ZodUndefined
 > = async ({ payload }) => {
   const { models } = await import('@hicommonwealth/model');
 
-  const contractAddress = genericWeb3.utils.toChecksumAddress(
-    payload.rawLog.address,
-  );
   if (
     payload.eventSource.eventSignature === communityStakeTradeEventSignature
   ) {
