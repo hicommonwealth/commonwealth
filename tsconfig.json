@@ -1,19 +1,4 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "target": "esnext",
-    "moduleResolution": "node10",
-    "module": "node16",
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "traceResolution": false,
-    "baseUrl": ".",
-    "paths": {
-      "@hicommonwealth/*": ["libs/*/src"]
-    }
-  },
   "files": [],
   "references": [
     { "path": "libs/adapters/tsconfig.build.json" },

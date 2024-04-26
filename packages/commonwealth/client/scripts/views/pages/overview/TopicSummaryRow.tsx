@@ -1,3 +1,4 @@
+import { slugify } from '@hicommonwealth/shared';
 import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
@@ -5,7 +6,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
-import { slugify } from 'utils';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';

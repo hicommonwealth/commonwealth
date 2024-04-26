@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/shared';
+import { ContentType, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -25,7 +25,6 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';

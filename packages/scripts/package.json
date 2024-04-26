@@ -1,5 +1,5 @@
 {
-  "name": "@hicommonwealth/scripts",
+  "name": "scripts",
   "private": "true",
   "version": "0.1.0",
   "description": "Scripts",
@@ -11,7 +11,7 @@
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha '__tests__/**/*.spec.ts'",
+    "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha './test/**/*.spec.ts'",
     "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {

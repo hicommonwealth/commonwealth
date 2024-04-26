@@ -1,9 +1,8 @@
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express, { json } from 'express';
 import logger from 'morgan';
+import { CHAIN_TEST_APP_PORT } from '../config';
 import setupRouter from './router';
-dotenv.config();
 
 const app = express();
 const router = setupRouter();
@@ -14,7 +13,7 @@ app.use(logger('dev') as express.RequestHandler);
 
 app.use(json() as express.RequestHandler);
 app.use('/', router);
-const port = process.env.CHAIN_PORT;
+const port = CHAIN_TEST_APP_PORT;
 app.set('port', port);
 
 app.listen(port, () => {
