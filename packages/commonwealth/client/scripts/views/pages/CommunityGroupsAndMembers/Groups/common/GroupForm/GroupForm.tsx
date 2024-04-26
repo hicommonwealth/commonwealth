@@ -402,8 +402,6 @@ const GroupForm = ({
     >
       {({ formState }) => (
         <>
-          {/* TODO: add breadcrum here as a separate div when that ticket is done */}
-
           {/* Form header */}
           <div className="header-row">
             <CWText type="h2" fontWeight="semiBold" className="header-text">
