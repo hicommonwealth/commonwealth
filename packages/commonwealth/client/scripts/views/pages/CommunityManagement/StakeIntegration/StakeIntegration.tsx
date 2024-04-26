@@ -18,6 +18,7 @@ const StakeIntegration = () => {
   const { stakeEnabled, refetchStakeQuery } = useCommunityStake();
 
   const handleStepChange = () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     refetchStakeQuery();
     navigate(`/manage/integrations`);
   };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 import 'components/component_kit/cw_checkbox.scss';
 import { CWText } from './cw_text';
@@ -23,7 +23,7 @@ type CheckboxFormValidationProps = {
 
 type CheckboxProps = {
   groupName?: string;
-  onChange?: (e?: any) => void;
+  onChange?: (e?: ChangeEvent<HTMLInputElement>) => void;
   labelClassName?: string;
 } & CheckboxType &
   CheckboxStyleProps &
@@ -51,9 +51,7 @@ export const CWCheckbox = ({
   };
 
   const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? formContext.register(name)
-    : ({} as any);
+  const formFieldContext = hookToForm ? formContext.register(name) : undefined;
 
   // TODO: this message is not needed now, but when its needed it should be coming from the radio group
   // const formFieldErrorMessage =
@@ -75,10 +73,10 @@ export const CWCheckbox = ({
         <input
           className={clsx('checkbox-input', { disabled })}
           {...params}
-          {...formFieldContext}
-          onChange={async (e) => {
-            hookToForm && name && (await formFieldContext?.onChange(e));
-            await onChange?.(e);
+          {...(formFieldContext || {})}
+          onChange={(e) => {
+            hookToForm && name && formFieldContext?.onChange?.(e);
+            onChange?.(e);
           }}
         />
         <div className="checkbox-control" />

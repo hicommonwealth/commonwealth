@@ -4,7 +4,7 @@ import { createStore } from 'zustand/vanilla';
 
 interface WelcomeOnboardModalProps {
   isWelcomeOnboardModalOpen: boolean;
-  setIsWelcomeOnboardModalOpen: (isOpen: boolean) => any;
+  setIsWelcomeOnboardModalOpen: (isOpen: boolean) => void;
 }
 
 export const welcomeOnboardModal = createStore<WelcomeOnboardModalProps>()(

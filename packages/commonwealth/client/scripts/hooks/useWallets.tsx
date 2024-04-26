@@ -220,9 +220,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        await walletProps?.onModalClose?.();
+        walletProps?.onModalClose?.();
       } else {
-        await walletProps?.onModalClose?.();
+        walletProps?.onModalClose?.();
       }
 
       trackAnalytics({
@@ -260,9 +260,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        await walletProps?.onModalClose?.();
+        walletProps?.onModalClose?.();
       } else {
-        await walletProps?.onModalClose?.();
+        walletProps?.onModalClose?.();
       }
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
@@ -314,7 +314,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (exitOnComplete) {
-      await walletProps?.onModalClose?.();
+      walletProps?.onModalClose?.();
       if (walletProps.onSuccess) {
         walletProps.onSuccess(account.address, newelyCreated);
       }
@@ -486,7 +486,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
-      await walletProps?.onModalClose?.();
+      walletProps?.onModalClose?.();
     }
     setActiveStep('welcome');
   };
@@ -551,11 +551,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
         );
       }
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
-      await walletProps?.onModalClose?.();
+      walletProps?.onModalClose?.();
     } catch (e) {
       console.log(e);
       notifyError('Failed to save profile info');
-      await walletProps?.onModalClose?.();
+      walletProps?.onModalClose?.();
     }
   };
 
@@ -779,7 +779,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       selectedWallet,
     );
     setIsMobileWalletVerificationStep(false);
-    await walletProps?.onModalClose?.();
+    walletProps?.onModalClose?.();
   };
 
   return {

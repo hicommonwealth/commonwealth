@@ -67,7 +67,7 @@ const PersonalInformationStep = ({
 
     // set email for notifications
     if (values.email) {
-      app.user.updateEmail(values.email);
+      await app.user.updateEmail(values.email);
     }
 
     // TODO: update notification preferences here for
