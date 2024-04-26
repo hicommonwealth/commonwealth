@@ -95,6 +95,7 @@ const FundContestDrawer = ({
         return (
           <FundContestForm
             onClose={handleClose}
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             handleTransferFunds={handleTransferFunds}
             amountEth={amountEth}
             amountError={amountError}

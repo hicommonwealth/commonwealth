@@ -2,6 +2,7 @@ import { Projection, schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
+import { contractHelpers } from '../services/commonProtocol';
 
 const log = logger(__filename);
 export class MissingContestManager extends Error {
@@ -34,9 +35,16 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
 ) {
+  const { ticker, decimals } = await contractHelpers.getTokenAttributes(
+    contest_address,
+  );
+  // TODO: evaluate errors from contract helpers and how to drive the event queue
+
   const [updated] = await models.ContestManager.update(
     {
       interval,
+      ticker,
+      decimals,
     },
     { where: { contest_address }, returning: true },
   );
@@ -54,6 +62,8 @@ async function updateOrCreateWithAlert(
         contest_address,
         community_id: community.id!,
         interval,
+        ticker,
+        decimals,
         created_at: new Date(),
         name: community.name,
         image_url: 'http://default.image', // TODO: can we have a default image for this?
