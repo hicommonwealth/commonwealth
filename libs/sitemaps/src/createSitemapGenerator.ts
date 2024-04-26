@@ -25,10 +25,20 @@ export function createSitemapGenerator(
 
     const children: SitemapFile[] = [];
     for (const paginator of paginators) {
+      console.log('Working with paginator...');
+
       while (await paginator.hasNext()) {
         const page = await paginator.next();
+
+        if (page.links.length === 0) {
+          continue;
+        }
+
+        console.log('Processing N links: ' + page.links.length);
         const sitemap = createSitemap(page.links);
-        const res = await writer.write(`sitemap-${idx++}.xml`, sitemap);
+        const sitemapPath = `sitemap-${idx++}.xml`;
+        const res = await writer.write(sitemapPath, sitemap);
+        console.log('Wrote sitemap: ' + sitemapPath);
         children.push({ location: res.location });
       }
     }
@@ -37,7 +47,9 @@ export function createSitemapGenerator(
       const index = createSitemapIndex(
         children.map((current) => current.location),
       );
-      const res = await writer.write(`sitemap-index.xml`, index);
+      const idx_path = `sitemap-index.xml`;
+      const res = await writer.write(idx_path, index);
+      console.log('Wrote sitemap index ' + idx_path);
       return { location: res.location };
     }
 
