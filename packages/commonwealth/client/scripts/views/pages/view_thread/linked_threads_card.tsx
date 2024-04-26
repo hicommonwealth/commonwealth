@@ -1,3 +1,4 @@
+import { slugify } from '@hicommonwealth/shared';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/view_thread/linked_threads_card.scss';
@@ -5,7 +6,6 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
-import { slugify } from '../../../../../shared/utils';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';

@@ -9,12 +9,14 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 type SharePopoverProps = {
   commentId?: number;
   discussionLink?: string;
+  customUrl?: string;
 } & Partial<PopoverTriggerProps>;
 
 export const SharePopover = ({
   commentId,
   discussionLink,
   renderTrigger,
+  customUrl,
 }: SharePopoverProps) => {
   const domain = document.location.origin;
   const { pathname: currentRoute } = useLocation();
@@ -30,6 +32,8 @@ export const SharePopover = ({
       }}
     />
   );
+
+  const twitterPrefix = 'https://twitter.com/intent/tweet?text=';
 
   return (
     <PopoverMenu
@@ -62,6 +66,8 @@ export const SharePopover = ({
                   urlToCopy = `${domain}/${communityId}${discussionLink}`;
                 }
               }
+            } else if (customUrl) {
+              urlToCopy = `${domain}/${app.activeChainId()}${customUrl}`;
             }
 
             await navigator.clipboard.writeText(urlToCopy);
@@ -72,14 +78,21 @@ export const SharePopover = ({
           iconLeftSize: 'regular',
           label: 'Share on X (Twitter)',
           onClick: async () => {
-            if (!commentId) {
-              await window.open(
-                `https://twitter.com/intent/tweet?text=${domain}${discussionLink}`,
+            if (discussionLink) {
+              window.open(
+                `${twitterPrefix}${domain}${discussionLink}`,
+                '_blank',
+              );
+            } else if (commentId) {
+              const currentRouteSansCommentParam =
+                currentRoute.split('?comment=')[0];
+              window.open(
+                `${twitterPrefix}${domain}${currentRouteSansCommentParam}?comment=${commentId}`,
                 '_blank',
               );
             } else {
-              await window.open(
-                `https://twitter.com/intent/tweet?text=${domain}${discussionLink}?comment=${commentId}`,
+              window.open(
+                `${twitterPrefix}${domain}/${app.activeChainId()}${customUrl}`,
                 '_blank',
               );
             }
