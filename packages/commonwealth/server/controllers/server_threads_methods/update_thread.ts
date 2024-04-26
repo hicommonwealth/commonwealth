@@ -13,7 +13,11 @@ import moment from 'moment';
 import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  parseUserMentions,
+  queryMentionedUsers,
+  uniqueMentions,
+} from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -328,71 +332,38 @@ export async function __updateThread(
     excludeAddresses: [address.address],
   });
 
-  let mentions;
-  try {
-    const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-    mentions = currentDraftMentions.filter((addrArray) => {
-      let alreadyExists = false;
-      previousDraftMentions.forEach((addrArray_) => {
-        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-          alreadyExists = true;
-        }
-      });
-      return !alreadyExists;
-    });
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(
+    decodeURIComponent(commentBody),
+  );
+  const mentions = uniqueMentions([
+    ...previousDraftMentions,
+    ...currentDraftMentions,
+  ]);
+  const mentionedAddresses = await queryMentionedUsers(
+    mentions,
+    thread.community_id,
+  );
 
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(
-      mentions.map(async (mention) => {
-        try {
-          const mentionedUser = await this.models.Address.findOne({
-            where: {
-              community_id: mention[0],
-              address: mention[1],
-            },
-            include: [this.models.User],
-          });
-          return mentionedUser;
-        } catch (err) {
-          return null;
-        }
-      }),
-    );
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
-
-  // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length > 0) {
-    mentionedAddresses.forEach((mentionedAddress) => {
-      if (!mentionedAddress.User) {
-        return; // some Addresses may be missing users, e.g. if the user removed the address
-      }
-      allNotificationOptions.push({
-        notification: {
-          categoryId: NotificationCategories.NewMention,
-          data: {
-            mentioned_user_id: mentionedAddress.User.id,
-            created_at: now,
-            thread_id: +finalThread.id,
-            root_type: ProposalType.Thread,
-            root_title: finalThread.title,
-            comment_text: finalThread.body,
-            community_id: finalThread.community_id,
-            author_address: finalThread.Address.address,
-            author_community_id: finalThread.Address.community_id,
-          },
+  mentionedAddresses.forEach(({ user_id }) => {
+    allNotificationOptions.push({
+      notification: {
+        categoryId: NotificationCategories.NewMention,
+        data: {
+          mentioned_user_id: user_id,
+          created_at: now,
+          thread_id: +finalThread.id,
+          root_type: ProposalType.Thread,
+          root_title: finalThread.title,
+          comment_text: finalThread.body,
+          community_id: finalThread.community_id,
+          author_address: finalThread.Address.address,
+          author_community_id: finalThread.Address.community_id,
         },
-        excludeAddresses: [finalThread.Address.address],
-      });
+      },
+      excludeAddresses: [finalThread.Address.address],
     });
-  }
+  });
 
   return [finalThread.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }

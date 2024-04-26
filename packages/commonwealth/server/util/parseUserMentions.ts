@@ -1,4 +1,27 @@
-export const parseUserMentions = (text): any[] => {
+import { AppError } from '@hicommonwealth/core';
+
+export type UserMention = {
+  profileId: string;
+  profileName: string;
+};
+
+export type UserMentionQuery = {
+  address: string;
+  user_id: string;
+}[];
+
+export const uniqueMentions = (mentions: UserMention[]): UserMention[] => {
+  const uniqueIds: Set<string> = new Set();
+  return mentions.filter((mention) => {
+    if (uniqueIds.has(mention.profileId)) {
+      return false;
+    }
+    uniqueIds.add(mention.profileId);
+    return true;
+  });
+};
+
+export const parseUserMentions = (text: string): UserMention[] => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   if (!text) return [];
   try {
@@ -14,18 +37,50 @@ export const parseUserMentions = (text): any[] => {
       .map((op) => {
         const chunks = op.attributes.link.split('/');
         const refIdx = chunks.indexOf('account');
-        return [chunks[refIdx - 1], chunks[refIdx + 1]];
+        return {
+          profileName: chunks[refIdx - 1],
+          profileId: chunks[refIdx + 1],
+        };
       });
   } catch (e) {
-    const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
-    const matches = text.match(regexp);
-    if (matches && matches.length > 0) {
-      return matches.map((match) => {
-        const chunks = match.slice(0, match.length - 1).split('/');
-        const refIdx = chunks.indexOf('account');
-        return [chunks[refIdx - 1], chunks[refIdx + 1]];
-      });
-    }
+    // matches profileName and number in [@${profileName}](/profile/id/${number})
+    const regex = /\[@([^[]+)]\(\/profile\/id\/(\d+)\)/g;
+    const matches = [...text.matchAll(regex)];
+    return matches.map(([, profileName, profileId]) => {
+      return { profileName, profileId };
+    });
+  }
+};
+
+export const queryMentionedUsers = async (
+  mentions: UserMention[],
+  communityId: string,
+): Promise<UserMentionQuery> => {
+  const profileIds = mentions.map((m) => `'${m.profileId}'`).join(', ');
+  const profileNames = mentions.map((m) => `'${m.profileName}'`).join(', ');
+  if (profileIds.length === 0 || profileNames.length === 0) {
     return [];
+  }
+
+  try {
+    return await this.models.sequelize.query(
+      `
+        SELECT a.address, a.user_id
+        FROM "Addresses" as a
+        INNER JOIN "Profiles" as p ON a.profile_id = p.profile_id
+        WHERE a.community_id = :communityId AND a.user_id IS NOT NULL
+        AND p.profile_id IN (:profileIds) AND p.profile_name IN (:profileNames)
+        LIMIT 1;
+      `,
+      {
+        replacements: {
+          communityId,
+          profileIds,
+          profileNames,
+        },
+      },
+    );
+  } catch (e) {
+    throw new AppError('Failed to parse mentions');
   }
 };
