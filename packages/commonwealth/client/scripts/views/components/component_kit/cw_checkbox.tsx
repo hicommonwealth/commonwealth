@@ -51,9 +51,7 @@ export const CWCheckbox = ({
   };
 
   const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? formContext.register(name)
-    : ({} as any);
+  const formFieldContext = hookToForm ? formContext.register(name) : undefined;
 
   // TODO: this message is not needed now, but when its needed it should be coming from the radio group
   // const formFieldErrorMessage =
@@ -75,9 +73,9 @@ export const CWCheckbox = ({
         <input
           className={clsx('checkbox-input', { disabled })}
           {...params}
-          {...formFieldContext}
+          {...(formFieldContext || {})}
           onChange={(e) => {
-            hookToForm && name && formFieldContext?.onChange(e);
+            hookToForm && name && formFieldContext?.onChange?.(e);
             onChange?.(e);
           }}
         />
