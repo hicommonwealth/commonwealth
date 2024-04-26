@@ -39,12 +39,14 @@ type MetaTagProperty =
   | 'og:site_name'
   | 'og:locale';
 
+type MetaTag = {
+  name?: MetaTagName;
+  property?: MetaTagProperty;
+  content: string;
+};
+
 type MetaTagsProps = {
-  customMeta?: {
-    name?: MetaTagName;
-    property?: MetaTagProperty;
-    content: string;
-  }[];
+  customMeta?: MetaTag[];
 };
 
 // These are the default meta tags for each page
@@ -105,11 +107,11 @@ const defaultMeta = {
     property: 'og:image',
     content: 'https://commonwealth.im/static/img/branding/common.png',
   },
-};
+} as const;
 
 const MetaTags = ({ customMeta }: MetaTagsProps) => {
   // make a unique aggregate of meta tags
-  const finalMeta = (() => {
+  const finalMeta: MetaTag[] = (() => {
     const tempMeta = { ...defaultMeta };
 
     customMeta?.map((meta) => {
@@ -122,12 +124,12 @@ const MetaTags = ({ customMeta }: MetaTagsProps) => {
       }
     });
 
-    return Object.values(tempMeta);
+    return [...Object.values(tempMeta)];
   })();
 
   return (
     <Helmet>
-      {finalMeta.map((meta: any, index) => (
+      {finalMeta.map((meta: MetaTag, index) => (
         <meta
           key={index}
           {...(meta.name && {
