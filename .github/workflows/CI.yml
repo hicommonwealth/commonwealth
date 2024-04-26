@@ -346,7 +346,7 @@ jobs:
           fi
 
       - name: Build
-        run: yarn build
+        run: NO_WEBPACK=true yarn build
 
       - name: Run linter
         env:
@@ -421,7 +421,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: NO_WEBPACK=true yarn build-ci
 
       - name: Run unit tests
         run: yarn workspaces run test
@@ -498,7 +498,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: NO_WEBPACK=true yarn build-ci
 
       ## EVM Section:
       - name: Start EVM Testnet
