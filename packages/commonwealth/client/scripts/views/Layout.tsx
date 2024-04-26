@@ -17,7 +17,8 @@ import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCi
 type LayoutAttrs = {
   Component: ReactNode | any;
   scoped?: boolean;
-  type:
+  renderDefaultMetatags?: boolean;
+  type?:
     | 'community' // Community-scoped layout with a header, CW sidebar, & community sidebar.
     | 'common' // Generic layout with header and CW sidebar, used for non-community-scoped pages.
     | 'blank'; //  Blank layout using Layout.scss styles
@@ -27,6 +28,7 @@ type LayoutAttrs = {
 const LayoutComponent = ({
   Component, // Child component being rendered
   scoped = false,
+  renderDefaultMetatags = true,
   type = 'community',
 }: LayoutAttrs) => {
   const navigate = useCommonNavigate();
@@ -131,7 +133,7 @@ const LayoutComponent = ({
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
-      <MetaTags />
+      {renderDefaultMetatags && <MetaTags />}
       <div className="Layout">
         {type === 'blank' ? (
           childToRender()
@@ -145,7 +147,10 @@ const LayoutComponent = ({
   );
 };
 
-export const withLayout = (Component, params) => {
+export const withLayout = (
+  Component,
+  params: Omit<LayoutAttrs, 'Component'>,
+) => {
   const LayoutWrapper = withRouter(LayoutComponent);
   return <LayoutWrapper Component={Component} {...params} />;
 };
