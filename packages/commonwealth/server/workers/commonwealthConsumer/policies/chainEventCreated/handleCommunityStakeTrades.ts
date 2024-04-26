@@ -19,7 +19,7 @@ export async function handleCommunityStakeTrades(
     4: ethAmount,
     // 5: protocolEthAmount,
     // 6: nameSpaceEthAmount,
-  } = event.parsedArgs;
+  } = event.parsedArgs as z.infer<typeof schemas.events.CommunityStakeTrade>;
 
   const existingTxn = await models.StakeTransaction.findOne({
     where: {
@@ -82,7 +82,7 @@ export async function handleCommunityStakeTrades(
     stake_id: parseInt(stakeId as string),
     stake_amount: parseInt(stakeAmount as string),
     stake_price: BigNumber.from(ethAmount).toString(),
-    address: trader,
+    address: BigNumber.from(trader).toString(),
     stake_direction: isBuy ? 'buy' : 'sell',
     timestamp: Number(block.timestamp),
   });

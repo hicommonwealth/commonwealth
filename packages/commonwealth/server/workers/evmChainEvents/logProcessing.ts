@@ -146,6 +146,7 @@ export async function parseLogs(
       eventSource: {
         kind: evmEventSource.kind,
         chainNodeId: evmEventSource.chain_node_id,
+        eventSignature: evmEventSource.event_signature,
       },
       parsedArgs: parsedLog.args,
       rawLog: log,

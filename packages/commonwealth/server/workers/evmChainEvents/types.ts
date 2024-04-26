@@ -7,6 +7,7 @@ export type EvmEvent = {
   eventSource: {
     kind: string;
     chainNodeId: number;
+    eventSignature: string;
   };
   parsedArgs: ethers.utils.Result;
   rawLog: Log;
