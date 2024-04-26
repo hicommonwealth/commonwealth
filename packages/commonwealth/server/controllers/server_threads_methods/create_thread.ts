@@ -213,7 +213,11 @@ export async function __createThread(
 
   const bodyText = decodeURIComponent(body);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, community.id);
+  const mentionedAddresses = await queryMentionedUsers(
+    mentions,
+    community.id,
+    this.models,
+  );
 
   const allNotificationOptions: EmitOptions[] = [];
 

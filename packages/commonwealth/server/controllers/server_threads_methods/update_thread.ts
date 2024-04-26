@@ -344,6 +344,7 @@ export async function __updateThread(
   const mentionedAddresses = await queryMentionedUsers(
     mentions,
     thread.community_id,
+    this.models,
   );
 
   allNotificationOptions.push(

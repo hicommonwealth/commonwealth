@@ -1,4 +1,5 @@
-import { AppError } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
@@ -13,9 +14,11 @@ export type UserMentionQuery = {
 }[];
 
 export const uniqueMentions = (mentions: UserMention[]): UserMention[] => {
+  const hash = (mention) =>
+    `name:${mention.profileName}id:${mention.profileId}`;
   const uniqueIds: Set<string> = new Set();
   return mentions.filter((mention) => {
-    if (uniqueIds.has(mention.profileId)) {
+    if (uniqueIds.has(hash(mention))) {
       return false;
     }
     uniqueIds.add(mention.profileId);
@@ -57,39 +60,45 @@ export const parseUserMentions = (text: string): UserMention[] => {
 export const queryMentionedUsers = async (
   mentions: UserMention[],
   communityId: string,
+  models: DB,
 ): Promise<UserMentionQuery> => {
-  const profileIds = mentions.map((m) => `'${m.profileId}'`).join(', ');
-  const profileNames = mentions.map((m) => `'${m.profileName}'`).join(', ');
-  if (profileIds.length === 0 || profileNames.length === 0) {
+  if (mentions.length === 0) {
     return [];
   }
 
   try {
-    return await this.models.sequelize.query(
-      `
+    const mentionQueries = mentions.map(async ({ profileId, profileName }) => {
+      const result = await models.sequelize.query(
+        `
         SELECT a.address, a.user_id
         FROM "Addresses" as a
-        INNER JOIN "Profiles" as p ON a.profile_id = p.profile_id
+        INNER JOIN "Profiles" as p ON a.profile_id = p.id
         WHERE a.community_id = :communityId AND a.user_id IS NOT NULL
-        AND p.profile_id IN (:profileIds) AND p.profile_name IN (:profileNames)
-        LIMIT 1;
+        AND p.id = :profileId AND p.profile_name = :profileName
       `,
-      {
-        replacements: {
-          communityId,
-          profileIds,
-          profileNames,
+        {
+          replacements: {
+            communityId,
+            profileId,
+            profileName,
+          },
         },
-      },
-    );
+      );
+
+      return result[0][0];
+    });
+    return (await Promise.all(mentionQueries)).filter(
+      (u) => !!u,
+    ) as UserMentionQuery;
   } catch (e) {
-    throw new AppError('Failed to parse mentions');
+    throw new ServerError('Failed to parse mentions', e);
   }
 };
 
 export const createCommentMentionNotifications = (
   mentions: UserMentionQuery,
   comment,
+  address,
 ): EmitOptions[] => {
   return mentions.map(({ user_id }) => {
     return {
@@ -104,11 +113,11 @@ export const createCommentMentionNotifications = (
           comment_id: +comment.id,
           comment_text: comment.text,
           community_id: comment.community_id,
-          author_address: comment.Address.address,
-          author_community_id: comment.Address.community_id,
+          author_address: address.address,
+          author_community_id: address.community_id,
         },
       },
-      excludeAddresses: [comment.Address.address],
+      excludeAddresses: [address.address],
     };
   });
 };
@@ -120,8 +129,9 @@ export const createThreadMentionNotifications = (
   return mentions.map(({ user_id }) => {
     return {
       notification: {
-        categoryId: NotificationCategories.NewThread,
+        categoryId: NotificationCategories.NewMention,
         data: {
+          mentioned_user_id: user_id,
           created_at: new Date(),
           thread_id: finalThread.id,
           root_type: ProposalType.Thread,

@@ -217,12 +217,13 @@ export async function __createThreadComment(
   const mentionedAddresses = await queryMentionedUsers(
     mentions,
     thread.community_id,
+    this.models,
   );
 
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push(
-    ...createCommentMentionNotifications(mentionedAddresses, comment),
+    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
   );
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);

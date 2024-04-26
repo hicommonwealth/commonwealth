@@ -155,10 +155,15 @@ export async function __updateComment(
   const mentionedAddresses = await queryMentionedUsers(
     mentions,
     thread.community_id,
+    this.models,
   );
 
   allNotificationOptions.push(
-    ...createCommentMentionNotifications(mentionedAddresses, finalComment),
+    ...createCommentMentionNotifications(
+      mentionedAddresses,
+      finalComment,
+      finalComment.Address,
+    ),
   );
 
   // update address last active
