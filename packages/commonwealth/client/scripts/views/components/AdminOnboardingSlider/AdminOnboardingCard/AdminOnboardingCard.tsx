@@ -6,31 +6,31 @@ import './AdminOnboardingCard.scss';
 
 const CARD_TYPES = {
   'launch-contest': {
-    iconName: 'shape1.svg',
+    iconFileName: 'shape1.svg',
     title: 'Launch a contest',
     description: 'Get your community engaged by launching a weekly contest',
     ctaText: 'Launch contest',
   },
   'create-topic': {
-    iconName: 'shape3.svg',
+    iconFileName: 'shape3.svg',
     title: 'Create a topic',
     description: 'Add custom topics to keep your discussions organized',
     ctaText: 'Create topic',
   },
   'make-group': {
-    iconName: 'shape4.svg',
+    iconFileName: 'shape4.svg',
     title: 'Make a group',
     description: 'Set user access permissions with custom parameters',
     ctaText: 'Make group',
   },
   'enable-integrations': {
-    iconName: 'shape5.svg',
+    iconFileName: 'shape5.svg',
     title: 'Enable integrations',
     description: 'Integrate your Discord, Snapshot, webhooks, etc.',
     ctaText: 'Integrate apps',
   },
   'create-thread': {
-    iconName: 'shape6.svg',
+    iconFileName: 'shape6.svg',
     title: 'Create a thread',
     description: 'Organize your discussions with topics',
     ctaText: 'Create thread',
@@ -55,7 +55,7 @@ export const AdminOnboardingCard = ({
       ) : (
         <img
           className="section-icon"
-          src={`/static/img/shapes/${CARD_TYPES[cardType].iconName}`}
+          src={`/static/img/shapes/${CARD_TYPES[cardType].iconFileName}`}
           alt={cardType}
         />
       )}
