@@ -32,6 +32,7 @@ describe('createSitemapGenerator', function () {
       discord_config_id: null,
       Addresses: [],
       CommunityStakes: [],
+      contest_managers: [],
     });
 
     if (!community) {
