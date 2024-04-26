@@ -84,8 +84,10 @@ export const SharePopover = ({
                 '_blank',
               );
             } else if (commentId) {
+              const currentRouteSansCommentParam =
+                currentRoute.split('?comment=')[0];
               window.open(
-                `${twitterPrefix}${domain}${discussionLink}?comment=${commentId}`,
+                `${twitterPrefix}${domain}${currentRouteSansCommentParam}?comment=${commentId}`,
                 '_blank',
               );
             } else {
