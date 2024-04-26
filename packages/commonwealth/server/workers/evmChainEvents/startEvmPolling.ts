@@ -1,4 +1,7 @@
 import { logger } from '@hicommonwealth/logging';
+import { models } from '@hicommonwealth/model';
+import { EVM_CE_POLL_INTERVAL_MS } from '../../config';
+import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
 const log = logger(__filename);
 
@@ -13,31 +16,28 @@ const log = logger(__filename);
 export async function startEvmPolling(
   interval: number,
 ): Promise<NodeJS.Timeout> {
-  const { processChainNode, scheduleNodeProcessing } = await import(
-    './nodeProcessing'
-  );
-
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(
-      `Interval for EVM polling must be at least 500_000 ms (500 seconds)`,
+      `Interval for EVM polling must be less than 500_000 ms (500 seconds)`,
     );
   }
 
   log.info(
     `All chains will be polled for events every ${interval / 1000} seconds`,
   );
-  await scheduleNodeProcessing(interval, processChainNode);
+  await scheduleNodeProcessing(models, interval, processChainNode);
   return setInterval(
     scheduleNodeProcessing,
     interval,
+    models,
     interval,
     processChainNode,
   );
 }
 
 if (require.main === module) {
-  startEvmPolling(120_000).catch((e) => {
+  startEvmPolling(EVM_CE_POLL_INTERVAL_MS).catch((e) => {
     log.error('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
   });

@@ -39,7 +39,7 @@
     "start-evm-ce": "tsx -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-ci": "FETCH_INTERVAL_MS=500 tsx -r tsconfig-paths/register server.ts",
-    "start-consumer": "tsx -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script",
+    "start-consumer": "tsx -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts",
     "start-message-relayer": "tsx -r tsconfig-paths/register ./server/workers/messageRelayer/messageRelayer.ts",
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true tsx -r tsconfig-paths/register server.ts",
     "stylelint": "stylelint client/styles/*",
