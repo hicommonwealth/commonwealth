@@ -6,6 +6,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import * as dotenv from 'dotenv';
 import express, { RequestHandler, json } from 'express';
+import { Response } from 'superagent';
 import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
   CACHE_ENDPOINTS,
@@ -25,7 +26,7 @@ const content_type = {
 };
 
 function verifyNoCacheResponse(
-  res,
+  res: Response,
   status = 200,
   cacheHeader = XCACHE_VALUES.MISS,
 ) {
@@ -35,25 +36,29 @@ function verifyNoCacheResponse(
   expect(res).to.have.header('X-Cache', cacheHeader);
 }
 
-async function makeGetRequest(endpoint, headers = {}) {
+async function makeGetRequest(endpoint: string, headers = {}) {
   headers = { ...headers, Accept: 'application/json' };
-  const res = await chai.request(app).get(endpoint).set(headers);
-
-  return res;
+  return chai.request(app).get(endpoint).set(headers);
 }
 
-async function makePostRequest(endpoint, body, headers = {}) {
+async function makePostRequest(
+  endpoint: string,
+  body: string | object | undefined,
+  headers = {},
+) {
   headers = { ...headers, Accept: 'application/json' };
-  const res = await chai.request(app).post(endpoint).set(headers).send(body);
-
-  return res;
+  return chai.request(app).post(endpoint).set(headers).send(body);
 }
 
 describe('Cache Decorator', () => {
   let cacheDecorator: CacheDecorator;
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
-  async function verifyCacheResponse(key, res, resEarlier) {
+  async function verifyCacheResponse(
+    key: string,
+    res: Response,
+    resEarlier: Response,
+  ) {
     expect(res).to.have.status(200);
     expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
     const valFromRedis = await cacheDecorator.checkCache(key);

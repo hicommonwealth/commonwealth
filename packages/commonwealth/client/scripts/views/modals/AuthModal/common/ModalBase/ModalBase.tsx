@@ -96,7 +96,9 @@ const ModalBase = ({
     onSocialLogin,
     onVerifyMobileWalletSignature,
   } = useWallets({
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
   });
 
@@ -261,6 +263,7 @@ const ModalBase = ({
                   <EmailForm
                     isLoading={isMagicLoading}
                     onCancel={() => setIsAuthenticatingWithEmail(false)}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onSubmit={async ({ email }) => await onEmailLogin(email)}
                   />
                 )}
@@ -293,20 +296,26 @@ const ModalBase = ({
             ...evmWallets.filter((x) => x !== 'walletconnect'),
           ] as EVMWallets[]
         }
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         isOpen={isEVMWalletsModalVisible}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClose={async () => {
           setIsEVMWalletsModalVisible(false);
           isWalletConnectEnabled && (await onResetWalletConnect());
         }}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onWalletSelect={async (option) => await onAuthMethodSelect(option)}
         disabled={isMagicLoading}
         canResetWalletConnect={isWalletConnectEnabled}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onResetWalletConnect={onResetWalletConnect}
       />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal
         isOpen={isMobileWalletVerificationStep}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClose={handleClose}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSignatureConfirmation={onVerifyMobileWalletSignature}
       />
     </>

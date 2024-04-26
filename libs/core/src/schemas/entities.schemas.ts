@@ -558,19 +558,19 @@ export const SubscriptionPreference = z.object({
 });
 
 export const ThreadSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommentSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   comment_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommunityAlert = z.object({
