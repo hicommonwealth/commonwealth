@@ -8,7 +8,7 @@ import {
   MembershipRejectReason,
   OptionsWithBalances,
 } from '@hicommonwealth/model';
-import { toBN } from 'web3-utils';
+import { toBigInt } from 'web3-utils';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -180,7 +180,7 @@ function _thresholdCheck(
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = toBN(balance).gt(toBN(thresholdData.threshold));
+    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
     return {
       result,
       message: !result

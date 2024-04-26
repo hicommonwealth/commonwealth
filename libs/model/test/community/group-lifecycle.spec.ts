@@ -13,7 +13,7 @@ chai.use(chaiAsPromised);
 const chance = Chance();
 
 describe('Group lifecycle', () => {
-  let id;
+  let id: string;
   let actor: Actor;
 
   const payload = {
@@ -52,6 +52,7 @@ describe('Group lifecycle', () => {
         CommunityStakes: [],
         topics: [],
         groups: [],
+        contest_managers: [],
         discord_config_id: null,
       },
       // { mock: true, log: true },

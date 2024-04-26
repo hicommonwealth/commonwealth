@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "esnext",
-    "moduleResolution": "node",
-    "module": "commonjs",
+    "moduleResolution": "node10",
+    "module": "node16",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -14,9 +14,17 @@
       "@hicommonwealth/*": ["libs/*/src"]
     }
   },
-  "include": ["**/src"],
-  "exclude": ["**/node_modules", "**/build"],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"]
-  }
+  "files": [],
+  "references": [
+    { "path": "libs/adapters/tsconfig.build.json" },
+    { "path": "libs/chains/tsconfig.build.json" },
+    { "path": "libs/core/tsconfig.build.json" },
+    { "path": "libs/logging/tsconfig.build.json" },
+    { "path": "libs/model/tsconfig.build.json" },
+    { "path": "libs/shared/tsconfig.build.json" },
+    { "path": "packages/commonwealth/tsconfig.build.json" },
+    { "path": "packages/discord-bot/tsconfig.build.json" },
+    { "path": "packages/scripts/tsconfig.json" },
+    { "path": "packages/snapshot-listener/tsconfig.build.json" }
+  ]
 }

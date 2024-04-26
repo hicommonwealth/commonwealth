@@ -1,20 +1,30 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
+import { NEW_SUBSCRIPTION_API_FLAG } from '../config';
 import * as community from './community';
+import * as contest from './contest';
 import * as feed from './feed';
 import * as integrations from './integrations';
+import * as subscription from './subscription';
 import * as thread from './threads';
 
 /**
  * API v1 - tRPC Router
  */
-const apiV1 = trpc.router({
+const artifacts = {
   community: community.trpcRouter,
   thread: thread.trpcRouter,
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
-});
+  contest: contest.trpcRouter,
+};
+
+if (NEW_SUBSCRIPTION_API_FLAG) {
+  artifacts['subscription'] = subscription.trpcRouter;
+}
+
+const apiV1 = trpc.router(artifacts);
 export type ApiV1 = typeof apiV1;
 
 /**

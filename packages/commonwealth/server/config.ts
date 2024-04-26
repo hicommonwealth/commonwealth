@@ -121,3 +121,6 @@ export const MESSAGE_RELAYER_TIMEOUT_MS =
   parseInt(process.env.MESSAGE_RELAYER_TIME_MS) || 200;
 export const MESSAGE_RELAYER_PREFETCH =
   parseInt(process.env.MESSAGE_RELAYER_PREFETCH) || 50;
+
+export const NEW_SUBSCRIPTION_API_FLAG =
+  process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;

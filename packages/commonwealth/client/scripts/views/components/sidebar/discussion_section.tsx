@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'components/sidebar/index.scss';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -43,15 +44,26 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const DiscussionSection = () => {
+export const DiscussionSection = ({
+  isContestAvailable,
+}: {
+  isContestAvailable: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+
+  const contestsEnabled = useFlag('contest');
+
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
     location,
   );
   const matchesOverviewRoute = matchRoutes(
     [{ path: '/overview' }, { path: ':scope/overview' }],
+    location,
+  );
+  const matchesContestsRoute = matchRoutes(
+    [{ path: '/contests' }, { path: ':scope/contests' }],
     location,
   );
   const matchesArchivedRoute = matchRoutes(
@@ -141,6 +153,35 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
+    ...(contestsEnabled && isContestAvailable
+      ? [
+          {
+            title: 'Contests',
+            containsChildren: false,
+            displayData: null,
+            hasDefaultToggle: false,
+            isActive: !!matchesContestsRoute,
+            isVisible: true,
+            isUpdated: true,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
+              resetSidebarState();
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/contests`,
+                app.activeChainId(),
+                () => {
+                  setDiscussionsToggleTree(
+                    `children.Contests.toggledState`,
+                    toggle,
+                  );
+                },
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: 'Overview',
       containsChildren: false,
