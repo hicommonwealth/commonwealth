@@ -214,11 +214,7 @@ export async function __createThreadComment(
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(
-    mentions,
-    thread.community_id,
-    this.models,
-  );
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   const allNotificationOptions: EmitOptions[] = [];
 

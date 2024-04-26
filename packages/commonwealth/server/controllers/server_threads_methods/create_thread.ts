@@ -213,20 +213,13 @@ export async function __createThread(
 
   const bodyText = decodeURIComponent(body);
   const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(
-    mentions,
-    community.id,
-    this.models,
-  );
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push(
     ...createThreadMentionNotifications(mentionedAddresses, finalThread),
   );
-
-  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
-  excludedAddrs.push(finalThread.Address.address);
 
   allNotificationOptions.push({
     notification: {
@@ -242,7 +235,7 @@ export async function __createThread(
         author_community_id: finalThread.Address.community_id,
       },
     },
-    excludeAddresses: finalThread.Address.address,
+    excludeAddresses: [finalThread.Address.address],
   });
 
   const analyticsOptions = {

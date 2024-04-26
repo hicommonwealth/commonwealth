@@ -334,18 +334,12 @@ export async function __updateThread(
   });
 
   const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(
-    decodeURIComponent(commentBody),
-  );
+  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
   const mentions = uniqueMentions([
     ...previousDraftMentions,
     ...currentDraftMentions,
   ]);
-  const mentionedAddresses = await queryMentionedUsers(
-    mentions,
-    thread.community_id,
-    this.models,
-  );
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
     ...createThreadMentionNotifications(mentionedAddresses, finalThread),

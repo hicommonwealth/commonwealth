@@ -152,11 +152,7 @@ export async function __updateComment(
     ...previousDraftMentions,
     ...currentDraftMentions,
   ]);
-  const mentionedAddresses = await queryMentionedUsers(
-    mentions,
-    thread.community_id,
-    this.models,
-  );
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
     ...createCommentMentionNotifications(

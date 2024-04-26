@@ -10,7 +10,7 @@ export type UserMention = {
 
 export type UserMentionQuery = {
   address: string;
-  user_id: string;
+  user_id: number;
 }[];
 
 export const uniqueMentions = (mentions: UserMention[]): UserMention[] => {
@@ -59,7 +59,6 @@ export const parseUserMentions = (text: string): UserMention[] => {
 
 export const queryMentionedUsers = async (
   mentions: UserMention[],
-  communityId: string,
   models: DB,
 ): Promise<UserMentionQuery> => {
   if (mentions.length === 0) {
@@ -73,12 +72,10 @@ export const queryMentionedUsers = async (
         SELECT a.address, a.user_id
         FROM "Addresses" as a
         INNER JOIN "Profiles" as p ON a.profile_id = p.id
-        WHERE a.community_id = :communityId AND a.user_id IS NOT NULL
-        AND p.id = :profileId AND p.profile_name = :profileName
+        WHERE a.user_id IS NOT NULL AND p.id = :profileId AND p.profile_name = :profileName
       `,
         {
           replacements: {
-            communityId,
             profileId,
             profileName,
           },
@@ -119,7 +116,7 @@ export const createCommentMentionNotifications = (
       },
       excludeAddresses: [address.address],
     };
-  });
+  }) as EmitOptions[];
 };
 
 export const createThreadMentionNotifications = (
@@ -144,5 +141,5 @@ export const createThreadMentionNotifications = (
       },
       excludeAddresses: [finalThread.Address.address],
     };
-  });
+  }) as EmitOptions[];
 };
