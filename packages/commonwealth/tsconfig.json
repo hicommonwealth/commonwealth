@@ -1,12 +1,13 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "rootDir": ".",
     "outDir": "build",
     "jsx": "react",
     "sourceMap": true,
     "paths": {
-      "*": ["./*", "./shared/*", "./client/scripts/*"]
+      "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
   "include": [
