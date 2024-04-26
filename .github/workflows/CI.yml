@@ -360,6 +360,9 @@ jobs:
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: yarn workspace commonwealth run lint-diff-canary
 
+      - name: libs/sitemaps check-types
+        run: yarn --cwd libs/sitemaps check-types
+
       - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
 
