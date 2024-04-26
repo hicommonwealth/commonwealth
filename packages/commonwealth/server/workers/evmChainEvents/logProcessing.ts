@@ -106,7 +106,7 @@ export async function getLogs({
     logIndex: parseInt(log.logIndex, 16),
   }));
 
-  return { logs: formattedLogs, lastBlockNum: endingBlockNum };
+  return { logs: formattedLogs, lastBlockNum: endBlock };
 }
 
 export async function parseLogs(
