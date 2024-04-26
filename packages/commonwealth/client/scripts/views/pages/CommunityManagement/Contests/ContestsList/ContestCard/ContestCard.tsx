@@ -107,7 +107,7 @@ const ContestCard = ({
           />
 
           <SharePopover
-            customUrl={'/contests'}
+            customUrl="/contests"
             renderTrigger={(handleInteraction) => (
               <CWThreadAction
                 action="share"

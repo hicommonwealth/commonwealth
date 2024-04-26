@@ -24,6 +24,7 @@ import {
   LaunchContestStep,
 } from '../../types';
 import PayoutRow from './PayoutRow';
+import useContestTopics from './useContestTopics';
 import {
   INITIAL_PERCENTAGE_VALUE,
   MAX_WINNERS,
@@ -33,7 +34,6 @@ import {
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
 
-import useContestTopics from 'views/pages/CommunityManagement/Contests/ManageContest/steps/DetailsFormStep/useContestTopics';
 import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
