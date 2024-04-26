@@ -130,6 +130,8 @@ export const processSnapshotProposalCreated: EventHandler<
         eventType: event as SnapshotEventType,
         ...snapshotNotificationData,
       },
+    }).catch((err) => {
+      log.error('Error sending snapshot notification', err);
     });
   }
 

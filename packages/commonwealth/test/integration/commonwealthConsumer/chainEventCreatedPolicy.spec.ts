@@ -3,7 +3,6 @@ import { DB, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
-import { seed } from '../../../../../libs/model/src/tester';
 // eslint-disable-next-line max-len
 import { processChainEventCreated } from '../../../server/workers/commonwealthConsumer/policies/chainEventCreated/chainEventCreatedPolicy';
 
@@ -80,7 +79,7 @@ describe('ChainEventCreated Policy', () => {
       { mock: false },
     );
 
-    const [user] = await seed('User', {
+    const [user] = await tester.seed('User', {
       isAdmin: true,
       selected_community_id: null,
     });
@@ -135,7 +134,7 @@ describe('ChainEventCreated Policy', () => {
   });
 
   it('should ignore stake transactions that already exist', async () => {
-    await seed('StakeTransaction', {
+    await tester.seed('StakeTransaction', {
       transaction_hash: transactionHash,
       community_id: community.id,
       stake_id: stakeId,

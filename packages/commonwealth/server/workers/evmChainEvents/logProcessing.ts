@@ -41,38 +41,40 @@ export async function getLogs({
   startingBlockNum: number;
   endingBlockNum?: number;
 }): Promise<{ logs: Log[]; lastBlockNum: number }> {
+  let startBlock = startingBlockNum;
+  let endBlock = endingBlockNum;
   const provider = getProvider(rpc);
-  if (!endingBlockNum) endingBlockNum = await provider.getBlockNumber();
+  if (!endBlock) endBlock = await provider.getBlockNumber();
 
-  if (startingBlockNum > endingBlockNum) {
+  if (startBlock > endBlock) {
     logger.error(
       'Starting block number is greater than the latest/current block number!',
       undefined,
       {
-        startingBlockNum,
-        endingBlockNum,
+        startBlock,
+        endBlock,
       },
     );
-    return { logs: [], lastBlockNum: endingBlockNum };
+    return { logs: [], lastBlockNum: endBlock };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endingBlockNum };
+    return { logs: [], lastBlockNum: endBlock };
   }
 
-  if (endingBlockNum - startingBlockNum > 500) {
+  if (endBlock - startBlock > 500) {
     // limit the number of blocks to fetch to 500 to avoid rate limiting on some EVM nodes like Celo
     // this should eventually be configured on the ChainNodes table by rpc since each rpc has different
     // rate limits e.g. Alchemy has a limit of 10k logs while Celo public nodes have a limit of 500.
-    startingBlockNum = endingBlockNum - 500;
+    startBlock = endBlock - 500;
     logger.error(
       'Block span too large. The number of fetch blocked is reduced to 500.',
       undefined,
       {
         contractAddresses,
-        startingBlockNum,
-        endingBlockNum,
+        startBlock,
+        endBlock,
       },
     );
   }
@@ -91,8 +93,8 @@ export async function getLogs({
     transactionIndex: string;
   }> = await provider.send('eth_getLogs', [
     {
-      fromBlock: decimalToHex(startingBlockNum),
-      toBlock: decimalToHex(endingBlockNum),
+      fromBlock: decimalToHex(startBlock),
+      toBlock: decimalToHex(endBlock),
       address: contractAddresses,
     },
   ]);
