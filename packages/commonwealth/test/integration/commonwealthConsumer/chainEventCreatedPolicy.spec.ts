@@ -50,13 +50,18 @@ async function processValidStakeTransaction(chainNodeId) {
         },
         '0x0000000000000000000000000000000000000000',
       ],
-      eventSource: { kind: 'Trade', chainNodeId },
+      eventSource: {
+        kind: 'Trade',
+        chainNodeId,
+        eventSignature:
+          '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
+      },
     },
   };
   await processChainEventCreated(context);
 }
 
-describe.only('ChainEventCreated Policy', () => {
+describe('ChainEventCreated Policy', () => {
   let models: DB;
   let chainNode, community;
 
@@ -100,6 +105,7 @@ describe.only('ChainEventCreated Policy', () => {
       ],
       topics: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
   });

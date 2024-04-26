@@ -82,7 +82,7 @@ export async function handleCommunityStakeTrades(
     stake_id: parseInt(stakeId as string),
     stake_amount: parseInt(stakeAmount as string),
     stake_price: BigNumber.from(ethAmount).toString(),
-    address: BigNumber.from(trader).toString(),
+    address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
     timestamp: Number(block.timestamp),
   });
