@@ -83,7 +83,7 @@ class Contest extends ContractBase {
     const tokenAddress = await this.contract.methods.contestToken().call();
 
     let txReceipt;
-    const weiAmount = this.web3.utils.toWei(this.toBN(amount));
+    const weiAmount = this.web3.utils.toWei(amount, 'ether');
     if (tokenAddress === '0x0000000000000000000000000000000000000000') {
       //ETH funding route
       try {
