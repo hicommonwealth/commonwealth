@@ -21,7 +21,6 @@
     "./server-test.ts",
     "./scripts"
   ],
-  "exclude": [],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
     { "path": "../../libs/chains/tsconfig.build.json" },
