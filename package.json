@@ -9,6 +9,7 @@
   "workspaces": [
     "packages/commonwealth",
     "packages/discord-bot",
+    "packages/scripts",
     "packages/snapshot-listener",
     "libs/*"
   ],
