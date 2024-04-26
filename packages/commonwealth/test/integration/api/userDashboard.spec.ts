@@ -210,6 +210,7 @@ describe('User Dashboard API', () => {
             [Op.in]: threadIds,
           },
         },
+        order: [['community_id', 'ASC']],
         raw: true,
       });
       expect(chains).to.deep.equal([
