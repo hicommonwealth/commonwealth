@@ -11,5 +11,6 @@
     "downlevelIteration": true,
     "traceResolution": false
   },
+  "include": [],
   "exclude": ["**/build", "**/node_modules"]
 }
