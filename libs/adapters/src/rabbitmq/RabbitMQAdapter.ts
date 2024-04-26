@@ -18,11 +18,13 @@ import { RascalPublications, RascalSubscriptions } from './types';
 const BrokerTopicPublicationMap = {
   [BrokerTopics.DiscordListener]: RascalPublications.DiscordListener,
   [BrokerTopics.SnapshotListener]: RascalPublications.SnapshotListener,
+  [BrokerTopics.ChainEvent]: RascalPublications.ChainEvent,
 };
 
 const BrokerTopicSubscriptionMap = {
   [BrokerTopics.DiscordListener]: RascalSubscriptions.DiscordListener,
   [BrokerTopics.SnapshotListener]: RascalSubscriptions.SnapshotListener,
+  [BrokerTopics.ChainEvent]: RascalSubscriptions.ChainEvent,
 };
 
 const defaultRetryStrategy: RetryStrategyFn = (

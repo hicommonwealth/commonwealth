@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import { localRpc } from '../../devnet/evm/evmChainEvents/util';
@@ -13,7 +13,11 @@ import {
 } from './util';
 
 describe('getEventSources', () => {
+  let models: DB;
+
   before(async () => {
+    const res = await import('@hicommonwealth/model');
+    models = res['models'];
     await tester.seedDb();
   });
 
@@ -22,19 +26,19 @@ describe('getEventSources', () => {
   });
 
   it('should not return sources that are not subscribed to', async () => {
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
   it("should not return sources that don't have a community contract", async () => {
     await getTestSubscription();
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
   it("should not return sources that don't have an ABI", async () => {
     await getTestCommunityContract();
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
@@ -44,14 +48,14 @@ describe('getEventSources', () => {
     contract.abi_id = abi.id;
     await contract.save();
 
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
   it('should return event sources organized by chain node', async () => {
     const signatures = await getTestSignatures();
     const abi = await getTestAbi();
-    const result = await getEventSources();
+    const result = await getEventSources(models);
 
     const chainNodeId = String(signatures[0].chain_node_id);
     const contractAddress = signatures[0].contract_address;

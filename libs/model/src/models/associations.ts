@@ -33,7 +33,10 @@ export const buildAssociations = (db: DB) => {
     { asMany: 'contracts' },
   );
 
-  db.ContractAbi.withMany(db.Contract, 'abi_id');
+  db.ContractAbi.withMany(db.Contract, 'abi_id').withMany(
+    db.EvmEventSource,
+    'abi_id',
+  );
 
   db.Community.withMany(db.Group, 'community_id', { asMany: 'groups' })
     .withMany(db.Topic, 'community_id', {

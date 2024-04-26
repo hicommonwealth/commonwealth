@@ -27,6 +27,7 @@ const generateSchemas = async () => {
       ],
       Memberships: ['PRIMARY KEY(id)'],
       Notifications: ['FOREIGN KEY(thread_id)'],
+      Outbox: ['PRIMARY KEY(event_id)'],
       Profiles: ['FOREIGN KEY(user_id)'],
       Reactions: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(community_id)'],
       SnapshotProposals: ['FOREIGN KEY(space)'],

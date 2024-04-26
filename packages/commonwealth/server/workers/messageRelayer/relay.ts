@@ -10,6 +10,7 @@ const log = logger(__filename);
 const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {
   SnapshotProposalCreated: BrokerTopics.SnapshotListener,
   DiscordMessageCreated: BrokerTopics.DiscordListener,
+  ChainEventCreated: BrokerTopics.ChainEvent,
 } as const;
 
 export async function relay(broker: Broker, models: DB): Promise<number> {
@@ -47,7 +48,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
           });
           break;
         }
-        publishedEventIds.push(event.id);
+        publishedEventIds.push(event.event_id);
         stats().incrementBy(
           'messageRelayerPublished',
           publishedEventIds.length,
@@ -60,22 +61,20 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
       }
     }
 
-    await models.sequelize.query(
-      `
-      UPDATE "Outbox"
-      SET relayed = true,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE relayed = false -- ensures query ignores irrelevant child partitions
-        AND id IN (:eventIds)
-    `,
-      {
-        replacements: {
-          eventIds: publishedEventIds,
+    if (publishedEventIds.length > 0) {
+      await models.Outbox.update(
+        {
+          relayed: true,
         },
-        transaction,
-        type: QueryTypes.UPDATE,
-      },
-    );
+        {
+          where: {
+            relayed: false,
+            event_id: publishedEventIds,
+          },
+          transaction,
+        },
+      );
+    }
   });
 
   return publishedEventIds.length;
