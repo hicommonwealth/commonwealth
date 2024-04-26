@@ -1,4 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
 export type UserMention = {
   profileId: string;
@@ -83,4 +85,54 @@ export const queryMentionedUsers = async (
   } catch (e) {
     throw new AppError('Failed to parse mentions');
   }
+};
+
+export const createCommentMentionNotifications = (
+  mentions: UserMentionQuery,
+  comment,
+): EmitOptions[] => {
+  return mentions.map(({ user_id }) => {
+    return {
+      notification: {
+        categoryId: NotificationCategories.NewMention,
+        data: {
+          mentioned_user_id: user_id,
+          created_at: new Date(),
+          thread_id: +comment.thread_id,
+          root_title: comment.root_title,
+          root_type: ProposalType.Thread,
+          comment_id: +comment.id,
+          comment_text: comment.text,
+          community_id: comment.community_id,
+          author_address: comment.Address.address,
+          author_community_id: comment.Address.community_id,
+        },
+      },
+      excludeAddresses: [comment.Address.address],
+    };
+  });
+};
+
+export const createThreadMentionNotifications = (
+  mentions: UserMentionQuery,
+  finalThread,
+): EmitOptions[] => {
+  return mentions.map(({ user_id }) => {
+    return {
+      notification: {
+        categoryId: NotificationCategories.NewThread,
+        data: {
+          created_at: new Date(),
+          thread_id: finalThread.id,
+          root_type: ProposalType.Thread,
+          root_title: finalThread.title,
+          comment_text: finalThread.body,
+          community_id: finalThread.community_id,
+          author_address: finalThread.Address.address,
+          author_community_id: finalThread.Address.community_id,
+        },
+      },
+      excludeAddresses: [finalThread.Address.address],
+    };
+  });
 };

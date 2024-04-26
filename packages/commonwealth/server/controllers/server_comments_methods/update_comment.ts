@@ -10,6 +10,7 @@ import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
+  createCommentMentionNotifications,
   parseUserMentions,
   queryMentionedUsers,
   uniqueMentions,
@@ -156,27 +157,9 @@ export async function __updateComment(
     thread.community_id,
   );
 
-  // notify mentioned users, given permissions are in place
-  mentionedAddresses.forEach((mentionedAddress) => {
-    allNotificationOptions.push({
-      notification: {
-        categoryId: NotificationCategories.NewMention,
-        data: {
-          mentioned_user_id: mentionedAddress.User.id,
-          created_at: new Date(),
-          thread_id: +comment.thread_id,
-          root_title,
-          root_type: ProposalType.Thread,
-          comment_id: +finalComment.id,
-          comment_text: finalComment.text,
-          community_id: finalComment.community_id,
-          author_address: finalComment.Address.address,
-          author_community_id: finalComment.Address.community_id,
-        },
-      },
-      excludeAddresses: [finalComment.Address.address],
-    });
-  });
+  allNotificationOptions.push(
+    ...createCommentMentionNotifications(mentionedAddresses, finalComment),
+  );
 
   // update address last active
   address.last_active = new Date();

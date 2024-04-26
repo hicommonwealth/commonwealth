@@ -14,6 +14,7 @@ import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
+  createThreadMentionNotifications,
   parseUserMentions,
   queryMentionedUsers,
   uniqueMentions,
@@ -345,25 +346,9 @@ export async function __updateThread(
     thread.community_id,
   );
 
-  mentionedAddresses.forEach(({ user_id }) => {
-    allNotificationOptions.push({
-      notification: {
-        categoryId: NotificationCategories.NewMention,
-        data: {
-          mentioned_user_id: user_id,
-          created_at: now,
-          thread_id: +finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          community_id: finalThread.community_id,
-          author_address: finalThread.Address.address,
-          author_community_id: finalThread.Address.community_id,
-        },
-      },
-      excludeAddresses: [finalThread.Address.address],
-    });
-  });
+  allNotificationOptions.push(
+    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
+  );
 
   return [finalThread.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }

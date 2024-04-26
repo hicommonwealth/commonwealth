@@ -12,6 +12,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import {
+  createCommentMentionNotifications,
   parseUserMentions,
   queryMentionedUsers,
   uniqueMentions,
@@ -218,6 +219,12 @@ export async function __createThreadComment(
     thread.community_id,
   );
 
+  const allNotificationOptions: EmitOptions[] = [];
+
+  allNotificationOptions.push(
+    ...createCommentMentionNotifications(mentionedAddresses, comment),
+  );
+
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(address.address);
 
@@ -227,8 +234,6 @@ export async function __createThreadComment(
   }
 
   const root_title = thread.title || '';
-
-  const allNotificationOptions: EmitOptions[] = [];
 
   // build notification for root thread
   allNotificationOptions.push({
@@ -269,28 +274,6 @@ export async function __createThreadComment(
         },
       },
       excludeAddresses: excludedAddrs,
-    });
-
-    // notify mentioned users if they have permission to view the originating forum
-    mentionedAddresses.forEach((mentionedAddress) => {
-      allNotificationOptions.push({
-        notification: {
-          categoryId: NotificationCategories.NewMention,
-          data: {
-            mentioned_user_id: mentionedAddress.User.id,
-            created_at: new Date(),
-            thread_id: +threadId,
-            root_title,
-            root_type: ProposalType.Thread,
-            comment_id: +comment.id,
-            comment_text: comment.text,
-            community_id: comment.community_id,
-            author_address: address.address,
-            author_community_id: address.community_id,
-          },
-        },
-        excludeAddresses: [address.address],
-      });
     });
   }
 
