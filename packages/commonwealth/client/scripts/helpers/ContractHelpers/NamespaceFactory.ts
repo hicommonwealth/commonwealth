@@ -47,7 +47,7 @@ class NamespaceFactory extends ContractBase {
     }
     const hexString = this.web3.utils.utf8ToHex(name);
     const activeNamespace = await this.contract.methods
-      .getNamespace(hexString)
+      .getNamespace(hexString.padEnd(66, '0'))
       .call();
     return activeNamespace;
   }

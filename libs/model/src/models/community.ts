@@ -178,16 +178,15 @@ export default (
     models.Community.hasMany(models.StarredCommunity, {
       foreignKey: 'community_id',
     });
-    models.Community.belongsToMany(models.Contract, {
-      through: models.CommunityContract,
-      foreignKey: 'community_id',
-    });
     models.Community.hasMany(models.Group, {
       as: 'groups',
       foreignKey: 'community_id',
     });
-    models.Community.hasMany(models.CommunityStake, {
-      foreignKey: { name: 'community_id' },
+    models.Community.hasMany(models.CommunityAlert, {
+      foreignKey: 'community_id',
+    });
+    models.Community.hasMany(models.CommunityAlert, {
+      foreignKey: 'community_id',
     });
   };
 

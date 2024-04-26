@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
@@ -58,6 +59,7 @@ interface StakeExchangeFormProps {
   addressOptions: OptionDropdown[];
   numberOfStakeToExchange: number;
   onSetNumberOfStakeToExchange: React.Dispatch<React.SetStateAction<number>>;
+  denomination: string;
   community?: ChainInfo;
 }
 
@@ -70,6 +72,7 @@ const StakeExchangeForm = ({
   addressOptions,
   numberOfStakeToExchange,
   onSetNumberOfStakeToExchange,
+  denomination,
   community,
 }: StakeExchangeFormProps) => {
   const chainRpc =
@@ -131,6 +134,9 @@ const StakeExchangeForm = ({
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,
+        ...(community?.ChainNode?.ethChainId && {
+          chainId: `${community.ChainNode.ethChainId}`,
+        }),
       });
 
       await createStakeTransaction.mutateAsync({
@@ -316,10 +322,16 @@ const StakeExchangeForm = ({
         <CWDivider />
 
         <div className="stake-valued-row">
-          <CWText type="caption">You have {stakeBalance} stake</CWText>
-          <CWText type="caption" className="valued">
-            valued at {capDecimals(String(stakeValue))} ETH
-          </CWText>
+          <div className="container">
+            <CWText type="caption">You have {stakeBalance} stake</CWText>
+            <CWText type="caption" className="valued">
+              valued at
+              <span className="denominationIcon">
+                {findDenominationIcon(denomination)}
+              </span>
+              {capDecimals(String(stakeValue))} {denomination}
+            </CWText>
+          </div>
           <CWText type="caption" className="vote-weight">
             Current vote weight {currentVoteWeight}
           </CWText>
@@ -354,7 +366,7 @@ const StakeExchangeForm = ({
               <Skeleton className="price-skeleton" />
             ) : (
               <CWText type="caption" fontWeight="medium">
-                {capDecimals(pricePerUnitEth)} ETH • ~$
+                {capDecimals(pricePerUnitEth)} {denomination}• ~$
                 {pricePerUnitUsd} USD
               </CWText>
             )}
@@ -427,7 +439,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {capDecimals(feesPriceEth)} ETH • ~$
+              {capDecimals(feesPriceEth)} {denomination}• ~$
               {feesPriceUsd} USD
             </CWText>
           )}
@@ -441,7 +453,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
-              {capDecimals(totalPriceEth)} ETH • ~$
+              {capDecimals(totalPriceEth)} {denomination}• ~$
               {totalPriceUsd} USD
             </CWText>
           )}

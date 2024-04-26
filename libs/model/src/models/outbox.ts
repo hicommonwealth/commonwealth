@@ -3,7 +3,7 @@ import { EventContext, schemas } from '@hicommonwealth/core';
 // import type { DataTypes } from 'sequelize';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
-import { DB } from './index';
+import { DB } from '.';
 // import { ModelInstance, ModelStatic } from './types';
 
 export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;

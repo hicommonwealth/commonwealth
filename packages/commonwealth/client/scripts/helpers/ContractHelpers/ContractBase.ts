@@ -66,10 +66,6 @@ abstract class ContractBase {
       this.contractAddress,
     );
   }
-
-  protected toBN(number: string | number) {
-    return this.web3.utils.toBN(number);
-  }
 }
 
 export default ContractBase;

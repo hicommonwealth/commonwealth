@@ -17,9 +17,9 @@ import { seed } from '../../src/tester';
 chai.use(chaiAsPromised);
 
 describe('Stake lifecycle', () => {
-  let id_with_stake;
-  let id_without_stake_to_set;
-  let id_without_stake;
+  let id_with_stake: string;
+  let id_without_stake_to_set: string;
+  let id_without_stake: string;
   let actor: Actor;
 
   const payload = {
@@ -30,16 +30,11 @@ describe('Stake lifecycle', () => {
   };
 
   before(async () => {
-    const [node] = await seed(
-      'ChainNode',
-      { contracts: [] },
-      // { mock: true, log: true },
-    );
-    const [user] = await seed(
-      'User',
-      { isAdmin: true, selected_community_id: null },
-      // { mock: true, log: true },
-    );
+    const [node] = await seed('ChainNode', { contracts: [] });
+    const [user] = await seed('User', {
+      isAdmin: true,
+      selected_community_id: null,
+    });
     const [community_with_stake] = await seed(
       'Community',
       {
@@ -61,6 +56,7 @@ describe('Stake lifecycle', () => {
         ],
         topics: [],
         groups: [],
+        contest_managers: [],
         discord_config_id: null,
       },
       // { mock: true, log: true },
@@ -79,6 +75,7 @@ describe('Stake lifecycle', () => {
         CommunityStakes: [],
         topics: [],
         groups: [],
+        contest_managers: [],
         discord_config_id: null,
       },
       // { mock: true, log: true },
@@ -97,6 +94,7 @@ describe('Stake lifecycle', () => {
         CommunityStakes: [],
         topics: [],
         groups: [],
+        contest_managers: [],
         discord_config_id: null,
       },
       // { mock: true, log: true },
