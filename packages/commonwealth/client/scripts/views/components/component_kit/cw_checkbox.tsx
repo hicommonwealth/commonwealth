@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 import 'components/component_kit/cw_checkbox.scss';
 import { CWText } from './cw_text';
@@ -23,7 +23,7 @@ type CheckboxFormValidationProps = {
 
 type CheckboxProps = {
   groupName?: string;
-  onChange?: (e?: any) => void;
+  onChange?: (e?: ChangeEvent<HTMLInputElement>) => void;
   labelClassName?: string;
 } & CheckboxType &
   CheckboxStyleProps &
@@ -76,9 +76,9 @@ export const CWCheckbox = ({
           className={clsx('checkbox-input', { disabled })}
           {...params}
           {...formFieldContext}
-          onChange={async (e) => {
-            hookToForm && name && (await formFieldContext?.onChange(e));
-            await onChange?.(e);
+          onChange={(e) => {
+            hookToForm && name && formFieldContext?.onChange(e);
+            onChange?.(e);
           }}
         />
         <div className="checkbox-control" />
