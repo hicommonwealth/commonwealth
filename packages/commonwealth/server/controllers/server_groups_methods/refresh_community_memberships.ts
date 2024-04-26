@@ -1,4 +1,5 @@
-import { AppError, logger } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   AddressAttributes,
   Balances,
@@ -19,7 +20,7 @@ import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBal
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 const Errors = {
   GroupNotFound: 'Group not found',
@@ -62,7 +63,7 @@ export async function __refreshCommunityMemberships(
 
     const getBalancesOptions = makeGetBalancesOptions(
       groupsToUpdate,
-      addresses,
+      addresses.map((a) => a.address),
     );
     const balances = await Promise.all(
       getBalancesOptions.map(async (options) => {

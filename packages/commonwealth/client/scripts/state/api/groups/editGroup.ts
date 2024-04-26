@@ -5,7 +5,7 @@ import { ApiEndpoints, queryClient } from '../config';
 
 interface EditGroupProps {
   groupId: string;
-  chainId: string;
+  communityId: string;
   address: string;
   groupName: string;
   groupDescription?: string;
@@ -16,7 +16,7 @@ interface EditGroupProps {
 
 const editGroup = async ({
   groupId,
-  chainId,
+  communityId,
   address,
   groupName,
   groupDescription,
@@ -26,8 +26,8 @@ const editGroup = async ({
 }: EditGroupProps) => {
   return await axios.put(`${app.serverUrl()}/groups/${groupId}`, {
     jwt: app.user.jwt,
-    community_id: chainId,
-    author_community_id: chainId,
+    community_id: communityId,
+    author_community_id: communityId,
     address,
     metadata: {
       name: groupName,
@@ -41,11 +41,11 @@ const editGroup = async ({
   });
 };
 
-const useEditGroupMutation = ({ chainId }: { chainId: string }) => {
+const useEditGroupMutation = ({ communityId }: { communityId: string }) => {
   return useMutation({
     mutationFn: editGroup,
     onSuccess: async () => {
-      const key = [ApiEndpoints.FETCH_GROUPS, chainId];
+      const key = [ApiEndpoints.FETCH_GROUPS, communityId];
       queryClient.cancelQueries(key);
       queryClient.refetchQueries(key);
     },

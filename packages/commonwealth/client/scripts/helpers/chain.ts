@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
@@ -14,7 +14,7 @@ export const deinitChainOrCommunity = async () => {
     app.chain = null;
   }
 
-  app.user.setSelectedChain(null);
+  app.user.setSelectedCommunity(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
   document.title = 'Common';
@@ -23,11 +23,11 @@ export const deinitChainOrCommunity = async () => {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
+export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
-    if (app.user.selectedChain) {
-      chain = app.user.selectedChain;
+    if (app.user.selectedCommunity) {
+      chain = app.user.selectedCommunity;
     } else {
       chain = app.config.chains.getById(app.config.defaultChain);
     }
@@ -129,8 +129,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
     chain.network === ChainNetwork.Ethereum ||
     chain.network === ChainNetwork.ERC721 ||
-    chain.network === ChainNetwork.ERC20 ||
-    chain.network === ChainNetwork.AxieInfinity
+    chain.network === ChainNetwork.ERC20
   ) {
     const Ethereum = (
       await import(
@@ -172,8 +171,8 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    await app.user.selectChain({
-      chain: chain.id,
+    await app.user.selectCommunity({
+      community: chain.id,
     });
   }
 

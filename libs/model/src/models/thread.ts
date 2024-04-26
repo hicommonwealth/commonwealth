@@ -1,4 +1,4 @@
-import { thread } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
@@ -22,7 +22,7 @@ export type Link = {
   title?: string;
 };
 
-export type ThreadAttributes = z.infer<typeof thread.Thread> & {
+export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
   // associations
   Community?: CommunityAttributes;
   Address?: AddressAttributes;
@@ -50,7 +50,7 @@ export default (
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },
-      kind: { type: dataTypes.TEXT, allowNull: false },
+      kind: { type: dataTypes.STRING, allowNull: false },
       stage: {
         type: dataTypes.TEXT,
         allowNull: false,
@@ -141,6 +141,46 @@ export default (
         { fields: ['community_id', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
+      hooks: {
+        afterCreate: async (
+          thread: ThreadInstance,
+          options: Sequelize.CreateOptions<ThreadAttributes>,
+        ) => {
+          // when thread created, increment Community.thread_count
+          await sequelize.query(
+            `
+            UPDATE "Communities"
+            SET thread_count = thread_count + 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: thread.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
+        },
+        afterDestroy: async (
+          thread: ThreadInstance,
+          options: Sequelize.InstanceDestroyOptions,
+        ) => {
+          // when thread deleted, decrement Community.thread_count
+          await sequelize.query(
+            `
+            UPDATE "Communities"
+            SET thread_count = thread_count - 1
+            WHERE id = :communityId
+          `,
+            {
+              replacements: {
+                communityId: thread.community_id,
+              },
+              transaction: options.transaction,
+            },
+          );
+        },
+      },
     },
   );
 
@@ -163,19 +203,17 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.Thread.belongsToMany(models.Address, {
-      through: models.Collaboration,
-      as: 'collaborators',
-    });
     models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
     });
-    models.Thread.hasMany(models.Collaboration);
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });
     models.Thread.hasMany(models.Notification, {
+      foreignKey: 'thread_id',
+    });
+    models.Thread.hasMany(models.ThreadSubscription, {
       foreignKey: 'thread_id',
     });
   };

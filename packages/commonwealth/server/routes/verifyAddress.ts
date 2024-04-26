@@ -1,19 +1,19 @@
 import { Op } from 'sequelize';
 
-import {
-  AppError,
-  ChainBase,
-  DynamicTemplate,
-  NotificationCategories,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   CommunityInstance,
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  DynamicTemplate,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
@@ -21,7 +21,7 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
-const log = logger().getLogger(__filename);
+const log = logger(__filename);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -101,7 +101,7 @@ const processAddress = async (
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      const newUser = await models.User.createWithProfile(models, {
+      const newUser = await models.User.createWithProfile({
         email: null,
       });
       addressInstance.profile_id = (

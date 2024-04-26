@@ -1,5 +1,5 @@
-import { NotificationCategories } from '@hicommonwealth/core';
 import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
@@ -8,9 +8,9 @@ import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerCommentsController', () => {
   beforeEach(() => {
-    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves(
-      '0',
-    );
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
+      '0x123': '0',
+    });
   });
   afterEach(() => {
     Sinon.restore();

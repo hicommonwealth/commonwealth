@@ -12,7 +12,7 @@ import {
   ChainNetwork,
   CosmosGovernanceVersion,
   WalletId,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import BN from 'bn.js';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -26,9 +26,11 @@ import {
   ITXData,
   ITXModalData,
 } from '../../../models/interfaces';
-import { COSMOS_EVM_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
+import CosmosEvmWebWalletController from '../../app/webWallets/cosmos_evm_metamask_web_wallet';
+import EVMKeplrWebWalletController from '../../app/webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import LeapWebWalletController from '../../app/webWallets/leap_web_wallet';
+import { getCosmosChains } from '../../app/webWallets/utils';
 import WebWalletController from '../../app/web_wallets';
 import type CosmosAccount from './account';
 import {
@@ -186,7 +188,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       (a) => a.address === activeAddress && a.community?.id === chain.id,
     )?.walletId;
     const isKeplr = walletId === WalletId.Keplr;
+    const isKeplrEvm = walletId === WalletId.KeplrEthereum;
     const isLeap = walletId === WalletId.Leap;
+    const isMM = walletId === WalletId.CosmosEvmMetamask;
     let wallet;
 
     if (isKeplr) {
@@ -197,6 +201,14 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       wallet = WebWalletController.Instance.getByName(
         WalletId.Leap,
       ) as LeapWebWalletController;
+    } else if (isKeplrEvm) {
+      wallet = WebWalletController.Instance.getByName(
+        WalletId.KeplrEthereum,
+      ) as EVMKeplrWebWalletController;
+    } else if (isMM) {
+      wallet = WebWalletController.Instance.getByName(
+        WalletId.CosmosEvmMetamask,
+      ) as CosmosEvmWebWalletController;
     } else {
       throw new Error('Cosmos wallet not found');
     }
@@ -207,10 +219,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     const cosm = await import('@cosmjs/stargate');
     const dbId = chain.meta.id;
+    const cosmosEvmChains = getCosmosChains(true);
     let client;
 
-    // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
-    if (COSMOS_EVM_CHAINS.some((c) => c === dbId)) {
+    if (cosmosEvmChains.some((c) => c === dbId)) {
       const chainId = wallet.getChainId();
 
       client = await EthSigningClient(
@@ -246,7 +258,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
       console.log(result);
       if (cosm.isDeliverTxFailure(result)) {
-        throw new Error('TX execution failed.');
+        throw new Error(`TX execution failed: ${result?.rawLog}`);
       } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({

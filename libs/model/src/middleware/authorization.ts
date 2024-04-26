@@ -1,14 +1,12 @@
 import {
   InvalidActor,
   InvalidInput,
-  comment,
-  community,
-  thread,
+  schemas,
   type CommandContext,
   type CommandHandler,
 } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import { ZodAny } from 'zod';
+import { ZodSchema } from 'zod';
 import { AddressAttributes, Role, models } from '..';
 
 /**
@@ -50,9 +48,18 @@ const authorizeAddress = async (
   return addr;
 };
 
-type CommunityMiddleware = CommandHandler<ZodAny, typeof community.Community>;
-type ThreadMiddleware = CommandHandler<ZodAny, typeof thread.Thread>;
-type CommentMiddleware = CommandHandler<ZodAny, typeof comment.Comment>;
+type CommunityMiddleware = CommandHandler<
+  ZodSchema,
+  typeof schemas.entities.Community
+>;
+type ThreadMiddleware = CommandHandler<
+  ZodSchema,
+  typeof schemas.entities.Thread
+>;
+type CommentMiddleware = CommandHandler<
+  ZodSchema,
+  typeof schemas.entities.Comment
+>;
 
 /**
  * Community middleware

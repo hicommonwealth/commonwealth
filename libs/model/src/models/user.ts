@@ -1,26 +1,24 @@
-import { User } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
-import type { DB } from '.';
+import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
+import { CommunityAlertAttributes } from './community_alerts';
 import type { ProfileAttributes, ProfileInstance } from './profile';
+import { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type EmailNotificationInterval = 'week' | 'never';
+export type EmailNotificationInterval = 'weekly' | 'never';
 
-export type UserAttributes = User & {
-  disableRichText?: boolean;
-  emailNotificationInterval?: EmailNotificationInterval;
-  selected_community_id?: string | null;
-  created_at?: Date;
-  updated_at?: Date;
-
+export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
+  SubscriptionPreferences?: SubscriptionPreferenceAttributes;
+  CommunityAlerts?: CommunityAlertAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -46,7 +44,6 @@ export type UserInstance = ModelInstance<UserAttributes> & {
 
 export type UserCreationAttributes = UserAttributes & {
   createWithProfile?: (
-    models: DB,
     attrs: UserAttributes,
     options?: CreateOptions,
   ) => Promise<UserInstance>;
@@ -63,11 +60,10 @@ export default (
     'User',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: dataTypes.STRING, allowNull: true, unique: true },
+      email: { type: dataTypes.STRING, allowNull: true },
       emailVerified: {
         type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
+        allowNull: true,
       },
       emailNotificationInterval: {
         type: dataTypes.STRING,
@@ -106,34 +102,51 @@ export default (
     },
   );
 
-  User.createWithProfile = async (
-    models: DB,
-    attrs: UserAttributes,
-    options?: CreateOptions,
-  ): Promise<UserInstance> => {
-    const newUser = await User.create(attrs, options);
-    const profile = await models.Profile.create(
-      {
-        user_id: newUser.id!,
-      },
-      options,
-    );
-    newUser.Profiles = [profile];
-    return newUser;
-  };
-
   User.associate = (models) => {
     models.User.belongsTo(models.Community, {
       as: 'selectedCommunity',
       foreignKey: 'selected_community_id',
-      constraints: false,
+      //constraints: false,
     });
     models.User.hasMany(models.Address);
-    models.User.hasMany(models.Profile);
+    models.User.hasMany(models.Profile, {
+      foreignKey: { name: 'user_id', allowNull: false },
+    });
     models.User.hasMany(models.StarredCommunity, {
       foreignKey: 'user_id',
       sourceKey: 'id',
     });
+    models.User.hasOne(models.SubscriptionPreference, {
+      foreignKey: 'user_id',
+      as: 'SubscriptionPreferences',
+    });
+    models.User.hasMany(models.CommunityAlert, {
+      foreignKey: 'user_id',
+      as: 'CommunityAlerts',
+    });
+    models.User.hasMany(models.ThreadSubscription, {
+      foreignKey: 'user_id',
+      as: 'ThreadSubscriptions',
+    });
+    models.User.hasMany(models.CommentSubscription, {
+      foreignKey: 'user_id',
+      as: 'CommentSubscriptions',
+    });
+
+    User.createWithProfile = async (
+      attrs: UserAttributes,
+      options?: CreateOptions,
+    ): Promise<UserInstance> => {
+      const newUser = await User.create(attrs, options);
+      const profile = await models.Profile.create(
+        {
+          user_id: newUser.id!,
+        },
+        options,
+      );
+      newUser.Profiles = [profile];
+      return newUser;
+    };
   };
 
   return User;

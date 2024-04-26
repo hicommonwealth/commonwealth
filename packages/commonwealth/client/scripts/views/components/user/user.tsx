@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,12 +11,13 @@ import CWPopover, {
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
+// TODO: When this is no longer used, this should be removed in favour of fullUser.tsx
 export const User = ({
   shouldLinkProfile,
   shouldShowPopover,
@@ -221,7 +222,7 @@ export const User = ({
                   setIsModalOpen(true);
                 }}
                 label="Ban address"
-                buttonType="primary-red"
+                buttonType="destructive"
               />
             </div>
           )}
@@ -229,6 +230,7 @@ export const User = ({
       )}
       <CWModal
         size="small"
+        zIndex={10001}
         content={
           <BanUserModal
             address={userAddress}

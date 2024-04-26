@@ -4,12 +4,15 @@ import MinimumProfile from 'client/scripts/models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
-import CWDrawer from '../../component_kit/new_designs/CWDrawer';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
+import CWDrawer, {
+  CWDrawerTopBar,
+} from '../../component_kit/new_designs/CWDrawer';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
-import { getColumnInfo } from '../util';
 
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 import './ViewUpvotesDrawer.scss';
 
 type Profile = Account | AddressInfo | MinimumProfile;
@@ -32,6 +35,28 @@ type Upvoter = {
   voting_weight: number;
 };
 
+const columns: CWTableColumnInfo[] = [
+  {
+    key: 'name',
+    header: 'Name',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'voteWeight',
+    header: 'Vote Weight',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    numeric: true,
+    sortable: true,
+    chronological: true,
+  },
+];
+
 export const ViewUpvotesDrawer = ({
   header,
   reactorData,
@@ -41,6 +66,12 @@ export const ViewUpvotesDrawer = ({
   isOpen,
   setIsOpen,
 }: ViewUpvotesDrawerProps) => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'timestamp',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
@@ -75,6 +106,16 @@ export const ViewUpvotesDrawer = ({
     }
   };
 
+  const profile = author['profile']
+    ? {
+        avatarUrl: author['profile'].avatarUrl,
+        lastActive: author['profile'].lastActive,
+        id: author['profile'].id,
+        address: author['profile'].address,
+        name: author['profile'].name,
+      }
+    : null;
+
   return (
     <div className="ViewUpvotesDrawer">
       <CWDrawer
@@ -83,22 +124,18 @@ export const ViewUpvotesDrawer = ({
         open={isOpen}
         onClose={() => setIsOpen(false)}
       >
-        <div className="drawer-actions">
-          <CWIconButton
-            iconName="caretDoubleRight"
-            onClick={() => setIsOpen(false)}
-            buttonSize="sm"
-          />
-        </div>
+        <CWDrawerTopBar onClose={() => setIsOpen(false)} />
+
         <div className="content-container">
           <CWText type="h3">{header}</CWText>
           <div className="upvoted-content">
             <div className="upvoted-content-header">
               <AuthorAndPublishInfo
                 authorAddress={author?.address}
-                authorChainId={getAuthorCommunityId(author)}
+                authorCommunityId={getAuthorCommunityId(author)}
                 publishDate={publishDate}
                 showUserAddressWithInfo={false}
+                profile={profile}
               />
             </div>
             <div className="upvoted-content-body">
@@ -108,7 +145,9 @@ export const ViewUpvotesDrawer = ({
           {reactorData?.length > 0 ? (
             <>
               <CWTable
-                columnInfo={getColumnInfo()}
+                columnInfo={tableState.columns}
+                sortingState={tableState.sorting}
+                setSortingState={tableState.setSorting}
                 rowData={getRowData(reactorData)}
               />
               <div className="upvote-totals">

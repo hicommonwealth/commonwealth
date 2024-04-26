@@ -85,7 +85,7 @@ export async function refreshMembershipsForAddress(
     (g) => !freshMemberships.find((m) => m.group_id === g.id),
   );
   const getBalancesOptions = makeGetBalancesOptions(groupsToFetchBalance, [
-    address,
+    address.address,
   ]);
   const balances = await Promise.all(
     getBalancesOptions.map(async (options) => {

@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc -b && tsc-alias",
+    "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'yarn start' 'yarn start-consumer'",
-    "start": "ts-node -T src/discord-listener/discordListener.ts",
-    "start-consumer": "ts-node -T src/discord-consumer/discordConsumer.ts",
+    "start": "tsx src/discord-listener/discordListener.ts",
+    "start-consumer": "tsx src/discord-consumer/discordConsumer.ts",
     "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node build/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
-    "test": "ts-mocha '__tests__/**/*.spec.ts'"
+    "test": "ts-mocha 'test/**/*.spec.ts'"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +22,8 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
     "pg": "^8.11.3",
-    "sequelize": "^6.32.1"
+    "sequelize": "^6.32.1",
+    "tsx": "^4.7.2"
   },
   "engines": {
     "node": "20.x"

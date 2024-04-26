@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-globals */
 import axios from 'axios';
-import $ from 'jquery';
 import moment from 'moment';
 import app from 'state';
 import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
@@ -47,31 +46,32 @@ class PollsController {
   }
 
   public async fetchPolls(communityId: string, threadId: number) {
-    await $.ajax({
-      url: `${app.serverUrl()}/threads/${threadId}/polls`,
-      type: 'GET',
-      data: {
-        chain: communityId,
-      },
-      success: (response) => {
-        for (const poll of response.result) {
-          const modeledPoll = modelFromServer(poll);
-          const existingPoll = this._store.getById(modeledPoll.id);
-          if (existingPoll) {
-            this._store.remove(existingPoll);
-          }
-          this._store.add(modeledPoll);
+    try {
+      const response = await axios.get(
+        `${app.serverUrl()}/threads/${threadId}/polls`,
+        {
+          params: {
+            chain: communityId,
+          },
+        },
+      );
+
+      for (const poll of response.data.result) {
+        const modeledPoll = modelFromServer(poll);
+        const existingPoll = this._store.getById(modeledPoll.id);
+        if (existingPoll) {
+          this._store.remove(existingPoll);
         }
-      },
-      error: (err) => {
-        console.log('Failed to fetch thread polls');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to fetch thread polls',
-        );
-      },
-    });
+        this._store.add(modeledPoll);
+      }
+    } catch (err) {
+      console.log('Failed to fetch thread polls');
+      throw new Error(
+        err.response && err.response.data.error
+          ? err.response.data.error
+          : 'Failed to fetch thread polls',
+      );
+    }
   }
 
   public async setPolling(args: {
@@ -120,33 +120,32 @@ class PollsController {
     pollId: number;
   }) {
     const { authorCommunity, address, threadId, pollId } = args;
-    await $.ajax({
-      url: `${app.serverUrl()}/polls/${pollId}`,
-      type: 'DELETE',
-      data: {
-        community_id: app.activeChainId(),
-        author_chain: authorCommunity,
-        address,
-        jwt: app.user.jwt,
-        poll_id: pollId,
-      },
-      success: () => {
-        // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
-        // This is an exception until polls get migrated to react query
-        updateThreadInAllCaches(app.activeChainId(), threadId, {
-          hasPoll: false,
-        });
-        this._store.remove(this._store.getById(pollId));
-      },
-      error: (err) => {
-        console.log('Failed to delete poll');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to delete poll',
-        );
-      },
-    });
+
+    try {
+      await axios.delete(`${app.serverUrl()}/polls/${pollId}`, {
+        data: {
+          community_id: app.activeChainId(),
+          author_chain: authorCommunity,
+          address,
+          jwt: app.user.jwt,
+          poll_id: pollId,
+        },
+      });
+
+      // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
+      // This is an exception until polls get migrated to react query
+      updateThreadInAllCaches(app.activeChainId(), threadId, {
+        hasPoll: false,
+      });
+      this._store.remove(this._store.getById(pollId));
+    } catch (err) {
+      console.log('Failed to delete poll');
+      throw new Error(
+        err.response && err.response.data.error
+          ? err.response.data.error
+          : 'Failed to delete poll',
+      );
+    }
   }
 
   public getByThreadId(threadId) {

@@ -4,9 +4,9 @@ import React from 'react';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { Option } from './Option';
 import './Select.scss';
@@ -71,7 +71,8 @@ export const Select = ({
           {...(selectedOption &&
             selectedOption.iconLeft && { iconLeft: selectedOption.iconLeft })}
           iconRight={popoverProps.anchorEl ? 'caretUp' : 'caretDown'}
-          buttonType="mini-white"
+          buttonType="secondary"
+          buttonHeight="sm"
           label={
             selectedOption
               ? selectedOption.label || selectedOption

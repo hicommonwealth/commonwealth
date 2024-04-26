@@ -1,18 +1,21 @@
 import { useFetchTopicsQuery } from 'client/scripts/state/api/topics';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
-import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import {
+  useFetchDiscordChannelsQuery,
+  useRemoveDiscordBotConfigMutation,
+} from 'state/api/discord';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './Discord.scss';
 import { DiscordConnections } from './DiscordConnections';
 import { ConnectionStatus } from './types';
 
 const CTA_TEXT = {
-  connected: 'Reconnect Discord',
+  connected: 'Disconnect Discord',
   none: 'Connect Discord',
   connecting: 'Connecting Discord...',
 };
@@ -22,6 +25,14 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community.discordConfigId ? 'connected' : 'none',
   );
+
+  const queryParams = useMemo(() => {
+    return new URLSearchParams(window.location.search);
+  }, []);
+
+  if (queryParams.has('discordConfigId')) {
+    app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
+  }
   const [isDiscordWebhooksEnabled, setIsDiscordWebhooksEnabled] = useState(
     community.discordBotWebhooksEnabled,
   );
@@ -32,6 +43,11 @@ const Discord = () => {
     communityId: app.activeChainId(),
   });
 
+  const {
+    mutateAsync: removeDiscordBotConfig,
+    isLoading: isRemovingDiscordBotConfig,
+  } = useRemoveDiscordBotConfigMutation();
+
   useEffect(() => {
     if (community.discordConfigId) {
       setConnectionStatus('connected');
@@ -39,7 +55,8 @@ const Discord = () => {
   }, [community]);
 
   const onConnect = useCallback(async () => {
-    if (connectionStatus === 'connecting') return;
+    if (connectionStatus === 'connecting' || connectionStatus === 'connected')
+      return;
     setConnectionStatus('connecting');
 
     try {
@@ -57,15 +74,39 @@ const Discord = () => {
           redirect_domain: isCustomDomain ? window.location.origin : undefined,
         }),
       );
-      const link = `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=1024&scope=applications.commands%20bot&redirect_uri=${redirectURL}/discord-callback&response_type=code&scope=bot&state=${currentState}`;
+      const link =
+        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}` +
+        `&permissions=1024&scope=applications.commands%20bot&redirect_uri=${redirectURL}` +
+        `/discord-callback&response_type=code&scope=bot&state=${currentState}`;
       window.open(link, '_parent');
 
       setConnectionStatus('none');
     } catch (e) {
-      notifyError('Failed to connect discord!');
+      notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
   }, [connectionStatus]);
+
+  const onDisconnect = useCallback(async () => {
+    if (connectionStatus === 'connecting' || connectionStatus === 'none')
+      return;
+    try {
+      await removeDiscordBotConfig({
+        communityId: app.activeChainId(),
+      });
+
+      if (queryParams.has('discordConfigId')) {
+        const url = new URL(window.location.href);
+        queryParams.delete('discordConfigId');
+        url.search = queryParams.toString();
+        history.replaceState(null, '', url.toString());
+      }
+      setConnectionStatus('none');
+    } catch (e) {
+      console.error(e);
+      notifyError('Failed to disconnect Discord');
+    }
+  }, [connectionStatus, queryParams, removeDiscordBotConfig]);
 
   const onToggleWebhooks = useCallback(async () => {
     const toggleMsgType = isDiscordWebhooksEnabled ? 'disable' : 'enable';
@@ -174,9 +215,13 @@ const Discord = () => {
 
       <CWButton
         buttonType="secondary"
-        label={CTA_TEXT[connectionStatus]}
+        label={
+          isRemovingDiscordBotConfig
+            ? 'Disconnecting Discord...'
+            : CTA_TEXT[connectionStatus]
+        }
         disabled={connectionStatus === 'connecting'}
-        onClick={onConnect}
+        onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>
   );

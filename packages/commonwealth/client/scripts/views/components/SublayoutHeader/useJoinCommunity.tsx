@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -12,8 +12,6 @@ import { AccountSelector } from 'views/components/component_kit/cw_wallets_list'
 import TOSModal from 'views/modals/TOSModal';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-
-const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
 const useJoinCommunity = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
@@ -59,14 +57,6 @@ const useJoinCommunity = () => {
       return false;
     }
 
-    // filter additionally by chain network if in list of non-interop, unless we are on that chain
-    // TODO: make this related to wallet.specificChains
-    if (
-      NON_INTEROP_NETWORKS.includes(addressChainInfo?.network) &&
-      activeChainInfo?.network !== addressChainInfo?.network
-    ) {
-      return false;
-    }
     return true;
   });
 
@@ -82,19 +72,98 @@ const useJoinCommunity = () => {
   );
 
   const performJoinCommunityLinking = async () => {
-    if (
-      sameBaseAddressesRemoveDuplicates.length > 1 &&
-      app.activeChainId() !== 'axie-infinity'
-    ) {
+    if (sameBaseAddressesRemoveDuplicates.length > 1) {
       setIsAccountSelectorModalOpen(true);
-    } else if (
-      sameBaseAddressesRemoveDuplicates.length === 1 &&
-      app.activeChainId() !== 'axie-infinity'
-    ) {
+    } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
       await linkToCommunity(0);
       return true;
     } else {
       setIsAuthModalOpen(true);
+    }
+  };
+
+  // Handles linking the specified address to the specified community
+  const linkSpecificAddressToSpecificCommunity = async ({
+    address,
+    communityId,
+    communityChainBase,
+    activeChainId,
+  }: {
+    address: string;
+    communityId: string;
+    communityChainBase: string;
+    activeChainId?: string;
+  }) => {
+    try {
+      const res = await linkExistingAddressToChainOrCommunity(
+        address,
+        communityId,
+        communityChainBase,
+      );
+
+      if (res && res.data.result) {
+        const { verification_token, addresses, encodedAddress } =
+          res.data.result;
+
+        // update addresses
+        app.user.setAddresses(
+          addresses.map((a) => {
+            return new AddressInfo({
+              id: a.id,
+              address: a.address,
+              communityId: a.community_id,
+              keytype: a.keytype,
+              walletId: a.wallet_id,
+            });
+          }),
+        );
+
+        // get newly added address info
+        const addressInfo = app.user.addresses.find(
+          (a) => a.address === encodedAddress && a.community.id === communityId,
+        );
+
+        // set verification token for the newly created account
+        const account = app.chain.accounts.get(
+          encodedAddress,
+          addressInfo.keytype,
+        );
+        if (app.chain) {
+          account.setValidationToken(verification_token);
+        }
+
+        // set active address if in a community
+        if (activeChainId) {
+          // set role in community
+          if (
+            !app.roles.getRoleInCommunity({
+              account,
+              community: activeChainId,
+            })
+          ) {
+            await app.roles.createRole({
+              address: addressInfo,
+              community: activeChainId,
+            });
+          }
+
+          await setActiveAccount(account);
+
+          // update active accounts
+          if (
+            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+              .length === 0
+          ) {
+            app.user.setActiveAccounts(
+              app.user.activeAccounts.concat([account]),
+            );
+          }
+        }
+      } else {
+        // Todo: handle error
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -109,63 +178,12 @@ const useJoinCommunity = () => {
 
         const address = originAddressInfo.address;
 
-        const res = await linkExistingAddressToChainOrCommunity(
+        await linkSpecificAddressToSpecificCommunity({
           address,
-          targetCommunity,
-          originAddressInfo.community.id,
-        );
-
-        if (res && res.result) {
-          const { verification_token, addresses, encodedAddress } = res.result;
-          app.user.setAddresses(
-            addresses.map((a) => {
-              return new AddressInfo({
-                id: a.id,
-                address: a.address,
-                chainId: a.community_id,
-                keytype: a.keytype,
-                walletId: a.wallet_id,
-              });
-            }),
-          );
-          const addressInfo = app.user.addresses.find(
-            (a) =>
-              a.address === encodedAddress &&
-              a.community.id === targetCommunity,
-          );
-
-          const account = app.chain.accounts.get(
-            encodedAddress,
-            addressInfo.keytype,
-          );
-          if (app.chain) {
-            account.setValidationToken(verification_token);
-            console.log('setting validation token');
-          }
-          if (
-            activeCommunityId &&
-            !app.roles.getRoleInCommunity({
-              account,
-              community: activeCommunityId,
-            })
-          ) {
-            await app.roles.createRole({
-              address: addressInfo,
-              community: activeCommunityId,
-            });
-          }
-          await setActiveAccount(account);
-          if (
-            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-              .length === 0
-          ) {
-            app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account]),
-            );
-          }
-        } else {
-          // Todo: handle error
-        }
+          communityId: targetCommunity,
+          communityChainBase: originAddressInfo.community.id,
+          activeChainId: activeCommunityId,
+        });
       } catch (err) {
         console.error(err);
       }
@@ -245,6 +263,7 @@ const useJoinCommunity = () => {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
     JoinCommunityModals,
+    linkSpecificAddressToSpecificCommunity,
   };
 };
 

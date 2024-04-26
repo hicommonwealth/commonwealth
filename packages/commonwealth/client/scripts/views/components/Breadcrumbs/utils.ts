@@ -46,11 +46,17 @@ export const generateBreadcrumbs = (
   locationPath: string,
   profileId: number,
   navigate: (val: To) => void,
+  customDomain: string,
   currentDiscussion?: currentDiscussion,
 ) => {
   let link: string;
   let label: string;
   let isParent: boolean;
+
+  if (customDomain) {
+    locationPath = `${customDomain}${locationPath}`;
+  }
+
   const pathSegments = locationPath
     .split('/')
     .filter((segment) => segment.length > 0);
@@ -67,17 +73,13 @@ export const generateBreadcrumbs = (
         link = `profile/id/${profileId}`;
         break;
       case 'members':
-        if (
-          pathSegments[index] === 'members' &&
-          pathSegments[index + 1] === 'update'
-        ) {
-          link = 'members';
-        }
+        link = 'members';
         break;
       case 'snapshot':
         //Match the header on the snapshots page
         pathSegments.splice(index + 1, 1);
         pathSegments[index] = 'snapshots';
+        link = 'snapshots';
         break;
       case 'proposal':
         link = 'proposals';
@@ -179,6 +181,15 @@ export const generateBreadcrumbs = (
 
       if (pathSegments.length > 1 && pathSegments[1] === 'manage') {
         pathSegments.splice(0, 1);
+      }
+
+      // handle contests
+      if (pathSegments.length === 3 && pathSegments[1] === 'contests') {
+        if (pathSegments[2] === 'launch') {
+          pathSegments[2] = 'Launch Contest';
+        } else {
+          pathSegments[2] = 'Edit Contest';
+        }
       }
     }
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -36,3 +37,22 @@ export const linksSchema = {
   identifier: z.string(),
   title: z.string().nullable().optional(),
 };
+
+export enum EventNames {
+  ThreadCreated = 'ThreadCreated',
+  CommentCreated = 'CommentCreated',
+  GroupCreated = 'GroupCreated',
+  CommunityCreated = 'CommunityCreated',
+  SnapshotProposalCreated = 'SnapshotProposalCreated',
+  DiscordMessageCreated = 'DiscordMessageCreated',
+
+  // Contests
+  RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
+  OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
+  ContestStarted = 'ContestStarted',
+  ContestContentAdded = 'ContestContentAdded',
+  ContestContentUpvoted = 'ContestContentUpvoted',
+  ContestWinnersRecorded = 'ContestWinnersRecorded',
+}
+
+export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);

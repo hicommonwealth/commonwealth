@@ -1,17 +1,12 @@
 import { RedisCache } from '@hicommonwealth/adapters';
+import { BalanceSourceType, cache, delay, dispose } from '@hicommonwealth/core';
 import {
-  BalanceSourceType,
-  BalanceType,
-  cache,
-  delay,
-  dispose,
-} from '@hicommonwealth/core';
-import {
-  Balances,
-  models,
   tester,
   tokenBalanceCache,
+  type Balances,
+  type DB,
 } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
@@ -19,36 +14,6 @@ import { toWei } from 'web3-utils';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
-
-async function resetChainNode(ethChainId: number) {
-  const ganacheChainNode = await models.ChainNode.findOne({
-    where: {
-      url: 'http://localhost:8545',
-    },
-  });
-
-  if (ganacheChainNode) {
-    await models.ChainNode.update(
-      {
-        eth_chain_id: ethChainId,
-        balance_type: BalanceType.Ethereum,
-        name: 'Local EVM Chain',
-      },
-      {
-        where: {
-          url: 'http://localhost:8545',
-        },
-      },
-    );
-  } else {
-    await models.ChainNode.create({
-      url: 'http://localhost:8545',
-      eth_chain_id: ethChainId,
-      balance_type: BalanceType.Ethereum,
-      name: 'Local EVM Chain',
-    });
-  }
-}
 
 function generateEVMAddresses(count: number): string[] {
   const web3 = new Web3();
@@ -73,6 +38,8 @@ function checkZeroBalances(balances: Balances, skipAddress: string[]) {
 describe('Token Balance Cache EVM Tests', function () {
   this.timeout(160000);
 
+  let models: DB;
+
   const sdk = new ChainTesting('http://127.0.0.1:3000');
 
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
@@ -87,8 +54,38 @@ describe('Token Balance Cache EVM Tests', function () {
   // ganache chain id
   const ethChainId = 1337;
 
+  async function resetChainNode(eth_chain_id: number) {
+    const ganacheChainNode = await models.ChainNode.findOne({
+      where: {
+        url: 'http://localhost:8545',
+      },
+    });
+
+    if (ganacheChainNode) {
+      await models.ChainNode.update(
+        {
+          eth_chain_id: eth_chain_id,
+          balance_type: BalanceType.Ethereum,
+          name: 'Local EVM Chain',
+        },
+        {
+          where: {
+            url: 'http://localhost:8545',
+          },
+        },
+      );
+    } else {
+      await models.ChainNode.create({
+        url: 'http://localhost:8545',
+        eth_chain_id: eth_chain_id,
+        balance_type: BalanceType.Ethereum,
+        name: 'Local EVM Chain',
+      });
+    }
+  }
+
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
   });
@@ -115,7 +112,7 @@ describe('Token Balance Cache EVM Tests', function () {
       );
       await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
       await sdk.getErc20(chainLinkAddress, addressTwo, transferAmount);
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -299,11 +296,15 @@ describe('Token Balance Cache EVM Tests', function () {
       const web3 = new Web3(
         new Web3.providers.HttpProvider('http://localhost:8545'),
       );
-      originalAddressOneBalance = await web3.eth.getBalance(addressOne);
-      originalAddressTwoBalance = await web3.eth.getBalance(addressTwo);
+      originalAddressOneBalance = (
+        await web3.eth.getBalance(addressOne)
+      ).toString();
+      originalAddressTwoBalance = (
+        await web3.eth.getBalance(addressTwo)
+      ).toString();
       await sdk.getETH(addressOne, transferAmount);
       await sdk.getETH(addressTwo, transferAmount);
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);
@@ -764,7 +765,7 @@ describe('Token Balance Cache EVM Tests', function () {
 
       await delay(20000);
 
-      const transferAmountBN = new BN(toWei(transferAmount));
+      const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       const finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
         .toString(10);

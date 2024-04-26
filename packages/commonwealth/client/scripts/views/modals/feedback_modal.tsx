@@ -1,11 +1,11 @@
+import axios from 'axios';
 import React from 'react';
-import $ from 'jquery';
 
 import app from '../../state';
-import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
+import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
@@ -26,6 +26,28 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
   const [isSending, setIsSending] = React.useState<boolean>(false);
   const [status, setStatus] = React.useState<ValidationStatus | null>(null);
 
+  const handleSendFeedback = async (e) => {
+    e.preventDefault();
+    setIsSending(true);
+    const urlText = document.location.href;
+
+    try {
+      await axios.post(`${app.serverUrl()}/sendFeedback`, {
+        text: feedbackText,
+        url: urlText,
+      });
+
+      setFeedbackText('');
+      setIsSending(false);
+      setStatus('success');
+      setMessage('Sent successfully!');
+    } catch (error) {
+      setIsSending(false);
+      setStatus('failure');
+      setMessage(error.response?.data?.error || error.message);
+    }
+  };
+
   return (
     <div className="FeedbackModal">
       <CWModalHeader label="Send feedback" onModalClose={onModalClose} />
@@ -45,29 +67,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
           buttonHeight="sm"
           disabled={isSending}
           label="Send feedback"
-          onClick={(e) => {
-            e.preventDefault();
-            setIsSending(true);
-            const urlText = document.location.href;
-
-            // send feedback
-            $.post(`${app.serverUrl()}/sendFeedback`, {
-              text: feedbackText,
-              url: urlText,
-            }).then(
-              () => {
-                setFeedbackText('');
-                setIsSending(false);
-                setStatus('success');
-                setMessage('Sent successfully!');
-              },
-              (err) => {
-                setIsSending(false);
-                setStatus('failure');
-                setMessage(err.responseJSON?.error || err.responseText);
-              }
-            );
-          }}
+          onClick={handleSendFeedback}
         />
       </CWModalFooter>
     </div>

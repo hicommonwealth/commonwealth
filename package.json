@@ -1,6 +1,7 @@
 {
   "private": true,
   "keywords": [],
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
@@ -13,7 +14,7 @@
   ],
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "build-ci": "yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db",
+    "build-ci": "yarn global add node-gyp && yarn --ignore-engines && yarn build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
@@ -31,7 +32,7 @@
     "psql": "yarn --cwd packages/commonwealth psql",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
-    "start": "concurrently -k -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
+    "start": "yarn workspace commonwealth start",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",
@@ -76,14 +77,13 @@
     "@types/cors": "^2.8.13",
     "@types/expect": "^24.3.0",
     "@types/filesystem": "^0.0.29",
-    "@types/jquery": "^3.5.4",
     "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.123",
     "@types/marked": "^4.0.1",
     "@types/mocha": "^10.0.1",
     "@types/moment": "^2.13.0",
     "@types/morgan": "^1.9.4",
-    "@types/node": "^18.11.8",
+    "@types/node": "^20.11.25",
     "@types/node-fetch": "2.x",
     "@types/passport": "^1.0.5",
     "@types/passport-jwt": "^3.0.3",
@@ -118,6 +118,7 @@
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-webpack": "^0.12.1",
+    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "faker": "^4.1.0",
@@ -149,8 +150,6 @@
     "stylelint-config-standard": "^29.0.0",
     "sync-request": "^6.1.0",
     "ts-mocha": "^6.0.0",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
@@ -162,7 +161,10 @@
     "webpack-deduplication-plugin": "^0.0.8",
     "webpack-dev-middleware": "^5.3.3",
     "webpack-hot-middleware": "^2.25.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "eslint-plugin-diff": "^2.0.3",
+    "eslint-plugin-functional": "^6.1.1",
+    "eslint-plugin-promise": "^6.1.1"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"

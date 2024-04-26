@@ -1,4 +1,4 @@
-import { DefaultPage } from '@hicommonwealth/core';
+import { DefaultPage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';
@@ -16,10 +16,10 @@ import {
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { useFlag } from '../../../../../hooks/useFlag';
@@ -250,7 +250,7 @@ const CommunityProfileForm = () => {
             <div className="header">
               <CWText type="h4">Links</CWText>
               <CWText type="b1">
-                Add your Discord, Twitter (X), Telegram, Github, Website, etc.
+                Add your Discord, X (Twitter), Telegram, Github, Website, etc.
               </CWText>
             </div>
             <LinksArray

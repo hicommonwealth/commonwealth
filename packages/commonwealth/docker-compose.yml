@@ -2,7 +2,9 @@ version: '3'
 services:
   cw_postgres:
     container_name: cw_postgres
-    image: postgres:15.1-alpine
+    build:
+      context: ./docker/
+      dockerfile: Dockerfile-pg-partman
     restart: always
     environment:
       POSTGRES_USER: commonwealth

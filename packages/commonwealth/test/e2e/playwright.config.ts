@@ -6,8 +6,6 @@ const config: PlaywrightTestConfig = {
     trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,
   },
-  globalSetup: './globalSetup.ts',
-  globalTeardown: './globalTeardown.ts',
   timeout: 60_000,
   fullyParallel: true,
   reporter: [['list'], ['playwright-json-summary-reporter']],

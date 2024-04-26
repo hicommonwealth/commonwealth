@@ -1,6 +1,6 @@
-declare let window: any;
+import axios from 'axios';
 
-import $ from 'jquery';
+declare let window: any;
 
 import type Web3 from 'web3';
 import type Account from '../../../models/Account';
@@ -8,22 +8,22 @@ import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
 import * as siwe from 'siwe';
-import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
+import { Web3BaseProvider } from 'web3';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
-  private _provider: provider;
+  private _provider: Web3BaseProvider;
   private _web3: Web3 | any;
 
   public readonly name = WalletId.Metamask;
@@ -69,9 +69,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     });
 
     return {
-      number: hexToNumber(block.number),
+      number: Number(hexToNumber(block.number)),
       hash: block.hash,
-      timestamp: hexToNumber(block.timestamp),
+      timestamp: Number(hexToNumber(block.timestamp)),
     };
   }
 
@@ -153,8 +153,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
               : '';
 
           // TODO: we should cache this data!
-          const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId == chainId);
+          const chains = await axios.get('https://chainid.network/chains.json');
+          const baseChain = chains.data.find((c) => c.chainId == chainId);
           const pubRpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           // remove duplicate https b/c chain list has a bug in their sepolia endpoint
           const url =
@@ -232,8 +232,10 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         });
       } catch (error) {
         if (error.code === 4902) {
-          const chains = await $.getJSON('https://chainid.network/chains.json');
-          const baseChain = chains.find((c) => c.chainId == communityChain);
+          const chains = await axios.get('https://chainid.network/chains.json');
+          const baseChain = chains.data.find(
+            (c) => c.chainId == communityChain,
+          );
           // Check if the string contains '${' and '}'
           const rpcUrl = baseChain.rpc.filter((r) => !/\${.*?}/.test(r));
           const url =

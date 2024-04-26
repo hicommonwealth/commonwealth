@@ -1,0 +1,18 @@
+{
+  "name": "@hicommonwealth/shared",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Client and Server Shared Utilities",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "types": "src/index",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "echo No tests for @hicommonwealth/shared"
+  },
+  "dependencies": {}
+}

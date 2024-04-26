@@ -1,4 +1,7 @@
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { trpc } from 'client/scripts/utils/trpcClient';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -10,7 +13,6 @@ import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
 } from 'state/api/groups';
-import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
@@ -19,13 +21,14 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
@@ -52,6 +55,7 @@ const CommunityMembersPage = () => {
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0],
   });
+
   const {
     shouldShowGroupMutationBannerForCommunities,
     setShouldShowGroupMutationBannerForCommunity,
@@ -63,7 +67,7 @@ const CommunityMembersPage = () => {
     });
 
   const { data: memberships = null } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -73,27 +77,79 @@ const CommunityMembersPage = () => {
     500,
   );
 
+  const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
+    .namespace;
+
+  const columns: CWTableColumnInfo[] = [
+    {
+      key: 'name',
+      header: 'Name',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'groups',
+      header: 'Groups',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: false,
+    },
+    {
+      key: 'stakeBalance',
+      header: 'Stake',
+      hasCustomSortValue: true,
+      numeric: true,
+      sortable: true,
+      hidden: !isStakedCommunity,
+    },
+    {
+      key: 'lastActive',
+      header: 'Last Active',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+  ];
+
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'lastActive',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   const {
     data: members,
     fetchNextPage,
     isLoading: isLoadingMembers,
-  } = useSearchProfilesQuery({
-    communityId: app.activeChainId(),
-    searchTerm: '',
-    limit: 30,
-    orderBy: APIOrderBy.LastActive,
-    orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
-    includeGroupIds: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-    ...(searchFilters.groupFilter === 'Ungrouped' && {
-      includeMembershipTypes: 'not-in-group',
-    }),
-    ...(!['All groups', 'Ungrouped'].includes(`${searchFilters.groupFilter}`) &&
-      searchFilters.groupFilter && {
-        includeMembershipTypes: `in-group:${searchFilters.groupFilter}`,
+  } = trpc.community.getMembers.useInfiniteQuery(
+    {
+      limit: 30,
+      order_by: tableState.orderBy,
+      order_direction: tableState.orderDirection,
+      search: debouncedSearchTerm,
+      community_id: app.activeChainId(),
+      include_roles: true,
+      ...(!['All groups', 'Ungrouped'].includes(
+        `${searchFilters.groupFilter}`,
+      ) &&
+        searchFilters.groupFilter && {
+          memberships: `in-group:${searchFilters.groupFilter}`,
+        }),
+      ...(searchFilters.groupFilter === 'Ungrouped' && {
+        memberships: 'not-in-group',
       }),
-  });
+      include_group_ids: true,
+      // only include stake balances if community has staking enabled
+      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
+        .namespace,
+    },
+    {
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => lastPage.page + 1,
+      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    },
+  );
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -140,13 +196,7 @@ const CommunityMembersPage = () => {
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
-        role: p.roles.find(
-          (role) =>
-            role.chain_id === app.activeChainId() &&
-            [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-              role.permission,
-            ),
-        )?.permission,
+        role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
             (groupId) =>
@@ -154,6 +204,8 @@ const CommunityMembersPage = () => {
           )
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b)),
+        stakeBalance: p.addresses[0].stake_balance,
+        lastActive: p.last_active,
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -244,131 +296,134 @@ const CommunityMembersPage = () => {
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
   return (
-    <section className="CommunityMembersPage">
-      {/* TODO: add breadcrums here */}
+    <CWPageLayout>
+      <section className="CommunityMembersPage">
+        {/* Header */}
+        <CWText type="h2">Members ({totalResults})</CWText>
 
-      {/* Header */}
-      <CWText type="h2">Members ({totalResults})</CWText>
+        {/* Tabs section */}
+        <CWTabsRow>
+          {TABS.map((tab, index) => (
+            <CWTab
+              key={index}
+              label={tab.label}
+              onClick={() => updateActiveTab(tab.value)}
+              isSelected={selectedTab === tab.value}
+            />
+          ))}
+        </CWTabsRow>
 
-      {/* Tabs section */}
-      <CWTabsRow>
-        {TABS.map((tab, index) => (
-          <CWTab
-            key={index}
-            label={tab.label}
-            onClick={() => updateActiveTab(tab.value)}
-            isSelected={selectedTab === tab.value}
-          />
-        ))}
-      </CWTabsRow>
-
-      {/* Gating group post-mutation banner */}
-      {shouldShowGroupMutationBannerForCommunities.includes(
-        app.activeChainId(),
-      ) &&
-        selectedTab === TABS[0].value && (
-          <section>
-            <CWBanner
-              type="info"
-              title="Don't see your group right away?"
-              body={`
-            Our app is crunching numbers, which takes some time. 
+        {/* Gating group post-mutation banner */}
+        {shouldShowGroupMutationBannerForCommunities.includes(
+          app.activeChainId(),
+        ) &&
+          selectedTab === TABS[0].value && (
+            <section>
+              <CWBanner
+                type="info"
+                title="Don't see your group right away?"
+                body={`
+            Our app is crunching numbers, which takes some time.
             Give it a few minutes and refresh to see your group.
           `}
-              onClose={() =>
-                setShouldShowGroupMutationBannerForCommunity(
-                  app.activeChainId(),
-                  false,
-                )
+                onClose={() =>
+                  setShouldShowGroupMutationBannerForCommunity(
+                    app.activeChainId(),
+                    false,
+                  )
+                }
+              />
+            </section>
+          )}
+
+        {/* Filter section */}
+        {selectedTab === TABS[1].value && groups?.length === 0 ? (
+          <></>
+        ) : (
+          <section
+            className={getClasses<{
+              'cols-3': boolean;
+              'cols-4': boolean;
+            }>(
+              {
+                'cols-3': !isAdmin,
+                'cols-4': isAdmin,
+              },
+              'filters',
+            )}
+          >
+            <CWTextInput
+              size="large"
+              fullWidth
+              placeholder={`Search ${
+                selectedTab === TABS[0].value ? 'members' : 'groups'
+              }`}
+              containerClassName="search-input-container"
+              inputClassName="search-input"
+              iconLeft={<CWIcon iconName="search" className="search-icon" />}
+              onInput={(e) =>
+                setSearchFilters((g) => ({
+                  ...g,
+                  searchText: e.target.value?.trim(),
+                }))
               }
             />
+            {app.user.activeAccount && (
+              <div className="select-dropdown-container">
+                <CWText type="b2" fontWeight="bold" className="filter-text">
+                  Filter
+                </CWText>
+                <CWSelectList
+                  isSearchable={false}
+                  isClearable={false}
+                  options={filterOptions}
+                  value={[
+                    ...filterOptions[0].options,
+                    ...filterOptions[1].options,
+                  ].find(
+                    (option) => option.value === searchFilters.groupFilter,
+                  )}
+                  onChange={(option) => {
+                    setSearchFilters((g) => ({
+                      ...g,
+                      groupFilter: option.value,
+                    }));
+                  }}
+                />
+              </div>
+            )}
+            {isAdmin && (
+              <CWButton
+                buttonWidth="full"
+                label="Create group"
+                iconLeft="plus"
+                onClick={navigateToCreateGroupPage}
+              />
+            )}
           </section>
         )}
 
-      {/* Filter section */}
-      {selectedTab === TABS[1].value && groups?.length === 0 ? (
-        <></>
-      ) : (
-        <section
-          className={getClasses<{
-            'cols-3': boolean;
-            'cols-4': boolean;
-          }>(
-            {
-              'cols-3': !isAdmin,
-              'cols-4': isAdmin,
-            },
-            'filters',
-          )}
-        >
-          <CWTextInput
-            size="large"
-            fullWidth
-            placeholder={`Search ${
-              selectedTab === TABS[0].value ? 'members' : 'groups'
-            }`}
-            containerClassName="search-input-container"
-            inputClassName="search-input"
-            iconLeft={<CWIcon iconName="search" className="search-icon" />}
-            onInput={(e) =>
-              setSearchFilters((g) => ({
-                ...g,
-                searchText: e.target.value?.trim(),
-              }))
-            }
+        {/* Main content section: based on the selected tab */}
+        {selectedTab === TABS[1].value ? (
+          <GroupsSection
+            filteredGroups={filteredGroups}
+            canManageGroups={isAdmin}
+            hasNoGroups={groups?.length === 0}
           />
-          {app.user.activeAccount && (
-            <div className="select-dropdown-container">
-              <CWText type="b2" fontWeight="bold" className="filter-text">
-                Filter
-              </CWText>
-              <CWSelectList
-                isSearchable={false}
-                isClearable={false}
-                options={filterOptions}
-                value={[
-                  ...filterOptions[0].options,
-                  ...filterOptions[1].options,
-                ].find((option) => option.value === searchFilters.groupFilter)}
-                onChange={(option) => {
-                  setSearchFilters((g) => ({
-                    ...g,
-                    groupFilter: option.value,
-                  }));
-                }}
-              />
-            </div>
-          )}
-          {isAdmin && (
-            <CWButton
-              buttonWidth="full"
-              label="Create group"
-              iconLeft="plus"
-              onClick={navigateToCreateGroupPage}
-            />
-          )}
-        </section>
-      )}
-
-      {/* Main content section: based on the selected tab */}
-      {selectedTab === TABS[1].value ? (
-        <GroupsSection
-          filteredGroups={filteredGroups}
-          canManageGroups={isAdmin}
-          hasNoGroups={groups?.length === 0}
-        />
-      ) : (
-        <MembersSection
-          filteredMembers={formattedMembers}
-          onLoadMoreMembers={() => {
-            if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-              fetchNextPage();
-            }
-          }}
-          isLoadingMoreMembers={isLoadingMembers}
-        />
-      )}
-    </section>
+        ) : (
+          <MembersSection
+            filteredMembers={formattedMembers}
+            onLoadMoreMembers={() => {
+              if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
+                fetchNextPage?.().catch(console.error);
+              }
+            }}
+            isLoadingMoreMembers={isLoadingMembers}
+            tableState={tableState}
+          />
+        )}
+      </section>
+    </CWPageLayout>
   );
 };
 

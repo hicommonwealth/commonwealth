@@ -5,7 +5,6 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "rootDir": ".",
-    "outDir": "build",
     "baseUrl": ".",
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src"],
@@ -19,12 +18,15 @@
     "./globals.d.ts",
     "./server",
     "./server.ts",
+    "./server-test.ts",
     "./scripts"
   ],
   "references": [
-    { "path": "../../libs/adapters" },
-    { "path": "../../libs/chains" },
-    { "path": "../../libs/core" },
-    { "path": "../../libs/model" }
+    { "path": "../../libs/adapters/tsconfig.build.json" },
+    { "path": "../../libs/chains/tsconfig.build.json" },
+    { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/model/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" },
+    { "path": "../../libs/shared/tsconfig.build.json" }
   ]
 }
