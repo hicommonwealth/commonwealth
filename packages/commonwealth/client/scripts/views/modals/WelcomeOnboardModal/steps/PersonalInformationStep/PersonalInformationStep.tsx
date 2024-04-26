@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import { generateUsername } from 'unique-username-generator';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -68,7 +69,7 @@ const PersonalInformationStep = ({
       onSubmit={handleSubmit}
       onWatch={handleWatch}
     >
-      {({ formState, watch }) => (
+      {({ formState, watch, setValue }) => (
         <>
           <div className="username-section">
             <CWTextInput
@@ -88,6 +89,7 @@ const PersonalInformationStep = ({
               buttonHeight="sm"
               type="button"
               containerClassName="random-generate-btn"
+              onClick={() => setValue('username', generateUsername('', 2))}
             />
           </div>
 
