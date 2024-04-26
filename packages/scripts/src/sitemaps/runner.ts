@@ -8,15 +8,17 @@ import {
 const log = logger(__filename);
 
 async function doExec() {
-  console.log('Creating writer... ');
+  log.info('Creating writer... ');
   const writer = createAsyncWriterS3();
-  console.log('Creating paginator... ');
+  log.info('Creating paginator... ');
   const paginator = createDatabasePaginatorDefault();
 
-  await createSitemapGenerator(writer, [
+  const { index } = await createSitemapGenerator(writer, [
     paginator.threads,
     paginator.profiles,
   ]).exec();
+
+  log.info('Sitemap written to: ' + index.location);
 
   process.exit(0);
 }

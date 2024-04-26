@@ -16,7 +16,15 @@ describe('createSitemapGenerator', function () {
       selected_community_id: null,
     });
 
+    if (!user) {
+      throw new Error('No user');
+    }
+
     const [node] = await tester.seed('ChainNode', { contracts: [] });
+
+    if (!node) {
+      throw new Error('No node');
+    }
 
     const [community] = await tester.seed('Community', {
       name: 'Acme',
@@ -26,6 +34,10 @@ describe('createSitemapGenerator', function () {
       CommunityStakes: [],
     });
 
+    if (!community) {
+      throw new Error('No community');
+    }
+
     const [address] = await tester.seed('Address', {
       address: '0x0000',
       community_id: community.id,
@@ -33,9 +45,17 @@ describe('createSitemapGenerator', function () {
       profile_id: null,
     });
 
+    if (!address) {
+      throw new Error('No address');
+    }
+
     const [topic] = await tester.seed('Topic', {
       community_id: community.id,
     });
+
+    if (!topic) {
+      throw new Error('No address');
+    }
 
     const nrPosts = 50;
 
