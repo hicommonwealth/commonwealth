@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -19,6 +20,7 @@ import { DismissModal } from './DismissModal';
 
 export const AdminOnboardingSlider = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const contestEnabled = useFlag('contest');
 
   const navigate = useCommonNavigate();
 
@@ -79,7 +81,8 @@ export const AdminOnboardingSlider = () => {
   };
 
   const isEvmCommunity = community?.base === ChainBase.Ethereum;
-  const isContestActionCompleted = isEvmCommunity && contestsData?.length > 0;
+  const isContestActionCompleted =
+    contestEnabled && isEvmCommunity && contestsData?.length > 0;
 
   if (
     !app.activeChainId() ||
@@ -119,7 +122,7 @@ export const AdminOnboardingSlider = () => {
             />
           </div>
           <div className="cards">
-            {isEvmCommunity && (
+            {contestEnabled && isEvmCommunity && (
               <AdminOnboardingCard
                 cardType="launch-contest"
                 isActionCompleted={contestsData.length > 0}
