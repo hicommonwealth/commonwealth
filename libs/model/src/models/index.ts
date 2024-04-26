@@ -2,7 +2,14 @@ import { DataTypes, Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
 import { Factories } from './factories';
 import type { Models } from './types';
-import { createFk, dropFk, manyToMany, mapFk, oneToMany } from './utils';
+import {
+  createFk,
+  dropFk,
+  manyToMany,
+  mapFk,
+  oneToMany,
+  oneToOne,
+} from './utils';
 
 export type DB = Models<typeof Factories> & {
   sequelize: Sequelize;
@@ -42,8 +49,10 @@ export const buildDb = (sequelize: Sequelize): DB => {
   const models = Object.fromEntries(
     Object.entries(Factories).map(([key, factory]) => {
       const model = factory(sequelize, DataTypes);
-      model.withMany = oneToMany as any; // TODO: can we make this work without any?
-      model.withManyToMany = manyToMany as any; // TODO: can we make this work without any?
+      // TODO: can we make this work without any?
+      model.withOne = oneToOne as any;
+      model.withMany = oneToMany as any;
+      model.withManyToMany = manyToMany as any;
       return [key, model];
     }),
   ) as Models<typeof Factories>;

@@ -14,11 +14,8 @@ export type CommunityBannerInstance = ModelInstance<CommunityBannerAttributes>;
 
 export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommunityBannerModelStatic => {
-  const CommunityBanner = <CommunityBannerModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <CommunityBannerModelStatic>sequelize.define<CommunityBannerInstance>(
     'CommunityBanner',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -35,13 +32,3 @@ export default (
       timestamps: true,
     },
   );
-
-  CommunityBanner.associate = (models) => {
-    models.CommunityBanner.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return CommunityBanner;
-};

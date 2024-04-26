@@ -31,11 +31,8 @@ export type TopicInstance = ModelInstance<TopicAttributes> & {
 
 export type TopicModelStatic = ModelStatic<TopicInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): TopicModelStatic => {
-  const Topic = <TopicModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <TopicModelStatic>sequelize.define<TopicInstance>(
     'Topic',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -83,18 +80,3 @@ export default (
       },
     },
   );
-
-  Topic.associate = (models) => {
-    models.Topic.belongsTo(models.Community, {
-      as: 'community',
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Topic.hasMany(models.Thread, {
-      as: 'threads',
-      foreignKey: 'topic_id',
-    });
-  };
-
-  return Topic;
-};

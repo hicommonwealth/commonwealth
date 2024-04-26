@@ -52,10 +52,6 @@ export default (
       foreignKey: 'notification_id',
       targetKey: 'id',
     });
-    models.NotificationsRead.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      targetKey: 'id',
-    });
   };
 
   return NotificationsRead;

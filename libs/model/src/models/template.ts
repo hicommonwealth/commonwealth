@@ -19,11 +19,8 @@ export type TemplateInstance = ModelInstance<TemplateAttributes>;
 
 export type TemplateModelStatic = ModelStatic<TemplateInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): TemplateModelStatic => {
-  const Template = <TemplateModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <TemplateModelStatic>sequelize.define<TemplateInstance>(
     'Template',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -44,17 +41,3 @@ export default (
       underscored: true,
     },
   );
-
-  Template.associate = (models) => {
-    models.Template.belongsTo(models.ContractAbi, {
-      foreignKey: 'abi_id',
-      targetKey: 'id',
-    });
-    models.Template.belongsTo(models.Community, {
-      foreignKey: 'created_for_community',
-      targetKey: 'id',
-    });
-  };
-
-  return Template;
-};

@@ -125,14 +125,6 @@ export default (
   );
 
   Subscription.associate = (models) => {
-    models.Subscription.belongsTo(models.User, {
-      foreignKey: 'subscriber_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.NotificationCategory, {
-      foreignKey: 'category_id',
-      targetKey: 'name',
-    });
     models.Subscription.hasMany(models.NotificationsRead, {
       foreignKey: 'subscription_id',
       onDelete: 'cascade',

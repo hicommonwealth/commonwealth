@@ -3,10 +3,12 @@ import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
+import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
-import { CommunityAlertAttributes } from './community_alerts';
+import type { CommunityAlertAttributes } from './community_alerts';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import { SubscriptionPreferenceAttributes } from './subscription_preference';
+import type { SubscriptionPreferenceAttributes } from './subscription_preference';
+import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
@@ -19,6 +21,8 @@ export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   CommunityAlerts?: CommunityAlertAttributes[];
+  ThreadSubscriptions?: ThreadSubscriptionAttributes[];
+  CommentSubscriptions?: CommentSubscriptionAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -56,7 +60,7 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
 ): UserModelStatic => {
-  const User = <UserModelStatic>sequelize.define(
+  const User = <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -103,34 +107,12 @@ export default (
   );
 
   User.associate = (models) => {
-    models.User.belongsTo(models.Community, {
-      as: 'selectedCommunity',
-      foreignKey: 'selected_community_id',
-      //constraints: false,
-    });
-    models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile, {
       foreignKey: { name: 'user_id', allowNull: false },
     });
     models.User.hasMany(models.StarredCommunity, {
       foreignKey: 'user_id',
       sourceKey: 'id',
-    });
-    models.User.hasOne(models.SubscriptionPreference, {
-      foreignKey: 'user_id',
-      as: 'SubscriptionPreferences',
-    });
-    models.User.hasMany(models.CommunityAlert, {
-      foreignKey: 'user_id',
-      as: 'CommunityAlerts',
-    });
-    models.User.hasMany(models.ThreadSubscription, {
-      foreignKey: 'user_id',
-      as: 'ThreadSubscriptions',
-    });
-    models.User.hasMany(models.CommentSubscription, {
-      foreignKey: 'user_id',
-      as: 'CommentSubscriptions',
     });
 
     User.createWithProfile = async (

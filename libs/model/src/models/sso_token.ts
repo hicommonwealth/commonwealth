@@ -63,10 +63,6 @@ export default (
       foreignKey: 'address_id',
       targetKey: 'id',
     });
-    models.SsoToken.belongsTo(models.Profile, {
-      foreignKey: 'profile_id',
-      targetKey: 'id',
-    });
   };
 
   return SsoToken;

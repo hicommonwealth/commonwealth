@@ -1,28 +1,59 @@
 import { Model, ModelStatic, Sequelize, SyncOptions } from 'sequelize';
-import type { CompositeKey, State } from './types';
+import type {
+  CompositeKey,
+  OneToManyOptions,
+  OneToOneOptions,
+  RuleOptions,
+  State,
+} from './types';
+
+/**
+ * Builds on-to-one association between two models
+ * @param this source model with FK to target
+ * @param target target model with FK to source
+ * @param keys one-to-one keys [source fk to target, target fk to source]
+ */
+export function oneToOne<Source extends State, Target extends State>(
+  this: ModelStatic<Model<Source>>,
+  target: ModelStatic<Model<Target>>,
+  keys: [keyof Source & string, keyof Target & string],
+  options?: OneToOneOptions<Source>,
+) {
+  this.belongsTo(target, {
+    foreignKey: keys[0],
+    onUpdate: 'NO ACTION',
+    onDelete: 'NO ACTION',
+  });
+  target.belongsTo(this, {
+    foreignKey: keys[1],
+    onUpdate: options?.onUpdate ?? 'NO ACTION',
+    onDelete: options?.onDelete ?? 'NO ACTION',
+  });
+
+  // don't forget to return this (fluent)
+  return this;
+}
 
 /**
  * Builds on-to-many association between parent/child models
  * @param this parent model with PK
  * @param child child model with FK
  * @param foreignKey foreign key field in the child model - sequelize defaults the PK
- * @param options -
- *   - `as`: association alias - defaults to model name
- *   - `optional`: true to allow children without parents (null FKs) - defaults to false
+ * @param options one-to-many options
  */
 export function oneToMany<Parent extends State, Child extends State>(
   this: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   foreignKey: keyof Child & string,
-  options?: { as?: string; optional?: boolean },
+  options?: OneToManyOptions<Parent, Child>,
 ) {
-  // can be optional
   this.hasMany(child, {
     foreignKey: { name: foreignKey, allowNull: options?.optional },
-    as: options?.as,
+    as: options?.asMany,
+    onUpdate: options?.onUpdate ?? 'NO ACTION',
+    onDelete: options?.onDelete ?? 'NO ACTION',
   });
-  // can be optional
-  child.belongsTo(this, { foreignKey });
+  child.belongsTo(this, { foreignKey, as: options?.asOne });
 
   // don't forget to return this (fluent)
   return this;
@@ -38,11 +69,19 @@ export function oneToMany<Parent extends State, Child extends State>(
  */
 export function manyToMany<X extends State, A extends State, B extends State>(
   this: ModelStatic<Model<X>>,
-  a: [ModelStatic<Model<A>>, keyof X & string, string],
-  b: [ModelStatic<Model<B>>, keyof X & string, string],
+  a: [ModelStatic<Model<A>>, keyof X & string, string, RuleOptions],
+  b: [ModelStatic<Model<B>>, keyof X & string, string, RuleOptions],
 ) {
-  this.belongsTo(a[0], { foreignKey: { name: a[1], allowNull: false } });
-  this.belongsTo(b[0], { foreignKey: { name: b[1], allowNull: false } });
+  this.belongsTo(a[0], {
+    foreignKey: { name: a[1], allowNull: false },
+    onUpdate: a[3]?.onUpdate ?? 'NO ACTION',
+    onDelete: a[3]?.onDelete ?? 'NO ACTION',
+  });
+  this.belongsTo(b[0], {
+    foreignKey: { name: b[1], allowNull: false },
+    onUpdate: b[3]?.onUpdate ?? 'NO ACTION',
+    onDelete: b[3]?.onDelete ?? 'NO ACTION',
+  });
   a[0].hasMany(this, { foreignKey: { name: a[1], allowNull: false } });
   b[0].hasMany(this, { foreignKey: { name: b[1], allowNull: false } });
   a[0].belongsToMany(b[0], { through: this, foreignKey: a[1], as: b[2] });

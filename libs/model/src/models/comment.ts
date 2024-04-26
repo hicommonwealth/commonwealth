@@ -4,7 +4,8 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import { ThreadAttributes } from './thread';
+import type { ReactionAttributes } from './reaction';
+import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
 const log = logger(__filename);
@@ -33,6 +34,7 @@ export type CommentAttributes = {
   Chain?: CommunityAttributes;
   Address?: AddressAttributes;
   Thread?: ThreadAttributes;
+  reactions?: ReactionAttributes[];
 
   //counts
   reaction_count: number;
@@ -171,13 +173,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
       targetKey: 'id',
-    });
-    models.Comment.hasMany(models.Reaction, {
-      foreignKey: 'comment_id',
-      as: 'reactions',
-    });
-    models.Comment.hasMany(models.CommentSubscription, {
-      foreignKey: 'comment_id',
     });
   };
 

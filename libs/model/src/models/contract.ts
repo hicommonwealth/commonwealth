@@ -33,11 +33,8 @@ export type ContractInstance = ModelInstance<ContractAttributes> & {
 
 export type ContractModelStatic = ModelStatic<ContractInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ContractModelStatic => {
-  const Contract = <ContractModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <ContractModelStatic>sequelize.define<ContractInstance>(
     'Contract',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -70,17 +67,3 @@ export default (
       updatedAt: 'updated_at',
     },
   );
-
-  Contract.associate = (models) => {
-    models.Contract.belongsTo(models.ChainNode, {
-      foreignKey: 'chain_node_id',
-      targetKey: 'id',
-    });
-    models.Contract.belongsTo(models.ContractAbi, {
-      foreignKey: 'abi_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Contract;
-};

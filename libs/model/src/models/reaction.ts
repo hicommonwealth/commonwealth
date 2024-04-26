@@ -201,14 +201,6 @@ export default (
       foreignKey: 'address_id',
       targetKey: 'id',
     });
-    models.Reaction.belongsTo(models.Comment, {
-      foreignKey: 'comment_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
   };
 
   return Reaction;

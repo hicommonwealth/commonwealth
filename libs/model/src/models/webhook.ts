@@ -18,11 +18,8 @@ export type WebhookInstance = ModelInstance<WebhookAttributes>;
 
 export type WebhookModelStatic = ModelStatic<WebhookInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): WebhookModelStatic => {
-  const Webhook = <WebhookModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <WebhookModelStatic>sequelize.define<WebhookInstance>(
     'Webhook',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -41,13 +38,3 @@ export default (
       updatedAt: 'updated_at',
     },
   );
-
-  Webhook.associate = (models) => {
-    models.Webhook.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Webhook;
-};

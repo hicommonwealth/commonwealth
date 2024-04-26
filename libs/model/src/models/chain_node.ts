@@ -13,8 +13,8 @@ export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): ChainNodeModelStatic => {
-  const ChainNode = <ChainNodeModelStatic>sequelize.define(
+): ChainNodeModelStatic =>
+  <ChainNodeModelStatic>sequelize.define<ChainNodeInstance>(
     'ChainNode',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -55,14 +55,3 @@ export default (
       },
     },
   );
-
-  ChainNode.associate = (models) => {
-    models.ChainNode.hasMany(models.Community, { foreignKey: 'chain_node_id' });
-    models.ChainNode.hasMany(models.Contract, {
-      foreignKey: 'chain_node_id',
-      as: 'contracts',
-    });
-  };
-
-  return ChainNode;
-};

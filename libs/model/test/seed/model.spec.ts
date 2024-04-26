@@ -6,6 +6,7 @@ import {
   bootstrap_testing,
   create_db_from_migrations,
   get_info_schema,
+  type TABLE_INFO,
 } from '../../src/tester';
 
 const generateSchemas = async () => {
@@ -63,11 +64,14 @@ const generateSchemas = async () => {
       model: model_schema[table],
       migration: migration_schema[table],
     }))
-    .reduce((p, c) => ({ ...p, [c.model.table_name]: c }), {});
+    .reduce(
+      (p, c) => ({ ...p, [c.model.table_name]: c }),
+      {} as Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>,
+    );
 };
 
 describe('Model schema', () => {
-  let schemas: { [x: string]: { model: any; migration: any } };
+  let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
   before(async () => {
     schemas = await generateSchemas();
@@ -92,6 +96,7 @@ describe('Model schema', () => {
       expect(model.columns).deep.equals(migration.columns);
 
       //TODO: reconcile constraints - too many naming issues found
+      //console.log(model.constraints, migration.constraints);
       expect([...model.constraints.values()]).deep.equals([
         ...migration.constraints.values(),
       ]);

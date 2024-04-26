@@ -4,7 +4,8 @@ import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import { NotificationAttributes } from './notification';
+import type { NotificationAttributes } from './notification';
+import type { ReactionAttributes } from './reaction';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -29,6 +30,7 @@ export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
+  reactions?: ReactionAttributes[];
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -185,11 +187,6 @@ export default (
   );
 
   Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-      as: 'Community',
-    });
     models.Thread.belongsTo(models.Address, {
       as: 'Address',
       foreignKey: 'address_id',
@@ -203,17 +200,7 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.Thread.hasMany(models.Reaction, {
-      foreignKey: 'thread_id',
-      as: 'reactions',
-    });
-    models.Thread.hasMany(models.Poll, {
-      foreignKey: 'thread_id',
-    });
     models.Thread.hasMany(models.Notification, {
-      foreignKey: 'thread_id',
-    });
-    models.Thread.hasMany(models.ThreadSubscription, {
       foreignKey: 'thread_id',
     });
   };

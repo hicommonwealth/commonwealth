@@ -11,6 +11,8 @@ export type DiscordBotConfigAttributes = {
   verification_token: string;
   token_expiration: Date;
   verified: boolean;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type DiscordBotConfigInstance =
@@ -18,11 +20,8 @@ export type DiscordBotConfigInstance =
 
 export type DiscordBotConfigModelStatic = ModelStatic<DiscordBotConfigInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): DiscordBotConfigModelStatic => {
-  const DiscordBotConfig = <DiscordBotConfigModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <DiscordBotConfigModelStatic>sequelize.define<DiscordBotConfigInstance>(
     'DiscordBotConfig',
     {
       id: {
@@ -53,14 +52,3 @@ export default (
       updatedAt: 'updated_at',
     },
   );
-
-  DiscordBotConfig.associate = (models) => {
-    models.DiscordBotConfig.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-      onDelete: 'CASCADE',
-    });
-  };
-
-  return DiscordBotConfig;
-};

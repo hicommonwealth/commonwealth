@@ -21,11 +21,8 @@ export type VoteInstance = ModelInstance<VoteAttributes>;
 
 export type VoteModelStatic = ModelStatic<VoteInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): VoteModelStatic => {
-  const Vote = <VoteModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <VoteModelStatic>sequelize.define<VoteInstance>(
     'Vote',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -44,14 +41,3 @@ export default (
       updatedAt: 'updated_at',
     },
   );
-
-  Vote.associate = (models) => {
-    models.Vote.belongsTo(models.Poll, {
-      foreignKey: 'poll_id',
-      constraints: false,
-      as: 'poll',
-    });
-  };
-
-  return Vote;
-};

@@ -15,12 +15,9 @@ export type NotificationCategoryInstance =
 export type NotificationCategoryModelStatic =
   ModelStatic<NotificationCategoryInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): NotificationCategoryModelStatic => {
-  const NotificationCategory = <NotificationCategoryModelStatic>(
-    sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <NotificationCategoryModelStatic>(
+    sequelize.define<NotificationCategoryInstance>(
       'NotificationCategory',
       {
         name: { type: dataTypes.STRING, primaryKey: true },
@@ -36,13 +33,3 @@ export default (
       },
     )
   );
-  NotificationCategory.associate = (models) => {
-    models.NotificationCategory.hasMany(models.Notification, {
-      foreignKey: 'category_id',
-    });
-    models.NotificationCategory.hasMany(models.Subscription, {
-      foreignKey: 'category_id',
-    });
-  };
-  return NotificationCategory;
-};

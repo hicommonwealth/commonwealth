@@ -3,6 +3,7 @@ import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
+import type { VoteAttributes } from './vote';
 
 export type PollAttributes = {
   id: number;
@@ -17,18 +18,16 @@ export type PollAttributes = {
   last_commented_on?: Date;
 
   // associations
-  Thread: ThreadAttributes;
-  Chain: CommunityAttributes;
+  Thread?: ThreadAttributes;
+  Chain?: CommunityAttributes;
+  votes?: VoteAttributes[];
 };
 
 export type PollInstance = ModelInstance<PollAttributes>;
 export type PollModelStatic = ModelStatic<PollInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): PollModelStatic => {
-  const Poll = <PollModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <PollModelStatic>sequelize.define<PollInstance>(
     'Poll',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -51,22 +50,3 @@ export default (
       indexes: [{ fields: ['thread_id'] }, { fields: ['community_id'] }],
     },
   );
-
-  Poll.associate = (models) => {
-    models.Poll.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
-    models.Poll.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Poll.hasMany(models.Vote, {
-      foreignKey: 'poll_id',
-      as: 'votes',
-      onDelete: 'CASCADE',
-    });
-  };
-
-  return Poll;
-};

@@ -18,11 +18,8 @@ export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
 
 export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ContractAbiModelStatic => {
-  const ContractAbi = <ContractAbiModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <ContractAbiModelStatic>sequelize.define<ContractAbiInstance>(
     'ContractAbi',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -64,10 +61,3 @@ export default (
       },
     },
   );
-
-  ContractAbi.associate = (models) => {
-    models.ContractAbi.hasMany(models.Contract, { foreignKey: 'abi_id' });
-  };
-
-  return ContractAbi;
-};

@@ -16,11 +16,8 @@ export type SubscriptionPreferenceInstance =
 export type SubscriptionPreferenceModelStatic =
   ModelStatic<SubscriptionPreferenceInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): SubscriptionPreferenceModelStatic => {
-  const SubscriptionPreferences = <SubscriptionPreferenceModelStatic>(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <SubscriptionPreferenceModelStatic>(
     sequelize.define<SubscriptionPreferenceInstance>(
       'SubscriptionPreferences',
       {
@@ -70,12 +67,3 @@ export default (
       },
     )
   );
-
-  SubscriptionPreferences.associate = (models: any) => {
-    SubscriptionPreferences.belongsTo(models.User, {
-      foreignKey: 'user_id',
-    });
-  };
-
-  return SubscriptionPreferences;
-};

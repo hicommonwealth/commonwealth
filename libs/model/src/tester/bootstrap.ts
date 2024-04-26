@@ -115,9 +115,10 @@ type COLUMN_INFO = {
 type CONSTRAINT_INFO = {
   table_name: string;
   constraint: string;
+  rules: string;
   constraint_name: string;
 };
-type TABLE_INFO = {
+export type TABLE_INFO = {
   table_name: string;
   columns: Record<string, string>;
   constraints: Set<string>;
@@ -154,12 +155,14 @@ ORDER BY 1, 2;`,
 SELECT
 	c.table_name,
 	c.constraint_type || '(' || STRING_AGG(k.column_name, ',' order by column_name) || ')' as constraint,
+  'update=' || COALESCE(r.update_rule,'') || ' delete=' || COALESCE(r.delete_rule,'') as rules,
 	c.constraint_name
 FROM
 	information_schema.table_constraints c
 	JOIN information_schema.key_column_usage k on c.constraint_name = k.constraint_name
+  LEFT JOIN information_schema.referential_constraints r ON c.constraint_name = r.constraint_name
 WHERE c.table_schema = 'public'
-GROUP BY c.table_name, c.constraint_name, c.constraint_type
+GROUP BY c.table_name, c.constraint_name, c.constraint_type, r.update_rule, r.delete_rule
 ORDER BY 1, 2;`,
     { type: QueryTypes.SELECT },
   );
@@ -180,7 +183,9 @@ ORDER BY 1, 2;`,
     .filter(
       (c) => !options?.ignore_constraints[c.table_name]?.includes(c.constraint),
     )
-    .forEach((c) => tables[c.table_name].constraints.add(c.constraint));
+    .forEach((c) =>
+      tables[c.table_name].constraints.add(`${c.constraint} ${c.rules}`),
+    );
   return tables;
 };
 

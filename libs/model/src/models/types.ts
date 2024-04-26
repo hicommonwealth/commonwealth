@@ -6,6 +6,39 @@ import {
   type BuildOptions,
 } from 'sequelize';
 
+/**
+ * Association rule options
+ * - `onUpdate`: update rule, 'NO ACTION' by default
+ * - `onDelete`: delete rule, 'NO ACTION' by default
+ */
+export type RuleOptions = {
+  onUpdate?: 'CASCADE' | 'NO ACTION' | 'SET NULL';
+  onDelete?: 'CASCADE' | 'NO ACTION' | 'SET NULL';
+};
+
+/**
+ * One to one association options
+ * - `as`: association alias - defaults to model name
+ */
+export type OneToOneOptions<Source extends State> = RuleOptions & {
+  as?: keyof Source & string;
+};
+
+/**
+ * One to many association options
+ * - `asOne`: parent association alias - defaults to model name
+ * - `asMany`: children association alias - defaults to model name
+ * - `optional`: true to allow children without parents (null FKs) - defaults to false
+ */
+export type OneToManyOptions<
+  Parent extends State,
+  Child extends State,
+> = RuleOptions & {
+  asOne?: keyof Child & string;
+  asMany?: keyof Parent & string;
+  optional?: boolean;
+};
+
 type ModelFactory<T> = (sequelize: Sequelize, dataTypes: typeof DataTypes) => T;
 type ModelFactories = Record<string, ModelFactory<unknown>>;
 export type Models<T extends ModelFactories> = {
@@ -17,21 +50,28 @@ export type ModelInstance<Attrs extends State> = Model<Attrs> & Attrs;
 export type ModelStatic<ParentModel extends Model> =
   typeof Model<ParentModel> & {
     associate: (models: Models<any>) => void;
+    withOne: <Target extends State>(
+      target: ModelStatic<Model<Target>>,
+      keys: [keyof Attributes<ParentModel> & string, keyof Target & string],
+      options?: OneToOneOptions<Attributes<ParentModel>>,
+    ) => ModelStatic<ParentModel>;
     withMany: <Child extends State>(
       child: ModelStatic<Model<Child>>,
       foreignKey: keyof Child & string,
-      options?: { as?: string; optional?: boolean },
+      options?: OneToManyOptions<Attributes<ParentModel>, Child>,
     ) => ModelStatic<ParentModel>;
     withManyToMany: <A extends State, B extends State>(
       a: [
         ModelStatic<Model<A>>,
         keyof Attributes<ParentModel> & string,
         string,
+        RuleOptions,
       ],
       b: [
         ModelStatic<Model<B>>,
         keyof Attributes<ParentModel> & string,
         string,
+        RuleOptions,
       ],
     ) => ModelStatic<ParentModel>;
   } & {

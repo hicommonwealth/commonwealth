@@ -45,11 +45,8 @@ export type CommunityInstance = ModelInstance<CommunityAttributes> & {
 
 export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommunityModelStatic => {
-  const Community = <CommunityModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <CommunityModelStatic>sequelize.define<CommunityInstance>(
     // Leave this as is for now so that we don't need to alias and models can join
     // with this model using .Chain rather than .Community. Models should incrementally
     // be aliased via `as: 'Community'` until all models use Community at which point,
@@ -154,41 +151,3 @@ export default (
       underscored: false,
     },
   );
-
-  Community.associate = (models) => {
-    models.Community.belongsTo(models.ChainNode, {
-      foreignKey: 'chain_node_id',
-    });
-    models.Community.belongsTo(models.DiscordBotConfig, {
-      foreignKey: 'discord_config_id',
-      targetKey: 'id',
-    });
-    models.Community.hasMany(models.Address, {
-      foreignKey: 'community_id',
-    });
-    models.Community.hasMany(models.Notification, {
-      foreignKey: 'community_id',
-    });
-    models.Community.hasMany(models.Topic, {
-      as: 'topics',
-      foreignKey: 'community_id',
-    });
-    models.Community.hasMany(models.Thread, { foreignKey: 'community_id' });
-    models.Community.hasMany(models.Comment, { foreignKey: 'community_id' });
-    models.Community.hasMany(models.StarredCommunity, {
-      foreignKey: 'community_id',
-    });
-    models.Community.hasMany(models.Group, {
-      as: 'groups',
-      foreignKey: 'community_id',
-    });
-    models.Community.hasMany(models.CommunityAlert, {
-      foreignKey: 'community_id',
-    });
-    models.Community.hasMany(models.CommunityAlert, {
-      foreignKey: 'community_id',
-    });
-  };
-
-  return Community;
-};
