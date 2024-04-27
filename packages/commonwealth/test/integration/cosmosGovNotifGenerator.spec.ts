@@ -214,8 +214,7 @@ describe('Cosmos Governance Notification Generator', () => {
         { transaction },
       );
 
-      // upserting to account for failure removing this community in related test below
-      await models.Community.upsert(
+      await models.Community.create(
         {
           id: 'osmosis',
           name: 'Osmosis',
@@ -321,10 +320,7 @@ describe('Cosmos Governance Notification Generator', () => {
       },
     );
 
-    // FIXME: skipping due to FK constraint violation Topics_community_id_fkey when deleting community
-    // seems like we are removing this constraint in migrations for performance reasons
-    // but defining with cascade delete in model...
-    it.skip('should not generate notifications if there are no cosmos chains', async () => {
+    it('should not generate notifications if there are no cosmos chains', async () => {
       await models.Community.destroy({
         where: {
           base: ChainBase.CosmosSDK,

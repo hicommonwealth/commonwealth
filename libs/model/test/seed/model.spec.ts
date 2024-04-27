@@ -24,42 +24,23 @@ const generateSchemas = async () => {
       Comments: [
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
       ],
-      CommunityContracts: ['UNIQUE(community_id)'],
-      CommunitySnapshotSpaces: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
-        'FOREIGN KEY SnapshotSpaces(snapshot_space_id) UPDATE CASCADE DELETE NO ACTION',
-      ],
-      Memberships: ['PRIMARY KEY(id)'],
       Notifications: [
         'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
       ],
-      Outbox: ['PRIMARY KEY(event_id)'],
-      Profiles: ['FOREIGN KEY Users(user_id) UPDATE CASCADE DELETE NO ACTION'],
       Reactions: [
         'FOREIGN KEY Addresses(address_id) UPDATE CASCADE DELETE NO ACTION',
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
-      ],
-      SnapshotProposals: [
-        'FOREIGN KEY SnapshotSpaces(space) UPDATE CASCADE DELETE NO ACTION',
-      ],
-      SsoTokens: [
-        'FOREIGN KEY Addresses(address_id) UPDATE CASCADE DELETE SET NULL',
-      ],
-      StarredCommunities: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
-        'FOREIGN KEY Users(user_id) UPDATE CASCADE DELETE NO ACTION',
       ],
       Subscriptions: [
         'FOREIGN KEY Comments(comment_id) UPDATE CASCADE DELETE SET NULL',
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE SET NULL',
         'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
       ],
-      Template: [
-        'FOREIGN KEY ContractAbis(abi_id) UPDATE CASCADE DELETE NO ACTION',
+      Memberships: [
+        'PRIMARY KEY(id)', // TODO: should we remove this id with a migration?
       ],
-      Threads: ['FOREIGN KEY Topics(topic_id) UPDATE CASCADE DELETE SET NULL'],
-      Topics: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE CASCADE',
+      Outbox: [
+        'PRIMARY KEY(event_id)', // removed in migration
       ],
     },
   });
@@ -111,11 +92,11 @@ describe('Model schema', () => {
       //console.log(model.columns, migration.columns);
       expect(model.columns).deep.equals(migration.columns);
 
-      //TODO: reconcile constraints - too many naming issues found
-      // console.log(
-      //   [...model.constraints.values()],
-      //   [...migration.constraints.values()],
-      // );
+      // model.table_name === 'Topics' &&
+      //   console.log(
+      //     [...model.constraints.values()],
+      //     [...migration.constraints.values()],
+      //   );
       expect([...model.constraints.values()]).deep.equals([
         ...migration.constraints.values(),
       ]);
