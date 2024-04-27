@@ -59,7 +59,7 @@ const generateSchemas = async () => {
       ],
       Threads: ['FOREIGN KEY Topics(topic_id) UPDATE CASCADE DELETE SET NULL'],
       Topics: [
-        'FOREIGN KEY Communities(community_id) UPDATE NO ACTION DELETE NO ACTION',
+        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE CASCADE',
       ],
     },
   });

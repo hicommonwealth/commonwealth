@@ -42,6 +42,8 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Topic, 'community_id', {
       asOne: 'community',
       asMany: 'topics',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     })
     .withMany(db.Address, 'community_id')
     .withMany(db.Thread, 'community_id', {
