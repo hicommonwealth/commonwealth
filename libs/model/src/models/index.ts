@@ -26,6 +26,17 @@ export const syncDb = async (db: DB, log = false) => {
     mapFk(db.Contest, db.ContestAction, ['contest_address', 'contest_id']),
     mapFk(db.ContestManager, db.Contest, ['contest_address']),
     mapFk(db.Topic, db.ContestTopic, [['id', 'topic_id']]),
+    mapFk(db.Community, db.CommunityStake, [['id', 'community_id']]),
+    mapFk(db.ChainNode, db.LastProcessedEvmBlock, [['id', 'chain_node_id']]),
+    mapFk(
+      db.CommunityStake,
+      db.StakeTransaction,
+      ['community_id', 'stake_id'],
+      {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+    ),
   ];
 
   compositeKeys.forEach(({ parent, child }) =>
@@ -35,8 +46,8 @@ export const syncDb = async (db: DB, log = false) => {
     force: true,
     logging: log ? console.log : false,
   });
-  compositeKeys.forEach(({ parent, child, key }) =>
-    createFk(db.sequelize, parent.tableName, child.tableName, key),
+  compositeKeys.forEach(({ parent, child, key, rules }) =>
+    createFk(db.sequelize, parent.tableName, child.tableName, key, rules),
   );
 };
 

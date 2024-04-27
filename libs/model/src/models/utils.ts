@@ -98,6 +98,7 @@ export const mapFk = <Parent extends State, Child extends State>(
   parent: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   key: CompositeKey<Parent, Child>,
+  rules?: RuleOptions,
 ) => ({
   parent,
   child,
@@ -109,6 +110,7 @@ export const mapFk = <Parent extends State, Child extends State>(
         ]
       : parent.getAttributes()[k].field!,
   ) as Array<string | [string, string]>,
+  rules,
 });
 
 /**
@@ -119,6 +121,7 @@ export const createFk = (
   parentTable: string,
   childTable: string,
   key: Array<string | [string, string]>,
+  rules?: RuleOptions,
 ) => {
   const fkName = `${childTable}_${parentTable.toLowerCase()}_fkey`;
   const pk = key.map((k) => (Array.isArray(k) ? k[0] : k)).join(',');
@@ -126,7 +129,10 @@ export const createFk = (
   sequelize?.query(
     `
     ALTER TABLE "${childTable}" ADD CONSTRAINT "${fkName}"
-    FOREIGN KEY (${fk}) REFERENCES "${parentTable}"(${pk});
+    FOREIGN KEY (${fk}) REFERENCES "${parentTable}"(${pk})
+    ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
+      rules?.onDelete ?? 'NO ACTION'
+    };
     `,
   );
 };

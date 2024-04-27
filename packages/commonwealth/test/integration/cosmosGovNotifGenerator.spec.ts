@@ -320,7 +320,7 @@ describe('Cosmos Governance Notification Generator', () => {
       },
     );
 
-    it.skip('should not generate notifications if there are no cosmos chains', async () => {
+    it('should not generate notifications if there are no cosmos chains', async () => {
       await models.Community.destroy({
         where: {
           base: ChainBase.CosmosSDK,
@@ -343,7 +343,7 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(notifications.length).to.equal(0);
     });
 
-    it.skip('should not generate notifications if there are no new proposals', async () => {
+    it('should not generate notifications if there are no new proposals', async () => {
       await createCosmosChains();
       const user = await models.User.findOne();
       await models.Subscription.findOrCreate({
@@ -373,7 +373,7 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(notifications.length).to.equal(0);
     });
 
-    it.skip('should generate notifications for recent proposals even if there are no existing notifications', async () => {
+    it('should generate notifications for recent proposals even if there are no existing notifications', async () => {
       createMockClients(
         [createFakeProposal('v1', 4), createFakeProposal('v1', 5)],
         [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)],
@@ -390,7 +390,7 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(notifications.length).to.equal(2);
     });
 
-    it.skip('should generate cosmos gov notifications for new proposals given existing notifications', async () => {
+    it('should generate cosmos gov notifications for new proposals given existing notifications', async () => {
       const v1ExistingNotifPropId = 24;
       const v1Beta1ExistingNotifPropId = 36;
       await models.Notification.create({
