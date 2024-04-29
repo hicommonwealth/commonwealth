@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/logging';
-import { toBN } from 'web3-utils';
+import { toBigInt } from 'web3-utils';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
@@ -118,7 +118,7 @@ async function getEthBalance(
     return {};
   } else {
     return {
-      [address]: toBN(data.result).toString(10),
+      [address]: toBigInt(data.result).toString(10),
     };
   }
 }

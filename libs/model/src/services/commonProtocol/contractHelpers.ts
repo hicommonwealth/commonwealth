@@ -38,7 +38,7 @@ export const getNamespace = async (
   const activeNamespace = await factory.methods
     .getNamespace(hexString.padEnd(66, '0'))
     .call();
-  return activeNamespace;
+  return String(activeNamespace);
 };
 
 /**
