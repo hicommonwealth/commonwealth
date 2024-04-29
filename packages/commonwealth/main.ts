@@ -35,6 +35,8 @@ require('express-async-errors');
 
 const DEV = process.env.NODE_ENV !== 'production';
 
+const SESSION_EXPIRY = 14 * 24 * 60 * 60 * 1000;
+
 /**
  * Bootstraps express app
  */
@@ -73,7 +75,7 @@ export async function main(
     db: db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 14 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+    expiration: SESSION_EXPIRY,
   });
 
   sessionStore.sync();
@@ -84,7 +86,7 @@ export async function main(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 365 * 24 * 60 * 60 * 1000, // Cookie expires in 1 year
+      maxAge: SESSION_EXPIRY,
     },
   });
 
