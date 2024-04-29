@@ -6,7 +6,7 @@
   "files": [
     "build"
   ],
-  "main": "build/index",
+  "main": "build/index.js",
   "scripts": {
     "build": "tsc -b",
     "clean": "rm -rf build",

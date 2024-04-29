@@ -7,7 +7,7 @@
   "files": [
     "build"
   ],
-  "main": "build/index",
+  "main": "build/index.js",
   "types": "src/index",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
