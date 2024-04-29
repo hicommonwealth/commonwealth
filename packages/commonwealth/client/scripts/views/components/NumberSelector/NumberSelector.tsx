@@ -13,6 +13,7 @@ interface NumberSelectorProps {
   onInput: (e) => void;
   value: string | number;
   inputClassName?: string;
+  inputDisabled?: boolean;
 }
 
 const NumberSelector = ({
@@ -23,6 +24,7 @@ const NumberSelector = ({
   onInput,
   value,
   inputClassName,
+  inputDisabled,
 }: NumberSelectorProps) => {
   return (
     <div className="NumberSelector">
@@ -37,6 +39,7 @@ const NumberSelector = ({
         value={value}
         containerClassName="number-container"
         inputClassName={inputClassName}
+        disabled={inputDisabled}
       />
       <CWCircleButton
         buttonType="secondary"

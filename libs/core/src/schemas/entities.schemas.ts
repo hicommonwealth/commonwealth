@@ -6,6 +6,7 @@ import {
   CosmosGovernanceVersion,
   DefaultPage,
   NotificationCategories,
+  commonProtocol,
 } from '@hicommonwealth/shared';
 import z from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
@@ -307,21 +308,24 @@ export const ContestManager = z
       .describe('Provided by admin on creation when stake funds are not used'),
     prize_percentage: z
       .number()
+      .int()
       .min(0)
-      .max(1)
+      .max(100)
       .optional()
       .describe('Percentage of pool used for prizes in recurring contests'),
     payout_structure: z
-      .array(z.number().min(0).max(1))
-      .describe(
-        'Sorted array of percentages for prize, from first to last, adding up to 1',
-      ),
+      .array(z.number().int().min(0).max(100))
+      .describe('Sorted array of percentages for prize, from first to last'),
     interval: z
       .number()
       .int()
       .min(0)
       .max(100)
       .describe('Recurring contest interval, 0 when one-off'),
+    ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
+    decimals: PG_INT.optional().default(
+      commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
+    ),
     created_at: z.date(),
     cancelled: z
       .boolean()
@@ -514,33 +518,57 @@ export const ChainNode = z.object({
 // aliases
 export const Chain = Community;
 
-export const Outbox = z.object({
-  id: PG_INT,
-  event_name: z.nativeEnum(EventNames),
-  event_payload: z.union([
-    events.ThreadCreated.extend({
-      event_name: z.literal(EventNames.ThreadCreated),
-    }),
-    events.CommentCreated.extend({
-      event_name: z.literal(EventNames.CommentCreated),
-    }),
-    events.GroupCreated.extend({
-      event_name: z.literal(EventNames.GroupCreated),
-    }),
-    events.CommunityCreated.extend({
-      event_name: z.literal(EventNames.CommunityCreated),
-    }),
-    events.SnapshotProposalCreated.extend({
-      event_name: z.literal(EventNames.SnapshotProposalCreated),
-    }),
-    events.DiscordMessageCreated.extend({
-      event_name: z.literal(EventNames.DiscordMessageCreated),
-    }),
-  ]),
-  relayed: z.boolean(),
-  created_at: z.date(),
-  updated_at: z.date(),
+const BaseOutboxProperties = z.object({
+  event_id: PG_INT.optional(),
+  relayed: z.boolean().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
+
+export const Outbox = z.union([
+  z
+    .object({
+      event_name: z.literal(EventNames.ThreadCreated),
+      event_payload: events.ThreadCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.CommentCreated),
+      event_payload: events.CommentCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.GroupCreated),
+      event_payload: events.GroupCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.CommunityCreated),
+      event_payload: events.CommunityCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.SnapshotProposalCreated),
+      event_payload: events.SnapshotProposalCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordMessageCreated),
+      event_payload: events.DiscordMessageCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.ChainEventCreated),
+      event_payload: events.ChainEventCreated,
+    })
+    .merge(BaseOutboxProperties),
+]);
 
 export const SubscriptionPreference = z.object({
   id: PG_INT,
@@ -556,19 +584,19 @@ export const SubscriptionPreference = z.object({
 });
 
 export const ThreadSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommentSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   comment_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommunityAlert = z.object({

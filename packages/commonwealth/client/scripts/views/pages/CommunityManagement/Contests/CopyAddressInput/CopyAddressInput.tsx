@@ -23,6 +23,7 @@ const CopyAddressInput = ({ address }: CopyAddressInputProps) => {
       <CWIconButton
         iconName="copyNew"
         buttonSize="med"
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={handleCopyLink}
       />
     </div>

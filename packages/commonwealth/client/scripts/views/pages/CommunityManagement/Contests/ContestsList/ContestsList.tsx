@@ -4,21 +4,13 @@ import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
+import mockedContests from '../mockedContests';
 import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
 interface ContestsListProps {
-  contests: {
-    id: number;
-    name: string;
-    imageUrl?: string;
-    finishDate: string;
-    topics: string[];
-    payouts: number[];
-    isActive: boolean;
-    address: string;
-  }[];
+  contests: typeof mockedContests;
   isAdmin: boolean;
   isLoading: boolean;
   stakeEnabled: boolean;
@@ -52,31 +44,30 @@ const ContestsList = ({
             isContestAvailable={isContestAvailable}
           />
         ) : (
-          contests.map(
-            ({
-              id,
-              name,
-              imageUrl,
-              finishDate,
-              topics,
-              payouts,
-              isActive,
-              address,
-            }) => (
+          contests.map((contest) => {
+            // only last contest is relevant
+            const { end_time, winners } =
+              contest.contests[contest.contests.length - 1];
+
+            return (
               <ContestCard
-                key={id}
+                key={contest.contest_address}
                 isAdmin={isAdmin}
-                id={id}
-                name={name}
-                imageUrl={imageUrl}
-                topics={topics}
-                payouts={payouts}
-                finishDate={finishDate}
-                isActive={isActive}
-                onFund={() => setFundDrawerAddress(address)}
+                address={contest.contest_address}
+                name={contest.name}
+                imageUrl={contest.image_url}
+                topics={contest.topics}
+                winners={winners}
+                finishDate={end_time.toISOString()}
+                isActive={!contest.paused}
+                onFund={() =>
+                  setFundDrawerAddress(
+                    contest.funding_token_address || 'stake address',
+                  )
+                }
               />
-            ),
-          )
+            );
+          })
         )}
       </div>
       <FundContestDrawer

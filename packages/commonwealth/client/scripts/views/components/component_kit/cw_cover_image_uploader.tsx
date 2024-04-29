@@ -101,7 +101,7 @@ export const CWCoverImageUploader = ({
       attachButton.current.style.display = 'flex';
 
       setImageURL(defaultFormContext.value);
-      setImageBehavior(ImageBehavior.Circle);
+      setImageBehavior(defaultImageBehaviour || ImageBehavior.Circle);
       setDefaultFormContext({
         isSet: true,
         value: defaultFormContext.value,

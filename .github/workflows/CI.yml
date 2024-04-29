@@ -345,8 +345,11 @@ jobs:
             exit 1
           fi
 
-      - name: Build
-        run: yarn build
+      - name: build
+        run: yarn workspaces run build
+
+      - name: check-types
+        run: yarn workspaces run check-types
 
       - name: Run linter
         env:
@@ -354,20 +357,11 @@ jobs:
         run: yarn lint-branch
 
       # To disable eslint-diff just comment the following two lines
-      #- name: Run eslint-diff
-      #  run: yarn workspace commonwealth run lint-diff
+      - name: Run eslint-diff
+        run: yarn workspace commonwealth run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: yarn workspace commonwealth run lint-diff-canary
-
-      - name: Commonwealth Typecheck
-        run: yarn --cwd packages/commonwealth check-types
-
-      - name: Discord-Bot Typecheck
-        run: yarn --cwd packages/discord-bot check-types
-
-      - name: Snapshot-listener Typecheck
-        run: yarn --cwd packages/snapshot-listener check-types
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
@@ -421,7 +415,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: NO_WEBPACK=true yarn build-ci
 
       - name: Run unit tests
         run: yarn workspaces run test
@@ -498,7 +492,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: NO_WEBPACK=true yarn build-ci
 
       ## EVM Section:
       - name: Start EVM Testnet

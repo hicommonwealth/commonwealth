@@ -16,6 +16,12 @@ export enum ContestRecurringType {
   No = 'no',
 }
 
-export type ContestFormSubmitValues = z.infer<
+export type ContestFormValidationSubmitValues = z.infer<
   typeof detailsFormValidationSchema
 >;
+
+export type ContestFormData = ContestFormValidationSubmitValues & {
+  prizePercentage: number;
+  payoutStructure: number[];
+  toggledTopicList: { name: string; id: number; checked: boolean }[];
+};
