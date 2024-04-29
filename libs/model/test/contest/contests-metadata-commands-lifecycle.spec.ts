@@ -26,7 +26,7 @@ describe('Contests metadata commands lifecycle', () => {
   ];
 
   let communityAdminActor: Actor | null = null;
-  let memberActor: Actor | null = null;
+  let communityMemberActor: Actor | null = null;
 
   before(async () => {
     await bootstrap_testing();
@@ -116,7 +116,7 @@ describe('Contests metadata commands lifecycle', () => {
 
     expect(communityAdminActor.address_id).to.not.be.empty;
 
-    memberActor = {
+    communityMemberActor = {
       user: {
         id: memberUser!.id,
         email: memberUser!.email!,
@@ -124,7 +124,7 @@ describe('Contests metadata commands lifecycle', () => {
       address_id: community[0]!.Addresses![1].address,
     };
 
-    expect(memberActor.address_id).to.not.be.empty;
+    expect(communityMemberActor.address_id).to.not.be.empty;
   });
 
   after(async () => {
@@ -134,7 +134,7 @@ describe('Contests metadata commands lifecycle', () => {
   describe('create contest metadata', () => {
     it('should fail to create if not community admin', async () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
-        actor: memberActor!,
+        actor: communityMemberActor!,
         id: community_id,
         payload: {
           name,
@@ -167,7 +167,8 @@ describe('Contests metadata commands lifecycle', () => {
           created_at,
         },
       });
-      expect(promise).to.be.rejectedWith('Community must exist');
+      // the auth middleware fails to find address if community doesn't exist
+      expect(promise).to.be.rejectedWith('User is not admin in the community');
     });
 
     it(`should create contest manager metadata`, async () => {
@@ -211,12 +212,29 @@ describe('Contests metadata commands lifecycle', () => {
     });
   });
 
-  describe.skip('update contest metadata', () => {
+  describe('update contest metadata', () => {
+    it('should fail to update if not community admin', async () => {
+      const { contest_address } = community[0]!.contest_managers![0];
+
+      const promise = command(Contest.UpdateContestManagerMetadata(), {
+        actor: communityMemberActor!,
+        id: community_id,
+        payload: {
+          contest_address,
+          name: 'xxx',
+          image_url: 'https://blah',
+        },
+      });
+
+      expect(promise).to.be.rejectedWith('User is not admin in the community');
+    });
+
     it('should fail to update if contest manager does not exist', async () => {
       const promise = command(Contest.UpdateContestManagerMetadata(), {
         actor: communityAdminActor!,
-        id: 'does-not-exist',
+        id: community_id,
         payload: {
+          contest_address: 'contest-manager-not-exists',
           name: 'xxx',
         },
       });
@@ -230,34 +248,68 @@ describe('Contests metadata commands lifecycle', () => {
         Contest.UpdateContestManagerMetadata(),
         {
           actor: communityAdminActor!,
-          id: contest_address,
+          id: community_id,
           payload: {
+            contest_address,
             name: 'xxx',
+            image_url: 'https://blah',
           },
         },
       );
-
-      expect(updateResult).to.deep.eq({
+      expect(updateResult!.contest_managers![0]).to.deep.contain({
         contest_address,
         name: 'xxx',
         community_id,
-        image_url,
+        image_url: 'https://blah',
         funding_token_address,
         prize_percentage,
         payout_structure,
         interval,
         paused,
-        created_at,
       });
     });
   });
 
-  describe.skip('pause/resume contest metadata', () => {
+  describe('pause/resume contest metadata', () => {
+    it('should fail to pause and resume if not admin', async () => {
+      const { contest_address } = community[0]!.contest_managers![1];
+
+      expect(contest_address).to.not.be.empty;
+
+      {
+        const promise = command(Contest.PauseContestManagerMetadata(), {
+          actor: communityMemberActor!,
+          id: community_id,
+          payload: {
+            contest_address,
+          },
+        });
+        expect(promise).to.be.rejectedWith(
+          'User is not admin in the community',
+        );
+      }
+
+      {
+        const promise = command(Contest.ResumeContestManagerMetadata(), {
+          actor: communityMemberActor!,
+          id: community_id,
+          payload: {
+            contest_address,
+          },
+        });
+        expect(promise).to.be.rejectedWith(
+          'User is not admin in the community',
+        );
+      }
+    });
+
     it('should fail to pause if contest manager does not exist', async () => {
       const promise = command(Contest.PauseContestManagerMetadata(), {
         actor: communityAdminActor!,
-        id: 'does-not-exist',
-        payload: {},
+        id: community_id,
+        payload: {
+          contest_address: 'does-not-exist',
+        },
       });
       expect(promise).to.be.rejectedWith('ContestManager must exist');
     });
@@ -265,8 +317,10 @@ describe('Contests metadata commands lifecycle', () => {
     it('should fail to resume if contest manager does not exist', async () => {
       const promise = command(Contest.ResumeContestManagerMetadata(), {
         actor: communityAdminActor!,
-        id: 'does-not-exist',
-        payload: {},
+        id: community_id,
+        payload: {
+          contest_address: 'does-not-exist',
+        },
       });
       expect(promise).to.be.rejectedWith('ContestManager must exist');
     });
@@ -274,18 +328,21 @@ describe('Contests metadata commands lifecycle', () => {
     it('should pause and resume contest manager metadata', async () => {
       const { contest_address, paused } = community[0]!.contest_managers![1];
 
+      expect(contest_address).to.not.be.empty;
       expect(paused).to.eq(false);
 
       const pausedResult = await command(
         Contest.PauseContestManagerMetadata(),
         {
           actor: communityAdminActor!,
-          id: contest_address,
-          payload: {},
+          id: community_id,
+          payload: {
+            contest_address,
+          },
         },
       );
 
-      expect(pausedResult).to.deep.eq({
+      expect(pausedResult!.contest_managers![0]).to.deep.contain({
         contest_address,
         name,
         community_id,
@@ -302,12 +359,14 @@ describe('Contests metadata commands lifecycle', () => {
         Contest.ResumeContestManagerMetadata(),
         {
           actor: communityAdminActor!,
-          id: contest_address,
-          payload: {},
+          id: community_id,
+          payload: {
+            contest_address,
+          },
         },
       );
 
-      expect(resumedResult).to.deep.eq({
+      expect(resumedResult!.contest_managers![0]).to.deep.contain({
         contest_address,
         name,
         community_id,
@@ -317,7 +376,6 @@ describe('Contests metadata commands lifecycle', () => {
         payout_structure,
         interval,
         paused: false,
-        created_at,
       });
     });
   });

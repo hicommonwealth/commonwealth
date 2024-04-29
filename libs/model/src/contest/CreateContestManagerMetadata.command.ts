@@ -10,8 +10,6 @@ export const CreateContestManagerMetadata: Command<
   ...schemas.commands.CreateContestManagerMetadata,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
-    const community = await models.Community.findByPk(id!);
-    mustExist('Community', community);
     const contestManager = await models.ContestManager.create({
       ...payload,
       community_id: id!,
