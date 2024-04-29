@@ -61,7 +61,6 @@ describe('Seed functions', () => {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
-        selected_community_id: null,
       };
       // NOTE: some props like emailVerified and isAdmin
       // are explicitly excluded via sequelize model config
@@ -123,9 +122,6 @@ describe('Seed functions', () => {
             is_user_default: false,
           },
         ],
-        CommunityStakes: [],
-        discord_config_id: null,
-        contest_managers: [],
       });
 
       const community = await testSeed('Community', {
@@ -152,7 +148,6 @@ describe('Seed functions', () => {
             is_user_default: false,
           },
         ],
-        CommunityStakes: [],
         groups: [
           {
             metadata: {
@@ -162,8 +157,6 @@ describe('Seed functions', () => {
           },
         ],
         topics: [{}, {}],
-        contest_managers: [],
-        discord_config_id: null,
       });
 
       await testSeed('NotificationCategory', {
