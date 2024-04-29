@@ -257,27 +257,23 @@ export async function login(page) {
   // As a result, the metamask button will not appear right away, because the lazy loading is initialized on
   // login screen. Therefore, we need to re-open the login screen a few times waiting for it to finish lazy loading.
   await expect(async () => {
-    await expect(async () => {
-      await page.mouse.click(0, 0);
-      await expect(
-        page.locator('.MuiModal-backdrop').first(),
-      ).not.toBeVisible();
-    }).toPass();
+    await page.mouse.click(0, 0);
+    await expect(page.locator('.MuiModal-backdrop').first()).toBeVisible();
+    await page.mouse.click(0, 0);
+    await expect(page.locator('.MuiModal-backdrop').first()).not.toBeVisible();
+
+    await expect(page.locator('.btn-border .primary')).toBeVisible();
     button = await page.locator('.btn-border .primary');
     await button.click();
     await expect(page.locator('.ModalLayout')).toBeVisible();
     button = await page.locator('.AuthButton');
     await button.click();
-
     await expect(page.locator('.MuiModal-backdrop').first()).toBeVisible();
-    await expect(async () => {
-      await expect(page.locator("text='Metamask'")).toBeVisible({
-        timeout: 100,
-      });
-      await page.locator("text='Metamask'").click();
-      await expect(page.locator('.MuiModal-backdrop').first()).not.toBeVisible({
-        timeout: 100,
-      });
+
+    await expect(page.locator('.ModalLayout')).toBeVisible();
+    await expect(page.locator("text='Metamask'")).toBeVisible({
+      timeout: 100,
     });
+    await page.locator("text='Metamask'").click();
   }).toPass();
 }
