@@ -563,7 +563,7 @@ export async function handleSocialLoginCallback({
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
       if (!app.user.email && ssoEmail && profiles?.length === 1) {
-        await app.user.setEmail(ssoEmail);
+        await app.user.updateEmail(ssoEmail);
       }
 
       // if account is created in last few minutes and has a single
