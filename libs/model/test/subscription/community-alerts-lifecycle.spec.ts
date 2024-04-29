@@ -17,7 +17,6 @@ describe('Community alerts lifecycle', () => {
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
-      selected_community_id: null,
     });
 
     const [node] = await seed('ChainNode', {
@@ -25,25 +24,12 @@ describe('Community alerts lifecycle', () => {
       name: 'Sepolia Testnet',
       eth_chain_id: 11155111,
       balance_type: BalanceType.Ethereum,
-      contracts: [],
     });
     [community] = await seed('Community', {
       chain_node_id: node?.id,
-      Addresses: [],
-      CommunityStakes: [],
-      topics: [],
-      groups: [],
-      contest_managers: [],
-      discord_config_id: null,
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: node?.id,
-      Addresses: [],
-      CommunityStakes: [],
-      topics: [],
-      groups: [],
-      contest_managers: [],
-      discord_config_id: null,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },

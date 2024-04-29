@@ -30,75 +30,43 @@ describe('Stake lifecycle', () => {
   };
 
   before(async () => {
-    const [node] = await seed('ChainNode', { contracts: [] });
-    const [user] = await seed('User', {
-      isAdmin: true,
-      selected_community_id: null,
+    const [node] = await seed('ChainNode', {});
+    const [user] = await seed('User', { isAdmin: true });
+    const [community_with_stake] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: user!.id,
+        },
+      ],
+      CommunityStakes: [
+        {
+          stake_id: 1,
+          stake_token: 'token',
+          vote_weight: 1,
+          stake_enabled: true,
+        },
+      ],
     });
-    const [community_with_stake] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            role: 'admin',
-            user_id: user!.id,
-            profile_id: undefined,
-          },
-        ],
-        CommunityStakes: [
-          {
-            stake_id: 1,
-            stake_token: 'token',
-            vote_weight: 1,
-            stake_enabled: true,
-          },
-        ],
-        topics: [],
-        groups: [],
-        contest_managers: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
-    const [community_without_stake_to_set] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            ...community_with_stake!.Addresses!.at(0)!,
-            id: undefined,
-            community_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        contest_managers: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
-    const [community_without_stake] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            ...community_with_stake!.Addresses!.at(0)!,
-            id: undefined,
-            community_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        contest_managers: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
+    const [community_without_stake_to_set] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          ...community_with_stake!.Addresses!.at(0)!,
+          id: undefined,
+        },
+      ],
+    });
+    const [community_without_stake] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          ...community_with_stake!.Addresses!.at(0)!,
+          id: undefined,
+        },
+      ],
+    });
 
     id_with_stake = community_with_stake!.id!;
     id_without_stake_to_set = community_without_stake_to_set!.id!;

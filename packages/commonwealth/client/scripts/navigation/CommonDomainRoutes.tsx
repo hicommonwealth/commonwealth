@@ -315,13 +315,14 @@ const CommonDomainRoutes = ({
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
+      renderDefaultMetatags: false,
     })}
   />,
   <Route
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
-      scope: false,
+      scoped: false,
     })}
   />,
   <Route

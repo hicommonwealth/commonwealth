@@ -81,7 +81,6 @@ describe('ChainEventCreated Policy', () => {
 
     const [user] = await tester.seed('User', {
       isAdmin: true,
-      selected_community_id: null,
     });
 
     [community] = await tester.seed('Community', {
@@ -102,10 +101,6 @@ describe('ChainEventCreated Policy', () => {
           stake_enabled: true,
         },
       ],
-      topics: [],
-      groups: [],
-      contest_managers: [],
-      discord_config_id: null,
     });
   });
 

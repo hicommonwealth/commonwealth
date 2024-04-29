@@ -28,35 +28,17 @@ describe('Group lifecycle', () => {
   };
 
   before(async () => {
-    const [node] = await seed(
-      'ChainNode',
-      { contracts: [] },
-      // { mock: true, log: true },
-    );
-    const [user] = await seed(
-      'User',
-      { isAdmin: true, selected_community_id: null },
-      // { mock: true, log: true },
-    );
-    const [community] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            role: 'admin',
-            user_id: user!.id,
-            profile_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        contest_managers: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
+    const [node] = await seed('ChainNode', {});
+    const [user] = await seed('User', { isAdmin: true });
+    const [community] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: user!.id,
+        },
+      ],
+    });
 
     id = community!.id!;
     actor = {

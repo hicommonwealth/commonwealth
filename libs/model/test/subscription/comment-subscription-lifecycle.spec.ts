@@ -24,7 +24,6 @@ describe('Comment subscription lifecycle', () => {
       name: 'Sepolia Testnet',
       eth_chain_id: 11155111,
       balance_type: BalanceType.Ethereum,
-      contracts: [],
     });
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
@@ -32,13 +31,8 @@ describe('Comment subscription lifecycle', () => {
         {
           role: 'member',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
-      CommunityStakes: [],
-      groups: [],
-      contest_managers: [],
-      discord_config_id: null,
     });
 
     const [thread] = await seed('Thread', {

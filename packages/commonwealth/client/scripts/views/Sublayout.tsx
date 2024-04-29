@@ -18,7 +18,6 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { UserSurveyGrowl } from './components/UserSurveyGrowl/UserSurveyGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
@@ -150,7 +149,6 @@ const Sublayout = ({
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        <UserSurveyGrowl />
         {userOnboardingEnabled && (
           <WelcomeOnboardModal
             isOpen={isWelcomeOnboardModalOpen}
