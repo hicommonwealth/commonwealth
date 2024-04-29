@@ -124,8 +124,12 @@ export const AaveProposalForm = () => {
       <div className="row-with-label">
         <CWLabel label="Proposer (you)" />
         <User
-          userAddress={author.address}
-          userCommunityId={author.community?.id || author.profile?.chain}
+          userAddress={author?.address}
+          userCommunityId={author?.community?.id || author?.profile?.chain}
+          shouldShowAsDeleted={
+            !author?.address &&
+            !(author?.community?.id || author?.profile?.chain)
+          }
           shouldLinkProfile
           shouldShowPopover
           shouldShowAddressWithDisplayName

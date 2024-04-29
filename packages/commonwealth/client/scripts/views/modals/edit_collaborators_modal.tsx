@@ -130,8 +130,11 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    userAddress={c.Address.address}
-                    userCommunityId={c.community_id}
+                    userAddress={c?.Address?.address}
+                    userCommunityId={c?.community_id}
+                    shouldShowAsDeleted={
+                      !c?.Address?.address && !c?.community_id
+                    }
                   />
                 </div>
               ))
@@ -151,8 +154,9 @@ export const EditCollaboratorsModal = ({
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
                   <User
-                    userAddress={c.address}
-                    userCommunityId={c.community_id}
+                    userAddress={c?.address}
+                    userCommunityId={c?.community_id}
+                    shouldShowAsDeleted={!c?.address && !c?.community_id}
                   />
                   <CWIconButton
                     iconName="close"
