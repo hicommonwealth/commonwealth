@@ -9,7 +9,9 @@ import {
   NotificationCategories,
   getThreadUrl,
 } from '@hicommonwealth/shared';
-import { capitalize } from 'lodash';
+import sgMail from '@sendgrid/mail';
+import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 import { Op, WhereOptions } from 'sequelize';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
@@ -20,10 +22,9 @@ import {
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const getForumNotificationCopy = async (
@@ -164,7 +165,7 @@ export const createImmediateNotificationEmailObject = async (
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(
+      }${chainEventLabel.heading} event on ${_.capitalize(
         ceInstance.community_id,
       )}`;
 

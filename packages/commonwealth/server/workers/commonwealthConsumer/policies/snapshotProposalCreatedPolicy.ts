@@ -6,9 +6,11 @@ import {
   SnapshotEventType,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { fileURLToPath } from 'node:url';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export const processSnapshotProposalCreated: EventHandler<

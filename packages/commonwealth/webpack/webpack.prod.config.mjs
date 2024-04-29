@@ -1,12 +1,15 @@
-const path = require('path');
-const webpack = require('webpack');
-const { merge } = require('webpack-merge');
-const common = require('./webpack.base.config.js');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const { WebpackDeduplicationPlugin } = require('webpack-deduplication-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import webpack from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import { WebpackDeduplicationPlugin } from 'webpack-deduplication-plugin';
+import { merge } from 'webpack-merge';
+import baseConfig from './webpack.base.config.mjs';
 
-module.exports = merge(common, {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default merge(baseConfig, {
   mode: 'production',
   stats: 'errors-only',
   bail: true,

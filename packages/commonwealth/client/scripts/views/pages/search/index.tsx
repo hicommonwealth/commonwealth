@@ -1,6 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import {
   SearchScope,
   SearchSort,
@@ -207,7 +207,7 @@ const SearchPage = () => {
       if (community === 'all_communities') {
         return 'across all communities.';
       }
-      return `in ${capitalize(community)}.`;
+      return `in ${_.capitalize(community)}.`;
     } else {
       // also applies when app.isCustomDomain() is true
       return '';
