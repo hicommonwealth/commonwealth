@@ -83,6 +83,9 @@ export async function main(
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: 365 * 24 * 60 * 60 * 1000, // Cookie expires in 1 year
+    },
   });
 
   const setupMiddleware = () => {
