@@ -22,7 +22,7 @@
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "integration-test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha -r tsconfig-paths/register './test/integration/**/*.spec.ts'",
     "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",
-    "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.js client/\\**/*.{ts,tsx} server/\\**/*.ts scripts/\\**/*.ts shared/\\**/*.ts test/\\**/*.ts",
+    "lint-diff": "NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.cjs client/\\**/*.{ts,tsx} server/\\**/*.ts scripts/\\**/*.ts shared/\\**/*.ts test/\\**/*.ts",
     "lint-diff-canary": "cp test/canary/eslint_canary.ts.disabled test/canary/eslint_canary.ts && (NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c .eslintrc-diff.cjs test/canary/eslint_canary.ts | tail +2; true) > test/canary/eslint_canary.log ; diff -u test/canary/eslint_canary.log test/canary/eslint_canary.snap",
     "lint-branch": "./scripts/lint-branch.sh",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
