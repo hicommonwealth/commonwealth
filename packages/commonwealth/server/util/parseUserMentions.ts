@@ -13,18 +13,33 @@ export type UserMentionQuery = {
   user_id: number;
 }[];
 
-export const uniqueMentions = (mentions: UserMention[]): UserMention[] => {
-  const hash = (mention) =>
-    `name:${mention.profileName}id:${mention.profileId}`;
-  const uniqueIds: Set<string> = new Set();
-  return mentions.filter((mention) => {
-    if (uniqueIds.has(hash(mention))) {
+const hash = (mention: UserMention) =>
+  `name:${mention.profileName}id:${mention.profileId}`;
+
+// Will return unique mentions of the diff between current and previous mentions
+export const findMentionDiff = (
+  previousMentions: UserMention[],
+  currentMentions: UserMention[],
+) => {
+  const previousMentionHashes = new Set(previousMentions.map(hash));
+
+  return currentMentions.filter((mention) => {
+    const hashedMention = hash(mention);
+
+    // If it exists in previous hash set, it is not a new mention
+    if (previousMentionHashes.has(hashedMention)) {
       return false;
     }
-    uniqueIds.add(mention.profileId);
+
+    // otherwise add it to the previous hash set so that we don't re-include duplicates
+    previousMentionHashes.add(hashedMention);
+
     return true;
   });
 };
+
+export const uniqueMentions = (mentions: UserMention[]) =>
+  findMentionDiff([], mentions);
 
 export const parseUserMentions = (text: string): UserMention[] => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions

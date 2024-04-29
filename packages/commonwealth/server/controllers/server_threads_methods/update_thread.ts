@@ -15,9 +15,9 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
   createThreadMentionNotifications,
+  findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
-  uniqueMentions,
 } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
@@ -335,10 +335,8 @@ export async function __updateThread(
 
   const previousDraftMentions = parseUserMentions(latestVersion);
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-  const mentions = uniqueMentions([
-    ...previousDraftMentions,
-    ...currentDraftMentions,
-  ]);
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
   const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(

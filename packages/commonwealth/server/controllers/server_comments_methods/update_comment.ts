@@ -11,9 +11,9 @@ import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createCommentMentionNotifications,
+  findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
-  uniqueMentions,
 } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -148,10 +148,8 @@ export async function __updateComment(
   const currentDraftMentions = parseUserMentions(
     decodeURIComponent(commentBody),
   );
-  const mentions = uniqueMentions([
-    ...previousDraftMentions,
-    ...currentDraftMentions,
-  ]);
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
   const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
