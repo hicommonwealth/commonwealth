@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { QueryTypes } from 'sequelize';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
@@ -43,16 +42,11 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  const count = parseInt(
-    (
-      await models.sequelize.query<{ count: string }>(
-        `
-        SELECT COUNT(*) FROM "Outbox";
-      `,
-        { type: QueryTypes.SELECT, raw: true },
-      )
-    )[0].count,
-  );
+  const count = await models.Outbox.count({
+    where: {
+      relayed: false,
+    },
+  });
   incrementNumUnrelayedEvents(count);
 
   await setupListener();

@@ -156,4 +156,5 @@ export enum BalanceSourceType {
 export enum BrokerTopics {
   SnapshotListener = 'SnapshotListener',
   DiscordListener = 'DiscordMessage',
+  ChainEvent = 'ChainEvent',
 }

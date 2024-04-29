@@ -1,4 +1,4 @@
-import { ChainNetwork } from '@hicommonwealth/shared';
+import { ChainNetwork, slugify } from '@hicommonwealth/shared';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useForceRerender from 'hooks/useForceRerender';
@@ -23,7 +23,6 @@ import {
   useCosmosProposalTallyQuery,
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
-import { slugify } from 'utils';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';

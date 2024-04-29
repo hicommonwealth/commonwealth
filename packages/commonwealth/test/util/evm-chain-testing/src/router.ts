@@ -3,7 +3,9 @@ import {
   advanceTimestamp,
   getAccounts,
   getBlock,
+  getChainSnapshot,
   getETH,
+  revertChainToSnapshot,
 } from './routes/chain';
 import { deploy1155, mint1155 } from './routes/erc1155';
 import { approve, getBalance, getTokens, transfer } from './routes/erc20';
@@ -30,8 +32,13 @@ function setupRouter(): Router {
   // Chain Info Routes
   router.get('/chain/accounts', getAccounts);
   router.get('/chain/block', getBlock);
-  router.post('/chain/advanceTime', advanceTimestamp);
   router.post('/chain/getEth', getETH);
+
+  // Chain Management Routes
+  router.post('/chain/advanceTime', advanceTimestamp);
+  router.get('/chain/getChainSnapshot', getChainSnapshot);
+  router.post('/chain/revertChainToSnapshot', revertChainToSnapshot);
+
   // Token Routes
   router.post('/erc20/balance', getBalance);
   router.post('/erc20/transfer', transfer);

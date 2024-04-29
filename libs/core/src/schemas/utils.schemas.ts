@@ -39,12 +39,13 @@ export const linksSchema = {
 };
 
 export enum EventNames {
-  ThreadCreated = 'ThreadCreated',
+  ChainEventCreated = 'ChainEventCreated',
   CommentCreated = 'CommentCreated',
-  GroupCreated = 'GroupCreated',
   CommunityCreated = 'CommunityCreated',
-  SnapshotProposalCreated = 'SnapshotProposalCreated',
   DiscordMessageCreated = 'DiscordMessageCreated',
+  GroupCreated = 'GroupCreated',
+  SnapshotProposalCreated = 'SnapshotProposalCreated',
+  ThreadCreated = 'ThreadCreated',
 
   // Contests
   RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
@@ -56,3 +57,10 @@ export enum EventNames {
 }
 
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
+
+export const ETHERS_BIG_NUMBER = z.object({
+  hex: z.string().regex(/^0x[0-9a-fA-F]+$/),
+  type: z.literal('BigNumber'),
+});
+
+export const EVM_ADDRESS = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
