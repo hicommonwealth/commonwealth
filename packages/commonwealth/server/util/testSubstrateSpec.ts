@@ -44,6 +44,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
     });
     const version = api.runtimeVersion;
     // TODO: TS2339: Property 'system' does not exist on type 'DecoratedRpc<"promise", RpcInterface>'.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const props = await (api.rpc as any).system.properties();
     log.info(
       `Fetched version: ${version.specName}:${
