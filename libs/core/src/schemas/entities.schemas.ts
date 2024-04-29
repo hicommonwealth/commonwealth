@@ -301,7 +301,7 @@ export const ContestManager = z
     contest_address: z.string().describe('On-Chain contest manager address'),
     community_id: z.string(),
     name: z.string(),
-    image_url: z.string(),
+    image_url: z.string().optional(),
     funding_token_address: z
       .string()
       .optional()

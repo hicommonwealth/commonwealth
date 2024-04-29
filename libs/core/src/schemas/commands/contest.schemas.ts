@@ -6,9 +6,9 @@ export const CreateContestManagerMetadata = {
   input: z.object({
     contest_address: z.string(),
     name: z.string(),
-    image_url: z.string(),
-    funding_token_address: z.string(),
-    prize_percentage: PG_INT,
+    image_url: z.string().optional(),
+    funding_token_address: z.string().optional(),
+    prize_percentage: PG_INT.optional(),
     payout_structure: z.array(PG_INT),
     interval: PG_INT.min(0),
     ticker: z.string(),

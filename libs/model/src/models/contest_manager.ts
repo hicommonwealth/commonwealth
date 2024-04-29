@@ -25,7 +25,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
       image_url: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       funding_token_address: { type: Sequelize.STRING },
       prize_percentage: { type: Sequelize.INTEGER },
