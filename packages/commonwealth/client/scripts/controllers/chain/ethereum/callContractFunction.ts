@@ -6,7 +6,6 @@ import type IWebWallet from 'models/IWebWallet';
 import app from 'state';
 import type Web3 from 'web3';
 import { AbiFunctionFragment, Transaction, Web3BaseProvider } from 'web3';
-import type { TransactionReceipt } from 'web3-core/types';
 import WebWalletController from '../../app/web_wallets';
 
 async function sendFunctionCall({
@@ -24,7 +23,7 @@ async function sendFunctionCall({
   web3: Web3;
   tx_options?: any;
 }) {
-  let txReceipt: TransactionReceipt | any;
+  let txReceipt: any;
   if (
     fn.stateMutability !== 'view' &&
     fn.stateMutability !== 'pure' &&
@@ -76,7 +75,7 @@ export async function callContractFunction({
   fn: AbiFunctionFragment;
   inputArgs: string[];
   tx_options?: any;
-}): Promise<TransactionReceipt | any> {
+}): Promise<any> {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
@@ -107,9 +106,7 @@ export async function callContractFunction({
     web3,
     tx_options,
   };
-  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
-    functionConfig,
-  );
+  const txReceipt: any = await sendFunctionCall(functionConfig);
   return txReceipt;
 }
 
