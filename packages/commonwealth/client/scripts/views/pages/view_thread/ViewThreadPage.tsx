@@ -410,7 +410,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             )
           }
           isEditing={isEditingBody}
-          author={app.chain.accounts.get(thread.author)}
+          author={
+            thread?.author ? app.chain.accounts.get(thread?.author) : null
+          }
           discord_meta={thread.discord_meta}
           collaborators={thread.collaborators}
           createdAt={thread.createdAt}

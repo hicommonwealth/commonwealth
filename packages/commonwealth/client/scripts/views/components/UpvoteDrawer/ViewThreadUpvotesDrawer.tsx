@@ -36,7 +36,7 @@ export const ViewThreadUpvotesDrawer = ({
       contentBody={thread.body}
       header="Thread upvotes"
       reactorData={reactorData}
-      author={app.chain.accounts.get(thread.author)}
+      author={thread?.author ? app.chain.accounts.get(thread?.author) : null}
       publishDate={thread.createdAt}
     />
   );
