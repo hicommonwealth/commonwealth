@@ -13,6 +13,7 @@ export const CreateContestManagerMetadata = {
     interval: PG_INT.min(0),
     ticker: z.string(),
     decimals: PG_INT,
+    topic_ids: z.array(z.number()),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
@@ -24,6 +25,7 @@ export const UpdateContestManagerMetadata = {
     contest_address: z.string(),
     name: z.string().optional(),
     image_url: z.string().optional(),
+    topic_ids: z.array(z.number()).optional(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),

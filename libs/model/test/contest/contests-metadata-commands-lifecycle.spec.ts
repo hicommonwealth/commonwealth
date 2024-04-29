@@ -1,5 +1,5 @@
 import { Actor, command, dispose, schemas } from '@hicommonwealth/core';
-import { Contest } from '@hicommonwealth/model';
+import { Contest, TopicAttributes } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import z from 'zod';
@@ -19,13 +19,12 @@ describe('Contests metadata commands lifecycle', () => {
   const interval = 10;
   const ticker = 'XYZ';
   const decimals = 18;
-  const cancelled = false;
 
   let community: [
     z.infer<typeof schemas.entities['Community']> | undefined,
     Record<string, any>[],
   ];
-
+  let topics: z.infer<typeof schemas.entities['Topic']>[] = [];
   let communityAdminActor: Actor | null = null;
   let communityMemberActor: Actor | null = null;
 
@@ -73,7 +72,7 @@ describe('Contests metadata commands lifecycle', () => {
           },
         ],
         CommunityStakes: [],
-        topics: [],
+        topics: [{}, {}, {}],
         groups: [],
         contest_managers: [
           {
@@ -88,7 +87,7 @@ describe('Contests metadata commands lifecycle', () => {
             prize_percentage,
             funding_token_address,
             decimals,
-            cancelled,
+            cancelled: false,
           },
           {
             contest_address: '0x2',
@@ -102,12 +101,16 @@ describe('Contests metadata commands lifecycle', () => {
             prize_percentage,
             funding_token_address,
             decimals,
-            cancelled,
+            cancelled: false,
           },
         ],
       },
       // { mock: true, log: true },
     );
+
+    topics = community![0]!.topics as Required<TopicAttributes>[];
+
+    expect(topics).to.not.be.empty;
 
     communityAdminActor = {
       user: {
@@ -149,6 +152,7 @@ describe('Contests metadata commands lifecycle', () => {
           interval,
           ticker,
           decimals,
+          topic_ids: [],
         },
       });
       expect(promise).to.be.rejectedWith('User is not admin in the community');
@@ -168,6 +172,7 @@ describe('Contests metadata commands lifecycle', () => {
           interval,
           ticker,
           decimals,
+          topic_ids: [],
         },
       });
       // the auth middleware fails to find address if community doesn't exist
@@ -192,6 +197,7 @@ describe('Contests metadata commands lifecycle', () => {
             interval,
             ticker,
             decimals,
+            topic_ids: topics.map((t) => t.id!),
           },
         },
       );
@@ -207,7 +213,20 @@ describe('Contests metadata commands lifecycle', () => {
         interval,
         ticker,
         decimals,
-        cancelled,
+        cancelled: false,
+      });
+
+      expect(createResult!.contest_managers![0].topics![0]).to.deep.contain({
+        id: topics[0].id,
+        name: topics[0].name,
+      });
+      expect(createResult!.contest_managers![0].topics![1]).to.deep.contain({
+        id: topics[1].id,
+        name: topics[1].name,
+      });
+      expect(createResult!.contest_managers![0].topics![2]).to.deep.contain({
+        id: topics[2].id,
+        name: topics[2].name,
       });
     });
   });
@@ -256,7 +275,9 @@ describe('Contests metadata commands lifecycle', () => {
           },
         },
       );
-      expect(updateResult!.contest_managers![0]).to.deep.contain({
+
+      const metadata = updateResult!.contest_managers![0];
+      expect(metadata).to.deep.contain({
         contest_address,
         name: 'xxx',
         community_id,
@@ -267,8 +288,68 @@ describe('Contests metadata commands lifecycle', () => {
         interval,
         ticker,
         decimals,
-        cancelled,
+        cancelled: false,
       });
+    });
+
+    it('should update contest manager metadata topics', async () => {
+      const { contest_address } = community[0]!.contest_managers![0];
+
+      {
+        // empty topic IDs
+        const updateResult = await command(
+          Contest.UpdateContestManagerMetadata(),
+          {
+            actor: communityAdminActor!,
+            id: community_id,
+            payload: {
+              contest_address,
+              topic_ids: [],
+            },
+          },
+        );
+        const metadata = updateResult?.contest_managers![0];
+        expect(metadata!.topics).to.have.length(0);
+      }
+
+      {
+        // add topic IDs
+        const updateResult = await command(
+          Contest.UpdateContestManagerMetadata(),
+          {
+            actor: communityAdminActor!,
+            id: community_id,
+            payload: {
+              contest_address,
+              topic_ids: [topics[0]!.id!, topics[1]!.id!],
+            },
+          },
+        );
+        const metadata = updateResult?.contest_managers![0];
+        expect(metadata!.topics).to.have.length(2);
+        const resultTopicIds = metadata!.topics!.map((t) => t.id);
+        expect(resultTopicIds).to.contain(topics[0]!.id!);
+        expect(resultTopicIds).to.contain(topics[1]!.id!);
+      }
+
+      {
+        // remove topic IDs
+        const updateResult = await command(
+          Contest.UpdateContestManagerMetadata(),
+          {
+            actor: communityAdminActor!,
+            id: community_id,
+            payload: {
+              contest_address,
+              topic_ids: [topics[0]!.id!],
+            },
+          },
+        );
+        const metadata = updateResult?.contest_managers![0];
+        expect(metadata!.topics).to.have.length(1);
+        const resultTopicIds = metadata!.topics!.map((t) => t.id);
+        expect(resultTopicIds[0]).to.eq(topics[0]!.id!);
+      }
     });
   });
 
