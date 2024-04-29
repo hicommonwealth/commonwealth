@@ -1,7 +1,16 @@
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from 'client/scripts/helpers/constants';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
-import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import {
+  useSearchProfilesQuery,
+  useUpdateProfileByAddressMutation,
+} from 'state/api/profiles';
+import { generateUsername } from 'unique-username-generator';
+import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -22,9 +31,31 @@ const PersonalInformationStep = ({
     useUpdateProfileByAddressMutation();
   const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
 
+  const [currentUsername, setCurrentUsername] = useState('');
+  const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
+
+  const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
+    useSearchProfilesQuery({
+      limit: 1000,
+      includeRoles: false,
+      searchTerm: debouncedSearchTerm,
+      communityId: 'all_communities',
+      orderBy: APIOrderBy.LastActive,
+      orderDirection: APIOrderDirection.Desc,
+    });
+
+  const existingUsernames = (profiles?.pages?.[0]?.results || []).map((user) =>
+    user?.profile_name?.trim?.().toLowerCase(),
+  );
+  const isUsernameTaken = existingUsernames.includes(
+    currentUsername.toLowerCase(),
+  );
+
   const handleSubmit = async (
     values: z.infer<typeof personalInformationFormValidation>,
   ) => {
+    if (isUsernameTaken || isCheckingUsernameUniqueness) return;
+
     await updateProfile({
       address: app.user.activeAccount?.profile?.address,
       chain: app.user.activeAccount?.profile?.chain,
@@ -68,7 +99,7 @@ const PersonalInformationStep = ({
       onSubmit={handleSubmit}
       onWatch={handleWatch}
     >
-      {({ formState, watch }) => (
+      {({ formState, watch, setValue }) => (
         <>
           <div className="username-section">
             <CWTextInput
@@ -81,6 +112,8 @@ const PersonalInformationStep = ({
               }
               name="username"
               hookToForm
+              onInput={(e) => setCurrentUsername(e.target.value.trim())}
+              customError={isUsernameTaken ? 'Username already exists' : ''}
             />
             <CWButton
               label="Generate random username"
@@ -88,6 +121,11 @@ const PersonalInformationStep = ({
               buttonHeight="sm"
               type="button"
               containerClassName="random-generate-btn"
+              onClick={() => {
+                const randomUsername = generateUsername('', 2);
+                setValue('username', randomUsername);
+                setCurrentUsername(randomUsername);
+              }}
             />
           </div>
 
@@ -116,7 +154,11 @@ const PersonalInformationStep = ({
               name="enableProductUpdates"
               hookToForm
               label="Send me product updates and news"
-              disabled={watch('email')?.trim() === '' || !formState.isDirty}
+              disabled={
+                watch('email')?.trim() === '' ||
+                !formState.isDirty ||
+                isCheckingUsernameUniqueness
+              }
             />
           </div>
 
