@@ -4,10 +4,10 @@ import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
-export const ResumeContestManagerMetadata: Command<
-  typeof schemas.commands.ResumeContestManagerMetadata
+export const CancelContestManagerMetadata: Command<
+  typeof schemas.commands.CancelContestManagerMetadata
 > = () => ({
-  ...schemas.commands.ResumeContestManagerMetadata,
+  ...schemas.commands.CancelContestManagerMetadata,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     const contestManager = await models.ContestManager.findOne({
@@ -17,7 +17,7 @@ export const ResumeContestManagerMetadata: Command<
       },
     });
     if (mustExist('ContestManager', contestManager)) {
-      contestManager.paused = false;
+      contestManager.cancelled = true;
       await contestManager.save();
       return {
         contest_managers: [contestManager.get({ plain: true })],

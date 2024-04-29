@@ -29,7 +29,7 @@ export const UpdateContestManagerMetadata = {
   }),
 };
 
-export const PauseContestManagerMetadata = {
+export const CancelContestManagerMetadata = {
   input: z.object({
     contest_address: z.string(),
   }),

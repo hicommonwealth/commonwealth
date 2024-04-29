@@ -323,10 +323,10 @@ export const ContestManager = z
       .max(100)
       .describe('Recurring contest interval, 0 when one-off'),
     created_at: z.date(),
-    paused: z
+    cancelled: z
       .boolean()
       .optional()
-      .describe('Flags when contest policy is paused by admin'),
+      .describe('Flags when contest policy is cancelled by admin'),
     topics: z.array(Topic).optional(),
     contests: z.array(Contest).optional(),
   })
