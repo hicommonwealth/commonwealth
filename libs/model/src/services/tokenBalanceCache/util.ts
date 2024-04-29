@@ -1,8 +1,8 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/logging';
-import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
 import AbiCoder from 'web3-eth-abi';
+import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
@@ -118,7 +118,7 @@ export async function evmOffChainRpcBatching(
     const address = idAddressMap[data.id];
     balances[address] = source.contractAddress
       ? AbiCoder.decodeParameter('uint256', data.result).toString()
-      : ethers.BigNumber.from(data.result).toString();
+      : toBN(data.result).toString(10);
   }
 
   return { balances, failedAddresses };
