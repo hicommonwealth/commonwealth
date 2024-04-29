@@ -216,7 +216,7 @@ export async function evmBalanceFetcherBatching(
       const balances = AbiCoder.decodeParameter(
         'uint256[]',
         data.result,
-      ) as Number[];
+      ) as number[];
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = String(balances[i])),
       );
