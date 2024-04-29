@@ -2,10 +2,10 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-len */
-require('dotenv').config();
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import dotenv from 'dotenv';
 import { TestServer, testServer } from 'server-test';
 import {
   cosmosLCDDuration,
@@ -17,6 +17,7 @@ const V1_CHAIN_ID = 'csdk';
 const V1BETA1_API = `/cosmosAPI`;
 const V1_API = `/cosmosAPI/v1`;
 
+dotenv.config();
 chai.use(chaiHttp);
 const expect = chai.expect;
 

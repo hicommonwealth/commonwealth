@@ -10,10 +10,12 @@ import {
   NotificationDataAndCategory,
   slugify,
 } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import { WebhookDestinations } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export const REGEX_IMAGE =

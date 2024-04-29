@@ -5,6 +5,9 @@ import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
 
+// handle exceptions thrown in express routes
+import 'express-async-errors';
+
 const TEST_WITHOUT_LOGS = process.env.TEST_WITHOUT_LOGS === 'true';
 
 /**
@@ -36,7 +39,7 @@ export const testServer = async (): Promise<TestServer> => {
   cache(new RedisCache('redis://localhost:6379'));
 
   const { tester } = await import('@hicommonwealth/model');
-  const { main } = await require('./main');
+  const { main } = await import('./main');
 
   const db = await tester.seedDb();
   const app = express();

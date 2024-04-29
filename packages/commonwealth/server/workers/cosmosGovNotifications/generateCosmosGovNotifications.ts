@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -11,6 +12,7 @@ import {
   filterProposals,
 } from './util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**
@@ -63,7 +65,7 @@ export async function generateCosmosGovNotifications() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
     .then(() => process.exit(0))
     .catch((err) => {

@@ -3,6 +3,8 @@ import { logger } from '@hicommonwealth/logging';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 async function main() {

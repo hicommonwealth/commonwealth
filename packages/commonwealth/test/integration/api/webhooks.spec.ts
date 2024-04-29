@@ -1,22 +1,23 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
-require('dotenv').config();
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import dotenv from 'dotenv';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import Errors from '../../../server/routes/webhooks/errors';
+import { markdownComment } from '../../util/fixtures/markdownComment';
+import { markdownThread } from '../../util/fixtures/markdownThread';
+import { richTextComment } from '../../util/fixtures/richTextComment';
+import { richTextThread } from '../../util/fixtures/richTextThread';
 
+dotenv.config();
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
-const markdownComment = require('../../util/fixtures/markdownComment');
-const richTextThread = require('../../util/fixtures/richTextThread');
-const richTextComment = require('../../util/fixtures/richTextComment');
 
 const expectErrorOnResponse = (statusCode, errorMsg, response) => {
   expect(response.statusCode).to.be.equal(statusCode);

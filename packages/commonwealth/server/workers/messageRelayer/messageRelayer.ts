@@ -7,10 +7,12 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 let isServiceHealthy = false;
@@ -55,7 +57,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   return relayForever(maxRelayIterations);
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   startMessageRelayer().catch((err) => {
     log.fatal(
       'Unknown error fatal requires immediate attention. Restart REQUIRED!',

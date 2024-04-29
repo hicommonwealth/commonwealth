@@ -8,6 +8,7 @@ import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DEFAULT_PORT } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
@@ -18,6 +19,7 @@ import {
 
 let isServiceHealthy = false;
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 stats(HotShotsStats());
 
