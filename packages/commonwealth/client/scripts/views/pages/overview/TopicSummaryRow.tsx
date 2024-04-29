@@ -79,7 +79,9 @@ export const TopicSummaryRow = ({
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const user = app.chain.accounts.get(thread.author);
+          const user = thread?.author
+            ? app.chain.accounts.get(thread?.author)
+            : null;
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
@@ -100,9 +102,13 @@ export const TopicSummaryRow = ({
                 <div className="row-top">
                   <div className="user-and-date-row">
                     <User
-                      userAddress={user.address}
+                      userAddress={user?.address}
                       userCommunityId={
-                        user.community?.id || user.profile?.chain
+                        user?.community?.id || user.profile?.chain
+                      }
+                      shouldShowAsDeleted={
+                        !user?.address &&
+                        !(user?.community?.id || user.profile?.chain)
                       }
                       shouldShowAddressWithDisplayName
                       shouldLinkProfile

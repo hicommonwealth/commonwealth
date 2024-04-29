@@ -13,14 +13,13 @@ describe('createSitemapGenerator', function () {
   before(async () => {
     const [user] = await tester.seed('User', {
       isAdmin: true,
-      selected_community_id: null,
     });
 
     if (!user) {
       throw new Error('No user');
     }
 
-    const [node] = await tester.seed('ChainNode', { contracts: [] });
+    const [node] = await tester.seed('ChainNode', {});
 
     if (!node) {
       throw new Error('No node');
@@ -29,10 +28,6 @@ describe('createSitemapGenerator', function () {
     const [community] = await tester.seed('Community', {
       name: 'Acme',
       chain_node_id: node.id,
-      discord_config_id: null,
-      Addresses: [],
-      CommunityStakes: [],
-      contest_managers: [],
     });
 
     if (!community) {
@@ -43,7 +38,6 @@ describe('createSitemapGenerator', function () {
       address: '0x0000',
       community_id: community.id,
       user_id: user.id,
-      profile_id: null,
     });
 
     if (!address) {

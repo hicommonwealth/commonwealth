@@ -1,8 +1,7 @@
 import type { AbiType } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { hashAbi } from '../utils';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type ContractAbiAttributes = {
   id: number;
@@ -20,7 +19,7 @@ export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): ContractAbiModelStatic => {
   const ContractAbi = <ContractAbiModelStatic>sequelize.define(
     'ContractAbi',
@@ -67,6 +66,7 @@ export default (
 
   ContractAbi.associate = (models) => {
     models.ContractAbi.hasMany(models.Contract, { foreignKey: 'abi_id' });
+    models.ContractAbi.hasMany(models.EvmEventSource, { foreignKey: 'abi_id' });
   };
 
   return ContractAbi;

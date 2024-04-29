@@ -90,7 +90,9 @@ export const TemplateDisplayTab = ({
         </div>
         {templates.length > 0 ? (
           templates.map((template, index) => {
-            const creator: Account = app.chain.accounts.get(template.createdBy);
+            const creator: Account = template?.createdBy
+              ? app.chain.accounts.get(template?.createdBy)
+              : null;
             return (
               <div className="table-row" key={index}>
                 <div className="table-column">
@@ -98,9 +100,13 @@ export const TemplateDisplayTab = ({
                 </div>
                 <div className="table-column">
                   <User
-                    userAddress={creator.address}
+                    userAddress={creator?.address}
                     userCommunityId={
-                      creator.community?.id || creator?.profile?.chain
+                      creator?.community?.id || creator?.profile?.chain
+                    }
+                    shouldShowAsDeleted={
+                      !creator?.address &&
+                      !(creator?.community?.id || creator?.profile?.chain)
                     }
                     shouldShowAddressWithDisplayName
                   />

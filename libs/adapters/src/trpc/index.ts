@@ -20,7 +20,7 @@ import {
 } from 'trpc-openapi';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
 
-interface Context {
+export interface Context {
   req: Request;
 }
 
@@ -188,17 +188,19 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
 export const toExpress = (router: OpenApiRouter) =>
   createExpressMiddleware({
     router,
-    createContext: ({ req }) => ({ req }),
+    createContext: ({ req }: { req: any }) => ({ req }),
   });
 
 // used for REST like routes (External)
 export const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
-    createContext: ({ req }) => ({ req }),
-    onError: ({ error }) => {
+    createContext: ({ req }: { req: any }) => ({ req }),
+    onError: ({ error }: { error: any }) => {
       console.error(error.code, JSON.stringify(error.cause));
     },
+    responseMeta: undefined,
+    maxBodySize: undefined,
   });
 
 export const toOpenApiDocument = (

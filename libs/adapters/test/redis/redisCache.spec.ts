@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
-const chai = require('chai');
-const expect = chai.expect;
 import { CacheNamespaces, cache, delay, dispose } from '@hicommonwealth/core';
+import chai from 'chai';
 import { RedisCache } from '../../src';
+const expect = chai.expect;
 
 async function addRandomKeys(test_namespace: CacheNamespaces) {
   const random = Math.random();

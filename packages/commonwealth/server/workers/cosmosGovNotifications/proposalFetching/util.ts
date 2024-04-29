@@ -3,8 +3,10 @@ import { logger } from '@hicommonwealth/logging';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { fileURLToPath } from 'node:url';
 import { AllCosmosProposals } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export function uint8ArrayToNumberBE(bytes) {

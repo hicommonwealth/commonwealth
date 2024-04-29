@@ -1,9 +1,11 @@
 import { InvalidState, schemas, type Query } from '@hicommonwealth/core';
-import { uniq } from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 import { Op, QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { contractHelpers } from '../services/commonProtocol';
+
+const uniq = _.uniq;
 
 const Errors = {
   StakeNotFound: 'Stake not found',
