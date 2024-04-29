@@ -35,7 +35,7 @@ export type SeedOptions = {
  * @param name name of the aggregate to seed
  * @param values partial seed values specific to the unit test
  * @param options seed options - defaults to mocking without skips
- * @returns tuple with main aggreate record and array of total records created
+ * @returns tuple with main aggregate record and array of total records created
  * @see "libs/model/\_\_tests\_\_/community/group-lifecycle.spec.ts"
  */
 export async function seed<T extends schemas.Aggregates>(
@@ -70,7 +70,9 @@ async function _seed(
       ...values,
     };
   }
-  const record = (await model.create(values)).toJSON();
+  const record = (
+    await model.create(values, { logging: options.log ? console.log : false })
+  ).toJSON();
   records.push(record);
 
   if (typeof values === 'object') {

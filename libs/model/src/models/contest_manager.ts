@@ -4,7 +4,7 @@ import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
 type ContestManager = ModelInstance<
-  z.infer<typeof schemas.projections.ContestManager>
+  z.infer<typeof schemas.entities.ContestManager>
 >;
 
 export default (sequelize: Sequelize.Sequelize) =>
@@ -19,17 +19,30 @@ export default (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.STRING,
         allowNull: false,
       },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      image_url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      funding_token_address: { type: Sequelize.STRING },
+      prize_percentage: { type: Sequelize.INTEGER },
+      payout_structure: { type: Sequelize.ARRAY(Sequelize.INTEGER) },
       interval: {
         type: Sequelize.INTEGER,
         allowNull: false,
         validate: { min: 0 },
       },
+      ticker: { type: Sequelize.STRING },
+      decimals: { type: Sequelize.INTEGER },
       created_at: { type: Sequelize.DATE, allowNull: false },
+      paused: { type: Sequelize.BOOLEAN },
     },
     {
       tableName: 'ContestManagers',
       timestamps: false,
       indexes: [],
-      // hooks: syncHooks,
     },
   );

@@ -1,7 +1,8 @@
 import { DataTypes, Sequelize } from 'sequelize';
+import { buildAssociations } from './associations';
 import { Factories } from './factories';
 import type { Models } from './types';
-import { createFk, dropFk, mapFk, oneToMany } from './utils';
+import { createFk, dropFk, manyToMany, mapFk, oneToMany } from './utils';
 
 export type DB = Models<typeof Factories> & {
   sequelize: Sequelize;
@@ -17,6 +18,7 @@ export const syncDb = async (db: DB, log = false) => {
   const compositeKeys = [
     mapFk(db.Contest, db.ContestAction, ['contest_address', 'contest_id']),
     mapFk(db.ContestManager, db.Contest, ['contest_address']),
+    mapFk(db.Topic, db.ContestTopic, [['id', 'topic_id']]),
   ];
 
   compositeKeys.forEach(({ parent, child }) =>
@@ -41,27 +43,21 @@ export const buildDb = (sequelize: Sequelize): DB => {
     Object.entries(Factories).map(([key, factory]) => {
       const model = factory(sequelize, DataTypes);
       model.withMany = oneToMany as any; // TODO: can we make this work without any?
+      model.withManyToMany = manyToMany as any; // TODO: can we make this work without any?
       return [key, model];
     }),
   ) as Models<typeof Factories>;
 
   const db = { sequelize, Sequelize, ...models };
+
+  // associate hook
   Object.keys(models).forEach((key) => {
     const model = models[key as keyof typeof Factories];
     'associate' in model && model.associate(db);
   });
 
-  // Proposed pattern to associate models with type safety
-  db.Community.withMany(db.CommunityStake, 'community_id').withMany(
-    db.ContestManager,
-    'community_id',
-  );
-  db.ContestManager.withMany(db.Contest, 'contest_address');
-  db.Contest.withMany(db.ContestAction, 'contest_address', { as: 'actions' });
-  db.CommunityStake.withMany(db.StakeTransaction, 'community_id').withMany(
-    db.StakeTransaction,
-    'stake_id',
-  );
+  // proposed association builder
+  buildAssociations(db);
 
   return db;
 };

@@ -12,7 +12,7 @@ export const detailsFormValidationSchema = z
     contestImage: z.string().optional(),
     feeType: z.string(),
     contestRecurring: z.string(),
-    fundingTokenAddress: z.string().optional(),
+    fundingTokenAddress: z.string().optional().nullable(),
   })
   .refine(
     (data) => {

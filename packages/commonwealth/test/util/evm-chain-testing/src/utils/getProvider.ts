@@ -1,13 +1,8 @@
 import Web3 from 'web3';
+import { PROVIDER_URL } from '../../config';
 
-export const providerUrl = 'http://chain:8545';
 const getProvider = () => {
-  if (process.env.RPC_HOST === 'ganache') {
-    return new Web3(new Web3.providers.HttpProvider(providerUrl));
-  }
-  return new Web3(
-    new Web3.providers.HttpProvider(String(process.env.RPC_HOST)),
-  );
+  return new Web3(new Web3.providers.HttpProvider(String(PROVIDER_URL)));
 };
 
 export default getProvider;

@@ -427,27 +427,22 @@ describe('CacheDecorator', () => {
 
     describe('verify activity helper class', () => {
       const ActivityLabel = 'test-activity';
-      const query = async (a, b, c) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const query = async (a: any, b: any, c: any) => {
         console.log('running query with params', a, b, c);
         return a + b + c;
       };
 
-      const query2 = (callCount) => async (a, b, c) => {
-        callCount++;
-        if (callCount === 1) {
-          throw new Error('test-error');
-        }
-        return query(a, b, c);
-      };
-
-      const keyGenerator1 = (a, b, c) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const keyGenerator1 = (a: any, b: any, c: any) => {
         return {
           cacheKey: `${a}-${b}-${c}`,
           cacheDuration: a + b + c,
         } as CacheKeyDuration;
       };
 
-      const keyGenerator2 = (a, b, c) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const keyGenerator2 = (a: any, b: any, c: any) => {
         return `${a}-${b}-${c}`;
       };
 

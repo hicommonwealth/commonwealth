@@ -1,58 +1,81 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
-import Permissions from 'utils/Permissions';
-import { CWCard } from 'views/components/component_kit/cw_card';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageNotFound } from 'views/pages/404';
+import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
+import FundContestDrawer from '../FundContestDrawer';
+import mockedContests from '../mockedContests';
+import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
-const mockedContests = [
-  { title: 'Contest 1', id: 1 },
-  { title: 'Contest 2', id: 2 },
-];
+interface ContestsListProps {
+  contests: typeof mockedContests;
+  isAdmin: boolean;
+  isLoading: boolean;
+  stakeEnabled: boolean;
+  isContestAvailable: boolean;
+}
+const ContestsList = ({
+  contests,
+  isAdmin,
+  isLoading,
+  stakeEnabled,
+  isContestAvailable,
+}: ContestsListProps) => {
+  const [fundDrawerAddress, setFundDrawerAddress] = useState('');
 
-const ContestsList = () => {
-  const navigate = useCommonNavigate();
-
-  if (
-    !app.isLoggedIn() ||
-    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
-  ) {
-    return <PageNotFound />;
+  if (isLoading) {
+    return (
+      <div>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton key={index} className="ContestsListSkeleton" />
+        ))}
+      </div>
+    );
   }
 
   return (
-    <CWPageLayout>
-      <div className="ContestsList">Contests</div>
-
-      {mockedContests.length === 0 ? (
-        <EmptyContestsList />
-      ) : (
-        <>
-          <CWButton
-            iconLeft="plusPhosphor"
-            label="Create contest"
-            onClick={() => navigate('/manage/contests/launch')}
+    <>
+      <div className="ContestsList">
+        {isAdmin && (!stakeEnabled || !isContestAvailable) ? (
+          <EmptyContestsList
+            isStakeEnabled={stakeEnabled}
+            isContestAvailable={isContestAvailable}
           />
-          {mockedContests.map((contest) => (
-            <CWCard key={contest.id}>
-              <CWText>{contest.title}</CWText>
-              <CWButton
-                label="Edit contest"
-                onClick={() => navigate(`/manage/contests/${contest.id}`)}
+        ) : (
+          contests.map((contest) => {
+            // only last contest is relevant
+            const { end_time, winners } =
+              contest.contests[contest.contests.length - 1];
+
+            return (
+              <ContestCard
+                key={contest.contest_address}
+                isAdmin={isAdmin}
+                address={contest.contest_address}
+                name={contest.name}
+                imageUrl={contest.image_url}
+                topics={contest.topics}
+                winners={winners}
+                finishDate={end_time.toISOString()}
+                isActive={!contest.paused}
+                onFund={() =>
+                  setFundDrawerAddress(
+                    contest.funding_token_address || 'stake address',
+                  )
+                }
               />
-            </CWCard>
-          ))}
-        </>
-      )}
-    </CWPageLayout>
+            );
+          })
+        )}
+      </div>
+      <FundContestDrawer
+        onClose={() => setFundDrawerAddress('')}
+        isOpen={!!fundDrawerAddress}
+        contestAddress={fundDrawerAddress}
+      />
+    </>
   );
 };
 

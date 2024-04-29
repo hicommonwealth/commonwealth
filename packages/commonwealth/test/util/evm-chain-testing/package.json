@@ -7,7 +7,9 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "ganache": "node node_modules/ganache/dist/node/cli.js --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0x6d903f6003cca6255D85CcA4D3B5E5146dC33925 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8",
-    "build": "tsc"
+    "build": "tsc",
+    "test-sdk": "ts-node test_sdk.ts",
+    "check-types": "tsc --noEmit"
   },
   "author": "",
   "license": "ISC",
@@ -18,9 +20,9 @@
     "express": "^4.18.2",
     "morgan": "^1.10.0",
     "tsx": "^4.7.2",
-    "web3": "^1.8.2"
+    "web3": "^4.7.0"
   },
   "optionalDependencies": {
-    "ganache": "^7.9.0"
+    "ganache": "^7.9.2"
   }
 }

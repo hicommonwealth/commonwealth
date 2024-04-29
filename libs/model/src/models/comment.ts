@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export type CommentAttributes = {
-  thread_id: string;
+  thread_id: number;
   address_id: number;
   text: string;
   plaintext: string;
@@ -108,7 +108,7 @@ export default (
                 transaction: options.transaction,
               });
               stats().increment('cw.hook.comment-count', {
-                thread_id,
+                thread_id: String(thread_id),
               });
             }
           } catch (error) {
@@ -129,7 +129,7 @@ export default (
                 transaction: options.transaction,
               });
               stats().decrement('cw.hook.comment-count', {
-                thread_id,
+                thread_id: String(thread_id),
               });
             }
           } catch (error) {
@@ -137,7 +137,7 @@ export default (
               `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
             );
             stats().increment('cw.hook.comment-count-error', {
-              thread_id,
+              thread_id: String(thread_id),
             });
           }
         },
@@ -176,6 +176,9 @@ export default (
     models.Comment.hasMany(models.Reaction, {
       foreignKey: 'comment_id',
       as: 'reactions',
+    });
+    models.Comment.hasMany(models.CommentSubscription, {
+      foreignKey: 'comment_id',
     });
   };
 

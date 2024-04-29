@@ -20,7 +20,7 @@ import {
 } from 'trpc-openapi';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
 
-interface Context {
+export interface Context {
   req: Request;
 }
 
@@ -70,6 +70,7 @@ export enum Tag {
   Reaction = 'Reaction',
   Query = 'Query',
   Integration = 'Integration',
+  Subscription = 'Subscription',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
@@ -90,7 +91,9 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .input(md.input.extend({ id: z.string() })) // this might cause client typing issues
     .output(md.output)
     .mutation(async ({ ctx, input }) => {
-      if (md.secure) await authenticate(ctx.req);
+      // md.secure must explicitly be false if the route requires no authentication
+      // if we provide any authorization method we force authentication as well
+      if (md.secure !== false || md.auth?.length) await authenticate(ctx.req);
       try {
         return await core.command(
           md,
@@ -98,6 +101,7 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
             id: input?.id,
             actor: {
               user: ctx.req.user as core.User,
+              // TODO: get from JWT?
               address_id: ctx.req.headers['address_id'] as string,
             },
             payload: input!,

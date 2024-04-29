@@ -1,0 +1,20 @@
+{
+  "name": "@hicommonwealth/sitemaps",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Sitemaps generator and related code",
+  "files": [
+    "build"
+  ],
+  "main": "build/index",
+  "types": "src/index",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "echo No tests for @hicommonwealth/sitemaps"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.814.0"
+  }
+}

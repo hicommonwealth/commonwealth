@@ -13,7 +13,7 @@ chai.use(chaiAsPromised);
 describe('Stake transactions', () => {
   const actor: Actor = { user: { email: '' } };
   let payload;
-  let community_id;
+  let community_id: string;
 
   before(async () => {
     const [node] = await seed('ChainNode', {
@@ -49,6 +49,7 @@ describe('Stake transactions', () => {
       ],
       topics: [],
       groups: [],
+      contest_managers: [],
       discord_config_id: null,
     });
 
@@ -119,7 +120,7 @@ describe('Stake transactions', () => {
         payload,
       });
     } catch (e) {
-      expect(e.message).to.equal(
+      expect((e as Error).message).to.equal(
         'Transaction is not associated with provided community',
       );
       return;

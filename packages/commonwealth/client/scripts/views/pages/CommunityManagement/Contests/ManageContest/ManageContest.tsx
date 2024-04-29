@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import app from 'state';
 import Permissions from 'utils/Permissions';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
 
 import {
@@ -10,20 +11,33 @@ import {
   SignTransactionsStep,
 } from './steps';
 import { LaunchContestStep } from './types';
+import useManageContestForm from './useManageContestForm';
 
 import './ManageContest.scss';
 
 interface ManageContestProps {
-  contestId?: string;
+  contestAddress?: string;
 }
 
-const ManageContest = ({ contestId }: ManageContestProps) => {
+const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
 
+  const {
+    setContestFormData,
+    contestFormData,
+    isContestDataLoading,
+    stakeEnabled,
+    contestNotFound,
+  } = useManageContestForm({
+    contestAddress,
+  });
+
   if (
     !app.isLoggedIn() ||
-    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+    !stakeEnabled ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
+    contestNotFound
   ) {
     return <PageNotFound />;
   }
@@ -33,14 +47,19 @@ const ManageContest = ({ contestId }: ManageContestProps) => {
       case 'DetailsForm':
         return (
           <DetailsFormStep
-            contestId={contestId}
+            contestAddress={contestAddress}
             onSetLaunchContestStep={setLaunchContestStep}
+            contestFormData={contestFormData}
+            onSetContestFormData={setContestFormData}
           />
         );
 
       case 'SignTransactions':
         return (
-          <SignTransactionsStep onSetLaunchContestStep={setLaunchContestStep} />
+          <SignTransactionsStep
+            onSetLaunchContestStep={setLaunchContestStep}
+            isDirectDepositSelected={false}
+          />
         );
 
       case 'ContestLive':
@@ -48,7 +67,15 @@ const ManageContest = ({ contestId }: ManageContestProps) => {
     }
   };
 
-  return <div className="ManageContest">{getCurrentStep()}</div>;
+  const shouldDetailsFormStepLoading =
+    launchContestStep === 'DetailsForm' && contestAddress && !contestFormData;
+  const isLoading = shouldDetailsFormStepLoading || isContestDataLoading;
+
+  return (
+    <div className="ManageContest">
+      {isLoading ? <CWCircleMultiplySpinner /> : getCurrentStep()}
+    </div>
+  );
 };
 
 export default ManageContest;

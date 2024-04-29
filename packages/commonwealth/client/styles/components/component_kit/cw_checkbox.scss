@@ -5,6 +5,11 @@
   align-items: center;
   cursor: pointer;
 
+  &.disabled {
+    pointer-events: painted;
+    cursor: not-allowed;
+  }
+
   .check {
     position: relative;
     height: 17px;
@@ -48,6 +53,11 @@
       border-color: #fff;
       content: '';
       z-index: 10000;
+    }
+
+    input[type='checkbox']:disabled + .checkbox-control:after {
+      cursor: not-allowed;
+      background-color: $neutral-50;
     }
   }
 

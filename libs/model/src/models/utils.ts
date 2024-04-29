@@ -5,9 +5,10 @@ import type { CompositeKey, State } from './types';
  * Builds on-to-many association between parent/child models
  * @param this parent model with PK
  * @param child child model with FK
- * @param foreignKey the foreign key field in the child model - sequelize defaults the PK
- * @param as association alias, defaults to model name
- * @param optional true to allow children without parents (null FKs), defaults to false
+ * @param foreignKey foreign key field in the child model - sequelize defaults the PK
+ * @param options -
+ *   - `as`: association alias - defaults to model name
+ *   - `optional`: true to allow children without parents (null FKs) - defaults to false
  */
 export function oneToMany<Parent extends State, Child extends State>(
   this: ModelStatic<Model<Parent>>,
@@ -28,13 +29,48 @@ export function oneToMany<Parent extends State, Child extends State>(
 }
 
 /**
+ * Builds many-to-many association between three models (A->X<-B)
+ * @param this cross-reference model with FKs to A and B
+ * @param a left model with PK
+ * @param b right model with PK
+ * @param foreignKey foreign key fields in X to [A,B]
+ * @param as association aliases [a,b]
+ */
+export function manyToMany<X extends State, A extends State, B extends State>(
+  this: ModelStatic<Model<X>>,
+  a: [ModelStatic<Model<A>>, keyof X & string, string],
+  b: [ModelStatic<Model<B>>, keyof X & string, string],
+) {
+  this.belongsTo(a[0], { foreignKey: { name: a[1], allowNull: false } });
+  this.belongsTo(b[0], { foreignKey: { name: b[1], allowNull: false } });
+  a[0].hasMany(this, { foreignKey: { name: a[1], allowNull: false } });
+  b[0].hasMany(this, { foreignKey: { name: b[1], allowNull: false } });
+  a[0].belongsToMany(b[0], { through: this, foreignKey: a[1], as: b[2] });
+  b[0].belongsToMany(a[0], { through: this, foreignKey: b[1], as: a[2] });
+
+  // don't forget to return this (fluent)
+  return this;
+}
+
+/**
  * Maps composite FK constraints with type safety
  */
 export const mapFk = <Parent extends State, Child extends State>(
   parent: ModelStatic<Model<Parent>>,
   child: ModelStatic<Model<Child>>,
   key: CompositeKey<Parent, Child>,
-) => ({ parent, child, key: key.map((k) => parent.getAttributes()[k].field!) });
+) => ({
+  parent,
+  child,
+  key: key.map((k) =>
+    Array.isArray(k)
+      ? [
+          parent.getAttributes()[k[0]].field!,
+          child.getAttributes()[k[1]].field!,
+        ]
+      : parent.getAttributes()[k].field!,
+  ) as Array<string | [string, string]>,
+});
 
 /**
  * Creates composite FK constraints (not supported by sequelize)
@@ -43,14 +79,15 @@ export const createFk = (
   sequelize: Sequelize,
   parentTable: string,
   childTable: string,
-  key: string[],
+  key: Array<string | [string, string]>,
 ) => {
   const fkName = `${childTable}_${parentTable.toLowerCase()}_fkey`;
-  const fk = key.map((k) => k).join(',');
+  const pk = key.map((k) => (Array.isArray(k) ? k[0] : k)).join(',');
+  const fk = key.map((k) => (Array.isArray(k) ? k[1] : k)).join(',');
   sequelize?.query(
     `
     ALTER TABLE "${childTable}" ADD CONSTRAINT "${fkName}"
-    FOREIGN KEY (${fk}) REFERENCES "${parentTable}"(${fk});
+    FOREIGN KEY (${fk}) REFERENCES "${parentTable}"(${pk});
     `,
   );
 };

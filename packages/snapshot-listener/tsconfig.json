@@ -1,16 +1,8 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "lib": ["es2019"],
-    "typeRoots": ["./node_modules/@types"],
-    "skipLibCheck": true,
-    "rootDir": "src",
-    "outDir": "build"
-  },
-  "include": ["src"],
+  "extends": "../tsconfig.json",
   "references": [
-    { "path": "../../libs/adapters" },
-    { "path": "../../libs/core" },
-    { "path": "../../libs/logging" }
+    { "path": "../../libs/adapters/tsconfig.build.json" },
+    { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" }
   ]
 }

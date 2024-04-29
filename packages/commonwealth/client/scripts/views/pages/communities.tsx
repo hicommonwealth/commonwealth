@@ -5,6 +5,7 @@ import {
 } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
+import { findDenominationString } from 'helpers/findDenomination';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
@@ -294,6 +295,9 @@ const CommunitiesPage = () => {
               mode={modeOfManageCommunityStakeModal}
               onModalClose={() => setModeOfManageCommunityStakeModal(null)}
               community={selectedCommunity}
+              denomination={
+                findDenominationString(selectedCommunity?.id) || 'ETH'
+              }
             />
           }
           onClose={() => setModeOfManageCommunityStakeModal(null)}

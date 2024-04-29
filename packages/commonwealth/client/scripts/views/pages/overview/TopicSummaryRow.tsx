@@ -1,3 +1,4 @@
+import { slugify } from '@hicommonwealth/shared';
 import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
@@ -5,7 +6,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
-import { slugify } from 'utils';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
@@ -79,7 +79,9 @@ export const TopicSummaryRow = ({
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const user = app.chain.accounts.get(thread.author);
+          const user = thread?.author
+            ? app.chain.accounts.get(thread?.author)
+            : null;
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
@@ -100,9 +102,13 @@ export const TopicSummaryRow = ({
                 <div className="row-top">
                   <div className="user-and-date-row">
                     <User
-                      userAddress={user.address}
+                      userAddress={user?.address}
                       userCommunityId={
-                        user.community?.id || user.profile?.chain
+                        user?.community?.id || user.profile?.chain
+                      }
+                      shouldShowAsDeleted={
+                        !user?.address &&
+                        !(user?.community?.id || user.profile?.chain)
                       }
                       shouldShowAddressWithDisplayName
                       shouldLinkProfile

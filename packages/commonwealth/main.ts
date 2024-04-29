@@ -28,7 +28,7 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
-import setupCosmosProxy from './server/util/cosmosProxy';
+import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
@@ -194,7 +194,7 @@ export async function main(
     dbValidationService,
   );
 
-  setupCosmosProxy(app, db, cacheDecorator);
+  setupCosmosProxies(app, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
   if (withFrontendBuild) {

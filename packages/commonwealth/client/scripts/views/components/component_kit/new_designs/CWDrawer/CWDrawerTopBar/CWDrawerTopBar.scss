@@ -1,0 +1,15 @@
+@import '../../../../../../../styles/shared.scss';
+
+.DrawerTopBar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 16px 56px 12px 25px;
+
+  @include extraSmall {
+    gap: 4px;
+    padding: 16px 16px 12px 16px;
+  }
+}

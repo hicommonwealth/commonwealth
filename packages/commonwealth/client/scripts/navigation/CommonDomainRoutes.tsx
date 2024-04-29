@@ -84,8 +84,8 @@ const CommunityStakeIntegration = lazy(
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
-const CommunityContests = lazy(
-  () => import('views/pages/CommunityManagement/Contests/ContestsList'),
+const AdminContestsPage = lazy(
+  () => import('views/pages/CommunityManagement/Contests/AdminContestsPage'),
 );
 const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
@@ -315,13 +315,14 @@ const CommonDomainRoutes = ({
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
+      renderDefaultMetatags: false,
     })}
   />,
   <Route
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
-      scope: false,
+      scoped: false,
     })}
   />,
   <Route
@@ -463,7 +464,7 @@ const CommonDomainRoutes = ({
         <Route
           key="/:scope/manage/contests"
           path="/:scope/manage/contests"
-          element={withLayout(CommunityContests, {
+          element={withLayout(AdminContestsPage, {
             scoped: true,
           })}
         />,
@@ -475,8 +476,8 @@ const CommonDomainRoutes = ({
           })}
         />,
         <Route
-          key="/:scope/manage/contests/:contestId"
-          path="/:scope/manage/contests/:contestId"
+          key="/:scope/manage/contests/:contestAddress"
+          path="/:scope/manage/contests/:contestAddress"
           element={withLayout(ManageContest, {
             scoped: true,
           })}
