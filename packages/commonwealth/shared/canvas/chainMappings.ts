@@ -43,7 +43,7 @@ export function chainBaseToCanvasChainId(
     // Temporarily locked to cosmoshub-1, since we don't have the live chain ID for cosmos chains
     return 'cosmoshub-1';
   } else if (chainBase === ChainBase.Ethereum) {
-    return idOrPrefix ? idOrPrefix.toString() : 1;
+    return idOrPrefix ? idOrPrefix.toString() : '1';
   } else if (chainBase === ChainBase.NEAR) {
     // Temporarily locked to mainnet
     // See also: client/scripts/views/pages/finish_near_login.tsx
