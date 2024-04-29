@@ -1,5 +1,6 @@
 import z from 'zod';
 import { ContestManager } from '../entities.schemas';
+import { PG_INT } from '../utils.schemas';
 
 export const CreateContestManagerMetadata = {
   input: z.object({
@@ -7,11 +8,11 @@ export const CreateContestManagerMetadata = {
     name: z.string(),
     image_url: z.string(),
     funding_token_address: z.string(),
-    prize_percentage: z.number(),
-    payout_structure: z.array(z.number()),
-    interval: z.number().min(0),
-    paused: z.boolean(),
-    created_at: z.date(),
+    prize_percentage: PG_INT,
+    payout_structure: z.array(PG_INT),
+    interval: PG_INT.min(0),
+    ticker: z.string(),
+    decimals: PG_INT,
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),

@@ -13,6 +13,8 @@ export const CreateContestManagerMetadata: Command<
     const contestManager = await models.ContestManager.create({
       ...payload,
       community_id: id!,
+      created_at: new Date(),
+      cancelled: false,
     });
     if (mustExist('ContestManager', contestManager)) {
       return {

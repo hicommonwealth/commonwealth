@@ -38,7 +38,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       ticker: { type: Sequelize.STRING },
       decimals: { type: Sequelize.INTEGER },
       created_at: { type: Sequelize.DATE, allowNull: false },
-      paused: { type: Sequelize.BOOLEAN },
+      cancelled: { type: Sequelize.BOOLEAN },
     },
     {
       tableName: 'ContestManagers',

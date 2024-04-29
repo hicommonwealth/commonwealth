@@ -12,13 +12,14 @@ describe('Contests metadata commands lifecycle', () => {
   const namespace = 'test-namespace';
 
   const name = 'My Contest';
-  const payout_structure = [0.9, 0.1];
+  const payout_structure = [10, 90];
   const prize_percentage = 1;
   const funding_token_address = 'funding-address';
   const image_url = 'url';
   const interval = 10;
-  const created_at = new Date();
-  const paused = false;
+  const ticker = 'XYZ';
+  const decimals = 18;
+  const cancelled = false;
 
   let community: [
     z.infer<typeof schemas.entities['Community']> | undefined,
@@ -83,10 +84,11 @@ describe('Contests metadata commands lifecycle', () => {
             contests: [],
             image_url,
             payout_structure,
+            ticker,
             prize_percentage,
             funding_token_address,
-            created_at,
-            paused,
+            decimals,
+            cancelled,
           },
           {
             contest_address: '0x2',
@@ -96,10 +98,11 @@ describe('Contests metadata commands lifecycle', () => {
             contests: [],
             image_url,
             payout_structure,
+            ticker,
             prize_percentage,
             funding_token_address,
-            created_at,
-            paused,
+            decimals,
+            cancelled,
           },
         ],
       },
@@ -144,8 +147,8 @@ describe('Contests metadata commands lifecycle', () => {
           prize_percentage,
           payout_structure,
           interval,
-          paused,
-          created_at,
+          ticker,
+          decimals,
         },
       });
       expect(promise).to.be.rejectedWith('User is not admin in the community');
@@ -163,8 +166,8 @@ describe('Contests metadata commands lifecycle', () => {
           prize_percentage,
           payout_structure,
           interval,
-          paused,
-          created_at,
+          ticker,
+          decimals,
         },
       });
       // the auth middleware fails to find address if community doesn't exist
@@ -187,27 +190,24 @@ describe('Contests metadata commands lifecycle', () => {
             prize_percentage,
             payout_structure,
             interval,
-            paused,
-            created_at,
+            ticker,
+            decimals,
           },
         },
       );
 
-      expect(createResult).to.deep.eq({
-        contest_managers: [
-          {
-            contest_address,
-            name,
-            community_id,
-            image_url,
-            funding_token_address,
-            prize_percentage,
-            payout_structure,
-            interval,
-            paused,
-            created_at,
-          },
-        ],
+      expect(createResult!.contest_managers![0]).to.deep.contain({
+        contest_address,
+        name,
+        community_id,
+        image_url,
+        funding_token_address,
+        prize_percentage,
+        payout_structure,
+        interval,
+        ticker,
+        decimals,
+        cancelled,
       });
     });
   });
@@ -265,7 +265,9 @@ describe('Contests metadata commands lifecycle', () => {
         prize_percentage,
         payout_structure,
         interval,
-        paused,
+        ticker,
+        decimals,
+        cancelled,
       });
     });
   });
@@ -297,35 +299,34 @@ describe('Contests metadata commands lifecycle', () => {
       expect(promise).to.be.rejectedWith('ContestManager must exist');
     });
 
-    // it('should cancel contest manager metadata', async () => {
-    //   const { contest_address, cancelled } = community[0]!.contest_managers![1];
+    it('should cancel contest manager metadata', async () => {
+      const { contest_address, cancelled } = community[0]!.contest_managers![1];
 
-    //   expect(contest_address).to.not.be.empty;
-    //   expect(cancelled).to.eq(false);
+      expect(contest_address).to.not.be.empty;
+      expect(cancelled).to.eq(false);
 
-    //   const cancelledResult = await command(
-    //     Contest.CancelContestManagerMetadata(),
-    //     {
-    //       actor: communityAdminActor!,
-    //       id: community_id,
-    //       payload: {
-    //         contest_address,
-    //       },
-    //     },
-    //   );
+      const cancelledResult = await command(
+        Contest.CancelContestManagerMetadata(),
+        {
+          actor: communityAdminActor!,
+          id: community_id,
+          payload: {
+            contest_address,
+          },
+        },
+      );
 
-    //   expect(cancelledResult!.contest_managers![0]).to.deep.contain({
-    //     contest_address,
-    //     name,
-    //     community_id,
-    //     image_url,
-    //     funding_token_address,
-    //     prize_percentage,
-    //     payout_structure,
-    //     interval,
-    //     cancelled: true,
-    //     created_at,
-    //   });
-    // });
+      expect(cancelledResult!.contest_managers![0]).to.deep.contain({
+        contest_address,
+        name,
+        community_id,
+        image_url,
+        funding_token_address,
+        prize_percentage,
+        payout_structure,
+        interval,
+        cancelled: true,
+      });
+    });
   });
 });
