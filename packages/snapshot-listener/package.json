@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && tsc-alias",
+    "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
@@ -18,11 +18,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "node-fetch": "2",
-    "tsx": "^4.7.2",
-    "tslog": "^3.3.4"
+    "node-fetch": "2"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.2"
   }
 }

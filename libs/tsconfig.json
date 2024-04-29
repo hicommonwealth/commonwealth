@@ -5,6 +5,7 @@
     "target": "esnext",
     "baseUrl": ".",
     "composite": true,
+    "strict": true,
 
     "forceConsistentCasingInFileNames": true,
     "preserveConstEnums": true,
@@ -14,11 +15,7 @@
 
     "sourceMap": true,
     "declaration": true,
-    "declarationMap": true,
-
-    "paths": {
-      "@hicommonwealth/*": ["libs/*/src"]
-    }
+    "declarationMap": true
   },
-  "exclude": ["**/node_modules", "**/build", "**/test", "**/__mocks__"]
+  "exclude": ["**/node_modules", "**/build"]
 }

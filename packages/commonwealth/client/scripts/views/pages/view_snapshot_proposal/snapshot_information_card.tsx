@@ -77,14 +77,14 @@ export const SnapshotInformationCard = ({
               value={
                 app.chain ? (
                   <User
-                    userAddress={proposal.author}
+                    userAddress={proposal?.author}
                     userCommunityId={app.activeChainId()}
                     shouldHideAvatar
                     shouldLinkProfile
                     shouldShowPopover
                   />
                 ) : (
-                  proposal.author
+                  proposal?.author || 'Deleted'
                 )
               }
             />

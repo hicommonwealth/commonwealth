@@ -9,6 +9,7 @@ export type ModalBaseTabs = {
 
 export type ModalVariantProps = {
   onClose: () => any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSuccess?: (isNewAccount?: boolean) => any;
   showWalletsFor?:
     | ChainBase.Ethereum

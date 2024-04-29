@@ -518,33 +518,57 @@ export const ChainNode = z.object({
 // aliases
 export const Chain = Community;
 
-export const Outbox = z.object({
-  id: PG_INT,
-  event_name: z.nativeEnum(EventNames),
-  event_payload: z.union([
-    events.ThreadCreated.extend({
-      event_name: z.literal(EventNames.ThreadCreated),
-    }),
-    events.CommentCreated.extend({
-      event_name: z.literal(EventNames.CommentCreated),
-    }),
-    events.GroupCreated.extend({
-      event_name: z.literal(EventNames.GroupCreated),
-    }),
-    events.CommunityCreated.extend({
-      event_name: z.literal(EventNames.CommunityCreated),
-    }),
-    events.SnapshotProposalCreated.extend({
-      event_name: z.literal(EventNames.SnapshotProposalCreated),
-    }),
-    events.DiscordMessageCreated.extend({
-      event_name: z.literal(EventNames.DiscordMessageCreated),
-    }),
-  ]),
-  relayed: z.boolean(),
-  created_at: z.date(),
-  updated_at: z.date(),
+const BaseOutboxProperties = z.object({
+  event_id: PG_INT.optional(),
+  relayed: z.boolean().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
+
+export const Outbox = z.union([
+  z
+    .object({
+      event_name: z.literal(EventNames.ThreadCreated),
+      event_payload: events.ThreadCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.CommentCreated),
+      event_payload: events.CommentCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.GroupCreated),
+      event_payload: events.GroupCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.CommunityCreated),
+      event_payload: events.CommunityCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.SnapshotProposalCreated),
+      event_payload: events.SnapshotProposalCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordMessageCreated),
+      event_payload: events.DiscordMessageCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.ChainEventCreated),
+      event_payload: events.ChainEventCreated,
+    })
+    .merge(BaseOutboxProperties),
+]);
 
 export const SubscriptionPreference = z.object({
   id: PG_INT,
@@ -560,19 +584,19 @@ export const SubscriptionPreference = z.object({
 });
 
 export const ThreadSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommentSubscription = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(),
   user_id: PG_INT,
   comment_id: PG_INT,
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export const CommunityAlert = z.object({

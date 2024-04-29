@@ -66,6 +66,7 @@ export default (
 
   ContractAbi.associate = (models) => {
     models.ContractAbi.hasMany(models.Contract, { foreignKey: 'abi_id' });
+    models.ContractAbi.hasMany(models.EvmEventSource, { foreignKey: 'abi_id' });
   };
 
   return ContractAbi;

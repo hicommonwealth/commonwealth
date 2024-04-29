@@ -2,6 +2,7 @@ import {
   Model,
   Sequelize,
   DataTypes as SequelizeDataTypes,
+  type Attributes,
   type BuildOptions,
 } from 'sequelize';
 
@@ -20,6 +21,18 @@ export type ModelStatic<ParentModel extends Model> =
       child: ModelStatic<Model<Child>>,
       foreignKey: keyof Child & string,
       options?: { as?: string; optional?: boolean },
+    ) => ModelStatic<ParentModel>;
+    withManyToMany: <A extends State, B extends State>(
+      a: [
+        ModelStatic<Model<A>>,
+        keyof Attributes<ParentModel> & string,
+        string,
+      ],
+      b: [
+        ModelStatic<Model<B>>,
+        keyof Attributes<ParentModel> & string,
+        string,
+      ],
     ) => ModelStatic<ParentModel>;
   } & {
     new (values?: State, options?: BuildOptions): ParentModel;

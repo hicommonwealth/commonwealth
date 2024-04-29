@@ -20,7 +20,7 @@ import {
 } from 'trpc-openapi';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
 
-interface Context {
+export interface Context {
   req: Request;
 }
 

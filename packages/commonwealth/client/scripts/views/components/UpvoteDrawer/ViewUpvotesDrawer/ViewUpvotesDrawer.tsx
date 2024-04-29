@@ -106,7 +106,7 @@ export const ViewUpvotesDrawer = ({
     }
   };
 
-  const profile = author['profile']
+  const profile = author?.['profile']
     ? {
         avatarUrl: author['profile'].avatarUrl,
         lastActive: author['profile'].lastActive,

@@ -11,9 +11,9 @@ import './MobileWalletConfirmationSubModal.scss';
 
 type MobileWalletConfirmationSubModal = {
   isOpen: boolean;
-  onClose: () => any;
+  onClose: () => void;
   disabled?: boolean;
-  onSignatureConfirmation?: () => any;
+  onSignatureConfirmation?: () => void;
 };
 
 const MobileWalletConfirmationSubModal = ({
