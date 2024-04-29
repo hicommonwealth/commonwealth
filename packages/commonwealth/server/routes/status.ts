@@ -288,6 +288,28 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   };
 };
 
+interface RequestWithCookies extends Express.Request {
+  cookies: Readonly<{ [name: string]: string }>;
+}
+
+function isRequestWithCookies(req: Express.Request): req is RequestWithCookies {
+  return (req as any).cookies;
+}
+
+function extendCookie(
+  req: RequestWithCookies,
+  res: TypedResponse<unknown>,
+  cookie_name: string,
+) {
+  const cookie_value = req.cookies[cookie_name];
+  if (cookie_value) {
+    res.cookie(cookie_name, cookie_value, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
+  }
+}
+
 export const status = async (
   models: DB,
   req: TypedRequestQuery,
@@ -331,6 +353,10 @@ export const status = async (
       const { roles, user, id, email } = userStatus;
       const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
       user.jwt = jwtToken as string;
+
+      if (isRequestWithCookies(req)) {
+        extendCookie(req, res, 'connect.sid');
+      }
 
       return success(res, {
         notificationCategories,
