@@ -46,6 +46,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     <User
       userAddress={author_address}
       userCommunityId={author_community_id}
+      shouldShowAsDeleted={!author_address && !author_community_id}
       shouldHideAvatar
     />
   );
@@ -152,6 +153,7 @@ export const getBatchNotificationFields = (
     <User
       userAddress={author_address}
       userCommunityId={author_community_id}
+      shouldShowAsDeleted={!author_address && !author_community_id}
       shouldHideAvatar
     />
   );
