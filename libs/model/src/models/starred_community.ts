@@ -21,16 +21,12 @@ export type StarredCommunityInstance =
 
 export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): StarredCommunityModelStatic => {
-  const StarredCommunity = <StarredCommunityModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+  <StarredCommunityModelStatic>sequelize.define<StarredCommunityInstance>(
     'StarredCommunity',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      user_id: { type: dataTypes.INTEGER, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      user_id: { type: dataTypes.INTEGER, primaryKey: true },
+      community_id: { type: dataTypes.STRING, primaryKey: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -39,20 +35,5 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['user_id', 'community_id'], unique: true }],
     },
   );
-
-  StarredCommunity.associate = (models) => {
-    models.StarredCommunity.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      targetKey: 'id',
-    });
-    models.StarredCommunity.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return StarredCommunity;
-};

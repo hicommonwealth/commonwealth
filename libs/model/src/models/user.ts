@@ -110,10 +110,6 @@ export default (
     models.User.hasMany(models.Profile, {
       foreignKey: { name: 'user_id', allowNull: false },
     });
-    models.User.hasMany(models.StarredCommunity, {
-      foreignKey: 'user_id',
-      sourceKey: 'id',
-    });
 
     User.createWithProfile = async (
       attrs: UserAttributes,

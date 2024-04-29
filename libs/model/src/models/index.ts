@@ -37,6 +37,12 @@ export const syncDb = async (db: DB, log = false) => {
         onDelete: 'CASCADE',
       },
     ),
+    mapFk(db.Community, db.StarredCommunity, [['id', 'community_id']], {
+      onUpdate: 'CASCADE',
+    }),
+    mapFk(db.User, db.StarredCommunity, [['id', 'user_id']], {
+      onUpdate: 'CASCADE',
+    }),
   ];
 
   compositeKeys.forEach(({ parent, child }) =>

@@ -58,7 +58,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.StarredCommunity, 'community_id')
     .withMany(db.CommunityAlert, 'community_id', {
       onDelete: 'CASCADE',
     })
@@ -126,6 +125,10 @@ export const buildAssociations = (db: DB) => {
   db.CommunityContract.withManyToMany(
     [db.Community, 'community_id', 'communities', {}],
     [db.Contract, 'contract_id', 'contracts', {}],
+  );
+  db.StarredCommunity.withManyToMany(
+    [db.Community, 'community_id', 'communities', {}],
+    [db.User, 'user_id', 'users', {}],
   );
 
   // Reconciling constraint rules in "loose" FKs
