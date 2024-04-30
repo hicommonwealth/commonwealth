@@ -3,6 +3,8 @@ import { logger } from '@hicommonwealth/logging';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 async function main() {
@@ -10,7 +12,7 @@ async function main() {
     where: {
       ...(process.env.COMMUNITY_ID && { id: process.env.COMMUNITY_ID }),
       namespace: {
-        [Op.ne]: null,
+        [Op.ne]: undefined,
       },
     },
     include: [
@@ -25,24 +27,21 @@ async function main() {
   // generate stakeholder group for each staked community
   for (const c of stakedCommunities) {
     if ((c.CommunityStakes || []).length > 0) {
-      const { groups, created } = await command(
-        Community.GenerateStakeholderGroups(),
-        {
-          id: c.id,
-          actor: {
-            user: undefined,
-          },
-          payload: {},
+      const result = await command(Community.GenerateStakeholderGroups(), {
+        id: c.id,
+        actor: {
+          user: { email: 'generate-stakeholder-groups' },
         },
-      );
+        payload: {},
+      });
 
-      if (created) {
+      if (result?.created) {
         log.info(
-          `created ${groups.length} stakeholder groups for ${c.id} – refreshing memberships...`,
+          `created ${result.groups?.length} stakeholder groups for ${c.id} – refreshing memberships...`,
         );
       } else {
         log.info(
-          `stakeholder groups (${groups.length}) already exist for ${c.id}`,
+          `stakeholder groups (${result?.groups?.length}) already exist for ${c.id}`,
         );
       }
     }

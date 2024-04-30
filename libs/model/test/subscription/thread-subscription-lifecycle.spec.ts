@@ -17,14 +17,12 @@ describe('Thread subscription lifecycle', () => {
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
-      selected_community_id: null,
     });
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       name: 'Sepolia Testnet',
       eth_chain_id: 11155111,
       balance_type: BalanceType.Ethereum,
-      contracts: [],
     });
     const [community] = await seed('Community', {
       chain_node_id: node?.id,
@@ -32,13 +30,9 @@ describe('Thread subscription lifecycle', () => {
         {
           role: 'member',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
-      CommunityStakes: [],
-      groups: [],
-      contest_managers: [],
-      discord_config_id: null,
+      topics: [{}],
     });
 
     [threadOne] = await seed('Thread', {

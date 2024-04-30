@@ -1,8 +1,7 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type TopicAttributes = {
   id?: number;
@@ -33,7 +32,7 @@ export type TopicModelStatic = ModelStatic<TopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): TopicModelStatic => {
   const Topic = <TopicModelStatic>sequelize.define(
     'Topic',

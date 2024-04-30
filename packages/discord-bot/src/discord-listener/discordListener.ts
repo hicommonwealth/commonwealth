@@ -15,9 +15,11 @@ import {
   MessageType,
   ThreadChannel,
 } from 'discord.js';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 stats(HotShotsStats());
 

@@ -33,6 +33,11 @@ export class ChainTesting {
     },
   };
 
+  // Object where keys are snapshot ids and the boolean variable indicates
+  // whether a snapshot id was already used to revert (cannot use id more than
+  // once).
+  protected chainSnapshotIds: Record<string, boolean> = {};
+
   /**
    * Creates a ChainTesting SDK Instance
    * @param host The chain-testing api host
@@ -355,6 +360,38 @@ export class ChainTesting {
       JSON.stringify(request),
       this.header,
     );
+  }
+
+  public async getChainSnapshot() {
+    const res = await axios.get(
+      `${this.host}/chain/getChainSnapshot`,
+      this.header,
+    );
+    if (res?.data?.result) {
+      this.chainSnapshotIds[res.data.snapshotId] = false;
+    } else {
+      throw new Error('Failed to get chain snapshot');
+    }
+
+    return res.data.result;
+  }
+
+  public async revertChainToSnapshot(snapshotId: string) {
+    if (this.chainSnapshotIds[snapshotId]) {
+      throw new Error(`Cannot re-use chain snapshot: ${snapshotId}`);
+    }
+    const res = await axios.post(
+      `${this.host}/chain/revertChainToSnapshot`,
+      JSON.stringify({ snapshotId }),
+      this.header,
+    );
+    console.log(res.data);
+    if (res?.data?.result) {
+      this.chainSnapshotIds[snapshotId] = true;
+    } else {
+      throw new Error(`Failed to revert chain to snapshot: ${snapshotId}`);
+    }
+    return res.data.result;
   }
 
   /**

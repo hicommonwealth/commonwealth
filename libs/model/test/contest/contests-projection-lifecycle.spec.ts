@@ -37,7 +37,7 @@ describe('Contests projection lifecycle', () => {
   const created_at = new Date();
   const start_time = created_at;
   const end_time = new Date(start_time.getTime() + 1000);
-  const paused = false;
+  const cancelled = false;
   const payout_structure = [90, 10];
   const prize_percentage = 1;
   const funding_token_address = 'funding-address';
@@ -98,7 +98,7 @@ describe('Contests projection lifecycle', () => {
             prize_percentage,
             funding_token_address,
             created_at,
-            paused,
+            cancelled,
           },
           {
             contest_address: oneoff,
@@ -111,7 +111,7 @@ describe('Contests projection lifecycle', () => {
             prize_percentage,
             funding_token_address,
             created_at,
-            paused,
+            cancelled,
           },
         ],
       },
@@ -276,7 +276,7 @@ describe('Contests projection lifecycle', () => {
         interval,
         ticker,
         decimals,
-        paused,
+        cancelled,
         created_at,
         topics: [],
         contests: [

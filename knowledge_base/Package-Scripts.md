@@ -38,7 +38,7 @@ If you add a script to the `package.json` file, please add documentation for it 
   + [lint-all](#lint-all)
   + [lint-branch](#lint-branch)
   + [lint-branch-warnings](#lint-branch-warnings)
-  + [style-lint](#style-lint)  
+  + [style-lint](#style-lint)
 * [Playwright](#playwright)
   + [e2e-start-server](#e2e-start-server)
   + [emit-notification](#emit-notification)
@@ -49,7 +49,6 @@ If you add a script to the `package.json` file, please add documentation for it 
   + [test](#test)
   + [test-api](#test-api)
   + [test-devnet](#test-devnet)
-  + [test-emit-notif](#test-emit-notif)
   + [test-integration-util](#test-integration-util)
   + [test-select](#test-select)
   + [test-suite](#test-suite)
@@ -121,7 +120,7 @@ Contributor: Kurtis Assad
 
 ### clean-db
 
-Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
+Definition: `tsx  server/scripts/cleanDb.ts`
 
 Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily.
 
@@ -280,7 +279,7 @@ Contributor: Kurtis Assad
 
 ### emit-notification
 
-Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification.ts`
+Definition: `tsx  server/scripts/emitTestNotification.ts`
 
 Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
 
@@ -314,7 +313,7 @@ Open considerations:
 
 ### integration-test
 
-Definition: `nyc ts-mocha --project tsconfig.json './test/integration/**/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha  './test/integration/**/*.spec.ts'`
 
 Description: Runs all tests in our integration folder and its subdirectories.
 
@@ -322,31 +321,23 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 ### test
 
-Definition: `nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
-
-Description: Runs all tests in our /test directory.
+See `unit-test`.
 
 ### test-api
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha --allow-uncaught './test/integration/api/**/*.spec.ts'`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
 ### test-devnet
 
-Definition: `nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/devnet/**/*.spec.ts`
 
-Description: Runs all tests in our `/devnet`` folder.
-
-### test-emit-notif
-
-Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/emitNotifications.spec.ts'`
-
-Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
+Description: Runs all tests in our `/devnet` folder. If `cosmos` is given as the first argument then run only the tests in `./test/devnet/cosmos/**/*.spec.ts`. If `evm` is given as the first argument then run only the tests in `./test/devnet/evm/**/*.spec.ts`.
 
 ### test-integration-util
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/integration/*.spec.ts`
 
 Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
 
@@ -356,13 +347,13 @@ Contributor: Timothee Legros
 
 ### test-select
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha`
 
 Description: Append a path to run specific test files or folders.
 
 ### test-suite
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
@@ -370,7 +361,7 @@ Considerations: This is equivalent to our `test` script but with `NODE_ENV=test`
 
 ### unit-test
 
-Definition: `NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/unit/seed_hack.spec.ts' && NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true mocha './test/unit/**/*.spec.ts'`
 
 Description: Tests all .spec files within the `./test/unit` sub-directory of test folder.
 
@@ -380,7 +371,7 @@ Contributor: Ryan Bennett
 
 ### unit-test:watch
 
-Definition: `NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'`
 
 Description: Watches for changes to any .spec files within `./test/unit` and automatically runs test when they are updated.
 
@@ -408,11 +399,10 @@ Description: Sanity scripts developers should run locally before pushing code, c
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 
-Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
-
+Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
 ### start
 
-Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
+Definition: `tsx watch  --max-old-space-size=4096 server.ts`
 
 Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
@@ -424,13 +414,13 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ### start-consumer
 
-Definition: `ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
+Definition: `tsx  server/workers/commonwealthConsumer/commonwealthConsumer.ts`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
 ### start-evm-ce
 
-Definition: `ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `tsx  server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 
@@ -464,7 +454,7 @@ Description: It creates new `tsx` file and modifies `componentsList.ts` file in 
 
 ### send-cosmos-notifs
 
-Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
+Definition: `node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/cosmosGovNotifications/generateCosmosGovNotifications.js`
 
 Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
 
@@ -472,6 +462,6 @@ Contributor: Timothee Legros
 
 ### send-notification-digest-emails
 
-Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
+Definition: `SEND_EMAILS=true tsx  server.ts`
 
 Description: Schedules a daily task for sending notification email digests.

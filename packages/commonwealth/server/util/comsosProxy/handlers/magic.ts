@@ -2,7 +2,9 @@ import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import axios from 'axios';
 import type { Request, Response } from 'express';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export function cosmosMagicOptionsHandler(_req: Request, res: Response): void {
