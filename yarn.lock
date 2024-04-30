@@ -1526,22 +1526,22 @@
   resolved "https://registry.yarnpkg.com/@brillout/import/-/import-0.2.3.tgz#98f04656692b35d70664cc917f3cb0e8f74942dd"
   integrity sha512-1T8WlD75eeFSMrptGy8jiLHmfHgMmSjWvLOIUvHmSVZt+6k0eQqYUoK4KbmE4T9pVLIfxvZSOm2D68VEqKRHRw==
 
-"@canvas-js/chain-cosmos@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-cosmos/-/chain-cosmos-0.9.0-next.1.tgz#a6577c41d35c97f515bb29cc76bbec9eefd7ea42"
-  integrity sha512-bKe32V8Ag9S+qmbiZK4ZOLfNUT8GVFGx1//MpF9OirFm+S3ikeWvkwUPkxJi6Z1lPB/FZglljoFhl2YDs3B7AQ==
+"@canvas-js/chain-cosmos@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-cosmos/-/chain-cosmos-0.9.0.tgz#a9974c4c41e5d9728c54bc40900d48901b3f2124"
+  integrity sha512-4eKG6bM9k90HJbo0d/9k0446pWVhGaxiHmRlSXhTZixfNX0ethAaIBkBCPOvg2RMpt5CGt8+Un9ZY49/uLybzw==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0-next.1"
-    "@canvas-js/signatures" "0.9.0-next.1"
-    "@canvas-js/utils" "0.9.0-next.1"
+    "@canvas-js/interfaces" "0.9.0"
+    "@canvas-js/signatures" "0.9.0"
+    "@canvas-js/utils" "0.9.0"
     "@cosmjs/amino" "^0.30.1"
     "@cosmjs/crypto" "^0.30.1"
     "@cosmjs/encoding" "^0.30.1"
-    "@ipld/dag-cbor" "^9.0.6"
+    "@ipld/dag-cbor" "^9.2.0"
     "@ipld/dag-json" "^10.1.5"
     "@keplr-wallet/types" "^0.11.64"
     "@libp2p/logger" "^4.0.2"
-    "@noble/curves" "^1.3.0"
+    "@noble/curves" "^1.4.0"
     "@noble/hashes" "^1.3.2"
     ethers "^6.9.0"
     multiformats "^13.0.1"
@@ -1559,46 +1559,46 @@
     multiformats "^13.0.1"
     siwe "^2.1.4"
 
-"@canvas-js/chain-ethereum@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.9.0-next.1.tgz#945a9d265522731110c37e5e1f88c61a07f7a637"
-  integrity sha512-ksGNsnwbea/x1KhbNvBbtRh52O6g09+meGhCwkY0S3VqkdzkI9K3CHOmDGBNUPmkt7OR47V7cUYlwRNiQf4uqg==
+"@canvas-js/chain-ethereum@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.9.0.tgz#72b66bac6beed934aee172521788ec7ef24025ce"
+  integrity sha512-cjdww62PSnwQZ/ZcKULEBUOrzTSZyRaCD2nA2UF8tqn7bXSYf6jJzLSeB5Xae4RFg0T3yezbZytQtythdx4Fgw==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0-next.1"
-    "@canvas-js/signatures" "0.9.0-next.1"
-    "@canvas-js/utils" "0.9.0-next.1"
+    "@canvas-js/interfaces" "0.9.0"
+    "@canvas-js/signatures" "0.9.0"
+    "@canvas-js/utils" "0.9.0"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     ethers "^6.9.0"
     multiformats "^13.0.1"
     siwe "^2.1.4"
 
-"@canvas-js/chain-solana@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-solana/-/chain-solana-0.9.0-next.1.tgz#47def92866497fa7df8c2baa598488ad6492341d"
-  integrity sha512-PsYeeKwPlQivrBsQaacrJtWrljdWlyI6pGDA0yoohaKu21rKeVbVfVGrxiXOi664uijf9HkxXzEg9SDXFALR2g==
+"@canvas-js/chain-solana@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-solana/-/chain-solana-0.9.0.tgz#0cf9b034aadc650afbcdedeb7559e89c1bbaf89d"
+  integrity sha512-9aQ3XT6ApVMphReznzLniHYZM7dzhGvqJM4StXMP4111zkwXEVsCQ0IsSkXoELugL2DT6xaHqStfjihazRr5tQ==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0-next.1"
-    "@canvas-js/signatures" "0.9.0-next.1"
-    "@canvas-js/utils" "0.9.0-next.1"
+    "@canvas-js/interfaces" "0.9.0"
+    "@canvas-js/signatures" "0.9.0"
+    "@canvas-js/utils" "0.9.0"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
-    "@noble/curves" "^1.3.0"
+    "@noble/curves" "^1.4.0"
     "@solana/web3.js" "^1.87.6"
     multiformats "^13.0.1"
 
-"@canvas-js/chain-substrate@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-substrate/-/chain-substrate-0.9.0-next.1.tgz#3c74548df086e31083ebf385cfb8c9540e3c2be9"
-  integrity sha512-5vlo07uFAvlFMS9FcN60dJcB7SV+gFHD8fUuw725qB8zHHXoD6HTdoGWD9wVNaBYrviZMG9f2XVl/l/SgN3S7g==
+"@canvas-js/chain-substrate@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-substrate/-/chain-substrate-0.9.0.tgz#ade71efcf0c4efbc2a39dade8851076e14beb865"
+  integrity sha512-ePU99KBM8rQk0lV3HkpxftA+X/FE3sEztmSjzS8SjtFwEN4i4gED9L6WPhjc50u1wabzDAvhp2NUB2iT+tu/Lw==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0-next.1"
-    "@canvas-js/signatures" "0.9.0-next.1"
-    "@canvas-js/utils" "0.9.0-next.1"
+    "@canvas-js/interfaces" "0.9.0"
+    "@canvas-js/signatures" "0.9.0"
+    "@canvas-js/utils" "0.9.0"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
-    "@noble/curves" "^1.3.0"
-    "@noble/hashes" "^1.3.2"
+    "@noble/curves" "^1.4.0"
+    "@noble/hashes" "^1.4.0"
     "@polkadot/extension-inject" "^0.46.3"
     "@polkadot/keyring" "^12.6.1"
     "@polkadot/util-crypto" "^12.2.1"
@@ -1711,10 +1711,10 @@
   dependencies:
     multiformats "^13.0.1"
 
-"@canvas-js/interfaces@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.9.0-next.1.tgz#d737813a351fde7734d91c5c257afcd712333934"
-  integrity sha512-UY/UYxh9T4hItrwlQuCjKN/dXiVSZtQFndMS6ISx1B/cC2QUx8CvqXMRrtBwWUmpxofBtmW7+Vx6IJJ499seTA==
+"@canvas-js/interfaces@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.9.0.tgz#6e8ec488262be7f00441812f4820077f75fda695"
+  integrity sha512-OJHMKNY55PqC+tQfUWpndVyX6tGSjdQHtmtWf4/oujlOsK1KvCMlOZVRYGdi/g9Lm5ArDfK5LXzNuiiy7dSAng==
   dependencies:
     multiformats "^13.0.1"
 
@@ -1773,17 +1773,17 @@
     abstract-level "^1.0.3"
     debug "^4.3.4"
 
-"@canvas-js/signatures@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/signatures/-/signatures-0.9.0-next.1.tgz#52c65adf8cbb4b3acd54f856cb963abad3e0e114"
-  integrity sha512-mU43r9zCLCjcsueTXH+QRlx1HnB/UPVzlC1scHp3wcr52uXP36bR5NKwS2JZDcpEuTKtVm351OAtnm5iLWptug==
+"@canvas-js/signatures@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/signatures/-/signatures-0.9.0.tgz#89dd9aab87ce761f58ff8ba828c045fe14e024a7"
+  integrity sha512-hSuvzF4yNlnDY6gS9CVkqGbbK80R88CoDqa5eNkqPlEsD6W6fdJZbKm+Ofpi3NthBglMe5rhJF3gHm0PLYadeQ==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0-next.1"
-    "@canvas-js/utils" "0.9.0-next.1"
-    "@ipld/dag-cbor" "^9.0.6"
+    "@canvas-js/interfaces" "0.9.0"
+    "@canvas-js/utils" "0.9.0"
+    "@ipld/dag-cbor" "^9.2.0"
     "@ipld/dag-json" "^10.2.0"
     "@libp2p/logger" "^4.0.6"
-    "@noble/curves" "^1.3.0"
+    "@noble/curves" "^1.4.0"
     "@noble/hashes" "^1.3.1"
     ethers "^6.9.1"
     multiformats "^13.0.1"
@@ -1799,10 +1799,10 @@
     "@noble/hashes" "^1.3.1"
     multiformats "^13.0.1"
 
-"@canvas-js/utils@0.9.0-next.1":
-  version "0.9.0-next.1"
-  resolved "https://registry.yarnpkg.com/@canvas-js/utils/-/utils-0.9.0-next.1.tgz#0710d1a8ee0078a2a998692ec945b4e9bf6e4976"
-  integrity sha512-GEri2igIoUfxzpE6jJCjeslIUVTo1UpO6NCtghI9Dfz48eDaa+qGTN4nqN3ZGXSs3Yd88l+7VNAyhEz1GsVJPw==
+"@canvas-js/utils@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@canvas-js/utils/-/utils-0.9.0.tgz#8953c1d9ccd847580040dbaba711f0dadc706d4e"
+  integrity sha512-IwMhEcJ/QvvmgaN2Kh1hoOC0KwX0nVf/tAOMjqkeejtDicrGHUVrU4dzx9YHPjD9vnJDponCds2MKw6FYRdYcw==
 
 "@canvas-js/vm@0.8.26":
   version "0.8.26"
@@ -3389,7 +3389,7 @@
   resolved "https://registry.yarnpkg.com/@ioredis/commands/-/commands-1.2.0.tgz#6d61b3097470af1fdbbe622795b8921d42018e11"
   integrity sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==
 
-"@ipld/dag-cbor@^9.0.6":
+"@ipld/dag-cbor@^9.0.6", "@ipld/dag-cbor@^9.2.0":
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/@ipld/dag-cbor/-/dag-cbor-9.2.0.tgz#3a3f0bee02d7e1c2f15582e896843d5b00fbba9f"
   integrity sha512-N14oMy0q4gM6OuZkIpisKe0JBSjf1Jb39VI+7jMLiWX9124u1Z3Fdj/Tag1NA0cVxxqWDh0CqsjcVfOKtelPDA==
@@ -4218,6 +4218,13 @@
   dependencies:
     "@noble/hashes" "1.3.1"
 
+"@noble/curves@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.4.0.tgz#f05771ef64da724997f69ee1261b2417a49522d6"
+  integrity sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==
+  dependencies:
+    "@noble/hashes" "1.4.0"
+
 "@noble/hashes@1.2.0", "@noble/hashes@~1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.2.0.tgz#a3150eeb09cc7ab207ebf6d7b9ad311a9bdbed12"
@@ -4237,6 +4244,11 @@
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
+
+"@noble/hashes@1.4.0", "@noble/hashes@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
+  integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
 
 "@noble/secp256k1@1.7.1", "@noble/secp256k1@~1.7.0":
   version "1.7.1"
