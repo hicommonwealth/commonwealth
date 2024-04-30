@@ -4,7 +4,7 @@ import { success } from '../types';
 
 import {
   fromCanvasSignedDataApiArgs,
-  isCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
 import {
   verifyComment,
@@ -74,7 +74,7 @@ export const postCanvasData = async (
   req: TypedRequestBody<CanvasPostReq>,
   res: TypedResponse<CanvasPostResp>,
 ) => {
-  if (!isCanvasSignedDataApiArgs(req.body)) {
+  if (!hasCanvasSignedDataApiArgs(req.body)) {
     throw new Error('Invalid canvas data');
   }
 

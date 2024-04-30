@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
 import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
-import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { hasCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -53,7 +53,7 @@ export const createThreadCommentHandler = async (
     discordMeta: discord_meta,
   };
 
-  if (isCanvasSignedDataApiArgs(req.body)) {
+  if (hasCanvasSignedDataApiArgs(req.body)) {
     threadCommentFields.canvasSignedData = req.body.canvas_signed_data;
     threadCommentFields.canvasHash = req.body.canvas_hash;
 

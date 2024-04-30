@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
-import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { hasCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -45,7 +45,7 @@ export const createCommentReactionHandler = async (
     commentId,
   };
 
-  if (isCanvasSignedDataApiArgs(req.body)) {
+  if (hasCanvasSignedDataApiArgs(req.body)) {
     commentReactionFields.canvasSignedData = req.body.canvas_signed_data;
     commentReactionFields.canvasHash = req.body.canvas_hash;
 

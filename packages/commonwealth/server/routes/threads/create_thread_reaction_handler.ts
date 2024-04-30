@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
-import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { hasCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -45,7 +45,7 @@ export const createThreadReactionHandler = async (
     threadId,
   };
 
-  if (isCanvasSignedDataApiArgs(req.body)) {
+  if (hasCanvasSignedDataApiArgs(req.body)) {
     // Only save the canvas fields if they are given and they are strings
     reactionFields.canvasSignedData = req.body.canvas_signed_data;
     reactionFields.canvasHash = req.body.canvas_hash;

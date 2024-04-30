@@ -60,7 +60,7 @@ export const fromCanvasSignedDataApiArgs = async (
   };
 };
 
-export const isCanvasSignedDataApiArgs = (
+export const hasCanvasSignedDataApiArgs = (
   args: any,
 ): args is CanvasSignedDataApiArgs => {
   /**

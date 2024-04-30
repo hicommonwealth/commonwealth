@@ -1,7 +1,7 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
-import { isCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import { hasCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -50,7 +50,7 @@ export const createThreadHandler = async (
     discordMeta: discord_meta,
   };
 
-  if (isCanvasSignedDataApiArgs(req.body)) {
+  if (hasCanvasSignedDataApiArgs(req.body)) {
     threadFields.canvasSignedData = req.body.canvas_signed_data;
     threadFields.canvasHash = req.body.canvas_hash;
 
