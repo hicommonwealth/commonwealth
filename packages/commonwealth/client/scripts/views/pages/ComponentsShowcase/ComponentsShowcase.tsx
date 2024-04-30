@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { groupBy } from 'lodash';
+import _ from 'lodash';
 import React from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -27,7 +27,7 @@ const ComponentsShowcase = () => {
   };
 
   const sortedComponentItems = componentItems.sort(alphabetically);
-  const groupedComponentItems = groupBy(
+  const groupedComponentItems = _.groupBy(
     sortedComponentItems,
     ({ type }) => type,
   );

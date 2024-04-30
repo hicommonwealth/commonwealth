@@ -4,6 +4,7 @@ import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
+import { fileURLToPath } from 'node:url';
 
 import { logger } from '@hicommonwealth/logging';
 import {
@@ -21,6 +22,7 @@ import type {
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
+
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
 import {
@@ -29,6 +31,7 @@ import {
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 const sortedStringify = configureStableStringify({

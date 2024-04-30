@@ -1,11 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { validateCommunity } from '../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { validateOwner } from '../util/validateOwner';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 enum SetDiscordBotConfigErrors {

@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export const LOGIN_TOKEN_EXPIRES_IN = 30;
 
@@ -32,7 +31,7 @@ export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> &
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): LoginTokenModelStatic => {
   const LoginToken = <LoginTokenModelStatic>sequelize.define(
     'LoginToken',

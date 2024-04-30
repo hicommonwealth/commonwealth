@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { parseInt } from 'lodash';
+import _ from 'lodash';
 import { PORT } from '../../../server/config';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
 
@@ -114,7 +114,7 @@ async function performUpvote(page, parentClass: string) {
           `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`,
         )
         .textContent(),
-    ).toEqual((parseInt(amountOfThreadLikes) + 1).toString());
+    ).toEqual((_.parseInt(amountOfThreadLikes) + 1).toString());
   }).toPass();
 
   threadLikeButton = await page.locator(

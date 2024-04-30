@@ -17,7 +17,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 0,
     created_at: new Date(),
-    paused: false,
+    cancelled: false,
     topics: [
       { id: 4423, name: 'General' },
       { id: 4425, name: 'bitcoin' },
@@ -49,7 +49,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 1,
     created_at: new Date(),
-    paused: false,
+    cancelled: false,
     topics: [{ id: 4425, name: 'bitcoin' }],
     contests: [
       {
@@ -87,7 +87,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 0,
     created_at: new Date(),
-    paused: false,
+    cancelled: false,
     topics: [
       { id: 4425, name: 'bitcoin' },
       { id: 4426, name: 'ethereum' },
@@ -117,7 +117,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 0,
     created_at: new Date(),
-    paused: true,
+    cancelled: true,
     topics: [
       { id: 4425, name: 'bitcoin' },
       { id: 4426, name: 'ethereum' },

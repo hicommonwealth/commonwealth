@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 import type { UserAttributes, UserInstance } from './user';
 
@@ -38,7 +37,7 @@ export type ProfileModelStatic = ModelStatic<ProfileInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): ProfileModelStatic => {
   const Profile = <ProfileModelStatic>sequelize.define(
     'Profile',
