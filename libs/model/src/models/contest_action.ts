@@ -28,7 +28,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         primaryKey: true,
       },
       action: {
-        type: Sequelize.ENUM(...schemas.projections.CONSTEST_ACTIONS),
+        type: Sequelize.ENUM(...schemas.projections.CONTEST_ACTIONS),
         primaryKey: true,
       },
       content_url: {
