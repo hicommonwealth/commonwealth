@@ -67,6 +67,7 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
 
     return (
       <FormProvider {...formMethods}>
+        {/* eslint-disable @typescript-eslint/no-misused-promises */}
         <form id={id} onSubmit={handleFormSubmit} className={className}>
           {typeof children === 'function' ? children(formMethods) : children}
         </form>
