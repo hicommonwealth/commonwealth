@@ -1,7 +1,7 @@
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;
@@ -28,20 +28,20 @@ export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
 
 export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: DataTypes) => {
+export default (sequelize: Sequelize.Sequelize) => {
   const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration',
     {
       address_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       thread_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Collaborations',

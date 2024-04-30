@@ -29,34 +29,34 @@ export default (sequelize: Sequelize.Sequelize) =>
     'EvmEventSource',
     {
       id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
       chain_node_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         unique: 'unique_event_source',
       },
       contract_address: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         unique: 'unique_event_source',
       },
       event_signature: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         unique: 'unique_event_source',
       },
-      kind: { type: dataTypes.STRING, allowNull: false },
-      created_at_block: { type: dataTypes.INTEGER, allowNull: true },
-      events_migrated: { type: dataTypes.BOOLEAN, allowNull: true },
+      kind: { type: Sequelize.STRING, allowNull: false },
+      created_at_block: { type: Sequelize.INTEGER, allowNull: true },
+      events_migrated: { type: Sequelize.BOOLEAN, allowNull: true },
       active: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-      abi_id: { type: dataTypes.INTEGER, allowNull: false },
+      abi_id: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
       tableName: 'EvmEventSources',

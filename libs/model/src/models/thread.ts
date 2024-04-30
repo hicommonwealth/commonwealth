@@ -1,12 +1,12 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
 import type { TopicAttributes } from './topic';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -38,89 +38,86 @@ export type ThreadInstance = ModelInstance<ThreadAttributes> & {
 
 export type ThreadModelStatic = ModelStatic<ThreadInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): ThreadModelStatic => {
+export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
   const Thread = <ThreadModelStatic>sequelize.define(
     'Thread',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: true },
-      created_by: { type: dataTypes.STRING, allowNull: true },
-      title: { type: dataTypes.TEXT, allowNull: false },
-      body: { type: dataTypes.TEXT, allowNull: true },
-      plaintext: { type: dataTypes.TEXT, allowNull: true },
-      kind: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: true },
+      created_by: { type: Sequelize.STRING, allowNull: true },
+      title: { type: Sequelize.TEXT, allowNull: false },
+      body: { type: Sequelize.TEXT, allowNull: true },
+      plaintext: { type: Sequelize.TEXT, allowNull: true },
+      kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
-        type: dataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: 'discussion',
       },
-      url: { type: dataTypes.TEXT, allowNull: true },
-      topic_id: { type: dataTypes.INTEGER, allowNull: true },
+      url: { type: Sequelize.TEXT, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: true },
       pinned: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       view_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       read_only: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       version_history: {
-        type: dataTypes.ARRAY(dataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         defaultValue: [],
         allowNull: false,
       },
-      links: { type: dataTypes.JSONB, allowNull: true },
-      discord_meta: { type: dataTypes.JSONB, allowNull: true },
-      has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
+      links: { type: Sequelize.JSONB, allowNull: true },
+      discord_meta: { type: Sequelize.JSONB, allowNull: true },
+      has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
 
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      canvas_action: { type: Sequelize.JSONB, allowNull: true },
+      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      canvas_hash: { type: Sequelize.STRING, allowNull: true },
       // timestamps
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      last_edited: { type: dataTypes.DATE, allowNull: true },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      last_commented_on: { type: dataTypes.DATE, allowNull: true },
-      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
-      archived_at: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+      last_edited: { type: Sequelize.DATE, allowNull: true },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
+      last_commented_on: { type: Sequelize.DATE, allowNull: true },
+      marked_as_spam_at: { type: Sequelize.DATE, allowNull: true },
+      archived_at: { type: Sequelize.DATE, allowNull: true },
       locked_at: {
-        type: dataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: true,
       },
 
       //counts
       reaction_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       comment_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
 
       //notifications
       max_notif_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },

@@ -1,5 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -16,25 +16,25 @@ export default (sequelize: Sequelize.Sequelize) =>
     'CommunityAlerts',
     {
       id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
       user_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       community_id: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       created_at: {
-        type: dataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updated_at: {
-        type: dataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },

@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
 import { Factories } from './factories';
 import type { Models } from './types';
@@ -65,7 +65,7 @@ export const syncDb = async (db: DB, log = false) => {
 export const buildDb = (sequelize: Sequelize): DB => {
   const models = Object.fromEntries(
     Object.entries(Factories).map(([key, factory]) => {
-      const model = factory(sequelize, DataTypes);
+      const model = factory(sequelize);
       // TODO: can we make this work without any?
       model.withOne = oneToOne as any;
       model.withMany = oneToMany as any;

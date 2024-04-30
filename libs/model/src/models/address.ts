@@ -1,11 +1,11 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
@@ -50,56 +50,53 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
 
 export type AddressModelStatic = ModelStatic<AddressInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): AddressModelStatic => {
+export default (sequelize: Sequelize.Sequelize): AddressModelStatic => {
   const Address: AddressModelStatic = <AddressModelStatic>(
     sequelize.define<AddressInstance>(
       'Address',
       {
-        id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        address: { type: dataTypes.STRING, allowNull: false },
-        community_id: { type: dataTypes.STRING, allowNull: false },
+        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+        address: { type: Sequelize.STRING, allowNull: false },
+        community_id: { type: Sequelize.STRING, allowNull: false },
         role: {
-          type: dataTypes.ENUM('member', 'moderator', 'admin'),
+          type: Sequelize.ENUM('member', 'moderator', 'admin'),
           defaultValue: 'member',
           allowNull: false,
         },
         is_user_default: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           defaultValue: false,
           allowNull: false,
         },
-        verification_token: { type: dataTypes.STRING, allowNull: false },
-        verification_token_expires: { type: dataTypes.DATE, allowNull: true },
-        verified: { type: dataTypes.DATE, allowNull: true },
-        keytype: { type: dataTypes.STRING, allowNull: true },
-        last_active: { type: dataTypes.DATE, allowNull: true },
-        created_at: { type: dataTypes.DATE, allowNull: false },
-        updated_at: { type: dataTypes.DATE, allowNull: false },
-        user_id: { type: dataTypes.INTEGER, allowNull: true },
+        verification_token: { type: Sequelize.STRING, allowNull: false },
+        verification_token_expires: { type: Sequelize.DATE, allowNull: true },
+        verified: { type: Sequelize.DATE, allowNull: true },
+        keytype: { type: Sequelize.STRING, allowNull: true },
+        last_active: { type: Sequelize.DATE, allowNull: true },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
+        user_id: { type: Sequelize.INTEGER, allowNull: true },
         is_councillor: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
           defaultValue: false,
         },
         is_validator: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
           defaultValue: false,
         },
         ghost_address: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
           defaultValue: false,
         },
-        profile_id: { type: dataTypes.INTEGER, allowNull: true },
-        wallet_id: { type: dataTypes.STRING, allowNull: true },
-        wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
-        block_info: { type: dataTypes.STRING, allowNull: true },
+        profile_id: { type: Sequelize.INTEGER, allowNull: true },
+        wallet_id: { type: Sequelize.STRING, allowNull: true },
+        wallet_sso_source: { type: Sequelize.STRING, allowNull: true },
+        block_info: { type: Sequelize.STRING, allowNull: true },
         hex: {
-          type: dataTypes.STRING(64),
+          type: Sequelize.STRING(64),
           allowNull: true,
           validate: {
             isRequiredForCosmos() {

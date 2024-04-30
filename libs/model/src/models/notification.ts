@@ -1,12 +1,12 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -30,25 +30,22 @@ export type NotificationInstance = ModelInstance<NotificationAttributes> & {
 
 export type NotificationModelStatic = ModelStatic<NotificationInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): NotificationModelStatic => {
+export default (sequelize: Sequelize.Sequelize): NotificationModelStatic => {
   const Notification = <NotificationModelStatic>(
     sequelize.define<NotificationInstance>(
       'Notification',
       {
-        id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        notification_data: { type: dataTypes.TEXT, allowNull: true },
+        id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+        notification_data: { type: Sequelize.TEXT, allowNull: true },
         chain_event_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: true,
           unique: true,
         },
-        entity_id: { type: dataTypes.INTEGER, allowNull: true },
-        community_id: { type: dataTypes.STRING, allowNull: true },
-        category_id: { type: dataTypes.STRING, allowNull: false },
-        thread_id: { type: dataTypes.INTEGER, allowNull: true },
+        entity_id: { type: Sequelize.INTEGER, allowNull: true },
+        community_id: { type: Sequelize.STRING, allowNull: true },
+        category_id: { type: Sequelize.STRING, allowNull: false },
+        thread_id: { type: Sequelize.INTEGER, allowNull: true },
       },
       {
         hooks: {

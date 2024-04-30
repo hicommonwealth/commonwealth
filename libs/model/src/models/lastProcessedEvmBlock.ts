@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import { DataTypes, ModelInstance, ModelStatic } from './types';
+import { ModelInstance, ModelStatic } from './types';
 
 export type LastProcessedEvmBlockAttributes = {
   chain_node_id: number;
@@ -14,7 +14,6 @@ export type LastProcessedEvmBlockModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
 ): LastProcessedEvmBlockModelStatic => {
   const LastProcessedEvmBlock: LastProcessedEvmBlockModelStatic = <
     LastProcessedEvmBlockModelStatic
@@ -22,10 +21,10 @@ export default (
     'LastProcessedEvmBlock',
     {
       chain_node_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      block_number: { type: dataTypes.INTEGER, allowNull: false },
+      block_number: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
       timestamps: false,

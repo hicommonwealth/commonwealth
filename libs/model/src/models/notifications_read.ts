@@ -1,7 +1,7 @@
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { NotificationAttributes } from './notification';
 import type { SubscriptionAttributes } from './subscription';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationsReadAttributes = {
   subscription_id: number;
@@ -20,19 +20,18 @@ export type NotificationsReadModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
 ): NotificationsReadModelStatic => {
   const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
     'NotificationsRead',
     {
-      subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
-      notification_id: { type: dataTypes.INTEGER, primaryKey: true },
+      subscription_id: { type: Sequelize.INTEGER, primaryKey: true },
+      notification_id: { type: Sequelize.INTEGER, primaryKey: true },
       is_read: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      user_id: { type: dataTypes.INTEGER, allowNull: false },
+      user_id: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
       tableName: 'NotificationsRead',

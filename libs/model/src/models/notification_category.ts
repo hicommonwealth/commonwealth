@@ -1,4 +1,4 @@
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationCategoryAttributes = {
@@ -19,10 +19,10 @@ export default (sequelize: Sequelize.Sequelize) =>
     sequelize.define<NotificationCategoryInstance>(
       'NotificationCategory',
       {
-        name: { type: dataTypes.STRING, primaryKey: true },
-        description: { type: dataTypes.TEXT, allowNull: false },
-        created_at: { type: dataTypes.DATE, allowNull: true },
-        updated_at: { type: dataTypes.DATE, allowNull: true },
+        name: { type: Sequelize.STRING, primaryKey: true },
+        description: { type: Sequelize.TEXT, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: true },
+        updated_at: { type: Sequelize.DATE, allowNull: true },
       },
       {
         tableName: 'NotificationCategories',

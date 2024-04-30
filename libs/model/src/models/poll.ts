@@ -1,4 +1,4 @@
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -29,16 +29,16 @@ export default (sequelize: Sequelize.Sequelize) =>
   <PollModelStatic>sequelize.define<PollInstance>(
     'Poll',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      thread_id: { type: Sequelize.INTEGER, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
 
-      prompt: { type: dataTypes.STRING, allowNull: false },
-      options: { type: dataTypes.STRING, allowNull: false },
-      ends_at: { type: dataTypes.DATE, allowNull: true },
+      prompt: { type: Sequelize.STRING, allowNull: false },
+      options: { type: Sequelize.STRING, allowNull: false },
+      ends_at: { type: Sequelize.DATE, allowNull: true },
 
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     },
     {
       timestamps: true,

@@ -1,5 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import z from 'zod';
 import type { CommunityAttributes } from './community';
 import type { MembershipAttributes } from './membership';
@@ -18,14 +18,14 @@ export default (sequelize: Sequelize.Sequelize) =>
   <GroupModelStatic>sequelize.define<GroupInstance>(
     'Group',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      metadata: { type: dataTypes.JSON, allowNull: false },
-      requirements: { type: dataTypes.JSON, allowNull: false },
-      is_system_managed: { type: dataTypes.BOOLEAN, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      metadata: { type: Sequelize.JSON, allowNull: false },
+      requirements: { type: Sequelize.JSON, allowNull: false },
+      is_system_managed: { type: Sequelize.BOOLEAN, allowNull: false },
 
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,

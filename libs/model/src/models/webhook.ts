@@ -1,5 +1,5 @@
 import { WebhookCategory } from '@hicommonwealth/shared';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -21,11 +21,15 @@ export default (sequelize: Sequelize.Sequelize) =>
   <WebhookModelStatic>sequelize.define<WebhookInstance>(
     'Webhook',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: dataTypes.STRING, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      url: { type: Sequelize.STRING, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       categories: {
-        type: dataTypes.ARRAY(dataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: [],
       },

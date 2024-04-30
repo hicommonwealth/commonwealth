@@ -1,4 +1,4 @@
-import * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import type { PollAttributes } from './poll';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -24,14 +24,14 @@ export default (sequelize: Sequelize.Sequelize) =>
   <VoteModelStatic>sequelize.define<VoteInstance>(
     'Vote',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      poll_id: { type: dataTypes.INTEGER, allowNull: false },
-      option: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      poll_id: { type: Sequelize.INTEGER, allowNull: false },
+      option: { type: Sequelize.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       author_community_id: { type: Sequelize.STRING, allowNull: true },
       community_id: { type: Sequelize.STRING, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Votes',
