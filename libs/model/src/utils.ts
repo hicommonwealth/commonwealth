@@ -28,6 +28,10 @@ type EmitEventValues =
   | {
       event_name: schemas.EventNames.ChainEventCreated;
       event_payload: z.infer<typeof schemas.events.ChainEventCreated>;
+    }
+  | {
+      event_name: schemas.EventNames.SnapshotProposalCreated;
+      event_payload: z.infer<typeof schemas.events.SnapshotProposalCreated>;
     };
 
 // Load with env var?
