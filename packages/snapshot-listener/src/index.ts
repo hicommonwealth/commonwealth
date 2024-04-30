@@ -5,13 +5,12 @@ import {
 } from '@hicommonwealth/adapters';
 import { schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { models } from '@hicommonwealth/model';
+import { fetchNewSnapshotProposal, models } from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DEFAULT_PORT } from './config';
-import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import {
   methodNotAllowedMiddleware,
   registerRoute,
