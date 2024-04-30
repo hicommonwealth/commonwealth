@@ -3,6 +3,7 @@
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
     { "path": "../../libs/core/tsconfig.build.json" },
-    { "path": "../../libs/logging/tsconfig.build.json" }
+    { "path": "../../libs/logging/tsconfig.build.json" },
+    { "path": "../../libs/model/tsconfig.build.json" }
   ]
 }
