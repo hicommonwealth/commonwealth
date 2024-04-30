@@ -83,9 +83,10 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (ethChainNodeExists[0].length === 0) {
         try {
           await testDb.sequelize.query(`
-        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
         VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}', 1,
-         'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
+         'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+          'ethereum', 'Ethereum (Mainnet)', now(), now());
     `);
         } catch (e) {
           console.log('ethChainNodeExists ERROR: ', e);
@@ -94,9 +95,10 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         if (polygonChainNodeExists[0].length === 0) {
           try {
             await testDb.sequelize.query(`
-        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
         VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 137,
-        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum', 'Polygon');
+        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum',
+         'Polygon', now(), now());
     `);
           } catch (e) {
             console.log('polygonChainNodeExists ERROR: ', e);
@@ -242,10 +244,13 @@ export async function login(page) {
 
   // wait for login button and login modal to appear
   await expect(async () => {
-    await expect(page.locator('.LoginSelector button')).toBeVisible();
-    button = await page.locator('.LoginSelector button');
+    await expect(page.locator('text="Sign in"')).toBeVisible();
+    button = await page.locator('text="Sign in"');
     await button.click();
-    await expect(page.locator('.LoginDesktop')).toBeVisible();
+    await expect(page.locator('.ModalBase')).toBeVisible();
+    button = await page.locator('.AuthButton');
+    await button.click();
+    await expect(page.locator('.MuiModal-backdrop').first()).toBeVisible();
   }).toPass();
 
   // Basic idea is that we lazily load the metamask mock (otherwise it will include ethereum to our initial bundle)
@@ -253,14 +258,27 @@ export async function login(page) {
   // login screen. Therefore, we need to re-open the login screen a few times waiting for it to finish lazy loading.
   await expect(async () => {
     await page.mouse.click(0, 0);
-    button = await page.locator('.LoginSelector button');
+    await expect(page.locator('.MuiModal-backdrop').first()).toBeVisible();
+    await page.mouse.click(0, 0);
+    await expect(page.locator('.MuiModal-backdrop').first()).not.toBeVisible();
+
+    await expect(page.locator('text="Sign in"')).toBeVisible();
+    button = await page.locator('text="Sign in"');
     await button.click();
+    await expect(page.locator('.ModalBase')).toBeVisible();
+    button = await page.locator('.AuthButton');
+    await button.click();
+    await expect(page.locator('.MuiModal-backdrop').first()).toBeVisible();
+
+    await expect(page.locator('.ModalBase')).toBeVisible();
     await expect(page.locator("text='Metamask'")).toBeVisible({
       timeout: 100,
     });
-    await page.locator("text='Metamask'").click();
-    await expect(page.locator('.LoginDesktop')).toHaveCount(0, {
-      timeout: 10000,
+    expect(async () => {
+      await page.locator("text='Metamask'").click();
+      await expect(page.locator("text='Metamask'")).not.toBeVisible({
+        timeout: 100,
+      });
     });
   }).toPass();
 }

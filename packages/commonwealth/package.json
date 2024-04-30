@@ -16,7 +16,7 @@
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
     "dump-db": "pg_dump $(heroku config:get HEROKU_POSTGRESQL_MAROON_URL -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
-    "e2e-start-server": "ETH_RPC=e2e-test yarn start",
+    "e2e-start-server": "NODE_ENV=test ETH_RPC=e2e-test yarn start",
     "emit-notification": "tsx  server/scripts/emitTestNotification.ts",
     "emit-webhook": "tsx  server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
