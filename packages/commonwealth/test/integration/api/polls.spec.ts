@@ -20,6 +20,8 @@ describe('Polls', () => {
 
   let userJWT: string;
   let userAddress: string;
+  // the userAddress with the chain and chain id prefix - this is used by canvas
+  let canvasAddress: string;
   let userSession: {
     session: Session;
     sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
@@ -46,7 +48,8 @@ describe('Polls', () => {
       { chain },
       'Alice',
     );
-    userAddress = userRes.address;
+    canvasAddress = userRes.address;
+    userAddress = canvasAddress.split(':')[2];
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       JWT_SECRET,
@@ -66,7 +69,7 @@ describe('Polls', () => {
   it('should create a poll for a thread', async () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: 'ethereum',
-      address: userAddress,
+      address: canvasAddress,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',
@@ -89,7 +92,7 @@ describe('Polls', () => {
       .send({
         author_chain: thread.community_id,
         chain: thread.community_id,
-        address: userAddress.split(':')[2],
+        address: userAddress,
         jwt: userJWT,
         ...data,
       });
@@ -116,7 +119,7 @@ describe('Polls', () => {
       .send({
         author_chain: chain,
         chain: chain,
-        address: userAddress.split(':')[2],
+        address: userAddress,
         jwt: userJWT,
         ...data,
       });
@@ -136,7 +139,7 @@ describe('Polls', () => {
       .send({
         author_chain: chain,
         chain: chain,
-        address: userAddress.split(':')[2],
+        address: userAddress,
         jwt: userJWT,
         ...data,
       });
@@ -162,7 +165,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionA');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress.split(':')[2],
+      userAddress,
     );
   });
 
@@ -178,7 +181,7 @@ describe('Polls', () => {
       .send({
         author_chain: chain,
         chain: chain,
-        address: userAddress.split(':')[2],
+        address: userAddress,
         jwt: userJWT,
         ...data,
       });
@@ -202,7 +205,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionB');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress.split(':')[2],
+      userAddress,
     );
   });
 
@@ -217,10 +220,7 @@ describe('Polls', () => {
 
     expect(res.status).to.equal(200);
     expect(res.body.result[0]).to.have.property('option', 'optionB');
-    expect(res.body.result[0]).to.have.property(
-      'address',
-      userAddress.split(':')[2],
-    );
+    expect(res.body.result[0]).to.have.property('address', userAddress);
   });
 
   it('should delete poll', async () => {
@@ -231,7 +231,7 @@ describe('Polls', () => {
       .send({
         author_chain: chain,
         chain: chain,
-        address: userAddress.split(':')[2],
+        address: userAddress,
         jwt: userJWT,
       });
 
