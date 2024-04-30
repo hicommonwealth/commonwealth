@@ -36,6 +36,7 @@ const PersonalInformationStep = ({
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
   const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
+  const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
@@ -48,8 +49,15 @@ const PersonalInformationStep = ({
         ? addresses?.[0]?.profile?.name
         : '';
 
-    if (formMethodsRef.current && defaultSSOUsername) {
-      formMethodsRef.current.setValue('username', defaultSSOUsername);
+    if (formMethodsRef.current) {
+      if (defaultSSOUsername) {
+        formMethodsRef.current.setValue('username', defaultSSOUsername);
+      }
+
+      if (app?.user?.email) {
+        formMethodsRef.current.setValue('email', app.user.email);
+        setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
+      }
     }
   }, []);
 
@@ -159,6 +167,7 @@ const PersonalInformationStep = ({
             }
             name="email"
             hookToForm
+            disabled={isEmailChangeDisabled}
           />
 
           <div className="notification-section">
