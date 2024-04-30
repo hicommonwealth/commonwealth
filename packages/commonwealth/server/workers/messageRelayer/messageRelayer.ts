@@ -7,11 +7,12 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 let isServiceHealthy = false;
@@ -43,16 +44,11 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  const count = parseInt(
-    (
-      await models.sequelize.query<{ count: string }>(
-        `
-        SELECT COUNT(*) FROM "Outbox";
-      `,
-        { type: QueryTypes.SELECT, raw: true },
-      )
-    )[0].count,
-  );
+  const count = await models.Outbox.count({
+    where: {
+      relayed: false,
+    },
+  });
   incrementNumUnrelayedEvents(count);
 
   await setupListener();
@@ -61,7 +57,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   return relayForever(maxRelayIterations);
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   startMessageRelayer().catch((err) => {
     log.fatal(
       'Unknown error fatal requires immediate attention. Restart REQUIRED!',

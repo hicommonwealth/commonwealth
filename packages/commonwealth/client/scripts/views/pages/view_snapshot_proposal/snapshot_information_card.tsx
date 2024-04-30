@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
@@ -33,6 +33,7 @@ const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
 
 type SnapshotInfoLinkRowProps = SnapshotInfoRowProps & { url: string };
 
+// eslint-disable-next-line react/no-multi-comp
 const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
   const { label, url, value } = props;
 
@@ -56,11 +57,12 @@ type SnapshotInformationCardProps = {
   threads: Array<{ id: number; title: string }> | null;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SnapshotInformationCard = ({
   proposal,
   threads,
 }: SnapshotInformationCardProps) => {
-  const votingSystem = capitalize(
+  const votingSystem = _.capitalize(
     proposal.type.split('-').join(' ').concat(' voting'),
   );
 
@@ -75,14 +77,14 @@ export const SnapshotInformationCard = ({
               value={
                 app.chain ? (
                   <User
-                    userAddress={proposal.author}
+                    userAddress={proposal?.author}
                     userCommunityId={app.activeChainId()}
                     shouldHideAvatar
                     shouldLinkProfile
                     shouldShowPopover
                   />
                 ) : (
-                  proposal.author
+                  proposal?.author || 'Deleted'
                 )
               }
             />

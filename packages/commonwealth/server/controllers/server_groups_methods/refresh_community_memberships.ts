@@ -11,6 +11,7 @@ import {
   tokenBalanceCache,
 } from '@hicommonwealth/model';
 import moment from 'moment';
+import { fileURLToPath } from 'node:url';
 import { Op, Sequelize } from 'sequelize';
 import {
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -20,6 +21,7 @@ import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBal
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 const Errors = {

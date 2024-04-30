@@ -1,7 +1,7 @@
 {
   "name": "discord-bot",
   "version": "1.0.0",
-  "description": "",
+  "type": "module",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build",
@@ -12,7 +12,7 @@
     "start-prod-consumer": "node build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node build/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
-    "test": "ts-mocha 'test/**/*.spec.ts'"
+    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'"
   },
   "keywords": [],
   "author": "",

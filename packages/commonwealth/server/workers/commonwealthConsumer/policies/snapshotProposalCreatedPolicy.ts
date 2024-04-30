@@ -1,4 +1,4 @@
-import { EventHandler, stats } from '@hicommonwealth/core';
+import { EventHandler, Policy, schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
@@ -6,9 +6,11 @@ import {
   SnapshotEventType,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { fileURLToPath } from 'node:url';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export const processSnapshotProposalCreated: EventHandler<
@@ -130,6 +132,8 @@ export const processSnapshotProposalCreated: EventHandler<
         eventType: event as SnapshotEventType,
         ...snapshotNotificationData,
       },
+    }).catch((err) => {
+      log.error('Error sending snapshot notification', err);
     });
   }
 
@@ -172,3 +176,16 @@ export const processSnapshotProposalCreated: EventHandler<
     }
   }
 };
+
+const snapshotInputs = {
+  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+};
+export const SnapshotPolicy: Policy<
+  typeof snapshotInputs,
+  ZodUndefined
+> = () => ({
+  inputs: snapshotInputs,
+  body: {
+    SnapshotProposalCreated: processSnapshotProposalCreated,
+  },
+});

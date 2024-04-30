@@ -1,6 +1,5 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractTemplateMetadataAttributes = {
   id: number;
@@ -22,7 +21,7 @@ export type CommunityContractTemplateMetadataStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): CommunityContractTemplateMetadataStatic => {
   const CommunityContractTemplateMetadata = <
     CommunityContractTemplateMetadataStatic

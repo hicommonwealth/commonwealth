@@ -1,7 +1,6 @@
 import type { SnapshotProposalAttributes } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type SnapshotProposalInstance =
   ModelInstance<SnapshotProposalAttributes> & {
@@ -12,7 +11,7 @@ export type SnapshotProposalModelStatic = ModelStatic<SnapshotProposalInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): SnapshotProposalModelStatic => {
   const SnapshotProposal = <SnapshotProposalModelStatic>sequelize.define(
     'SnapshotProposal',

@@ -5,11 +5,13 @@ import {
   models,
 } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'node:url';
 import Sequelize, { Transaction } from 'sequelize';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 enum SupportedNotificationChains {
@@ -408,7 +410,7 @@ async function main() {
  * chain-event notification and re-emits it as if it were a brand new notification. Since it replaces an old
  * (but real) notification, it links to a real proposal.
  */
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       process.exit(0);

@@ -100,7 +100,9 @@ export const ContractTemplateCard = ({
     });
   };
 
-  const enabler = app.chain.accounts.get(templateInfo.enabledBy);
+  const enabler = templateInfo?.enabledBy
+    ? app.chain.accounts.get(templateInfo?.enabledBy)
+    : null;
   const enabledOn = moment(templateInfo.enabledAt).format('MM/DD/YY');
 
   return (
@@ -141,9 +143,13 @@ export const ContractTemplateCard = ({
                 </CWText>
                 <div className="enabledby-row">
                   <User
-                    userAddress={enabler.address}
+                    userAddress={enabler?.address}
                     userCommunityId={
-                      enabler.community?.id || enabler?.profile?.chain
+                      enabler?.community?.id || enabler?.profile?.chain
+                    }
+                    shouldShowAsDeleted={
+                      !enabler?.address &&
+                      !(enabler?.community?.id || enabler?.profile?.chain)
                     }
                     shouldShowAddressWithDisplayName
                   />

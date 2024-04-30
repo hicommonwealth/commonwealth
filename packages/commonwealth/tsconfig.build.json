@@ -1,15 +1,12 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "build"
-  },
   "include": [
-    "./client",
-    "./shared",
-    "./globals.d.ts",
-    "./server",
-    "./server.ts",
-    "./scripts"
+    "client",
+    "globals.d.ts",
+    "server",
+    "server.ts",
+    "scripts",
+    "shared"
   ],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
