@@ -1,24 +1,16 @@
 import {
   HotShotsStats,
-  RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
-  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import {
-  Broker,
-  BrokerTopics,
-  EventContext,
-  broker,
-  stats,
-} from '@hicommonwealth/core';
+import { schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { models } from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
-import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
+import { DEFAULT_PORT } from './config';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import {
   methodNotAllowedMiddleware,
@@ -50,8 +42,6 @@ export const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
 app.use(json() as RequestHandler);
 
-let controller: Broker;
-
 registerRoute(app, 'get', '/', (req: Request, res: Response) => {
   res.send('OK!');
 });
@@ -75,42 +65,46 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       res.status(400).send('Error sending snapshot event');
     }
 
-    const response = await fetchNewSnapshotProposal(parsedId, eventType);
+    const response = await fetchNewSnapshotProposal(parsedId);
 
-    const event: EventContext<'SnapshotProposalCreated'> = {
-      name: 'SnapshotProposalCreated',
-      payload: {
+    const space = response.data.proposal?.space.id;
+
+    if (!space) {
+      log.error('Space not defined!');
+      return res.status(400).send('Error getting snapshot space');
+    }
+
+    const associatedCommunities = await models.CommunitySnapshotSpaces.count({
+      where: { snapshot_space_id: space },
+    });
+
+    if (associatedCommunities === 0) {
+      log.info(`No associated communities found for space ${space}`);
+      return res.status(200).json({ message: 'No associated community' });
+    }
+
+    await models.Outbox.create({
+      event_name: schemas.EventNames.SnapshotProposalCreated,
+      event_payload: {
         id: parsedId,
         event: req.body.event,
         title: response.data.proposal?.title ?? null,
         body: response.data.proposal?.body ?? null,
         choices: response.data.proposal?.choices ?? null,
-        space: response.data.proposal?.space.id ?? null,
+        space: space ?? null,
         start: response.data.proposal?.start ?? null,
         expire: response.data.proposal?.end ?? null,
         token: req.body.token,
         secret: req.body.secret,
       },
-    };
-
-    const result = await controller?.publish(
-      BrokerTopics.SnapshotListener,
-      event,
-    );
-
-    if (!result) {
-      log.error('Failed to publish snapshot message', undefined, {
-        event,
-      });
-      res.status(500).send('Failed to publish snapshot');
-    }
+    });
 
     stats().increment('snapshot_listener.received_snapshot_event', {
       event: eventType,
-      space: event.payload.space,
+      space: space,
     });
 
-    res.status(200).send({ message: 'Snapshot event received', event });
+    res.status(200).send({ message: 'Snapshot event received' });
   } catch (err) {
     log.error('Error sending snapshot event', err);
     res.status(500).send('error: ' + err);
@@ -121,20 +115,5 @@ app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
-
-  if (NODE_ENV !== 'test') {
-    try {
-      const rmqAdapter = new RabbitMQAdapter(
-        getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
-      );
-      await rmqAdapter.init();
-      broker(rmqAdapter);
-      isServiceHealthy = true;
-    } catch (err) {
-      log.fatal(`Error starting server: ${err}`);
-      isServiceHealthy = false;
-    }
-  }
-
-  controller = broker();
+  isServiceHealthy = true;
 });
