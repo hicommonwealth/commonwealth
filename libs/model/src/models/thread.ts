@@ -1,6 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
 import { z } from 'zod';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
@@ -145,39 +146,35 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          // when thread created, increment Community.thread_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET thread_count = thread_count + 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: thread.community_id,
+          const { Chain, Outbox } = sequelize.models;
+
+          await Chain.increment('thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
+
+          await emitEvent(
+            Outbox,
+            [
+              {
+                event_name: schemas.EventNames.ThreadCreated,
+                event_payload: thread.get({ plain: true }),
               },
-              transaction: options.transaction,
-            },
+            ],
+            options.transaction,
           );
         },
         afterDestroy: async (
           thread: ThreadInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          // when thread deleted, decrement Community.thread_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET thread_count = thread_count - 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: thread.community_id,
-              },
-              transaction: options.transaction,
-            },
-          );
+          const { Chain } = sequelize.models;
+          await Chain.increment('thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
         },
       },
     },

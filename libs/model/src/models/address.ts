@@ -148,39 +148,23 @@ export default (
           address: AddressInstance,
           options: Sequelize.CreateOptions<AddressAttributes>,
         ) => {
-          // when address created, increment Community.address_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET address_count = address_count + 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: address.community_id,
-              },
-              transaction: options.transaction,
-            },
-          );
+          const { Chain } = sequelize.models;
+          await Chain.increment('address_count', {
+            by: 1,
+            where: { id: address.community_id },
+            transaction: options.transaction,
+          });
         },
         afterDestroy: async (
           address: AddressInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          // when address deleted, decrement Community.address_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET address_count = address_count - 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: address.community_id,
-              },
-              transaction: options.transaction,
-            },
-          );
+          const { Chain } = sequelize.models;
+          await Chain.decrement('address_count', {
+            by: 1,
+            where: { id: address.community_id },
+            transaction: options.transaction,
+          });
         },
       },
     },
