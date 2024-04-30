@@ -30,6 +30,11 @@ type EmitEventValues =
       event_payload: z.infer<typeof schemas.events.ChainEventCreated>;
     };
 
+// Load with env var?
+const DISALLOWED_EVENTS = process.env.DISALLOWED_EVENTS
+  ? process.env.DISALLOWED_EVENTS.split(',')
+  : [];
+
 /**
  * This functions takes either a new domain record or a pre-formatted event and inserts it into the Outbox. For core
  * domain events (e.g. new thread, new comment, etc.), the event_payload should be the complete domain record. The point
@@ -42,5 +47,16 @@ export async function emitEvent(
   values: Array<EmitEventValues>,
   transaction?: Transaction | null,
 ) {
-  await outbox.bulkCreate(values, { transaction });
+  const records: Array<EmitEventValues> = [];
+  for (const event of values) {
+    if (!DISALLOWED_EVENTS.includes(event.event_name)) {
+      records.push(event);
+    }
+  }
+
+  console.log(records);
+
+  if (records.length > 0) {
+    await outbox.bulkCreate(values, { transaction });
+  }
 }
