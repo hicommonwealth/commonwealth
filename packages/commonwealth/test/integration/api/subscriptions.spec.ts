@@ -577,12 +577,6 @@ describe('Subscriptions Tests', () => {
       const snapshot_id = 'test_space';
       let snapshotSubscription;
 
-      before('create a snapshot space', async () => {
-        await server.models.SnapshotSpace.create({
-          snapshot_space: snapshot_id,
-        });
-      });
-
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;

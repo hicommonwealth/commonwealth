@@ -8,6 +8,7 @@ import {
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { fileURLToPath } from 'node:url';
+import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
@@ -41,8 +42,12 @@ export const processSnapshotProposalCreated: EventHandler<
 
   log.info(`Processing snapshot message`, payload);
 
-  const associatedCommunities = await models.CommunitySnapshotSpaces.findAll({
-    where: { snapshot_space_id: space },
+  const associatedCommunities = await models.Community.findAll({
+    where: {
+      snapshot_spaces: {
+        [Op.contains]: [space],
+      },
+    },
   });
 
   log.info(
@@ -60,7 +65,7 @@ export const processSnapshotProposalCreated: EventHandler<
   }
 
   for (const community of associatedCommunities) {
-    const communityId = community.community_id;
+    const communityId = community.id;
     const communityDiscordConfig = await models.DiscordBotConfig.findAll({
       where: {
         community_id: communityId,

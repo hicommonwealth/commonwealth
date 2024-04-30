@@ -144,6 +144,11 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
       redirect: { type: dataTypes.TEXT, allowNull: true },
+      snapshot_spaces: {
+        type: dataTypes.ARRAY(dataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
     },
     {
       tableName: 'Communities',

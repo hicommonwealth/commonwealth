@@ -509,9 +509,6 @@ export const seedDb = async () => {
       },
     ]);
 
-    await models.SnapshotSpace.create({
-      snapshot_space: 'test space',
-    });
     return models;
   } catch (error) {
     console.error('seedDB', error);

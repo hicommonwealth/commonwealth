@@ -1,1 +1,1 @@
-web: node --max_old_space_size=$(../../scripts/get-max-old-space-size.sh) packages/snapshot-listener/build/index.js
+web: cd packages/snapshot-listener && node --max_old_space_size=$(../../scripts/get-max-old-space-size.sh) ./build/index.js
