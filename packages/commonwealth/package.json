@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
-    "archive-outbox": "node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
+    "archive-outbox": "node --experimental-specifier-resolution=node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
@@ -34,7 +34,7 @@
     "reset-frack-db": "heroku pg:copy commonwealth-beta::HEROKU_POSTGRESQL_MAROON_URL DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "resize-large-images": "tsx  ./scripts/resizeImages.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true tsx  server.ts",
-    "send-cosmos-notifs": "node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/cosmosGovNotifications/generateCosmosGovNotifications.js",
+    "send-cosmos-notifs": "node --experimental-specifier-resolution=node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/cosmosGovNotifications/generateCosmosGovNotifications.js",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
     "start": "tsx watch --max-old-space-size=4096 server.ts",
     "start-evm-ce": "tsx  server/workers/evmChainEvents/startEvmPolling.ts",
