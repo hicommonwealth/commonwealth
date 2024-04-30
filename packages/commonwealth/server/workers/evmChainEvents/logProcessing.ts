@@ -2,8 +2,10 @@ import { Log } from '@ethersproject/providers';
 import { stats } from '@hicommonwealth/core';
 import { logger as _logger } from '@hicommonwealth/logging';
 import { ethers } from 'ethers';
+import { fileURLToPath } from 'node:url';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const logger = _logger(__filename);
 
 /**

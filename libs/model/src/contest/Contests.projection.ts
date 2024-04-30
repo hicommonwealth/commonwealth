@@ -1,10 +1,13 @@
 import { Projection, schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
+
 export class MissingContestManager extends Error {
   constructor(
     message: string,
