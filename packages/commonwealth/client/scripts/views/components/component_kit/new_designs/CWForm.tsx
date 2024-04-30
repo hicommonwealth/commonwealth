@@ -60,8 +60,9 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
       await formMethods.handleSubmit(onSubmit)(event);
 
       // trigger error callback if there are any errors
-      Object.keys(formMethods.formState.errors).length &&
-        (await onErrors(formMethods.formState.errors));
+      if (Object.keys(formMethods.formState.errors).length) {
+        await onErrors(formMethods.formState.errors);
+      }
     };
 
     return (
