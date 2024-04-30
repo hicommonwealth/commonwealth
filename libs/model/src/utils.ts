@@ -1,9 +1,14 @@
 import { schemas } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
+import { fileURLToPath } from 'node:url';
 import { Model, ModelCtor, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { OutboxAttributes, OutboxModelStatic } from './models';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export function hashAbi(abi: AbiType): string {
   const hashInstance = hasher({
@@ -55,6 +60,11 @@ export async function emitEvent(
   for (const event of values) {
     if (!DISALLOWED_EVENTS.includes(event.event_name)) {
       records.push(event);
+    } else {
+      log.warn('Event not inserted into outbox!', {
+        event_name: event.event_name,
+        disallowed_events: DISALLOWED_EVENTS,
+      });
     }
   }
 
