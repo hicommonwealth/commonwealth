@@ -1,5 +1,4 @@
-import { addressSwapper } from 'shared/utils';
-import { CanvasSignedDataApiArgs, fromCanvasSignedDataApiArgs } from './types';
+import { CanvasSignedData } from './types';
 import { verify } from './verify';
 
 function assert(condition: unknown, message?: string): asserts condition {
@@ -17,9 +16,11 @@ function assertMatches(a, b, obj: string, field: string) {
   );
 }
 
-export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
+export const verifyComment = async (
+  canvasSignedData: CanvasSignedData,
+  fields,
+) => {
   const { thread_id, text, address, parent_comment_id } = fields;
-  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(args);
 
   await verify(canvasSignedData);
 
@@ -39,17 +40,8 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
     'parent',
   );
 
-  // TODO: Can this be moved somewhere where it doesn't need to be repeated?
-  let addressToCompare = address;
-  if (actionMessage.payload.address.split(':')[0] == 'polkadot') {
-    addressToCompare = addressSwapper({
-      currentPrefix: 42,
-      address: address,
-    });
-  }
-
   assertMatches(
-    addressToCompare,
+    address,
     actionMessage.payload.address.split(':')[2],
     'comment',
     'origin',
@@ -57,9 +49,11 @@ export const verifyComment = async (args: CanvasSignedDataApiArgs, fields) => {
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
+export const verifyThread = async (
+  canvasSignedData: CanvasSignedData,
+  fields,
+) => {
   const { title, body, address, community, link, topic } = fields;
-  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(args);
 
   await verify(canvasSignedData);
 
@@ -81,16 +75,8 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
     'topic',
   );
 
-  let addressToCompare = address;
-  if (actionMessage.payload.address.split(':')[0] == 'polkadot') {
-    addressToCompare = addressSwapper({
-      currentPrefix: 42,
-      address: address,
-    });
-  }
-
   assertMatches(
-    addressToCompare,
+    address,
     actionMessage.payload.address.split(':')[2],
     'thread',
     'origin',
@@ -98,9 +84,11 @@ export const verifyThread = async (args: CanvasSignedDataApiArgs, fields) => {
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
+export const verifyReaction = async (
+  canvasSignedData: CanvasSignedData,
+  fields,
+) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;
-  const { canvasSignedData } = await fromCanvasSignedDataApiArgs(args);
 
   await verify(canvasSignedData);
 
@@ -118,16 +106,8 @@ export const verifyReaction = async (args: CanvasSignedDataApiArgs, fields) => {
   );
   assertMatches(value, actionMessage.payload.args.value, 'reaction', 'value');
 
-  let addressToCompare = address;
-  if (actionMessage.payload.address.split(':')[0] == 'polkadot') {
-    addressToCompare = addressSwapper({
-      currentPrefix: 42,
-      address: address,
-    });
-  }
-
   assertMatches(
-    addressToCompare,
+    address,
     actionMessage.payload.address.split(':')[2],
     'reaction',
     'origin',

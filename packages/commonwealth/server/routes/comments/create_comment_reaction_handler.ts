@@ -1,7 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
-import { hasCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import {
+  fromCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import { addressSwapper } from 'shared/utils';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -50,9 +54,18 @@ export const createCommentReactionHandler = async (
     commentReactionFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      await verifyReaction(req.body, {
+      const { canvasSignedData } = await fromCanvasSignedDataApiArgs(req.body);
+
+      await verifyReaction(canvasSignedData, {
         comment_id: commentId,
-        address: address.address,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: address.address,
+              })
+            : address.address,
         value: reaction,
       });
     }

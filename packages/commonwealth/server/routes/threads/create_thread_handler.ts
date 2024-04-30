@@ -1,7 +1,11 @@
 import { IDiscordMeta } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
-import { hasCanvasSignedDataApiArgs } from 'shared/canvas/types';
+import {
+  fromCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import { addressSwapper } from 'shared/utils';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -55,10 +59,19 @@ export const createThreadHandler = async (
     threadFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      await verifyThread(req.body, {
+      const { canvasSignedData } = await fromCanvasSignedDataApiArgs(req.body);
+
+      await verifyThread(canvasSignedData, {
         title,
         body,
-        address: address.address,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: address.address,
+              })
+            : address.address,
         community: community.id,
         topic: topicId ? parseInt(topicId, 10) : null,
       });
