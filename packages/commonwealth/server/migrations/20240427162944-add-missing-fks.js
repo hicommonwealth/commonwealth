@@ -58,15 +58,14 @@ ADD CONSTRAINT "Profiles_user_id_fkey"
 FOREIGN KEY (user_id) REFERENCES public."Users"(id)
 ON UPDATE CASCADE ON DELETE NO ACTION;
 
+-- Link orphan community snapshot spaces to dummy 'commonwealth-orphans' community        
+update public."CommunitySnapshotSpaces" set community_id = 'commonwealth-orphans'
+where community_id not in (select id from public."Communities");
+
 ALTER TABLE ONLY public."CommunitySnapshotSpaces"
 ADD CONSTRAINT "CommunitySnapshotSpaces_community_id_fkey"
 FOREIGN KEY (community_id) REFERENCES public."Communities"(id)
 ON UPDATE CASCADE ON DELETE NO ACTION;
-
-
--- Link orphan community snapshot spaces to dummy 'commonwealth-orphans' community        
-update public."CommunitySnapshotSpaces" set community_id = 'commonwealth-orphans'
-where community_id not in (select id from public."Communities");
 
 ALTER TABLE ONLY public."CommunitySnapshotSpaces"
 ADD CONSTRAINT "CommunitySnapshotSpaces_snapshotspace_id_fkey"
@@ -85,7 +84,6 @@ ALTER TABLE ONLY public."SsoTokens"
 ADD CONSTRAINT "SsoTokens_address_id_fkey"
 FOREIGN KEY (address_id) REFERENCES public."Addresses"(id)
 ON UPDATE CASCADE ON DELETE SET NULL;
-
 
 -- delete orphan starred communities
 delete from public."StarredCommunities" where not exists(select id from public."Communities" where id=community_id);

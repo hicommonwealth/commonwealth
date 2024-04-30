@@ -1,6 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { DataTypes, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { Factories } from '../../src/models/factories';
 import {
   bootstrap_testing,
@@ -85,7 +85,7 @@ describe('Model schema', () => {
     logging: false,
   });
   Object.values(Factories).forEach((factory) => {
-    const m = factory(s, DataTypes);
+    const m = factory(s);
     it(`Should match ${m.tableName}`, async () => {
       const { model, migration } = schemas[m.tableName];
 
