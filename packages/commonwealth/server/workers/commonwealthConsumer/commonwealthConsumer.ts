@@ -8,17 +8,20 @@ import {
 } from '@hicommonwealth/adapters';
 import { Broker, BrokerTopics, broker, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
+
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: __filename.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {

@@ -1,6 +1,5 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type NotificationCategoryAttributes = {
   name: string;
@@ -17,7 +16,7 @@ export type NotificationCategoryModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): NotificationCategoryModelStatic => {
   const NotificationCategory = <NotificationCategoryModelStatic>(
     sequelize.define(

@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
-import { toBigInt } from 'web3-utils';
+import { ethers } from 'ethers';
+import { fileURLToPath } from 'url';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
@@ -9,6 +10,7 @@ import {
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export type GetEthBalancesOptions = {
@@ -118,7 +120,7 @@ async function getEthBalance(
     return {};
   } else {
     return {
-      [address]: toBigInt(data.result).toString(10),
+      [address]: ethers.BigNumber.from(data.result).toString(),
     };
   }
 }

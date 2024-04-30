@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "module": "es2020",
+    "target": "esnext",
     "baseUrl": ".",
     "composite": true,
     "strict": true,

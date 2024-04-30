@@ -1,4 +1,4 @@
-module.exports = {
+export const richTextComment = {
   author_chain: 'edgeware',
   chain: 'edgeware',
   community: '',
