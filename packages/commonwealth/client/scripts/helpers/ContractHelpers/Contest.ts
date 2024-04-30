@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -41,8 +42,8 @@ class Contest extends ContractBase {
     winnerShares: number[],
     stakeId: number = 2,
     prizeShare: number,
-    voterShare: number,
-    feeShare: number,
+    voterShare: number = 20,
+    feeShare: number = 100,
     weight: number = 1,
     walletAddress: string,
   ): Promise<string> {
@@ -55,11 +56,12 @@ class Contest extends ContractBase {
         contestInterval,
         winnerShares,
         stakeId,
-        prizeShare,
         voterShare,
-        feeShare,
         weight,
         walletAddress,
+        undefined,
+        feeShare,
+        prizeShare,
       );
       const newContestAddress =
         txReceipt.events.NewContest.returnValues.contest;
@@ -70,7 +72,50 @@ class Contest extends ContractBase {
     }
   }
 
-  //TODO Reccurring contest pending ABI
+  /**
+   * deploys a new single run contest
+   * @param namespaceName namespace name to configure for
+   * @param contestLength amount of time the contest should run
+   * @param winnerShares the percent of each respective winning places prize(ie 5 = 5%)
+   * @param stakeId the id of the community stake token, defaults to 2
+   * @param voterShare the % amount of prize pool claimable by voters each week(ie 5 = 5%)
+   * @param weight the weight of each stake balance, defaults to 1
+   * @param walletAddress the wallet address to make transactions from
+   * @param exchangeToken the token address for the prize. (ETH should be a 20 byte 0 address)
+   * @returns the contract address of the new contest
+   */
+  async newSingleContest(
+    namespaceName: string,
+    contestLength: number,
+    winnerShares: number[],
+    stakeId: number = 2,
+    voterShare: number = 20,
+    weight: number = 1,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<string> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    try {
+      const txReceipt = await this.namespaceFactory.newContest(
+        namespaceName,
+        contestLength,
+        winnerShares,
+        stakeId,
+        voterShare,
+        weight,
+        walletAddress,
+        exchangeToken,
+      );
+      const newContestAddress =
+        txReceipt.events.NewContest.returnValues.contest;
+      this.contractAddress = newContestAddress;
+      return newContestAddress;
+    } catch (error) {
+      throw new Error('Failed to initialize contest ' + error);
+    }
+  }
 
   /**
    * Allows for deposit of contest token(ETH or ERC20) to contest
@@ -78,7 +123,10 @@ class Contest extends ContractBase {
    * @param walletAddress the users wallet address
    * @returns transaction receipt
    */
-  async deposit(amount: number, walletAddress: string): Promise<any> {
+  async deposit(
+    amount: number,
+    walletAddress: string,
+  ): Promise<TransactionReceipt> {
     this.reInitContract();
     const tokenAddress = await this.contract.methods.contestToken().call();
 
@@ -119,6 +167,19 @@ class Contest extends ContractBase {
       });
     }
     return txReceipt;
+  }
+
+  async getCurrentWinners(): Promise<number[]> {
+    if (this.contractAddress === '') {
+      throw Error('Must provide contract address during initialization');
+    }
+    try {
+      const winnerIds: any[] = await this.contract.methods.winnerIds().call();
+
+      return winnerIds.map((x) => Number(x));
+    } catch (error) {
+      throw Error('Failed to fetch winners' + error);
+    }
   }
 }
 
