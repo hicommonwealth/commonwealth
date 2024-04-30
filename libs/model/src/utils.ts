@@ -54,8 +54,6 @@ export async function emitEvent(
     }
   }
 
-  console.log(records);
-
   if (records.length > 0) {
     await outbox.bulkCreate(values, { transaction });
   }
