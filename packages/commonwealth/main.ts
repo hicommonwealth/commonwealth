@@ -31,10 +31,9 @@ import BanCache from './server/util/banCheckCache';
 import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
+import { SESSION_EXPIRY_MILLIS } from './session';
 
 const DEV = process.env.NODE_ENV !== 'production';
-
-const SESSION_EXPIRY = 14 * 24 * 60 * 60 * 1000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -77,7 +76,7 @@ export async function main(
     db: db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: SESSION_EXPIRY,
+    expiration: SESSION_EXPIRY_MILLIS,
   });
 
   sessionStore.sync();
@@ -88,7 +87,7 @@ export async function main(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: SESSION_EXPIRY,
+      maxAge: SESSION_EXPIRY_MILLIS,
     },
   });
 
