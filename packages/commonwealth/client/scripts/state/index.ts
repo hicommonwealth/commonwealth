@@ -204,7 +204,7 @@ export async function initAppState(
     const [{ data: statusRes }, { data: communities }, { data: nodesRes }] =
       await Promise.all([
         axios.get(`${app.serverUrl()}/status`),
-        axios.get(`${app.serverUrl()}/communities?active=true`),
+        axios.get(`${app.serverUrl()}/communities`),
         axios.get(`${app.serverUrl()}/nodes`),
       ]);
 
