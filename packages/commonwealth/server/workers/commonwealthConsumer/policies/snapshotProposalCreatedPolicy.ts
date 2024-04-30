@@ -29,7 +29,7 @@ export const processSnapshotProposalCreated: EventHandler<
     return;
   }
 
-  let snapshotNotificationData: ISnapshotNotificationData = {
+  const snapshotNotificationData: ISnapshotNotificationData = {
     space,
     id,
     title,

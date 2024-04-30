@@ -9,10 +9,6 @@ import {
   success,
 } from '../../types';
 
-const Errors = {
-  InvalidRequest: 'Invalid request',
-};
-
 type GetCommunitiesRequestQuery = {
   active?: string;
   snapshots?: string;

@@ -144,7 +144,6 @@ class ChainInfo {
     stages_enabled,
     custom_stages,
     custom_domain,
-    snapshot,
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
