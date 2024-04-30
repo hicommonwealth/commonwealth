@@ -12,6 +12,7 @@ import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
+import { SESSION_EXPIRY_MILLIS } from '../../session';
 import { ETH_RPC, JWT_SECRET } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
