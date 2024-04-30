@@ -17,7 +17,7 @@ import {
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
-import { deserializeSession } from 'shared/canvas/types';
+import { deserializeCanvas } from 'shared/canvas/types';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -204,7 +204,7 @@ const verifyAddress = async (
         })
       : req.body.address;
 
-  const decodedSession: Session = deserializeSession(req.body.session);
+  const decodedSession: Session = deserializeCanvas(req.body.session);
 
   await processAddress(
     models,

@@ -122,7 +122,7 @@ const FinishNearLogin = () => {
       const signature = await acct.signMessage(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        canvas.serializeSessionPayload(canvasSessionPayload),
+        canvas.serializeCanvasPayload(canvasSessionPayload),
       );
 
       await acct.validate(

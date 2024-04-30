@@ -29,7 +29,7 @@ import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
 import { CANVAS_TOPIC } from 'shared/canvas';
-import { deserializeSession } from 'shared/canvas/types';
+import { deserializeCanvas } from 'shared/canvas/types';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getSessionSignerForAddress } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
@@ -487,7 +487,7 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
-    const session: Session = deserializeSession(req.body.session);
+    const session: Session = deserializeCanvas(req.body.session);
 
     if (communityToJoin) {
       if (isCosmos) {

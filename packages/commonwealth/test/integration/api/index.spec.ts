@@ -3,7 +3,7 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { serializeSession } from 'shared/canvas/types';
+import { serializeCanvas } from 'shared/canvas/types';
 import { bech32ToHex } from 'shared/utils';
 import { TestServer, testServer } from '../../../server-test';
 import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
@@ -111,7 +111,7 @@ describe('API Tests', () => {
           address,
           community_id,
           wallet_id,
-          session: serializeSession(session),
+          session: serializeCanvas(session),
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');

@@ -1,4 +1,3 @@
-import { decode, parse } from '@ipld/dag-json';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -9,7 +8,7 @@ import {
 } from 'client/scripts/views/components/UpvoteDrawer';
 import type Comment from 'models/Comment';
 import { verify } from 'shared/canvas';
-import { CanvasSignedData } from 'shared/canvas/types';
+import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -99,9 +98,9 @@ export const CommentCard = ({
   useEffect(() => {
     const doUpdate = async () => {
       try {
-        const canvasSignedData = decode(
-          parse(comment.canvasSignedData),
-        ) as CanvasSignedData;
+        const canvasSignedData: CanvasSignedData = deserializeCanvas(
+          comment.canvasSignedData,
+        );
         await verify(canvasSignedData);
         setVerifiedCanvasSignedData(canvasSignedData);
       } catch (err) {

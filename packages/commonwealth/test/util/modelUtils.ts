@@ -27,7 +27,7 @@ import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
 import {
   CanvasSignResult,
   CanvasSignedData,
-  serializeSession,
+  serializeCanvas,
   toCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
 import { createRole, findOneRole } from '../../server/util/roles';
@@ -283,7 +283,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         community_id: chain,
         chain_id,
         wallet_id,
-        session: serializeSession(session),
+        session: serializeCanvas(session),
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;

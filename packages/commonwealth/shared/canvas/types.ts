@@ -13,12 +13,16 @@ export type CanvasSignResult = {
   canvasHash: string;
 };
 
-export const serializeSession = (session: Session): string => {
-  return stringify(encode(session));
+// The `CanvasSignedData` and `Session` objects may contain data that cannot be
+// automatically serialized by JSON, e.g. Uint8Array. We are using the IPLD dag-json codec
+// to serialize and deserialize these objects.
+
+export const serializeCanvas = (data: any): string => {
+  return stringify(encode(data));
 };
 
-export const deserializeSession = (serializedSession: string): Session => {
-  return decode(parse(serializedSession));
+export const deserializeCanvas = (serializedData: string): any => {
+  return decode(parse(serializedData));
 };
 
 export const toCanvasSignedDataApiArgs = async (
@@ -32,7 +36,7 @@ export const toCanvasSignedDataApiArgs = async (
   const { canvasSignedData, canvasHash } = data;
 
   return {
-    canvas_signed_data: stringify(encode(canvasSignedData)),
+    canvas_signed_data: serializeCanvas(canvasSignedData),
     canvas_hash: canvasHash,
   };
 };

@@ -1,9 +1,8 @@
-import { decode, parse } from '@ipld/dag-json';
 import React, { useEffect, useState } from 'react';
 
 import 'modals/canvas_verify_data_modal.scss';
 import { verify } from 'shared/canvas';
-import { CanvasSignedData } from 'shared/canvas/types';
+import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
 import {
   CWModalBody,
   CWModalHeader,
@@ -22,9 +21,9 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
   useEffect(() => {
     const doUpdate = async () => {
       try {
-        const canvasSignedData = decode(
-          parse(obj.canvasSignedData),
-        ) as CanvasSignedData;
+        const canvasSignedData: CanvasSignedData = deserializeCanvas(
+          obj.canvasSignedData,
+        );
         await verify(canvasSignedData);
         setVerifiedCanvasSignedData(canvasSignedData);
       } catch (err) {
