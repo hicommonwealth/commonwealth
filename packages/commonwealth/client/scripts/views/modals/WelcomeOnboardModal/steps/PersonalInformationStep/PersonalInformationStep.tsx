@@ -21,6 +21,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -61,6 +62,8 @@ const PersonalInformationStep = ({
     }
   }, []);
 
+  const { toggleAllInAppNotifications } = useNotificationSettings();
+
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
       limit: 1000,
@@ -97,9 +100,13 @@ const PersonalInformationStep = ({
       await app.user.updateEmail(values.email);
     }
 
-    // TODO: update notification preferences here for
-    // values.enableAccountNotifications - does this mean all account notifications?
-    // values.enableProductUpdates - ?
+    // enable/disable all in-app notifications for user
+    await toggleAllInAppNotifications(values.enableAccountNotifications);
+
+    // TODO:
+    // values.enableProductUpdates - as per product, this should be just a checkbox
+    // right now that should do nothing, and needs to be work on.
+    // https://github.com/hicommonwealth/commonwealth/issues/6645#issuecomment-2078105164
 
     onComplete();
   };

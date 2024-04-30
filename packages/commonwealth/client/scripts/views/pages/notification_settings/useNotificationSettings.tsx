@@ -1,3 +1,4 @@
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import 'pages/notification_settings/index.scss';
@@ -5,6 +6,15 @@ import { useEffect, useState } from 'react';
 import app from 'state';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
+
+export type SnapshotInfo = {
+  snapshotId: string;
+  space: {
+    avatar: string;
+    name: string;
+  };
+  subs: Array<NotificationSubscription>;
+};
 
 const useNotificationSettings = () => {
   const forceRerender = useForceRerender();
@@ -98,6 +108,35 @@ const useNotificationSettings = () => {
         subscribedCommunityIds?.includes?.(x?.id) && !chainEventSubs?.[x?.id],
     );
 
+  const toggleAllInAppNotifications = async (enableAll: boolean) => {
+    const subIds = [];
+
+    // get all subscription ids
+    Object.entries(chainEventSubs).map(([_, subs]) =>
+      subIds.push(...(subs || [])),
+    );
+    Object.entries(bundledSubs).map(([_, subs]) =>
+      subIds.push(...(subs || [])),
+    );
+    snapshotsInfo.map(({ snapshotId, subs }: SnapshotInfo) => {
+      if (snapshotId) subIds.push(...(subs || []));
+    });
+
+    // enable/disable all subscriptions
+    await handleSubscriptions(!enableAll, subIds);
+    await handleEmailSubscriptions(!enableAll, subIds);
+    if (enableAll) {
+      relevantSubscribedCommunities
+        .sort((x, y) => x.name.localeCompare(y.name))
+        .map((community) => {
+          app.user.notifications.subscribe({
+            categoryId: NotificationCategories.ChainEvent,
+            options: { communityId: community.id },
+          });
+        });
+    }
+  };
+
   return {
     handleSubscriptions,
     handleEmailSubscriptions,
@@ -114,6 +153,7 @@ const useNotificationSettings = () => {
     bundledSubs,
     chainEventSubs,
     relevantSubscribedCommunities,
+    toggleAllInAppNotifications,
   };
 };
 

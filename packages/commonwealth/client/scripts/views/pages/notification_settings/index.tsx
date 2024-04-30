@@ -7,7 +7,6 @@ import React, { useEffect } from 'react';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -23,7 +22,9 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
-import useNotificationSettings from './useNotificationSettings';
+import useNotificationSettings, {
+  SnapshotInfo,
+} from './useNotificationSettings';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -31,15 +32,6 @@ const emailIntervalFrequencyMap = {
   daily: 'Everyday',
   twoweeks: 'Every two weeks',
   monthly: 'Once a month',
-};
-
-type SnapshotInfo = {
-  snapshotId: string;
-  space: {
-    avatar: string;
-    name: string;
-  };
-  subs: Array<NotificationSubscription>;
 };
 
 const NotificationSettingsPage = () => {
