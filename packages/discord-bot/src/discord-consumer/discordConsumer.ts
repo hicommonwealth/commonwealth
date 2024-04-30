@@ -19,10 +19,12 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
 import { CW_BOT_KEY, DISCOBOT_ADDRESS, RABBITMQ_URI } from '../utils/config';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 stats(HotShotsStats());
 

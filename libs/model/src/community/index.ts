@@ -1,4 +1,3 @@
-export * from './CreateCommunity.command';
 export * from './CreateGroup.command';
 export * from './CreateStakeTransaction.command';
 export * from './GenerateStakeholderGroups.command';
@@ -8,4 +7,3 @@ export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
 export * from './ImportDiscourseCommunity.command';
 export * from './SetCommunityStake.command';
-export * from './UpdateCommunity.command';

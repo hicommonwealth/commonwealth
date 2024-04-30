@@ -1,8 +1,10 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { RegisteredTypes } from '@polkadot/types/types';
+import { fileURLToPath } from 'node:url';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
@@ -41,7 +43,9 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
       ...sanitizedSpec,
     });
     const version = api.runtimeVersion;
-    const props = await api.rpc.system.properties();
+    // TODO: TS2339: Property 'system' does not exist on type 'DecoratedRpc<"promise", RpcInterface>'.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const props = await (api.rpc as any).system.properties();
     log.info(
       `Fetched version: ${version.specName}:${
         version.specVersion

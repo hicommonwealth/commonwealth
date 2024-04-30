@@ -1,6 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
@@ -9,7 +8,7 @@ import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
 export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
@@ -47,7 +46,7 @@ export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): CommunityModelStatic => {
   const Community = <CommunityModelStatic>sequelize.define(
     // Leave this as is for now so that we don't need to alias and models can join
@@ -178,16 +177,15 @@ export default (
     models.Community.hasMany(models.StarredCommunity, {
       foreignKey: 'community_id',
     });
-    models.Community.belongsToMany(models.Contract, {
-      through: models.CommunityContract,
-      foreignKey: 'community_id',
-    });
     models.Community.hasMany(models.Group, {
       as: 'groups',
       foreignKey: 'community_id',
     });
-    models.Community.hasMany(models.CommunityStake, {
-      foreignKey: { name: 'community_id' },
+    models.Community.hasMany(models.CommunityAlert, {
+      foreignKey: 'community_id',
+    });
+    models.Community.hasMany(models.CommunityAlert, {
+      foreignKey: 'community_id',
     });
   };
 

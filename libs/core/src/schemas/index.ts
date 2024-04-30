@@ -16,9 +16,14 @@ export type Aggregates = Extract<
   | 'Thread'
   | 'User'
   | 'StakeTransaction'
+  | 'SubscriptionPreference'
+  | 'CommunityAlert'
+  | 'Address'
+  | 'Topic'
 >;
 export { entities };
 
 export * as commands from './commands';
+export * as projections from './projections';
 export * as queries from './queries';
 export * from './utils.schemas';

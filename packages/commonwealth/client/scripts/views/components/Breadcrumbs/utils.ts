@@ -182,6 +182,15 @@ export const generateBreadcrumbs = (
       if (pathSegments.length > 1 && pathSegments[1] === 'manage') {
         pathSegments.splice(0, 1);
       }
+
+      // handle contests
+      if (pathSegments.length === 3 && pathSegments[1] === 'contests') {
+        if (pathSegments[2] === 'launch') {
+          pathSegments[2] = 'Launch Contest';
+        } else {
+          pathSegments[2] = 'Edit Contest';
+        }
+      }
     }
 
     // Create the breadcrumb object.

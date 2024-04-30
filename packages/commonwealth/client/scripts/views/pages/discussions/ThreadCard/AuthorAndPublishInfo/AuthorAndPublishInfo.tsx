@@ -87,6 +87,7 @@ export const AuthorAndPublishInfo = ({
         userCommunityId={authorCommunityId}
         shouldShowPopover
         shouldLinkProfile
+        shouldShowAsDeleted={!authorAddress && !authorCommunityId}
         shouldShowAddressWithDisplayName={
           fromDiscordBot ? false : showUserAddressWithInfo
         }

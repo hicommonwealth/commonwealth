@@ -57,6 +57,7 @@ import {
   SignOut,
   Sparkle,
   SquaresFour,
+  Timer,
   Trash,
   TwitterLogo,
   Users,
@@ -215,6 +216,7 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,
   // trash: Icons.CWTrash,
   trash: withPhosphorIcon(Trash),
@@ -237,6 +239,8 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
+  base: CustomIcons.CWBase,
+  blast: CustomIcons.CWBlast,
   email: CustomIcons.CWEmail,
   eth: CustomIcons.CWEth,
   cosmos: CustomIcons.CWCosmos,

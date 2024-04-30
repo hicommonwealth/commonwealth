@@ -1,5 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
+import { DataTypes, Sequelize } from 'sequelize';
+import { Factories } from '../../src/models/factories';
 import {
   bootstrap_testing,
   create_db_from_migrations,
@@ -24,6 +26,7 @@ const generateSchemas = async () => {
       ],
       Memberships: ['PRIMARY KEY(id)'],
       Notifications: ['FOREIGN KEY(thread_id)'],
+      Outbox: ['PRIMARY KEY(event_id)'],
       Profiles: ['FOREIGN KEY(user_id)'],
       Reactions: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(community_id)'],
       SnapshotProposals: ['FOREIGN KEY(space)'],
@@ -65,7 +68,7 @@ const generateSchemas = async () => {
 };
 
 describe('Model schema', () => {
-  let schemas;
+  let schemas: { [x: string]: { model: any; migration: any } };
 
   before(async () => {
     schemas = await generateSchemas();
@@ -75,48 +78,16 @@ describe('Model schema', () => {
     await dispose()();
   });
 
-  [
-    'Addresses',
-    'Bans',
-    'ChainNodes',
-    'Collaborations',
-    'Comments',
-    'Communities',
-    'CommunityBanners',
-    'CommunityContractTemplate',
-    'CommunityContractTemplateMetadata',
-    'CommunityContracts',
-    'CommunitySnapshotSpaces',
-    'CommunityStakes',
-    'ContractAbis',
-    'Contracts',
-    'DiscordBotConfig',
-    'EvmEventSources',
-    'Groups',
-    'LastProcessedEvmBlocks',
-    'LoginTokens',
-    'Memberships',
-    'NotificationCategories',
-    'Notifications',
-    'NotificationsRead',
-    'Polls',
-    'Profiles',
-    'Reactions',
-    'SnapshotProposals',
-    'SnapshotSpaces',
-    'SsoTokens',
-    'StakeTransactions',
-    'StarredCommunities',
-    'Subscriptions',
-    'Template',
-    'Threads',
-    'Topics',
-    'Users',
-    'Votes',
-    'Webhooks',
-  ].forEach((name) => {
-    it(`Should match ${name}`, async () => {
-      const { model, migration } = schemas[name];
+  const s = new Sequelize({
+    dialect: 'postgres',
+    username: 'commonwealth',
+    password: 'edgeware',
+    logging: false,
+  });
+  Object.values(Factories).forEach((factory) => {
+    const m = factory(s, DataTypes);
+    it(`Should match ${m.tableName}`, async () => {
+      const { model, migration } = schemas[m.tableName];
 
       //console.log(model.columns, migration.columns);
       expect(model.columns).deep.equals(migration.columns);

@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/shared';
+import { ContentType, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -25,7 +25,6 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
@@ -39,6 +38,7 @@ import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import MetaTags from '../../components/MetaTags';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
@@ -51,6 +51,7 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import { getTextFromDelta } from '../../components/react_quill_editor/';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
@@ -382,9 +383,88 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     action: 'comment',
   });
 
+  const getMetaDescription = (meta: string) => {
+    try {
+      const parsedMeta = JSON.parse(meta);
+      if (getTextFromDelta(parsedMeta)) {
+        return getTextFromDelta(parsedMeta) || meta;
+      } else {
+        return meta;
+      }
+    } catch (error) {
+      return;
+    }
+  };
+
+  const ogTitle =
+    thread?.title?.length > 60
+      ? `${thread?.title?.slice?.(0, 52)}...`
+      : thread?.title;
+  const ogDescription =
+    getMetaDescription(thread?.body || '')?.length > 155
+      ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
+      : getMetaDescription(thread?.body || '');
+  const ogImageUrl = app?.chain?.meta?.iconUrl;
+
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
+      <MetaTags
+        customMeta={[
+          {
+            name: 'title',
+            content: ogTitle,
+          },
+          {
+            name: 'description',
+            content: ogDescription,
+          },
+          {
+            name: 'author',
+            content: thread?.author,
+          },
+          {
+            name: 'twitter:card',
+            content: 'summary_large_image',
+          },
+          {
+            name: 'twitter:title',
+            content: ogTitle,
+          },
+          {
+            name: 'twitter:description',
+            content: ogDescription,
+          },
+          {
+            name: 'twitter:image',
+            content: ogImageUrl,
+          },
+          {
+            name: 'twitter:url',
+            content: window.location.href,
+          },
+          {
+            name: 'og:title',
+            content: ogTitle,
+          },
+          {
+            name: 'og:description',
+            content: ogDescription,
+          },
+          {
+            name: 'og:image',
+            content: ogImageUrl,
+          },
+          {
+            name: 'og:type',
+            content: 'article',
+          },
+          {
+            name: 'og:url',
+            content: window.location.href,
+          },
+        ]}
+      />
       <CWPageLayout>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -410,7 +490,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             )
           }
           isEditing={isEditingBody}
-          author={app.chain.accounts.get(thread.author)}
+          author={
+            thread?.author ? app.chain.accounts.get(thread?.author) : null
+          }
           discord_meta={thread.discord_meta}
           collaborators={thread.collaborators}
           createdAt={thread.createdAt}

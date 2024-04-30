@@ -3,7 +3,7 @@ import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { idToProposal } from 'identifiers';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import Thread from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -89,7 +89,7 @@ export const NewSnapshotProposalForm = ({
     } catch (err) {
       err.code === 'ACTION_REJECTED'
         ? notifyError('User rejected signing')
-        : notifyError(capitalize(err.error_description));
+        : notifyError(_.capitalize(err.error_description));
     } finally {
       setIsSaving(false);
     }
@@ -262,7 +262,7 @@ export const NewSnapshotProposalForm = ({
             }}
             defaultValue={form.name}
           />
-          {form.choices.map((_, idx) => {
+          {form.choices.map((unused1, idx) => {
             return (
               <CWTextInput
                 key={`choice-${idx}`}

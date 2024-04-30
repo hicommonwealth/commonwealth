@@ -1,11 +1,10 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type {
   CommunityContractAttributes,
   CommunityContractInstance,
 } from './community_contract';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type ContractAttributes = {
   id?: number;
@@ -35,7 +34,7 @@ export type ContractModelStatic = ModelStatic<ContractInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): ContractModelStatic => {
   const Contract = <ContractModelStatic>sequelize.define(
     'Contract',
@@ -72,10 +71,6 @@ export default (
   );
 
   Contract.associate = (models) => {
-    models.Contract.belongsToMany(models.Community, {
-      through: models.CommunityContract,
-      foreignKey: 'community_id',
-    });
     models.Contract.belongsTo(models.ChainNode, {
       foreignKey: 'chain_node_id',
       targetKey: 'id',

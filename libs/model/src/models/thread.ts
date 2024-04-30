@@ -1,12 +1,11 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import { NotificationAttributes } from './notification';
 import type { TopicAttributes } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -39,7 +38,7 @@ export type ThreadModelStatic = ModelStatic<ThreadInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): ThreadModelStatic => {
   const Thread = <ThreadModelStatic>sequelize.define(
     'Thread',
@@ -203,22 +202,17 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.Thread.belongsToMany(models.Address, {
-      through: models.Collaboration,
-      as: 'collaborators',
-      foreignKey: { name: 'thread_id', allowNull: false },
-    });
     models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
-    });
-    models.Thread.hasMany(models.Collaboration, {
-      foreignKey: 'thread_id',
     });
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });
     models.Thread.hasMany(models.Notification, {
+      foreignKey: 'thread_id',
+    });
+    models.Thread.hasMany(models.ThreadSubscription, {
       foreignKey: 'thread_id',
     });
   };

@@ -1,9 +1,8 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type StakeTransactionAttributes = z.infer<
   typeof schemas.entities.StakeTransaction
@@ -19,9 +18,9 @@ export type StakeTransactionModelStatic = ModelStatic<StakeTransactionInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): StakeTransactionModelStatic => {
-  const StakeTransaction = <StakeTransactionModelStatic>sequelize.define(
+  dataTypes: DataTypes,
+): StakeTransactionModelStatic =>
+  <StakeTransactionModelStatic>sequelize.define<StakeTransactionInstance>(
     'StakeTransaction',
     {
       transaction_hash: {
@@ -44,23 +43,8 @@ export default (
       timestamp: { type: dataTypes.INTEGER, allowNull: false },
     },
     {
-      underscored: true,
-      timestamps: false,
       tableName: 'StakeTransactions',
+      timestamps: false,
       indexes: [{ fields: ['address'] }, { fields: ['community_id'] }],
     },
   );
-
-  StakeTransaction.associate = (models) => {
-    models.StakeTransaction.belongsTo(models.CommunityStake, {
-      foreignKey: 'community_id',
-      targetKey: 'community_id',
-    });
-    models.StakeTransaction.belongsTo(models.CommunityStake, {
-      foreignKey: 'stake_id',
-      targetKey: 'stake_id',
-    });
-  };
-
-  return StakeTransaction;
-};

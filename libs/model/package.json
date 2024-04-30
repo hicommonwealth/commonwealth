@@ -1,18 +1,19 @@
 {
   "name": "@hicommonwealth/model",
   "private": "true",
+  "type": "module",
   "version": "0.1.0",
   "description": "Core Model - Server Side",
   "files": [
     "build"
   ],
-  "main": "build/index",
+  "main": "build/index.js",
   "types": "src/index",
   "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf build",
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "yarn build && NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
+    "test": "yarn build && NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",

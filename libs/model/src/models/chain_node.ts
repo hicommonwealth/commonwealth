@@ -1,8 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type ChainNodeAttributes = z.infer<typeof schemas.entities.ChainNode>;
 
@@ -12,7 +11,7 @@ export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): ChainNodeModelStatic => {
   const ChainNode = <ChainNodeModelStatic>sequelize.define(
     'ChainNode',
@@ -35,6 +34,7 @@ export default (
       bech32: { type: dataTypes.STRING, allowNull: true },
       cosmos_gov_version: { type: dataTypes.STRING(64), allowNull: true },
       block_explorer: { type: dataTypes.STRING, allowNull: true },
+      slip44: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

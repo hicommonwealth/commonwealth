@@ -24,6 +24,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
+import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
@@ -35,6 +36,7 @@ import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 type MagicLoginContext = {
@@ -140,7 +142,6 @@ async function createNewMagicUser({
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.createWithProfile(
-      models,
       {
         // never use emails from magic, even for "email" login -- magic maintains the mapping
         // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece

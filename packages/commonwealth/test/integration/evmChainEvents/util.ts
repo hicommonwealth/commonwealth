@@ -183,6 +183,7 @@ export async function getTestSubscription(version?: 'v1' | 'v2') {
 
 export async function getTestSignatures(version?: 'v1' | 'v2') {
   const chainNode = await getTestChainNode(version);
+  const abi = await getTestAbi(version);
 
   let contractAddress: string;
   if (!version || version === 'v1') {
@@ -198,6 +199,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
       contract_address: contractAddress,
       event_signature: compoundPropCreatedSignature,
       kind: 'proposal-created',
+      abi_id: abi.id,
     },
   });
 
@@ -207,6 +209,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
       contract_address: contractAddress,
       event_signature: compoundPropQueuedSignature,
       kind: 'proposal-queued',
+      abi_id: abi.id,
     },
   });
 

@@ -58,7 +58,7 @@ Key:
 - 👁 `/reactionsCounts`
   - Returns all counts of reactions given a list of thread IDs, comment IDs and proposal IDs
 
-# General Suggestions (230522)
+## General Suggestions (230522)
 
 - Found a common pattern where the user's `last_active` column is updated when various actions are performed. Change into a middleware or helper utility function?
 - Found a common pattern where the text of a thread/comment is parsed for mentions and new mentions are notified. Move logic into helper utility function?

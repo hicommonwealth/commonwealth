@@ -44,7 +44,11 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const DiscussionSection = () => {
+export const DiscussionSection = ({
+  isContestAvailable,
+}: {
+  isContestAvailable: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -149,7 +153,7 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
-    ...(contestsEnabled
+    ...(contestsEnabled && isContestAvailable
       ? [
           {
             title: 'Contests',
