@@ -574,7 +574,7 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.SnapshotProposal} subscription tests`, () => {
-      const snapshot_id = 'test_space';
+      const snapshot_id = 'dydxgov.eth';
       let snapshotSubscription;
 
       it('should create a snapshot-proposal subscription', async () => {
