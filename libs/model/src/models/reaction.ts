@@ -20,15 +20,15 @@ export type ReactionAttributes = {
 
   calculated_voting_weight: number;
 
+  // canvas-related columns
+  canvas_signed_data: string;
+  canvas_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
 
   Chain?: CommunityAttributes;
   Address?: AddressAttributes;
-
-  // canvas-related columns
-  canvas_signed_data: string;
-  canvas_hash: string;
 };
 
 export type ReactionInstance = ModelInstance<ReactionAttributes>;

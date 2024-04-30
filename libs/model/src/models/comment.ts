@@ -20,6 +20,10 @@ export type CommentAttributes = {
   parent_id?: string;
   version_history?: string[];
 
+  // canvas-related columns
+  canvas_signed_data: string;
+  canvas_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -34,10 +38,6 @@ export type CommentAttributes = {
   //counts
   reaction_count: number;
   reaction_weights_sum: number;
-
-  // canvas-related columns
-  canvas_signed_data: string;
-  canvas_hash: string;
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;

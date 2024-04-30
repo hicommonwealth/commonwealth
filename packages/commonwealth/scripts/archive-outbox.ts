@@ -3,8 +3,8 @@ import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
 import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
-import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
 // REQUIRED for S3 env var
