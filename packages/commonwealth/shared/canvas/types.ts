@@ -13,6 +13,14 @@ export type CanvasSignResult = {
   canvasHash: string;
 };
 
+export const serializeSession = (session: Session): string => {
+  return stringify(encode(session));
+};
+
+export const deserializeSession = (serializedSession: string): Session => {
+  return decode(parse(serializedSession));
+};
+
 export const toCanvasSignedDataApiArgs = async (
   data: undefined | CanvasSignResult,
 ): Promise<CanvasSignedDataApiArgs> => {

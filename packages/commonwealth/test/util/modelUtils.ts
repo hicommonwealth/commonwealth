@@ -18,7 +18,7 @@ import type {
   Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { encode, stringify } from '@ipld/dag-json';
+import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
@@ -27,6 +27,7 @@ import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
 import {
   CanvasSignResult,
   CanvasSignedData,
+  serializeSession,
   toCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
 import { createRole, findOneRole } from '../../server/util/roles';
@@ -282,7 +283,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         community_id: chain,
         chain_id,
         wallet_id,
-        session: stringify(encode(session)),
+        session: serializeSession(session),
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;

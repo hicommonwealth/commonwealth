@@ -3,10 +3,10 @@ import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import { Session } from '@canvas-js/interfaces';
-import { encode, stringify } from '@ipld/dag-json';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
+import { serializeSession } from 'shared/canvas/types';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
@@ -175,7 +175,7 @@ class Account {
       address: this.address,
       community_id: this.community.id,
       jwt: app.user.jwt,
-      session: stringify(encode(session)),
+      session: serializeSession(session),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
     };

@@ -15,9 +15,9 @@ import {
   NotificationCategories,
   WalletId,
 } from '@hicommonwealth/shared';
-import { decode, parse } from '@ipld/dag-json';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
+import { deserializeSession } from 'shared/canvas/types';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -204,7 +204,7 @@ const verifyAddress = async (
         })
       : req.body.address;
 
-  const decodedSession: Session = decode(parse(req.body.session));
+  const decodedSession: Session = deserializeSession(req.body.session);
 
   await processAddress(
     models,

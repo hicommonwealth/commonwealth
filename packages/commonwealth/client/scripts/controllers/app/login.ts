@@ -12,11 +12,11 @@ import { initAppState } from 'state';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
-import { encode, stringify } from '@ipld/dag-json';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic } from 'magic-sdk';
 import { CANVAS_TOPIC } from 'shared/canvas';
+import { serializeSession } from 'shared/canvas/types';
 
 import axios from 'axios';
 import app from 'state';
@@ -519,7 +519,7 @@ export async function handleSocialLoginCallback({
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,
-        session: stringify(encode(session)),
+        session: serializeSession(session),
         walletSsoSource,
       },
     },
