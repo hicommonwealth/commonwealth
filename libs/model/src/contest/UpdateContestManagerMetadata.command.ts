@@ -51,19 +51,21 @@ export const UpdateContestManagerMetadata: Command<
       }
 
       const result = await models.sequelize.transaction(async (transaction) => {
-        // destroy all old associations
-        await models.ContestTopic.destroy({
-          where: {
-            contest_address: payload.contest_address,
-          },
-          transaction,
-        });
-
-        // create new associations
-        if (contestTopicsToCreate.length > 0) {
-          await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
+        if (payload.topic_ids) {
+          // destroy all old associations
+          await models.ContestTopic.destroy({
+            where: {
+              contest_address: payload.contest_address,
+            },
             transaction,
           });
+
+          // create new associations
+          if (contestTopicsToCreate.length > 0) {
+            await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
+              transaction,
+            });
+          }
         }
 
         // update metadata
