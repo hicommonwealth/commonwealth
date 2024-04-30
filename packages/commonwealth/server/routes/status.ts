@@ -329,11 +329,9 @@ export const status = async (
         threadCountQueryData,
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
-
-      // const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
-      //   expiresIn: SESSION_EXPIRY_MILLIS / 1000,
-      // });
+      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
+        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+      });
       user.jwt = jwtToken as string;
 
       return success(res, {
