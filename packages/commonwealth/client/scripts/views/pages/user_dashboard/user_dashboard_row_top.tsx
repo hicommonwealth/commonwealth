@@ -66,6 +66,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       <User
         userAddress={author_address}
         userCommunityId={author_community_id}
+        shouldShowAsDeleted={!author_address && !author_community_id}
         shouldLinkProfile
         avatarSize={32}
       />

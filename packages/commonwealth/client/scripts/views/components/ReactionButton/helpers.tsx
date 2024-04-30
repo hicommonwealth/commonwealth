@@ -23,7 +23,8 @@ export const getDisplayedReactorsForPopup = ({
           <CWText noWrap>
             <User
               userAddress={reactorAddress}
-              userCommunityId={app.chain.id}
+              userCommunityId={app?.chain?.id}
+              shouldShowAsDeleted={!reactorAddress && !app?.chain?.id}
               shouldLinkProfile
             />
           </CWText>

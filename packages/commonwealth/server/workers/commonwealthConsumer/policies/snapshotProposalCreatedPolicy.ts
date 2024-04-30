@@ -1,4 +1,4 @@
-import { EventHandler, stats } from '@hicommonwealth/core';
+import { EventHandler, Policy, schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
@@ -132,6 +132,8 @@ export const processSnapshotProposalCreated: EventHandler<
         eventType: event as SnapshotEventType,
         ...snapshotNotificationData,
       },
+    }).catch((err) => {
+      log.error('Error sending snapshot notification', err);
     });
   }
 
@@ -174,3 +176,16 @@ export const processSnapshotProposalCreated: EventHandler<
     }
   }
 };
+
+const snapshotInputs = {
+  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+};
+export const SnapshotPolicy: Policy<
+  typeof snapshotInputs,
+  ZodUndefined
+> = () => ({
+  inputs: snapshotInputs,
+  body: {
+    SnapshotProposalCreated: processSnapshotProposalCreated,
+  },
+});

@@ -268,6 +268,7 @@ const CustomDomainRoutes = ({
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
+        renderDefaultMetatags: false,
       })}
     />,
     <Route
@@ -392,8 +393,8 @@ const CustomDomainRoutes = ({
             })}
           />,
           <Route
-            key="/manage/contests/:contestId"
-            path="/manage/contests/:contestId"
+            key="/manage/contests/:contestAddress"
+            path="/manage/contests/:contestAddress"
             element={withLayout(ManageContest, {
               scoped: true,
             })}

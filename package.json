@@ -9,6 +9,7 @@
   "workspaces": [
     "packages/commonwealth",
     "packages/discord-bot",
+    "packages/scripts",
     "packages/snapshot-listener",
     "libs/*"
   ],
@@ -154,9 +155,6 @@
     "stylelint-config-prettier": "^9.0.4",
     "stylelint-config-standard": "^29.0.0",
     "sync-request": "^6.1.0",
-    "ts-mocha": "^10.0.0",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",

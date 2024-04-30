@@ -279,7 +279,7 @@ export class Thread implements IUniqueId {
     address_last_active: string;
     associatedReactions?: AssociatedReaction[];
   }) {
-    this.author = Address.address;
+    this.author = Address?.address;
     this.title = getDecodedString(title);
     this.body = getDecodedString(body);
     this.plaintext = plaintext;
@@ -290,7 +290,7 @@ export class Thread implements IUniqueId {
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
-    this.authorCommunity = Address.community_id;
+    this.authorCommunity = Address?.community_id;
     this.pinned = pinned;
     this.url = url;
     this.communityId = community_id;
@@ -330,13 +330,13 @@ export class Thread implements IUniqueId {
       ? moment(last_commented_on)
       : moment(created_at);
 
-    if (Address.User) {
+    if (Address?.User) {
       this.profile = addressToUserProfile(Address);
     } else {
       this.profile = {
         id: profile_id,
         name: profile_name,
-        address: Address.address,
+        address: Address?.address,
         lastActive: address_last_active,
         avatarUrl: avatar_url ?? undefined,
       };

@@ -315,13 +315,14 @@ const CommonDomainRoutes = ({
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
+      renderDefaultMetatags: false,
     })}
   />,
   <Route
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
-      scope: false,
+      scoped: false,
     })}
   />,
   <Route
@@ -475,8 +476,8 @@ const CommonDomainRoutes = ({
           })}
         />,
         <Route
-          key="/:scope/manage/contests/:contestId"
-          path="/:scope/manage/contests/:contestId"
+          key="/:scope/manage/contests/:contestAddress"
+          path="/:scope/manage/contests/:contestAddress"
           element={withLayout(ManageContest, {
             scoped: true,
           })}

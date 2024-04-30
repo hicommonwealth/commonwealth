@@ -1,3 +1,4 @@
+export * as ContestHelper from './contestHelper';
 export * as newNamespaceValidator from './newNamespaceValidator';
 
 import * as communityStakeConfigValidatorModule from './communityStakeConfigValidator';

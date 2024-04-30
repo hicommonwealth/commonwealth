@@ -85,7 +85,9 @@ export const CommentCard = ({
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
-  const author = app.chain.accounts.get(comment.author);
+  const author = comment?.author
+    ? app.chain.accounts.get(comment?.author)
+    : null;
 
   const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
     useState<boolean>(false);
@@ -121,8 +123,8 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorAddress={author.address}
-            authorCommunityId={author.community?.id || author?.profile?.chain}
+            authorAddress={author?.address}
+            authorCommunityId={author?.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"

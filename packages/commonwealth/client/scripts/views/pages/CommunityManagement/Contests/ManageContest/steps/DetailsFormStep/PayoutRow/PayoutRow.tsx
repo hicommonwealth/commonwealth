@@ -14,6 +14,7 @@ interface PayoutRowProps {
   onSetPayoutStructure: (payoutStructure: number[]) => void;
   index: number;
   payoutNumber: number;
+  disabled: boolean;
 }
 
 const PayoutRow = ({
@@ -21,6 +22,7 @@ const PayoutRow = ({
   onSetPayoutStructure,
   index,
   payoutNumber,
+  disabled,
 }: PayoutRowProps) => {
   const handleInput = (e) => {
     let value = e.target.value.trim();
@@ -80,9 +82,11 @@ const PayoutRow = ({
             value={payoutNumber + '%'}
             key={index}
             onInput={handleInput}
-            minusDisabled={payoutStructure[index] === 0}
+            minusDisabled={disabled || payoutStructure[index] === 0}
+            plusDisabled={disabled}
             onMinusClick={handleMinusClick}
             onPlusClick={handlePlusClick}
+            inputDisabled={disabled}
           />
         </div>
       </div>
