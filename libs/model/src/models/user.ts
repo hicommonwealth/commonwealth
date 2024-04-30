@@ -1,6 +1,6 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
-import type { CreateOptions, DataTypes } from 'sequelize';
+import type { CreateOptions } from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommentSubscriptionAttributes } from './comment_subscriptions';
@@ -56,10 +56,7 @@ export type UserCreationAttributes = UserAttributes & {
 export type UserModelStatic = ModelStatic<UserInstance> &
   UserCreationAttributes;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): UserModelStatic => {
+export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
   const User = <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {

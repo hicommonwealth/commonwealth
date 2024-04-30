@@ -7,9 +7,11 @@ import {
 } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/logging';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**

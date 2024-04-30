@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type BanAttributes = {
@@ -13,7 +12,7 @@ export type BanAttributes = {
 export type BanInstance = ModelInstance<BanAttributes>;
 export type BanModelStatic = ModelStatic<BanInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <BanModelStatic>sequelize.define<BanInstance>(
     'Bans',
     {

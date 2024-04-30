@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type TemplateAttributes = {
@@ -19,7 +18,7 @@ export type TemplateInstance = ModelInstance<TemplateAttributes>;
 
 export type TemplateModelStatic = ModelStatic<TemplateInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <TemplateModelStatic>sequelize.define<TemplateInstance>(
     'Template',
     {

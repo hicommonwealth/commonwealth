@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type SsoTokenAttributes = {
   id?: number;
@@ -21,7 +20,7 @@ export type SsoTokenModelStatic = ModelStatic<SsoTokenInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): SsoTokenModelStatic => {
   const SsoToken = <SsoTokenModelStatic>sequelize.define(
     'SsoToken',

@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "esnext",
-    "moduleResolution": "node10",
-    "module": "node16",
+    "moduleResolution": "bundler",
+    "module": "es2020",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,

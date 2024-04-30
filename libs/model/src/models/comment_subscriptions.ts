@@ -1,6 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -13,7 +12,7 @@ export type CommentSubscriptionInstance =
 export type CommentSubscriptionModelStatic =
   ModelStatic<CommentSubscriptionInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <CommentSubscriptionModelStatic>sequelize.define<CommentSubscriptionInstance>(
     'CommentSubscriptions',
     {

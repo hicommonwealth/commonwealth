@@ -1,6 +1,5 @@
 import { WebhookCategory } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -18,7 +17,7 @@ export type WebhookInstance = ModelInstance<WebhookAttributes>;
 
 export type WebhookModelStatic = ModelStatic<WebhookInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <WebhookModelStatic>sequelize.define<WebhookInstance>(
     'Webhook',
     {

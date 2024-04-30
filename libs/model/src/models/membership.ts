@@ -1,8 +1,7 @@
 import type * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
 import { AddressAttributes } from './address';
 import { GroupAttributes } from './group';
-import { ModelInstance, ModelStatic } from './types';
+import { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type MembershipRejectReason =
   | {
@@ -31,7 +30,7 @@ export type MembershipModelStatic = ModelStatic<MembershipInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): MembershipModelStatic => {
   const Membership = <MembershipModelStatic>(
     sequelize.define<MembershipInstance>(

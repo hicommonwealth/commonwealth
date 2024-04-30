@@ -1,9 +1,12 @@
 import { broker, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { MESSAGE_RELAYER_TIMEOUT_MS } from '../../config';
 import { relay } from './relay';
 
 const INITIAL_ERROR_TIMEOUT = 2_000;
+
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 export let numUnrelayedEvents = 0;
 

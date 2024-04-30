@@ -1,8 +1,10 @@
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { EVM_CE_POLL_INTERVAL_MS } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**
@@ -36,7 +38,7 @@ export async function startEvmPolling(
   );
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   startEvmPolling(EVM_CE_POLL_INTERVAL_MS).catch((e) => {
     log.error('Evm poller shutting down due to a critical error:', e);
     process.exit(1);

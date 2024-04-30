@@ -1,6 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
@@ -45,7 +44,7 @@ export type CommunityInstance = ModelInstance<CommunityAttributes> & {
 
 export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <CommunityModelStatic>sequelize.define<CommunityInstance>(
     // Leave this as is for now so that we don't need to alias and models can join
     // with this model using .Chain rather than .Community. Models should incrementally

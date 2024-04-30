@@ -1,8 +1,7 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { NotificationAttributes } from './notification';
 import type { SubscriptionAttributes } from './subscription';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
 export type NotificationsReadAttributes = {
   subscription_id: number;
@@ -21,7 +20,7 @@ export type NotificationsReadModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): NotificationsReadModelStatic => {
   const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
     'NotificationsRead',

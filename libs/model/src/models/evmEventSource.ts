@@ -1,4 +1,4 @@
-import Sequelize, { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
 import { ContractAttributes } from './contract';
 import { ContractAbiAttributes } from './contract_abi';
@@ -24,7 +24,7 @@ export type EvmEventSourceInstance = ModelInstance<EvmEventSourceAttributes>;
 
 export type EvmEventSourceModelStatic = ModelStatic<EvmEventSourceInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <EvmEventSourceModelStatic>sequelize.define(
     'EvmEventSource',
     {

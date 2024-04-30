@@ -1,6 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
 import z from 'zod';
 import type { CommunityAttributes } from './community';
 import type { MembershipAttributes } from './membership';
@@ -15,7 +14,7 @@ export type GroupAttributes = z.infer<typeof schemas.entities.Group> & {
 export type GroupInstance = ModelInstance<GroupAttributes>;
 export type GroupModelStatic = ModelStatic<GroupInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <GroupModelStatic>sequelize.define<GroupInstance>(
     'Group',
     {

@@ -1,6 +1,5 @@
 import type { AbiType } from '@hicommonwealth/shared';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { hashAbi } from '../utils';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -18,7 +17,7 @@ export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
 
 export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <ContractAbiModelStatic>sequelize.define<ContractAbiInstance>(
     'ContractAbi',
     {

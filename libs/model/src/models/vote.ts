@@ -1,4 +1,3 @@
-import type { DataTypes } from 'sequelize';
 import * as Sequelize from 'sequelize';
 import type { PollAttributes } from './poll';
 import type { ModelInstance, ModelStatic } from './types';
@@ -21,7 +20,7 @@ export type VoteInstance = ModelInstance<VoteAttributes>;
 
 export type VoteModelStatic = ModelStatic<VoteInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <VoteModelStatic>sequelize.define<VoteInstance>(
     'Vote',
     {

@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityBannerAttributes = {
@@ -14,7 +13,7 @@ export type CommunityBannerInstance = ModelInstance<CommunityBannerAttributes>;
 
 export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <CommunityBannerModelStatic>sequelize.define<CommunityBannerInstance>(
     'CommunityBanner',
     {

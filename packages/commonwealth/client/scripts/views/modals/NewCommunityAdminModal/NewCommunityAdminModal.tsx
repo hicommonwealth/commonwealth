@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { formatAddressShort } from 'helpers';
-import { uniqBy } from 'lodash';
+import _ from 'lodash';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -43,7 +43,7 @@ const NewCommunityAdminModal = ({
     onAction: true,
   });
 
-  const availableAddresses = uniqBy(
+  const availableAddresses = _.uniqBy(
     availableAddressesOnSelectedChain,
     'address',
   );

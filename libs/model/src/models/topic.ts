@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -31,7 +30,7 @@ export type TopicInstance = ModelInstance<TopicAttributes> & {
 
 export type TopicModelStatic = ModelStatic<TopicInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <TopicModelStatic>sequelize.define<TopicInstance>(
     'Topic',
     {

@@ -1,13 +1,14 @@
 import { IDiscordMeta, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export type CommentAttributes = {
@@ -45,10 +46,7 @@ export type CommentInstance = ModelInstance<CommentAttributes>;
 
 export type CommentModelStatic = ModelStatic<CommentInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommentModelStatic => {
+export default (sequelize: Sequelize.Sequelize): CommentModelStatic => {
   const Comment = <CommentModelStatic>sequelize.define(
     'Comment',
     {

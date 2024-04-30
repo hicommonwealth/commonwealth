@@ -1,6 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -10,10 +9,7 @@ export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ChainNodeModelStatic =>
+export default (sequelize: Sequelize.Sequelize): ChainNodeModelStatic =>
   <ChainNodeModelStatic>sequelize.define<ChainNodeInstance>(
     'ChainNode',
     {

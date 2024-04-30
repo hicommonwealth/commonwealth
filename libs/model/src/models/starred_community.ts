@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
@@ -21,7 +20,7 @@ export type StarredCommunityInstance =
 
 export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <StarredCommunityModelStatic>sequelize.define<StarredCommunityInstance>(
     'StarredCommunity',
     {

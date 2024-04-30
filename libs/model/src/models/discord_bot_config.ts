@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type DiscordBotConfigAttributes = {
@@ -20,7 +19,7 @@ export type DiscordBotConfigInstance =
 
 export type DiscordBotConfigModelStatic = ModelStatic<DiscordBotConfigInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <DiscordBotConfigModelStatic>sequelize.define<DiscordBotConfigInstance>(
     'DiscordBotConfig',
     {

@@ -1,13 +1,14 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export type NotificationAttributes = {
@@ -31,7 +32,7 @@ export type NotificationModelStatic = ModelStatic<NotificationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): NotificationModelStatic => {
   const Notification = <NotificationModelStatic>(
     sequelize.define<NotificationInstance>(

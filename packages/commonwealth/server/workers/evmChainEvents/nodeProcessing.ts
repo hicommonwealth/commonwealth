@@ -1,11 +1,13 @@
 import { schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**

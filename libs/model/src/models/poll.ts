@@ -1,5 +1,4 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -26,7 +25,7 @@ export type PollAttributes = {
 export type PollInstance = ModelInstance<PollAttributes>;
 export type PollModelStatic = ModelStatic<PollInstance>;
 
-export default (sequelize: Sequelize.Sequelize, dataTypes: typeof DataTypes) =>
+export default (sequelize: Sequelize.Sequelize) =>
   <PollModelStatic>sequelize.define<PollInstance>(
     'Poll',
     {

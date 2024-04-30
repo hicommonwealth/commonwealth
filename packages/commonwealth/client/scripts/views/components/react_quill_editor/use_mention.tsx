@@ -6,7 +6,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
 import axios from 'axios';
-import { debounce } from 'lodash';
+import _ from 'lodash';
 import app from 'state';
 import {
   APIOrderBy,
@@ -65,7 +65,7 @@ export const useMention = ({
       dataAttributes: ['name', 'link', 'component'],
       renderItem: (item) => item.component,
       onSelect: selectMention,
-      source: debounce(
+      source: _.debounce(
         async (
           searchTerm: string,
           renderList: (

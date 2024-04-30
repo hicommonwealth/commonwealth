@@ -2,7 +2,6 @@ import {
   EmitNotification,
   NotificationCategories,
 } from '@hicommonwealth/shared';
-import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
 import type { CommentAttributes } from './comment';
 import type { CommunityAttributes } from './community';
@@ -12,7 +11,7 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { DataTypes, ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
 export enum SubscriptionValidationErrors {
@@ -54,7 +53,7 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: DataTypes,
 ): SubscriptionModelStatic => {
   const Subscription = <SubscriptionModelStatic>sequelize.define(
     'Subscription',

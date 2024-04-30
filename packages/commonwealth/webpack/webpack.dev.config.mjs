@@ -1,10 +1,13 @@
-const path = require('path');
-const webpack = require('webpack');
-const { merge } = require('webpack-merge');
-const common = require('./webpack.base.config.js');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import webpack from 'webpack';
+import { merge } from 'webpack-merge';
+import baseConfig from './webpack.base.config.mjs';
 
-module.exports = merge(common, {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const devConfig = merge(baseConfig, {
   mode: 'development',
   devtool: 'eval-cheap-source-map',
   stats: {
@@ -36,7 +39,7 @@ module.exports = merge(common, {
   },
 });
 
-module.exports = merge(module.exports, {
+export default merge(devConfig, {
   entry: {
     app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
   },
