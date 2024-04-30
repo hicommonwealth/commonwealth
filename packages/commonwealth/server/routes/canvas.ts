@@ -86,11 +86,11 @@ export const postCanvasData = async (
   // TODO: Implement verification and call the create
   // thread/comment/reaction server method with POST data pre-filled.
   if (actionMessage.payload.name === 'thread') {
-    await verifyThread(req.body, {});
+    await verifyThread(canvasSignedData, {});
   } else if (actionMessage.payload.name === 'comment') {
-    await verifyComment(req.body, {});
+    await verifyComment(canvasSignedData, {});
   } else if (actionMessage.payload.name === 'reaction') {
-    await verifyReaction(req.body, {});
+    await verifyReaction(canvasSignedData, {});
   }
 
   // TODO: Return some kind of identifier for the generated data.
