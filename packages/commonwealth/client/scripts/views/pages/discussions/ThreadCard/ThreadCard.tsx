@@ -3,11 +3,13 @@ import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteD
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ThreadContestTag from 'views/components/ThreadContestTag';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -59,6 +61,7 @@ export const ThreadCard = ({
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+  const contestsEnabled = useFlag('contest');
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -90,6 +93,17 @@ export const ThreadCard = ({
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
+
+  const contestWinners = [
+    { date: '03/09/2024', round: 7, isRecurring: true },
+    { date: '03/10/2024', isRecurring: false },
+    {
+      date: '03/10/2024',
+      round: 8,
+      isRecurring: true,
+    },
+  ];
+  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   return (
     <>
@@ -136,6 +150,10 @@ export const ThreadCard = ({
             {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
             <div className="content-title">
               <CWText type="h5" fontWeight="semiBold">
+                {showContestWinnerTag &&
+                  contestWinners?.map((winner, index) => (
+                    <ThreadContestTag key={index} {...winner} />
+                  ))}
                 {thread.title}
               </CWText>
             </div>
