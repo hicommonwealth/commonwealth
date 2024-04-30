@@ -93,7 +93,6 @@ export * from './profile';
 export * from './reaction';
 export * from './role';
 export * from './role_assignment';
-export * from './snapshot_proposal';
 export * from './snapshot_spaces';
 export * from './sso_token';
 export * from './stake_transaction';

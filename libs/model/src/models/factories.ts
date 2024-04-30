@@ -31,7 +31,6 @@ import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
 import Reaction from './reaction';
-import SnapshotProposal from './snapshot_proposal';
 import SnapshotSpace from './snapshot_spaces';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
@@ -80,7 +79,6 @@ export const Factories = {
   Poll,
   Profile,
   Reaction,
-  SnapshotProposal,
   SnapshotSpace,
   SsoToken,
   StakeTransaction,
