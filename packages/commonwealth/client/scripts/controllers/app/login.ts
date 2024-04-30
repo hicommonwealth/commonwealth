@@ -8,6 +8,7 @@ import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import { initAppState } from 'state';
 
+import { OpenFeature } from '@openfeature/web-sdk';
 import axios from 'axios';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
 import moment from 'moment';
@@ -552,8 +553,12 @@ export async function handleSocialLoginCallback({
       await updateActiveAddresses({ chain: c });
     }
 
-    // TODO: behind a feature flag
-    {
+    const client = OpenFeature.getClient();
+    const userOnboardingEnabled = client.getBooleanValue(
+      'userOnboardingEnabled',
+      false,
+    );
+    if (userOnboardingEnabled) {
       const {
         created_at: accountCreatedTime,
         Profiles: profiles,
@@ -563,7 +568,7 @@ export async function handleSocialLoginCallback({
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
       if (!app.user.email && ssoEmail && profiles?.length === 1) {
-        await app.user.updateEmail(ssoEmail);
+        await app.user.updateEmail(ssoEmail, false);
       }
 
       // if account is created in last few minutes and has a single
