@@ -19,6 +19,7 @@
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
+    "db-all": "yarn --cwd packages/commonwealth db-all",
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
