@@ -31,7 +31,7 @@ const createReaction = async ({
     address,
     reaction: reactionType,
     jwt: app.user.jwt,
-    ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 };
 

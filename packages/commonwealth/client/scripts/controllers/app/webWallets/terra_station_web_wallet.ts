@@ -1,7 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import type { SessionSigner } from '@canvas-js/interfaces';
 import { toBase64 } from '@cosmjs/encoding';
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
@@ -78,14 +77,14 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async getSessionSigner(): Promise<SessionSigner> {
+  public getSessionSigner() {
     return new CosmosSignerCW({
       bech32Prefix: app.chain?.meta.bech32Prefix,
       signer: {
         type: 'bytes',
         signBytes: (message) => window.station.signBytes(toBase64(message)),
-        getAddress: async () => this._accounts[0],
-        getChainId: async () => this.getChainId(),
+        getAddress: () => this._accounts[0],
+        getChainId: () => this.getChainId(),
       },
     });
   }

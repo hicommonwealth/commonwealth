@@ -43,7 +43,8 @@ export async function signSessionWithAccount<T extends { address: string }>(
   return session;
 }
 
-export const getMagicCosmosSessionSigner = async (
+export const getMagicCosmosSessionSigner = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   signer: { signMessage: any },
   address: string,
   chainId: string,
@@ -51,8 +52,8 @@ export const getMagicCosmosSessionSigner = async (
   return new CosmosSignerCW({
     signer: {
       type: 'amino',
-      getAddress: async () => address,
-      getChainId: async () => chainId,
+      getAddress: () => address,
+      getChainId: () => chainId,
       signAmino: async (chainIdIgnore, signerIgnore, signDoc) => {
         const { msgs, fee } = signDoc;
         return {
@@ -65,6 +66,7 @@ export const getMagicCosmosSessionSigner = async (
 };
 
 export async function getSessionFromWallet(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wallet: IWebWallet<any>,
   opts?: { timestamp?: number },
 ) {
@@ -95,6 +97,7 @@ function getCaip2Address(address: string) {
 async function sign(
   address_: string,
   call: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
 ): Promise<CanvasSignResult> {
   const address = getCaip2Address(address_);

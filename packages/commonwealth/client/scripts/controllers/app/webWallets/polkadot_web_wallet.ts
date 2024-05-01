@@ -5,8 +5,6 @@ import {
 } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
-import type { SessionSigner } from '@canvas-js/interfaces';
-
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 
 import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
@@ -46,7 +44,7 @@ class PolkadotWebWalletController
     return this._accounts || [];
   }
 
-  public async getSessionSigner(): Promise<SessionSigner> {
+  public async getSessionSigner() {
     const accounts = await web3Accounts();
     const address = accounts[0].address;
 
@@ -56,6 +54,8 @@ class PolkadotWebWalletController
     });
 
     const extension = await web3FromAddress(reencodedAddress);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return new SubstrateSignerCW({ extension });
   }
 

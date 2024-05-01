@@ -62,7 +62,7 @@ export const createThreadCommentHandler = async (
     threadCommentFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      const { canvasSignedData } = await fromCanvasSignedDataApiArgs(req.body);
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
       await verifyComment(canvasSignedData, {
         thread_id: parseInt(threadId, 10) || undefined,
         text,

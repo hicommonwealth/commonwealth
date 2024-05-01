@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 
 import {
@@ -95,21 +95,23 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    const doUpdate = async () => {
-      try {
-        const canvasSignedData: CanvasSignedData = deserializeCanvas(
-          comment.canvasSignedData,
-        );
-        await verify(canvasSignedData);
-        setVerifiedCanvasSignedData(canvasSignedData);
-      } catch (err) {
-        console.log('Unexpected error while verifying action/session');
-        return;
-      }
-    };
-    doUpdate();
+  const doVerify = useCallback(async () => {
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        comment.canvasSignedData,
+      );
+      await verify(canvasSignedData);
+      setVerifiedCanvasSignedData(canvasSignedData);
+    } catch (err) {
+      console.log('Unexpected error while verifying action/session');
+      return;
+    }
   }, [comment.canvasSignedData]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    doVerify();
+  }, [doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);

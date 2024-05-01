@@ -61,12 +61,12 @@ class TerraWalletConnectWebWalletController
     };
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new CosmosSignerCW({
       signer: {
         type: 'bytes',
-        getAddress: async () => this._accounts[0].address,
-        getChainId: async () => this.getChainId(),
+        getAddress: () => this._accounts[0].address,
+        getChainId: () => this.getChainId(),
         signBytes: async (bytes) => {
           const result = await this._wallet.signBytes(Buffer.from(bytes));
           if (!result.success) {

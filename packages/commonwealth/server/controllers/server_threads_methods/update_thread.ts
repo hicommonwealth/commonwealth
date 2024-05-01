@@ -52,8 +52,8 @@ export type UpdateThreadOptions = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasSignedData?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 

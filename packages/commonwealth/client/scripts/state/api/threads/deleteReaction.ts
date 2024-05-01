@@ -33,7 +33,7 @@ const deleteReaction = async ({
         address: address,
         community_id: app.chain.id,
         jwt: app.user.jwt,
-        ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+        ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     },
   );

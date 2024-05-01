@@ -78,7 +78,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._chainId;
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new CosmosSignerCW({
       bech32Prefix: app.chain?.meta.bech32Prefix || 'inj',
       signer: {
@@ -88,8 +88,8 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
           signerAddress: string,
           message: string,
         ) => this._web3.eth.personal.sign(message, signerAddress, ''),
-        getAddress: async () => this._ethAccounts[0],
-        getChainId: async () => this._chainId,
+        getAddress: () => this._ethAccounts[0],
+        getChainId: () => this._chainId,
       },
     });
   }
@@ -106,9 +106,9 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     try {
       let ethereum = window.ethereum;
       if (window.ethereum.providers?.length) {
-        window.ethereum.providers.forEach(async (p) => {
+        for (const p of window.ethereum.providers) {
           if (p.isMetaMask) ethereum = p;
-        });
+        }
       }
 
       // (this needs to be called first, before other requests)

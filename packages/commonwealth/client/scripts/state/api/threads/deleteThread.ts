@@ -28,7 +28,7 @@ const deleteThread = async ({
       community_id: communityId,
       address: address,
       jwt: app.user.jwt,
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   });
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import 'modals/canvas_verify_data_modal.scss';
 import { verify } from 'shared/canvas';
@@ -18,21 +18,23 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
 
-  useEffect(() => {
-    const doUpdate = async () => {
-      try {
-        const canvasSignedData: CanvasSignedData = deserializeCanvas(
-          obj.canvasSignedData,
-        );
-        await verify(canvasSignedData);
-        setVerifiedCanvasSignedData(canvasSignedData);
-      } catch (err) {
-        console.log('Unexpected error while verifying action/session');
-        return;
-      }
-    };
-    doUpdate();
+  const doVerify = useCallback(async () => {
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        obj.canvasSignedData,
+      );
+      await verify(canvasSignedData);
+      setVerifiedCanvasSignedData(canvasSignedData);
+    } catch (err) {
+      console.log('Unexpected error while verifying action/session');
+      return;
+    }
   }, [obj.canvasSignedData]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    doVerify();
+  }, [doVerify]);
 
   return (
     <div

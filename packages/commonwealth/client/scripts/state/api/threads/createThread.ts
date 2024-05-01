@@ -57,7 +57,7 @@ const createThread = async ({
     url,
     readOnly,
     jwt: app.user.jwt,
-    ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 
   return new Thread(response.data.result);

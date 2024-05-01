@@ -70,15 +70,15 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new SIWESigner({
       signer: {
-        signMessage: async (message) =>
+        signMessage: (message) =>
           this._web3.givenProvider.request({
             method: 'personal_sign',
             params: [message, this.accounts[0]],
           }),
-        getAddress: async () => this.accounts[0],
+        getAddress: () => this.accounts[0],
       },
       chainId: parseInt(this.getChainId()),
     });

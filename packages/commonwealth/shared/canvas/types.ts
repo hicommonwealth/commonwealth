@@ -17,17 +17,19 @@ export type CanvasSignResult = {
 // automatically serialized by JSON, e.g. Uint8Array. We are using the IPLD dag-json codec
 // to serialize and deserialize these objects.
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const serializeCanvas = (data: any): string => {
   return stringify(encode(data));
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const deserializeCanvas = (serializedData: string): any => {
   return decode(parse(serializedData));
 };
 
-export const toCanvasSignedDataApiArgs = async (
+export const toCanvasSignedDataApiArgs = (
   data: undefined | CanvasSignResult,
-): Promise<CanvasSignedDataApiArgs> => {
+): CanvasSignedDataApiArgs => {
   // ignore undefined data
   if (data === undefined) {
     return;
@@ -46,21 +48,15 @@ export type CanvasSignedDataApiArgs = {
   canvas_hash: string;
 };
 
-export const fromCanvasSignedDataApiArgs = async (
+export const fromCanvasSignedDataApiArgs = (
   data: CanvasSignedDataApiArgs,
-): Promise<CanvasSignResult> => {
-  const canvasSignedData: CanvasSignedData = decode(
-    parse(data.canvas_signed_data),
-  );
-
-  // try to deserialize
-  return {
-    canvasSignedData,
-    canvasHash: data.canvas_hash,
-  };
-};
+): CanvasSignResult => ({
+  canvasSignedData: deserializeCanvas(data.canvas_signed_data),
+  canvasHash: data.canvas_hash,
+});
 
 export const hasCanvasSignedDataApiArgs = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
 ): args is CanvasSignedDataApiArgs => {
   /**

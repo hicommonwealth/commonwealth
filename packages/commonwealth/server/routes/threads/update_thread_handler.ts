@@ -22,8 +22,8 @@ type UpdateThreadRequestBody = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasSignedData?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;

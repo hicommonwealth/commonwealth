@@ -40,7 +40,7 @@ const editComment = async ({
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
       jwt: app.user.jwt,
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 

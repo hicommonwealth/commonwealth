@@ -47,7 +47,7 @@ const deleteComment = async ({
       text: '[deleted]',
       plaintext: '[deleted]',
       versionHistory: [],
-      ...(await toCanvasSignedDataApiArgs(canvasSignedData)),
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   };
 };

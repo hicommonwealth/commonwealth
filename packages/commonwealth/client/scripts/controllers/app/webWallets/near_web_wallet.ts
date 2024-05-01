@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import type { SessionSigner } from '@canvas-js/interfaces';
+import { SessionSigner } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -24,15 +22,17 @@ class NearWebWalletController implements IWebWallet<any> {
     return 'near';
   }
 
-  public async getRecentBlock(chainIdentifier: string) {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async getRecentBlock(_chainIdentifier: string) {
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async getSessionPublicAddress(): Promise<string> {
     return null;
   }
 
-  public async getSessionSigner(): Promise<SessionSigner> {
+  public getSessionSigner(): SessionSigner {
     throw new Error('not implemented');
   }
 

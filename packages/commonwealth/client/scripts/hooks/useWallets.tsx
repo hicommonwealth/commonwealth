@@ -421,7 +421,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     try {
       if (walletToUse.chain !== 'near') {
         await primaryAccountToUse.validate(cachedSessionToUse, false);
-        verifySession(cachedSessionToUse);
+        await verifySession(cachedSessionToUse);
       }
       await onLogInWithAccount(primaryAccountToUse, false, true, false);
       // Important: when we first create an account and verify it, the user id
@@ -688,7 +688,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     );
 
     await account.validate(session);
-    verifySession(session);
+    await verifySession(session);
     console.log('Started new session for', wallet.chain);
 
     // ensure false for newlyCreated / linking vars on revalidate

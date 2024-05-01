@@ -59,7 +59,7 @@ export const createThreadHandler = async (
     threadFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      const { canvasSignedData } = await fromCanvasSignedDataApiArgs(req.body);
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
       await verifyThread(canvasSignedData, {
         title,

@@ -211,7 +211,7 @@ export async function updateActiveAddresses({
       }
       let hasSession = false;
       try {
-        await matchedSessionSigner.getCachedSession(
+        matchedSessionSigner.getCachedSession(
           CANVAS_TOPIC,
           communityAccount.address,
         );
@@ -475,7 +475,7 @@ export async function handleSocialLoginCallback({
         ChainBase.CosmosSDK,
         prefix,
       );
-      const sessionSigner = await getMagicCosmosSessionSigner(
+      const sessionSigner = getMagicCosmosSessionSigner(
         signer,
         magicAddress,
         canvasChainId,

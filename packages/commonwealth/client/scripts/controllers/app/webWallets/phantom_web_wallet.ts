@@ -1,7 +1,5 @@
 declare let window: any;
 
-import type { SessionSigner } from '@canvas-js/interfaces';
-
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { SolanaSignerCW } from 'shared/canvas/sessionSigners';
 import IWebWallet from '../../../models/IWebWallet';
@@ -43,7 +41,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return null;
   }
 
-  public async getSessionSigner(): Promise<SessionSigner> {
+  public getSessionSigner() {
     return new SolanaSignerCW({
       signer: window.solana,
       chainId: this.getChainId(),

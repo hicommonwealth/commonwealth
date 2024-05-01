@@ -26,49 +26,43 @@ const useCheckAuthenticatedAddresses = ({
   }>({});
 
   useEffect(() => {
-    const updateAuthenticatedAddresses = async () => {
-      const sessionSigners = getSessionSigners();
+    const sessionSigners = getSessionSigners();
 
-      const newAuthenticatedAddresses: Record<string, boolean> = {};
+    const newAuthenticatedAddresses: Record<string, boolean> = {};
 
-      for (const account of userActiveAccounts) {
-        const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+    for (const account of userActiveAccounts) {
+      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
 
-        const communityIdOrPrefix =
-          account.community.base === ChainBase.CosmosSDK
-            ? account.community.ChainNode?.bech32
-            : account.community.ChainNode?.ethChainId;
-        const communityCanvasChainId = chainBaseToCanvasChainId(
-          account.community.base,
-          communityIdOrPrefix,
-        );
-        const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+      const communityIdOrPrefix =
+        account.community.base === ChainBase.CosmosSDK
+          ? account.community.ChainNode?.bech32
+          : account.community.ChainNode?.ethChainId;
+      const communityCanvasChainId = chainBaseToCanvasChainId(
+        account.community.base,
+        communityIdOrPrefix,
+      );
+      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-        // find a session signer that matches
-        const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
-          sessionSigner.match(caip2Address),
-        );
-        if (!matchedSessionSigner) {
-          newAuthenticatedAddresses[caip2Address] = false;
-          continue;
-        }
-        // check if it has an authorised session
-        let hasSession = false;
-        try {
-          await matchedSessionSigner.getCachedSession(
-            CANVAS_TOPIC,
-            caip2Address,
-          );
-          hasSession = true;
-        } catch (e) {
-          // do nothing
-        }
-        newAuthenticatedAddresses[caip2Address] = hasSession;
+      // find a session signer that matches
+      const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
+        sessionSigner.match(caip2Address),
+      );
+      if (!matchedSessionSigner) {
+        newAuthenticatedAddresses[caip2Address] = false;
+        continue;
       }
+      // check if it has an authorised session
+      let hasSession = false;
+      try {
+        matchedSessionSigner.getCachedSession(CANVAS_TOPIC, caip2Address);
+        hasSession = true;
+      } catch (e) {
+        // do nothing
+      }
+      newAuthenticatedAddresses[caip2Address] = hasSession;
+    }
 
-      setAuthenticatedAddresses(newAuthenticatedAddresses);
-    };
-    updateAuthenticatedAddresses();
+    setAuthenticatedAddresses(newAuthenticatedAddresses);
   }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
 
   return { authenticatedAddresses };

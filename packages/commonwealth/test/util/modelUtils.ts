@@ -34,11 +34,7 @@ import { createRole, findOneRole } from '../../server/util/roles';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
-async function createCanvasSignResult({
-  session,
-  sign,
-  action,
-}): Promise<CanvasSignResult> {
+function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {
     clock: 0,
     parents: [],
@@ -338,7 +334,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       timestamp: Date.now(),
     };
 
-    const canvasSignResult = await createCanvasSignResult({
+    const canvasSignResult = createCanvasSignResult({
       session,
       sign,
       action,
@@ -359,7 +355,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         url,
         readOnly: readOnly || false,
         jwt,
-        ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },
@@ -415,7 +411,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       },
       timestamp: Date.now(),
     };
-    const canvasSignResult = await createCanvasSignResult({
+    const canvasSignResult = createCanvasSignResult({
       session,
       sign,
       action,
@@ -433,7 +429,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         thread_id,
         text,
         jwt,
-        ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },
@@ -476,7 +472,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       args: { comment_id, value: reaction },
       timestamp: Date.now(),
     };
-    const canvasSignResult = await createCanvasSignResult({
+    const canvasSignResult = createCanvasSignResult({
       session,
       sign,
       action,
@@ -495,7 +491,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         author_chain,
         jwt,
         thread_id,
-        ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },
@@ -520,7 +516,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       args: { thread_id, value: reaction },
       timestamp: Date.now(),
     };
-    const canvasSignResult = await createCanvasSignResult({
+    const canvasSignResult = createCanvasSignResult({
       session,
       sign,
       action,
@@ -537,7 +533,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         author_chain,
         jwt,
         thread_id,
-        ...(await toCanvasSignedDataApiArgs(canvasSignResult)),
+        ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
     return res.body;
   },

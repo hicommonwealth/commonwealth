@@ -4,7 +4,19 @@ import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 
 export interface LeapWindow {
-  leap?: any;
+  leap?: {
+    signArbitrary: (
+      chainId: string,
+      address: string,
+      msg: string,
+    ) => Promise<{
+      pub_key: {
+        type: string;
+        value: string;
+      };
+      signature: string;
+    }>;
+  };
 }
 
 declare global {
@@ -17,7 +29,7 @@ class LeapWebWalletController extends KeplrLikeWebWalletController {
     super(WalletId.Leap, 'Leap');
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new CosmosSignerCW({
       bech32Prefix: app.chain?.meta.bech32Prefix,
       signer: {
@@ -28,8 +40,8 @@ class LeapWebWalletController extends KeplrLikeWebWalletController {
             this.accounts[0].address,
             msg,
           ),
-        getAddress: async () => this.accounts[0].address,
-        getChainId: async () => this.getChainId(),
+        getAddress: () => this.accounts[0].address,
+        getChainId: () => this.getChainId(),
       },
     });
   }

@@ -71,15 +71,15 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new SIWESigner({
       signer: {
-        signMessage: async (message) =>
+        signMessage: (message) =>
           this._web3.givenProvider.request({
             method: 'personal_sign',
             params: [this.accounts[0], message],
           }),
-        getAddress: async () => this.accounts[0],
+        getAddress: () => this.accounts[0],
       },
       chainId: parseInt(this.getChainId()),
     });

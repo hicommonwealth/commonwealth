@@ -55,7 +55,7 @@ export const createThreadReactionHandler = async (
     reactionFields.canvasHash = req.body.canvas_hash;
 
     if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-      const { canvasSignedData } = await fromCanvasSignedDataApiArgs(req.body);
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
       await verifyReaction(canvasSignedData, {
         thread_id: threadId,

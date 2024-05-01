@@ -133,7 +133,7 @@ const FinishNearLogin = () => {
         chainId,
       );
 
-      verifySession(canvasSessionPayload);
+      await verifySession(canvasSessionPayload);
 
       if (!app.isLoggedIn()) {
         await initAppState();

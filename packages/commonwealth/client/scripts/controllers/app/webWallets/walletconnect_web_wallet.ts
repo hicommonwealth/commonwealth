@@ -63,11 +63,11 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new SIWESigner({
       signer: {
-        getAddress: async () => this._accounts[0],
-        signMessage: async (message) =>
+        getAddress: () => this._accounts[0],
+        signMessage: (message) =>
           this._provider.request({
             method: 'personal_sign',
             params: [message, this._accounts[0]],

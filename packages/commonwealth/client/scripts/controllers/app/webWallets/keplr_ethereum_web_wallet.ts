@@ -75,7 +75,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     };
   }
 
-  public async getSessionSigner() {
+  public getSessionSigner() {
     return new CosmosSignerCW({
       bech32Prefix: app.chain.meta.bech32Prefix,
       signer: {
@@ -93,11 +93,11 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           );
           return `0x${Buffer.from(signature).toString('hex')}`;
         },
-        getAddress: async () => {
+        getAddress: () => {
           const { data: addressData } = fromBech32(this.accounts[0].address);
           return `0x${bytesToHex(addressData)}`;
         },
-        getChainId: async () => this._chainId,
+        getChainId: () => this._chainId,
       },
     });
   }
