@@ -173,10 +173,10 @@ export function mapFk<Source extends State, Target extends State>(
   const name = `${this.tableName}_${target.tableName.toLowerCase()}_fkey`;
   const fk = key.map((k) => (Array.isArray(k) ? k[0] : k));
   const pk = key.map((k) => (Array.isArray(k) ? k[1] : k));
-  console.log(
-    'mapFk:',
-    `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
-  );
+  // console.log(
+  //   'mapFk:',
+  //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
+  // );
   this._fks.push({
     name,
     source: this.tableName,
