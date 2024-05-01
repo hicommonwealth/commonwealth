@@ -2,14 +2,7 @@ import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
 import { Factories } from './factories';
 import type { Models } from './types';
-import {
-  createFk,
-  dropFk,
-  manyToMany,
-  mapFk,
-  oneToMany,
-  oneToOne,
-} from './utils';
+import { createFk, dropFk, manyToMany, oneToMany, oneToOne } from './utils';
 
 export type DB = Models<typeof Factories> & {
   sequelize: Sequelize;
@@ -21,40 +14,15 @@ export type DB = Models<typeof Factories> & {
  * - This is not yet supported by sequelize
  */
 export const syncDb = async (db: DB, log = false) => {
-  // TODO: build this map when creating one to many associations with composite keys
-  const compositeKeys = [
-    mapFk(db.Contest, db.ContestAction, ['contest_address', 'contest_id']),
-    mapFk(db.ContestManager, db.Contest, ['contest_address']),
-    mapFk(db.Topic, db.ContestTopic, [['id', 'topic_id']]),
-    mapFk(db.Community, db.CommunityStake, [['id', 'community_id']]),
-    mapFk(db.ChainNode, db.LastProcessedEvmBlock, [['id', 'chain_node_id']]),
-    mapFk(
-      db.CommunityStake,
-      db.StakeTransaction,
-      ['community_id', 'stake_id'],
-      {
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      },
-    ),
-    mapFk(db.Community, db.StarredCommunity, [['id', 'community_id']], {
-      onUpdate: 'CASCADE',
-    }),
-    mapFk(db.User, db.StarredCommunity, [['id', 'user_id']], {
-      onUpdate: 'CASCADE',
-    }),
-  ];
-
-  compositeKeys.forEach(({ parent, child }) =>
-    dropFk(db.sequelize, parent.tableName, child.tableName),
+  const fks = Object.keys(Factories).flatMap(
+    (k) => db[k as keyof typeof Factories]._fks,
   );
+  fks.forEach((fk) => dropFk(db.sequelize, fk));
   await db.sequelize.sync({
     force: true,
     logging: log ? console.log : false,
   });
-  compositeKeys.forEach(({ parent, child, key, rules }) =>
-    createFk(db.sequelize, parent.tableName, child.tableName, key, rules),
-  );
+  fks.forEach((fk) => createFk(db.sequelize, fk));
 };
 
 /**
@@ -66,24 +34,23 @@ export const buildDb = (sequelize: Sequelize): DB => {
   const models = Object.fromEntries(
     Object.entries(Factories).map(([key, factory]) => {
       const model = factory(sequelize);
+      model._fks = [];
       // TODO: can we make this work without any?
       model.withOne = oneToOne as any;
       model.withMany = oneToMany as any;
       model.withManyToMany = manyToMany as any;
       return [key, model];
     }),
-  ) as Models<typeof Factories>;
+  );
 
-  const db = { sequelize, Sequelize, ...models };
+  const db = { sequelize, Sequelize, ...models } as DB;
+  buildAssociations(db);
 
-  // associate hook
+  // TODO: remove legacy associate hook
   Object.keys(models).forEach((key) => {
     const model = models[key as keyof typeof Factories];
     'associate' in model && model.associate(db);
   });
-
-  // proposed association builder
-  buildAssociations(db);
 
   return db;
 };

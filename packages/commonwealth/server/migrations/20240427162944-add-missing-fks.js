@@ -103,6 +103,9 @@ ALTER TABLE ONLY public."StarredCommunities"
 ADD CONSTRAINT "Starredcommunities_user_id_fkey"
 FOREIGN KEY (user_id) REFERENCES public."Users"(id)
 ON UPDATE CASCADE ON DELETE NO ACTION;
+
+ALTER TABLE ONLY public."ContestTopics" ADD CONSTRAINT "ContestTopics_contestmanagers_fkey" 
+FOREIGN KEY (contest_address) REFERENCES public."ContestManagers"(contest_address);
 `,
         {
           transaction: t,
@@ -129,6 +132,8 @@ ALTER TABLE ONLY public."SsoTokens" DROP CONSTRAINT IF EXISTS "SsoTokens_address
 ALTER TABLE ONLY public."StarredCommunities" DROP CONSTRAINT "Starredcommunities_pkey";
 ALTER TABLE ONLY public."StarredCommunities" DROP CONSTRAINT IF EXISTS "Starredcommunities_community_id_fkey";
 ALTER TABLE ONLY public."StarredCommunities" DROP CONSTRAINT IF EXISTS "Starredcommunities_user_id_fkey";
+
+ALTER TABLE ONLY public."ContestTopics" DROP CONSTRAINT "ContestTopics_contestmanagers_fkey";
 `,
         {
           transaction: t,

@@ -22,7 +22,7 @@ const generateSchemas = async () => {
         'FOREIGN KEY Profiles(profile_id) UPDATE CASCADE DELETE SET NULL',
       ],
       Comments: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
+        'FOREIGN KEY Communities(community_id) UPDATE NO ACTION DELETE NO ACTION',
       ],
       Notifications: [
         'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',

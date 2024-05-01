@@ -1,7 +1,7 @@
 import { DB } from '.';
 
 /**
- * Proposed pattern to associate models with type safety
+ * Associates models with type safety
  */
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address, 'user_id')
@@ -27,11 +27,9 @@ export const buildAssociations = (db: DB) => {
     asMany: 'Memberships',
   });
 
-  db.ChainNode.withMany(db.Community, 'chain_node_id').withMany(
-    db.Contract,
-    'chain_node_id',
-    { asMany: 'contracts' },
-  );
+  db.ChainNode.withMany(db.Community, 'chain_node_id')
+    .withMany(db.Contract, 'chain_node_id', { asMany: 'contracts' })
+    .withOne(db.LastProcessedEvmBlock, ['id', 'chain_node_id']);
 
   db.ContractAbi.withMany(db.Contract, 'abi_id').withMany(
     db.EvmEventSource,
@@ -72,10 +70,11 @@ export const buildAssociations = (db: DB) => {
     asMany: 'memberships',
   });
 
-  db.Topic.withMany(db.Thread, 'topic_id', { asMany: 'threads' }).withMany(
-    db.ContestTopic,
-    'topic_id',
-  );
+  db.Topic.withMany(db.Thread, 'topic_id', {
+    asMany: 'threads',
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  }).withMany(db.ContestTopic, 'topic_id');
 
   db.Thread.withMany(db.Poll, 'thread_id', {})
     .withMany(db.ContestAction, 'thread_id', {
@@ -94,16 +93,19 @@ export const buildAssociations = (db: DB) => {
 
   db.ContestManager.withMany(db.Contest, 'contest_address', {
     asMany: 'contests',
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
   }).withMany(db.ContestTopic, 'contest_address', { asMany: 'topics' });
-  db.Contest.withMany(db.ContestAction, 'contest_address', {
+
+  db.Contest.withMany(db.ContestAction, ['contest_address', 'contest_id'], {
     asMany: 'actions',
   });
 
-  db.CommunityStake.withMany(db.StakeTransaction, 'community_id').withMany(
+  db.CommunityStake.withMany(
     db.StakeTransaction,
-    'stake_id',
+    ['community_id', 'stake_id'],
+    {
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
   );
 
   db.Poll.withMany(db.Vote, 'poll_id', {
@@ -127,8 +129,8 @@ export const buildAssociations = (db: DB) => {
     [db.Contract, 'contract_id', 'contracts', {}],
   );
   db.StarredCommunity.withManyToMany(
-    [db.Community, 'community_id', 'communities', {}],
-    [db.User, 'user_id', 'users', {}],
+    [db.Community, 'community_id', 'communities', { onUpdate: 'CASCADE' }],
+    [db.User, 'user_id', 'users', { onUpdate: 'CASCADE' }],
   );
 
   // Reconciling constraint rules in "loose" FKs
