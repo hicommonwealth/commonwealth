@@ -10,6 +10,7 @@ import app from 'state';
 import { addressSwapper } from 'utils';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import TOSModal from 'views/modals/TOSModal';
+import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 
@@ -18,6 +19,7 @@ const useJoinCommunity = () => {
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -80,6 +82,10 @@ const useJoinCommunity = () => {
     } else {
       setIsAuthModalOpen(true);
     }
+
+    await toggleCommunityStar({
+      community: activeCommunityId,
+    });
   };
 
   // Handles linking the specified address to the specified community
@@ -183,6 +189,10 @@ const useJoinCommunity = () => {
           communityId: targetCommunity,
           communityChainBase: originAddressInfo.community.id,
           activeChainId: activeCommunityId,
+        });
+
+        await toggleCommunityStar({
+          community: activeCommunityId,
         });
       } catch (err) {
         console.error(err);
