@@ -68,27 +68,25 @@ export function getRabbitMQConfig(
   const vhostConfig = config.vhosts![vhost];
   if (service === RascalConfigServices.CommonwealthService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
-      RascalExchanges.Discobot,
       RascalExchanges.MessageRelayer,
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
       RascalQueues.SnapshotListener,
-      RascalQueues.DiscordListener,
       RascalQueues.ChainEvent,
+      RascalQueues.NotificationsProvider,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.SnapshotListener,
-      RascalBindings.DiscordListener,
       RascalBindings.ChainEvent,
+      // TODO: add notifications provider binding
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
-      RascalPublications.DiscordListener,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.SnapshotListener,
-      RascalSubscriptions.DiscordListener,
       RascalSubscriptions.ChainEvent,
+      RascalSubscriptions.NotificationsProvider,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
