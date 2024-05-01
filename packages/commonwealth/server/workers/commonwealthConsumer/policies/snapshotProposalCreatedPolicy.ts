@@ -2,6 +2,7 @@ import { EventHandler, Policy, schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
+  ISnapshotNotificationData,
   NotificationCategories,
   SnapshotEventType,
 } from '@hicommonwealth/shared';
@@ -27,14 +28,15 @@ export const processSnapshotProposalCreated: EventHandler<
     return;
   }
 
-  let snapshotNotificationData = {
+  let snapshotNotificationData: ISnapshotNotificationData = {
     space,
     id,
     title,
     body,
     choices,
-    start,
-    expire,
+    start: String(start),
+    expire: String(expire),
+    eventType: event as SnapshotEventType,
   };
 
   log.info(`Processing snapshot message`, payload);
@@ -66,6 +68,7 @@ export const processSnapshotProposalCreated: EventHandler<
       choices: proposal.choices,
       start: proposal.start,
       expire: proposal.expire,
+      eventType: event as SnapshotEventType,
     };
 
     proposal.is_upstream_deleted = true;
@@ -104,8 +107,8 @@ export const processSnapshotProposalCreated: EventHandler<
       body,
       choices,
       space,
-      start,
-      expire,
+      start: String(start),
+      expire: String(start),
       event,
       is_upstream_deleted: false,
     });
@@ -128,10 +131,7 @@ export const processSnapshotProposalCreated: EventHandler<
     // Notifications
     emitNotifications(models, {
       categoryId: NotificationCategories.SnapshotProposal,
-      data: {
-        eventType: event as SnapshotEventType,
-        ...snapshotNotificationData,
-      },
+      data: snapshotNotificationData,
     }).catch((err) => {
       log.error('Error sending snapshot notification', err);
     });

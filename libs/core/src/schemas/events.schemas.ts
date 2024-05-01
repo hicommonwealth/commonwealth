@@ -18,8 +18,8 @@ export const SnapshotProposalCreated = z.object({
   choices: z.array(z.string()).optional(),
   space: z.string().optional(),
   event: z.string().optional(),
-  start: z.string().optional(),
-  expire: z.string().optional(),
+  start: z.number().optional(),
+  expire: z.number().optional(),
   token: z.string().optional(),
   secret: z.string().optional(),
 });
