@@ -26,7 +26,7 @@ class Contest extends ContractBase {
    * deploys a new recurring contest and configures the feeManager to divert feeShare of
    * stake fees to new contest
    * @param namespaceName namespace name to configure for
-   * @param contestInterval the recurrng contest interval in ms
+   * @param contestInterval the recurrng contest interval in seconds
    * @param winnerShares the percent of each respective winning places prize(ie 5 = 5%)
    * @param stakeId the id of the community stake token, defaults to 2
    * @param prizeShare the % amount of the prize pool to payout each interval(ie 5 = 5%)
@@ -75,7 +75,7 @@ class Contest extends ContractBase {
   /**
    * deploys a new single run contest
    * @param namespaceName namespace name to configure for
-   * @param contestLength amount of time the contest should run
+   * @param contestLength amount of time the contest should run in seconds
    * @param winnerShares the percent of each respective winning places prize(ie 5 = 5%)
    * @param stakeId the id of the community stake token, defaults to 2
    * @param voterShare the % amount of prize pool claimable by voters each week(ie 5 = 5%)
