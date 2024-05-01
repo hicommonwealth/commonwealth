@@ -162,7 +162,6 @@ class Contest extends ContractBase {
       await this.web3.eth.sendTransaction(txObject);
 
       txReceipt = this.contract.methods.deposit(weiAmount).send({
-        value: weiAmount,
         from: walletAddress,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
