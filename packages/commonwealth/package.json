@@ -12,7 +12,6 @@
     "bundle": "webpack --config webpack/webpack.prod.config.mjs --progress",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "clean-db": "tsx  server/scripts/cleanDb.ts",
-    "clean-db": "tsx  server/scripts/cleanDb.ts",
     "create-migration": "npx sequelize migration:generate --name",
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
