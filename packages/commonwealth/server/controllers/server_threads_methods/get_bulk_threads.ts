@@ -16,6 +16,8 @@ export type GetBulkThreadsOptions = {
   fromDate: string;
   toDate: string;
   archived: boolean;
+  contestAddress: string;
+  status: string;
 };
 
 export type AssociatedReaction = {
