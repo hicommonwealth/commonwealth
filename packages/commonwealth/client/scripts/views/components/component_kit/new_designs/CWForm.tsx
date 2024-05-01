@@ -62,7 +62,7 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
 
         // trigger error callback if there are any errors
         if (Object.keys(formMethods.formState.errors).length) {
-          await onErrors(formMethods.formState.errors);
+          onErrors(formMethods.formState.errors);
         }
       } catch (error) {
         console.error(`Error, submitting CWForm: ${error}`);
