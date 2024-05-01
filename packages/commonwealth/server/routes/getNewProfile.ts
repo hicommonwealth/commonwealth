@@ -57,6 +57,7 @@ const getNewProfile = async (
       where: {
         active: false,
       },
+      attributes: ['id'],
     })
   ).map((c) => c.id);
 
