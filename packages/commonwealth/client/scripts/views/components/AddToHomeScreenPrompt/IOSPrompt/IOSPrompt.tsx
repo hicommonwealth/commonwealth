@@ -14,6 +14,7 @@ interface IOSPromptProps {
 export const IOSPrompt = ({ hidePromptAction }: IOSPromptProps) => {
   const { animationStyles } = useAnimation({
     transitionDuration: '0.5s',
+    transformNumber: 'translateY(100%)',
   });
   return (
     <div className="IOSPrompt">
