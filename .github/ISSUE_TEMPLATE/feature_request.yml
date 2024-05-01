@@ -15,7 +15,15 @@ body:
     attributes:
       label: Project Owner
       description: Point of contact for questions (if not creator)
-      placeholder: ex. @sachben91
+      placeholder: "@sachben91"
+    validations:
+      required: false
+  - type: input
+    id: bucket
+    attributes:
+      label: Bucket ID
+      description: Ticket number of bucket (optional).
+      placeholder: "#12345"
     validations:
       required: false
   - type: textarea
