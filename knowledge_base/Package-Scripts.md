@@ -120,7 +120,7 @@ Contributor: Kurtis Assad
 
 ### clean-db
 
-Definition: `tsx -r tsconfig-paths/register server/scripts/cleanDb.ts`
+Definition: `tsx  server/scripts/cleanDb.ts`
 
 Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily.
 
@@ -279,7 +279,7 @@ Contributor: Kurtis Assad
 
 ### emit-notification
 
-Definition: `tsx -r tsconfig-paths/register server/scripts/emitTestNotification.ts`
+Definition: `tsx  server/scripts/emitTestNotification.ts`
 
 Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
 
@@ -313,7 +313,7 @@ Open considerations:
 
 ### integration-test
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha -r tsconfig-paths/register './test/integration/**/*.spec.ts'`
+Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha  './test/integration/**/*.spec.ts'`
 
 Description: Runs all tests in our integration folder and its subdirectories.
 
@@ -402,7 +402,7 @@ Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
 ### start
 
-Definition: `tsx watch -r tsconfig-paths/register --max-old-space-size=4096 server.ts`
+Definition: `tsx watch  --max-old-space-size=4096 server.ts`
 
 Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
@@ -414,13 +414,13 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ### start-consumer
 
-Definition: `tsx -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts`
+Definition: `tsx  server/workers/commonwealthConsumer/commonwealthConsumer.ts`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
 ### start-evm-ce
 
-Definition: `tsx -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `tsx  server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 
@@ -462,6 +462,6 @@ Contributor: Timothee Legros
 
 ### send-notification-digest-emails
 
-Definition: `SEND_EMAILS=true tsx -r tsconfig-paths/register server.ts`
+Definition: `SEND_EMAILS=true tsx  server.ts`
 
 Description: Schedules a daily task for sending notification email digests.

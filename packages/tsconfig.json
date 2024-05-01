@@ -9,7 +9,10 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "traceResolution": false
+    "traceResolution": false,
+    "paths": {
+      "@hicommonwealth/*": ["../libs/*/src/index.ts"]
+    }
   },
   "exclude": ["**/build", "**/node_modules"]
 }

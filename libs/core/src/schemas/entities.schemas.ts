@@ -299,7 +299,7 @@ export const ContestManager = z
     contest_address: z.string().describe('On-Chain contest manager address'),
     community_id: z.string(),
     name: z.string(),
-    image_url: z.string(),
+    image_url: z.string().optional(),
     funding_token_address: z
       .string()
       .optional()
@@ -325,10 +325,10 @@ export const ContestManager = z
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
     created_at: z.date(),
-    paused: z
+    cancelled: z
       .boolean()
       .optional()
-      .describe('Flags when contest policy is paused by admin'),
+      .describe('Flags when contest policy is cancelled by admin'),
     topics: z.array(Topic).optional(),
     contests: z.array(Contest).optional(),
   })
