@@ -67,6 +67,7 @@ async function startKnockWorker() {
     process.exit(1);
   }
 
+  isServiceHealthy = true;
   log.info('Knock Worker started');
 }
 
