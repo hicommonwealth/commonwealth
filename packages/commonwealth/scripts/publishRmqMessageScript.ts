@@ -9,8 +9,8 @@ async function publishRmqMessageScript() {
 
   const publishJson = await publishRmqMsg(
     'http://guest:guest@localhost:15672/api',
-    RascalExchanges.SnapshotListener,
-    RascalRoutingKeys.SnapshotListener,
+    RascalExchanges.Discobot,
+    RascalRoutingKeys.DiscordListener,
     snapshot,
   );
 

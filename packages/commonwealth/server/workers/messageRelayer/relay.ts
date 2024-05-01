@@ -1,4 +1,9 @@
-import { Broker, BrokerTopics, schemas, stats } from '@hicommonwealth/core';
+import {
+  Broker,
+  BrokerPublications,
+  schemas,
+  stats,
+} from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { fileURLToPath } from 'node:url';
@@ -8,12 +13,6 @@ import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
-
-const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {
-  SnapshotProposalCreated: BrokerTopics.SnapshotListener,
-  DiscordMessageCreated: BrokerTopics.DiscordListener,
-  ChainEventCreated: BrokerTopics.ChainEvent,
-} as const;
 
 export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];
@@ -38,7 +37,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
 
     for (const event of events) {
       try {
-        const res = await broker.publish(EventNameTopicMap[event.event_name], {
+        const res = await broker.publish(BrokerPublications.MessageRelayer, {
           name: event.event_name,
           payload: event.event_payload,
         });
