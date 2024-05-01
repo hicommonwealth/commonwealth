@@ -85,7 +85,6 @@ import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import { sendMessage } from '../routes/snapshotAPI';
 import updateAddress from '../routes/updateAddress';
 import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
@@ -94,7 +93,6 @@ import type DatabaseValidationService from '../middleware/databaseValidationServ
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
-import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
@@ -1214,28 +1212,12 @@ function setupRouter(
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
-  // snapshotAPI
-  registerRoute(
-    router,
-    'post',
-    '/snapshotAPI/sendMessage',
-    sendMessage.bind(this),
-  );
-
   registerRoute(
     router,
     'get',
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  // snapshot-commonwealth
-  registerRoute(
-    router,
-    'get',
-    '/snapshot',
-    getSnapshotProposal.bind(this, models),
   );
 
   registerRoute(

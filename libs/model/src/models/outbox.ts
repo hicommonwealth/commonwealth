@@ -1,7 +1,7 @@
 import { EventContext, schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
-import { DataTypes, ModelInstance, ModelStatic } from './types';
+import { ModelInstance, ModelStatic } from './types';
 
 export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
 
@@ -13,10 +13,7 @@ export type OutboxInstance = ModelInstance<OutboxAttributes>;
 
 export type OutboxModelStatic = ModelStatic<OutboxInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): OutboxModelStatic => {
+export default (sequelize: Sequelize.Sequelize): OutboxModelStatic => {
   const outbox = <OutboxModelStatic>sequelize.define(
     'Outbox',
     {
@@ -32,22 +29,22 @@ export default (
          * DB. Issue to track: https://github.com/sequelize/sequelize/issues/12718
          */
         primaryKey: true,
-        type: dataTypes.BIGINT,
+        type: Sequelize.BIGINT,
         autoIncrement: true,
         autoIncrementIdentity: true,
         set() {
           throw new Error('event_id is read-only');
         },
       },
-      event_name: { type: dataTypes.TEXT, allowNull: false },
-      event_payload: { type: dataTypes.JSONB, allowNull: false },
+      event_name: { type: Sequelize.TEXT, allowNull: false },
+      event_payload: { type: Sequelize.JSONB, allowNull: false },
       relayed: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Outbox',

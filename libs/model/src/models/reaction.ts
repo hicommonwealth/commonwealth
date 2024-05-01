@@ -1,10 +1,10 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -35,25 +35,22 @@ export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
 export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): ReactionModelStatic => {
+export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
   const Reaction = <ReactionModelStatic>sequelize.define(
     'Reaction',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
-      proposal_id: { type: dataTypes.STRING, allowNull: true },
-      comment_id: { type: dataTypes.INTEGER, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
-      reaction: { type: dataTypes.ENUM('like'), allowNull: false },
-      calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      thread_id: { type: Sequelize.INTEGER, allowNull: true },
+      proposal_id: { type: Sequelize.STRING, allowNull: true },
+      comment_id: { type: Sequelize.INTEGER, allowNull: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: false },
+      reaction: { type: Sequelize.ENUM('like'), allowNull: false },
+      calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      canvas_action: { type: Sequelize.JSONB, allowNull: true },
+      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      canvas_hash: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {
@@ -200,14 +197,6 @@ export default (
     });
     models.Reaction.belongsTo(models.Address, {
       foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Comment, {
-      foreignKey: 'comment_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
       targetKey: 'id',
     });
   };

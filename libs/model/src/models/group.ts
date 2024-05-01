@@ -1,32 +1,31 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import z from 'zod';
-import { CommunityAttributes } from './community';
-import { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { CommunityAttributes } from './community';
+import type { MembershipAttributes } from './membership';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type GroupAttributes = z.infer<typeof schemas.entities.Group> & {
   // associations
   community?: CommunityAttributes;
+  memberships?: MembershipAttributes[];
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;
 export type GroupModelStatic = ModelStatic<GroupInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): GroupModelStatic => {
-  const Group = <GroupModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <GroupModelStatic>sequelize.define<GroupInstance>(
     'Group',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      metadata: { type: dataTypes.JSON, allowNull: false },
-      requirements: { type: dataTypes.JSON, allowNull: false },
-      is_system_managed: { type: dataTypes.BOOLEAN, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      metadata: { type: Sequelize.JSON, allowNull: false },
+      requirements: { type: Sequelize.JSON, allowNull: false },
+      is_system_managed: { type: Sequelize.BOOLEAN, allowNull: false },
 
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,
@@ -37,17 +36,3 @@ export default (
       indexes: [{ fields: ['community_id'] }],
     },
   );
-
-  Group.associate = (models) => {
-    models.Group.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Group.hasMany(models.Membership, {
-      foreignKey: 'group_id',
-      as: 'memberships',
-    });
-  };
-
-  return Group;
-};
