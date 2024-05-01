@@ -1,5 +1,6 @@
 import bip39 from 'bip39';
 import fs from 'fs';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import cosmos from 'cosmos-lib'; // TODO: add lib types?
 

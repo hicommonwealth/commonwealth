@@ -32,7 +32,8 @@ export const ImportDiscourseCommunity: Command<
   body: async ({ id: communityId, payload }) => {
     // TODO: use global lock to limit concurrency on this command?
 
-    const { base, accountsClaimable, dumpUrl } = payload;
+    // TODO: implement accountsClaimable
+    const { base, dumpUrl } = payload;
 
     // cleanup functions are pushed to this array, then popped off
     // and invoked after everything is done

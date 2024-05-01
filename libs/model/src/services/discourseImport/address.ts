@@ -11,7 +11,7 @@ const createAddress = async (
   {
     discourseUserId,
     cwUserId,
-    username,
+    // username,
     address,
     communityId,
     email,

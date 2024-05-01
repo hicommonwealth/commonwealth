@@ -66,6 +66,7 @@ export const createAllCategoriesInCW = async (
         cwConnection,
         {
           discourseCategoryId,
+          // eslint-disable-next-line no-useless-escape
           name: name.replace(/[\/\\]/g, ' '),
           description,
           communityId,
