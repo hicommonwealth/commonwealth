@@ -1526,17 +1526,17 @@
   resolved "https://registry.yarnpkg.com/@brillout/import/-/import-0.2.3.tgz#98f04656692b35d70664cc917f3cb0e8f74942dd"
   integrity sha512-1T8WlD75eeFSMrptGy8jiLHmfHgMmSjWvLOIUvHmSVZt+6k0eQqYUoK4KbmE4T9pVLIfxvZSOm2D68VEqKRHRw==
 
-"@canvas-js/chain-cosmos@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-cosmos/-/chain-cosmos-0.9.0.tgz#a9974c4c41e5d9728c54bc40900d48901b3f2124"
-  integrity sha512-4eKG6bM9k90HJbo0d/9k0446pWVhGaxiHmRlSXhTZixfNX0ethAaIBkBCPOvg2RMpt5CGt8+Un9ZY49/uLybzw==
+"@canvas-js/chain-cosmos@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-cosmos/-/chain-cosmos-0.9.1.tgz#ba9a3f588267ed3aaf3578b8f9a3643af9b57cca"
+  integrity sha512-pV+/y7nwYBkKqQxW/2BAT7vc5mKJg+96fvxXswof9pnjldwaScNxdjwp4rQYGQB1QWeeKKjzLQPqasySAr88+Q==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0"
-    "@canvas-js/signatures" "0.9.0"
-    "@canvas-js/utils" "0.9.0"
-    "@cosmjs/amino" "^0.30.1"
-    "@cosmjs/crypto" "^0.30.1"
-    "@cosmjs/encoding" "^0.30.1"
+    "@canvas-js/interfaces" "0.9.1"
+    "@canvas-js/signatures" "0.9.1"
+    "@canvas-js/utils" "0.9.1"
+    "@cosmjs/amino" "^0.32.3"
+    "@cosmjs/crypto" "^0.32.3"
+    "@cosmjs/encoding" "^0.32.3"
     "@ipld/dag-cbor" "^9.2.0"
     "@ipld/dag-json" "^10.1.5"
     "@keplr-wallet/types" "^0.11.64"
@@ -1546,42 +1546,42 @@
     ethers "^6.9.0"
     multiformats "^13.0.1"
 
-"@canvas-js/chain-ethereum@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.9.0.tgz#72b66bac6beed934aee172521788ec7ef24025ce"
-  integrity sha512-cjdww62PSnwQZ/ZcKULEBUOrzTSZyRaCD2nA2UF8tqn7bXSYf6jJzLSeB5Xae4RFg0T3yezbZytQtythdx4Fgw==
+"@canvas-js/chain-ethereum@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-ethereum/-/chain-ethereum-0.9.1.tgz#3a4e4adc8300656a8f3707bad2a4c5bc59a02827"
+  integrity sha512-WP6y20joOJvVnxoMUR2j/sxSoi2l71O3LUP8klqUxrMvmKyrZbLM9mogNIL6rzcVx7gsavjK+brzeEtUdGZFMA==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0"
-    "@canvas-js/signatures" "0.9.0"
-    "@canvas-js/utils" "0.9.0"
+    "@canvas-js/interfaces" "0.9.1"
+    "@canvas-js/signatures" "0.9.1"
+    "@canvas-js/utils" "0.9.1"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     ethers "^6.9.0"
     multiformats "^13.0.1"
     siwe "^2.1.4"
 
-"@canvas-js/chain-solana@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-solana/-/chain-solana-0.9.0.tgz#0cf9b034aadc650afbcdedeb7559e89c1bbaf89d"
-  integrity sha512-9aQ3XT6ApVMphReznzLniHYZM7dzhGvqJM4StXMP4111zkwXEVsCQ0IsSkXoELugL2DT6xaHqStfjihazRr5tQ==
+"@canvas-js/chain-solana@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-solana/-/chain-solana-0.9.1.tgz#a1fe72f687abb5fd2aab5c3743c1a3aff9dcf690"
+  integrity sha512-SG7TDRYrXikf1POw3246hcLxNqbOhkvC0cDCJHrNoHKBDoc+jLoPO0ae9H7/srXGRbZxjeGupTVrwb+QGeVhVg==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0"
-    "@canvas-js/signatures" "0.9.0"
-    "@canvas-js/utils" "0.9.0"
+    "@canvas-js/interfaces" "0.9.1"
+    "@canvas-js/signatures" "0.9.1"
+    "@canvas-js/utils" "0.9.1"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     "@noble/curves" "^1.4.0"
     "@solana/web3.js" "^1.87.6"
     multiformats "^13.0.1"
 
-"@canvas-js/chain-substrate@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/chain-substrate/-/chain-substrate-0.9.0.tgz#ade71efcf0c4efbc2a39dade8851076e14beb865"
-  integrity sha512-ePU99KBM8rQk0lV3HkpxftA+X/FE3sEztmSjzS8SjtFwEN4i4gED9L6WPhjc50u1wabzDAvhp2NUB2iT+tu/Lw==
+"@canvas-js/chain-substrate@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/chain-substrate/-/chain-substrate-0.9.1.tgz#b374073c50d27b143d836e921a6b3a5237978bbf"
+  integrity sha512-YtZirNI7qDaNbNnkwQHi1onV9dhP20X1ZUgt0flq0FpbruNj4LDh9wXcuhC9YLiZoy+DutkfRVEsyrATbCUqYw==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0"
-    "@canvas-js/signatures" "0.9.0"
-    "@canvas-js/utils" "0.9.0"
+    "@canvas-js/interfaces" "0.9.1"
+    "@canvas-js/signatures" "0.9.1"
+    "@canvas-js/utils" "0.9.1"
     "@ipld/dag-json" "^10.1.5"
     "@libp2p/logger" "^4.0.2"
     "@noble/curves" "^1.4.0"
@@ -1591,20 +1591,20 @@
     "@polkadot/util-crypto" "^12.2.1"
     multiformats "^13.0.1"
 
-"@canvas-js/interfaces@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.9.0.tgz#6e8ec488262be7f00441812f4820077f75fda695"
-  integrity sha512-OJHMKNY55PqC+tQfUWpndVyX6tGSjdQHtmtWf4/oujlOsK1KvCMlOZVRYGdi/g9Lm5ArDfK5LXzNuiiy7dSAng==
+"@canvas-js/interfaces@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.9.1.tgz#c05e87d343a3164a43fa9b811f6b92033e858b84"
+  integrity sha512-dv2YvgCHd4gVqNjlBnMbgS/gaehbOwmfTp6BxLTczY6C1TjuCVptvWLdDcSX5sSWTIBoGg+Y7oNf0b7diF4/CA==
   dependencies:
     multiformats "^13.0.1"
 
-"@canvas-js/signatures@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/signatures/-/signatures-0.9.0.tgz#89dd9aab87ce761f58ff8ba828c045fe14e024a7"
-  integrity sha512-hSuvzF4yNlnDY6gS9CVkqGbbK80R88CoDqa5eNkqPlEsD6W6fdJZbKm+Ofpi3NthBglMe5rhJF3gHm0PLYadeQ==
+"@canvas-js/signatures@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/signatures/-/signatures-0.9.1.tgz#8e33a30402bdafb076ac5cab66dec22c6966295d"
+  integrity sha512-kQQ0F8h6+bcDw9x9mejIvRmzQN+I+L5A03Cf2LGuSuZR3sJJTbBKKQN+tMRX21skJ0s0J1Ol9pC7zZP8JkoHqQ==
   dependencies:
-    "@canvas-js/interfaces" "0.9.0"
-    "@canvas-js/utils" "0.9.0"
+    "@canvas-js/interfaces" "0.9.1"
+    "@canvas-js/utils" "0.9.1"
     "@ipld/dag-cbor" "^9.2.0"
     "@ipld/dag-json" "^10.2.0"
     "@libp2p/logger" "^4.0.6"
@@ -1613,10 +1613,10 @@
     ethers "^6.9.1"
     multiformats "^13.0.1"
 
-"@canvas-js/utils@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@canvas-js/utils/-/utils-0.9.0.tgz#8953c1d9ccd847580040dbaba711f0dadc706d4e"
-  integrity sha512-IwMhEcJ/QvvmgaN2Kh1hoOC0KwX0nVf/tAOMjqkeejtDicrGHUVrU4dzx9YHPjD9vnJDponCds2MKw6FYRdYcw==
+"@canvas-js/utils@0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@canvas-js/utils/-/utils-0.9.1.tgz#fc07cb83b496f17d17927ae9debd1b1db46b644c"
+  integrity sha512-oyMTpF0Usvex3YovlMCD2Hhh8gjxKOrt8eg/oOjtzbHJP/JoM4DBFqCFGBt6L74HR0TxmzSc5JVAhLEsY97xCQ==
 
 "@chainsafe/as-sha256@^0.3.1":
   version "0.3.1"
@@ -1684,16 +1684,6 @@
     "@noble/hashes" "^1.0.0"
     protobufjs "^6.8.8"
 
-"@cosmjs/amino@^0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@cosmjs/amino/-/amino-0.30.1.tgz#7c18c14627361ba6c88e3495700ceea1f76baace"
-  integrity sha512-yNHnzmvAlkETDYIpeCTdVqgvrdt1qgkOXwuRVi8s27UKI5hfqyE9fJ/fuunXE6ZZPnKkjIecDznmuUOMrMvw4w==
-  dependencies:
-    "@cosmjs/crypto" "^0.30.1"
-    "@cosmjs/encoding" "^0.30.1"
-    "@cosmjs/math" "^0.30.1"
-    "@cosmjs/utils" "^0.30.1"
-
 "@cosmjs/amino@^0.31.3":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/amino/-/amino-0.31.3.tgz#0f4aa6bd68331c71bd51b187fa64f00eb075db0a"
@@ -1703,6 +1693,16 @@
     "@cosmjs/encoding" "^0.31.3"
     "@cosmjs/math" "^0.31.3"
     "@cosmjs/utils" "^0.31.3"
+
+"@cosmjs/amino@^0.32.3":
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/@cosmjs/amino/-/amino-0.32.3.tgz#b81d4a2b8d61568431a1afcd871e1344a19d97ff"
+  integrity sha512-G4zXl+dJbqrz1sSJ56H/25l5NJEk/pAPIr8piAHgbXYw88OdAOlpA26PQvk2IbSN/rRgVbvlLTNgX2tzz1dyUA==
+  dependencies:
+    "@cosmjs/crypto" "^0.32.3"
+    "@cosmjs/encoding" "^0.32.3"
+    "@cosmjs/math" "^0.32.3"
+    "@cosmjs/utils" "^0.32.3"
 
 "@cosmjs/cosmwasm-stargate@^0.31.3":
   version "0.31.3"
@@ -1721,19 +1721,6 @@
     long "^4.0.0"
     pako "^2.0.2"
 
-"@cosmjs/crypto@^0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@cosmjs/crypto/-/crypto-0.30.1.tgz#21e94d5ca8f8ded16eee1389d2639cb5c43c3eb5"
-  integrity sha512-rAljUlake3MSXs9xAm87mu34GfBLN0h/1uPPV6jEwClWjNkAMotzjC0ab9MARy5FFAvYHL3lWb57bhkbt2GtzQ==
-  dependencies:
-    "@cosmjs/encoding" "^0.30.1"
-    "@cosmjs/math" "^0.30.1"
-    "@cosmjs/utils" "^0.30.1"
-    "@noble/hashes" "^1"
-    bn.js "^5.2.0"
-    elliptic "^6.5.4"
-    libsodium-wrappers "^0.7.6"
-
 "@cosmjs/crypto@^0.31.3":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/crypto/-/crypto-0.31.3.tgz#c752cb6d682fdc735dcb45a2519f89c56ba16c26"
@@ -1747,19 +1734,32 @@
     elliptic "^6.5.4"
     libsodium-wrappers-sumo "^0.7.11"
 
-"@cosmjs/encoding@^0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.30.1.tgz#b5c4e0ef7ceb1f2753688eb96400ed70f35c6058"
-  integrity sha512-rXmrTbgqwihORwJ3xYhIgQFfMSrwLu1s43RIK9I8EBudPx3KmnmyAKzMOVsRDo9edLFNuZ9GIvysUCwQfq3WlQ==
+"@cosmjs/crypto@^0.32.3":
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/@cosmjs/crypto/-/crypto-0.32.3.tgz#787f8e659709678722068ee1ddf379f65051a25e"
+  integrity sha512-niQOWJHUtlJm2GG4F00yGT7sGPKxfUwz+2qQ30uO/E3p58gOusTcH2qjiJNVxb8vScYJhFYFqpm/OA/mVqoUGQ==
   dependencies:
-    base64-js "^1.3.0"
-    bech32 "^1.1.4"
-    readonly-date "^1.0.0"
+    "@cosmjs/encoding" "^0.32.3"
+    "@cosmjs/math" "^0.32.3"
+    "@cosmjs/utils" "^0.32.3"
+    "@noble/hashes" "^1"
+    bn.js "^5.2.0"
+    elliptic "^6.5.4"
+    libsodium-wrappers-sumo "^0.7.11"
 
 "@cosmjs/encoding@^0.31.3":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.31.3.tgz#2519d9c9ae48368424971f253775c4580b54c5aa"
   integrity sha512-6IRtG0fiVYwyP7n+8e54uTx2pLYijO48V3t9TLiROERm5aUAIzIlz6Wp0NYaI5he9nh1lcEGJ1lkquVKFw3sUg==
+  dependencies:
+    base64-js "^1.3.0"
+    bech32 "^1.1.4"
+    readonly-date "^1.0.0"
+
+"@cosmjs/encoding@^0.32.3":
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.32.3.tgz#e245ff511fe4a0df7ba427b5187aab69e3468e5b"
+  integrity sha512-p4KF7hhv8jBQX3MkB3Defuhz/W0l3PwWVYU2vkVuBJ13bJcXyhU9nJjiMkaIv+XP+W2QgRceqNNgFUC5chNR7w==
   dependencies:
     base64-js "^1.3.0"
     bech32 "^1.1.4"
@@ -1773,17 +1773,17 @@
     "@cosmjs/stream" "^0.31.3"
     xstream "^11.14.0"
 
-"@cosmjs/math@^0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.30.1.tgz#8b816ef4de5d3afa66cb9fdfb5df2357a7845b8a"
-  integrity sha512-yaoeI23pin9ZiPHIisa6qqLngfnBR/25tSaWpkTm8Cy10MX70UF5oN4+/t1heLaM6SSmRrhk3psRkV4+7mH51Q==
-  dependencies:
-    bn.js "^5.2.0"
-
 "@cosmjs/math@^0.31.3":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.31.3.tgz#767f7263d12ba1b9ed2f01f68d857597839fd957"
   integrity sha512-kZ2C6glA5HDb9hLz1WrftAjqdTBb3fWQsRR+Us2HsjAYdeE6M3VdXMsYCP5M3yiihal1WDwAY2U7HmfJw7Uh4A==
+  dependencies:
+    bn.js "^5.2.0"
+
+"@cosmjs/math@^0.32.3":
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.32.3.tgz#16e4256f4da507b9352327da12ae64056a2ba6c9"
+  integrity sha512-amumUtZs8hCCnV+lSBaJIiZkGabQm22QGg/IotYrhcmoOEOjt82n7hMNlNXRs7V6WLMidGrGYcswB5zcmp0Meg==
   dependencies:
     bn.js "^5.2.0"
 
@@ -1851,15 +1851,15 @@
     readonly-date "^1.0.0"
     xstream "^11.14.0"
 
-"@cosmjs/utils@^0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.30.1.tgz#6d92582341be3c2ec8d82090253cfa4b7f959edb"
-  integrity sha512-KvvX58MGMWh7xA+N+deCfunkA/ZNDvFLw4YbOmX3f/XBIkqrVY7qlotfy2aNb1kgp6h4B6Yc8YawJPDTfvWX7g==
-
 "@cosmjs/utils@^0.31.3":
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.31.3.tgz#f97bbfda35ad69e80cd5c7fe0a270cbda16db1ed"
   integrity sha512-VBhAgzrrYdIe0O5IbKRqwszbQa7ZyQLx9nEQuHQ3HUplQW7P44COG/ye2n6AzCudtqxmwdX7nyX8ta1J07GoqA==
+
+"@cosmjs/utils@^0.32.3":
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.32.3.tgz#5dcaee6dd7cc846cdc073e9a7a7f63242f5f7e31"
+  integrity sha512-WCZK4yksj2hBDz4w7xFZQTRZQ/RJhBX26uFHmmQFIcNUUVAihrLO+RerqJgk0dZqC42wstM9pEUQGtPmLcIYvg==
 
 "@csstools/selector-specificity@^2.0.2":
   version "2.0.2"
@@ -15234,18 +15234,6 @@ libsodium-wrappers-sumo@^0.7.11:
   integrity sha512-DGypHOmJbB1nZn89KIfGOAkDgfv5N6SBGC3Qvmy/On0P0WD1JQvNRS/e3UL3aFF+xC0m+MYz5M+MnRnK2HMrKQ==
   dependencies:
     libsodium-sumo "^0.7.11"
-
-libsodium-wrappers@^0.7.6:
-  version "0.7.13"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.13.tgz#83299e06ee1466057ba0e64e532777d2929b90d3"
-  integrity sha512-kasvDsEi/r1fMzKouIDv7B8I6vNmknXwGiYodErGuESoFTohGSKZplFtVxZqHaoQ217AynyIFgnOVRitpHs0Qw==
-  dependencies:
-    libsodium "^0.7.13"
-
-libsodium@^0.7.13:
-  version "0.7.13"
-  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.13.tgz#230712ec0b7447c57b39489c48a4af01985fb393"
-  integrity sha512-mK8ju0fnrKXXfleL53vtp9xiPq5hKM0zbDQtcxQIsSmxNgSxqCj6R7Hl9PkrNe2j29T4yoDaF7DJLK9/i5iWUw==
 
 lie@3.1.1:
   version "3.1.1"
