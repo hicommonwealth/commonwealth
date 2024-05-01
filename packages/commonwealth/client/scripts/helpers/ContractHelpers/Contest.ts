@@ -63,8 +63,9 @@ class Contest extends ContractBase {
         feeShare,
         prizeShare,
       );
-      const newContestAddress =
-        txReceipt.events.NewContest.returnValues.contest;
+      const newContestAddress = String(
+        txReceipt.events.NewContest.returnValues.contest,
+      );
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
@@ -108,8 +109,9 @@ class Contest extends ContractBase {
         walletAddress,
         exchangeToken,
       );
-      const newContestAddress =
-        txReceipt.events.NewContest.returnValues.contest;
+      const newContestAddress = String(
+        txReceipt.events.NewContest.returnValues.contest,
+      );
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
