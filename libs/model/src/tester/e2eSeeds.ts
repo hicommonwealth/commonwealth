@@ -83,8 +83,8 @@ export const e2eTestEntities = async function (
         (
           await testDb.ChainNode.findOrCreate({
             where: {
-              id: -1,
-              eth_chain_id: -1,
+              id: 9999,
+              eth_chain_id: 9999,
               url: 'test1',
               balance_type: 'ethereum',
               name: 'TestName1',
@@ -94,8 +94,8 @@ export const e2eTestEntities = async function (
         (
           await testDb.ChainNode.findOrCreate({
             where: {
-              id: -2,
-              eth_chain_id: -2,
+              id: 99999,
+              eth_chain_id: 99999,
               url: 'test2',
               balance_type: 'ethereum',
               name: 'TestName2',
@@ -109,7 +109,7 @@ export const e2eTestEntities = async function (
       ...(await testDb.Community.bulkCreate([
         {
           id: 'cmntest',
-          chain_node_id: -1,
+          chain_node_id: 9999,
           name: 'cmntest',
           network: ChainNetwork.Ethereum,
           type: ChainType.Offchain,
@@ -123,7 +123,7 @@ export const e2eTestEntities = async function (
         },
         {
           id: 'cmntest2',
-          chain_node_id: -2,
+          chain_node_id: 99999,
           name: 'cmntest2',
           network: ChainNetwork.Ethereum,
           type: ChainType.Offchain,
@@ -324,6 +324,29 @@ export const e2eTestEntities = async function (
             )[0],
         ),
       )),
+    );
+
+    const notificationCategories: string[] = [
+      'new-thread-creation',
+      'new-comment-creation',
+      'new-mention',
+      'new-reaction',
+      'chain-event',
+      'new-collaboration',
+      'thread-edit',
+      'comment-edit',
+      'snapshot-proposal',
+    ];
+
+    await Promise.all(
+      notificationCategories.map(async (name) => {
+        await testDb.NotificationCategory.findOrCreate({
+          where: {
+            name,
+            description: '',
+          },
+        });
+      }),
     );
 
     return {

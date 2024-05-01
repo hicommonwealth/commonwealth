@@ -271,14 +271,9 @@ export async function login(page) {
     await expect(page.locator('.MuiModal-backdrop').first()).toBeVisible();
 
     await expect(page.locator('.ModalBase')).toBeVisible();
-    await expect(page.locator("text='Metamask'")).toBeVisible({
-      timeout: 100,
-    });
-    expect(async () => {
-      await page.locator("text='Metamask'").click();
-      await expect(page.locator("text='Metamask'")).not.toBeVisible({
-        timeout: 100,
-      });
-    });
+    await expect(page.locator("text='Metamask'")).toBeVisible();
+    button = await page.locator('.AuthButton').last();
+    await button.click();
+    await expect(page.locator("text='Metamask'")).not.toBeVisible();
   }).toPass();
 }
