@@ -71,22 +71,27 @@ export function getRabbitMQConfig(
     copyConfigs(allExchanges, vhostConfig.exchanges, [
       RascalExchanges.SnapshotListener,
       RascalExchanges.Discobot,
+      RascalExchanges.ChainEvent,
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
       RascalQueues.SnapshotListener,
       RascalQueues.DiscordListener,
+      RascalQueues.ChainEvent,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.SnapshotListener,
       RascalBindings.DiscordListener,
+      RascalBindings.ChainEvent,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.SnapshotListener,
       RascalPublications.DiscordListener,
+      RascalPublications.ChainEvent,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.SnapshotListener,
       RascalSubscriptions.DiscordListener,
+      RascalSubscriptions.ChainEvent,
     ]);
   } else if (service === RascalConfigServices.SnapshotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [

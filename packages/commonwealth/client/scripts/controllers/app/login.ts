@@ -8,7 +8,10 @@ import { signSessionWithMagic } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import { initAppState } from 'state';
 
+import { OpenFeature } from '@openfeature/web-sdk';
 import axios from 'axios';
+import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
+import moment from 'moment';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -549,6 +552,37 @@ export async function handleSocialLoginCallback({
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
+
+    const client = OpenFeature.getClient();
+    const userOnboardingEnabled = client.getBooleanValue(
+      'userOnboardingEnabled',
+      false,
+    );
+    if (userOnboardingEnabled) {
+      const {
+        created_at: accountCreatedTime,
+        Profiles: profiles,
+        email: ssoEmail,
+      } = response.data.result;
+
+      // if email is not set, set the SSO email as the default email
+      // only if its a standalone account (no account linking)
+      if (!app.user.email && ssoEmail && profiles?.length === 1) {
+        await app.user.updateEmail(ssoEmail, false);
+      }
+
+      // if account is created in last few minutes and has a single
+      // profile (no account linking) then open the welcome modal.
+      const isCreatedInLast5Minutes =
+        accountCreatedTime &&
+        moment().diff(moment(accountCreatedTime), 'minutes') < 5;
+      if (isCreatedInLast5Minutes && profiles?.length === 1) {
+        setTimeout(() => {
+          welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
+        }, 1000);
+      }
+    }
+
     return magicAddress;
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);

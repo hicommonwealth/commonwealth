@@ -1,8 +1,8 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
+import type { VoteAttributes } from './vote';
 
 export type PollAttributes = {
   id: number;
@@ -17,30 +17,28 @@ export type PollAttributes = {
   last_commented_on?: Date;
 
   // associations
-  Thread: ThreadAttributes;
-  Chain: CommunityAttributes;
+  Thread?: ThreadAttributes;
+  Chain?: CommunityAttributes;
+  votes?: VoteAttributes[];
 };
 
 export type PollInstance = ModelInstance<PollAttributes>;
 export type PollModelStatic = ModelStatic<PollInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): PollModelStatic => {
-  const Poll = <PollModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <PollModelStatic>sequelize.define<PollInstance>(
     'Poll',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      thread_id: { type: Sequelize.INTEGER, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
 
-      prompt: { type: dataTypes.STRING, allowNull: false },
-      options: { type: dataTypes.STRING, allowNull: false },
-      ends_at: { type: dataTypes.DATE, allowNull: true },
+      prompt: { type: Sequelize.STRING, allowNull: false },
+      options: { type: Sequelize.STRING, allowNull: false },
+      ends_at: { type: Sequelize.DATE, allowNull: true },
 
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     },
     {
       timestamps: true,
@@ -51,22 +49,3 @@ export default (
       indexes: [{ fields: ['thread_id'] }, { fields: ['community_id'] }],
     },
   );
-
-  Poll.associate = (models) => {
-    models.Poll.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
-    models.Poll.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Poll.hasMany(models.Vote, {
-      foreignKey: 'poll_id',
-      as: 'votes',
-      onDelete: 'CASCADE',
-    });
-  };
-
-  return Poll;
-};

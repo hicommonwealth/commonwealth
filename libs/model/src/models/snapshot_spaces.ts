@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type SnapshotSpaceAttributes = {
@@ -12,20 +11,17 @@ export type SnapshotSpaceInstance = ModelInstance<SnapshotSpaceAttributes>;
 
 export type SnapshotSpaceModelStatic = ModelStatic<SnapshotSpaceInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): SnapshotSpaceModelStatic => {
+export default (sequelize: Sequelize.Sequelize): SnapshotSpaceModelStatic => {
   const SnapshotSpaces = <SnapshotSpaceModelStatic>sequelize.define(
     'SnapshotSpaces',
     {
       snapshot_space: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         primaryKey: true,
         allowNull: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'SnapshotSpaces',

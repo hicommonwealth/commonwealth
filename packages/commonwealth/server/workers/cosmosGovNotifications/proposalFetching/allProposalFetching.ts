@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { AllCosmosProposals } from './types';
 import {
   filterV1GovCommunities,
@@ -15,6 +16,7 @@ import {
   fetchUpToLatestCosmosProposalV1,
 } from './v1ProposalFetching';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**

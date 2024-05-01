@@ -1,12 +1,14 @@
 import { IDiscordMeta, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
+import { fileURLToPath } from 'url';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import { ThreadAttributes } from './thread';
+import type { ReactionAttributes } from './reaction';
+import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export type CommentAttributes = {
@@ -33,6 +35,7 @@ export type CommentAttributes = {
   Chain?: CommunityAttributes;
   Address?: AddressAttributes;
   Thread?: ThreadAttributes;
+  reactions?: ReactionAttributes[];
 
   //counts
   reaction_count: number;
@@ -43,52 +46,49 @@ export type CommentInstance = ModelInstance<CommentAttributes>;
 
 export type CommentModelStatic = ModelStatic<CommentInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommentModelStatic => {
+export default (sequelize: Sequelize.Sequelize): CommentModelStatic => {
   const Comment = <CommentModelStatic>sequelize.define(
     'Comment',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       thread_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'Threads',
           key: 'id',
         },
       },
-      parent_id: { type: dataTypes.STRING, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: true },
-      created_by: { type: dataTypes.STRING, allowNull: true },
-      text: { type: dataTypes.TEXT, allowNull: false },
-      plaintext: { type: dataTypes.TEXT, allowNull: true },
+      parent_id: { type: Sequelize.STRING, allowNull: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: true },
+      created_by: { type: Sequelize.STRING, allowNull: true },
+      text: { type: Sequelize.TEXT, allowNull: false },
+      plaintext: { type: Sequelize.TEXT, allowNull: true },
       version_history: {
-        type: dataTypes.ARRAY(dataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         defaultValue: [],
         allowNull: false,
       },
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      canvas_action: { type: Sequelize.JSONB, allowNull: true },
+      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      canvas_hash: { type: Sequelize.STRING, allowNull: true },
       // timestamps
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
-      discord_meta: { type: dataTypes.JSONB, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
+      marked_as_spam_at: { type: Sequelize.DATE, allowNull: true },
+      discord_meta: { type: Sequelize.JSONB, allowNull: true },
 
       //counts
       reaction_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
@@ -171,13 +171,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
       targetKey: 'id',
-    });
-    models.Comment.hasMany(models.Reaction, {
-      foreignKey: 'comment_id',
-      as: 'reactions',
-    });
-    models.Comment.hasMany(models.CommentSubscription, {
-      foreignKey: 'comment_id',
     });
   };
 

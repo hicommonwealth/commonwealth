@@ -1,0 +1,57 @@
+@import '../../../../../../styles/shared.scss';
+
+.PersonalInformationStep {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+
+  .h4 {
+    color: $neutral-600;
+    .b1 {
+      color: $neutral-500;
+    }
+  }
+
+  .username-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .random-generate-btn {
+      padding: 0;
+      margin: 0;
+      margin-left: auto;
+
+      button {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      &:focus,
+      &:focus-within {
+        border-color: transparent !important;
+      }
+    }
+  }
+
+  .notification-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .footer {
+    display: block;
+
+    a,
+    a:visited,
+    a:active,
+    a:hover {
+      color: $primary-600;
+    }
+  }
+}

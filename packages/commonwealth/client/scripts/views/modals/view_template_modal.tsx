@@ -24,7 +24,9 @@ const ViewTemplateModal = ({
   template: Template;
   onClose: () => void;
 }) => {
-  const creator: Account = app.chain.accounts.get(template.createdBy);
+  const creator: Account = template?.createdBy
+    ? app.chain.accounts.get(template?.createdBy)
+    : null;
 
   return (
     <div className="ViewTemplateModal">
@@ -33,8 +35,12 @@ const ViewTemplateModal = ({
         <div className="CreationRow">
           <CWText type="b2">By</CWText>
           <User
-            userAddress={creator.address}
-            userCommunityId={creator.community?.id || creator?.profile?.chain}
+            userAddress={creator?.address}
+            userCommunityId={creator?.community?.id || creator?.profile?.chain}
+            shouldShowAsDeleted={
+              !creator?.address &&
+              !(creator?.community?.id || creator?.profile?.chain)
+            }
             shouldShowAddressWithDisplayName
           />
           <CWText type="b2">•</CWText>

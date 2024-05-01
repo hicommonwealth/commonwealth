@@ -1,25 +1,25 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "jsx": "react",
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "rootDir": ".",
     "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "build",
+    "jsx": "react",
+    "sourceMap": true,
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
+      "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
   "include": [
-    "./client",
-    "./shared",
-    "./test",
-    "./globals.d.ts",
-    "./server",
-    "./server.ts",
-    "./server-test.ts",
-    "./scripts"
+    "client",
+    "globals.d.ts",
+    "server",
+    "server.ts",
+    "server-test.ts",
+    "scripts",
+    "shared",
+    "test"
   ],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },

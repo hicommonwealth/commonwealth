@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type BanAttributes = {
@@ -13,18 +12,15 @@ export type BanAttributes = {
 export type BanInstance = ModelInstance<BanAttributes>;
 export type BanModelStatic = ModelStatic<BanInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): BanModelStatic => {
-  const Ban = <BanModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <BanModelStatic>sequelize.define<BanInstance>(
     'Bans',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      address: { type: dataTypes.STRING, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      address: { type: Sequelize.STRING, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Bans',
@@ -35,13 +31,3 @@ export default (
       indexes: [{ fields: ['community_id'] }],
     },
   );
-
-  Ban.associate = (models) => {
-    models.Ban.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Ban;
-};

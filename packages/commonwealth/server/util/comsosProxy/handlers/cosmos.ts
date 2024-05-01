@@ -13,6 +13,9 @@ import {
   upgradeBetaNodeIfNeeded,
 } from '../utils';
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300;

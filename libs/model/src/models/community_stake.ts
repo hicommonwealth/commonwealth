@@ -1,6 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
@@ -16,28 +15,25 @@ export type CommunityStakeInstance = ModelInstance<CommunityStakeAttributes>;
 
 export type CommunityStakeModelStatic = ModelStatic<CommunityStakeInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommunityStakeModelStatic =>
+export default (sequelize: Sequelize.Sequelize): CommunityStakeModelStatic =>
   <CommunityStakeModelStatic>sequelize.define<CommunityStakeInstance>(
     'CommunityStakes',
     {
       community_id: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         primaryKey: true,
       },
       stake_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
       },
-      stake_token: { type: dataTypes.STRING, allowNull: false },
-      vote_weight: { type: dataTypes.INTEGER, allowNull: false },
-      stake_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      stake_token: { type: Sequelize.STRING, allowNull: false },
+      vote_weight: { type: Sequelize.INTEGER, allowNull: false },
+      stake_enabled: { type: Sequelize.BOOLEAN, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,

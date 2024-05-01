@@ -268,6 +268,7 @@ const CustomDomainRoutes = ({
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
+        renderDefaultMetatags: false,
       })}
     />,
     <Route
