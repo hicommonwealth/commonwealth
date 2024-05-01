@@ -2,7 +2,7 @@
 /* eslint-disable no-script-url */
 import { WalletId } from '@hicommonwealth/shared';
 import 'components/user/user.scss';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import React from 'react';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
@@ -96,8 +96,8 @@ export const UserBlock = ({
           {showCommunityName && (
             <div>
               {user instanceof MinimumProfile
-                ? capitalize(user.chain)
-                : capitalize(user.community.name)}
+                ? _.capitalize(user.chain)
+                : _.capitalize(user.community.name)}
             </div>
           )}
         </div>

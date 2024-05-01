@@ -2,41 +2,44 @@ import React from 'react';
 
 import { CWCard } from 'views/components/component_kit/cw_card';
 
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { SharePopover } from 'views/components/share_popover';
 
 import ContestCountdown from '../ContestCountdown';
 
 import './ContestCard.scss';
 
 interface ContestCardProps {
-  id: number;
+  address: string;
   name: string;
   imageUrl?: string;
   finishDate: string;
-  topics: string[];
-  payouts: number[];
+  topics: { id?: number; name?: string }[];
+  winners: { prize?: number; creator_address?: string }[];
   isAdmin: boolean;
   isActive: boolean;
   onFund: () => void;
 }
 
 const ContestCard = ({
-  id,
+  address,
   name,
   imageUrl,
   finishDate,
   topics,
-  payouts,
+  winners,
   isAdmin,
   isActive,
   onFund,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const handleCancelContest = () => {
     // TODO open warning modal
@@ -44,7 +47,7 @@ const ContestCard = ({
   };
 
   const handleEditContest = () => {
-    navigate(`/manage/contests/${id}`);
+    navigate(`/manage/contests/${address}`);
   };
 
   const handleLeaderboardClick = () => {
@@ -61,10 +64,6 @@ const ContestCard = ({
     console.log('navigate to discussions');
   };
 
-  const handleShareClick = () => {
-    // TODO open share popover
-  };
-
   const handleFundClick = () => {
     onFund();
   };
@@ -79,17 +78,19 @@ const ContestCard = ({
           <CWText type="h3">{name}</CWText>
           <ContestCountdown finishTime={finishDate} isActive={isActive} />
         </div>
-        <CWText className="topics">Topics: {topics.join(', ')}</CWText>
+        <CWText className="topics">
+          Topics: {topics.map(({ name: topicName }) => topicName).join(', ')}
+        </CWText>
         <CWText className="prizes-header" fontWeight="bold">
           Current Prizes
         </CWText>
         <div className="prizes">
-          {payouts.map((payout, index) => (
-            <div className="prize-row" key={index}>
+          {winners.map((winner, index) => (
+            <div className="prize-row" key={winner.creator_address}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{payout} ETH</CWText>
+              <CWText fontWeight="bold">{winner.prize} ETH</CWText>
             </div>
           ))}
         </div>
@@ -104,12 +105,19 @@ const ContestCard = ({
             action="winners"
             onClick={handleWinnersClick}
           />
-          <CWThreadAction
-            label="Share"
-            action="share"
-            onClick={handleShareClick}
+
+          <SharePopover
+            customUrl="/contests"
+            renderTrigger={(handleInteraction) => (
+              <CWThreadAction
+                action="share"
+                label="Share"
+                onClick={handleInteraction}
+              />
+            )}
           />
-          {isActive && (
+
+          {isActive && hasJoinedCommunity && (
             <CWThreadAction
               label="Fund"
               action="fund"

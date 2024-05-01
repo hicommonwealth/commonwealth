@@ -242,7 +242,6 @@ export const CWMagic = (props: CustomIconProps) => {
 export const CWBlast = ({
   componentType,
   iconSize,
-  className,
   ...otherProps
 }: CustomIconProps) => {
   return (
@@ -289,7 +288,6 @@ export const CWBlast = ({
 export const CWBase = ({
   componentType,
   iconSize,
-  className,
   ...otherProps
 }: CustomIconProps) => {
   return (

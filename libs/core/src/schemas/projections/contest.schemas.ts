@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils.schemas';
 
-export const CONSTEST_ACTIONS = ['added', 'upvoted'] as const;
+export const CONTEST_ACTIONS = ['added', 'upvoted'] as const;
 
 export const ContestAction = z
   .object({
@@ -9,7 +9,7 @@ export const ContestAction = z
     contest_id: PG_INT.describe('On-Chain contest id, 0 when one-off'),
     content_id: PG_INT.describe('On-Chain content id, 0 when adding'),
     actor_address: z.string(),
-    action: z.enum(CONSTEST_ACTIONS).describe('Type of content action'),
+    action: z.enum(CONTEST_ACTIONS).describe('Type of content action'),
     content_url: z.string().url().describe('Content url').optional(),
     thread_id: PG_INT.optional().describe('Thread id mapped from content url'),
     thread_title: z.string().optional(),

@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractTemplateMetadataAttributes = {
@@ -22,7 +21,6 @@ export type CommunityContractTemplateMetadataStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
 ): CommunityContractTemplateMetadataStatic => {
   const CommunityContractTemplateMetadata = <
     CommunityContractTemplateMetadataStatic
@@ -30,20 +28,20 @@ export default (
     'CommunityContractTemplateMetadata',
     {
       id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      slug: { type: dataTypes.STRING, allowNull: false },
-      nickname: { type: dataTypes.STRING, allowNull: true },
-      display_name: { type: dataTypes.STRING, allowNull: false },
+      slug: { type: Sequelize.STRING, allowNull: false },
+      nickname: { type: Sequelize.STRING, allowNull: true },
+      display_name: { type: Sequelize.STRING, allowNull: false },
       display_options: {
-        type: dataTypes.ENUM('0', '1', '2', '3'),
+        type: Sequelize.ENUM('0', '1', '2', '3'),
         allowNull: true,
       },
-      enabled_by: { type: dataTypes.STRING, allowNull: true },
-      created_at: { type: dataTypes.DATE, allowNull: true },
-      updated_at: { type: dataTypes.DATE, allowNull: true },
+      enabled_by: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: true },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     },
     {
       tableName: 'CommunityContractTemplateMetadata',

@@ -471,15 +471,23 @@ const NotificationSettingsPage = () => {
                           if (sub.Thread?.communityId) {
                             return (
                               <User
-                                userAddress={sub.Thread.author}
-                                userCommunityId={sub.Thread.communityId}
+                                userAddress={sub?.Thread?.author}
+                                userCommunityId={sub?.Thread?.communityId}
+                                shouldShowAsDeleted={
+                                  !sub?.Thread?.author &&
+                                  !sub?.Thread?.communityId
+                                }
                               />
                             );
                           } else if (sub.Comment?.communityId) {
                             return (
                               <User
-                                userAddress={sub.Comment.author}
-                                userCommunityId={sub.Comment.communityId}
+                                userAddress={sub?.Comment?.author}
+                                userCommunityId={sub?.Comment?.communityId}
+                                shouldShowAsDeleted={
+                                  !sub?.Comment?.author &&
+                                  !sub?.Comment?.communityId
+                                }
                               />
                             );
                           } else {

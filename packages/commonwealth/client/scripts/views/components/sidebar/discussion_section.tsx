@@ -235,6 +235,8 @@ export const DiscussionSection = ({
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
+      const topicInvolvedInActiveContest = true;
+
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
         containsChildren: false,
@@ -261,6 +263,9 @@ export const DiscussionSection = ({
           );
         },
         displayData: null,
+        ...(topicInvolvedInActiveContest
+          ? { rightIcon: <CWIcon iconName="trophy" iconSize="small" /> }
+          : {}),
       };
       discussionsGroupData.push(discussionSectionGroup);
     }

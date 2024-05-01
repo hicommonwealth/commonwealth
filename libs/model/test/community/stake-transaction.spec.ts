@@ -13,7 +13,7 @@ chai.use(chaiAsPromised);
 describe('Stake transactions', () => {
   const actor: Actor = { user: { email: '' } };
   let payload;
-  let community_id;
+  let community_id: string;
 
   before(async () => {
     const [node] = await seed('ChainNode', {
@@ -22,12 +22,10 @@ describe('Stake transactions', () => {
       name: 'Sepolia Testnet',
       eth_chain_id: commonProtocol.ValidChains.Sepolia,
       balance_type: BalanceType.Ethereum,
-      contracts: [],
     });
 
     const [user] = await seed('User', {
       isAdmin: true,
-      selected_community_id: null,
     });
     const [community] = await seed('Community', {
       namespace: 'qaa',
@@ -36,7 +34,6 @@ describe('Stake transactions', () => {
         {
           role: 'admin',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
       CommunityStakes: [
@@ -47,10 +44,6 @@ describe('Stake transactions', () => {
           stake_enabled: true,
         },
       ],
-      topics: [],
-      groups: [],
-      contest_managers: [],
-      discord_config_id: null,
     });
 
     community_id = community!.id!;
@@ -120,7 +113,7 @@ describe('Stake transactions', () => {
         payload,
       });
     } catch (e) {
-      expect(e.message).to.equal(
+      expect((e as Error).message).to.equal(
         'Transaction is not associated with provided community',
       );
       return;

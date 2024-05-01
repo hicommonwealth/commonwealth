@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
@@ -11,6 +12,7 @@ import {
   Stats,
 } from './interfaces';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**
@@ -59,7 +61,9 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   adapters.clear();
 
   // exit when not unit testing
-  code !== 'UNIT_TEST' && process.exit(code === 'ERROR' ? 1 : 0);
+  process.env.NODE_ENV !== 'test' &&
+    code !== 'UNIT_TEST' &&
+    process.exit(code === 'ERROR' ? 1 : 0);
 };
 
 /**

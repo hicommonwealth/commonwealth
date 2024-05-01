@@ -53,7 +53,8 @@ export const CommentEditor = ({
           >
             <User
               userAddress={author?.address}
-              userCommunityId={author?.community.id}
+              userCommunityId={author?.community?.id}
+              shouldShowAsDeleted={!author?.address && !author?.community?.id}
               shouldHideAvatar
               shouldLinkProfile
             />

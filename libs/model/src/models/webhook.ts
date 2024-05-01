@@ -1,6 +1,5 @@
 import { WebhookCategory } from '@hicommonwealth/shared';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -18,18 +17,19 @@ export type WebhookInstance = ModelInstance<WebhookAttributes>;
 
 export type WebhookModelStatic = ModelStatic<WebhookInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): WebhookModelStatic => {
-  const Webhook = <WebhookModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <WebhookModelStatic>sequelize.define<WebhookInstance>(
     'Webhook',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: dataTypes.STRING, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      url: { type: Sequelize.STRING, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       categories: {
-        type: dataTypes.ARRAY(dataTypes.STRING),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: [],
       },
@@ -41,13 +41,3 @@ export default (
       updatedAt: 'updated_at',
     },
   );
-
-  Webhook.associate = (models) => {
-    models.Webhook.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Webhook;
-};
