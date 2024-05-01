@@ -52,13 +52,30 @@ const getNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const addresses = await profile.getAddresses();
+  const inActiveCommunities = (
+    await models.Community.findAll({
+      where: {
+        active: false,
+      },
+    })
+  ).map((c) => c.id);
+
+  const addresses = await profile.getAddresses({
+    where: {
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
+      },
+    },
+  });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
   const threads = await models.Thread.findAll({
     where: {
       address_id: {
         [Op.in]: addressIds,
+      },
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
       },
     },
     include: [{ model: models.Address, as: 'Address' }],
@@ -68,6 +85,9 @@ const getNewProfile = async (
     where: {
       address_id: {
         [Op.in]: addressIds,
+      },
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
       },
     },
     include: [{ model: models.Address, as: 'Address' }],
@@ -80,6 +100,9 @@ const getNewProfile = async (
     where: {
       id: {
         [Op.in]: commentThreadIds,
+      },
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
       },
     },
   });
