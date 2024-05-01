@@ -9,8 +9,8 @@
     "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'yarn start' 'yarn start-consumer'",
     "start": "tsx src/discord-listener/discordListener.ts",
     "start-consumer": "tsx src/discord-consumer/discordConsumer.ts",
-    "start-prod-consumer": "node --experimental-specifier-resolution=node build/discord-consumer/discordConsumer.js",
-    "start-prod-listener": "node --experimental-specifier-resolution=node build/discord-listener/discordListener.js",
+    "start-prod-consumer": "node --import=extensionless/register build/discord-consumer/discordConsumer.js",
+    "start-prod-listener": "node --import=extensionless/register build/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
     "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'"
   },
