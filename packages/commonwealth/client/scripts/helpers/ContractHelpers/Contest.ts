@@ -159,7 +159,7 @@ class Contest extends ContractBase {
         data: data,
         from: walletAddress,
       };
-      const approveReceipt = this.web3.eth.sendTransaction(txObject);
+      await this.web3.eth.sendTransaction(txObject);
 
       txReceipt = this.contract.methods.deposit(weiAmount).send({
         value: weiAmount,
@@ -176,7 +176,9 @@ class Contest extends ContractBase {
       throw Error('Must provide contract address during initialization');
     }
     try {
-      const winnerIds: any[] = await this.contract.methods.winnerIds().call();
+      const winnerIds: number[] = await this.contract.methods
+        .winnerIds()
+        .call();
 
       return winnerIds.map((x) => Number(x));
     } catch (error) {
