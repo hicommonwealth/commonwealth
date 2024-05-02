@@ -1,20 +1,26 @@
+import {
+  BrokerPublications,
+  BrokerSubscriptions,
+  schemas,
+} from '@hicommonwealth/core';
+
 export enum RascalPublications {
-  SnapshotListener = 'SnapshotListenerPublication',
-  DiscordListener = 'DiscordMessagePublication',
-  ChainEvent = 'ChainEventPublication',
+  DiscordListener = BrokerPublications.DiscordListener,
+  MessageRelayer = BrokerPublications.MessageRelayer,
 }
 
+// SnapshotListener and ChainEvent subscriptions will eventually be replaced by NotificationsProvider
 export enum RascalSubscriptions {
-  SnapshotListener = 'SnapshotListenerSubscription',
-  DiscordListener = 'DiscordMessageSubscription',
-  ChainEvent = 'ChainEventSubscription',
+  SnapshotListener = BrokerSubscriptions.SnapshotListener,
+  DiscordListener = BrokerSubscriptions.DiscordListener,
+  ChainEvent = BrokerSubscriptions.ChainEvent,
+  NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
 }
 
 export enum RascalExchanges {
-  SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange',
   Discobot = 'DiscobotExchange',
-  ChainEvent = 'ChainEventExchange',
+  MessageRelayer = 'MessageRelayerExchange',
 }
 
 export enum RascalQueues {
@@ -22,6 +28,7 @@ export enum RascalQueues {
   SnapshotListener = 'SnapshotListenerQueueV2',
   DiscordListener = 'DiscordMessageQueueV2',
   ChainEvent = 'ChainEventQueue',
+  NotificationsProvider = 'NotificationsProviderQueue',
 }
 
 export enum RascalBindings {
@@ -32,8 +39,8 @@ export enum RascalBindings {
 }
 
 export enum RascalRoutingKeys {
-  SnapshotListener = 'SnapshotListener',
+  SnapshotListener = schemas.EventNames.SnapshotProposalCreated,
   DeadLetter = 'DeadLetter',
-  DiscordListener = 'DiscordListener',
-  ChainEvent = 'ChainEvent',
+  DiscordListener = schemas.EventNames.DiscordMessageCreated,
+  ChainEvent = schemas.EventNames.ChainEventCreated,
 }
