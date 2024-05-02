@@ -8,7 +8,7 @@ const log = logger(__filename);
 
 dotenv.config();
 
-export default async function fetchNewSnapshotProposal(id: string) {
+export async function fetchNewSnapshotProposal(id: string) {
   try {
     const response = await fetch('https://hub.snapshot.org/graphql', {
       method: 'POST',
@@ -41,7 +41,10 @@ export default async function fetchNewSnapshotProposal(id: string) {
 
     return proposal;
   } catch (err) {
-    log.error('Error fetching snapshot proposal from GraphQL endpoint', err);
+    log.error(
+      'Error fetching snapshot proposal from GraphQL endpoint',
+      err as Error,
+    );
     return err;
   }
 }

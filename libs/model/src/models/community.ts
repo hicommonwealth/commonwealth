@@ -141,6 +141,11 @@ export default (sequelize: Sequelize.Sequelize) =>
       created_at: { type: Sequelize.DATE, allowNull: true },
       updated_at: { type: Sequelize.DATE, allowNull: true },
       redirect: { type: Sequelize.TEXT, allowNull: true },
+      snapshot_spaces: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
     },
     {
       tableName: 'Communities',
