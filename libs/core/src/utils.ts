@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ErrorMapper } from './types';
+import { ErrorMapperFn } from './types';
 
 export const ALL_COMMUNITIES = 'all_communities';
 export const MAX_COMMUNITY_IMAGE_SIZE_KB = 500;
@@ -49,21 +49,20 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
 
 export async function withErrorMappers<T>(
-  errorMappers: ErrorMapper[],
+  errorMapperFns: ErrorMapperFn[],
   fn: () => Promise<T>,
 ): Promise<T> {
+  let result: T | undefined = undefined;
   try {
-    return fn();
+    result = await fn();
   } catch (err) {
-    for (const mapper of errorMappers) {
-      for (const prettyErrorMessage in mapper) {
-        const mapperFn = mapper[prettyErrorMessage];
-        const mappedError = mapperFn(err as Error);
-        if (mappedError) {
-          throw mappedError;
-        }
+    for (const mapper of errorMapperFns) {
+      const mappedError = mapper(err as Error);
+      if (mappedError) {
+        throw mappedError;
       }
     }
     throw err;
   }
+  return result;
 }

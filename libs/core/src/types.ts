@@ -159,6 +159,4 @@ export enum BrokerTopics {
   ChainEvent = 'ChainEvent',
 }
 
-export type ErrorMapperFn = (err: Error) => Error;
-
-export type ErrorMapper = Record<string, ErrorMapperFn>;
+export type ErrorMapperFn = (err: Error) => Error | null;
