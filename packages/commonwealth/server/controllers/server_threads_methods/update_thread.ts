@@ -217,22 +217,23 @@ export async function __updateThread(
     await thread.update(
       {
         ...toUpdate,
-        version_history: [...versionHistory],
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       { transaction },
     );
 
-    // The update above doesn't work because it can't detect array changes so doesn't write it to db
-    await this.models.Thread.update(
-      {
-        version_history: versionHistory,
-      },
-      {
-        where: { id: threadId },
-        transaction,
-      },
-    );
+    if (versionHistory) {
+      // The update above doesn't work because it can't detect array changes so doesn't write it to db
+      await this.models.Thread.update(
+        {
+          version_history: versionHistory,
+        },
+        {
+          where: { id: threadId },
+          transaction,
+        },
+      );
+    }
 
     await updateThreadCollaborators(
       permissions,

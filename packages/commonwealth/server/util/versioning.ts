@@ -9,9 +9,7 @@ export function addVersionHistory(
   // update version history
   let latestVersion;
   try {
-    latestVersion = JSON.parse(
-      oldVersionHistory[oldVersionHistory.length - 1],
-    ).body;
+    latestVersion = JSON.parse(oldVersionHistory[0]).body;
   } catch (err) {
     console.log(err);
   }
@@ -29,4 +27,6 @@ export function addVersionHistory(
     arr.unshift(versionHistory);
     return { latestVersion, versionHistory: arr };
   }
+
+  return { latestVersion, versionHistory: null };
 }
