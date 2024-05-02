@@ -37,6 +37,8 @@ const useToggleCommunityStarMutation = () => {
         });
         app.user.removeStarredCommunity(star.community_id, star.user_id);
       }
+
+      app.sidebarRedraw.emit('redraw');
     },
   });
 };

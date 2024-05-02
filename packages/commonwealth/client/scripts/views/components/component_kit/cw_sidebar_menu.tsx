@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
+import useForceRerender from 'hooks/useForceRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
@@ -33,7 +34,7 @@ const resetSidebarState = () => {
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
-  const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
+  // const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   if (props.type === 'default') {
@@ -125,13 +126,13 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               }
             />
             <div
-              className={isStarred ? 'star-filled' : 'star-empty'}
+              className={props.isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
                   community: item.id,
                 });
-                setIsStarred((prevState) => !prevState);
+                // setIsStarred((prevState) => !prevState);
               }}
             />
           </div>
@@ -151,6 +152,15 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+  const forceRerender = useForceRerender();
+
+  useEffect(() => {
+    app.sidebarRedraw.on('redraw', forceRerender);
+
+    return () => {
+      app.sidebarRedraw.off('redraw', forceRerender);
+    };
+  }, [forceRerender]);
 
   return (
     <div
