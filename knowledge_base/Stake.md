@@ -33,4 +33,4 @@ For any issues, reach out to Ian Rowan.
 
 ## Change Log
 
-- 240424: Authored by Israel Lund; added by Graham Johnson (#7681).
+- 240502: Cheatsheet authored by Israel Lund; entry added by Graham Johnson and certified fresh by Ian Rowan (#7681).
