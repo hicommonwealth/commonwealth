@@ -1,6 +1,6 @@
 import { AppError, BalanceSourceType } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/shared';
-import Web3 from 'web3';
+import Web3, { AbiFunctionFragment } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
@@ -79,7 +79,6 @@ export const getNamespaceBalance = async (
 };
 
 /**
- * @ianrowan TODO: finish and test
  * Gets token ticker and decimal places to wei
  */
 export const getTokenAttributes = async (
@@ -116,7 +115,7 @@ export const getTokenAttributes = async (
         stateMutability: 'view',
         type: 'function',
       },
-    ],
+    ] as AbiFunctionFragment[],
     contestToken,
   );
 
