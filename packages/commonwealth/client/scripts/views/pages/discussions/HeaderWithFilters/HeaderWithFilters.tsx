@@ -426,11 +426,15 @@ export const HeaderWithFilters = ({
                 stagesEnabled && (
                   <Select
                     selected={selectedStage || 'All Stages'}
-                    onSelect={(item: any) =>
+                    onSelect={(item) =>
                       onFilterSelect({
                         filterKey: 'stage',
                         filterVal:
-                          item.value === 'All Stages' ? '' : item.value,
+                          typeof item !== 'string'
+                            ? item.value === 'All Stages'
+                              ? ''
+                              : item.value
+                            : '',
                       })
                     }
                     options={[

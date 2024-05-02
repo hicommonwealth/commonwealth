@@ -23,7 +23,7 @@ export type SelectProps = {
       | string
       | {
           id?: string | number;
-          value?: any;
+          value?: string;
           label: string;
           iconLeft?: IconName;
           type?: 'header' | 'header-divider' | 'contest';
@@ -35,7 +35,7 @@ export type SelectProps = {
     | string[]
     | {
         id?: string | number;
-        value?: any;
+        value?: string;
         label: string;
         iconLeft?: IconName;
         type?: 'header' | 'header-divider' | 'contest';
@@ -142,10 +142,10 @@ export const Select = ({
                           <CWIconButton
                             iconName="write"
                             iconSize="small"
-                            onClick={async (e) => {
+                            onClick={(e) => {
                               e.stopPropagation();
                               popoverProps.setAnchorEl(null);
-                              onOptionEdit && (await onOptionEdit(option));
+                              onOptionEdit?.(option);
                             }}
                           />
                         ),
