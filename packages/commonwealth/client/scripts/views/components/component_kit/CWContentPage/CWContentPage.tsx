@@ -2,7 +2,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { IThreadCollaborator, VersionHistory } from 'models/Thread';
+import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -177,12 +177,6 @@ export const CWContentPage = ({
     authorCommunityId = author.community.id;
   }
 
-  const currentVersion: VersionHistory = {
-    author: author as MinimumProfile,
-    timestamp: moment(),
-    body: thread.plaintext,
-  };
-
   const authorAndPublishInfoRow = (
     <div className="header-info-row">
       <AuthorAndPublishInfo
@@ -207,7 +201,7 @@ export const CWContentPage = ({
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
         profile={thread?.profile}
-        versionHistory={[currentVersion, ...thread.versionHistory]}
+        versionHistory={thread.versionHistory}
         changeContentText={setThreadBody}
       />
     </div>
