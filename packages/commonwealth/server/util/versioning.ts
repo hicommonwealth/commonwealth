@@ -5,7 +5,6 @@ export function addVersionHistory(
   oldVersionHistory: string[],
   body: string,
   address: AddressInstance,
-  isDelta = false,
 ): { latestVersion: string; versionHistory: string[] } {
   // update version history
   let latestVersion;
@@ -14,9 +13,15 @@ export function addVersionHistory(
   } catch (err) {
     console.log(err);
   }
-  const parsedBody = isDelta
-    ? JSON.parse(decodeURIComponent(body)).ops[0].insert
-    : body;
+
+  let parsedBody;
+  try {
+    parsedBody = JSON.parse(decodeURIComponent(body)).ops[0].insert;
+  } catch (error) {
+    // If parsing fails, or the property doesn't exist, assign the original body
+    parsedBody = body;
+  }
+
   if (parsedBody !== latestVersion) {
     const recentEdit = {
       timestamp: moment(),

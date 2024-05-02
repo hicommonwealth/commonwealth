@@ -167,7 +167,6 @@ export async function __updateThread(
     thread.version_history,
     body,
     address,
-    true,
   );
 
   // build analytics
