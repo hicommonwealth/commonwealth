@@ -42,7 +42,7 @@ export type AddressAttributes = {
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-  getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
+  getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
@@ -146,39 +146,23 @@ export default (sequelize: Sequelize.Sequelize): AddressModelStatic => {
             address: AddressInstance,
             options: Sequelize.CreateOptions<AddressAttributes>,
           ) => {
-            // when address created, increment Community.address_count
-            await sequelize.query(
-              `
-            UPDATE "Communities"
-            SET address_count = address_count + 1
-            WHERE id = :communityId
-          `,
-              {
-                replacements: {
-                  communityId: address.community_id,
-                },
-                transaction: options.transaction,
-              },
-            );
+            const { Community } = sequelize.models;
+            await Community.increment('address_count', {
+              by: 1,
+              where: { id: address.community_id },
+              transaction: options.transaction,
+            });
           },
           afterDestroy: async (
             address: AddressInstance,
             options: Sequelize.InstanceDestroyOptions,
           ) => {
-            // when address deleted, decrement Community.address_count
-            await sequelize.query(
-              `
-            UPDATE "Communities"
-            SET address_count = address_count - 1
-            WHERE id = :communityId
-          `,
-              {
-                replacements: {
-                  communityId: address.community_id,
-                },
-                transaction: options.transaction,
-              },
-            );
+            const { Community } = sequelize.models;
+            await Community.decrement('address_count', {
+              by: 1,
+              where: { id: address.community_id },
+              transaction: options.transaction,
+            });
           },
         },
       },
