@@ -24,6 +24,7 @@ export function oneToOne<Source extends State, Target extends State>(
 ) {
   this.belongsTo(target, {
     foreignKey: keys[0],
+    as: options?.as,
     onUpdate: 'NO ACTION',
     onDelete: 'NO ACTION',
   });

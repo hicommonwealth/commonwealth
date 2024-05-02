@@ -140,8 +140,14 @@ export const buildAssociations = (db: DB) => {
       model: db.Group,
       key: 'group_id',
       as: 'memberships',
+      asOne: 'group',
     },
-    { model: db.Address, key: 'address_id', as: 'Memberships' },
+    {
+      model: db.Address,
+      key: 'address_id',
+      as: 'Memberships',
+      asOne: 'address',
+    },
   );
   db.Collaboration.withManyToMany(
     { model: db.Address, key: 'address_id' },

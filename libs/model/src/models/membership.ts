@@ -20,8 +20,8 @@ export type MembershipAttributes = {
   last_checked: Date;
 
   // associations
-  Group?: GroupAttributes;
-  Address?: AddressAttributes;
+  group?: GroupAttributes;
+  address?: AddressAttributes;
 };
 
 export type MembershipInstance = ModelInstance<MembershipAttributes>;
