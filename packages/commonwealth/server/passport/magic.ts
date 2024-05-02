@@ -143,10 +143,8 @@ async function createNewMagicUser({
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.createWithProfile(
       {
-        // never use emails from magic, even for "email" login -- magic maintains the mapping
-        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
-        // of login information.
-        email: null,
+        email: magicUserMetadata.email || null,
+        emailVerified: !!magicUserMetadata.email,
       },
       { transaction },
     );
