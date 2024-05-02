@@ -53,6 +53,7 @@ describe('withErrorMappers', () => {
         backoff: 'exponential',
       });
     }
+    return null;
   };
 
   it('should return resolved value if no mappers and no error thrown', async () => {
