@@ -1,4 +1,4 @@
-import { Projection, schemas } from '@hicommonwealth/core';
+import { AppError, Projection, schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';
@@ -43,7 +43,9 @@ async function updateOrCreateWithAlert(
     where: { namespace },
     raw: true,
   });
-
+  if (!community?.ChainNode?.url) {
+    throw new AppError('Chain Node not found');
+  }
   const { ticker, decimals } = await contractHelpers.getTokenAttributes(
     contest_address,
     new Web3(community?.ChainNode?.url),

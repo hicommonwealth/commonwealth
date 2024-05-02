@@ -1,6 +1,6 @@
 import { AppError, BalanceSourceType } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/shared';
-import Web3, { AbiFunctionFragment } from 'web3';
+import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
@@ -85,7 +85,10 @@ export const getTokenAttributes = async (
   contestAddress: string,
   web3: Web3,
 ): Promise<TokenAttributes> => {
-  const contest = new web3.eth.Contract(contestABI, contestAddress);
+  const contest = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contestAddress,
+  );
   const contestToken: string = await contest.methods.contestToken().call();
 
   if (contestToken === '0x0000000000000000000000000000000000000000') {
@@ -115,7 +118,7 @@ export const getTokenAttributes = async (
         stateMutability: 'view',
         type: 'function',
       },
-    ] as AbiFunctionFragment[],
+    ] as AbiItem[],
     contestToken,
   );
 
