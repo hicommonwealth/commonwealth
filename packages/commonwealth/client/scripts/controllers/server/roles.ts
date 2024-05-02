@@ -51,7 +51,7 @@ export class RolesController {
       address_chain: options.community,
       address_id: options.address.id,
       allow: 0,
-      chain_id: options.community,
+      community_id: options.community,
       community_role_id: options.address.id,
       deny: 0,
       is_user_default: true,
