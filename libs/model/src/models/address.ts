@@ -42,7 +42,7 @@ export type AddressAttributes = {
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-  getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
+  getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
@@ -146,8 +146,8 @@ export default (sequelize: Sequelize.Sequelize): AddressModelStatic => {
             address: AddressInstance,
             options: Sequelize.CreateOptions<AddressAttributes>,
           ) => {
-            const { Chain } = sequelize.models;
-            await Chain.increment('address_count', {
+            const { Community } = sequelize.models;
+            await Community.increment('address_count', {
               by: 1,
               where: { id: address.community_id },
               transaction: options.transaction,
@@ -157,8 +157,8 @@ export default (sequelize: Sequelize.Sequelize): AddressModelStatic => {
             address: AddressInstance,
             options: Sequelize.InstanceDestroyOptions,
           ) => {
-            const { Chain } = sequelize.models;
-            await Chain.decrement('address_count', {
+            const { Community } = sequelize.models;
+            await Community.decrement('address_count', {
               by: 1,
               where: { id: address.community_id },
               transaction: options.transaction,

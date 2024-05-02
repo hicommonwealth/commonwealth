@@ -145,9 +145,9 @@ export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Chain, Outbox } = sequelize.models;
+          const { Community, Outbox } = sequelize.models;
 
-          await Chain.increment('thread_count', {
+          await Community.increment('thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
@@ -168,8 +168,8 @@ export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
           thread: ThreadInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          const { Chain } = sequelize.models;
-          await Chain.increment('thread_count', {
+          const { Community } = sequelize.models;
+          await Community.increment('thread_count', {
             by: 1,
             where: { id: thread.community_id },
             transaction: options.transaction,
