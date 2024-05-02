@@ -16,6 +16,8 @@ export type UpdateCustomDomainResult = CommunityAttributes & {
   dns_target?: string;
 };
 
+// TODO: better handling of environments (e.g. how to replicate on local env?)
+
 // NOTE: only governance + proposal templates use the web3 API on the client, which would involve
 //   alchemy configuration, so we will omit that as those features are unused -- but we may want to
 //   support it in the future, esp if stake/contests hit mainnet?
@@ -43,7 +45,6 @@ export async function __updateCustomDomain(
       .replace('https://', '')
       .replace('http://', '');
 
-    // TODO: error check
     const herokuResponse = await axios.delete(
       `https://api.heroku.com/apps/${process.env.HEROKU_APP_NAME}/domains/${domainHostname}`,
       {
