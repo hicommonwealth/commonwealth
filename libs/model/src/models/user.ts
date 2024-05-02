@@ -1,13 +1,15 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
 import type { CreateOptions } from 'sequelize';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
+import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
-import { CommunityAlertAttributes } from './community_alerts';
+import type { CommunityAlertAttributes } from './community_alerts';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import { SubscriptionPreferenceAttributes } from './subscription_preference';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { SubscriptionPreferenceAttributes } from './subscription_preference';
+import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
@@ -19,6 +21,8 @@ export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   CommunityAlerts?: CommunityAlertAttributes[];
+  ThreadSubscriptions?: ThreadSubscriptionAttributes[];
+  CommentSubscriptions?: CommentSubscriptionAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -52,31 +56,28 @@ export type UserCreationAttributes = UserAttributes & {
 export type UserModelStatic = ModelStatic<UserInstance> &
   UserCreationAttributes;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): UserModelStatic => {
-  const User = <UserModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
+  const User = <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: dataTypes.STRING, allowNull: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      email: { type: Sequelize.STRING, allowNull: true },
       emailVerified: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: true,
       },
       emailNotificationInterval: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         defaultValue: 'never',
         allowNull: false,
       },
-      isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
+      isAdmin: { type: Sequelize.BOOLEAN, defaultValue: false },
       disableRichText: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      selected_community_id: { type: dataTypes.STRING, allowNull: true },
+      selected_community_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -103,34 +104,8 @@ export default (
   );
 
   User.associate = (models) => {
-    models.User.belongsTo(models.Community, {
-      as: 'selectedCommunity',
-      foreignKey: 'selected_community_id',
-      //constraints: false,
-    });
-    models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile, {
       foreignKey: { name: 'user_id', allowNull: false },
-    });
-    models.User.hasMany(models.StarredCommunity, {
-      foreignKey: 'user_id',
-      sourceKey: 'id',
-    });
-    models.User.hasOne(models.SubscriptionPreference, {
-      foreignKey: 'user_id',
-      as: 'SubscriptionPreferences',
-    });
-    models.User.hasMany(models.CommunityAlert, {
-      foreignKey: 'user_id',
-      as: 'CommunityAlerts',
-    });
-    models.User.hasMany(models.ThreadSubscription, {
-      foreignKey: 'user_id',
-      as: 'ThreadSubscriptions',
-    });
-    models.User.hasMany(models.CommentSubscription, {
-      foreignKey: 'user_id',
-      as: 'CommentSubscriptions',
     });
 
     User.createWithProfile = async (

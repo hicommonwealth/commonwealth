@@ -119,9 +119,8 @@ type COLUMN_INFO = {
 type CONSTRAINT_INFO = {
   table_name: string;
   constraint: string;
-  constraint_name: string;
 };
-type TABLE_INFO = {
+export type TABLE_INFO = {
   table_name: string;
   columns: Record<string, string>;
   constraints: Set<string>;
@@ -156,15 +155,31 @@ ORDER BY 1, 2;`,
   const constraints = await db.query<CONSTRAINT_INFO>(
     `
 SELECT
-	c.table_name,
-	c.constraint_type || '(' || STRING_AGG(k.column_name, ',' order by column_name) || ')' as constraint,
-	c.constraint_name
+	C.TABLE_NAME,
+	C.CONSTRAINT_TYPE || coalesce(' ' || C2.TABLE_NAME,'') || '(' || STRING_AGG(
+		K.COLUMN_NAME,
+		','
+		ORDER BY
+			COLUMN_NAME
+	) || ')' || COALESCE(' UPDATE ' || R.UPDATE_RULE, '') || COALESCE(' DELETE ' || R.DELETE_RULE, '') AS CONSTRAINT
 FROM
-	information_schema.table_constraints c
-	JOIN information_schema.key_column_usage k on c.constraint_name = k.constraint_name
-WHERE c.table_schema = 'public'
-GROUP BY c.table_name, c.constraint_name, c.constraint_type
-ORDER BY 1, 2;`,
+	INFORMATION_SCHEMA.TABLE_CONSTRAINTS C
+	JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE K ON C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
+	LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS R ON C.CONSTRAINT_NAME = R.CONSTRAINT_NAME
+	LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS C2 ON R.UNIQUE_CONSTRAINT_NAME = C2.CONSTRAINT_NAME
+WHERE
+	C.TABLE_SCHEMA = 'public'
+GROUP BY
+	C.TABLE_NAME,
+	C.CONSTRAINT_NAME,
+	C.CONSTRAINT_TYPE,
+	C2.TABLE_NAME,
+	R.UPDATE_RULE,
+	R.DELETE_RULE
+ORDER BY
+	1,
+	2;
+`,
     { type: QueryTypes.SELECT },
   );
   const tables: Record<string, TABLE_INFO> = {};

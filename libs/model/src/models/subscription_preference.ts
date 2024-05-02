@@ -1,7 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type SubscriptionPreferenceAttributes = z.infer<
   typeof schemas.entities.SubscriptionPreference
@@ -15,41 +15,38 @@ export type SubscriptionPreferenceInstance =
 export type SubscriptionPreferenceModelStatic =
   ModelStatic<SubscriptionPreferenceInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): SubscriptionPreferenceModelStatic => {
-  const SubscriptionPreferences = <SubscriptionPreferenceModelStatic>(
+export default (sequelize: Sequelize.Sequelize) =>
+  <SubscriptionPreferenceModelStatic>(
     sequelize.define<SubscriptionPreferenceInstance>(
       'SubscriptionPreferences',
       {
-        id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        user_id: { type: dataTypes.INTEGER, allowNull: false },
+        id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+        user_id: { type: Sequelize.INTEGER, allowNull: false },
         email_notifications_enabled: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
         },
-        digest_email_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
-        recap_email_enabled: { type: dataTypes.BOOLEAN, allowNull: false },
+        digest_email_enabled: { type: Sequelize.BOOLEAN, allowNull: false },
+        recap_email_enabled: { type: Sequelize.BOOLEAN, allowNull: false },
         mobile_push_notifications_enabled: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
         },
         mobile_push_discussion_activity_enabled: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
         },
         mobile_push_admin_alerts_enabled: {
-          type: dataTypes.BOOLEAN,
+          type: Sequelize.BOOLEAN,
           allowNull: false,
         },
         created_at: {
-          type: dataTypes.DATE,
+          type: Sequelize.DATE,
           allowNull: false,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
         },
         updated_at: {
-          type: dataTypes.DATE,
+          type: Sequelize.DATE,
           allowNull: false,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
         },
@@ -69,12 +66,3 @@ export default (
       },
     )
   );
-
-  SubscriptionPreferences.associate = (models: any) => {
-    SubscriptionPreferences.belongsTo(models.User, {
-      foreignKey: 'user_id',
-    });
-  };
-
-  return SubscriptionPreferences;
-};
