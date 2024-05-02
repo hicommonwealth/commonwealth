@@ -1,6 +1,7 @@
 import type { Command } from '@hicommonwealth/core';
 import { InvalidState, schemas } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
+import z from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
@@ -18,23 +19,29 @@ export const CreateContestManagerMetadata: Command<
   body: async ({ id, payload }) => {
     const { topic_ids, ...rest } = payload;
 
-    // verify topics exist
-    const topics = await models.Topic.findAll({
-      where: {
-        id: {
-          [Op.in]: topic_ids || [],
-        },
-      },
-    });
-    if (topics.length !== (topic_ids || []).length) {
-      throw new InvalidState(Errors.InvalidTopics);
-    }
+    let contestTopics: TopicAttributes[] = [];
+    let contestTopicsToCreate: z.infer<typeof schemas.entities.ContestTopic>[] =
+      [];
 
-    const contestTopicsToCreate = topics.map((t) => ({
-      contest_address: rest.contest_address,
-      topic_id: t.id!,
-      created_at: new Date(),
-    }));
+    if (topic_ids) {
+      // verify topics exist
+      const topics = await models.Topic.findAll({
+        where: {
+          id: {
+            [Op.in]: topic_ids,
+          },
+        },
+      });
+      if (topics.length !== topic_ids.length) {
+        throw new InvalidState(Errors.InvalidTopics);
+      }
+      contestTopics = topics.map((t) => t.get({ plain: true }));
+      contestTopicsToCreate = topics.map((t) => ({
+        contest_address: rest.contest_address,
+        topic_id: t.id!,
+        created_at: new Date(),
+      }));
+    }
 
     const contestManager = await models.sequelize.transaction(
       async (transaction) => {
@@ -61,9 +68,7 @@ export const CreateContestManagerMetadata: Command<
         contest_managers: [
           {
             ...contestManager.get({ plain: true }),
-            topics: topics.map((t) =>
-              t.get({ plain: true }),
-            ) as Required<TopicAttributes>[],
+            topics: contestTopics as Required<TopicAttributes>[],
           },
         ],
       };
