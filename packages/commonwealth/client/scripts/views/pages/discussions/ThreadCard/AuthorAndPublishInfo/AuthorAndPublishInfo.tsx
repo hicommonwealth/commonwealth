@@ -13,8 +13,12 @@ import CWPopover, {
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { UserProfile } from '../../../../../models/MinimumProfile';
-import { IThreadCollaborator } from '../../../../../models/Thread';
+import {
+  IThreadCollaborator,
+  VersionHistory,
+} from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
+import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
 import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
@@ -45,6 +49,8 @@ export type AuthorAndPublishInfoProps = {
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
+  versionHistory?: VersionHistory[];
+  changeContentText?: (text: string) => void;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -68,6 +74,8 @@ export const AuthorAndPublishInfo = ({
   archivedAt,
   popoverPlacement,
   profile,
+  versionHistory,
+  changeContentText,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -78,6 +86,10 @@ export const AuthorAndPublishInfo = ({
   );
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+  const versionHistoryOptions = versionHistory?.map((v) => ({
+    value: v.body,
+    label: v.timestamp.format('MMMM D, YYYY h:mmA'),
+  }));
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
@@ -147,29 +159,42 @@ export const AuthorAndPublishInfo = ({
       {publishDate && (
         <>
           {dotIndicator}
-
-          <CWTooltip
-            placement="top"
-            content={
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
-                {publishDate.format('h:mm A')}
-              </div>
-            }
-            renderTrigger={(handleInteraction) => (
-              <CWText
-                type="caption"
-                fontWeight="regular"
-                className="section-text publish-date"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              >
-                {showPublishLabelWithDate ? 'Published ' : ''}
-                {showEditedLabelWithDate ? 'Edited ' : ''}
-                {getRelativeTimestamp(publishDate?.toISOString())}
-              </CWText>
-            )}
-          />
+          {versionHistoryOptions?.length > 1 ? (
+            <div className="version-history">
+              <CWSelectList
+                options={versionHistoryOptions}
+                placeholder={`Edited ${getRelativeTimestamp(
+                  publishDate?.toISOString(),
+                )}`}
+                onChange={({ value }) => {
+                  changeContentText(value);
+                }}
+              />
+            </div>
+          ) : (
+            <CWTooltip
+              placement="top"
+              content={
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
+                  {publishDate.format('h:mm A')}
+                </div>
+              }
+              renderTrigger={(handleInteraction) => (
+                <CWText
+                  type="caption"
+                  fontWeight="regular"
+                  className="section-text publish-date"
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {showPublishLabelWithDate ? 'Published ' : ''}
+                  {showEditedLabelWithDate ? 'Edited ' : ''}
+                  {getRelativeTimestamp(publishDate?.toISOString())}
+                </CWText>
+              )}
+            />
+          )}
         </>
       )}
 

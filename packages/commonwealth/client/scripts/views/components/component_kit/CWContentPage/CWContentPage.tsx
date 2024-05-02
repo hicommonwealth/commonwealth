@@ -2,7 +2,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { IThreadCollaborator } from 'models/Thread';
+import { IThreadCollaborator, VersionHistory } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -79,6 +79,7 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
+  setThreadBody?: (body: string) => void;
 };
 
 export const CWContentPage = ({
@@ -115,6 +116,7 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
+  setThreadBody,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -175,6 +177,12 @@ export const CWContentPage = ({
     authorCommunityId = author.community.id;
   }
 
+  const currentVersion: VersionHistory = {
+    author: author as MinimumProfile,
+    timestamp: moment(),
+    body: thread.plaintext,
+  };
+
   const authorAndPublishInfoRow = (
     <div className="header-info-row">
       <AuthorAndPublishInfo
@@ -199,6 +207,8 @@ export const CWContentPage = ({
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
         profile={thread?.profile}
+        versionHistory={[currentVersion, ...thread.versionHistory]}
+        changeContentText={setThreadBody}
       />
     </div>
   );
