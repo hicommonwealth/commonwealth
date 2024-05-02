@@ -49,7 +49,7 @@
 
   @include smallInclusive {
     padding: 16px 0 16px 0;
-    overflow: scroll;
+    overflow: auto;
   }
 
   a {
@@ -71,5 +71,6 @@
 
   &.isLink {
     cursor: pointer;
+    overflow: auto;
   }
 }
