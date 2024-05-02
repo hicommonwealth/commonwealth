@@ -158,3 +158,7 @@ export enum BrokerTopics {
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
 }
+
+export type ErrorMapperFn = (err: Error) => Error;
+
+export type ErrorMapper = Record<string, ErrorMapperFn>;
