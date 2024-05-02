@@ -32,7 +32,7 @@ export type CommentAttributes = {
   discord_meta?: IDiscordMeta;
 
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
   Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];

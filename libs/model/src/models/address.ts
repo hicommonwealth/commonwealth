@@ -34,7 +34,7 @@ export type AddressAttributes = {
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;

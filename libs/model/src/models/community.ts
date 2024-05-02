@@ -50,7 +50,7 @@ export default (sequelize: Sequelize.Sequelize) =>
     // with this model using .Chain rather than .Community. Models should incrementally
     // be aliased via `as: 'Community'` until all models use Community at which point,
     // this can be updated to 'Community' and all aliases can be removed.
-    'Chain',
+    'Community',
     {
       id: { type: Sequelize.STRING, primaryKey: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true }, // only null if starter community

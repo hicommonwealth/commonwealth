@@ -8,7 +8,7 @@ export type CommunityStakeAttributes = z.infer<
   typeof schemas.entities.CommunityStake
 > & {
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };
 
 export type CommunityStakeInstance = ModelInstance<CommunityStakeAttributes>;

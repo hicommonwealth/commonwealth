@@ -27,7 +27,7 @@ export type ReactionAttributes = {
   created_at?: Date;
   updated_at?: Date;
 
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
 };
 
