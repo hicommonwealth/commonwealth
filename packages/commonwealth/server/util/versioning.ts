@@ -1,10 +1,11 @@
+import { AddressInstance } from '@hicommonwealth/model';
 import moment from 'moment';
 
 export function addVersionHistory(
   oldVersionHistory: string[],
   body: string,
-  address,
-  delta = false,
+  address: AddressInstance,
+  isDelta = false,
 ): { latestVersion: string; versionHistory: string[] } {
   // update version history
   let latestVersion;
@@ -13,11 +14,11 @@ export function addVersionHistory(
   } catch (err) {
     console.log(err);
   }
-  const parsedBody = delta
+  const parsedBody = isDelta
     ? JSON.parse(decodeURIComponent(body)).ops[0].insert
     : body;
   if (parsedBody !== latestVersion) {
-    const recentEdit: any = {
+    const recentEdit = {
       timestamp: moment(),
       author: address,
       body: parsedBody,
