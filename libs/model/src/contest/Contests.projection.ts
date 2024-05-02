@@ -42,10 +42,13 @@ async function updateOrCreateWithAlert(
   const community = await models.Community.findOne({
     where: { namespace },
     raw: true,
+    include: [models.ChainNode],
   });
+
   if (!community?.ChainNode?.url) {
     throw new AppError('Chain Node not found');
   }
+
   const { ticker, decimals } = await contractHelpers.getTokenAttributes(
     contest_address,
     new Web3(community?.ChainNode?.url),
