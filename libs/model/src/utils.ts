@@ -1,5 +1,6 @@
-import { schemas } from '@hicommonwealth/core';
+import { EventNames, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { entities } from '@hicommonwealth/schemas';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { fileURLToPath } from 'node:url';
@@ -23,20 +24,20 @@ export function hashAbi(abi: AbiType): string {
 
 type EmitEventValues =
   | {
-      event_name: schemas.EventNames.CommentCreated;
-      event_payload: z.infer<typeof schemas.entities.Comment>;
+      event_name: EventNames.CommentCreated;
+      event_payload: z.infer<typeof entities.Comment>;
     }
   | {
-      event_name: schemas.EventNames.ThreadCreated;
-      event_payload: z.infer<typeof schemas.entities.Thread>;
+      event_name: EventNames.ThreadCreated;
+      event_payload: z.infer<typeof entities.Thread>;
     }
   | {
-      event_name: schemas.EventNames.ChainEventCreated;
-      event_payload: z.infer<typeof schemas.events.ChainEventCreated>;
+      event_name: EventNames.ChainEventCreated;
+      event_payload: z.infer<typeof events.ChainEventCreated>;
     }
   | {
-      event_name: schemas.EventNames.SnapshotProposalCreated;
-      event_payload: z.infer<typeof schemas.events.SnapshotProposalCreated>;
+      event_name: EventNames.SnapshotProposalCreated;
+      event_payload: z.infer<typeof events.SnapshotProposalCreated>;
     };
 
 // Load with env var?

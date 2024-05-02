@@ -16,6 +16,7 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
+  BrokerSubscriptions,
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,

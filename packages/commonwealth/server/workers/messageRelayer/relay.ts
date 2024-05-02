@@ -1,7 +1,7 @@
-import { Broker, Events, Outbox, stats } from '@hicommonwealth/core';
+import { Broker, Outbox, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
-import { BrokerTopics } from '@hicommonwealth/shared';
+import { BrokerPublications } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -9,12 +9,6 @@ import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
-
-const EventNameTopicMap: Partial<Record<Events, BrokerTopics>> = {
-  SnapshotProposalCreated: BrokerTopics.SnapshotListener,
-  DiscordMessageCreated: BrokerTopics.DiscordListener,
-  ChainEventCreated: BrokerTopics.ChainEvent,
-} as const;
 
 export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];

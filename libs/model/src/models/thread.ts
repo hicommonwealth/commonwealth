@@ -1,3 +1,4 @@
+import { EventNames } from '@hicommonwealth/core';
 import { entities } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -157,7 +158,7 @@ export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
             Outbox,
             [
               {
-                event_name: schemas.EventNames.ThreadCreated,
+                event_name: EventNames.ThreadCreated,
                 event_payload: thread.get({ plain: true }),
               },
             ],

@@ -8,6 +8,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { Broker, broker, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { BrokerSubscriptions } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';

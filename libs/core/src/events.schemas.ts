@@ -1,8 +1,12 @@
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
+import {
+  ETHERS_BIG_NUMBER,
+  EVM_ADDRESS,
+  entities,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-export const ThreadCreated = Thread;
-export const CommentCreated = Comment;
+export const ThreadCreated = entities.Thread;
+export const CommentCreated = entities.Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
@@ -276,6 +280,3 @@ export const ContestWinnersRecorded = ContestManagerEvent.extend({
     )
     .describe('Contest winners from first to last'),
 }).describe('When contest winners are recorded and contest ends');
-
-import * as events from './events.schemas';
-export type Events = keyof typeof events;

@@ -1,5 +1,10 @@
 import { ILogger } from '@hicommonwealth/logging';
-import { AnalyticsOptions, CacheNamespaces } from '@hicommonwealth/shared';
+import {
+  AnalyticsOptions,
+  BrokerPublications,
+  BrokerSubscriptions,
+  CacheNamespaces,
+} from '@hicommonwealth/shared';
 import { Events } from '../events';
 import {
   EventContext,

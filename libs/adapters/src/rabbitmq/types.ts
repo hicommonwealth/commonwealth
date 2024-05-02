@@ -1,8 +1,8 @@
+import { EventNames } from '@hicommonwealth/core';
 import {
   BrokerPublications,
   BrokerSubscriptions,
-  schemas,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 
 export enum RascalPublications {
   DiscordListener = BrokerPublications.DiscordListener,
@@ -39,8 +39,8 @@ export enum RascalBindings {
 }
 
 export enum RascalRoutingKeys {
-  SnapshotListener = schemas.EventNames.SnapshotProposalCreated,
+  SnapshotListener = EventNames.SnapshotProposalCreated,
   DeadLetter = 'DeadLetter',
-  DiscordListener = schemas.EventNames.DiscordMessageCreated,
-  ChainEvent = schemas.EventNames.ChainEventCreated,
+  DiscordListener = EventNames.DiscordMessageCreated,
+  ChainEvent = EventNames.ChainEventCreated,
 }
