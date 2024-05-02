@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from './constants';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -38,24 +38,6 @@ export const linksSchema = {
   title: z.string().nullable().optional(),
 };
 
-export enum EventNames {
-  ChainEventCreated = 'ChainEventCreated',
-  CommentCreated = 'CommentCreated',
-  CommunityCreated = 'CommunityCreated',
-  DiscordMessageCreated = 'DiscordMessageCreated',
-  GroupCreated = 'GroupCreated',
-  SnapshotProposalCreated = 'SnapshotProposalCreated',
-  ThreadCreated = 'ThreadCreated',
-
-  // Contests
-  RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
-  OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
-  ContestStarted = 'ContestStarted',
-  ContestContentAdded = 'ContestContentAdded',
-  ContestContentUpvoted = 'ContestContentUpvoted',
-  ContestWinnersRecorded = 'ContestWinnersRecorded',
-}
-
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 
 export const ETHERS_BIG_NUMBER = z.object({
@@ -64,3 +46,5 @@ export const ETHERS_BIG_NUMBER = z.object({
 });
 
 export const EVM_ADDRESS = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+
+export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());

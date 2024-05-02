@@ -1,9 +1,9 @@
-import { schemas } from '@hicommonwealth/core';
+import { entities } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type ChainNodeAttributes = z.infer<typeof schemas.entities.ChainNode>;
+export type ChainNodeAttributes = z.infer<typeof entities.ChainNode>;
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 

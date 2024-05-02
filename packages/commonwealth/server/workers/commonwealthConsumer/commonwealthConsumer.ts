@@ -6,8 +6,9 @@ import {
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { Broker, BrokerTopics, broker, stats } from '@hicommonwealth/core';
+import { Broker, broker, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { BrokerTopics } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';

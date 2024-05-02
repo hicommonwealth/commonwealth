@@ -1,8 +1,8 @@
-import { schemas, type Policy } from '@hicommonwealth/core';
+import { events, type Policy } from '@hicommonwealth/core';
 
 const inputs = {
-  ThreadCreated: schemas.events.ThreadCreated,
-  CommentCreated: schemas.events.CommentCreated,
+  ThreadCreated: events.ThreadCreated,
+  CommentCreated: events.CommentCreated,
 };
 
 export const ContestWorker: Policy<typeof inputs> = () => ({

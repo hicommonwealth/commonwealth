@@ -1,7 +1,3 @@
-import * as events from './events.schemas';
-export type Events = keyof typeof events;
-export { events };
-
 import * as entities from './entities.schemas';
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<

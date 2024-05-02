@@ -1,4 +1,4 @@
-import { schemas } from '@hicommonwealth/core';
+import { entities } from '@hicommonwealth/schemas';
 import type { CreateOptions } from 'sequelize';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
-export type UserAttributes = z.infer<typeof schemas.entities.User> & {
+export type UserAttributes = z.infer<typeof entities.User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];

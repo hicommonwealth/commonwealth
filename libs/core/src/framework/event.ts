@@ -1,5 +1,5 @@
 import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
-import { Events } from '../schemas';
+import { Events } from '../events';
 import {
   InvalidInput,
   type EventContext,

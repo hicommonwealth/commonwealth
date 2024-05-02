@@ -1,10 +1,6 @@
-import {
-  Broker,
-  BrokerTopics,
-  DiscordAction,
-  EventContext,
-} from '@hicommonwealth/core';
+import { Broker, EventContext } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { BrokerTopics, DiscordAction } from '@hicommonwealth/shared';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { fileURLToPath } from 'url';
 import { getImageUrls } from '../discord-listener/util';

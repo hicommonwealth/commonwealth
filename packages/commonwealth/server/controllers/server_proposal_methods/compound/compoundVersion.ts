@@ -8,7 +8,8 @@ import {
   GovernorCountingSimple,
   GovernorCountingSimple__factory,
 } from '@hicommonwealth/chains';
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { cache } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/shared';
 import { providers } from 'ethers';
 import { GovVersion } from './types';
 

@@ -1,9 +1,10 @@
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { cache } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   CommunityInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import { CacheNamespaces } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS } from 'server/config';
 import { ServerCommunitiesController } from '../server_communities_controller';

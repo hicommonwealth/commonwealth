@@ -31,3 +31,18 @@ export const getThreadUrl = (
     ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
     : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
 };
+
+export const ALL_COMMUNITIES = 'all_communities';
+export const MAX_COMMUNITY_IMAGE_SIZE_KB = 500;
+
+export function timeoutPromise(timeout: number) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Timed out after ${timeout}ms`));
+    }, timeout);
+  });
+}
+
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

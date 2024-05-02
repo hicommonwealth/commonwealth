@@ -1,11 +1,11 @@
 import {
-  AnalyticsOptions,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   User,
   analytics,
   stats,
 } from '@hicommonwealth/core';
+import { AnalyticsOptions } from '@hicommonwealth/shared';
 import { NextFunction, Request, Response } from 'express';
 import { BadRequest, InternalServerError, Unauthorized } from './http';
 

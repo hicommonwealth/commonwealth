@@ -1,4 +1,3 @@
-import { NodeHealth } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
 import axios from 'axios';
@@ -13,6 +12,7 @@ import {
   upgradeBetaNodeIfNeeded,
 } from '../utils';
 
+import { NodeHealth } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

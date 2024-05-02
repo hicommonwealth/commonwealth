@@ -1,12 +1,13 @@
 import {
+  ALL_COMMUNITIES,
   ChainBase,
   ChainType,
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
-import { ALL_COMMUNITIES, checkIconSize } from '../../utils';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { Community, Group, StakeTransaction } from '../entities.schemas';
+import { checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({

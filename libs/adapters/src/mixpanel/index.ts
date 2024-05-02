@@ -1,5 +1,6 @@
-import { Analytics, AnalyticsOptions } from '@hicommonwealth/core';
+import { Analytics } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { AnalyticsOptions } from '@hicommonwealth/shared';
 import MixpanelLib from 'mixpanel';
 import { fileURLToPath } from 'url';
 

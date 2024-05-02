@@ -1,5 +1,6 @@
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { cache } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
+import { CacheNamespaces } from '@hicommonwealth/shared';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { fileURLToPath } from 'url';
 import {

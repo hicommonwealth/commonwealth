@@ -1,4 +1,5 @@
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { cache } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/shared';
 
 // Rate Limiter Middleware Function
 type RateLimiterOptions = {

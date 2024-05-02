@@ -1,5 +1,6 @@
-import { delay, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { delay } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { Client } from 'pg';
 import { NODE_ENV } from '../../config';

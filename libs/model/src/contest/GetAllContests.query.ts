@@ -1,16 +1,15 @@
-import { Query, schemas } from '@hicommonwealth/core';
+import { Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-export const GetAllContests: Query<
-  typeof schemas.queries.GetAllContests
-> = () => ({
-  ...schemas.queries.GetAllContests,
+export const GetAllContests: Query<typeof queries.GetAllContests> = () => ({
+  ...queries.GetAllContests,
   auth: [],
   body: async ({ payload }) => {
     const results = await models.sequelize.query<
-      z.infer<typeof schemas.queries.ContestResults>
+      z.infer<typeof queries.ContestResults>
     >(
       `
 select

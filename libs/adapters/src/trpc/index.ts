@@ -4,6 +4,7 @@ import {
   INVALID_INPUT_ERROR,
   type CommandMetadata,
   type EventSchemas,
+  type Events,
   type EventsHandlerMetadata,
   type QueryMetadata,
 } from '@hicommonwealth/core';
@@ -138,7 +139,7 @@ export const event = <
         const [[name, payload]] = Object.entries(input as object);
         return await core.handleEvent(
           md,
-          { name: name as core.schemas.Events, payload },
+          { name: name as Events, payload },
           false,
         );
       } catch (error) {

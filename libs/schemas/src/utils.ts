@@ -1,19 +1,5 @@
+import { MAX_COMMUNITY_IMAGE_SIZE_KB } from '@hicommonwealth/shared';
 import { z } from 'zod';
-
-export const ALL_COMMUNITIES = 'all_communities';
-export const MAX_COMMUNITY_IMAGE_SIZE_KB = 500;
-
-export function timeoutPromise(timeout: number) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Timed out after ${timeout}ms`));
-    }, timeout);
-  });
-}
-
-export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 export async function getFileSizeBytes(url: string): Promise<number> {
   try {
@@ -44,5 +30,3 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
     });
   }
 }
-
-export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());

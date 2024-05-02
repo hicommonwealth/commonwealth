@@ -1,10 +1,11 @@
-import { schemas, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
+import { commands } from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 export const DeleteCommentSubscription: Command<
-  typeof schemas.commands.DeleteCommentSubscription
+  typeof commands.DeleteCommentSubscription
 > = () => ({
-  ...schemas.commands.DeleteCommentSubscription,
+  ...commands.DeleteCommentSubscription,
   auth: [],
   secure: true,
   body: async ({ payload, actor }) => {

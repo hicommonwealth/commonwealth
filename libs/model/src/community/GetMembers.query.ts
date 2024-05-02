@@ -1,4 +1,5 @@
-import { InvalidState, schemas, type Query } from '@hicommonwealth/core';
+import { InvalidState, type Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/schemas';
 import _ from 'lodash';
 import moment from 'moment';
 import { Op, QueryTypes } from 'sequelize';
@@ -14,10 +15,8 @@ const Errors = {
   CommunityNotFound: 'Community not found',
 };
 
-export const GetMembers: Query<
-  typeof schemas.queries.GetCommunityMembers
-> = () => ({
-  ...schemas.queries.GetCommunityMembers,
+export const GetMembers: Query<typeof queries.GetCommunityMembers> = () => ({
+  ...queries.GetCommunityMembers,
   auth: [],
   body: async ({ payload }) => {
     const community = await models.Community.findByPk(payload.community_id);
@@ -271,13 +270,9 @@ export const GetMembers: Query<
         );
       }
     }
-    return schemas.queries.buildPaginatedResponse(
-      profilesWithAddresses,
-      totalResults,
-      {
-        limit: payload.limit,
-        offset: payload.limit * (payload.cursor - 1),
-      },
-    );
+    return queries.buildPaginatedResponse(profilesWithAddresses, totalResults, {
+      limit: payload.limit,
+      offset: payload.limit * (payload.cursor - 1),
+    });
   },
 });

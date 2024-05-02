@@ -1,10 +1,11 @@
-import { schemas, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
+import { commands } from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 export const CreateCommentSubscription: Command<
-  typeof schemas.commands.CreateCommentSubscription
+  typeof commands.CreateCommentSubscription
 > = () => ({
-  ...schemas.commands.CreateCommentSubscription,
+  ...commands.CreateCommentSubscription,
   auth: [],
   secure: true,
   body: async ({ payload, actor }) => {

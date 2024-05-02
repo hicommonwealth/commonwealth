@@ -1,4 +1,4 @@
-import { Projection, schemas } from '@hicommonwealth/core';
+import { Projection, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
 import { models } from '../database';
@@ -20,13 +20,12 @@ export class MissingContestManager extends Error {
 }
 
 const inputs = {
-  RecurringContestManagerDeployed:
-    schemas.events.RecurringContestManagerDeployed,
-  OneOffContestManagerDeployed: schemas.events.OneOffContestManagerDeployed,
-  ContestStarted: schemas.events.ContestStarted,
-  ContestContentAdded: schemas.events.ContestContentAdded,
-  ContestContentUpvoted: schemas.events.ContestContentUpvoted,
-  ContestWinnersRecorded: schemas.events.ContestWinnersRecorded,
+  RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
+  OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  ContestStarted: events.ContestStarted,
+  ContestContentAdded: events.ContestContentAdded,
+  ContestContentUpvoted: events.ContestContentUpvoted,
+  ContestWinnersRecorded: events.ContestWinnersRecorded,
 };
 
 /**

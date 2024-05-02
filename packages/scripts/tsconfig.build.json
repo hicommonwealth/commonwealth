@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "rootDir": "src",
+    "outDir": "build"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../libs/sitemaps/tsconfig.build.json" },
+    { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/model/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" }
+  ]
+}

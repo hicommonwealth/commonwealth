@@ -1,4 +1,4 @@
-import { EventHandler, Policy, schemas, stats } from '@hicommonwealth/core';
+import { EventHandler, Policy, events, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
@@ -178,7 +178,7 @@ export const processSnapshotProposalCreated: EventHandler<
 };
 
 const snapshotInputs = {
-  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+  SnapshotProposalCreated: events.SnapshotProposalCreated,
 };
 export const SnapshotPolicy: Policy<
   typeof snapshotInputs,

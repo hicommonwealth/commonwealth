@@ -1,10 +1,11 @@
-import { schemas, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 export const GetThreadSubscriptions: Query<
-  typeof schemas.queries.GetThreadSubscriptions
+  typeof queries.GetThreadSubscriptions
 > = () => ({
-  ...schemas.queries.GetThreadSubscriptions,
+  ...queries.GetThreadSubscriptions,
   auth: [],
   secure: true,
   body: async ({ actor }) => {

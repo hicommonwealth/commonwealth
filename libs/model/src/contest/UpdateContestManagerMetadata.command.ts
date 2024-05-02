@@ -1,5 +1,6 @@
 import type { Command } from '@hicommonwealth/core';
-import { InvalidState, schemas } from '@hicommonwealth/core';
+import { InvalidState } from '@hicommonwealth/core';
+import { commands, entities } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -11,9 +12,9 @@ const Errors = {
 };
 
 export const UpdateContestManagerMetadata: Command<
-  typeof schemas.commands.UpdateContestManagerMetadata
+  typeof commands.UpdateContestManagerMetadata
 > = () => ({
-  ...schemas.commands.UpdateContestManagerMetadata,
+  ...commands.UpdateContestManagerMetadata,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     const { topic_ids, ...rest } = payload;
@@ -26,9 +27,8 @@ export const UpdateContestManagerMetadata: Command<
     });
 
     if (mustExist('ContestManager', contestManager)) {
-      let contestTopicsToCreate: z.infer<
-        typeof schemas.entities['ContestTopic']
-      >[] = [];
+      let contestTopicsToCreate: z.infer<typeof entities['ContestTopic']>[] =
+        [];
 
       if (Array.isArray(topic_ids) && topic_ids.length > 0) {
         const topics = await models.Topic.findAll({

@@ -1,11 +1,15 @@
 import { ILogger } from '@hicommonwealth/logging';
 import {
+  AnalyticsOptions,
+  BrokerTopics,
+  CacheNamespaces,
+} from '@hicommonwealth/shared';
+import { Events } from '../events';
+import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
 } from '../framework';
-import { Events } from '../schemas';
-import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
 
 /**
  * Resource disposer function

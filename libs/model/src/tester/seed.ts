@@ -1,5 +1,6 @@
 import { generateMock } from '@anatine/zod-mock';
-import { DeepPartial, schemas } from '@hicommonwealth/core';
+import { DeepPartial } from '@hicommonwealth/core';
+import { Aggregates, Entities, entities } from '@hicommonwealth/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z, { ZodNullable, ZodObject, ZodUnknown } from 'zod';
 import type { State } from '../models';
@@ -32,11 +33,11 @@ function isNullable(value: ZodUnknown) {
  * @returns tuple with main aggregate record and array of total records created
  * @see "libs/model/\_\_tests\_\_/community/group-lifecycle.spec.ts"
  */
-export async function seed<T extends schemas.Aggregates>(
+export async function seed<T extends Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas.entities[T]>>,
+  values?: DeepPartial<z.infer<typeof entities[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<[z.infer<typeof schemas.entities[T]> | undefined, State[]]> {
+): Promise<[z.infer<typeof entities[T]> | undefined, State[]]> {
   const db = await bootstrap_testing();
 
   const records: State[] = [];
@@ -51,7 +52,7 @@ async function _seed(
   records: State[],
   level: number,
 ) {
-  const schema = schemas.entities[model.name as schemas.Entities];
+  const schema = entities[model.name as Entities];
   if (schema && options.mock && schema instanceof ZodObject) {
     const mocked = generateMock(schema, {});
     // force undefined associations

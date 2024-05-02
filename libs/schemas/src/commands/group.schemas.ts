@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { Community, Group, Requirement } from '../entities.schemas';
 import { PG_INT } from '../utils.schemas';
 

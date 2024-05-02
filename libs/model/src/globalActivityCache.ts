@@ -1,5 +1,6 @@
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { cache } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { CacheNamespaces } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';

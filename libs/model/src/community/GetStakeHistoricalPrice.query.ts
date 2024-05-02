@@ -1,12 +1,12 @@
 import type { Query } from '@hicommonwealth/core';
-import { schemas } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
 export const GetStakeHistoricalPrice: Query<
-  typeof schemas.queries.GetStakeHistoricalPrice
+  typeof queries.GetStakeHistoricalPrice
 > = () => ({
-  ...schemas.queries.GetStakeHistoricalPrice,
+  ...queries.GetStakeHistoricalPrice,
   auth: [],
   body: async ({ payload }) => {
     const { past_date_epoch, community_id, stake_id } = payload;

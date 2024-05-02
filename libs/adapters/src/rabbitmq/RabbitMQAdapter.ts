@@ -1,15 +1,15 @@
 import {
   Broker,
-  BrokerTopics,
   EventContext,
   EventSchemas,
+  Events,
   EventsHandlerMetadata,
   InvalidInput,
   RetryStrategyFn,
   handleEvent,
-  schemas,
 } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
+import { BrokerTopics } from '@hicommonwealth/shared';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 import { fileURLToPath } from 'url';
@@ -104,7 +104,7 @@ export class RabbitMQAdapter implements Broker {
     this._initialized = true;
   }
 
-  public async publish<Name extends schemas.Events>(
+  public async publish<Name extends Events>(
     topic: BrokerTopics,
     event: EventContext<Name>,
   ): Promise<boolean> {

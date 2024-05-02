@@ -1,4 +1,4 @@
-import { schemas } from '@hicommonwealth/core';
+import { entities } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes } from './address';
@@ -22,7 +22,7 @@ export type Link = {
   title?: string;
 };
 
-export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
+export type ThreadAttributes = z.infer<typeof entities.Thread> & {
   // associations
   Community?: CommunityAttributes;
   Address?: AddressAttributes;
