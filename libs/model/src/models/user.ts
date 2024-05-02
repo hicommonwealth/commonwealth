@@ -20,9 +20,9 @@ export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   Profiles?: ProfileAttributes[];
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
-  CommunityAlerts?: CommunityAlertAttributes[];
   threadSubscriptions?: ThreadSubscriptionAttributes[];
   commentSubscriptions?: CommentSubscriptionAttributes[];
+  communityAlerts?: CommunityAlertAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define

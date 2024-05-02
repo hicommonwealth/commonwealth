@@ -6,10 +6,6 @@ import { DB } from '.';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address, 'user_id')
     .withMany(db.Profile, 'user_id', { onUpdate: 'CASCADE' })
-    .withMany(db.CommunityAlert, 'user_id', {
-      asMany: 'CommunityAlerts',
-      onDelete: 'CASCADE',
-    })
     .withMany(db.Subscription, 'subscriber_id')
     .withMany(db.NotificationsRead, 'user_id')
     .withOne(db.Community, ['selected_community_id', 'id'], {
@@ -67,9 +63,6 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.ContestManager, 'community_id', {
       asMany: 'contest_managers',
       onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    })
-    .withMany(db.CommunityAlert, 'community_id', {
       onDelete: 'CASCADE',
     })
     .withMany(db.Notification, 'community_id')
@@ -157,6 +150,21 @@ export const buildAssociations = (db: DB) => {
     { model: db.Community, key: 'community_id', onUpdate: 'CASCADE' },
     { model: db.User, key: 'user_id', onUpdate: 'CASCADE' },
   );
+  db.CommunityAlert.withManyToMany(
+    {
+      model: db.User,
+      key: 'user_id',
+      as: 'communityAlerts',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.Community,
+      key: 'community_id',
+      as: 'communityAlerts',
+      onDelete: 'CASCADE',
+    },
+  );
+
   db.ThreadSubscription.withManyToMany(
     {
       model: db.Thread,

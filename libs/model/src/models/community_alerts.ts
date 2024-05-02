@@ -15,18 +15,13 @@ export default (sequelize: Sequelize.Sequelize) =>
   <CommunityAlertModelStatic>sequelize.define<CommunityAlertInstance>(
     'CommunityAlerts',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       user_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       community_id: {
         type: Sequelize.STRING,
-        allowNull: false,
+        primaryKey: true,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -45,11 +40,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
-      indexes: [
-        {
-          fields: ['user_id', 'community_id'],
-          unique: true,
-        },
-      ],
     },
   );

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
+import type { CommunityAlertAttributes } from './community_alerts';
 import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
@@ -22,6 +23,7 @@ export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
   Contract?: ContractInstance;
   thread_count?: number;
   address_count?: number;
+  communityAlerts?: CommunityAlertAttributes[];
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
