@@ -64,6 +64,11 @@ import {
   UpdateCommunityIdResult,
   __updateCommunityId,
 } from './server_communities_methods/update_community_id';
+import {
+  UpdateCustomDomainOptions,
+  UpdateCustomDomainResult,
+  __updateCustomDomain,
+} from './server_communities_methods/update_custom_domain';
 
 /**
  * Implements methods related to communities
@@ -147,5 +152,11 @@ export class ServerCommunitiesController {
     options: UpdateCommunityIdOptions,
   ): Promise<UpdateCommunityIdResult> {
     return __updateCommunityId.call(this, options);
+  }
+
+  async updateCustomDomain(
+    options: UpdateCustomDomainOptions,
+  ): Promise<UpdateCustomDomainResult> {
+    return __updateCustomDomain.call(this, options);
   }
 }

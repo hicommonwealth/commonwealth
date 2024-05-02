@@ -78,13 +78,17 @@ export const updateCommunityCustomDomain = async ({
   custom_domain,
 }: {
   community_id: string;
-  custom_domain: string;
-}) => {
-  await axios.patch(`${app.serverUrl()}/communities/${community_id}`, {
-    jwt: app.user.jwt,
-    id: community_id,
-    custom_domain,
-  });
+  custom_domain?: string;
+}): Promise<string> => {
+  const res = await axios.patch(
+    `${app.serverUrl()}/communities/${community_id}/custom_domain`,
+    {
+      jwt: app.user.jwt,
+      community_id,
+      custom_domain,
+    },
+  );
+  return res.data.result.dns_target;
 };
 
 export const updateSiteAdmin = async ({

@@ -15,6 +15,7 @@ const UpdateCustomDomainTask = () => {
   const [customDomain, setCustomDomain] = useState<string>('');
   const [customDomainValidated, setCustomDomainValidated] =
     useState<boolean>(false);
+  const [dnsTarget, setDnsTarget] = useState<string>('');
 
   const openConfirmationModal = () => {
     openConfirmation({
@@ -29,10 +30,14 @@ const UpdateCustomDomainTask = () => {
           onClick: () => {
             void (async () => {
               try {
-                await updateCommunityCustomDomain({
+                const dns_target = await updateCommunityCustomDomain({
                   community_id: communityId,
                   custom_domain: customDomain,
                 });
+                if (dns_target) {
+                  // TODO: display this to the admin to report to community
+                  setDnsTarget(dns_target);
+                }
                 setCommunityId('');
                 setCustomDomain('');
                 notifySuccess('Custom domain updated');

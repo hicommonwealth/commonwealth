@@ -19,7 +19,7 @@ export const updateCommunityIdHandler = async (
   res: TypedResponse<UpdateCommunityIdResponse>,
 ) => {
   if (!req.user.isAdmin) {
-    throw new AppError('Must be a super admin to update community id');
+    throw new AppError('Must be a site admin to update community id');
   }
 
   const validationResult = UpdateCommunityIdSchema.safeParse(req.body);

@@ -72,7 +72,6 @@ import writeUserSetting from '../routes/writeUserSetting';
 import { getCanvasData, postCanvasData } from '../routes/canvas';
 
 import updateCommunityCategory from '../routes/updateCommunityCategory';
-import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 import createWebhook from '../routes/webhooks/createWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
@@ -151,6 +150,7 @@ import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_hand
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
+import { updateCustomDomainHandler } from '../routes/communities/update_custom_domain_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
@@ -335,6 +335,14 @@ function setupRouter(
     '/communities/update_id',
     passport.authenticate('jwt', { session: false }),
     updateCommunityIdHandler.bind(this, models, serverControllers),
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/communities/:communityId/customDomain',
+    passport.authenticate('jwt', { session: false }),
+    updateCustomDomainHandler.bind(this, serverControllers),
   );
 
   registerRoute(
@@ -1082,14 +1090,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     getBannedAddresses.bind(this, models),
-  );
-
-  // Custom domain update route
-  registerRoute(
-    router,
-    'post',
-    '/updateCommunityCustomDomain',
-    updateCommunityCustomDomain.bind(this, models),
   );
 
   // Discord Bot
