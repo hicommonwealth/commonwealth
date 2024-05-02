@@ -1,5 +1,5 @@
-web: cd packages/commonwealth && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --enable-source-maps ./build/server.js
-consumer: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/commonwealthConsumer/commonwealthConsumer.js
-evm-ce: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/evmChainEvents/startEvmPolling.js
-message-relayer: cd packages/commonwealth && node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/messageRelayer/messageRelayer.js
+web: cd packages/commonwealth && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js
+consumer: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/commonwealthConsumer/commonwealthConsumer.js
+evm-ce: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/evmChainEvents/startEvmPolling.js
+message-relayer: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/messageRelayer/messageRelayer.js
 release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json

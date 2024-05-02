@@ -1,6 +1,6 @@
 # Feature Flags
 
-This entry documents our feature flag system built with Unleash, a flag management solution. Environment variables are documented in a [separate entry](./Environment-Variables.md).
+This entry documents our feature flag system built with Unleash, a flag management solution. Environment variables are documented in a [separate entry](./Environment-Variables.md). See [ADR 002](./ADRs/002-OpenFeature.md) for the rationale behind our introduction of feature flagging.
 
 Unleash gives us access to several desirable features: flags may be turned on or off without a full app rebuild, and flagged features may be displayed to a certain percentage of users (as in A/B testing).
 

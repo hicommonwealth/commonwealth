@@ -119,7 +119,10 @@
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-webpack": "^0.12.1",
+    "eslint-plugin-diff": "^2.0.3",
+    "eslint-plugin-functional": "^6.1.1",
     "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "faker": "^4.1.0",
@@ -161,15 +164,15 @@
     "webpack-deduplication-plugin": "^0.0.8",
     "webpack-dev-middleware": "^5.3.3",
     "webpack-hot-middleware": "^2.25.2",
-    "webpack-merge": "^5.8.0",
-    "eslint-plugin-diff": "^2.0.3",
-    "eslint-plugin-functional": "^6.1.1",
-    "eslint-plugin-promise": "^6.1.1"
+    "webpack-merge": "^5.8.0"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"
   },
   "engines": {
     "node": "20.x"
+  },
+  "dependencies": {
+    "extensionless": "^1.9.6"
   }
 }

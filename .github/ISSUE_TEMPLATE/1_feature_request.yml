@@ -1,0 +1,60 @@
+name: "Product: Feature Request"
+description: "For product team to request a new feature."
+labels: ["refinement", "needs estimate", "enhancement"]
+projects: ["hicommonwealth/33"]
+body:
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Description
+      description: Describe the requested feature in a few sentences max.
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Project Owner
+      description: Point of contact for questions (if not creator)
+      placeholder: "@sachben91"
+    validations:
+      required: false
+  - type: input
+    id: bucket
+    attributes:
+      label: Bucket ID
+      description: Ticket number of bucket (optional).
+      placeholder: "#12345"
+    validations:
+      required: false
+  - type: textarea
+    id: feature-specs
+    attributes:
+      label: User Stories / Acceptance Criteria
+      description: List the specifications here required for acceptance.
+    validations:
+      required: true
+  - type: textarea
+    id: design-devlink
+    attributes:
+      label: Design Devlink
+      description: Place Figma link here and ensure it is to the correct screen.
+    validations:
+      required: false
+  - type: textarea
+    id: design-screenshot
+    attributes:
+      label: Design Screenshot
+      description: Upload screenshot here. Should match devlink above.
+    validations:
+      required: false
+  - type: textarea
+    id: addl-context
+    attributes:
+      label: Additional Context
+      description: Add any other info needed here.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        **Please ensure you add this ticket to the correct milestone before hitting submit. Thanks!**
