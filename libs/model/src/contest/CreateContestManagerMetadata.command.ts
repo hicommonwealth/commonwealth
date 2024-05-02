@@ -22,11 +22,11 @@ export const CreateContestManagerMetadata: Command<
     const topics = await models.Topic.findAll({
       where: {
         id: {
-          [Op.in]: topic_ids,
+          [Op.in]: topic_ids || [],
         },
       },
     });
-    if (topics.length !== topic_ids.length) {
+    if (topics.length !== (topic_ids || []).length) {
       throw new InvalidState(Errors.InvalidTopics);
     }
 
