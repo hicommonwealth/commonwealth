@@ -1,6 +1,6 @@
 # Stake
 
-Community stake is a non-transferrable, fungible token bought and sold by users on a bonding curve.
+Community stake is a non-transferable, fungible token bought and sold by users on a bonding curve.
 
 Users deposit Ethereum into a smart contract in exchange for the ERC1155 stake tokens.
 
@@ -19,13 +19,15 @@ AWS_ACCESS_KEY_ID=AKIA3JC4FJBRG5N5GLMW
 AWS_SECRET_ACCESS_KEY= # REDACTED
 ```
 
-In your local db run:
+Within the local database instance, run:
 
 ```sql
 INSERT INTO public."ChainNodes" (url, eth_chain_id, alt_wallet_url, balance_type, name) VALUES ('https://eth-sepolia.g.alchemy.com/v2/G-9qTX3nSlAcihqA056hwGHiiolrUQj2', 11155111, 'https://eth-sepolia.g.alchemy.com/v2/G-9qTX3nSlAcihqA056hwGHiiolrUQj2', 'ethereum', 'Sepolia');
 ```
 
-Then migrate the database (`yarn migrate-db`) and create a new community, and in the `Select chain` dropdown select `Sepolia`. Make sure you have Sepolia testnet enabled in your wallet as well as some Sepolia to pay for gas fees. If you don’t have any, here is a Sepolia faucet. <https://sepoliafaucet.com/>
+Then migrate the database (`yarn migrate-db`) and create a new community within the Common app. From the `Select chain` dropdown in the Create Community Form, select `Sepolia`.
+
+Sepolia testnet must be enabled in your web wallet, with some Sepolia to pay for gas fees. This can be obtained from a [Sepolia faucet](https://sepoliafaucet.com/).
 
 For any issues, reach out to Ian Rowan.
 
