@@ -21,12 +21,34 @@ describe('User mention utils', () => {
       },
     ]);
 
+    userMentions = parseUserMentions(
+      '[@u*()ser!](/profile/id/10)[@us%^er2!](/profile/id/11)',
+    );
+    expect(userMentions).deep.equal([
+      { profileId: '10', profileName: 'u*()ser!' },
+      {
+        profileId: '11',
+        profileName: 'us%^er2!',
+      },
+    ]);
+
     // malformed
     userMentions = parseUserMentions('@[user](/profile/id/10');
     expect(userMentions).deep.equal([]);
 
-    // malformed
-    userMentions = parseUserMentions('[@](/profile/id/10)');
+    // Malformed: Missing opening square bracket
+    userMentions = parseUserMentions('@user](/profile/id/10)');
+    expect(userMentions).deep.equal([]);
+
+    // Malformed: Missing closing square bracket
+    userMentions = parseUserMentions('[@user(/profile/id/10)');
+    expect(userMentions).deep.equal([]);
+
+    // Malformed: Empty profile link
+    userMentions = parseUserMentions('[@user]');
+    expect(userMentions).deep.equal([]);
+
+    userMentions = parseUserMentions('[@[name]](/profile/id/10)');
     expect(userMentions).deep.equal([]);
   });
 
