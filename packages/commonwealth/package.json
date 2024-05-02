@@ -40,6 +40,7 @@
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-ci": "FETCH_INTERVAL_MS=500 tsx  server.ts",
     "start-consumer": "tsx  server/workers/commonwealthConsumer/commonwealthConsumer.ts",
+    "start-knock": "tsx  server/workers/knock/knock.ts",
     "start-message-relayer": "tsx  ./server/workers/messageRelayer/messageRelayer.ts",
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true tsx  server.ts",
     "stylelint": "stylelint client/styles/*",
