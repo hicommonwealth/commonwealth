@@ -1,21 +1,22 @@
 {
-  "name": "@hicommonwealth/scripts",
+  "name": "scripts",
   "private": "true",
   "version": "0.1.0",
-  "description": "Scripts",
+  "type": "module",
   "files": [
     "build"
   ],
-  "main": "build/index",
+  "main": "build/index.js",
   "scripts": {
     "build": "tsc -b",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'",
-    "generate-stakeholder-groups": "npx ts-node -T src/generate-stakeholder-groups"
+    "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha './test/**/*.spec.ts'",
+    "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
-    "sequelize": "^6.32.1"
-  },
-  "devDependencies": {}
+    "sequelize": "^6.32.1",
+    "mocha": "^10.4.0",
+    "tsx": "^4.7.2"
+  }
 }

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 import { formatAddressShort } from 'helpers';
-import { uniqBy } from 'lodash';
+import _ from 'lodash';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import {
   CWModalBody,
@@ -11,7 +12,6 @@ import {
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
@@ -43,7 +43,7 @@ const NewCommunityAdminModal = ({
     onAction: true,
   });
 
-  const availableAddresses = uniqBy(
+  const availableAddresses = _.uniqBy(
     availableAddressesOnSelectedChain,
     'address',
   );

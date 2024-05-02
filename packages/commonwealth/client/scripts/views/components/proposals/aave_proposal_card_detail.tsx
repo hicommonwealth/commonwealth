@@ -60,9 +60,17 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
             </CWText>
           ) : (
             <User
-              userAddress={proposal.author.address}
+              userAddress={proposal?.author?.address}
               userCommunityId={
-                proposal.author.community?.id || proposal.author.profile?.chain
+                proposal?.author?.community?.id ||
+                proposal?.author?.profile?.chain
+              }
+              shouldShowAsDeleted={
+                !proposal?.author?.address &&
+                !(
+                  proposal?.author?.community?.id ||
+                  proposal?.author?.profile?.chain
+                )
               }
               shouldHideAvatar
               shouldLinkProfile

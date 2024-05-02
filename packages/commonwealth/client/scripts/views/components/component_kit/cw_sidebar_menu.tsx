@@ -11,7 +11,7 @@ import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
-import { CWButton } from './new_designs/cw_button';
+import { CWButton } from './new_designs/CWButton';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
@@ -115,8 +115,14 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
             <User
               avatarSize={18}
               shouldShowAvatarOnly
-              userAddress={roles[0].address}
-              userCommunityId={roles[0].address_chain || roles[0].community_id}
+              userAddress={roles?.[0]?.address}
+              userCommunityId={
+                roles?.[0]?.address_chain || roles?.[0]?.community_id
+              }
+              shouldShowAsDeleted={
+                !roles?.[0]?.address &&
+                !(roles?.[0]?.address_chain || roles?.[0]?.community_id)
+              }
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}

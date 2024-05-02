@@ -1,5 +1,5 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
 import compression from 'compression';
@@ -14,11 +14,13 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import { dirname } from 'node:path';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
+import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { PRERENDER_TOKEN, SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -26,14 +28,14 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
-import setupCosmosProxy from './server/util/cosmosProxy';
+import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
-// set up express async error handling hack
-require('express-async-errors');
-
 const DEV = process.env.NODE_ENV !== 'production';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Bootstraps express app
@@ -57,7 +59,7 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
-  const log = logger().getLogger(__filename);
+  const log = logger(__filename);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
@@ -192,7 +194,7 @@ export async function main(
     dbValidationService,
   );
 
-  setupCosmosProxy(app, db, cacheDecorator);
+  setupCosmosProxies(app, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
   if (withFrontendBuild) {

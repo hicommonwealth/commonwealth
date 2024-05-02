@@ -1,16 +1,23 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "lib": ["es2020"],
-    "typeRoots": ["./node_modules/@types"],
-    "skipLibCheck": true,
+    "strict": true,
     "rootDir": "src",
-    "outDir": "build"
+    "outDir": "build",
+    "paths": {
+      "@hicommonwealth/adapters": ["../../libs/adapters/src"],
+      "@hicommonwealth/sitemaps": ["../../libs/sitemaps/src"],
+      "@hicommonwealth/core": ["../../libs/core/src"],
+      "@hicommonwealth/model": ["../../libs/model/src"],
+      "@hicommonwealth/logging": ["../../libs/logging/src"]
+    }
   },
   "include": ["src"],
   "references": [
-    { "path": "../../libs/adapters" },
-    { "path": "../../libs/core" },
-    { "path": "../../libs/model" }
+    { "path": "../../libs/adapters/tsconfig.build.json" },
+    { "path": "../../libs/sitemaps/tsconfig.build.json" },
+    { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/model/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" }
   ]
 }

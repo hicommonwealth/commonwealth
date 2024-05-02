@@ -1,5 +1,7 @@
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { DB } from './models/index';
 
@@ -29,7 +31,7 @@ export async function getActivityFeed(models: DB, id = 0) {
                 COALESCE(
                     json_agg(
                         json_build_object('Addresses', json_build_array(row_to_json(A)))
-                    ) FILTER (WHERE A.id IS NOT NULL), 
+                    ) FILTER (WHERE A.id IS NOT NULL),
                     json_build_array()
                 ) as commenters
     FROM ranked_thread_notifs rtn
@@ -58,7 +60,8 @@ export async function getActivityFeed(models: DB, id = 0) {
   return notifications;
 }
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export class GlobalActivityCache {
   private _cacheKey = 'global_activity';

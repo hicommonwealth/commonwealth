@@ -1,10 +1,16 @@
+import { ILogger } from '@hicommonwealth/logging';
 import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
 } from '../framework';
 import { Events } from '../schemas';
-import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
+import {
+  AnalyticsOptions,
+  BrokerPublications,
+  BrokerSubscriptions,
+  CacheNamespaces,
+} from '../types';
 
 /**
  * Resource disposer function
@@ -23,33 +29,6 @@ export interface Disposable {
  * Adapter factory
  */
 export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
-
-export type LogContext = {
-  // fingerprint is a Rollbar concept that helps Rollbar group error occurrences together
-  fingerprint?: string;
-  [key: string]: unknown;
-};
-
-/**
- * Logger port
- * Logs messages at different levels
- */
-export interface ILogger {
-  trace(msg: string, error?: Error, context?: LogContext): void;
-  debug(msg: string, error?: Error, context?: LogContext): void;
-  info(msg: string, error?: Error, context?: LogContext): void;
-  warn(msg: string, error?: Error, context?: LogContext): void;
-  error(msg: string, error?: Error, context?: LogContext): void;
-  fatal(msg: string, error?: Error, context?: LogContext): void;
-}
-
-/**
- * Logger factory
- * Builds a named logger
- */
-export interface Logger extends Disposable {
-  getLogger(...ids: string[]): ILogger;
-}
 
 /**
  * Stats port
@@ -131,7 +110,7 @@ export interface Analytics extends Disposable {
 
 export type RetryStrategyFn = (
   err: Error | undefined,
-  topic: BrokerTopics,
+  topic: BrokerSubscriptions,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
@@ -142,12 +121,12 @@ export type RetryStrategyFn = (
  */
 export interface Broker extends Disposable {
   publish<Name extends Events>(
-    topic: BrokerTopics,
+    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    topic: BrokerTopics,
+    topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
   ): Promise<boolean>;

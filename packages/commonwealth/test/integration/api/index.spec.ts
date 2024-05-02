@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-expressions */
-import { ChainBase, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
@@ -39,8 +39,7 @@ describe('API Tests', () => {
     });
 
     it('should create an ETH address', async () => {
-      const keypair = wallet.generate();
-      const address = `0x${keypair.getAddress().toString('hex')}`;
+      const { address } = server.seeder.generateEthAddress();
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
@@ -86,7 +85,7 @@ describe('API Tests', () => {
     });
 
     it('should verify an ETH address', async () => {
-      const { keypair, address } = server.seeder.generateEthAddress();
+      const { privateKey, address } = server.seeder.generateEthAddress();
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
       let res = await chai
@@ -114,7 +113,6 @@ describe('API Tests', () => {
       const nonce = siwe.generateNonce();
       const domain = 'https://commonwealth.test';
       const siweMessage = createSiweMessage(message, domain, nonce);
-      const privateKey = keypair.getPrivateKey();
       const signatureData = personalSign({ privateKey, data: siweMessage });
       const signature = `${domain}/${nonce}/${signatureData}`;
       res = await chai

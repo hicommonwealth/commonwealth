@@ -1,4 +1,4 @@
-import { AccessLevel, RoleObject } from '@hicommonwealth/core';
+import { AccessLevel, RoleObject } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -6,18 +6,6 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-
-export const slugify = (str: string): string => {
-  // Remove any character that isn't a alphanumeric character or a
-  // space, and then replace any sequence of spaces with dashes.
-  if (!str) return '';
-
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
-};
 
 export const slugifyPreserveDashes = (str: string): string => {
   // Remove any character that isn't a alphanumeric character, a
@@ -33,26 +21,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .replace(/(\s|-)+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-};
-
-/* eslint-disable */
-export const getThreadUrl = (
-  thread: {
-    chain: string;
-    type_id?: string | number;
-    id?: string | number;
-    title?: string;
-  },
-  comment?: string | number,
-): string => {
-  const aId = thread.chain;
-  const tId = thread.type_id || thread.id;
-  const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
-  const cId = comment ? `?comment=${comment}` : '';
-
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
 };
 
 export const getThreadUrlWithoutObject = (
@@ -228,10 +196,7 @@ export const addressSwapper = (options: {
   }
 
   // check if it is valid with the current prefix & reencode if needed
-  const [valid, errorMsg] = checkAddress(
-    options.address,
-    options.currentPrefix,
-  );
+  const [valid] = checkAddress(options.address, options.currentPrefix);
 
   if (!valid) {
     try {

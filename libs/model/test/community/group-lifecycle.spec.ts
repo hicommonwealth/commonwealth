@@ -13,7 +13,7 @@ chai.use(chaiAsPromised);
 const chance = Chance();
 
 describe('Group lifecycle', () => {
-  let id;
+  let id: string;
   let actor: Actor;
 
   const payload = {
@@ -28,34 +28,17 @@ describe('Group lifecycle', () => {
   };
 
   before(async () => {
-    const [node] = await seed(
-      'ChainNode',
-      { contracts: [] },
-      // { mock: true, log: true },
-    );
-    const [user] = await seed(
-      'User',
-      { isAdmin: true, selected_community_id: null },
-      // { mock: true, log: true },
-    );
-    const [community] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            role: 'admin',
-            user_id: user!.id,
-            profile_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
+    const [node] = await seed('ChainNode', {});
+    const [user] = await seed('User', { isAdmin: true });
+    const [community] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: user!.id,
+        },
+      ],
+    });
 
     id = community!.id!;
     actor = {
@@ -80,7 +63,6 @@ describe('Group lifecycle', () => {
   });
 
   it('should fail creation when sending invalid topics', () => {
-    console.log('testing');
     const invalid = {
       id,
       actor,

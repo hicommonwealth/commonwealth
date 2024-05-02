@@ -1,6 +1,5 @@
-import type { AbiType } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
+import type { AbiType } from '@hicommonwealth/shared';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { hashAbi } from '../utils';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -18,24 +17,21 @@ export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
 
 export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ContractAbiModelStatic => {
-  const ContractAbi = <ContractAbiModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <ContractAbiModelStatic>sequelize.define<ContractAbiInstance>(
     'ContractAbi',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      nickname: { type: dataTypes.STRING, allowNull: true, unique: true },
-      abi: { type: dataTypes.JSONB, allowNull: false },
-      abi_hash: { type: dataTypes.TEXT, allowNull: false, unique: true },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      nickname: { type: Sequelize.STRING, allowNull: true, unique: true },
+      abi: { type: Sequelize.JSONB, allowNull: false },
+      abi_hash: { type: Sequelize.TEXT, allowNull: false, unique: true },
       verified: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'ContractAbis',
@@ -64,10 +60,3 @@ export default (
       },
     },
   );
-
-  ContractAbi.associate = (models) => {
-    models.ContractAbi.hasMany(models.Contract, { foreignKey: 'abi_id' });
-  };
-
-  return ContractAbi;
-};

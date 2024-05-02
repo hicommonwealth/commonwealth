@@ -1,11 +1,7 @@
-import {
-  Cache,
-  ILogger,
-  delay,
-  logger,
-  type CacheNamespaces,
-} from '@hicommonwealth/core';
+import { Cache, delay, type CacheNamespaces } from '@hicommonwealth/core';
+import { ILogger, logger } from '@hicommonwealth/logging';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
+import { fileURLToPath } from 'url';
 
 const CONNECT_TIMEOUT = 5000;
 
@@ -48,7 +44,8 @@ export class RedisCache implements Cache {
       };
     }
 
-    this._log = logger().getLogger(__filename);
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     this._log.info(`Connecting to Redis at: ${redis_url}`);
     this._client = createClient(redisOptions) as RedisClientType;
 

@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import NotificationSubscription from 'models/NotificationSubscription';
 
 export type SubUniqueData =

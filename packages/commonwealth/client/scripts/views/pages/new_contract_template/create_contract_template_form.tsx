@@ -4,14 +4,14 @@ import { useParams } from 'react-router-dom';
 import 'new_contract_template/create_contract_template_form.scss';
 
 import { notifyError } from 'controllers/app/notifications';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { CWText } from 'views/components/component_kit/cw_text';
-import app from 'state';
-import isValidJson from '../../../../../shared/validateJson';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import isValidJson from '../../../../../shared/validateJson';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 const CreateContractTemplateForm = () => {
@@ -131,7 +131,7 @@ const CreateContractTemplateForm = () => {
           inputValidationFn={(value: string) => {
             try {
               const jsonValid = isValidJson(
-                JSON.parse(value.replace(/\s/g, ''))
+                JSON.parse(value.replace(/\s/g, '')),
               );
               if (jsonValid) {
                 return [];
@@ -145,12 +145,11 @@ const CreateContractTemplateForm = () => {
       <CWDivider className="divider" />
       <div className="buttons">
         <CWButton
-          buttonType="secondary-black"
+          buttonType="secondary"
           label="Cancel"
           onClick={handleCancel}
         />
         <CWButton
-          buttonType="primary-black"
           label="Create"
           disabled={isCreatingDisabled}
           onClick={createContractTemplate}

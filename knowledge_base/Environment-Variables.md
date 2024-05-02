@@ -261,19 +261,19 @@ Required in production. The JWT seed secret that is used to generate all user JW
 
 ## MAGIC_API_KEY
 
-Secret API key for Magic login. Contact Jake Naviasky or Graham Johnson for access.
+Secret API key for Magic sign-in. Contact Jake Naviasky or Graham Johnson for access.
 
 ## MAGIC_DEFAULT_CHAIN
 
-Default chain for Magic login; as of 231212, we use `ethereum`.
+Default chain for Magic sign-in; as of 231212, we use `ethereum`.
 
 ## MAGIC_PUBLISHABLE_KEY
 
-Publishable API key for Magic login; as of 231212, development uses `pk_live_EF89AABAFB87D6F4`.
+Publishable API key for Magic sign-in; as of 231212, development uses `pk_live_EF89AABAFB87D6F4`.
 
 ## MAGIC_SUPPORTED_BASES
 
-Chain bases supported for Magic login; as of 231212, we use `cosmos,ethereum`.
+Chain bases supported for Magic sign-in; as of 231212, we use `cosmos,ethereum`.
 
 ## MIXPANEL_DEV_TOKEN
 
@@ -355,7 +355,7 @@ Enables Webhook and email dispatching in production when set to `true`. Should b
 
 ## SENDGRID_API_KEY
 
-Used in email-based communications (notifications, digests, login).
+Used in email-based communications (notifications, digests, sign-in).
 
 ## SERVER_URL
 

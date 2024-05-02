@@ -1,4 +1,5 @@
 import { String } from 'aws-sdk/clients/apigateway';
+import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
 import { reservationHookAbi } from './Abi/ReservationHookAbi';
@@ -47,7 +48,7 @@ class NamespaceFactory extends ContractBase {
     }
     const hexString = this.web3.utils.utf8ToHex(name);
     const activeNamespace = await this.contract.methods
-      .getNamespace(hexString)
+      .getNamespace(hexString.padEnd(66, '0'))
       .call();
     return activeNamespace;
   }
@@ -147,6 +148,63 @@ class NamespaceFactory extends ContractBase {
           maxPriorityFeePerGas: null,
           maxFeePerGas: null,
         });
+    } catch {
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
+  async newContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    stakeId: number = 2,
+    voterShare: number,
+    weight: number = 1,
+    walletAddress: string,
+    exchangeToken?: string,
+    feeShare?: number,
+    prizeShare?: number,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    let txReceipt;
+    try {
+      if (!exchangeToken) {
+        txReceipt = await this.contract.methods
+          .newContest(
+            namespaceName,
+            contestInterval,
+            winnerShares,
+            stakeId,
+            prizeShare,
+            voterShare,
+            feeShare,
+            weight,
+          )
+          .send({
+            from: walletAddress,
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          });
+      } else {
+        txReceipt = await this.contract
+          .newSingleContest(
+            namespaceName,
+            contestInterval,
+            winnerShares,
+            stakeId,
+            voterShare,
+            weight,
+            exchangeToken,
+          )
+          .send({
+            from: walletAddress,
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          });
+      }
     } catch {
       throw new Error('Transaction failed');
     }

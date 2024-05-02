@@ -11,7 +11,7 @@ import {
 import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
 import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
 import { TemplateSelector } from '../components/TemplateActionSelector';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 
 type TemplateFormModalProps = {
   isOpen: boolean;

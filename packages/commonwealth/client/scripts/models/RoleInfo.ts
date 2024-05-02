@@ -1,4 +1,4 @@
-import type { AccessLevel } from '@hicommonwealth/core';
+import type { AccessLevel } from '@hicommonwealth/shared';
 import type momentType from 'moment';
 import moment from 'moment';
 import type AddressInfo from './AddressInfo';

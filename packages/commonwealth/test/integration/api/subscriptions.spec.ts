@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { dispose, NotificationCategories } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { SubscriptionValidationErrors } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -573,14 +574,8 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.SnapshotProposal} subscription tests`, () => {
-      const snapshot_id = 'test_space';
+      const snapshot_id = 'dydxgov.eth';
       let snapshotSubscription;
-
-      before('create a snapshot space', async () => {
-        await server.models.SnapshotSpace.create({
-          snapshot_space: snapshot_id,
-        });
-      });
 
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;

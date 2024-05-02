@@ -1,12 +1,16 @@
-import type { IForumNotificationData } from '@hicommonwealth/core';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/core';
+import {
+  getThreadUrl,
+  IForumNotificationData,
+  NotificationCategories,
+  ProposalType,
+} from '@hicommonwealth/shared';
 import { pluralize } from 'helpers';
 import _ from 'lodash';
 import moment from 'moment';
 import 'pages/notifications/notification_row.scss';
 import React from 'react';
 import app from 'state';
-import { getCommunityUrl, getThreadUrl } from 'utils';
+import { getCommunityUrl } from 'utils';
 import { User } from 'views/components/user/user';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
@@ -42,6 +46,7 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
     <User
       userAddress={author_address}
       userCommunityId={author_community_id}
+      shouldShowAsDeleted={!author_address && !author_community_id}
       shouldHideAvatar
     />
   );
@@ -148,6 +153,7 @@ export const getBatchNotificationFields = (
     <User
       userAddress={author_address}
       userCommunityId={author_community_id}
+      shouldShowAsDeleted={!author_address && !author_community_id}
       shouldHideAvatar
     />
   );

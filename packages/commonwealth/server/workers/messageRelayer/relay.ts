@@ -1,22 +1,18 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerTopics,
-  logger,
+  BrokerPublications,
   schemas,
   stats,
 } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 
-const log = logger(PinoLogger()).getLogger(__filename);
-
-const EventNameTopicMap: Partial<Record<schemas.Events, BrokerTopics>> = {
-  SnapshotProposalCreated: BrokerTopics.SnapshotListener,
-  DiscordMessageCreated: BrokerTopics.DiscordListener,
-} as const;
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];
@@ -41,7 +37,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
 
     for (const event of events) {
       try {
-        const res = await broker.publish(EventNameTopicMap[event.event_name], {
+        const res = await broker.publish(BrokerPublications.MessageRelayer, {
           name: event.event_name,
           payload: event.event_payload,
         });
@@ -53,7 +49,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
           });
           break;
         }
-        publishedEventIds.push(event.id);
+        publishedEventIds.push(event.event_id);
         stats().incrementBy(
           'messageRelayerPublished',
           publishedEventIds.length,
@@ -66,22 +62,20 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
       }
     }
 
-    await models.sequelize.query(
-      `
-      UPDATE "Outbox"
-      SET relayed = true,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE relayed = false -- ensures query ignores irrelevant child partitions
-        AND id IN (:eventIds)
-    `,
-      {
-        replacements: {
-          eventIds: publishedEventIds,
+    if (publishedEventIds.length > 0) {
+      await models.Outbox.update(
+        {
+          relayed: true,
         },
-        transaction,
-        type: QueryTypes.UPDATE,
-      },
-    );
+        {
+          where: {
+            relayed: false,
+            event_id: publishedEventIds,
+          },
+          transaction,
+        },
+      );
+    }
   });
 
   return publishedEventIds.length;

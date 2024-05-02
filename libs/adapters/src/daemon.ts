@@ -1,7 +1,10 @@
-import { CacheNamespaces, logger } from '@hicommonwealth/core';
+import { CacheNamespaces } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import { CacheDecorator, KeyFunction } from './redis';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export class Activity<T extends (...args: any[]) => any> {
   queryWithCache: T;
@@ -113,7 +116,7 @@ export class Daemons {
       try {
         clearInterval(jobId);
       } catch (err) {
-        log.warn('Error cancelling task', err as Error);
+        log.warn('Error cancelling task', { err });
         // remove from map
         return this.tasks.delete(label);
       }

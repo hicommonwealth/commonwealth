@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -37,7 +37,9 @@ export function isDefaultStage(stage: string) {
 
 // Provides a default if community has no custom stages.
 export function parseCustomStages(customStages?: string[]): string[] {
-  return customStages ?? Object.values(ThreadStage);
+  return customStages && customStages.length > 0
+    ? customStages
+    : Object.values(ThreadStage);
 }
 
 /*

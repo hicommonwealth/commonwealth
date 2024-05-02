@@ -18,7 +18,7 @@ describe('Thread queries', () => {
     await dispose()();
   });
 
-  it('query_thread_through_collabo', async () => {
+  it('query_thread_through_collaborations', async () => {
     const chain = await models.Community.findOne();
     expect(chain.id).to.not.be.null;
     const address = (

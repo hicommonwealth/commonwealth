@@ -1,4 +1,4 @@
-import RWLock from 'async-rwlock';
+import { RWLock } from 'async-rwlock';
 
 // Maintains a cache with periodic, atomic jobs that also permits direct,
 // non-atomic, write access to the cache.
@@ -27,7 +27,7 @@ export abstract class JobRunner<CacheT> {
   }
 
   public close() {
-    clearInterval(this._timeoutHandle);
+    clearInterval(this._timeoutHandle as number | undefined);
     this._timeoutHandle = undefined;
   }
 

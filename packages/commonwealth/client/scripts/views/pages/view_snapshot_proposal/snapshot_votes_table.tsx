@@ -60,16 +60,15 @@ export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
           <div key={vote.id} className="vote-row">
             {app.chain ? (
               <User
-                userAddress={vote.voter}
+                userAddress={vote?.voter}
                 userCommunityId={app.activeChainId()}
                 shouldLinkProfile
                 shouldShowPopover
               />
             ) : (
-              <CWText className="column-text">{`${vote.voter.slice(
-                0,
-                15,
-              )}...`}</CWText>
+              <CWText className="column-text">
+                {`${vote?.voter?.slice?.(0, 15)}...` || 'Deleted'}
+              </CWText>
             )}
             <CWText className="column-text" noWrap>
               {choices[vote.choice - 1]}

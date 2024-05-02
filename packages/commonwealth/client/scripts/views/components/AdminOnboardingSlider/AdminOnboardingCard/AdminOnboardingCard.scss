@@ -9,29 +9,21 @@
   border-radius: 6px;
   border: 1px solid $neutral-200;
   background: white;
-  min-width: 250px;
+  min-width: 245px;
   flex: 1;
 
-  .circle-btn-border {
-    border: none !important;
-    padding: 0 !important;
+  .section-icon {
+    width: 40px;
+    height: 40px;
+  }
 
-    .CircleButton {
-      padding: 10px !important;
-
-      &:disabled {
-        background-color: $neutral-400;
-
-        svg {
-          color: white !important;
-        }
-      }
-
-      svg {
-        height: 24px !important;
-        width: 24px !important;
-      }
-    }
+  .check-icon {
+    background-color: #0079cc;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: $white;
+    padding: 8px;
   }
 
   .content {

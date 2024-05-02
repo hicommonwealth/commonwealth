@@ -1,4 +1,4 @@
-import { WebhookCategory } from '@hicommonwealth/core';
+import { WebhookCategory } from '@hicommonwealth/shared';
 
 class Webhook {
   public readonly id: number;

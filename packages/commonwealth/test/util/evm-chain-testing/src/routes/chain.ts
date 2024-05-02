@@ -1,13 +1,14 @@
+import axios from 'axios';
 import { Request, Response } from 'express';
 import Web3 from 'web3';
-import getProvider, { providerUrl } from '../utils/getProvider';
-import axios from 'axios';
+import { PROVIDER_URL } from '../../config';
 import { chainAdvanceTime, chainGetEth } from '../types';
+import getProvider from '../utils/getProvider';
 
 const getBlockInfo = async () => {
   const provider = getProvider();
   const block = await provider.eth.getBlock(
-    await provider.eth.getBlockNumber()
+    await provider.eth.getBlockNumber(),
   );
   return block;
 };
@@ -30,9 +31,23 @@ export const getAccounts = async (req: Request, res: Response) => {
 };
 
 export const getBlock = async (req: Request, res: Response) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function getJsonStringifiableValue(value: any): any {
+    if (typeof value === 'bigint') {
+      return Number(value);
+    } else {
+      return value;
+    }
+  }
   try {
     const block = await getBlockInfo();
-    res.status(200).json(block).send();
+    const sanitizedBlock = Object.fromEntries(
+      Object.entries(block).map(([key, value]) => [
+        key,
+        getJsonStringifiableValue(value),
+      ]),
+    );
+    res.status(200).json(sanitizedBlock).send();
   } catch (err) {
     console.error(err);
     res
@@ -47,11 +62,11 @@ export const getBlock = async (req: Request, res: Response) => {
 
 export const advanceEvmTime = async (
   time: number | string,
-  blocks: number | string
+  blocks: number | string,
 ) => {
   const advance_secs = Web3.utils.numberToHex(time).toString();
   await axios.post(
-    providerUrl,
+    PROVIDER_URL,
     // '{"jsonrpc": "2.0", "id": 1, "method": "evm_increaseTime", "params": ["0x15180"] }',
     {
       jsonrpc: '2.0',
@@ -63,10 +78,10 @@ export const advanceEvmTime = async (
       headers: {
         'Content-Type': 'application/json',
       },
-    }
+    },
   );
   await axios.post(
-    providerUrl,
+    PROVIDER_URL,
     {
       jsonrpc: '2.0',
       id: 1,
@@ -77,7 +92,7 @@ export const advanceEvmTime = async (
       headers: {
         'Content-Type': 'application/json',
       },
-    }
+    },
   );
 };
 
@@ -111,7 +126,7 @@ export const getETH = async (req: Request, res: Response) => {
     await provider.eth.sendTransaction({
       from: accounts[7],
       to: request.toAddress,
-      value: provider.utils.toWei(request.amount),
+      value: provider.utils.toWei(request.amount, 'ether'),
     });
     res.status(200).send();
   } catch (err) {
@@ -123,5 +138,79 @@ export const getETH = async (req: Request, res: Response) => {
         error: String(err),
       })
       .send();
+  }
+};
+
+export const getChainSnapshot = async (req: Request, res: Response) => {
+  let result;
+  try {
+    result = await axios.post(
+      PROVIDER_URL,
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'evm_snapshot',
+        params: [],
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    res.status(200).json({
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    if (e.response) {
+      res.status(result?.status).json({
+        message: e.response.data,
+      });
+    } else {
+      res.status(result?.status || 500).json({
+        message: 'Internal Server Error',
+      });
+    }
+  }
+};
+
+export const revertChainToSnapshot = async (req: Request, res: Response) => {
+  let result;
+
+  // const snapshotId = Web3.utils.numberToHex(time).toString();
+  const data: { snapshotId: string } = req.body;
+  try {
+    result = await axios.post(
+      PROVIDER_URL,
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'evm_revert',
+        params: [data.snapshotId],
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    res.status(200).json({
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    if (e.response) {
+      res.status(result?.status).json({
+        message: e.response.data,
+      });
+    } else {
+      res.status(result?.status || 500).json({
+        message: 'Internal Server Error',
+        error: e,
+      });
+    }
   }
 };

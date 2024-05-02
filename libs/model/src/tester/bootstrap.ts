@@ -1,9 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import path from 'node:path';
+import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { TESTING, TEST_DB_NAME } from '../config';
-import { buildDb, type DB } from '../models';
+import { buildDb, syncDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
@@ -47,12 +47,16 @@ export const migrate_db = async (sequelize: Sequelize) => {
       glob: path.resolve('../../packages/commonwealth/server/migrations/*.js'),
       // migration resolver since we use v2 migration interface
       resolve: ({ name, path, context }) => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const migration = require(path!);
         return {
           name,
-          up: async () => migration.up(context, Sequelize),
-          down: async () => migration.down(context, Sequelize),
+          up: async () => {
+            const migration = (await import(path!)).default;
+            return migration.up(context, Sequelize);
+          },
+          down: async () => {
+            const migration = (await import(path!)).default;
+            return migration.down(context, Sequelize);
+          },
         };
       },
     },
@@ -115,9 +119,8 @@ type COLUMN_INFO = {
 type CONSTRAINT_INFO = {
   table_name: string;
   constraint: string;
-  constraint_name: string;
 };
-type TABLE_INFO = {
+export type TABLE_INFO = {
   table_name: string;
   columns: Record<string, string>;
   constraints: Set<string>;
@@ -131,17 +134,16 @@ type TABLE_INFO = {
 export const get_info_schema = async (
   db: Sequelize,
   options?: {
-    ignore_tables: string[];
     ignore_columns: Record<string, string[]>;
     ignore_constraints: Record<string, string[]>;
   },
 ): Promise<Record<string, TABLE_INFO>> => {
   const columns = await db.query<COLUMN_INFO>(
     `
-SELECT 
+SELECT
 	table_name,
-	column_name, 
-	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name) 
+	column_name,
+	COALESCE(udt_name || '(' || character_maximum_length || ')', udt_name)
 	|| CASE WHEN is_identity = 'YES' THEN '-id' ELSE '' END
 	|| CASE WHEN is_nullable = 'YES' THEN '-null' ELSE '' END as column_type,
 	column_default
@@ -152,24 +154,38 @@ ORDER BY 1, 2;`,
   );
   const constraints = await db.query<CONSTRAINT_INFO>(
     `
-SELECT 
-	c.table_name, 
-	c.constraint_type || '(' || STRING_AGG(k.column_name, ',' order by column_name) || ')' as constraint,
-	c.constraint_name
-FROM 
-	information_schema.table_constraints c
-	JOIN information_schema.key_column_usage k on c.constraint_name = k.constraint_name
-WHERE c.table_schema = 'public'
-GROUP BY c.table_name, c.constraint_name, c.constraint_type
-ORDER BY 1, 2;`,
+SELECT
+	C.TABLE_NAME,
+	C.CONSTRAINT_TYPE || coalesce(' ' || C2.TABLE_NAME,'') || '(' || STRING_AGG(
+		K.COLUMN_NAME,
+		','
+		ORDER BY
+			COLUMN_NAME
+	) || ')' || COALESCE(' UPDATE ' || R.UPDATE_RULE, '') || COALESCE(' DELETE ' || R.DELETE_RULE, '') AS CONSTRAINT
+FROM
+	INFORMATION_SCHEMA.TABLE_CONSTRAINTS C
+	JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE K ON C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
+	LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS R ON C.CONSTRAINT_NAME = R.CONSTRAINT_NAME
+	LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS C2 ON R.UNIQUE_CONSTRAINT_NAME = C2.CONSTRAINT_NAME
+WHERE
+	C.TABLE_SCHEMA = 'public'
+GROUP BY
+	C.TABLE_NAME,
+	C.CONSTRAINT_NAME,
+	C.CONSTRAINT_TYPE,
+	C2.TABLE_NAME,
+	R.UPDATE_RULE,
+	R.DELETE_RULE
+ORDER BY
+	1,
+	2;
+`,
     { type: QueryTypes.SELECT },
   );
   const tables: Record<string, TABLE_INFO> = {};
   columns
     .filter(
-      (c) =>
-        !options?.ignore_tables.includes(c.table_name) &&
-        !options?.ignore_columns[c.table_name]?.includes(c.column_name),
+      (c) => !options?.ignore_columns[c.table_name]?.includes(c.column_name),
     )
     .forEach((c) => {
       const t = (tables[c.table_name] = tables[c.table_name] ?? {
@@ -181,15 +197,13 @@ ORDER BY 1, 2;`,
     });
   constraints
     .filter(
-      (c) =>
-        !options?.ignore_tables.includes(c.table_name) &&
-        !options?.ignore_constraints[c.table_name]?.includes(c.constraint),
+      (c) => !options?.ignore_constraints[c.table_name]?.includes(c.constraint),
     )
     .forEach((c) => tables[c.table_name].constraints.add(c.constraint));
   return tables;
 };
 
-let testdb: DB | undefined = undefined;
+let db: DB | undefined = undefined;
 /**
  * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
  * and creating/migrating a fresh instance if it doesn't exist.
@@ -201,10 +215,10 @@ export const bootstrap_testing = async (
   log = false,
 ): Promise<DB> => {
   if (!TESTING) throw new Error('Seeds only work when testing!');
-  if (!testdb) {
+  if (!db) {
     await verify_db(TEST_DB_NAME);
     try {
-      testdb = buildDb(
+      db = buildDb(
         new Sequelize({
           dialect: 'postgres',
           database: TEST_DB_NAME,
@@ -213,16 +227,13 @@ export const bootstrap_testing = async (
           logging: false,
         }),
       );
-      await testdb.sequelize.sync({
-        force: true,
-        logging: log ? console.log : false,
-      });
+      await syncDb(db, log);
     } catch (error) {
       console.error('Error bootstrapping test db:', error);
       throw error;
     }
-  } else if (truncate) await truncate_db(testdb);
-  return testdb;
+  } else if (truncate) await truncate_db(db);
+  return db;
 };
 
-TESTING && dispose(async () => truncate_db(testdb));
+TESTING && dispose(async () => truncate_db(db));

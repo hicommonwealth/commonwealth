@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { Thread, ThreadAttributes, type DB } from '@hicommonwealth/model';
+import { slugify } from '@hicommonwealth/shared';
 import { Feed } from 'feed';
-import { slugify } from '../../shared/utils';
 import { GetBulkThreadsResult } from '../controllers/server_threads_methods/get_bulk_threads';
 import { ServerControllers } from '../routing/router';
 import { TypedRequestQuery, TypedResponse } from '../types';
@@ -80,6 +80,8 @@ export const getFeedHandler = async (
       from_date,
       to_date,
       archived,
+      contestAddress,
+      status,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -93,6 +95,8 @@ export const getFeedHandler = async (
       fromDate: from_date,
       toDate: to_date,
       archived: archived,
+      contestAddress,
+      status,
     });
 
     const community = await models.Community.findOne({

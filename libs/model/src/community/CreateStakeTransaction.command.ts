@@ -1,5 +1,6 @@
 import type { Command } from '@hicommonwealth/core';
-import { commonProtocol, schemas } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -33,8 +34,8 @@ export const CreateStakeTransaction: Command<
       where: { id: payload.community_id },
       include: [
         {
-          model: models.ChainNode,
-          attributes: ['eth_chain_id', 'url'],
+          model: models.ChainNode.scope('withPrivateData'),
+          attributes: ['eth_chain_id', 'url', 'private_url'],
         },
       ],
     });
@@ -51,7 +52,11 @@ export const CreateStakeTransaction: Command<
       throw Error('Chain does not have deployed namespace factory');
     }
 
-    const web3 = new Web3(community!.ChainNode!.url);
+    // TODO: @kurtisassad web3 should be encapsulated behind a protocol service
+    // TODO: @kurtisassad so we can easily mock chain actions in unit tests
+    const web3 = new Web3(
+      community!.ChainNode!.private_url || community!.ChainNode!.url,
+    );
 
     const communityStakeAddress: string =
       commonProtocol.factoryContracts[

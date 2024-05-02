@@ -1,8 +1,11 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import faker from 'faker';
 import React from 'react';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 const tagTypes = [
   'passed',
@@ -57,54 +60,62 @@ const makeData = (num: number) => {
   });
 };
 
-const createColumnInfo = () => {
-  return [
-    {
-      key: 'name',
-      header: 'Community',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'description',
-      header: 'Description',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'members',
-      header: 'Members',
-      numeric: true,
-      sortable: true,
-    },
-    {
-      key: 'threads',
-      header: 'Threads',
-      numeric: true,
-      sortable: true,
-    },
-    {
-      key: 'tags',
-      header: 'Tags',
-      numeric: false,
-      sortable: false,
-    },
-    {
-      key: 'buttons',
-      header: 'Buttons',
-      numeric: false,
-      sortable: false,
-    },
-  ];
-};
-
 const rowData = makeData(6);
-const columnInfo = createColumnInfo();
+
+const columns: CWTableColumnInfo[] = [
+  {
+    key: 'name',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'description',
+    header: 'Description',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'members',
+    header: 'Members',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'threads',
+    header: 'Threads',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'tags',
+    header: 'Tags',
+    numeric: false,
+    sortable: false,
+  },
+  {
+    key: 'buttons',
+    header: 'Buttons',
+    numeric: false,
+    sortable: false,
+  },
+];
 
 const TablesShowcase = () => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'members',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   return (
     <>
-      <CWTable columnInfo={columnInfo} rowData={rowData} />
+      <CWTable
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
+        rowData={rowData}
+      />
     </>
   );
 };

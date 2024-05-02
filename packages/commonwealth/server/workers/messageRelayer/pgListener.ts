@@ -1,16 +1,18 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { delay, logger, stats } from '@hicommonwealth/core';
-import { Client } from 'pg';
+import { delay, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
+import pg from 'pg';
 import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 const OUTBOX_CHANNEL = 'outbox_channel';
 let retryCount = 0;
 const maxRetries = 5;
 let connected = false;
 
-async function connectListener(client: Client) {
+async function connectListener(client: pg.Client) {
   try {
     await client.query(`LISTEN "${OUTBOX_CHANNEL}";`);
   } catch (err) {
@@ -19,7 +21,7 @@ async function connectListener(client: Client) {
   }
 }
 
-async function reconnect(client: Client) {
+async function reconnect(client: pg.Client) {
   if (retryCount < maxRetries) {
     // Exponential backoff strategy for reconnection attempts
     const timeout = Math.pow(2, retryCount) * 1000;
@@ -47,10 +49,10 @@ async function reconnect(client: Client) {
   }
 }
 
-export async function setupListener(): Promise<Client> {
+export async function setupListener(): Promise<pg.Client> {
   log.info('Setting up listener...');
   const { DATABASE_URI } = await import('@hicommonwealth/model');
-  const client = new Client({
+  const client = new pg.Client({
     connectionString: DATABASE_URI,
     ssl: ['test', 'development'].includes(NODE_ENV)
       ? false
@@ -58,7 +60,7 @@ export async function setupListener(): Promise<Client> {
   });
 
   client.on('notification', (payload) => {
-    log.info('Notification received', undefined, { payload });
+    log.info('Notification received', { payload });
     incrementNumUnrelayedEvents(1);
     stats().increment('messageRelayerNotificationReceived');
   });

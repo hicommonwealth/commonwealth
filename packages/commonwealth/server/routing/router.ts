@@ -2,9 +2,9 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import apiRouter from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import ddd from '../routes/ddd';
 
 import {
   methodNotAllowedMiddleware,
@@ -85,7 +85,6 @@ import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import { sendMessage } from '../routes/snapshotAPI';
 import updateAddress from '../routes/updateAddress';
 import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
@@ -94,7 +93,6 @@ import type DatabaseValidationService from '../middleware/databaseValidationServ
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
-import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
@@ -182,6 +180,7 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
+import { failure } from '../types';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -232,6 +231,9 @@ function setupRouter(
   const router = express.Router();
 
   router.use(useragent.express());
+
+  // Routes API
+  app.use('/api', apiRouter);
 
   // Updating the address
   registerRoute(
@@ -1210,28 +1212,12 @@ function setupRouter(
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
-  // snapshotAPI
-  registerRoute(
-    router,
-    'post',
-    '/snapshotAPI/sendMessage',
-    sendMessage.bind(this),
-  );
-
   registerRoute(
     router,
     'get',
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  // snapshot-commonwealth
-  registerRoute(
-    router,
-    'get',
-    '/snapshot',
-    getSnapshotProposal.bind(this, models),
   );
 
   registerRoute(
@@ -1304,10 +1290,11 @@ function setupRouter(
 
   app.use(endpoint, router);
 
-  // new ddd routes
-  app.use('/ddd', ddd);
-
   app.use(methodNotAllowedMiddleware());
+  app.use('/api/*', function (_req, res) {
+    res.status(404);
+    return failure(res, 'Not Found');
+  });
 }
 
 export default setupRouter;

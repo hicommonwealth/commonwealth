@@ -1,12 +1,14 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import type { Placement } from '@popperjs/core/lib';
+import clsx from 'clsx';
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { Option } from './Option';
 import './Select.scss';
@@ -19,13 +21,26 @@ export type SelectProps = {
   onSelect?: (
     v:
       | string
-      | { id: string | number; value: any; label: string; iconLeft?: IconName },
+      | {
+          id?: string | number;
+          value?: string;
+          label: string;
+          iconLeft?: IconName;
+          type?: 'header' | 'header-divider' | 'contest';
+        },
   ) => any;
   onOpen?: () => {};
   onClose?: () => {};
   options:
     | string[]
-    | { id: string | number; value: any; label: string; iconLeft?: IconName }[];
+    | {
+        id?: string | number;
+        value?: string;
+        label: string;
+        iconLeft?: IconName;
+        type?: 'header' | 'header-divider' | 'contest';
+      }[]
+    | {}[];
   canEditOption?: boolean;
   onOptionEdit?: (
     v: string | { id: string | number; value: any; label: string },
@@ -71,7 +86,8 @@ export const Select = ({
           {...(selectedOption &&
             selectedOption.iconLeft && { iconLeft: selectedOption.iconLeft })}
           iconRight={popoverProps.anchorEl ? 'caretUp' : 'caretDown'}
-          buttonType="mini-white"
+          buttonType="secondary"
+          buttonHeight="sm"
           label={
             selectedOption
               ? selectedOption.label || selectedOption
@@ -89,6 +105,24 @@ export const Select = ({
                 const optionLabel = option.label || option;
                 const current = option.value || option;
 
+                if (
+                  option.type === 'header' ||
+                  option.type === 'header-divider'
+                ) {
+                  return (
+                    <CWText
+                      type="caption"
+                      fontWeight="medium"
+                      className={clsx('select-header', {
+                        divider: option.type === 'header-divider',
+                      })}
+                      key={i}
+                    >
+                      {option.label}
+                    </CWText>
+                  );
+                }
+
                 return (
                   <Option
                     key={i}
@@ -102,19 +136,20 @@ export const Select = ({
                     }}
                     isSelected={selected === current}
                     iconLeft={option && option.iconLeft ? option.iconLeft : ''}
-                    {...(canEditOption && {
-                      iconRight: (
-                        <CWIconButton
-                          iconName="write"
-                          iconSize="small"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            popoverProps.setAnchorEl(null);
-                            onOptionEdit && (await onOptionEdit(option));
-                          }}
-                        />
-                      ),
-                    })}
+                    {...(canEditOption &&
+                      !option.type && {
+                        iconRight: (
+                          <CWIconButton
+                            iconName="write"
+                            iconSize="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              popoverProps.setAnchorEl(null);
+                              onOptionEdit?.(option);
+                            }}
+                          />
+                        ),
+                      })}
                     {...(option.value === 'Archived' && {
                       iconRight: (
                         <CWIconButton iconName="archiveTray" iconSize="small" />

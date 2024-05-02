@@ -1,34 +1,23 @@
 import {
   Broker,
-  BrokerTopics,
+  BrokerPublications,
+  BrokerSubscriptions,
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
-  ILogger,
   InvalidInput,
   RetryStrategyFn,
-  eventHandler,
-  logger,
+  handleEvent,
   schemas,
 } from '@hicommonwealth/core';
+import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
-import * as Rascal from 'rascal';
-import { AckOrNack } from 'rascal';
-import { RascalPublications, RascalSubscriptions } from './types';
-
-const BrokerTopicPublicationMap = {
-  [BrokerTopics.DiscordListener]: RascalPublications.DiscordListener,
-  [BrokerTopics.SnapshotListener]: RascalPublications.SnapshotListener,
-};
-
-const BrokerTopicSubscriptionMap = {
-  [BrokerTopics.DiscordListener]: RascalSubscriptions.DiscordListener,
-  [BrokerTopics.SnapshotListener]: RascalSubscriptions.SnapshotListener,
-};
+import { AckOrNack, default as Rascal } from 'rascal';
+import { fileURLToPath } from 'url';
 
 const defaultRetryStrategy: RetryStrategyFn = (
   err: Error | undefined,
-  topic: BrokerTopics,
+  topic: BrokerSubscriptions,
   content: any,
   ackOrNackFn: AckOrNack,
   log: ILogger,
@@ -61,7 +50,8 @@ export class RabbitMQAdapter implements Broker {
   private _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    this._log = logger().getLogger(__filename);
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -103,7 +93,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async publish<Name extends schemas.Events>(
-    topic: BrokerTopics,
+    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean> {
     if (!this.initialized) {
@@ -115,35 +105,26 @@ export class RabbitMQAdapter implements Broker {
       event,
     };
 
-    const rascalPubName: RascalPublications | undefined =
-      BrokerTopicPublicationMap[topic];
-    if (!rascalPubName) {
+    if (!this.publishers.includes(topic)) {
       this._log.error(
-        `Unsupported event: ${event.name}`,
-        undefined,
-        logContext,
-      );
-      return false;
-    }
-
-    if (!this.publishers.includes(rascalPubName)) {
-      this._log.error(
-        `${rascalPubName} not supported by this adapter instance`,
+        `${topic} not supported by this adapter instance`,
         undefined,
         {
           ...logContext,
-          rascalPublication: rascalPubName,
+          rascalPublication: topic,
         },
       );
       return false;
     }
 
     try {
-      const publication = await this.broker!.publish(rascalPubName, event);
+      const publication = await this.broker!.publish(topic, event, {
+        routingKey: event.name,
+      });
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
-          this._log.debug('Message published', undefined, {
+          this._log.debug('Message published', {
             messageId,
             ...logContext,
           });
@@ -164,7 +145,7 @@ export class RabbitMQAdapter implements Broker {
         e instanceof Error ? e : undefined,
         {
           ...logContext,
-          publication: rascalPubName,
+          publication: topic,
         },
       );
     }
@@ -173,7 +154,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async subscribe(
-    topic: BrokerTopics,
+    topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<EventSchemas>,
     retryStrategy?: RetryStrategyFn,
   ): Promise<boolean> {
@@ -181,34 +162,28 @@ export class RabbitMQAdapter implements Broker {
       return false;
     }
 
-    const rascalSubName = BrokerTopicSubscriptionMap[topic];
-    if (!rascalSubName) {
-      this._log.error(`Unsupported topic`, undefined, { topic });
-      return false;
-    }
-
-    if (!this.subscribers.includes(rascalSubName)) {
+    if (!this.subscribers.includes(topic)) {
       this._log.error(
-        `${rascalSubName} not supported by this adapter instance`,
+        `${topic} not supported by this adapter instance`,
         undefined,
         {
           topic,
-          rascalSubscription: rascalSubName,
+          rascalSubscription: topic,
         },
       );
       return false;
     }
 
     try {
-      this._log.info(`${this.name} subscribing to ${rascalSubName}`);
-      const subscription = await this.broker!.subscribe(rascalSubName);
+      this._log.info(`${this.name} subscribing to ${topic}`);
+      const subscription = await this.broker!.subscribe(topic);
 
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
-          eventHandler(handler, content, true)
+          handleEvent(handler, content, true)
             .then(() => {
-              this._log.debug('Message Acked', undefined, {
+              this._log.debug('Message Acked', {
                 topic,
                 message: content,
               });

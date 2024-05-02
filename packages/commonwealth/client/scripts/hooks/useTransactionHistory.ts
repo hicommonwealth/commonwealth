@@ -13,7 +13,7 @@ const useTransactionHistory = ({
   addressFilter,
 }: TransactionHistoryProps) => {
   const { data } = trpc.community.getStakeTransaction.useQuery({
-    addresses: addressFilter.length > 0 ? addressFilter.join(',') : undefined,
+    addresses: addressFilter.length === 1 ? addressFilter.join(',') : undefined,
   });
 
   let filteredData = !data
@@ -22,6 +22,7 @@ const useTransactionHistory = ({
         community: t.community,
         address: t.address,
         stake: t.stake_amount,
+        price: t.stake_price,
         voteWeight: t.stake_amount * t.vote_weight,
         timestamp: t.timestamp * 1000,
         action: t.stake_direction === 'buy' ? 'mint' : 'burn',
@@ -37,6 +38,7 @@ const useTransactionHistory = ({
           t.transaction_hash,
           t.community?.chain_node_id,
         ),
+        chain: '',
       }));
 
   // filter by community name and symbol
