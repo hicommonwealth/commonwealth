@@ -24,21 +24,11 @@ describe('Snapshot Listener API', () => {
       { mock: false },
     );
 
-    const [community] = await tester.seed('Community', {
+    await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       Addresses: [],
       CommunityStakes: [],
-    });
-
-    const [snapshotSpace] = await tester.seed('SnapshotSpace', {
-      snapshot_space: '6969888.eth',
-    });
-
-    await models.CommunitySnapshotSpaces.create({
-      community_id: community?.id,
-      snapshot_space_id: snapshotSpace?.snapshot_space,
-      created_at: new Date(),
-      updated_at: new Date(),
+      snapshot_spaces: ['6969888.eth'],
     });
   });
 

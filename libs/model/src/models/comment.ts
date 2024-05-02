@@ -1,7 +1,8 @@
-import { IDiscordMeta, stats } from '@hicommonwealth/core';
+import { IDiscordMeta, schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes } from './community';
@@ -34,7 +35,7 @@ export type CommentAttributes = {
   discord_meta?: IDiscordMeta;
 
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
   Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];
@@ -99,7 +100,7 @@ export default (sequelize: Sequelize.Sequelize) =>
     {
       hooks: {
         afterCreate: async (comment: CommentInstance, options) => {
-          const { Thread } = sequelize.models;
+          const { Thread, Outbox } = sequelize.models;
           const thread_id = comment.thread_id;
           try {
             const thread = await Thread.findOne({
@@ -118,6 +119,17 @@ export default (sequelize: Sequelize.Sequelize) =>
               `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
             );
           }
+
+          await emitEvent(
+            Outbox,
+            [
+              {
+                event_name: schemas.EventNames.CommentCreated,
+                event_payload: comment.get({ plain: true }),
+              },
+            ],
+            options.transaction,
+          );
         },
         afterDestroy: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;

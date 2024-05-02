@@ -10,7 +10,7 @@ export type WebhookAttributes = {
   community_id: string;
   created_at?: Date;
   updated_at?: Date;
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };
 
 export type WebhookInstance = ModelInstance<WebhookAttributes>;

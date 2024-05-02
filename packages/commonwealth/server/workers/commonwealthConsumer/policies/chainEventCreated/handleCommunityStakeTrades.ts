@@ -2,9 +2,11 @@ import { schemas } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
+import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export async function handleCommunityStakeTrades(

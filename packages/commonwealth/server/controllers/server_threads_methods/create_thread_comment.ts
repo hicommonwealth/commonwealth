@@ -11,7 +11,12 @@ import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  createCommentMentionNotifications,
+  parseUserMentions,
+  queryMentionedUsers,
+  uniqueMentions,
+} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -209,27 +214,14 @@ export async function __createThreadComment(
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
-  let mentionedAddresses;
-  try {
-    const mentions = parseUserMentions(bodyText);
-    if (mentions && mentions.length > 0) {
-      mentionedAddresses = await Promise.all(
-        mentions.map(async (mention) => {
-          const mentionedUser = await this.models.Address.findOne({
-            where: {
-              community_id: mention[0] || null,
-              address: mention[1],
-            },
-            include: [this.models.User],
-          });
-          return mentionedUser;
-        }),
-      );
-      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-    }
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
+  const mentions = uniqueMentions(parseUserMentions(bodyText));
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
+  const allNotificationOptions: EmitOptions[] = [];
+
+  allNotificationOptions.push(
+    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
+  );
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(address.address);
@@ -240,8 +232,6 @@ export async function __createThreadComment(
   }
 
   const root_title = thread.title || '';
-
-  const allNotificationOptions: EmitOptions[] = [];
 
   // build notification for root thread
   allNotificationOptions.push({
@@ -283,36 +273,6 @@ export async function __createThreadComment(
       },
       excludeAddresses: excludedAddrs,
     });
-
-    // notify mentioned users if they have permission to view the originating forum
-    if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map((mentionedAddress) => {
-        if (!mentionedAddress.User) {
-          return; // some Addresses may be missing users, e.g. if the user removed the address
-        }
-        const shouldNotifyMentionedUser = true;
-        if (shouldNotifyMentionedUser) {
-          allNotificationOptions.push({
-            notification: {
-              categoryId: NotificationCategories.NewMention,
-              data: {
-                mentioned_user_id: mentionedAddress.User.id,
-                created_at: new Date(),
-                thread_id: +threadId,
-                root_title,
-                root_type: ProposalType.Thread,
-                comment_id: +comment.id,
-                comment_text: comment.text,
-                community_id: comment.community_id,
-                author_address: address.address,
-                author_community_id: address.community_id,
-              },
-            },
-            excludeAddresses: [address.address],
-          });
-        }
-      });
-    }
   }
 
   // update author last saved (in background)

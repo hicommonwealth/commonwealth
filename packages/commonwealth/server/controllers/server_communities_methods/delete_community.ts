@@ -125,7 +125,6 @@ export async function __deleteCommunity(
           const models: Array<
             ModelStatic<ModelInstance<{ community_id?: string }>>
           > = [
-            this.models.CommunitySnapshotSpaces,
             this.models.CommunityStake,
             this.models.DiscordBotConfig,
             this.models.Ban,

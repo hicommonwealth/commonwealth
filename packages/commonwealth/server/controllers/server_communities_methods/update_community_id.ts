@@ -85,7 +85,6 @@ export async function __updateCommunityId(
         this.models.Vote,
         this.models.Webhook,
         this.models.CommunityContract,
-        this.models.CommunitySnapshotSpaces,
         this.models.CommunityStake,
         this.models.DiscordBotConfig,
         this.models.Group,

@@ -18,7 +18,7 @@ export type PollAttributes = {
 
   // associations
   Thread?: ThreadAttributes;
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   votes?: VoteAttributes[];
 };
 
