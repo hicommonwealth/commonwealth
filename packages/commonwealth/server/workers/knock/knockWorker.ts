@@ -27,6 +27,7 @@ let isServiceHealthy = false;
 startHealthCheckLoop({
   enabled: __filename.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
+  // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
     if (!isServiceHealthy) {
       throw new Error('service not healthy');
