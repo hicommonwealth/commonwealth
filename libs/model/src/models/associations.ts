@@ -125,10 +125,6 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.SnapshotSpace.withMany(db.SnapshotProposal, 'space', {
-    onUpdate: 'CASCADE',
-  });
-
   db.NotificationCategory.withMany(db.Subscription, 'category_id').withMany(
     db.Notification,
     'category_id',
@@ -198,21 +194,6 @@ export const buildAssociations = (db: DB) => {
       hooks: true,
     },
   );
-  db.CommunitySnapshotSpaces.withManyToMany(
-    {
-      model: db.Community,
-      key: 'community_id',
-      as: 'spaces',
-      onUpdate: 'CASCADE',
-    },
-    {
-      model: db.SnapshotSpace,
-      key: 'snapshot_space_id',
-      as: 'spaces',
-      asOne: 'snapshot_space',
-      onUpdate: 'CASCADE',
-    },
-  );
 
   // 3-way x-ref table
   db.CommunityContractTemplate.belongsTo(db.CommunityContract, {
@@ -233,7 +214,6 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'community_id',
   });
   db.Subscription.belongsTo(db.Community, {
-    as: 'Community',
     foreignKey: 'community_id',
   });
   db.Subscription.belongsTo(db.Thread, {

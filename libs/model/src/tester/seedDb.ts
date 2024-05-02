@@ -509,25 +509,6 @@ export const seedDb = async () => {
       },
     ]);
 
-    await models.SnapshotSpace.create({
-      snapshot_space: 'test space',
-    });
-
-    await models.SnapshotProposal.create({
-      id: '1',
-      title: 'Test Snapshot Proposal',
-      body: 'This is a test proposal',
-      choices: ['Yes', 'No'],
-      space: 'test space',
-      event: 'proposal/created',
-      start: new Date().toString(),
-      expire: new Date(
-        new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
-      ).toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
     return models;
   } catch (error) {
     console.error('seedDB', error);
