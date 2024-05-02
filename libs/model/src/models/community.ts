@@ -1,6 +1,7 @@
 import { schemas } from '@hicommonwealth/core';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
+import type { CommunitySnapshotSpacesAttributes } from '.';
 import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
@@ -14,12 +15,11 @@ import type { UserAttributes } from './user';
 export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
-  StarredCommunities?:
-    | StarredCommunityAttributes[]
-    | StarredCommunityAttributes['id'][];
+  StarredCommunities?: StarredCommunityAttributes[];
   Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
+  spaces?: CommunitySnapshotSpacesAttributes[];
   ChainObjectVersion?: any; // TODO
   Contract?: ContractInstance;
   thread_count?: number;

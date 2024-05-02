@@ -1,5 +1,5 @@
 import { schemas } from '@hicommonwealth/core';
-import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -17,18 +17,13 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ThreadSubscriptionModelStatic>sequelize.define<ThreadSubscriptionInstance>(
     'ThreadSubscriptions',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       user_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       thread_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -47,11 +42,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
-      indexes: [
-        {
-          fields: ['user_id', 'thread_id'],
-          unique: true,
-        },
-      ],
     },
   );

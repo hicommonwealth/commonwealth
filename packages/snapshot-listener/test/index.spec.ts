@@ -37,6 +37,8 @@ describe('Snapshot Listener API', () => {
     await models.CommunitySnapshotSpaces.create({
       community_id: community?.id,
       snapshot_space_id: snapshotSpace?.snapshot_space,
+      created_at: new Date(),
+      updated_at: new Date(),
     });
   });
 

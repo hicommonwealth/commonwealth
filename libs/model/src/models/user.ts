@@ -21,8 +21,8 @@ export type UserAttributes = z.infer<typeof schemas.entities.User> & {
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   CommunityAlerts?: CommunityAlertAttributes[];
-  ThreadSubscriptions?: ThreadSubscriptionAttributes[];
-  CommentSubscriptions?: CommentSubscriptionAttributes[];
+  threadSubscriptions?: ThreadSubscriptionAttributes[];
+  commentSubscriptions?: CommentSubscriptionAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -56,8 +56,8 @@ export type UserCreationAttributes = UserAttributes & {
 export type UserModelStatic = ModelStatic<UserInstance> &
   UserCreationAttributes;
 
-export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
-  const User = <UserModelStatic>sequelize.define<UserInstance>(
+export default (sequelize: Sequelize.Sequelize) =>
+  <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -102,27 +102,3 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
       },
     },
   );
-
-  User.associate = (models) => {
-    models.User.hasMany(models.Profile, {
-      foreignKey: { name: 'user_id', allowNull: false },
-    });
-
-    User.createWithProfile = async (
-      attrs: UserAttributes,
-      options?: CreateOptions,
-    ): Promise<UserInstance> => {
-      const newUser = await User.create(attrs, options);
-      const profile = await models.Profile.create(
-        {
-          user_id: newUser.id!,
-        },
-        options,
-      );
-      newUser.Profiles = [profile];
-      return newUser;
-    };
-  };
-
-  return User;
-};

@@ -51,8 +51,8 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
   emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
-export default (sequelize: Sequelize.Sequelize): SubscriptionModelStatic => {
-  const Subscription = <SubscriptionModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <SubscriptionModelStatic>sequelize.define<SubscriptionInstance>(
     'Subscription',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
@@ -119,26 +119,3 @@ export default (sequelize: Sequelize.Sequelize): SubscriptionModelStatic => {
       },
     },
   );
-
-  Subscription.associate = (models) => {
-    models.Subscription.hasMany(models.NotificationsRead, {
-      foreignKey: 'subscription_id',
-      onDelete: 'cascade',
-    });
-    models.Subscription.belongsTo(models.Community, {
-      as: 'Community',
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.Comment, {
-      foreignKey: 'comment_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Subscription;
-};

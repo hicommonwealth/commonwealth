@@ -524,6 +524,8 @@ export const seedDb = async () => {
       expire: new Date(
         new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
       ).toString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     return models;

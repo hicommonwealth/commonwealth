@@ -192,6 +192,7 @@ export const Thread = z.object({
   canvas_session: z.string(),
   canvas_hash: z.string(),
 
+  created_by: z.string().optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
   last_edited: z.date().optional(),
@@ -210,7 +211,7 @@ export const Thread = z.object({
   //notifications
   max_notif_id: PG_INT,
 
-  profile_name: z.string(),
+  profile_name: z.string().optional(),
 });
 
 export const Comment = z.object({
@@ -584,7 +585,6 @@ export const SubscriptionPreference = z.object({
 });
 
 export const ThreadSubscription = z.object({
-  id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
   created_at: z.date().optional(),
@@ -592,7 +592,6 @@ export const ThreadSubscription = z.object({
 });
 
 export const CommentSubscription = z.object({
-  id: PG_INT.optional(),
   user_id: PG_INT,
   comment_id: PG_INT,
   created_at: z.date().optional(),

@@ -9,10 +9,8 @@ export type SnapshotProposalInstance =
 
 export type SnapshotProposalModelStatic = ModelStatic<SnapshotProposalInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-): SnapshotProposalModelStatic => {
-  const SnapshotProposal = <SnapshotProposalModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <SnapshotProposalModelStatic>sequelize.define<SnapshotProposalInstance>(
     'SnapshotProposal',
     {
       id: {
@@ -57,13 +55,3 @@ export default (
       updatedAt: { type: Sequelize.DATE, allowNull: false },
     },
   );
-
-  SnapshotProposal.associate = (models) => {
-    models.SnapshotProposal.belongsTo(models.SnapshotSpace, {
-      foreignKey: 'space',
-      targetKey: 'snapshot_space',
-    });
-  };
-
-  return SnapshotProposal;
-};

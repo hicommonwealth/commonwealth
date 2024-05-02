@@ -15,6 +15,8 @@ export type SnapshotProposalAttributes = {
   start?: string;
   expire: string;
   is_upstream_deleted?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export const enum SnapshotEventType {

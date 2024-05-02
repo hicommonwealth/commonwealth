@@ -2,6 +2,7 @@ import { Model, Sequelize, SyncOptions } from 'sequelize';
 import type {
   CompositeKey,
   FkMap,
+  ManyToManyOptions,
   ModelStatic,
   OneToManyOptions,
   OneToOneOptions,
@@ -102,45 +103,63 @@ export function oneToMany<Parent extends State, Child extends State>(
 /**
  * Builds many-to-many association between three models (A->X<-B)
  * @param this cross-reference model with FKs to A and B
- * @param a [A model with PK, X->A fk field, alias, fk rules]
- * @param b [B model with PK, X->B fk field, alias, fk rules]
+ * @param a [A model with PK, X->A fk field, aliases, fk rules]
+ * @param b [B model with PK, X->B fk field, aliases, fk rules]
  */
 export function manyToMany<X extends State, A extends State, B extends State>(
   this: ModelStatic<Model<X>>,
-  a: [ModelStatic<Model<A>>, keyof X & string, string, RuleOptions],
-  b: [ModelStatic<Model<B>>, keyof X & string, string, RuleOptions],
+  a: ManyToManyOptions<X, A>,
+  b: ManyToManyOptions<X, B>,
 ) {
-  this.belongsTo(a[0], {
-    foreignKey: { name: a[1], allowNull: false },
-    onUpdate: a[3]?.onUpdate ?? 'NO ACTION',
-    onDelete: a[3]?.onDelete ?? 'NO ACTION',
+  this.belongsTo(a.model, {
+    foreignKey: { name: a.key, allowNull: false },
+    as: a.asOne,
+    onUpdate: a.onUpdate ?? 'NO ACTION',
+    onDelete: a.onDelete ?? 'NO ACTION',
   });
-  this.belongsTo(b[0], {
-    foreignKey: { name: b[1], allowNull: false },
-    onUpdate: b[3]?.onUpdate ?? 'NO ACTION',
-    onDelete: b[3]?.onDelete ?? 'NO ACTION',
+  this.belongsTo(b.model, {
+    foreignKey: { name: b.key, allowNull: false },
+    as: b.asOne,
+    onUpdate: b.onUpdate ?? 'NO ACTION',
+    onDelete: b.onDelete ?? 'NO ACTION',
   });
-  a[0].hasMany(this, { foreignKey: { name: a[1], allowNull: false } });
-  b[0].hasMany(this, { foreignKey: { name: b[1], allowNull: false } });
-  a[0].belongsToMany(b[0], { through: this, foreignKey: a[1], as: b[2] });
-  b[0].belongsToMany(a[0], { through: this, foreignKey: b[1], as: a[2] });
+  a.model.hasMany(this, {
+    foreignKey: { name: a.key, allowNull: false },
+    hooks: a.hooks,
+    as: a.as,
+  });
+  b.model.hasMany(this, {
+    foreignKey: { name: b.key, allowNull: false },
+    hooks: b.hooks,
+    as: b.as,
+  });
+  a.model.belongsToMany(b.model, {
+    through: this,
+    foreignKey: a.key,
+    as: a.asMany,
+  });
+  b.model.belongsToMany(a.model, {
+    through: this,
+    foreignKey: b.key,
+    as: b.asMany,
+  });
 
   // map fk when x-ref has composite pk
   if (this.primaryKeyAttributes.length > 1) {
     mapFk.apply(this as any, [
-      a[0] as any,
-      [[a[1], a[0].primaryKeyAttribute]],
+      a.model as any,
+      [[a.key, a.model.primaryKeyAttribute]],
       {
-        onUpdate: a[3]?.onUpdate ?? 'NO ACTION',
-        onDelete: a[3]?.onDelete ?? 'NO ACTION',
+        onUpdate: a.onUpdate ?? 'NO ACTION',
+        onDelete: a.onDelete ?? 'NO ACTION',
       },
     ]);
     mapFk.apply(this as any, [
-      b[0] as any,
-      [[b[1], b[0].primaryKeyAttribute]],
+      b.model as any,
+      [[b.key, b.model.primaryKeyAttribute]],
       {
-        onUpdate: b[3]?.onUpdate ?? 'NO ACTION',
-        onDelete: b[3]?.onDelete ?? 'NO ACTION',
+        onUpdate: b.onUpdate ?? 'NO ACTION',
+        onDelete: b.onDelete ?? 'NO ACTION',
       },
     ]);
   }
