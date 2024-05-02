@@ -126,7 +126,6 @@ export default (sequelize: Sequelize.Sequelize): SubscriptionModelStatic => {
       onDelete: 'cascade',
     });
     models.Subscription.belongsTo(models.Community, {
-      as: 'Community',
       foreignKey: 'community_id',
       targetKey: 'id',
     });

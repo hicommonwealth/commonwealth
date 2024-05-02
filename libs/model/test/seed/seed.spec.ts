@@ -180,39 +180,4 @@ describe('Seed functions', () => {
       ).to.eventually.be.rejectedWith(ValidationError);
     });
   });
-
-  describe('SnapshotSpace', () => {
-    step('Should seed with overrides', async () => {
-      await testSeed('SnapshotSpace', {
-        snapshot_space: 'test space',
-      });
-    });
-  });
-
-  describe('SnapshotProposal', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed('SnapshotProposal', {
-        space: 'test space',
-      });
-      await testSeed('SnapshotProposal', {
-        space: 'test space',
-      });
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed('SnapshotProposal', {
-        id: '1',
-        title: 'Test Snapshot Proposal',
-        body: 'This is a test proposal',
-        // TODO: fix equivalence assertion in test
-        // choices: ['Yes', 'No'],
-        space: 'test space',
-        event: 'proposal/created',
-        start: new Date().toString(),
-        expire: new Date(
-          new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
-        ).toString(),
-      });
-    });
-  });
 });

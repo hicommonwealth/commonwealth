@@ -38,6 +38,28 @@ export const linksSchema = {
   title: z.string().nullable().optional(),
 };
 
+<<<<<<< HEAD:libs/schemas/src/utils.schemas.ts
+=======
+export enum EventNames {
+  ChainEventCreated = 'ChainEventCreated',
+  CommentCreated = 'CommentCreated',
+  CommunityCreated = 'CommunityCreated',
+  DiscordMessageCreated = 'DiscordMessageCreated',
+  GroupCreated = 'GroupCreated',
+  SnapshotProposalCreated = 'SnapshotProposalCreated',
+  ThreadCreated = 'ThreadCreated',
+  UserMentioned = 'UserMentioned',
+
+  // Contests
+  RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
+  OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
+  ContestStarted = 'ContestStarted',
+  ContestContentAdded = 'ContestContentAdded',
+  ContestContentUpvoted = 'ContestContentUpvoted',
+  ContestWinnersRecorded = 'ContestWinnersRecorded',
+}
+
+>>>>>>> master:libs/core/src/schemas/utils.schemas.ts
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 
 export const ETHERS_BIG_NUMBER = z.object({

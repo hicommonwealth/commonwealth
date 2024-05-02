@@ -399,6 +399,7 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+  snapshot_spaces: z.array(z.string().max(255)).default([]).optional(),
 });
 
 export const CommunityContract = z.object({

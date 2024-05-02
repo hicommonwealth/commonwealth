@@ -1,6 +1,6 @@
 import { EventNames, events as coreEvents, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { DB } from '@hicommonwealth/model';
+import { DB, emitEvent } from '@hicommonwealth/model';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { getEventSources } from './getEventSources';
@@ -86,7 +86,7 @@ export async function processChainNode(
             >,
           }),
         );
-        await models.Outbox.bulkCreate(records, { transaction });
+        await emitEvent(models.Outbox, records, transaction);
       }
     });
 

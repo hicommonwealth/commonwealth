@@ -5,13 +5,13 @@ import {
 } from '@hicommonwealth/adapters';
 import { EventNames, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { models } from '@hicommonwealth/model';
+import { fetchNewSnapshotProposal, models } from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
+import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { DEFAULT_PORT } from './config';
-import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import {
   methodNotAllowedMiddleware,
   registerRoute,
@@ -53,7 +53,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       res.status(400).send('Error sending snapshot event');
     }
 
-    log.debug('Snapshot received', { requestBody: req.body });
+    log.info('Snapshot received', { requestBody: req.body });
 
     const parsedId = req.body.id?.replace(/.*\//, '');
     const eventType = req.body.event?.split('/')[1];
@@ -74,11 +74,15 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       return res.status(400).send('Error getting snapshot space');
     }
 
-    const associatedCommunities = await models.CommunitySnapshotSpaces.count({
-      where: { snapshot_space_id: space },
+    const associatedCommunities = await models.Community.findOne({
+      where: {
+        snapshot_spaces: {
+          [Op.contains]: [space],
+        },
+      },
     });
 
-    if (associatedCommunities === 0) {
+    if (!associatedCommunities) {
       log.info(`No associated communities found for space ${space}`);
       return res.status(200).json({ message: 'No associated community' });
     }

@@ -18,7 +18,7 @@ const log = logger(__filename);
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: import.meta.url.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {

@@ -1,9 +1,5 @@
 import { ILogger } from '@hicommonwealth/logging';
-import {
-  AnalyticsOptions,
-  BrokerTopics,
-  CacheNamespaces,
-} from '@hicommonwealth/shared';
+import { AnalyticsOptions, CacheNamespaces } from '@hicommonwealth/shared';
 import { Events } from '../events';
 import {
   EventContext,
@@ -109,7 +105,7 @@ export interface Analytics extends Disposable {
 
 export type RetryStrategyFn = (
   err: Error | undefined,
-  topic: BrokerTopics,
+  topic: BrokerSubscriptions,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
@@ -120,12 +116,12 @@ export type RetryStrategyFn = (
  */
 export interface Broker extends Disposable {
   publish<Name extends Events>(
-    topic: BrokerTopics,
+    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    topic: BrokerTopics,
+    topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
   ): Promise<boolean>;

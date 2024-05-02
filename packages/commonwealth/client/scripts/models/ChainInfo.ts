@@ -65,7 +65,6 @@ class ChainInfo {
     stagesEnabled,
     customStages,
     customDomain,
-    snapshot,
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
@@ -92,6 +91,7 @@ class ChainInfo {
     redirect,
     thread_count,
     address_count,
+    snapshot_spaces,
   }) {
     this.id = id;
     this.network = network;
@@ -105,7 +105,6 @@ class ChainInfo {
     this.customStages = customStages;
     this.customDomain = customDomain;
     this.terms = terms;
-    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
@@ -131,6 +130,7 @@ class ChainInfo {
     this.redirect = redirect;
     this.threadCount = thread_count;
     this.addressCount = address_count;
+    this.snapshot = snapshot_spaces || [];
   }
 
   public static fromJSON({
@@ -144,7 +144,6 @@ class ChainInfo {
     stages_enabled,
     custom_stages,
     custom_domain,
-    snapshot,
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
@@ -171,6 +170,7 @@ class ChainInfo {
     thread_count,
     address_count,
     CommunityStakes,
+    snapshot_spaces,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -200,7 +200,6 @@ class ChainInfo {
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
-      snapshot,
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -227,6 +226,7 @@ class ChainInfo {
       redirect,
       thread_count,
       address_count,
+      snapshot_spaces,
     });
   }
 

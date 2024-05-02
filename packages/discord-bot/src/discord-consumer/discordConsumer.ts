@@ -16,7 +16,6 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
-  BrokerTopics,
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
@@ -139,12 +138,14 @@ async function main() {
   });
 
   const result = await brokerInstance.subscribe(
-    BrokerTopics.DiscordListener,
+    BrokerSubscriptions.DiscordListener,
     Discord(),
   );
 
   if (!result) {
-    throw new Error(`Failed to subscribe to ${BrokerTopics.DiscordListener}`);
+    throw new Error(
+      `Failed to subscribe to ${BrokerSubscriptions.DiscordListener}`,
+    );
   }
 
   isServiceHealthy = true;
