@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { Comment, Thread } from './entities.schemas';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from './utils.schemas';
 
-export const ThreadCreated = z.object({ thread: z.string() });
-export const CommentCreated = z.object({ comment: z.string() });
+export const ThreadCreated = Thread;
+export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),

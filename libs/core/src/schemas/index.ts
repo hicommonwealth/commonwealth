@@ -2,7 +2,13 @@ import * as events from './events.schemas';
 export type Events = keyof typeof events;
 export { events };
 
-import * as entities from './entities.schemas';
+import * as entitySchemas from './entities.schemas';
+import { Outbox } from './outbox.schema';
+
+const entities = {
+  ...entitySchemas,
+  Outbox,
+};
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
   Entities,
@@ -10,8 +16,6 @@ export type Aggregates = Extract<
   | 'Comment'
   | 'Community'
   | 'NotificationCategory'
-  | 'SnapshotProposal'
-  | 'SnapshotSpace'
   | 'Subscription'
   | 'Thread'
   | 'User'
