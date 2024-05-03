@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import _ from 'lodash';
 import React, { useState } from 'react';
 import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
@@ -130,8 +130,11 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    userAddress={c.Address.address}
-                    userCommunityId={c.community_id}
+                    userAddress={c?.Address?.address}
+                    userCommunityId={c?.community_id}
+                    shouldShowAsDeleted={
+                      !c?.Address?.address && !c?.community_id
+                    }
                   />
                 </div>
               ))
@@ -151,8 +154,9 @@ export const EditCollaboratorsModal = ({
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
                   <User
-                    userAddress={c.address}
-                    userCommunityId={c.community_id}
+                    userAddress={c?.address}
+                    userCommunityId={c?.community_id}
+                    shouldShowAsDeleted={!c?.address && !c?.community_id}
                   />
                   <CWIconButton
                     iconName="close"
@@ -179,7 +183,7 @@ export const EditCollaboratorsModal = ({
           onClick={onModalClose}
         />
         <CWButton
-          disabled={isEqual(thread.collaborators, collaborators)}
+          disabled={_.isEqual(thread.collaborators, collaborators)}
           label="Save changes"
           buttonType="primary"
           buttonHeight="sm"

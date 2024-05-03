@@ -3,6 +3,7 @@ import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'node:url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -14,6 +15,7 @@ import {
   filterProposals,
 } from './util';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 dotenv.config();
 
@@ -67,7 +69,7 @@ export async function generateCosmosGovNotifications() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
     .then(() => {
       stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');

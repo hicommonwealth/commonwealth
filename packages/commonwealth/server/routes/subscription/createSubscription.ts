@@ -1,8 +1,9 @@
 import { AppError } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
 import {
+  checkSnapshotObjectExists,
   CommentInstance,
   CommunityInstance,
+  DB,
   SubscriptionAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
@@ -59,12 +60,11 @@ export default async (
       if (!req.body.snapshot_id) {
         return next(new AppError(Errors.InvalidSnapshotSpace));
       }
-      const space = await models.SnapshotSpace.findOne({
-        where: {
-          snapshot_space: req.body.snapshot_id,
-        },
-      });
-      if (!space) return next(new AppError(Errors.InvalidSnapshotSpace));
+      const spaceExists = await checkSnapshotObjectExists(
+        'space',
+        req.body.snapshot_id,
+      );
+      if (!spaceExists) return next(new AppError(Errors.InvalidSnapshotSpace));
       obj = { snapshot_id: req.body.snapshot_id };
       break;
     }

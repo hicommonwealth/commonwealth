@@ -91,12 +91,12 @@ export function getAllRascalConfigs(
   };
 
   const allExchanges: Record<keyof OmittedRascalExchanges, ExchangeConfig> = {
-    [RascalExchanges.SnapshotListener]: {
+    [RascalExchanges.Discobot]: {
       type: 'fanout',
       ...exchangeConfig,
     },
-    [RascalExchanges.Discobot]: {
-      type: 'fanout',
+    [RascalExchanges.MessageRelayer]: {
+      type: 'topic',
       ...exchangeConfig,
     },
   };
@@ -114,14 +114,32 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.ChainEvent]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.NotificationsProvider]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
     [RascalBindings.SnapshotListener]: {
-      source: RascalExchanges.SnapshotListener,
+      source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.SnapshotListener,
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.SnapshotListener,
+    },
+    [RascalBindings.ChainEvent]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ChainEvent,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ChainEvent,
     },
     [RascalBindings.DiscordListener]: {
       source: RascalExchanges.Discobot,
@@ -129,17 +147,17 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.DiscordListener,
     },
+    // TODO: add a binding from the MessageRelayer to NotificationsProvider queue with * binding key
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
-    [RascalPublications.SnapshotListener]: {
-      exchange: RascalExchanges.SnapshotListener,
-      routingKey: RascalRoutingKeys.SnapshotListener,
-      ...publicationConfig,
-    },
     [RascalPublications.DiscordListener]: {
       exchange: RascalExchanges.Discobot,
       routingKey: RascalRoutingKeys.DiscordListener,
+      ...publicationConfig,
+    },
+    [RascalPublications.MessageRelayer]: {
+      exchange: RascalExchanges.MessageRelayer,
       ...publicationConfig,
     },
   };
@@ -151,6 +169,14 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.DiscordListener]: {
       queue: RascalQueues.DiscordListener,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.ChainEvent]: {
+      queue: RascalQueues.ChainEvent,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.NotificationsProvider]: {
+      queue: RascalQueues.NotificationsProvider,
       ...subscriptionConfig,
     },
   };

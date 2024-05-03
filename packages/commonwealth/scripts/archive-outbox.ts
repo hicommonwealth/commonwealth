@@ -6,11 +6,13 @@ import { execSync } from 'child_process';
 import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
 // REQUIRED for S3 env var
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 
@@ -22,7 +24,7 @@ function dumpTablesSync(table: string, outputFile: string): boolean {
     return false;
   }
 
-  const cmd = `pg_dump -t ${table} -f ${outputFile} -d ${databaseUrl}`;
+  const cmd = `PGSSLMODE=allow pg_dump -t ${table} -f ${outputFile} -d ${databaseUrl}`;
 
   try {
     // execSync returns stdout as Buffer by default, convert it to string if needed
@@ -193,7 +195,7 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       log.info('Success');

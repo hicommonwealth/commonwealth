@@ -1,8 +1,10 @@
 import { logger } from '@hicommonwealth/logging';
 import { Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { DATABASE_URI, TESTING } from './config';
 import { buildDb } from './models';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 !process.env.DATABASE_URL &&

@@ -9,6 +9,7 @@
   "workspaces": [
     "packages/commonwealth",
     "packages/discord-bot",
+    "packages/scripts",
     "packages/snapshot-listener",
     "libs/*"
   ],
@@ -18,6 +19,7 @@
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
+    "db-all": "yarn --cwd packages/commonwealth db-all",
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
@@ -32,7 +34,7 @@
     "psql": "yarn --cwd packages/commonwealth psql",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
-    "start": "concurrently -k -n watcher,server -c red,green 'tsc -b -w packages/commonwealth' 'yarn workspace commonwealth start'",
+    "start": "yarn workspace commonwealth start",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",
@@ -63,7 +65,7 @@
     "@openzeppelin/contracts": "^2.4.0",
     "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
     "@osmonauts/lcd": "^0.10.0",
-    "@playwright/test": "^1.31.2",
+    "@playwright/test": "^1.43.1",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@tharsis/address-converter": "^0.1.8",
     "@types/amqplib": "^0.8.2",
@@ -118,7 +120,10 @@
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-webpack": "^0.12.1",
+    "eslint-plugin-diff": "^2.0.3",
+    "eslint-plugin-functional": "^6.1.1",
     "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "faker": "^4.1.0",
@@ -130,7 +135,7 @@
     "husky": "^8.0.0",
     "ignore-loader": "^0.1.2",
     "ignore-styles": "^5.0.1",
-    "mocha": "^6.2.2",
+    "mocha": "^10.3.0",
     "mock-express-request": "^0.2.2",
     "nyc": "^15.1.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
@@ -149,7 +154,6 @@
     "stylelint-config-prettier": "^9.0.4",
     "stylelint-config-standard": "^29.0.0",
     "sync-request": "^6.1.0",
-    "ts-mocha": "^6.0.0",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
@@ -161,15 +165,15 @@
     "webpack-deduplication-plugin": "^0.0.8",
     "webpack-dev-middleware": "^5.3.3",
     "webpack-hot-middleware": "^2.25.2",
-    "webpack-merge": "^5.8.0",
-    "eslint-plugin-diff": "^2.0.3",
-    "eslint-plugin-functional": "^6.1.1",
-    "eslint-plugin-promise": "^6.1.1"
+    "webpack-merge": "^5.8.0"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"
   },
   "engines": {
     "node": "20.x"
+  },
+  "dependencies": {
+    "extensionless": "^1.9.6"
   }
 }

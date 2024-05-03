@@ -44,7 +44,11 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const DiscussionSection = () => {
+export const DiscussionSection = ({
+  isContestAvailable,
+}: {
+  isContestAvailable: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -87,9 +91,6 @@ export const DiscussionSection = () => {
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
     ? 'Forum'
     : 'Discussion';
-
-  // TODO contest item should be visible only if at least one contest exists
-  const contestsItemVisible = false;
 
   // Build Toggle Tree
   const discussionsDefaultToggleTree: ToggleTree = {
@@ -152,7 +153,7 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
-    ...(contestsEnabled && contestsItemVisible
+    ...(contestsEnabled && isContestAvailable
       ? [
           {
             title: 'Contests',
@@ -234,6 +235,8 @@ export const DiscussionSection = () => {
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
+      const topicInvolvedInActiveContest = false;
+
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
         containsChildren: false,
@@ -260,6 +263,9 @@ export const DiscussionSection = () => {
           );
         },
         displayData: null,
+        ...(topicInvolvedInActiveContest
+          ? { rightIcon: <CWIcon iconName="trophy" iconSize="small" /> }
+          : {}),
       };
       discussionsGroupData.push(discussionSectionGroup);
     }

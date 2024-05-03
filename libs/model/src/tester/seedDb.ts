@@ -362,14 +362,20 @@ export const seedDb = async () => {
       {
         community_id: alex.id!,
         contract_id: alexContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         community_id: yearn.id!,
         contract_id: yearnContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         community_id: sushi.id!,
         contract_id: sushiContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ]);
 
@@ -502,23 +508,6 @@ export const seedDb = async () => {
         is_active: true,
       },
     ]);
-
-    await models.SnapshotSpace.create({
-      snapshot_space: 'test space',
-    });
-
-    await models.SnapshotProposal.create({
-      id: '1',
-      title: 'Test Snapshot Proposal',
-      body: 'This is a test proposal',
-      choices: ['Yes', 'No'],
-      space: 'test space',
-      event: 'proposal/created',
-      start: new Date().toString(),
-      expire: new Date(
-        new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
-      ).toString(),
-    });
 
     return models;
   } catch (error) {

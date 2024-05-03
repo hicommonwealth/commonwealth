@@ -1,20 +1,24 @@
 {
   "name": "@hicommonwealth/adapters",
   "private": "true",
+  "type": "module",
   "version": "0.1.0",
   "description": "External adapters",
   "files": [
     "build"
   ],
-  "main": "build/index",
+  "main": "build/index.js",
   "types": "src/index",
   "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf build",
+    "build": "tsc -b tsconfig.build.json",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha 'test/**/*.spec.ts'"
+    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "@hicommonwealth/core": "*",
+    "@hicommonwealth/logging": "*",
+    "@hicommonwealth/shared": "*",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
@@ -32,5 +36,7 @@
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "tsx": "^4.7.2"
+  }
 }

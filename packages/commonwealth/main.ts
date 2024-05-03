@@ -14,11 +14,13 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import { dirname } from 'node:path';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
+import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import { PRERENDER_TOKEN, SESSION_SECRET } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -29,11 +31,12 @@ import BanCache from './server/util/banCheckCache';
 import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
-
-// set up express async error handling hack
-require('express-async-errors');
+import { SESSION_EXPIRY_MILLIS } from './session';
 
 const DEV = process.env.NODE_ENV !== 'production';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Bootstraps express app
@@ -73,7 +76,7 @@ export async function main(
     db: db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 14 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+    expiration: SESSION_EXPIRY_MILLIS,
   });
 
   sessionStore.sync();
@@ -83,6 +86,9 @@ export async function main(
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: SESSION_EXPIRY_MILLIS,
+    },
   });
 
   const setupMiddleware = () => {

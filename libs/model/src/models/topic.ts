@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -31,42 +30,39 @@ export type TopicInstance = ModelInstance<TopicAttributes> & {
 
 export type TopicModelStatic = ModelStatic<TopicInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): TopicModelStatic => {
-  const Topic = <TopicModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <TopicModelStatic>sequelize.define<TopicInstance>(
     'Topic',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      name: { type: dataTypes.STRING, allowNull: false },
-      description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      name: { type: Sequelize.STRING, allowNull: false },
+      description: { type: Sequelize.TEXT, allowNull: false, defaultValue: '' },
       featured_in_sidebar: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       featured_in_new_post: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      order: { type: dataTypes.INTEGER, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
+      order: { type: Sequelize.INTEGER, allowNull: true },
       default_offchain_template: {
-        type: dataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
-      channel_id: { type: dataTypes.STRING, allowNull: true },
+      channel_id: { type: Sequelize.STRING, allowNull: true },
       group_ids: {
-        type: dataTypes.ARRAY(dataTypes.INTEGER),
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
         allowNull: false,
         defaultValue: [],
       },
-      telegram: { type: dataTypes.STRING, allowNull: true },
+      telegram: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -83,18 +79,3 @@ export default (
       },
     },
   );
-
-  Topic.associate = (models) => {
-    models.Topic.belongsTo(models.Community, {
-      as: 'community',
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Topic.hasMany(models.Thread, {
-      as: 'threads',
-      foreignKey: 'topic_id',
-    });
-  };
-
-  return Topic;
-};

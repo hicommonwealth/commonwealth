@@ -9,6 +9,7 @@ export enum ValidChains {
 export const STAKE_ID = 2;
 
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.
+// WARNING: ADD THE CONTRACT IN EvmEventSources TABLE VIA MIGRATION IF ADDING HERE!
 export const factoryContracts: {
   [key in ValidChains]: {
     factory: string;

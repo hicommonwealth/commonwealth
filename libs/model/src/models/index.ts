@@ -1,8 +1,8 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
 import { Factories } from './factories';
 import type { Models } from './types';
-import { createFk, dropFk, mapFk, oneToMany } from './utils';
+import { createFk, dropFk, manyToMany, oneToMany, oneToOne } from './utils';
 
 export type DB = Models<typeof Factories> & {
   sequelize: Sequelize;
@@ -14,23 +14,15 @@ export type DB = Models<typeof Factories> & {
  * - This is not yet supported by sequelize
  */
 export const syncDb = async (db: DB, log = false) => {
-  // TODO: build this map when creating one to many associations with composite keys
-  const compositeKeys = [
-    mapFk(db.Contest, db.ContestAction, ['contest_address', 'contest_id']),
-    mapFk(db.ContestManager, db.Contest, ['contest_address']),
-    mapFk(db.Topic, db.ContestTopic, [['id', 'topic_id']]),
-  ];
-
-  compositeKeys.forEach(({ parent, child }) =>
-    dropFk(db.sequelize, parent.tableName, child.tableName),
+  const fks = Object.keys(Factories).flatMap(
+    (k) => db[k as keyof typeof Factories]._fks,
   );
+  fks.forEach((fk) => dropFk(db.sequelize, fk));
   await db.sequelize.sync({
     force: true,
     logging: log ? console.log : false,
   });
-  compositeKeys.forEach(({ parent, child, key }) =>
-    createFk(db.sequelize, parent.tableName, child.tableName, key),
-  );
+  fks.forEach((fk) => createFk(db.sequelize, fk));
 };
 
 /**
@@ -41,22 +33,24 @@ export const syncDb = async (db: DB, log = false) => {
 export const buildDb = (sequelize: Sequelize): DB => {
   const models = Object.fromEntries(
     Object.entries(Factories).map(([key, factory]) => {
-      const model = factory(sequelize, DataTypes);
-      model.withMany = oneToMany as any; // TODO: can we make this work without any?
+      const model = factory(sequelize);
+      model._fks = [];
+      // TODO: can we make this work without any?
+      model.withOne = oneToOne as any;
+      model.withMany = oneToMany as any;
+      model.withManyToMany = manyToMany as any;
       return [key, model];
     }),
-  ) as Models<typeof Factories>;
+  );
 
-  const db = { sequelize, Sequelize, ...models };
+  const db = { sequelize, Sequelize, ...models } as DB;
+  buildAssociations(db);
 
-  // associate hook
+  // TODO: remove legacy associate hook
   Object.keys(models).forEach((key) => {
     const model = models[key as keyof typeof Factories];
     'associate' in model && model.associate(db);
   });
-
-  // proposed association builder
-  buildAssociations(db);
 
   return db;
 };
@@ -73,7 +67,6 @@ export * from './community_contract';
 export * from './community_contract_template';
 export * from './community_contract_template_metadata';
 export * from './community_role';
-export * from './community_snapshot_spaces';
 export * from './community_stake';
 export * from './contract';
 export * from './contract_abi';
@@ -92,8 +85,6 @@ export * from './profile';
 export * from './reaction';
 export * from './role';
 export * from './role_assignment';
-export * from './snapshot_proposal';
-export * from './snapshot_spaces';
 export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';

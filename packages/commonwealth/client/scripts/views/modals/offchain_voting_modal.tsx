@@ -47,8 +47,9 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
               <User
                 shouldShowPopover
                 shouldLinkProfile
-                userAddress={vote.address}
-                userCommunityId={vote.authorCommunityId}
+                userAddress={vote?.address}
+                userCommunityId={vote?.authorCommunityId}
+                shouldShowAsDeleted={!vote?.address && !vote?.authorCommunityId}
               />
             </div>
             <div className="offchain-poll-voter-choice">{vote.option}</div>

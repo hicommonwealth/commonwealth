@@ -1,6 +1,6 @@
-import { NodeHealth } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
+import { NodeHealth } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Request, Response } from 'express';
 import _ from 'lodash';
@@ -13,6 +13,9 @@ import {
   upgradeBetaNodeIfNeeded,
 } from '../utils';
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300;

@@ -1,13 +1,14 @@
-import { NodeHealth } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
-import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
+import { CosmosGovernanceVersion, NodeHealth } from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import _ from 'lodash';
+import { fileURLToPath } from 'url';
 
 export const IGNORE_COSMOS_CHAIN_IDS = ['csdk', 'evmosdev'];
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 const DEVNET_COSMOS_ID_RE = /^(csdk|evmosdev)/;
 const IGNORE_COSMOS_METHODS = ['tx', 'auth'];

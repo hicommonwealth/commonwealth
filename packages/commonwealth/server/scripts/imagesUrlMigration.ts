@@ -1,8 +1,11 @@
 import { models } from '@hicommonwealth/model';
 import AWS from 'aws-sdk';
 import fs from 'fs';
-import path from 'path';
+import { fileURLToPath } from 'node:url';
+import path, { dirname } from 'path';
 import { Op } from 'sequelize';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 AWS.config.update({
   signatureVersion: 'v4',

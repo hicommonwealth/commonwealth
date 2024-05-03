@@ -1,11 +1,14 @@
 import {
+  ALL_COMMUNITIES,
   ChainBase,
   ChainType,
   CommunityCategoryType,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+  checkIconSize,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../../constants';
-import { ALL_COMMUNITIES, checkIconSize } from '../../utils';
+import { PG_INT } from '..';
 import { Community, Group, StakeTransaction } from '../entities.schemas';
 
 export const CreateCommunity = {
@@ -17,12 +20,7 @@ export const CreateCommunity = {
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
-    chain_node_id: z
-      .number()
-      .int()
-      .min(MIN_SCHEMA_INT)
-      .max(MAX_SCHEMA_INT)
-      .optional(), // corresponds to the chain field
+    chain_node_id: PG_INT.optional(), // corresponds to the chain field
     description: z.string().optional(),
     icon_url: z
       .string()
@@ -46,12 +44,7 @@ export const CreateCommunity = {
       .optional(),
     cosmos_chain_id: z.string().optional(),
     address: z.string().optional(), // address for the contract of the chain
-    decimals: z
-      .number()
-      .int()
-      .min(MIN_SCHEMA_INT)
-      .max(MAX_SCHEMA_INT)
-      .optional(),
+    decimals: PG_INT.optional(),
     substrate_spec: z.string().optional(),
     bech32_prefix: z.string().optional(), // required for cosmos communities
     token_name: z.string().optional(),

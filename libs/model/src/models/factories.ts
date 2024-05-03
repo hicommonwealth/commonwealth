@@ -10,7 +10,6 @@ import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityContractTemplate from './community_contract_template';
 import CommunityContractTemplateMetadata from './community_contract_template_metadata';
-import CommunitySnapshotSpaces from './community_snapshot_spaces';
 import CommunityStake from './community_stake';
 import Contest from './contest';
 import ContestAction from './contest_action';
@@ -27,12 +26,10 @@ import Membership from './membership';
 import Notification from './notification';
 import NotificationCategory from './notification_category';
 import NotificationsRead from './notifications_read';
-// import Outbox from './outbox';
+import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
 import Reaction from './reaction';
-import SnapshotProposal from './snapshot_proposal';
-import SnapshotSpace from './snapshot_spaces';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
@@ -59,7 +56,6 @@ export const Factories = {
   CommunityContract,
   CommunityContractTemplate,
   CommunityContractTemplateMetadata,
-  CommunitySnapshotSpaces,
   CommunityStake,
   Contest,
   ContestAction,
@@ -76,12 +72,10 @@ export const Factories = {
   Notification,
   NotificationCategory,
   NotificationsRead,
-  // Outbox,
+  Outbox,
   Poll,
   Profile,
   Reaction,
-  SnapshotProposal,
-  SnapshotSpace,
   SsoToken,
   StakeTransaction,
   StarredCommunity,
