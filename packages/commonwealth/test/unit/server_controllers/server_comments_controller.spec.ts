@@ -550,7 +550,7 @@ describe('ServerCommentsController', () => {
         },
         Comment: {
           findOne: async () => data,
-          update: async () => null,
+          update: () => null,
         },
       };
       const banCache = {
@@ -627,7 +627,7 @@ describe('ServerCommentsController', () => {
       const db = {
         Comment: {
           findOne: async () => data,
-          update: async () => null,
+          update: () => null,
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
