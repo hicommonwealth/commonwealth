@@ -167,7 +167,6 @@ export const AuthorAndPublishInfo = ({
                   publishDate?.toISOString(),
                 )}`}
                 onChange={({ value }) => {
-                  console.log('setting content to ', value);
                   changeContentText(value);
                 }}
               />
