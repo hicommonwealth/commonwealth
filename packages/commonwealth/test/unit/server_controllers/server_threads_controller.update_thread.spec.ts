@@ -105,7 +105,7 @@ describe('ServerThreadsController', () => {
             update: async () => null,
             toJSON: () => ({}),
           }),
-          update: async () => null,
+          update: () => null,
         },
         Topic: {
           findOne: async () => ({
