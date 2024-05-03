@@ -1,4 +1,5 @@
-import { schemas } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/core';
+import { entities } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent } from '../utils';
@@ -23,7 +24,7 @@ export type Link = {
   title?: string;
 };
 
-export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
+export type ThreadAttributes = z.infer<typeof entities.Thread> & {
   // associations
   Community?: CommunityAttributes;
   Address?: AddressAttributes;
@@ -157,7 +158,7 @@ export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
             Outbox,
             [
               {
-                event_name: schemas.EventNames.ThreadCreated,
+                event_name: EventNames.ThreadCreated,
                 event_payload: thread.get({ plain: true }),
               },
             ],

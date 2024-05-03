@@ -1,10 +1,11 @@
-import { schemas, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import { models } from '../database';
 
 export const GetCommunityAlerts: Query<
-  typeof schemas.queries.GetCommunityAlerts
+  typeof queries.GetCommunityAlerts
 > = () => ({
-  ...schemas.queries.GetCommunityAlerts,
+  ...queries.GetCommunityAlerts,
   auth: [],
   secure: true,
   body: async ({ actor }) => {

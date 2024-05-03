@@ -1,4 +1,4 @@
-import { schemas } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
@@ -83,5 +83,5 @@ export async function __searchCommunities(
 
   const totalResults = parseInt(count, 10);
 
-  return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
+  return queries.buildPaginatedResponse(results, totalResults, bind);
 }

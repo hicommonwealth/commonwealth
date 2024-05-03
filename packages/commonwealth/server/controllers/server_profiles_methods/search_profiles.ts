@@ -1,8 +1,8 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
-import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { queries } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
@@ -185,7 +185,7 @@ export async function __searchProfiles(
     }
   }
 
-  return schemas.queries.buildPaginatedResponse(
+  return queries.buildPaginatedResponse(
     profilesWithAddresses,
     totalResults,
     bind,

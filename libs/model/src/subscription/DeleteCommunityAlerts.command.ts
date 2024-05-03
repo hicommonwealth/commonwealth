@@ -1,10 +1,11 @@
-import { schemas, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
+import { commands } from '@hicommonwealth/shared';
 import { models } from '../database';
 
 export const DeleteCommunityAlerts: Command<
-  typeof schemas.commands.DeleteCommunityAlert
+  typeof commands.DeleteCommunityAlert
 > = () => ({
-  ...schemas.commands.DeleteCommunityAlert,
+  ...commands.DeleteCommunityAlert,
   auth: [],
   secure: true,
   body: async ({ payload, actor }) => {

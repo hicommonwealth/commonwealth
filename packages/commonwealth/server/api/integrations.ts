@@ -1,11 +1,11 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { analytics, schemas, type Policy } from '@hicommonwealth/core';
+import { analytics, events, type Policy } from '@hicommonwealth/core';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 const inputs = {
-  GroupCreated: schemas.events.GroupCreated,
-  ThreadCreated: schemas.events.ThreadCreated,
-  CommentCreated: schemas.events.CommentCreated,
+  GroupCreated: events.GroupCreated,
+  ThreadCreated: events.ThreadCreated,
+  CommentCreated: events.CommentCreated,
 };
 
 const Analytics: Policy<typeof inputs> = () => ({

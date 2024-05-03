@@ -1,5 +1,5 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { AppError, schemas } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -14,6 +14,7 @@ import {
   ChainType,
   DefaultPage,
   NotificationCategories,
+  commands,
 } from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
@@ -68,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof schemas.commands.CreateCommunity.input>;
+  community: z.infer<typeof commands.CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {

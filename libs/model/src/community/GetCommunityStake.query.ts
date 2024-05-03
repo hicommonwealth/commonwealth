@@ -1,10 +1,11 @@
-import { schemas, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import { models } from '../database';
 
 export const GetCommunityStake: Query<
-  typeof schemas.queries.GetCommunityStake
+  typeof queries.GetCommunityStake
 > = () => ({
-  ...schemas.queries.GetCommunityStake,
+  ...queries.GetCommunityStake,
   auth: [],
   body: async ({ payload }) => {
     return (

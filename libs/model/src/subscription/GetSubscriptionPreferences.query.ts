@@ -1,11 +1,12 @@
-import { schemas, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { shouldExist } from '../middleware/guards';
 
 export const GetSubscriptionPreferences: Query<
-  typeof schemas.queries.GetSubscriptionPreferences
+  typeof queries.GetSubscriptionPreferences
 > = () => ({
-  ...schemas.queries.GetSubscriptionPreferences,
+  ...queries.GetSubscriptionPreferences,
   auth: [],
   secure: true,
   body: async ({ actor }) => {

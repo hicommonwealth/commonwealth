@@ -1,8 +1,9 @@
-import { InvalidState, schemas, type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import {
   BalanceSourceType,
   ContractSource,
   ThresholdData,
+  commands,
 } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { GroupAttributes } from '../models';
@@ -16,9 +17,9 @@ const Errors = {
 };
 
 export const GenerateStakeholderGroups: Command<
-  typeof schemas.commands.GenerateStakeholderGroups
+  typeof commands.GenerateStakeholderGroups
 > = () => ({
-  ...schemas.commands.GenerateStakeholderGroups,
+  ...commands.GenerateStakeholderGroups,
   auth: [],
   body: async ({ id }) => {
     const community = await models.Community.findByPk(id, {

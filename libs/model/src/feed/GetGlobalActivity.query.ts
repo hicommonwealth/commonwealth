@@ -1,11 +1,10 @@
-import { Query, schemas } from '@hicommonwealth/core';
+import { Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { GlobalActivityCache } from '../globalActivityCache';
 
-export const GetGlobalActivity: Query<
-  typeof schemas.queries.ThreadFeed
-> = () => ({
-  ...schemas.queries.ThreadFeed,
+export const GetGlobalActivity: Query<typeof queries.ThreadFeed> = () => ({
+  ...queries.ThreadFeed,
   auth: [],
   body: async () => {
     return await GlobalActivityCache.getInstance(models).getGlobalActivity();

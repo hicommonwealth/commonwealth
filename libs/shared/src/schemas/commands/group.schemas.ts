@@ -1,4 +1,3 @@
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Community, Group, Requirement } from '../entities.schemas';
 import { PG_INT } from '../utils.schemas';
@@ -8,18 +7,8 @@ export const CreateGroup = {
     metadata: z.object({
       name: z.string(),
       description: z.string(),
-      required_requirements: z
-        .number()
-        .int()
-        .min(MIN_SCHEMA_INT)
-        .max(MAX_SCHEMA_INT)
-        .optional(),
-      membership_ttl: z
-        .number()
-        .int()
-        .min(MIN_SCHEMA_INT)
-        .max(MAX_SCHEMA_INT)
-        .optional(),
+      required_requirements: PG_INT.optional(),
+      membership_ttl: PG_INT.optional(),
     }),
     requirements: z.array(Requirement),
     topics: z.array(PG_INT).optional(),

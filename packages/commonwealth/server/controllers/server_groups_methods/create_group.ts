@@ -1,11 +1,11 @@
-import { AppError, schemas } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   GroupAttributes,
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import { Requirement } from '@hicommonwealth/shared';
+import { Requirement, entities } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -30,7 +30,7 @@ const Errors = {
 export type CreateGroupOptions = {
   user: UserInstance;
   community: CommunityAttributes;
-  metadata: z.infer<typeof schemas.entities.GroupMetadata>;
+  metadata: z.infer<typeof entities.GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
   systemManaged?: boolean;

@@ -1,10 +1,11 @@
-import { schemas, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
+import { commands } from '@hicommonwealth/shared';
 import { models } from '../database';
 
 export const CreateCommunityAlert: Command<
-  typeof schemas.commands.CreateCommunityAlert
+  typeof commands.CreateCommunityAlert
 > = () => ({
-  ...schemas.commands.CreateCommunityAlert,
+  ...commands.CreateCommunityAlert,
   auth: [],
   secure: true,
   body: async ({ payload, actor }) => {

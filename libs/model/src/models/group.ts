@@ -1,11 +1,11 @@
-import { schemas } from '@hicommonwealth/core';
+import { entities } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import z from 'zod';
 import type { CommunityAttributes } from './community';
 import type { MembershipAttributes } from './membership';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type GroupAttributes = z.infer<typeof schemas.entities.Group> & {
+export type GroupAttributes = z.infer<typeof entities.Group> & {
   // associations
   community?: CommunityAttributes;
   memberships?: MembershipAttributes[];

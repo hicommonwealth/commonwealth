@@ -1,9 +1,12 @@
+import {
+  ETHERS_BIG_NUMBER,
+  EVM_ADDRESS,
+  entities,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Comment, Thread } from './entities.schemas';
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from './utils.schemas';
 
-export const ThreadCreated = Thread;
-export const CommentCreated = Comment;
+export const ThreadCreated = entities.Thread;
+export const CommentCreated = entities.Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),

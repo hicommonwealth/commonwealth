@@ -1,4 +1,5 @@
-import { ServerError, schemas, type Query } from '@hicommonwealth/core';
+import { ServerError, type Query } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
@@ -18,10 +19,8 @@ const getLastEdited = (post: CommentAttributes) => {
   return lastEdited;
 };
 
-export const GetBulkThreads: Query<
-  typeof schemas.queries.GetBulkThreads
-> = () => ({
-  ...schemas.queries.GetBulkThreads,
+export const GetBulkThreads: Query<typeof queries.GetBulkThreads> = () => ({
+  ...queries.GetBulkThreads,
   auth: [],
   body: async ({ payload }) => {
     const {
@@ -57,7 +56,7 @@ export const GetBulkThreads: Query<
 
     // sql query parts that order results by provided query param
     const orderByQueries: Record<
-      z.infer<typeof schemas.queries.OrderByQueriesKeys>,
+      z.infer<typeof queries.OrderByQueriesKeys>,
       string
     > = {
       'createdAt:asc': 'threads.thread_created ASC',

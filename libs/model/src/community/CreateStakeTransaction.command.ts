@@ -1,6 +1,5 @@
 import type { Command } from '@hicommonwealth/core';
-import { schemas } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commands, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -11,9 +10,9 @@ import { mustExist } from '../middleware/guards';
  * @constructor
  */
 export const CreateStakeTransaction: Command<
-  typeof schemas.commands.CreateStakeTransaction
+  typeof commands.CreateStakeTransaction
 > = () => ({
-  ...schemas.commands.CreateStakeTransaction,
+  ...commands.CreateStakeTransaction,
   auth: [],
   body: async ({ payload }) => {
     const { transaction_hash } = payload;

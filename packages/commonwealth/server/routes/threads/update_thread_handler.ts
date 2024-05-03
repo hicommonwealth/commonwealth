@@ -1,5 +1,4 @@
-import { ThreadAttributes } from '@hicommonwealth/model';
-import { IDiscordMeta } from '@hicommonwealth/shared';
+import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 

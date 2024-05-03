@@ -1,10 +1,10 @@
-import { zBoolean } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import {
   discordMetaSchema,
   linksSchema,
   paginationSchema,
   PG_INT,
+  zBoolean,
 } from '../utils.schemas';
 
 export const OrderByQueriesKeys = z.enum([

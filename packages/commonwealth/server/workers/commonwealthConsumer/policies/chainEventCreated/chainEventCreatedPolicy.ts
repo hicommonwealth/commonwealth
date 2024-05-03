@@ -1,4 +1,4 @@
-import { EventHandler, Policy, schemas } from '@hicommonwealth/core';
+import { EventHandler, Policy, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
 import { ZodUndefined } from 'zod';
@@ -48,7 +48,7 @@ export const processChainEventCreated: EventHandler<
 };
 
 const chainEventInputs = {
-  ChainEventCreated: schemas.events.ChainEventCreated,
+  ChainEventCreated: events.ChainEventCreated,
 };
 
 export const ChainEventPolicy: Policy<

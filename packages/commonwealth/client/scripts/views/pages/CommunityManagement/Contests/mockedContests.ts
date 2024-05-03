@@ -1,9 +1,9 @@
-import { schemas } from '@hicommonwealth/core';
+import { queries } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const now = new Date();
 
-const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
+const mockedContests: Array<z.infer<typeof queries.ContestResults>> = [
   {
     contest_address: '0x502607Eb8152E30Ac46902C898DBCaDC1508a9a5',
     community_id: 'basemas',

@@ -1,3 +1,5 @@
+import z from 'zod';
+import { Denominations, WeiDecimals } from '../commonProtocol/utils';
 import {
   BalanceSourceType,
   BalanceType,
@@ -6,13 +8,9 @@ import {
   ChainType,
   CosmosGovernanceVersion,
   DefaultPage,
-  MAX_SCHEMA_INT,
-  MIN_SCHEMA_INT,
   NodeHealth,
   NotificationCategories,
-  commonProtocol,
-} from '@hicommonwealth/shared';
-import z from 'zod';
+} from '../types';
 import { Contest } from './projections';
 import { PG_INT, discordMetaSchema, linksSchema } from './utils.schemas';
 
@@ -240,11 +238,7 @@ export const Comment = z.object({
     .optional(),
 
   reaction_count: PG_INT,
-  reaction_weights_sum: z
-    .number()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional(),
+  reaction_weights_sum: PG_INT.optional(),
 
   Address: Address.optional(),
 });
@@ -265,12 +259,7 @@ export const CommunityStake = z.object({
   community_id: z.string(),
   stake_id: PG_INT.default(1),
   stake_token: z.string().default(''),
-  vote_weight: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .default(1),
+  vote_weight: PG_INT.default(1),
   stake_enabled: z.boolean().default(false),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -318,10 +307,8 @@ export const ContestManager = z
       .min(0)
       .max(100)
       .describe('Recurring contest interval, 0 when one-off'),
-    ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
-    decimals: PG_INT.optional().default(
-      commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
-    ),
+    ticker: z.string().optional().default(Denominations.ETH),
+    decimals: PG_INT.optional().default(WeiDecimals[Denominations.ETH]),
     created_at: z.date(),
     cancelled: z
       .boolean()
@@ -352,12 +339,7 @@ export const Community = z.object({
   id: z.string().optional(),
   description: z.string().optional(),
   social_links: z.array(z.string()).optional(),
-  ss58_prefix: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional(),
+  ss58_prefix: PG_INT.optional(),
   stages_enabled: z.boolean().optional(),
   custom_stages: z.array(z.string()).optional(),
   custom_domain: z.string().optional(),
@@ -374,22 +356,11 @@ export const Community = z.object({
   hide_projects: z.boolean().optional(),
   token_name: z.string().optional(),
   ce_verbose: z.boolean().optional(),
-  discord_config_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional()
-    .nullish(),
+  discord_config_id: PG_INT.optional().nullish(),
   category: z.unknown().optional(), // Assuming category can be any type
   discord_bot_webhooks_enabled: z.boolean().optional(),
   directory_page_enabled: z.boolean().optional(),
-  directory_page_chain_node_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional(),
+  directory_page_chain_node_id: PG_INT.optional(),
   namespace: z.string().optional(),
   namespace_address: z.string().optional(),
   redirect: z.string().optional(),
@@ -415,13 +386,7 @@ export const Contract = z.object({
   id: PG_INT,
   address: z.string().max(255),
   chain_node_id: PG_INT,
-  abi_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional()
-    .nullable(),
+  abi_id: PG_INT.optional().nullable(),
   decimals: PG_INT.optional(),
   token_name: z.string().max(255).optional(),
   symbol: z.string().max(255).optional(),
@@ -466,32 +431,15 @@ export const Subscription = z.object({
   updated_at: z.date(),
   immediate_email: z.boolean().default(false),
   community_id: z.string().max(255).optional().nullable(),
-  thread_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional()
-    .nullable(),
-  comment_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional()
-    .nullable(),
+  thread_id: PG_INT.optional().nullable(),
+  comment_id: PG_INT.optional().nullable(),
   snapshot_id: z.string().max(255).optional().nullable(),
 });
 
 export const ChainNode = z.object({
   id: PG_INT.optional(),
   url: z.string().max(255),
-  eth_chain_id: z
-    .number()
-    .int()
-    .min(MIN_SCHEMA_INT)
-    .max(MAX_SCHEMA_INT)
-    .optional(),
+  eth_chain_id: PG_INT.optional(),
   alt_wallet_url: z.string().max(255).optional(),
   private_url: z.string().max(255).optional(),
   balance_type: z.nativeEnum(BalanceType),

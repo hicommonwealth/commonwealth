@@ -1,11 +1,11 @@
-import { EventContext, schemas } from '@hicommonwealth/core';
+import { EventContext, Events, Outbox } from '@hicommonwealth/core';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { ModelInstance, ModelStatic } from './types';
 
-export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
+export type OutboxAttributes = z.infer<typeof Outbox>;
 
-export type InsertOutboxEvent = EventContext<schemas.Events> & {
+export type InsertOutboxEvent = EventContext<Events> & {
   created_at?: Date;
 };
 

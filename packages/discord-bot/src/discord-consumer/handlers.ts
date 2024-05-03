@@ -1,9 +1,9 @@
-import { TopicAttributes } from '@hicommonwealth/model';
 import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
-} from '@hicommonwealth/shared';
+  TopicAttributes,
+} from '@hicommonwealth/model';
 import axios from 'axios';
 import { SERVER_URL } from '../utils/config';
 import { sequelize } from '../utils/database';

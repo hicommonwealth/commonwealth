@@ -12,7 +12,7 @@ import {
   EventHandler,
   Policy,
   broker,
-  schemas,
+  events,
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
@@ -20,7 +20,7 @@ import {
   CommentDiscordActions,
   IDiscordMessage,
   ThreadDiscordActions,
-} from '@hicommonwealth/shared';
+} from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
@@ -128,7 +128,7 @@ async function main() {
   }
 
   const inputs = {
-    DiscordMessageCreated: schemas.events.DiscordMessageCreated,
+    DiscordMessageCreated: events.DiscordMessageCreated,
   };
 
   const Discord: Policy<typeof inputs> = () => ({

@@ -1,5 +1,4 @@
-import { CommentAttributes } from '@hicommonwealth/model';
-import { IDiscordMeta } from '@hicommonwealth/shared';
+import { CommentAttributes, IDiscordMeta } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
