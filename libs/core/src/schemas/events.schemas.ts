@@ -8,6 +8,12 @@ export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
 });
+export const UserMentioned = z.object({
+  authorId: z.number(),
+  userMentionedId: z.number(),
+  threadId: z.string().optional(),
+  commentId: z.string().optional(),
+});
 export const CommunityCreated = z.object({
   communityId: z.string(),
   userId: z.string(),
