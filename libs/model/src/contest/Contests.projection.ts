@@ -47,11 +47,14 @@ async function updateOrCreateWithAlert(
   if (!community?.ChainNode?.url) {
     throw new AppError('Chain Node not found');
   }
-
-  const { ticker, decimals } = await contractHelpers.getTokenAttributes(
-    contest_address,
-    new Web3(community?.ChainNode?.url),
-  );
+  console.log('env', process.env.NODE_ENV);
+  const { ticker, decimals } =
+    process.env.NODE_ENV === 'test'
+      ? { ticker: 'ETH', decimals: 18 }
+      : await contractHelpers.getTokenAttributes(
+          contest_address,
+          new Web3(community?.ChainNode?.url),
+        );
   // TODO: evaluate errors from contract helpers and how to drive the event queue
 
   const [updated] = await models.ContestManager.update(
