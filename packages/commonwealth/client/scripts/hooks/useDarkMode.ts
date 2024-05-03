@@ -20,21 +20,25 @@ export function useDarkMode(): boolean {
   const [value, setValue] = useState(getCurrentState());
 
   const listener = useCallback(() => {
+    console.log('FIXME: listener');
     const val = getCurrentState();
     setValue(val);
   }, [getCurrentState]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
+      console.warn('No window');
       return;
     }
 
+    console.log('FIXME: registering');
     window.addEventListener('storage', listener);
 
     return () => {
+      console.log('FIXME unregistering');
       window.removeEventListener('storage', listener);
     };
-  });
+  }, [listener]);
 
   return value;
 }

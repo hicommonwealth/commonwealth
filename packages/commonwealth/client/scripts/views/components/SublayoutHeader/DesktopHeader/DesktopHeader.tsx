@@ -14,7 +14,6 @@ import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearch
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
@@ -106,7 +105,7 @@ const DesktopHeader = ({
 
           <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
 
-          {isLoggedIn && <NotificationsMenuPopover />}
+          {/*{isLoggedIn && <Knock />}*/}
         </div>
 
         {isLoggedIn && (
