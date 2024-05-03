@@ -1,16 +1,18 @@
 import {
+  BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
   DefaultPage,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+  NodeHealth,
   NotificationCategories,
   commonProtocol,
 } from '@hicommonwealth/shared';
 import z from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
-import { BalanceSourceType, NodeHealth } from '../types';
 import { Contest } from './projections';
 import { PG_INT, discordMetaSchema, linksSchema } from './utils.schemas';
 

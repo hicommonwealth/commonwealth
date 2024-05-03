@@ -1,10 +1,11 @@
-import { AppError, Requirement, schemas } from '@hicommonwealth/core';
+import { AppError, schemas } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   GroupAttributes,
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import { Requirement } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
