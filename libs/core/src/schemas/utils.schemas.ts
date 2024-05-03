@@ -1,5 +1,5 @@
+import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 
 export enum LinkSource {
   Snapshot = 'snapshot',

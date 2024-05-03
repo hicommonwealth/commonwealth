@@ -1,5 +1,5 @@
+import { zBoolean } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { zBoolean } from '../../utils';
 import {
   discordMetaSchema,
   linksSchema,

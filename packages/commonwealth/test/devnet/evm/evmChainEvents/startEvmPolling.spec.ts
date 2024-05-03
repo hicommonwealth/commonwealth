@@ -1,5 +1,6 @@
-import { delay, dispose, schemas } from '@hicommonwealth/core';
+import { dispose, schemas } from '@hicommonwealth/core';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
+import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { z } from 'zod';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';

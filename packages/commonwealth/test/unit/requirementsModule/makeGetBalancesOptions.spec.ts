@@ -1,9 +1,9 @@
-import { BalanceSourceType } from '@hicommonwealth/core';
 import {
   AddressAttributes,
   GetBalancesOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
 

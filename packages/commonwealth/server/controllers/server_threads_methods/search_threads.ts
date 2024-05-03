@@ -1,5 +1,6 @@
-import { ALL_COMMUNITIES, schemas } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
+import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 import {

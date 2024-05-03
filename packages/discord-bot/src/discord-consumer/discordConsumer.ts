@@ -9,16 +9,18 @@ import {
 import {
   Broker,
   BrokerSubscriptions,
-  CommentDiscordActions,
   EventHandler,
-  IDiscordMessage,
   Policy,
-  ThreadDiscordActions,
   broker,
   schemas,
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import {
+  CommentDiscordActions,
+  IDiscordMessage,
+  ThreadDiscordActions,
+} from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
