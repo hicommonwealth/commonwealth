@@ -55,18 +55,19 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
       }
     }, [formMethods, onWatch]);
 
-    const handleFormSubmit = async (event) => {
-      try {
-        // This will chain our custom onSubmit along with the react-hook-form's submit chain
-        await formMethods.handleSubmit(onSubmit)(event);
-
-        // trigger error callback if there are any errors
-        if (Object.keys(formMethods.formState.errors).length) {
-          onErrors(formMethods.formState.errors);
-        }
-      } catch (error) {
-        console.error(`Error, submitting CWForm: ${error}`);
-      }
+    const handleFormSubmit = (event) => {
+      // This will chain our custom onSubmit along with the react-hook-form's submit chain
+      formMethods
+        .handleSubmit(onSubmit)(event)
+        .then(() => {
+          // trigger error callback if there are any errors
+          if (Object.keys(formMethods.formState.errors).length) {
+            onErrors(formMethods.formState.errors);
+          }
+        })
+        .catch((e) => {
+          console.error(`CWForm submit error => `, e);
+        });
     };
 
     return (
