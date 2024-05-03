@@ -1,6 +1,6 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { BalanceSourceType } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
