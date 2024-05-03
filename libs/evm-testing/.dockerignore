@@ -1,5 +1,5 @@
 node_modules
-sdk
+src/sdk
 npm-debug.log
 docker-compose.yml
 dockerfile

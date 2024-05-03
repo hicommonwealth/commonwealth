@@ -10,7 +10,7 @@ import {
   govCompGetVotes,
   govCompProposalId,
   govCompVote,
-} from '../src/types';
+} from '../types';
 import { ERC1155 } from './erc1155';
 import { ERC721 } from './nft';
 

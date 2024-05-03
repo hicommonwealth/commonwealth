@@ -3,12 +3,12 @@ export interface IGovernor {
 
   createArbitraryProposal: (
     accountIndex: number,
-    advanceDays?: number | string
+    advanceDays?: number | string,
   ) => Promise<any>;
 
   queueProposal: (
     proposalId: string | number,
-    advanceTime?: boolean
+    advanceTime?: boolean,
   ) => Promise<any>;
 
   cancelProposal(proposalId: string | number): Promise<any>;
@@ -16,14 +16,14 @@ export interface IGovernor {
   castVote(
     proposalId: string | number,
     accountIndex: number,
-    forAgainst: boolean
+    forAgainst: boolean,
   ): Promise<any>;
 
   getProposalDetails(proposalId: number | string): Promise<any>;
 
   executeProposal(
     proposalId: string | number,
-    advanceTime?: boolean
+    advanceTime?: boolean,
   ): Promise<any>;
 
   getVotes(accountIndex: number, numberOfVotes: string): Promise<any>;

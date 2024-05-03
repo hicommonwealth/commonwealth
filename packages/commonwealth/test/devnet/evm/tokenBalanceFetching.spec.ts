@@ -1,5 +1,6 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
+import { ChainTesting, ERC1155, ERC721 } from '@hicommonwealth/evm-testing';
 import {
   tester,
   tokenBalanceCache,
@@ -11,9 +12,6 @@ import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
-import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
-import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
-import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
 
 function generateEVMAddresses(count: number): string[] {
   const web3 = new Web3();
