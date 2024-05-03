@@ -60,7 +60,7 @@ describe('Contests projection lifecycle', () => {
 
   before(async () => {
     await bootstrap_testing();
-    const [chain] = await seed('ChainNode', { contracts: [] });
+    const [chain] = await seed('ChainNode', { contracts: [], url: 'test' });
     const [user] = await seed(
       'User',
       {
