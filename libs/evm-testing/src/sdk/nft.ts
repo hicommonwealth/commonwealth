@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { erc721Approve } from '../types';
+import Web3, { AbiFragment, Contract } from 'web3';
 import { erc_721 } from '../utils/contracts';
 import getProvider from '../utils/getProvider';
 
@@ -7,7 +6,9 @@ export class ERC721 {
   public address: string;
   public host: string;
   public header: any;
-  public activeTokenIds: string[] = [];
+  public contract: Contract<AbiFragment[]>;
+  private readonly provider: Web3;
+  private accounts: string[] | undefined;
 
   /**
    *
@@ -19,6 +20,16 @@ export class ERC721 {
     this.host = host;
     this.header = header;
     this.address = address;
+
+    this.provider = getProvider();
+    this.contract = erc_721(this.address, this.provider);
+  }
+
+  private async getAccounts() {
+    if (!this.accounts) {
+      this.accounts = await this.provider.eth.getAccounts();
+    }
+    return this.accounts;
   }
 
   /**
@@ -28,12 +39,21 @@ export class ERC721 {
    * @returns
    */
   public async mint(tokenId: string, to: number) {
-    const provider = getProvider();
-    const contract = erc_721(this.address, provider);
-    const accounts = await provider.eth.getAccounts();
+    const accounts = await this.getAccounts();
+    const txReceipt = await this.contract.methods
+      .safeMint(accounts[to], tokenId)
+      .send({
+        from: accounts[0],
+        gas: '500000',
+      });
+    return { block: Number(txReceipt.blockNumber) };
+  }
 
-    const tx = contract.methods.safeMint(accounts[to], tokenId);
-    const txReceipt = await tx.send({ from: accounts[0], gas: '500000' });
+  public async burn(tokenId: string) {
+    const accounts = await this.getAccounts();
+    const txReceipt = await this.contract.methods
+      .burn(tokenId)
+      .send({ from: accounts[0], gas: '500000' });
     return { block: Number(txReceipt.blockNumber) };
   }
 
@@ -50,19 +70,12 @@ export class ERC721 {
     from?: string,
     accountIndex?: number,
   ): Promise<{ block: number }> {
-    const request: erc721Approve = {
-      nftAddress: this.address,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/transfer`,
-      JSON.stringify(request),
-      this.header,
-    );
-    return response.data;
+    const accounts = await this.getAccounts();
+    const account = accountIndex ? accounts[accountIndex] : from;
+    const txReceipt = await this.contract.methods
+      .safeTransferFrom(account, accounts[to], tokenId)
+      .send({ from: accounts[0], gas: '500000' });
+    return { block: Number(txReceipt.blockNumber) };
   }
 
   /**
@@ -77,49 +90,21 @@ export class ERC721 {
     to: number,
     from?: string,
     accountIndex?: number,
+    all?: boolean,
   ): Promise<{ block: number }> {
-    const request: erc721Approve = {
-      nftAddress: this.address,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-      all: false,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/approve`,
-      JSON.stringify(request),
-      this.header,
-    );
-    return response.data;
-  }
+    const accounts = await this.getAccounts();
+    const account = accountIndex ? accounts[accountIndex] : from;
 
-  /**
-   * Approve all holdings for use
-   * @param tokenId NFT token ID
-   * @param to the operator to approve to acct idx
-   * @param from from acct(owner): optional if using acct Index
-   * @param accountIndex from acct index(owner): optional if using from
-   */
-  public async approveAllERC721(
-    tokenId: string,
-    to: number,
-    from?: string,
-    accountIndex?: number,
-  ) {
-    const request: erc721Approve = {
-      nftAddress: this.address,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-      all: true,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/approve`,
-      JSON.stringify(request),
-      this.header,
-    );
-    return response.data;
+    if (all) {
+      const txReceipt = await this.contract.methods
+        .setApprovalForAll(accounts[to], true)
+        .send({ from: account, gas: '500000' });
+      return { block: Number(txReceipt.blockNumber) };
+    }
+
+    const txReceipt = await this.contract.methods
+      .approve(accounts[to], tokenId)
+      .send({ from: account, gas: '500000' });
+    return { block: Number(txReceipt.blockNumber) };
   }
 }
