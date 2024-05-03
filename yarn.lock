@@ -1384,7 +1384,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.13.10", "@babel/runtime@^7.23.9":
+"@babel/runtime@^7.13.10", "@babel/runtime@^7.21.0", "@babel/runtime@^7.23.9":
   version "7.24.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.24.5.tgz#230946857c053a36ccc66e1dd03b17dd0c4ed02c"
   integrity sha512-Nms86NXrsaeU9vbBJKni6gXiEXZ4CVpYVzEjDH9Sb8vmZ3UljyA1GSOJl/6LGPO8EHLuSF9H+IxNXHPX8QHJ4g==
@@ -3412,6 +3412,19 @@
     phoenix "1.6.16"
     zustand "^3.7.2"
 
+"@knocklabs/client@^0.8.14":
+  version "0.8.21"
+  resolved "https://registry.yarnpkg.com/@knocklabs/client/-/client-0.8.21.tgz#4356e091408676d0ebf65d5931189493ca9abd4b"
+  integrity sha512-uPaUAwbg9Bi0UIPIYOE4v4GiasKezZNQ/ge9KST2wlSHAfpKWrHf7s85H4mD7IGkVc0xkokF4RZ4lqr7cy48wg==
+  dependencies:
+    "@babel/runtime" "^7.23.9"
+    axios "^1.6.0"
+    axios-retry "^3.1.9"
+    eventemitter2 "^6.4.5"
+    jwt-decode "^4.0.0"
+    phoenix "1.6.16"
+    zustand "^3.7.2"
+
 "@knocklabs/react-core@^0.2.13":
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/@knocklabs/react-core/-/react-core-0.2.13.tgz#5603510f21e3293bb7e2fb2a2eb616bbcdbfd697"
@@ -3421,6 +3434,19 @@
     date-fns "^3.3.1"
     swr "^2.2.5"
     zustand "^3.7.2"
+
+"@knocklabs/react-notification-feed@^0.8.15":
+  version "0.8.15"
+  resolved "https://registry.yarnpkg.com/@knocklabs/react-notification-feed/-/react-notification-feed-0.8.15.tgz#8e4a3fbce482e95c4dc24ed23665d11d7daca783"
+  integrity sha512-elOReO52Sf2xR61PdkvjkVg4dPpZmIkXs8PcrqjO2bKRE5LpfNGx8BNdu3ovS6AhTVT8dvxFitJ3E3QDFx9zLQ==
+  dependencies:
+    "@knocklabs/client" "^0.8.14"
+    "@popperjs/core" "^2.9.2"
+    date-fns "^2.24.0"
+    lodash.debounce "^4.0.8"
+    react-popper "^2.2.5"
+    react-popper-tooltip "^4.3.0"
+    zustand "^3.5.10"
 
 "@knocklabs/react@^0.2.15":
   version "0.2.15"
@@ -4916,7 +4942,7 @@
   resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.0.6.tgz"
   integrity sha512-zj7Gw8QC4jmR92eKUvtrZUEpl2ypRbq+qlE4pwf9n2hnUO9BOAcWUs4/Ht+gNIbFt98xtqhLvccdCfD469MzpQ==
 
-"@popperjs/core@^2.11.5", "@popperjs/core@^2.11.8":
+"@popperjs/core@^2.11.5", "@popperjs/core@^2.11.8", "@popperjs/core@^2.9.2":
   version "2.11.8"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
@@ -10482,6 +10508,13 @@ datastore-core@^9.0.0, datastore-core@^9.0.1:
     it-sort "^3.0.1"
     it-take "^3.0.1"
     uint8arrays "^4.0.2"
+
+date-fns@^2.24.0:
+  version "2.30.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.30.0.tgz#f367e644839ff57894ec6ac480de40cae4b0f4d0"
+  integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
 
 date-fns@^2.29.1:
   version "2.29.3"
@@ -20479,7 +20512,7 @@ react-modern-drawer@^1.2.2:
   resolved "https://registry.yarnpkg.com/react-modern-drawer/-/react-modern-drawer-1.2.2.tgz#cee2d3355a1ac7ac0842d3fba33a28cd8f7f2464"
   integrity sha512-SXUNjofHzeoEas0kdMWWafuF2+vwdtbQD1cpkHxo7oyFj3v+2l2CMeJjc/GodYsnxVhSiYj75xosMJXXed9ykQ==
 
-react-popper-tooltip@^4.4.2:
+react-popper-tooltip@^4.3.0, react-popper-tooltip@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/react-popper-tooltip/-/react-popper-tooltip-4.4.2.tgz#0dc4894b8e00ba731f89bd2d30584f6032ec6163"
   integrity sha512-y48r0mpzysRTZAIh8m2kpZ8S1YPNqGtQPDrlXYSGvDS1c1GpG/NUXbsbIdfbhXfmSaRJuTcaT6N1q3CKuHRVbg==
@@ -20488,7 +20521,7 @@ react-popper-tooltip@^4.4.2:
     "@popperjs/core" "^2.11.5"
     react-popper "^2.3.0"
 
-react-popper@^2.3.0:
+react-popper@^2.2.5, react-popper@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-2.3.0.tgz#17891c620e1320dce318bad9fede46a5f71c70ba"
   integrity sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==
@@ -25587,7 +25620,7 @@ zod@^3.21.4, zod@^3.22.4:
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.4.tgz#f31c3a9386f61b1f228af56faa9255e845cf3fff"
   integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==
 
-zustand@^3.7.2:
+zustand@^3.5.10, zustand@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.7.2.tgz#7b44c4f4a5bfd7a8296a3957b13e1c346f42514d"
   integrity sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==
