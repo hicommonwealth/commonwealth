@@ -29,6 +29,7 @@ type StatusResp = {
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
   user?: {
+    id: number;
     email: string;
     emailVerified: boolean;
     emailInterval: EmailNotificationInterval;
@@ -272,6 +273,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   return {
     roles,
     user: {
+      id: user.id,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
