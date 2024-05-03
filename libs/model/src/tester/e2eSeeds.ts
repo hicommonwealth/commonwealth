@@ -338,16 +338,19 @@ export const e2eTestEntities = async function (
       'snapshot-proposal',
     ];
 
-    await Promise.all(
-      notificationCategories.map(async (name) => {
-        await testDb.NotificationCategory.findOrCreate({
-          where: {
-            name,
-            description: '',
-          },
-        });
-      }),
-    );
+    try {
+      await Promise.all(
+        notificationCategories.map(async (name) => {
+          await testDb.NotificationCategory.findOrCreate({
+            where: {
+              name,
+            },
+          });
+        }),
+      );
+    } catch (e) {
+      console.log(e);
+    }
 
     return {
       testThreads,
