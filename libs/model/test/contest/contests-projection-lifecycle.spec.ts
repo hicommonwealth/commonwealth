@@ -21,7 +21,7 @@ chai.use(chaiAsPromised);
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
   const namespace = 'test-namespace';
-  const recurring = 'test-recurring-contest';
+  const recurring = '0x0000000000000000000000000000000000000000';
   const oneoff = 'test-oneoff-contest';
   const contest_id = 1;
   const content_id = 1;

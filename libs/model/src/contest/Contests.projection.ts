@@ -41,7 +41,6 @@ async function updateOrCreateWithAlert(
 ) {
   const community = await models.Community.findOne({
     where: { namespace },
-    raw: true,
     include: models.ChainNode,
   });
 
