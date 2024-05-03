@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { erc721Approve, erc721MintBurn } from '../types';
+import { erc721Approve } from '../types';
+import { erc_721 } from '../utils/contracts';
+import getProvider from '../utils/getProvider';
 
 export class ERC721 {
   public address: string;
@@ -26,19 +28,13 @@ export class ERC721 {
    * @returns
    */
   public async mint(tokenId: string, to: number) {
-    const request: erc721MintBurn = {
-      nftAddress: this.address,
-      tokenId,
-      to,
-      mint: true,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/mintBurn`,
-      JSON.stringify(request),
-      this.header,
-    );
-    this.activeTokenIds.push(tokenId);
-    return response.data;
+    const provider = getProvider();
+    const contract = erc_721(this.address, provider);
+    const accounts = await provider.eth.getAccounts();
+
+    const tx = contract.methods.safeMint(accounts[to], tokenId);
+    const txReceipt = await tx.send({ from: accounts[0], gas: '500000' });
+    return { block: Number(txReceipt.blockNumber) };
   }
 
   /**

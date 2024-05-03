@@ -35,7 +35,7 @@ function checkZeroBalances(balances: Balances, skipAddress: string[]) {
   }
 }
 
-describe.skip('Token Balance Cache EVM Tests', function () {
+describe.only('Token Balance Cache EVM Tests', function () {
   this.timeout(160000);
 
   let models: DB;
@@ -88,8 +88,6 @@ describe.skip('Token Balance Cache EVM Tests', function () {
   before(async () => {
     anvil = createAnvil({
       forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
-      // noMining: true,
-      blockTime: 12,
       silent: false,
       port: 8545,
       autoImpersonate: true,

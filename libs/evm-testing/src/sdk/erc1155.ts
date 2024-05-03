@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { erc1155Mint } from '../types';
+import { erc_1155 } from '../utils/contracts';
+import getProvider from '../utils/getProvider';
 
 export class ERC1155 {
   public address: string;
@@ -20,18 +20,12 @@ export class ERC1155 {
   }
 
   public async mint(tokenId: string, amount: number, to: string) {
-    const request: erc1155Mint = {
-      contractAddress: this.address,
-      tokenId,
-      to,
-      amount,
-    };
-    const response = await axios.post(
-      `${this.host}/erc1155/mint`,
-      JSON.stringify(request),
-      this.header,
-    );
-    this.activeTokenIds.push(tokenId);
-    return response.data;
+    const provider = getProvider();
+    const contract = erc_1155(this.address, provider);
+    const accounts = await provider.eth.getAccounts();
+
+    const tx = contract.methods.mint(to, Number(tokenId), amount);
+    const txReceipt = await tx.send({ from: accounts[0], gas: '500000' });
+    return { block: Number(txReceipt.blockNumber) };
   }
 }
