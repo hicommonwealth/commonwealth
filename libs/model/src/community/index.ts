@@ -5,4 +5,5 @@ export * from './GetCommunityStake.query';
 export * from './GetMembers.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
+export * from './ImportDiscourseCommunity.command';
 export * from './SetCommunityStake.command';

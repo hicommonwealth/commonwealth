@@ -21,11 +21,15 @@ export const sequelize = new Sequelize(DATABASE_URI, {
       },
   dialectOptions:
     process.env.NODE_ENV !== 'production' || process.env.NO_SSL
-      ? { requestTimeout: 40000 }
+      ? { multipleStatements: true, requestTimeout: 40000 }
       : DATABASE_URI ===
         'postgresql://commonwealth:edgeware@localhost/commonwealth'
-      ? { requestTimeout: 40000, ssl: false }
-      : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+      ? { multipleStatements: true, requestTimeout: 40000, ssl: false }
+      : {
+          multipleStatements: true,
+          requestTimeout: 40000,
+          ssl: { rejectUnauthorized: false },
+        },
   pool: {
     max: 10,
     min: 0,
@@ -35,3 +39,22 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 });
 
 export const models = buildDb(sequelize);
+
+export const createDiscourseDBConnection = (databaseUri: string) => {
+  return new Sequelize(databaseUri, {
+    logging: (msg) => {
+      log.trace(msg);
+    },
+    dialectOptions: {
+      multipleStatements: true,
+      requestTimeout: 40_000,
+      ssl: {
+        rejectUnauthorized: false, // TODO: handle ssl in prod?
+      },
+    },
+    pool: {
+      max: 3,
+      min: 0,
+    },
+  });
+};
