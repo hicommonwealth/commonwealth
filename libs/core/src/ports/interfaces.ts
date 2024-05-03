@@ -5,7 +5,12 @@ import {
   EventsHandlerMetadata,
 } from '../framework';
 import { Events } from '../schemas';
-import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
+import {
+  AnalyticsOptions,
+  BrokerPublications,
+  BrokerSubscriptions,
+  CacheNamespaces,
+} from '../types';
 
 /**
  * Resource disposer function
@@ -105,7 +110,7 @@ export interface Analytics extends Disposable {
 
 export type RetryStrategyFn = (
   err: Error | undefined,
-  topic: BrokerTopics,
+  topic: BrokerSubscriptions,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
@@ -116,12 +121,12 @@ export type RetryStrategyFn = (
  */
 export interface Broker extends Disposable {
   publish<Name extends Events>(
-    topic: BrokerTopics,
+    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    topic: BrokerTopics,
+    topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
   ): Promise<boolean>;

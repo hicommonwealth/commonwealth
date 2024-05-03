@@ -144,7 +144,10 @@ export class UserController {
     this._setEmail(email);
   }
 
-  public async updateEmail(email: string): Promise<void> {
+  public async updateEmail(
+    email: string,
+    shouldNotifyFailure = true,
+  ): Promise<void> {
     this._setEmail(email);
 
     try {
@@ -154,7 +157,9 @@ export class UserController {
       });
     } catch (e) {
       console.log(e);
-      notifyError('Unable to update email');
+      if (shouldNotifyFailure) {
+        notifyError('Unable to update email');
+      }
     }
   }
 
