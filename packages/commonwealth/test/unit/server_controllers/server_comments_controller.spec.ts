@@ -674,7 +674,7 @@ describe('ServerCommentsController', () => {
       const db = {
         Comment: {
           findOne: async () => data,
-          update: async () => null,
+          update: () => null,
         },
         Thread: {
           findOne: async () => null,
@@ -723,7 +723,7 @@ describe('ServerCommentsController', () => {
               didDestroy = true;
             },
           }),
-          update: async () => ({}),
+          update: () => ({}),
         },
         Subscription: {
           destroy: async () => ({}),
