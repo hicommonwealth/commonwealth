@@ -26,6 +26,15 @@ export class UserController {
     this._activeAccount = account;
   }
 
+  private _id: number;
+  public get id(): number {
+    return this._id;
+  }
+
+  public setId(id: number): void {
+    this._id = id;
+  }
+
   private _email: string;
   public get email(): string {
     return this._email;
