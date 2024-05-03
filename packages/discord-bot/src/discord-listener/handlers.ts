@@ -1,6 +1,6 @@
 import {
   Broker,
-  BrokerTopics,
+  BrokerPublications,
   DiscordAction,
   EventContext,
 } from '@hicommonwealth/core';
@@ -62,7 +62,10 @@ export async function handleMessage(
   }
 
   // 3. Publish the message to RabbitMQ queue
-  const result = await controller.publish(BrokerTopics.DiscordListener, event);
+  const result = await controller.publish(
+    BrokerPublications.DiscordListener,
+    event,
+  );
 
   if (!result) {
     log.error(`Failed to publish event`, undefined, {
@@ -129,7 +132,7 @@ export async function handleThreadChannel(
 
   if (event) {
     const result = await controller.publish(
-      BrokerTopics.DiscordListener,
+      BrokerPublications.DiscordListener,
       event,
     );
 

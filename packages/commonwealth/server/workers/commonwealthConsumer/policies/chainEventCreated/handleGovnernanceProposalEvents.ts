@@ -8,10 +8,12 @@ import {
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 import emitNotifications from '../../../../util/emitNotifications';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 const web3 = new Web3();
 

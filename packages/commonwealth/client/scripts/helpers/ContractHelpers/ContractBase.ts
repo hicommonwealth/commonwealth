@@ -59,6 +59,13 @@ abstract class ContractBase {
       );
     }
   }
+
+  protected reInitContract() {
+    this.contract = new this.web3.eth.Contract(
+      this.abi as AbiItem[],
+      this.contractAddress,
+    );
+  }
 }
 
 export default ContractBase;

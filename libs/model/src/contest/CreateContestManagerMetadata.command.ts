@@ -38,11 +38,7 @@ export const CreateContestManagerMetadata: Command<
 
     const contestManager = await models.sequelize.transaction(
       async (transaction) => {
-        await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
-          transaction,
-        });
-
-        return models.ContestManager.create(
+        const manager = await models.ContestManager.create(
           {
             ...rest,
             community_id: id!,
@@ -51,6 +47,12 @@ export const CreateContestManagerMetadata: Command<
           },
           { transaction },
         );
+
+        await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
+          transaction,
+        });
+
+        return manager;
       },
     );
 

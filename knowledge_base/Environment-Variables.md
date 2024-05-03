@@ -42,6 +42,8 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
 - [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
+- [FLAG_COMMUNITY_STAKE](#flag_community_stake)
+- [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
@@ -231,6 +233,14 @@ After this time, the server will try the original DB endpoint again.
 
 Boolean toggle to display side-wide homepage feature for communities. Temporary flag for 2.0 work.
 
+## FLAG_COMMUNITY_STAKE
+
+Boolean toggle to enable [community stake](./Stake.md) for local development.
+
+## FLAG_NEW_CREATE_COMMUNITY
+
+Boolean toggle allowing the creation of new communities during local development.
+
 ## FLAG_PROPOSAL_TEMPLATES
 
 Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
@@ -251,19 +261,19 @@ Required in production. The JWT seed secret that is used to generate all user JW
 
 ## MAGIC_API_KEY
 
-Secret API key for Magic login. Contact Jake Naviasky or Graham Johnson for access.
+Secret API key for Magic sign-in. Contact Jake Naviasky or Graham Johnson for access.
 
 ## MAGIC_DEFAULT_CHAIN
 
-Default chain for Magic login; as of 231212, we use `ethereum`.
+Default chain for Magic sign-in; as of 231212, we use `ethereum`.
 
 ## MAGIC_PUBLISHABLE_KEY
 
-Publishable API key for Magic login; as of 231212, development uses `pk_live_EF89AABAFB87D6F4`.
+Publishable API key for Magic sign-in; as of 231212, development uses `pk_live_EF89AABAFB87D6F4`.
 
 ## MAGIC_SUPPORTED_BASES
 
-Chain bases supported for Magic login; as of 231212, we use `cosmos,ethereum`.
+Chain bases supported for Magic sign-in; as of 231212, we use `cosmos,ethereum`.
 
 ## MIXPANEL_DEV_TOKEN
 
@@ -345,7 +355,7 @@ Enables Webhook and email dispatching in production when set to `true`. Should b
 
 ## SENDGRID_API_KEY
 
-Used in email-based communications (notifications, digests, login).
+Used in email-based communications (notifications, digests, sign-in).
 
 ## SERVER_URL
 

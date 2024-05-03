@@ -198,15 +198,12 @@ export async function initAppState(
   shouldRedraw = true,
 ): Promise<void> {
   try {
-    const [
-      { data: statusRes },
-      { data: communitiesWithSnapshotsRes },
-      { data: nodesRes },
-    ] = await Promise.all([
-      axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/communities?snapshots=true`),
-      axios.get(`${app.serverUrl()}/nodes`),
-    ]);
+    const [{ data: statusRes }, { data: communities }, { data: nodesRes }] =
+      await Promise.all([
+        axios.get(`${app.serverUrl()}/status`),
+        axios.get(`${app.serverUrl()}/communities`),
+        axios.get(`${app.serverUrl()}/nodes`),
+      ]);
 
     app.config.chains.clear();
     app.config.nodes.clear();
@@ -221,16 +218,12 @@ export async function initAppState(
         app.config.nodes.add(NodeInfo.fromJSON(node));
       });
 
-    communitiesWithSnapshotsRes.result
-      .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
-      .forEach((chainsWithSnapshots) => {
-        delete chainsWithSnapshots.community.ChainNode;
+    communities.result
+      .filter((c) => c.community.active)
+      .forEach((c) => {
         const chainInfo = ChainInfo.fromJSON({
-          ChainNode: app.config.nodes.getById(
-            chainsWithSnapshots.community.chain_node_id,
-          ),
-          snapshot: chainsWithSnapshots.snapshot,
-          ...chainsWithSnapshots.community,
+          ChainNode: app.config.nodes.getById(c.community.chain_node_id),
+          ...c.community,
         });
         app.config.chains.add(chainInfo);
         if (chainInfo.redirect) {
