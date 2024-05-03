@@ -394,6 +394,11 @@ export class ChainTesting {
     return res.data.result;
   }
 
+  public async mineBlock() {
+    const res = await axios.get(`${this.host}/chain/mineBlock`, this.header);
+    return res.data;
+  }
+
   /**
    * Deploys an ERC721 and produces a reuseable object to interact with it
    * @returns ERC721 Object

@@ -2,10 +2,12 @@ import { Log } from '@ethersproject/providers';
 import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { AbiType } from '@hicommonwealth/shared';
+import { Anvil, createAnvil } from '@viem/anvil';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
 import Web3 from 'web3';
+import { ETH_ALCHEMY_API_KEY } from '../../../../server/config';
 import {
   getEvents,
   getLogs,
@@ -39,9 +41,19 @@ describe('EVM Chain Events Log Processing Tests', () => {
     propQueuedResult: { block: number },
     abi: AbiType,
     propCreatedLog: Log,
-    propQueuedLog: Log;
+    propQueuedLog: Log,
+    anvil: Anvil;
 
   before(async function () {
+    anvil = createAnvil({
+      forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
+      // noMining: true,
+      blockTime: 12,
+      silent: false,
+      port: 8545,
+      autoImpersonate: true,
+    });
+    await anvil.start();
     this.timeout(80_000);
 
     await tester.seedDb();
@@ -53,6 +65,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
   });
 
   after(async () => {
+    await anvil.stop();
     await dispose()();
   });
 

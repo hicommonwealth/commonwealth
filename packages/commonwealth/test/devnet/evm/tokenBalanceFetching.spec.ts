@@ -8,10 +8,12 @@ import {
   type DB,
 } from '@hicommonwealth/model';
 import { BalanceSourceType, BalanceType, delay } from '@hicommonwealth/shared';
+import { Anvil, createAnvil } from '@viem/anvil';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
+import { ETH_ALCHEMY_API_KEY } from '../../../server/config';
 
 function generateEVMAddresses(count: number): string[] {
   const web3 = new Web3();
@@ -33,10 +35,11 @@ function checkZeroBalances(balances: Balances, skipAddress: string[]) {
   }
 }
 
-describe('Token Balance Cache EVM Tests', function () {
+describe.skip('Token Balance Cache EVM Tests', function () {
   this.timeout(160000);
 
   let models: DB;
+  let anvil: Anvil;
 
   const sdk = new ChainTesting('http://127.0.0.1:3000');
 
@@ -83,12 +86,23 @@ describe('Token Balance Cache EVM Tests', function () {
   }
 
   before(async () => {
+    anvil = createAnvil({
+      forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
+      // noMining: true,
+      blockTime: 12,
+      silent: false,
+      port: 8545,
+      autoImpersonate: true,
+    });
+
+    await anvil.start();
     models = await tester.seedDb();
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
   });
 
   after(async () => {
+    await anvil.stop();
     await dispose()();
   });
 

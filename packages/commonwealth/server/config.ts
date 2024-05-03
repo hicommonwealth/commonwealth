@@ -123,3 +123,5 @@ export const EVM_CE_POLL_INTERVAL_MS =
 
 export const NEW_SUBSCRIPTION_API_FLAG =
   process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;
+
+export const ETH_ALCHEMY_API_KEY = process.env.ETH_ALCHEMY_API_KEY;

@@ -1,8 +1,10 @@
 import { dispose, schemas } from '@hicommonwealth/core';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
+import { Anvil, createAnvil } from '@viem/anvil';
 import { expect } from 'chai';
 import { z } from 'zod';
+import { ETH_ALCHEMY_API_KEY } from '../../../../server/config';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   getTestAbi,
@@ -14,6 +16,7 @@ import { sdk } from './util';
 
 describe('EVM Chain Events End to End Tests', () => {
   let models: DB;
+  let anvil: Anvil;
 
   let propCreatedResult: { block: number; proposalId: string };
   let contract: ContractInstance;
@@ -46,7 +49,15 @@ describe('EVM Chain Events End to End Tests', () => {
 
   before(async () => {
     models = await tester.seedDb();
-
+    anvil = createAnvil({
+      forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
+      // noMining: true,
+      blockTime: 12,
+      silent: false,
+      port: 8545,
+      autoImpersonate: true,
+    });
+    await anvil.start();
     const currentBlock = (await sdk.getBlock()).number;
     // advance time to avoid test interaction issues
     await sdk.safeAdvanceTime(currentBlock + 501);
@@ -59,6 +70,7 @@ describe('EVM Chain Events End to End Tests', () => {
   });
 
   after(async () => {
+    await anvil.stop();
     await dispose()();
   });
 
