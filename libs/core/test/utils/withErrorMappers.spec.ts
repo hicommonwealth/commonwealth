@@ -47,7 +47,7 @@ describe('withErrorMappers', () => {
   };
 
   const rateLimitErrorMapper: ErrorMapperFn = (err: Error) => {
-    if (err.message.includes('Rate limit exceeded')) {
+    if (err.message.toLowerCase().includes('rate limit')) {
       return new FakeRetriable('Rate limit exceeded', {
         maxRetries: 50,
         backoff: 'exponential',
