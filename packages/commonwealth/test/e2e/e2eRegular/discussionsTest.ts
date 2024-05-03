@@ -61,7 +61,10 @@ export const discussionTests = (test) => {
       let reactionsCountDivs = await page.locator('div.reactions-count');
 
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('div.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         await pwexpect(reactionsCountDivs.first()).toBeVisible();
       }).toPass();
 
@@ -80,7 +83,10 @@ export const discussionTests = (test) => {
       ).toString();
       // assert reaction count increased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           expectedNewReactionCount,
         );
@@ -94,7 +100,10 @@ export const discussionTests = (test) => {
 
       // assert reaction count decreased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           firstThreadReactionCount,
         );
