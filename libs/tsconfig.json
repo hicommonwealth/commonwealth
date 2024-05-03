@@ -4,7 +4,6 @@
     "module": "es2020",
     "target": "esnext",
     "baseUrl": ".",
-    "rootDir": ".",
     "composite": true,
     "strict": true,
 
@@ -16,12 +15,7 @@
 
     "sourceMap": true,
     "declaration": true,
-    "declarationMap": true,
-
-    "paths": {
-      "@hicommonwealth/*": ["./*/src"]
-    }
+    "declarationMap": true
   },
-  "include": ["**/src", "**/test"],
   "exclude": ["**/node_modules", "**/build"]
 }

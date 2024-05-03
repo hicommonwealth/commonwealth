@@ -1,4 +1,4 @@
-import { type CacheNamespaces } from '@hicommonwealth/core';
+import { Cache, type CacheNamespaces } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
 import { delay } from '@hicommonwealth/shared';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
@@ -62,41 +62,6 @@ export class RedisCache implements Cache {
     });
 
     void this._client.connect();
-  }
-  add(request: RequestInfo | URL): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  addAll(requests: RequestInfo[]): Promise<void>;
-  addAll(requests: Iterable<RequestInfo>): Promise<void>;
-  addAll(requests: unknown): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  delete(
-    request: RequestInfo | URL,
-    options?: CacheQueryOptions | undefined,
-  ): Promise<boolean> {
-    throw new Error('Method not implemented.');
-  }
-  keys(
-    request?: RequestInfo | URL | undefined,
-    options?: CacheQueryOptions | undefined,
-  ): Promise<readonly Request[]> {
-    throw new Error('Method not implemented.');
-  }
-  match(
-    request: RequestInfo | URL,
-    options?: CacheQueryOptions | undefined,
-  ): Promise<Response | undefined> {
-    throw new Error('Method not implemented.');
-  }
-  matchAll(
-    request?: RequestInfo | URL | undefined,
-    options?: CacheQueryOptions | undefined,
-  ): Promise<readonly Response[]> {
-    throw new Error('Method not implemented.');
-  }
-  put(request: RequestInfo | URL, response: Response): Promise<void> {
-    throw new Error('Method not implemented.');
   }
 
   // get namespace key for redis

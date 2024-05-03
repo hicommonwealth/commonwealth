@@ -16,6 +16,7 @@
     "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "@hicommonwealth/logging": "*",
     "@hicommonwealth/shared": "*",
     "zod": "^3.22.4"
   },
