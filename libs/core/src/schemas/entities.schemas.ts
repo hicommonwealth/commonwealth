@@ -11,14 +11,8 @@ import {
 import z from 'zod';
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
 import { BalanceSourceType, NodeHealth } from '../types';
-import * as events from './events.schemas';
 import { Contest } from './projections';
-import {
-  EventNames,
-  PG_INT,
-  discordMetaSchema,
-  linksSchema,
-} from './utils.schemas';
+import { PG_INT, discordMetaSchema, linksSchema } from './utils.schemas';
 
 export const User = z.object({
   id: PG_INT.optional(),
@@ -301,7 +295,7 @@ export const ContestManager = z
     contest_address: z.string().describe('On-Chain contest manager address'),
     community_id: z.string(),
     name: z.string(),
-    image_url: z.string(),
+    image_url: z.string().optional(),
     funding_token_address: z
       .string()
       .optional()
@@ -327,10 +321,10 @@ export const ContestManager = z
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
     created_at: z.date(),
-    paused: z
+    cancelled: z
       .boolean()
       .optional()
-      .describe('Flags when contest policy is paused by admin'),
+      .describe('Flags when contest policy is cancelled by admin'),
     topics: z.array(Topic).optional(),
     contests: z.array(Contest).optional(),
   })
@@ -404,6 +398,7 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+  snapshot_spaces: z.array(z.string().max(255)).default([]).optional(),
 });
 
 export const CommunityContract = z.object({
@@ -517,58 +512,6 @@ export const ChainNode = z.object({
 
 // aliases
 export const Chain = Community;
-
-const BaseOutboxProperties = z.object({
-  event_id: PG_INT.optional(),
-  relayed: z.boolean().optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
-
-export const Outbox = z.union([
-  z
-    .object({
-      event_name: z.literal(EventNames.ThreadCreated),
-      event_payload: events.ThreadCreated,
-    })
-    .merge(BaseOutboxProperties),
-  z
-    .object({
-      event_name: z.literal(EventNames.CommentCreated),
-      event_payload: events.CommentCreated,
-    })
-    .merge(BaseOutboxProperties),
-  z
-    .object({
-      event_name: z.literal(EventNames.GroupCreated),
-      event_payload: events.GroupCreated,
-    })
-    .merge(BaseOutboxProperties),
-  z
-    .object({
-      event_name: z.literal(EventNames.CommunityCreated),
-      event_payload: events.CommunityCreated,
-    })
-    .merge(BaseOutboxProperties),
-  z
-    .object({
-      event_name: z.literal(EventNames.SnapshotProposalCreated),
-      event_payload: events.SnapshotProposalCreated,
-    })
-    .merge(BaseOutboxProperties),
-  z
-    .object({
-      event_name: z.literal(EventNames.DiscordMessageCreated),
-      event_payload: events.DiscordMessageCreated,
-    })
-    .merge(BaseOutboxProperties),
-  z
-    .object({
-      event_name: z.literal(EventNames.ChainEventCreated),
-      event_payload: events.ChainEventCreated,
-    })
-    .merge(BaseOutboxProperties),
-]);
 
 export const SubscriptionPreference = z.object({
   id: PG_INT,

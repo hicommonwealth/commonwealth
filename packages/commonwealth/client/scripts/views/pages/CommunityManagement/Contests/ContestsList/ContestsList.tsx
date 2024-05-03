@@ -59,7 +59,7 @@ const ContestsList = ({
                 topics={contest.topics}
                 winners={winners}
                 finishDate={end_time.toISOString()}
-                isActive={!contest.paused}
+                isActive={!contest.cancelled}
                 onFund={() =>
                   setFundDrawerAddress(
                     contest.funding_token_address || 'stake address',

@@ -1,11 +1,18 @@
 import { z } from 'zod';
+import { Comment, Thread } from './entities.schemas';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from './utils.schemas';
 
-export const ThreadCreated = z.object({ thread: z.string() });
-export const CommentCreated = z.object({ comment: z.string() });
+export const ThreadCreated = Thread;
+export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
+});
+export const UserMentioned = z.object({
+  authorId: z.number(),
+  userMentionedId: z.number(),
+  threadId: z.string().optional(),
+  commentId: z.string().optional(),
 });
 export const CommunityCreated = z.object({
   communityId: z.string(),
@@ -18,8 +25,8 @@ export const SnapshotProposalCreated = z.object({
   choices: z.array(z.string()).optional(),
   space: z.string().optional(),
   event: z.string().optional(),
-  start: z.string().optional(),
-  expire: z.string().optional(),
+  start: z.number().optional(),
+  expire: z.number().optional(),
   token: z.string().optional(),
   secret: z.string().optional(),
 });
