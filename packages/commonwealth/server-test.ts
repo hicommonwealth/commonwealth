@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
 
@@ -26,6 +26,7 @@ export type TestServer = {
   cacheDecorator: CacheDecorator;
   models: DB;
   seeder: ModelSeeder;
+  e2eTestEntities: E2E_TestEntities;
   truncate: () => Promise<void>;
 };
 
@@ -47,6 +48,7 @@ export const testServer = async (): Promise<TestServer> => {
     withLoggingMiddleware: !TEST_WITHOUT_LOGS,
   });
   const seeder = modelSeeder(app, db);
+  const e2eTestEntities = await tester.e2eTestEntities(db);
 
   // auto dispose server
   dispose(async () => {
@@ -58,6 +60,7 @@ export const testServer = async (): Promise<TestServer> => {
     cacheDecorator,
     models: db,
     seeder,
+    e2eTestEntities,
     truncate: () => tester.truncate_db(db),
   };
 };
