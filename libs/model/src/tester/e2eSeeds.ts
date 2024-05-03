@@ -326,24 +326,25 @@ export const e2eTestEntities = async function (
       )),
     );
 
-    const notificationCategories: string[] = [
-      'new-thread-creation',
-      'new-comment-creation',
-      'new-mention',
-      'new-reaction',
-      'chain-event',
-      'new-collaboration',
-      'thread-edit',
-      'comment-edit',
-      'snapshot-proposal',
+    const notificationCategories: [string, string][] = [
+      ['new-thread-creation', 'someone makes a new thread'],
+      ['new-comment-creation', 'someone makes a new comment'],
+      ['new-mention', 'someone @ mentions a user'],
+      ['new-reaction', 'someone reacts to a post'],
+      ['chain-event', 'a chain event occurs'],
+      ['new-collaboration', 'someone collaborates with a user'],
+      ['thread-edit', 'A thread is edited'],
+      ['comment-edit', 'A comment is edited'],
+      ['snapshot-proposal', 'Snapshot proposal notifications'],
     ];
 
     try {
       await Promise.all(
-        notificationCategories.map(async (name) => {
+        notificationCategories.map(async (n) => {
           await testDb.NotificationCategory.findOrCreate({
             where: {
-              name,
+              name: n[0],
+              description: n[1],
             },
           });
         }),
