@@ -1,5 +1,5 @@
 import { Action, Message, Session, Signature } from '@canvas-js/interfaces';
-import { decode, encode, parse, stringify } from '@ipld/dag-json';
+import { parse, stringify } from '@ipld/dag-json';
 
 export type CanvasSignedData = {
   sessionMessage: Message<Session>;
@@ -19,12 +19,12 @@ export type CanvasSignResult = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const serializeCanvas = (data: any): string => {
-  return stringify(encode(data));
+  return stringify(data);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const deserializeCanvas = (serializedData: string): any => {
-  return decode(parse(serializedData));
+  return parse(serializedData);
 };
 
 export const toCanvasSignedDataApiArgs = (
