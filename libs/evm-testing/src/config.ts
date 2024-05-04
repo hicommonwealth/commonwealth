@@ -4,3 +4,5 @@ dotenv.config();
 
 // URL of the local Ganache, Anvil, or Hardhat chain
 export const PROVIDER_URL = process.env.PROVIDER_URL ?? 'http://chain:8545';
+
+export const ETH_ALCHEMY_API_KEY = process.env.ETH_ALCHEMY_API_KEY;

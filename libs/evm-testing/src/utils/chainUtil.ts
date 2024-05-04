@@ -1,7 +1,6 @@
 import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
-import { ETH_ALCHEMY_API_KEY } from 'commonwealth/server/config';
 import Web3 from 'web3';
-import { PROVIDER_URL } from '../config';
+import { ETH_ALCHEMY_API_KEY, PROVIDER_URL } from '../config';
 import getProvider from './getProvider';
 
 export async function advanceTime(seconds: number, blocks = 1) {
