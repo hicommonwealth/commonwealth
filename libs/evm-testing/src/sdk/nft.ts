@@ -1,35 +1,18 @@
-import Web3, { AbiFragment, Contract } from 'web3';
+import { AbiFragment, Contract } from 'web3';
 import { erc_721 } from '../utils/contracts';
-import getProvider from '../utils/getProvider';
+import { SdkBase } from './sdkBase';
 
-export class ERC721 {
+export class ERC721 extends SdkBase {
   public address: string;
-  public host: string;
-  public header: any;
   public contract: Contract<AbiFragment[]>;
-  private readonly provider: Web3;
-  private accounts: string[] | undefined;
 
   /**
-   *
-   * @param host chain testing host
-   * @param header axios header
    * @param address address of deployed NFT
    */
-  constructor(host: string, header: any, address: string) {
-    this.host = host;
-    this.header = header;
+  constructor(address: string) {
+    super();
     this.address = address;
-
-    this.provider = getProvider();
-    this.contract = erc_721(this.address, this.provider);
-  }
-
-  private async getAccounts() {
-    if (!this.accounts) {
-      this.accounts = await this.provider.eth.getAccounts();
-    }
-    return this.accounts;
+    this.contract = erc_721(this.address, this.web3);
   }
 
   /**

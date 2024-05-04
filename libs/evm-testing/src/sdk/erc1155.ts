@@ -3,9 +3,6 @@ import getProvider from '../utils/getProvider';
 
 export class ERC1155 {
   public address: string;
-  public host: string;
-  public header: any;
-  public activeTokenIds: string[] = [];
 
   /**
    *
@@ -13,9 +10,7 @@ export class ERC1155 {
    * @param header axios header
    * @param address address of deployed NFT
    */
-  constructor(host: string, header: any, address: string) {
-    this.host = host;
-    this.header = header;
+  constructor(address: string) {
     this.address = address;
   }
 

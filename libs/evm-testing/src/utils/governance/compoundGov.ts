@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { advanceEvmTime } from '../../routes/chain';
+import { advanceTime } from '../chainUtil';
 import { comp_gov, erc20 } from '../contracts';
 import getProvider from '../getProvider';
 import { IGovernor } from './IGovernor';
@@ -51,7 +51,7 @@ export class compoundGovernor implements IGovernor {
     if (advanceDays) {
       const secs = Number(advanceDays) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
     console.log(proposalId);
 
@@ -101,12 +101,12 @@ export class compoundGovernor implements IGovernor {
 
   public async queueProposal(
     proposalId: string | number,
-    advanceTime?: boolean,
+    advanceTimeToo?: boolean,
   ): Promise<any> {
-    if (advanceTime) {
+    if (advanceTimeToo) {
       const secs = Number(3) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -120,12 +120,12 @@ export class compoundGovernor implements IGovernor {
 
   public async executeProposal(
     proposalId: string | number,
-    advanceTime?: boolean,
+    advanceTimeToo?: boolean,
   ): Promise<any> {
-    if (advanceTime) {
+    if (advanceTimeToo) {
       const secs = Number(5) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
