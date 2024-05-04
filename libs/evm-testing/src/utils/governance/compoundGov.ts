@@ -53,7 +53,6 @@ export class compoundGovernor implements IGovernor {
       const blocks = secs / 12 + 500;
       await advanceTime(secs, blocks);
     }
-    console.log(proposalId);
 
     return {
       proposalId: String(
@@ -73,7 +72,6 @@ export class compoundGovernor implements IGovernor {
     const cancel = await contract.methods
       .cancel(proposalId)
       .send({ from: accounts[0], gas: '150000' });
-    console.log(cancel);
     return { block: Number(cancel['blockNumber']) };
   }
 
@@ -88,7 +86,6 @@ export class compoundGovernor implements IGovernor {
     const vote = await contract.methods
       .castVote(proposalId, Number(forAgainst))
       .send({ from: accounts, gas: '1000000' });
-    console.log(vote);
     return { block: Number(vote['blockNumber']) };
   }
 
@@ -114,7 +111,6 @@ export class compoundGovernor implements IGovernor {
     const queued = await contract.methods
       .queue(proposalId)
       .send({ from: accounts, gas: '500000' });
-    console.log(queued);
     return { block: Number(queued['blockNumber']) };
   }
 
@@ -133,7 +129,6 @@ export class compoundGovernor implements IGovernor {
     const executed = await contract.methods
       .execute(proposalId)
       .send({ from: accounts, value: '0', gas: '1000000' });
-    console.log(executed);
     return { block: Number(executed['blockNumber']) };
   }
 
