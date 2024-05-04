@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import { Request, Response } from 'express';
 import Web3 from 'web3';
-import { PROVIDER_URL } from '../../config';
+import { PROVIDER_URL } from '../config';
 import { chainAdvanceTime, chainGetEth } from '../types';
 import getProvider from '../utils/getProvider';
 
@@ -39,6 +39,7 @@ export const getBlock = async (req: Request, res: Response) => {
       return value;
     }
   }
+
   try {
     const block = await getBlockInfo();
     const sanitizedBlock = Object.fromEntries(
@@ -164,8 +165,8 @@ export const getChainSnapshot = async (req: Request, res: Response) => {
     });
   } catch (e) {
     console.error(e);
-    if (e.response) {
-      res.status(result?.status).json({
+    if (isAxiosError(e) && e.response) {
+      res.status(result?.status || 500).json({
         message: e.response.data,
       });
     } else {
@@ -202,14 +203,13 @@ export const revertChainToSnapshot = async (req: Request, res: Response) => {
     });
   } catch (e) {
     console.error(e);
-    if (e.response) {
-      res.status(result?.status).json({
+    if (isAxiosError(e) && e.response) {
+      res.status(result?.status || 500).json({
         message: e.response.data,
       });
     } else {
       res.status(result?.status || 500).json({
         message: 'Internal Server Error',
-        error: e,
       });
     }
   }

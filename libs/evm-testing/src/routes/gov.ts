@@ -5,9 +5,9 @@ import {
   govCompProposalId,
   govCompVote,
 } from '../types';
-import { compoundGovernor } from '../utils/governance/compoundGov';
-import { aaveGovernor } from '../utils/governance/aaveGov';
 import { IGovernor } from '../utils/governance/IGovernor';
+import { aaveGovernor } from '../utils/governance/aaveGov';
+import { compoundGovernor } from '../utils/governance/compoundGov';
 
 export const createProposal = async (req: Request, res: Response) => {
   try {
@@ -56,7 +56,7 @@ export const getVotes = async (req: Request, res: Response) => {
       : new aaveGovernor();
     const block = await gov.getVotes(
       request.accountIndex,
-      request.numberOfVotes
+      request.numberOfVotes,
     );
     res.status(200).json(block).send();
   } catch (err) {
@@ -79,7 +79,7 @@ export const castVote = async (req: Request, res: Response) => {
     const block = await gov.castVote(
       request.proposalId,
       request.accountIndex,
-      request.forAgainst
+      request.forAgainst,
     );
     res.status(200).json(block).send();
   } catch (err) {
