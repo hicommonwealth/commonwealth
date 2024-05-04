@@ -2,8 +2,8 @@ import { EventNames, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { AbiType, entities } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
-import { fileURLToPath } from 'node:url';
 import { Model, ModelCtor, Transaction } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { OutboxAttributes, OutboxModelStatic } from './models';
 
