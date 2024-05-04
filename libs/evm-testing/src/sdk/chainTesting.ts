@@ -120,10 +120,13 @@ export class ChainTesting extends SdkBase {
    * @param proposalId
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async queueProposal(proposalId: string, govType = 'compound') {
+  public async queueProposal(
+    proposalId: string,
+    govType = 'compound',
+  ): Promise<{ block: number }> {
     const gov: IGovernor =
       govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    const block = await gov.queueProposal(proposalId, true);
+    return await gov.queueProposal(proposalId, true);
   }
 
   /**
@@ -134,7 +137,7 @@ export class ChainTesting extends SdkBase {
   public async executeProposal(proposalId: string, govType = 'compound') {
     const gov: IGovernor =
       govType === 'compound' ? new compoundGovernor() : new aaveGovernor();
-    const block = await gov.executeProposal(proposalId, true);
+    return await gov.executeProposal(proposalId, true);
   }
 
   /**

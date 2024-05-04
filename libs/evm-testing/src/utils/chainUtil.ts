@@ -1,3 +1,5 @@
+import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
+import { ETH_ALCHEMY_API_KEY } from 'commonwealth/server/config';
 import Web3 from 'web3';
 import { PROVIDER_URL } from '../config';
 import getProvider from './getProvider';
@@ -46,4 +48,19 @@ export async function mineBlocks(blocks: number) {
   }
 
   return true;
+}
+
+export async function getAnvil(
+  options: CreateAnvilOptions = {},
+): Promise<Anvil> {
+  const anvil = createAnvil({
+    forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
+    silent: false,
+    port: 8545,
+    autoImpersonate: true,
+    startTimeout: 10_000,
+    ...options,
+  });
+  await anvil.start();
+  return anvil;
 }

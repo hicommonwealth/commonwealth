@@ -1,13 +1,13 @@
 import { Log } from '@ethersproject/providers';
 import { dispose } from '@hicommonwealth/core';
+import { getAnvil } from '@hicommonwealth/evm-testing/src/utils/chainUtil';
 import { tester } from '@hicommonwealth/model';
 import { AbiType } from '@hicommonwealth/shared';
-import { Anvil, createAnvil } from '@viem/anvil';
+import { Anvil } from '@viem/anvil';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
 import Web3 from 'web3';
-import { ETH_ALCHEMY_API_KEY } from '../../../../server/config';
 import {
   getEvents,
   getLogs,
@@ -22,7 +22,6 @@ import {
 import {
   compoundPropCreatedSignature,
   compoundPropQueuedSignature,
-  getEvmSecondsAndBlocks,
   localRpc,
   sdk,
 } from './util';
@@ -30,6 +29,9 @@ import {
 chai.use(chaiAsPromised);
 
 const web3 = new Web3();
+
+const compoundVotingDelayBlocks = 13140;
+const compoundVotingPeriodBlocks = 19710;
 
 /*
  * The main objective of these tests is to ensure log processing logic works
@@ -45,15 +47,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
     anvil: Anvil;
 
   before(async function () {
-    anvil = createAnvil({
-      forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
-      // noMining: true,
-      blockTime: 12,
-      silent: false,
-      port: 8545,
-      autoImpersonate: true,
-    });
-    await anvil.start();
+    anvil = await getAnvil();
     this.timeout(80_000);
 
     await tester.seedDb();
@@ -61,6 +55,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
     await sdk.getVotingPower(1, '400000');
     propCreatedResult = await sdk.createProposal(1);
+    await sdk.mineBlocks(compoundVotingDelayBlocks + 1);
     expect(propCreatedResult.block).to.not.be.undefined;
   });
 
@@ -115,11 +110,8 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(propCreatedResult, 'Must have created a proposal to run this test')
         .to.not.be.undefined;
 
-      let res = getEvmSecondsAndBlocks(3);
-      await sdk.safeAdvanceTime(propCreatedResult.block + res.blocks);
       await sdk.castVote(propCreatedResult.proposalId, 1, true);
-      res = getEvmSecondsAndBlocks(3);
-      await sdk.advanceTime(String(res.secs), res.blocks);
+      await sdk.mineBlocks(compoundVotingPeriodBlocks + 1);
 
       propQueuedResult = await sdk.queueProposal(propCreatedResult.proposalId);
 
@@ -138,6 +130,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         startingBlockNum: propQueuedResult.block,
         endingBlockNum: propQueuedResult.block + 1,
       });
+      console.log(propQueuedLogs);
       expect(propQueuedLogs.logs.length).to.equal(1);
       propQueuedLog = propQueuedLogs.logs[0];
     }).timeout(80_000);
@@ -146,7 +139,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expectAbi();
 
       expect(propQueuedResult.block).to.not.be.undefined;
-      await sdk.safeAdvanceTime(propQueuedResult.block + 501);
+      await sdk.mineBlocks(501);
 
       const { logs } = await getLogs({
         rpc: localRpc,
