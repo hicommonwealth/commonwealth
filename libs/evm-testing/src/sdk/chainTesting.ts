@@ -304,12 +304,6 @@ export class ChainTesting extends SdkBase {
   }
 
   public async deployErc1155(): Promise<ERC1155> {
-    // const response = await axios.get(`${this.host}/erc1155/deploy`);
-    // return new ERC1155(
-    //   this.host,
-    //   this.header,
-    //   response.data['contractAddress'],
-    // );
     const provider = getProvider();
     const contract = new provider.eth.Contract(erc_1155_abi as AbiItem[]);
     const account = (await provider.eth.getAccounts())[0];
