@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { erc1155Mint } from '../src/types';
+import { erc1155Mint } from '../types';
 
 export class ERC1155 {
   public address: string;

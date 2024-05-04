@@ -1,15 +1,30 @@
 import cors from 'cors';
 import express, { json } from 'express';
-import logger from 'morgan';
-import { CHAIN_TEST_APP_PORT } from '../config';
+import pinoHttp from 'pino-http';
+import { CHAIN_TEST_APP_PORT } from './config';
 import setupRouter from './router';
 
 const app = express();
 const router = setupRouter();
 
+app.use(
+  pinoHttp({
+    quietReqLogger: false,
+    transport: {
+      target: 'pino-http-print',
+      options: {
+        destination: 1,
+        all: false,
+        colorize: true,
+        relativeUrl: true,
+        translateTime: 'HH:MM:ss.l',
+      },
+    },
+  }),
+);
+
 app.use(cors());
 app.options('*', cors());
-app.use(logger('dev') as express.RequestHandler);
 
 app.use(json() as express.RequestHandler);
 app.use('/', router);

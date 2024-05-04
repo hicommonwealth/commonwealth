@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { erc721Approve, erc721MintBurn } from '../src/types';
+import { erc721Approve, erc721MintBurn } from '../types';
 
 export class ERC721 {
   public address: string;
@@ -35,7 +35,7 @@ export class ERC721 {
     const response = await axios.post(
       `${this.host}/erc721/mintBurn`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     this.activeTokenIds.push(tokenId);
     return response.data;
@@ -52,8 +52,8 @@ export class ERC721 {
     tokenId: string,
     to: number,
     from?: string,
-    accountIndex?: number
-  ): Promise<{block: number}> {
+    accountIndex?: number,
+  ): Promise<{ block: number }> {
     const request: erc721Approve = {
       nftAddress: this.address,
       tokenId,
@@ -64,7 +64,7 @@ export class ERC721 {
     const response = await axios.post(
       `${this.host}/erc721/transfer`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -80,7 +80,7 @@ export class ERC721 {
     tokenId: string,
     to: number,
     from?: string,
-    accountIndex?: number
+    accountIndex?: number,
   ): Promise<{ block: number }> {
     const request: erc721Approve = {
       nftAddress: this.address,
@@ -93,7 +93,7 @@ export class ERC721 {
     const response = await axios.post(
       `${this.host}/erc721/approve`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -109,7 +109,7 @@ export class ERC721 {
     tokenId: string,
     to: number,
     from?: string,
-    accountIndex?: number
+    accountIndex?: number,
   ) {
     const request: erc721Approve = {
       nftAddress: this.address,
@@ -122,7 +122,7 @@ export class ERC721 {
     const response = await axios.post(
       `${this.host}/erc721/approve`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
