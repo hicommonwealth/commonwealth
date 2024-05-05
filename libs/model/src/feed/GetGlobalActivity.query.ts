@@ -3,10 +3,12 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { GlobalActivityCache } from '../globalActivityCache';
 
-export const GetGlobalActivity: Query<typeof schemas.ThreadFeed> = () => ({
-  ...schemas.ThreadFeed,
-  auth: [],
-  body: async () => {
-    return await GlobalActivityCache.getInstance(models).getGlobalActivity();
-  },
-});
+export function GetGlobalActivity(): Query<typeof schemas.ThreadFeed> {
+  return {
+    ...schemas.ThreadFeed,
+    auth: [],
+    body: async () => {
+      return await GlobalActivityCache.getInstance(models).getGlobalActivity();
+    },
+  };
+}

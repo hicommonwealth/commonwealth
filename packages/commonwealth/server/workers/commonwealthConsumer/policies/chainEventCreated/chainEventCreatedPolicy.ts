@@ -51,12 +51,14 @@ const chainEventInputs = {
   ChainEventCreated: events.ChainEventCreated,
 };
 
-export const ChainEventPolicy: Policy<
+export function ChainEventPolicy(): Policy<
   typeof chainEventInputs,
   ZodUndefined
-> = () => ({
-  inputs: chainEventInputs,
-  body: {
-    ChainEventCreated: processChainEventCreated,
-  },
-});
+> {
+  return {
+    inputs: chainEventInputs,
+    body: {
+      ChainEventCreated: processChainEventCreated,
+    },
+  };
+}

@@ -4,24 +4,26 @@ import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
-export const CancelContestManagerMetadata: Command<
+export function CancelContestManagerMetadata(): Command<
   typeof schemas.CancelContestManagerMetadata
-> = () => ({
-  ...schemas.CancelContestManagerMetadata,
-  auth: [isCommunityAdmin],
-  body: async ({ id, payload }) => {
-    const contestManager = await models.ContestManager.findOne({
-      where: {
-        community_id: id,
-        contest_address: payload.contest_address,
-      },
-    });
-    if (mustExist('ContestManager', contestManager)) {
-      contestManager.cancelled = true;
-      await contestManager.save();
-      return {
-        contest_managers: [contestManager.get({ plain: true })],
-      };
-    }
-  },
-});
+> {
+  return {
+    ...schemas.CancelContestManagerMetadata,
+    auth: [isCommunityAdmin],
+    body: async ({ id, payload }) => {
+      const contestManager = await models.ContestManager.findOne({
+        where: {
+          community_id: id,
+          contest_address: payload.contest_address,
+        },
+      });
+      if (mustExist('ContestManager', contestManager)) {
+        contestManager.cancelled = true;
+        await contestManager.save();
+        return {
+          contest_managers: [contestManager.get({ plain: true })],
+        };
+      }
+    },
+  };
+}

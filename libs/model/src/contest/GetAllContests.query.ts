@@ -4,14 +4,15 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-export const GetAllContests: Query<typeof schemas.GetAllContests> = () => ({
-  ...schemas.GetAllContests,
-  auth: [],
-  body: async ({ payload }) => {
-    const results = await models.sequelize.query<
-      z.infer<typeof schemas.ContestResults>
-    >(
-      `
+export function GetAllContests(): Query<typeof schemas.GetAllContests> {
+  return {
+    ...schemas.GetAllContests,
+    auth: [],
+    body: async ({ payload }) => {
+      const results = await models.sequelize.query<
+        z.infer<typeof schemas.ContestResults>
+      >(
+        `
 select
     cm.community_id,
   	cm.contest_address,
@@ -71,20 +72,21 @@ group by
 order by
   cm.name
 `,
-      {
-        type: QueryTypes.SELECT,
-        raw: true,
-        replacements: { contest_id: null, ...payload },
-      },
-    );
-    results.forEach((r) =>
-      r.contests.forEach((c) => {
-        c.winners?.forEach((w) => (w.prize = w.prize / 10 ** r.decimals));
-        c.start_time = new Date(c.start_time);
-        c.end_time = new Date(c.end_time);
-        c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
-      }),
-    );
-    return results;
-  },
-});
+        {
+          type: QueryTypes.SELECT,
+          raw: true,
+          replacements: { contest_id: null, ...payload },
+        },
+      );
+      results.forEach((r) =>
+        r.contests.forEach((c) => {
+          c.winners?.forEach((w) => (w.prize = w.prize / 10 ** r.decimals));
+          c.start_time = new Date(c.start_time);
+          c.end_time = new Date(c.end_time);
+          c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
+        }),
+      );
+      return results;
+    },
+  };
+}

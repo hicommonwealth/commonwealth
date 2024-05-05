@@ -213,31 +213,31 @@ export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
 };
 
 /**
- * Command factory function
+ * Command metadata
  */
 export type Command<Schema> = Schema extends Schemas<infer Input, infer Output>
-  ? () => CommandMetadata<Input, Output>
+  ? CommandMetadata<Input, Output>
   : never;
 
 /**
- * Query factory function
+ * Query metadata
  */
 export type Query<Schema> = Schema extends Schemas<infer Input, infer Output>
-  ? () => QueryMetadata<Input, Output>
+  ? QueryMetadata<Input, Output>
   : never;
 
 /**
- * Policy factory function
+ * Policy metadata
  */
 export type Policy<
-  Inputs extends EventSchemas,
+  Inputs,
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
-> = () => EventsHandlerMetadata<Inputs, Output>;
+> = Inputs extends EventSchemas ? EventsHandlerMetadata<Inputs, Output> : never;
 
 /**
- * Projection factory function
+ * Projection metadata
  */
 export type Projection<
-  Inputs extends EventSchemas,
+  Inputs,
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
-> = () => EventsHandlerMetadata<Inputs, Output>;
+> = Inputs extends EventSchemas ? EventsHandlerMetadata<Inputs, Output> : never;

@@ -107,12 +107,11 @@ export const processSnapshotProposalCreated: EventHandler<
 const snapshotInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
 };
-export const SnapshotPolicy: Policy<
-  typeof snapshotInputs,
-  ZodUndefined
-> = () => ({
-  inputs: snapshotInputs,
-  body: {
-    SnapshotProposalCreated: processSnapshotProposalCreated,
-  },
-});
+export function SnapshotPolicy(): Policy<typeof snapshotInputs, ZodUndefined> {
+  return {
+    inputs: snapshotInputs,
+    body: {
+      SnapshotProposalCreated: processSnapshotProposalCreated,
+    },
+  };
+}

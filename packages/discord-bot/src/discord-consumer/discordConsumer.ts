@@ -131,12 +131,14 @@ async function main() {
     DiscordMessageCreated: events.DiscordMessageCreated,
   };
 
-  const Discord: Policy<typeof inputs> = () => ({
-    inputs,
-    body: {
-      DiscordMessageCreated: processDiscordMessageCreated,
-    },
-  });
+  function Discord(): Policy<typeof inputs> {
+    return {
+      inputs,
+      body: {
+        DiscordMessageCreated: processDiscordMessageCreated,
+      },
+    };
+  }
 
   const result = await brokerInstance.subscribe(
     BrokerSubscriptions.DiscordListener,

@@ -24,15 +24,17 @@ const inputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
 };
 
-const Snapshot: Policy<typeof inputs> = () => ({
-  inputs,
-  body: {
-    SnapshotProposalCreated: async ({ payload }) => {
-      const { id } = payload;
-      idOutput = id;
+function Snapshot(): Policy<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      SnapshotProposalCreated: async ({ payload }) => {
+        const { id } = payload;
+        idOutput = id;
+      },
     },
-  },
-});
+  };
+}
 
 describe('RabbitMQ', () => {
   let rmqAdapter: RabbitMQAdapter;
@@ -169,14 +171,16 @@ describe('RabbitMQ', () => {
         SnapshotProposalCreated: events.SnapshotProposalCreated,
       };
 
-      const FailingSnapshot: Policy<typeof inputs> = () => ({
-        inputs,
-        body: {
-          SnapshotProposalCreated: async () => {
-            shouldNotExecute = false;
+      function FailingSnapshot(): Policy<typeof inputs> {
+        return {
+          inputs,
+          body: {
+            SnapshotProposalCreated: async () => {
+              shouldNotExecute = false;
+            },
           },
-        },
-      });
+        };
+      }
 
       let retryExecuted;
       const subRes = await rmqAdapter.subscribe(

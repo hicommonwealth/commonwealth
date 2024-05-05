@@ -3,20 +3,21 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const GetUserActivity: Query<typeof schemas.ThreadFeed> = () => ({
-  ...schemas.ThreadFeed,
-  auth: [],
-  secure: true,
-  body: async ({ actor }) => {
-    /**
-     * Last 50 updated threads
-     */
+export function GetUserActivity(): Query<typeof schemas.ThreadFeed> {
+  return {
+    ...schemas.ThreadFeed,
+    auth: [],
+    secure: true,
+    body: async ({ actor }) => {
+      /**
+       * Last 50 updated threads
+       */
 
-    const filterByCommunityForUsers = actor.user.id
-      ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
-      : '';
+      const filterByCommunityForUsers = actor.user.id
+        ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
+        : '';
 
-    const query = `
+      const query = `
     WITH ranked_thread_notifs AS (
         SELECT t.id AS thread_id, t.max_notif_id
         FROM "Threads" t
@@ -33,7 +34,7 @@ export const GetUserActivity: Query<typeof schemas.ThreadFeed> = () => ({
                 COALESCE(
                     json_agg(
                         json_build_object('Addresses', json_build_array(row_to_json(A)))
-                    ) FILTER (WHERE A.id IS NOT NULL), 
+                    ) FILTER (WHERE A.id IS NOT NULL),
                     json_build_array()
                 ) as commenters
     FROM ranked_thread_notifs rtn
@@ -53,12 +54,13 @@ export const GetUserActivity: Query<typeof schemas.ThreadFeed> = () => ({
     ORDER BY nts.created_at DESC;
   `;
 
-    const notifications: any = await models.sequelize.query(query, {
-      type: QueryTypes.SELECT,
-      raw: true,
-      replacements: [actor.user.id],
-    });
+      const notifications: any = await models.sequelize.query(query, {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements: [actor.user.id],
+      });
 
-    return notifications;
-  },
-});
+      return notifications;
+    },
+  };
+}

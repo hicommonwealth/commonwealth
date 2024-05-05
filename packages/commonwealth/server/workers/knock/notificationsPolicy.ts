@@ -13,28 +13,30 @@ const notificationInputs = {
   UserMentioned: events.UserMentioned,
 };
 
-export const NotificationsPolicy: Policy<typeof notificationInputs> = () => ({
-  inputs: notificationInputs,
-  body: {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    SnapshotProposalCreated: async () => {
-      log.info('Method not implemented');
+export function NotificationsPolicy(): Policy<typeof notificationInputs> {
+  return {
+    inputs: notificationInputs,
+    body: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      SnapshotProposalCreated: async () => {
+        log.info('Method not implemented');
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      ChainEventCreated: async () => {
+        log.info('Method not implemented');
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      ThreadCreated: async () => {
+        log.info('Method not implemented');
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      CommentCreated: async () => {
+        log.info('Method not implemented');
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      UserMentioned: async () => {
+        log.info('Method not implemented');
+      },
     },
-    // eslint-disable-next-line @typescript-eslint/require-await
-    ChainEventCreated: async () => {
-      log.info('Method not implemented');
-    },
-    // eslint-disable-next-line @typescript-eslint/require-await
-    ThreadCreated: async () => {
-      log.info('Method not implemented');
-    },
-    // eslint-disable-next-line @typescript-eslint/require-await
-    CommentCreated: async () => {
-      log.info('Method not implemented');
-    },
-    // eslint-disable-next-line @typescript-eslint/require-await
-    UserMentioned: async () => {
-      log.info('Method not implemented');
-    },
-  },
-});
+  };
+}

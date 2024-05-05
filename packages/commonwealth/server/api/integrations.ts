@@ -8,31 +8,33 @@ const inputs = {
   CommentCreated: events.CommentCreated,
 };
 
-const Analytics: Policy<typeof inputs> = () => ({
-  inputs,
-  body: {
-    GroupCreated: async ({ name, payload }) => {
-      analytics().track(MixpanelCommunityInteractionEvent.CREATE_GROUP, {
-        name,
-        ...payload,
-      });
-    },
+function Analytics(): Policy<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      GroupCreated: async ({ name, payload }) => {
+        analytics().track(MixpanelCommunityInteractionEvent.CREATE_GROUP, {
+          name,
+          ...payload,
+        });
+      },
 
-    ThreadCreated: async ({ name, payload }) => {
-      analytics().track(MixpanelCommunityInteractionEvent.CREATE_THREAD, {
-        name,
-        ...payload,
-      });
-    },
+      ThreadCreated: async ({ name, payload }) => {
+        analytics().track(MixpanelCommunityInteractionEvent.CREATE_THREAD, {
+          name,
+          ...payload,
+        });
+      },
 
-    CommentCreated: async ({ name, payload }) => {
-      analytics().track(MixpanelCommunityInteractionEvent.CREATE_COMMENT, {
-        name,
-        ...payload,
-      });
+      CommentCreated: async ({ name, payload }) => {
+        analytics().track(MixpanelCommunityInteractionEvent.CREATE_COMMENT, {
+          name,
+          ...payload,
+        });
+      },
     },
-  },
-});
+  };
+}
 
 export const trpcRouter = trpc.router({
   analytics: trpc.event(Analytics, trpc.Tag.Integration),
