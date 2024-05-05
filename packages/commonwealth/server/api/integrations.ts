@@ -12,25 +12,31 @@ function Analytics(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
-      GroupCreated: async ({ name, payload }) => {
-        analytics().track(MixpanelCommunityInteractionEvent.CREATE_GROUP, {
-          name,
-          ...payload,
-        });
+      GroupCreated: ({ name, payload }) => {
+        return Promise.resolve(
+          analytics().track(MixpanelCommunityInteractionEvent.CREATE_GROUP, {
+            name,
+            ...payload,
+          }),
+        );
       },
 
-      ThreadCreated: async ({ name, payload }) => {
-        analytics().track(MixpanelCommunityInteractionEvent.CREATE_THREAD, {
-          name,
-          ...payload,
-        });
+      ThreadCreated: ({ name, payload }) => {
+        return Promise.resolve(
+          analytics().track(MixpanelCommunityInteractionEvent.CREATE_THREAD, {
+            name,
+            ...payload,
+          }),
+        );
       },
 
-      CommentCreated: async ({ name, payload }) => {
-        analytics().track(MixpanelCommunityInteractionEvent.CREATE_COMMENT, {
-          name,
-          ...payload,
-        });
+      CommentCreated: ({ name, payload }) => {
+        return Promise.resolve(
+          analytics().track(MixpanelCommunityInteractionEvent.CREATE_COMMENT, {
+            name,
+            ...payload,
+          }),
+        );
       },
     },
   };
