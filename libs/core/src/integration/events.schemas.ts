@@ -1,12 +1,13 @@
 import {
+  Comment,
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
-  entities,
-} from '@hicommonwealth/shared';
+  Thread,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-export const ThreadCreated = entities.Thread;
-export const CommentCreated = entities.Comment;
+export const ThreadCreated = Thread;
+export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),

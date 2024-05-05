@@ -1,11 +1,11 @@
 import { type Query } from '@hicommonwealth/core';
-import { queries } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 export const GetCommentSubscriptions: Query<
-  typeof queries.GetCommentSubscriptions
+  typeof schemas.GetCommentSubscriptions
 > = () => ({
-  ...queries.GetCommentSubscriptions,
+  ...schemas.GetCommentSubscriptions,
   auth: [],
   secure: true,
   body: async ({ actor }) => {

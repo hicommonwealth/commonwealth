@@ -87,6 +87,7 @@
     "@hicommonwealth/core": "*",
     "@hicommonwealth/model": "*",
     "@hicommonwealth/logging": "*",
+    "@hicommonwealth/schemas": "*",
     "@hicommonwealth/shared": "*",
     "@hookform/resolvers": "^3.3.1",
     "@keplr-wallet/types": "^0.12.23",

@@ -1,11 +1,11 @@
 import { type Command } from '@hicommonwealth/core';
-import { commands } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 export const UpdateSubscriptionPreferences: Command<
-  typeof commands.UpdateSubscriptionPreferences
+  typeof schemas.UpdateSubscriptionPreferences
 > = () => ({
-  ...commands.UpdateSubscriptionPreferences,
+  ...schemas.UpdateSubscriptionPreferences,
   auth: [],
   secure: true,
   body: async ({ payload, actor }) => {

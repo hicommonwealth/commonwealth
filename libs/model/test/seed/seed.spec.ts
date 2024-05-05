@@ -1,12 +1,11 @@
 import { dispose, type DeepPartial } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   NotificationCategories,
-  entities,
-  type Aggregates,
 } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -20,16 +19,16 @@ chai.use(chaiAsPromised);
 
 // testSeed creates an entity using the `seed` function
 // then attempts to find the entity and validate it
-async function testSeed<T extends Aggregates>(
+async function testSeed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof entities[T]>>,
+  values?: DeepPartial<z.infer<typeof schemas.entities[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<z.infer<typeof entities[T]>> {
+): Promise<z.infer<typeof schemas.entities[T]>> {
   const [record, records] = await seed(name, values, options);
   expect(records.length, 'failed to create entity').to.be.gt(0);
 
   // perform schema validation on created entity (throws)
-  const schema = entities[name];
+  const schema = schemas.entities[name];
   const model = models[name];
   const data: ReturnType<typeof schema.parse> = schema.parse(record);
 

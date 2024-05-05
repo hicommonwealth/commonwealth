@@ -1,5 +1,5 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-import { commands } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
@@ -12,8 +12,8 @@ export const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export const CreateGroup: Command<typeof commands.CreateGroup> = () => ({
-  ...commands.CreateGroup,
+export const CreateGroup: Command<typeof schemas.CreateGroup> = () => ({
+  ...schemas.CreateGroup,
   auth: [isCommunityAdminOrModerator],
   body: async ({ id, payload }) => {
     const groups = await models.Group.findAll({

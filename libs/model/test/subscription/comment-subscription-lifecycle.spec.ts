@@ -1,5 +1,6 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { BalanceType, entities } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
+import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import z from 'zod';
 import { models } from '../../src/database';
@@ -12,8 +13,8 @@ import { seed } from '../../src/tester';
 
 describe('Comment subscription lifecycle', () => {
   let actor: Actor;
-  let commentOne: z.infer<typeof entities.Comment> | undefined;
-  let commentTwo: z.infer<typeof entities.Comment> | undefined;
+  let commentOne: z.infer<typeof schemas.Comment> | undefined;
+  let commentTwo: z.infer<typeof schemas.Comment> | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,

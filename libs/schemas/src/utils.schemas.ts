@@ -1,10 +1,10 @@
-import { z } from 'zod';
 import {
   MAX_COMMUNITY_IMAGE_SIZE_KB,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
-} from '../constants';
-import { getFileSizeBytes } from '../utils';
+  getFileSizeBytes,
+} from '@hicommonwealth/shared';
+import { z } from 'zod';
 
 export enum LinkSource {
   Snapshot = 'snapshot',

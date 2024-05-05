@@ -1,10 +1,10 @@
 import { type Command } from '@hicommonwealth/core';
-import { commands } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { mustNotExist } from '../middleware/guards';
 
-export const CreateThread: Command<typeof commands.CreateTodo> = () => ({
-  ...commands.CreateTodo,
+export const CreateThread: Command<typeof schemas.CreateTodo> = () => ({
+  ...schemas.CreateTodo,
   auth: [],
   body: async ({ id, payload }) => {
     const thread = await models.Thread.findOne({ where: { id } });

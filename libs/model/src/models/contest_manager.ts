@@ -1,9 +1,9 @@
-import { entities } from '@hicommonwealth/shared';
+import { ContestManager } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-type ContestManager = ModelInstance<z.infer<typeof entities.ContestManager>>;
+type ContestManager = ModelInstance<z.infer<typeof ContestManager>>;
 
 export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestManager>>sequelize.define<ContestManager>(

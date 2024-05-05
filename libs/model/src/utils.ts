@@ -1,6 +1,7 @@
 import { EventNames, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type { AbiType, entities } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
+import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { Model, ModelCtor, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -24,11 +25,11 @@ export function hashAbi(abi: AbiType): string {
 type EmitEventValues =
   | {
       event_name: EventNames.CommentCreated;
-      event_payload: z.infer<typeof entities.Comment>;
+      event_payload: z.infer<typeof schemas.Comment>;
     }
   | {
       event_name: EventNames.ThreadCreated;
-      event_payload: z.infer<typeof entities.Thread>;
+      event_payload: z.infer<typeof schemas.Thread>;
     }
   | {
       event_name: EventNames.ChainEventCreated;

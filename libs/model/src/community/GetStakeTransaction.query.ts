@@ -1,12 +1,12 @@
 import type { Query } from '@hicommonwealth/core';
-import { queries } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
 export const GetStakeTransaction: Query<
-  typeof queries.GetStakeTransaction
+  typeof schemas.GetStakeTransaction
 > = () => ({
-  ...queries.GetStakeTransaction,
+  ...schemas.GetStakeTransaction,
   auth: [],
   body: async ({ payload }) => {
     const { addresses } = payload;

@@ -6,7 +6,8 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import { Requirement, entities } from '@hicommonwealth/shared';
+import { GroupMetadata } from '@hicommonwealth/schemas';
+import { Requirement } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -29,7 +30,7 @@ export type UpdateGroupOptions = {
   user: UserInstance;
   address: AddressInstance;
   groupId: number;
-  metadata?: z.infer<typeof entities.GroupMetadata>;
+  metadata?: z.infer<typeof GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
 };

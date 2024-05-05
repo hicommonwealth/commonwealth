@@ -1,5 +1,6 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { BalanceType, entities } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
+import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import z from 'zod';
 import { models } from '../../src/database';
@@ -12,8 +13,8 @@ import { seed } from '../../src/tester';
 
 describe('Thread subscription lifecycle', () => {
   let actor: Actor;
-  let threadOne: z.infer<typeof entities.Thread> | undefined;
-  let threadTwo: z.infer<typeof entities.Thread> | undefined;
+  let threadOne: z.infer<typeof schemas.Thread> | undefined;
+  let threadTwo: z.infer<typeof schemas.Thread> | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,

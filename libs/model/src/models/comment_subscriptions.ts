@@ -1,11 +1,9 @@
-import { entities } from '@hicommonwealth/shared';
+import { CommentSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type CommentSubscriptionAttributes = z.infer<
-  typeof entities.CommentSubscription
->;
+export type CommentSubscriptionAttributes = z.infer<typeof CommentSubscription>;
 
 export type CommentSubscriptionInstance =
   ModelInstance<CommentSubscriptionAttributes>;

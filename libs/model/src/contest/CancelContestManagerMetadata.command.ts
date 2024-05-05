@@ -1,13 +1,13 @@
 import type { Command } from '@hicommonwealth/core';
-import { commands } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
 export const CancelContestManagerMetadata: Command<
-  typeof commands.CancelContestManagerMetadata
+  typeof schemas.CancelContestManagerMetadata
 > = () => ({
-  ...commands.CancelContestManagerMetadata,
+  ...schemas.CancelContestManagerMetadata,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     const contestManager = await models.ContestManager.findOne({

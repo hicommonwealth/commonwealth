@@ -1,4 +1,4 @@
-import { PG_INT } from '@hicommonwealth/shared';
+import { PG_INT } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { EventNames } from './events';
 import * as events from './events.schemas';

@@ -1,5 +1,5 @@
 import { EventNames } from '@hicommonwealth/core';
-import { entities } from '@hicommonwealth/shared';
+import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent } from '../utils';
@@ -24,7 +24,7 @@ export type Link = {
   title?: string;
 };
 
-export type ThreadAttributes = z.infer<typeof entities.Thread> & {
+export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
   Address?: AddressAttributes;

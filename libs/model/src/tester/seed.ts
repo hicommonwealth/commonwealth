@@ -4,7 +4,7 @@ import {
   entities,
   type Aggregates,
   type Entities,
-} from '@hicommonwealth/shared';
+} from '@hicommonwealth/schemas';
 import { Model, ModelStatic } from 'sequelize';
 import z, { ZodNullable, ZodObject, ZodUnknown } from 'zod';
 import type { State } from '../models';

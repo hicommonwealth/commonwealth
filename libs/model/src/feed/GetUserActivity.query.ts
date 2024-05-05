@@ -1,10 +1,10 @@
 import { Query } from '@hicommonwealth/core';
-import { queries } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const GetUserActivity: Query<typeof queries.ThreadFeed> = () => ({
-  ...queries.ThreadFeed,
+export const GetUserActivity: Query<typeof schemas.ThreadFeed> = () => ({
+  ...schemas.ThreadFeed,
   auth: [],
   secure: true,
   body: async ({ actor }) => {

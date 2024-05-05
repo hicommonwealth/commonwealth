@@ -1,9 +1,9 @@
 {
-  "name": "@hicommonwealth/core",
+  "name": "@hicommonwealth/schemas",
   "private": "true",
   "type": "module",
   "version": "0.1.0",
-  "description": "Core Abstractions and Shared Utilities",
+  "description": "Shared model schemas",
   "files": [
     "build"
   ],
@@ -13,15 +13,10 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
+    "test": "echo No tests for @hicommonwealth/schemas"
   },
   "dependencies": {
-    "@hicommonwealth/logging": "*",
-    "@hicommonwealth/schemas": "*",
     "@hicommonwealth/shared": "*",
     "zod": "^3.22.4"
-  },
-  "devDependencies": {
-    "tsx": "^4.7.2"
   }
 }

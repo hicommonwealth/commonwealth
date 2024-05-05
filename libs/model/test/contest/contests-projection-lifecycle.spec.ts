@@ -6,7 +6,8 @@ import {
   handleEvent,
   query,
 } from '@hicommonwealth/core';
-import { commonProtocol, queries } from '@hicommonwealth/shared';
+import { ContestResults } from '@hicommonwealth/schemas';
+import { commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
@@ -323,7 +324,7 @@ describe('Contests projection lifecycle', () => {
           },
         ],
       },
-    ] as Array<z.infer<typeof queries.ContestResults>>);
+    ] as Array<z.infer<typeof ContestResults>>);
   });
 
   it('should raise invalid state when community with namespace not found', async () => {

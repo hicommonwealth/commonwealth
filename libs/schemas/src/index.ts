@@ -1,11 +1,6 @@
 import * as entities from './entities.schemas';
 
-export * as commands from './commands';
-export * as entities from './entities.schemas';
-export * as projections from './projections';
-export * as queries from './queries';
-export * from './utils.schemas';
-
+export { entities };
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
   Entities,
@@ -22,3 +17,9 @@ export type Aggregates = Extract<
   | 'Address'
   | 'Topic'
 >;
+
+export * from './commands';
+export * from './entities.schemas';
+export * from './projections';
+export * from './queries';
+export * from './utils.schemas';

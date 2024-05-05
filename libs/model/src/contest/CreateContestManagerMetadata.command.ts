@@ -1,6 +1,6 @@
 import type { Command } from '@hicommonwealth/core';
 import { InvalidState } from '@hicommonwealth/core';
-import { commands } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
@@ -12,9 +12,9 @@ const Errors = {
 };
 
 export const CreateContestManagerMetadata: Command<
-  typeof commands.CreateContestManagerMetadata
+  typeof schemas.CreateContestManagerMetadata
 > = () => ({
-  ...commands.CreateContestManagerMetadata,
+  ...schemas.CreateContestManagerMetadata,
   auth: [isCommunityAdmin],
   body: async ({ id, payload }) => {
     const { topic_ids, ...rest } = payload;

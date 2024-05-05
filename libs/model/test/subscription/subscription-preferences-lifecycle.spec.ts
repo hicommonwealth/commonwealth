@@ -1,6 +1,6 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { entities } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import { SubscriptionPreference } from 'schemas/src/entities.schemas';
 import z from 'zod';
 import { models } from '../../src/database';
 import {
@@ -11,9 +11,7 @@ import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
-  let subPreferences:
-    | z.infer<typeof entities.SubscriptionPreference>
-    | undefined;
+  let subPreferences: z.infer<typeof SubscriptionPreference> | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,

@@ -1,9 +1,9 @@
-import { entities } from '@hicommonwealth/shared';
+import { ContestTopic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-type ContestTopic = ModelInstance<z.infer<typeof entities.ContestTopic>>;
+type ContestTopic = ModelInstance<z.infer<typeof ContestTopic>>;
 
 export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestTopic>>sequelize.define<ContestTopic>(

@@ -1,5 +1,3 @@
-import z from 'zod';
-import { Denominations, WeiDecimals } from '../commonProtocol/utils';
 import {
   BalanceSourceType,
   BalanceType,
@@ -10,7 +8,9 @@ import {
   DefaultPage,
   NodeHealth,
   NotificationCategories,
-} from '../types';
+  commonProtocol,
+} from '@hicommonwealth/shared';
+import z from 'zod';
 import { Contest } from './projections';
 import { PG_INT, discordMetaSchema, linksSchema } from './utils.schemas';
 
@@ -307,8 +307,10 @@ export const ContestManager = z
       .min(0)
       .max(100)
       .describe('Recurring contest interval, 0 when one-off'),
-    ticker: z.string().optional().default(Denominations.ETH),
-    decimals: PG_INT.optional().default(WeiDecimals[Denominations.ETH]),
+    ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
+    decimals: PG_INT.optional().default(
+      commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
+    ),
     created_at: z.date(),
     cancelled: z
       .boolean()

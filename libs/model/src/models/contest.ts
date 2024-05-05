@@ -1,9 +1,9 @@
-import { projections } from '@hicommonwealth/shared';
+import { Contest } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-type Contest = ModelInstance<z.infer<typeof projections.Contest>>;
+type Contest = ModelInstance<z.infer<typeof Contest>>;
 
 export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<Contest>>sequelize.define<Contest>(

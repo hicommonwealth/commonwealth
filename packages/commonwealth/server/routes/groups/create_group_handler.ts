@@ -1,12 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
 import { GroupAttributes } from '@hicommonwealth/model';
-import { Requirement, entities } from '@hicommonwealth/shared';
+import { GroupMetadata } from '@hicommonwealth/schemas';
+import { Requirement } from '@hicommonwealth/shared';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type CreateGroupBody = {
-  metadata: z.infer<typeof entities.GroupMetadata>;
+  metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
 };

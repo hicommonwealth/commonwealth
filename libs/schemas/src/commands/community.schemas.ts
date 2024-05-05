@@ -1,10 +1,12 @@
-import { z } from 'zod';
 import {
   ALL_COMMUNITIES,
+  ChainBase,
+  ChainType,
+  CommunityCategoryType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
-} from '../../constants';
-import { ChainBase, ChainType, CommunityCategoryType } from '../../types';
+} from '@hicommonwealth/shared';
+import { z } from 'zod';
 import { Community, Group, StakeTransaction } from '../entities.schemas';
 import { PG_INT, checkIconSize } from '../utils.schemas';
 

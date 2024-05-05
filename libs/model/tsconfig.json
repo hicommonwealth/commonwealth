@@ -3,6 +3,7 @@
   "references": [
     { "path": "../core/tsconfig.build.json" },
     { "path": "../chains/tsconfig.build.json" },
+    { "path": "../schemas/tsconfig.build.json" },
     { "path": "../shared/tsconfig.build.json" },
     { "path": "../logging/tsconfig.build.json" }
   ]

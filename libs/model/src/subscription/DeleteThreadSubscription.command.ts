@@ -1,11 +1,11 @@
 import { type Command } from '@hicommonwealth/core';
-import { commands } from '@hicommonwealth/shared';
+import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 export const DeleteThreadSubscription: Command<
-  typeof commands.DeleteThreadSubscription
+  typeof schemas.DeleteThreadSubscription
 > = () => ({
-  ...commands.DeleteThreadSubscription,
+  ...schemas.DeleteThreadSubscription,
   auth: [],
   secure: true,
   body: async ({ payload, actor }) => {
