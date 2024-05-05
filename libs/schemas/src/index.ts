@@ -1,6 +1,5 @@
 import * as entities from './entities.schemas';
 
-export { entities };
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
   Entities,

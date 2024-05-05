@@ -27,9 +27,7 @@ export function UpdateContestManagerMetadata(): Command<
       });
 
       if (mustExist('ContestManager', contestManager)) {
-        let contestTopicsToCreate: z.infer<
-          typeof schemas.entities['ContestTopic']
-        >[] = [];
+        let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
 
         if (Array.isArray(topic_ids) && topic_ids.length > 0) {
           const topics = await models.Topic.findAll({
