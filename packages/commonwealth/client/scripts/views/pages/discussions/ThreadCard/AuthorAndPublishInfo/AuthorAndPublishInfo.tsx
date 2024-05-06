@@ -1,7 +1,7 @@
 import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import React, { useRef } from 'react';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
@@ -23,6 +23,25 @@ import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
+
+function formatVersionText(
+  timestamp: Moment,
+  address: string | null,
+  profile: UserProfile,
+  collabInfo: Record<string, string>,
+) {
+  const formattedTime = timestamp.format('MMMM D, YYYY h:mmA');
+  // Some old posts don't have address, so account for them by omitting address
+  if (!address) {
+    return formattedTime;
+  }
+  let formattedName = collabInfo[address] ?? 'Anonymous';
+  if (profile.address === address) {
+    formattedName = profile.name ?? 'Anonymous';
+  }
+
+  return formattedTime + '\n' + formattedName + ' ' + address.substring(0, 5);
+}
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
@@ -85,10 +104,21 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
+  const collaboratorLookupInfo: Record<string, string> =
+    collaboratorsInfo?.reduce((acc, collaborator) => {
+      acc[collaborator.address] = collaborator.User.Profiles[0].name;
+      return acc;
+    }, {});
+
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
   const versionHistoryOptions = versionHistory?.map((v) => ({
     value: v.body,
-    label: v.timestamp.format('MMMM D, YYYY h:mmA'),
+    label: formatVersionText(
+      v.timestamp,
+      v.author?.address,
+      profile,
+      collaboratorLookupInfo,
+    ),
   }));
 
   return (
@@ -168,6 +198,9 @@ export const AuthorAndPublishInfo = ({
                 )}`}
                 onChange={({ value }) => {
                   changeContentText(value);
+                }}
+                formatOptionLabel={(option) => {
+                  return option.label.split('\n')[0];
                 }}
               />
             </div>
