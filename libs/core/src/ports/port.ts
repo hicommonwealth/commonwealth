@@ -68,11 +68,8 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
 };
 
 export const disposeAdapter = (name: string): void => {
-  console.log('Disposing', name);
-  console.log(adapters);
   adapters.get(name)?.dispose();
   adapters.delete(name);
-  console.log(adapters);
   adapters.clear();
 };
 

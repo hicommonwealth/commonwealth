@@ -1,6 +1,7 @@
 import {
   EventNames,
   WorkflowKeys,
+  dispose,
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
@@ -20,7 +21,7 @@ import {
 
 chai.use(chaiAsPromised);
 
-describe.only('CommentCreated Event Handler', () => {
+describe('CommentCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined,
     author: z.infer<typeof schemas.User> | undefined,
     subscriber: z.infer<typeof schemas.User> | undefined,
@@ -93,6 +94,10 @@ describe.only('CommentCreated Event Handler', () => {
   beforeEach(async () => {
     await models.ThreadSubscription.truncate();
     await models.CommentSubscription.truncate();
+  });
+
+  after(() => {
+    dispose()();
   });
 
   it('should not throw if a valid author is not found', async () => {
