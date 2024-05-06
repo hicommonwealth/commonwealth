@@ -8,17 +8,19 @@ import {
 } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerTopics,
-  CommentDiscordActions,
+  BrokerSubscriptions,
   EventHandler,
-  IDiscordMessage,
   Policy,
-  ThreadDiscordActions,
   broker,
   schemas,
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import {
+  CommentDiscordActions,
+  IDiscordMessage,
+  ThreadDiscordActions,
+} from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
@@ -137,12 +139,14 @@ async function main() {
   });
 
   const result = await brokerInstance.subscribe(
-    BrokerTopics.DiscordListener,
+    BrokerSubscriptions.DiscordListener,
     Discord(),
   );
 
   if (!result) {
-    throw new Error(`Failed to subscribe to ${BrokerTopics.DiscordListener}`);
+    throw new Error(
+      `Failed to subscribe to ${BrokerSubscriptions.DiscordListener}`,
+    );
   }
 
   isServiceHealthy = true;

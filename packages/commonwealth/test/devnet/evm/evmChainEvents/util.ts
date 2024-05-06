@@ -1,4 +1,4 @@
-import { ChainTesting } from '../../../util/evm-chain-testing/sdk/chainTesting';
+import { ChainTesting } from '@hicommonwealth/evm-testing';
 
 export const localRpc = 'http://localhost:8545';
 export const sdk = new ChainTesting('http://127.0.0.1:3000');

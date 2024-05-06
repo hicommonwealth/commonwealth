@@ -1,5 +1,6 @@
-import { delay, schemas } from '@hicommonwealth/core';
+import { schemas } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
+import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { numUnrelayedEvents } from '../../../server/workers/messageRelayer/relayForever';

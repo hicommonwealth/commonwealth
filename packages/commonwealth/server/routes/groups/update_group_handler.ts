@@ -1,5 +1,6 @@
-import { AppError, Requirement, schemas } from '@hicommonwealth/core';
+import { AppError, schemas } from '@hicommonwealth/core';
 import { GroupAttributes, models } from '@hicommonwealth/model';
+import { Requirement } from '@hicommonwealth/shared';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
