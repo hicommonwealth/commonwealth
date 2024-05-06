@@ -1,24 +1,26 @@
 import {
+  Contest,
+  PG_INT,
+  discordMetaSchema,
+  linksSchema,
+} from '@hicommonwealth/schemas';
+import {
+  BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
   DefaultPage,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+  NodeHealth,
   NotificationCategories,
   commonProtocol,
 } from '@hicommonwealth/shared';
 import z from 'zod';
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '../constants';
-import { BalanceSourceType, NodeHealth } from '../types';
-import * as events from './events.schemas';
-import { Contest } from './projections';
-import {
-  EventNames,
-  PG_INT,
-  discordMetaSchema,
-  linksSchema,
-} from './utils.schemas';
+import { EventNames } from '../integration';
+import * as events from '../integration/events.schemas';
 
 export const User = z.object({
   id: PG_INT.optional(),

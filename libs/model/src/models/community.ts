@@ -1,4 +1,4 @@
-import { schemas } from '@hicommonwealth/core';
+import { Community } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { AddressInstance } from './address';
@@ -11,7 +11,7 @@ import type { TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type CommunityAttributes = z.infer<typeof schemas.entities.Community> & {
+export type CommunityAttributes = z.infer<typeof Community> & {
   // associations
   ChainNode?: ChainNodeAttributes;
   StarredCommunities?:
@@ -50,7 +50,7 @@ export default (sequelize: Sequelize.Sequelize) =>
     // with this model using .Chain rather than .Community. Models should incrementally
     // be aliased via `as: 'Community'` until all models use Community at which point,
     // this can be updated to 'Community' and all aliases can be removed.
-    'Chain',
+    'Community',
     {
       id: { type: Sequelize.STRING, primaryKey: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true }, // only null if starter community
@@ -141,6 +141,11 @@ export default (sequelize: Sequelize.Sequelize) =>
       created_at: { type: Sequelize.DATE, allowNull: true },
       updated_at: { type: Sequelize.DATE, allowNull: true },
       redirect: { type: Sequelize.TEXT, allowNull: true },
+      snapshot_spaces: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
     },
     {
       tableName: 'Communities',

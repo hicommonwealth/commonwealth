@@ -25,6 +25,7 @@
 - [Groups](./Groups.md)
 - [Notifications](./Notifications.md)
 - [Notifications QA](./Notifications-QA.md)
+- [Stake](./Stake.md).
 
 ## Chain Tools
 
