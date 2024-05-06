@@ -1,4 +1,4 @@
-import * as entities from './entities.schemas';
+import * as entities from './entities';
 
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
@@ -18,7 +18,7 @@ export type Aggregates = Extract<
 >;
 
 export * from './commands';
-export * from './entities.schemas';
+export * from './entities';
 export * from './projections';
 export * from './queries';
-export * from './utils.schemas';
+export * from './utils';

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { Community, Group, Requirement } from '../entities.schemas';
-import { PG_INT } from '../utils.schemas';
+import { Community, Group, Requirement } from '../entities';
+import { PG_INT } from '../utils';
 
 export const CreateGroup = {
   input: z.object({

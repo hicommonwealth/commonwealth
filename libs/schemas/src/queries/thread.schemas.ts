@@ -5,7 +5,7 @@ import {
   paginationSchema,
   PG_INT,
   zBoolean,
-} from '../utils.schemas';
+} from '../utils';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',

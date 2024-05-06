@@ -1,18 +1,11 @@
 import {
+  LinkSource,
   MAX_COMMUNITY_IMAGE_SIZE_KB,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
   getFileSizeBytes,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-
-export enum LinkSource {
-  Snapshot = 'snapshot',
-  Proposal = 'proposal',
-  Thread = 'thread',
-  Web = 'web',
-  Template = 'template',
-}
 
 export const paginationSchema = {
   limit: z.coerce

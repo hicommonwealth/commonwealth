@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ContestManager } from '../entities.schemas';
+import { ContestManager } from '../entities';
 import { Contest, ContestAction } from '../projections';
 
 export const ContestResults = ContestManager.extend({

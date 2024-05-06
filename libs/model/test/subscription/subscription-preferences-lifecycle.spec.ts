@@ -1,6 +1,6 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
-import { SubscriptionPreference } from 'schemas/src/entities.schemas';
 import z from 'zod';
 import { models } from '../../src/database';
 import {

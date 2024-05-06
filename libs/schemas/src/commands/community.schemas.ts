@@ -7,8 +7,8 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Group, StakeTransaction } from '../entities.schemas';
-import { PG_INT, checkIconSize } from '../utils.schemas';
+import { Community, Group, StakeTransaction } from '../entities';
+import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({

@@ -1,5 +1,5 @@
 import z from 'zod';
-import { PG_INT } from '../utils.schemas';
+import { PG_INT } from '../utils';
 
 export const PaginationParamsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().default(10),
