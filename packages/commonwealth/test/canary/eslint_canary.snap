@@ -5,3 +5,4 @@
   39:1  error  Unexpected 'FIXME' comment: 'FIXME this should not be accepted'                                                                                                     no-warning-comments
 
 ✖ 4 problems (4 errors, 0 warnings)
+
