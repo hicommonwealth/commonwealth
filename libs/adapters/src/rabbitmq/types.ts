@@ -32,6 +32,7 @@ export enum RascalQueues {
 }
 
 export enum RascalBindings {
+  NotificationsProvider = 'NotificationsProviderBinding',
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
@@ -39,6 +40,7 @@ export enum RascalBindings {
 }
 
 export enum RascalRoutingKeys {
+  NotificationsProvider = '*',
   SnapshotListener = EventNames.SnapshotProposalCreated,
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
