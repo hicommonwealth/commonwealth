@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PG_INT } from '../utils.schemas';
+import { PG_INT } from '../utils';
 
 export const CONTEST_ACTIONS = ['added', 'upvoted'] as const;
 

@@ -4,7 +4,7 @@ import {
   EventSchemas,
   EventsHandlerMetadata,
 } from '../framework';
-import { Events } from '../schemas';
+import { Events } from '../integration/events';
 
 /**
  * Resource disposer function
