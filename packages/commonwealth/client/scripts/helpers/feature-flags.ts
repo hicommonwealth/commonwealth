@@ -7,14 +7,14 @@ import { InMemoryProvider } from '@openfeature/web-sdk';
 import { UnleashClient } from 'unleash-proxy-client';
 import { UnleashProvider } from '../../../shared/UnleashProvider';
 
-const buildFlag = (env: string) => {
+const buildFlag = (env: string, defaultValue: 'on' | 'off' = 'off') => {
   return {
     variants: {
       on: true,
       off: false,
     },
     disabled: false,
-    defaultVariant: env === 'true' ? 'on' : 'off',
+    defaultVariant: env === 'true' ? 'on' : defaultValue,
   };
 };
 
@@ -27,7 +27,10 @@ const featureFlags = {
     process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
   ),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
-  knockInAppNotifications: buildFlag(process.env.KNOCK_IN_APP_NOTIFICATIONS),
+  knockInAppNotifications: buildFlag(
+    process.env.KNOCK_IN_APP_NOTIFICATIONS,
+    'on',
+  ), // FIXME: make sure this is 'off' before merge.
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

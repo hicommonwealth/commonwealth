@@ -51,21 +51,23 @@ export const Knock = () => {
   }
 
   return (
-    <KnockProvider apiKey={KNOCK_PUBLIC_API_KEY} userId={`${userId}`}>
-      {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
-      <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
-        <div>
-          <NotificationIconButton
-            ref={notifButtonRef}
-            onClick={() => setIsVisible(!isVisible)}
-          />
-          <NotificationFeedPopover
-            buttonRef={notifButtonRef}
-            isVisible={isVisible}
-            onClose={() => setIsVisible(false)}
-          />
-        </div>
-      </KnockFeedProvider>
-    </KnockProvider>
+    <div className="knock-notifications-button">
+      <KnockProvider apiKey={KNOCK_PUBLIC_API_KEY} userId={`${userId}`}>
+        {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
+        <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
+          <div>
+            <NotificationIconButton
+              ref={notifButtonRef}
+              onClick={() => setIsVisible(!isVisible)}
+            />
+            <NotificationFeedPopover
+              buttonRef={notifButtonRef}
+              isVisible={isVisible}
+              onClose={() => setIsVisible(false)}
+            />
+          </div>
+        </KnockFeedProvider>
+      </KnockProvider>
+    </div>
   );
 };

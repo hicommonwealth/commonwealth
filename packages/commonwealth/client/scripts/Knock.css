@@ -1,3 +1,4 @@
-.nf-notification-icon-button {
-  fill: red;
+.knock-notifications-button svg {
+  color: rgb(117, 117, 117);
+  fill: rgb(255, 255, 255) !important;
 }
