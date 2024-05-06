@@ -50,6 +50,9 @@ export default (sequelize: Sequelize.Sequelize) =>
           fields: ['user_id', 'thread_id'],
           unique: true,
         },
+        {
+          fields: ['thread_id'],
+        },
       ],
     },
   );

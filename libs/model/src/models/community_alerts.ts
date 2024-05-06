@@ -48,6 +48,9 @@ export default (sequelize: Sequelize.Sequelize) =>
           fields: ['user_id', 'community_id'],
           unique: true,
         },
+        {
+          fields: ['community_id'],
+        },
       ],
     },
   );

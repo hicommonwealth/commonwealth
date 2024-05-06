@@ -34,6 +34,9 @@ export default (sequelize: Sequelize.Sequelize) =>
       updatedAt: 'updated_at',
       tableName: 'CommentSubscriptions',
       underscored: false,
-      indexes: [{ fields: ['user_id', 'comment_id'], unique: true }],
+      indexes: [
+        { fields: ['user_id', 'comment_id'], unique: true },
+        { fields: ['comment_id'] },
+      ],
     },
   );
