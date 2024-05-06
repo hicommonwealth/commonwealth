@@ -9,10 +9,15 @@ import React, { useRef, useState } from 'react';
 import '@knocklabs/react-notification-feed/dist/index.css';
 import app from 'state';
 
+import './Knock.css';
+
 const KNOCK_PUBLIC_API_KEY =
   'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM';
 
 const KNOCK_IN_APP_FEED_ID = 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb';
+
+// TODO: Now the problem is CSS is inheriting into the buttons so I just have to
+// fix that.
 
 function useUserId(): number | undefined {
   // const [userId, setUserId] = useState(undefined);
@@ -48,7 +53,7 @@ export const Knock = () => {
   return (
     <KnockProvider apiKey={KNOCK_PUBLIC_API_KEY} userId={`${userId}`}>
       {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
-      <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID}>
+      <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
         <div>
           <NotificationIconButton
             ref={notifButtonRef}

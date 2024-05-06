@@ -3,6 +3,8 @@ import React from 'react';
 import app from 'state';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
+import { Knock } from 'Knock';
+import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
@@ -14,7 +16,6 @@ import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearch
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-
 import UserDropdown from './UserDropdown';
 
 import './DesktopHeader.scss';
@@ -50,6 +51,8 @@ const DesktopHeader = ({
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
+
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   return (
     <div className="DesktopHeader">
@@ -105,7 +108,7 @@ const DesktopHeader = ({
 
           <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
 
-          {/*{isLoggedIn && <Knock />}*/}
+          {isLoggedIn && enableKnockInAppNotifications && <Knock />}
         </div>
 
         {isLoggedIn && (
