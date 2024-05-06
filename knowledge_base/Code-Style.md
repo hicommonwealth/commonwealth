@@ -29,7 +29,7 @@ TSDoc syntax is preferred over inline comments when documenting newly declared f
 
 TSDoc syntax is especially preferred in the following cases:
 
-1. Edge cases where clear naming, and descriptive typing, still leaves ambiguity of intent.
+1. Code where clear naming and descriptive typing still leave ambiguity of intent.
 2. Code that is exported or else frequently re-invoked, so as to populate built-in IDE preview features.
 3. Code we plan to expose to external developers (e.g. in our API),where we may wish to autogenerate external-facing HTML documents describing how to use our interface.
 
