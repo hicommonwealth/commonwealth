@@ -67,6 +67,15 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
     process.exit(code === 'ERROR' ? 1 : 0);
 };
 
+export const disposeAdapter = (name: string): void => {
+  console.log('Disposing', name);
+  console.log(adapters);
+  adapters.get(name)?.dispose();
+  adapters.delete(name);
+  console.log(adapters);
+  adapters.clear();
+};
+
 /**
  * Registers resource disposers that get triggered on process exits
  * @param disposer the disposer function

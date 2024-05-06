@@ -50,6 +50,7 @@
     "test-e2e": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eRegular/*",
     "test-e2e-mature": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/mature/*",
     "test-e2e-serial": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
+    "test-integration": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/integration/**/*.spec.ts'",
     "test-integration-util": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/integration/*.spec.ts",
     "test-select": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha",
     "test-suite": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'",

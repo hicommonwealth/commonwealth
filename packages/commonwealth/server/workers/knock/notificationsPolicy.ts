@@ -1,7 +1,7 @@
 import { Policy, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'node:url';
-import { processCommentCreated } from './policies/commentCreated';
+import { processCommentCreated } from './eventHandlers/commentCreated';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -31,7 +31,9 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         log.info('Method not implemented');
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      CommentCreated: processCommentCreated,
+      CommentCreated: async (event) => {
+        await processCommentCreated(event);
+      },
       // eslint-disable-next-line @typescript-eslint/require-await
       UserMentioned: async () => {
         log.info('Method not implemented');
