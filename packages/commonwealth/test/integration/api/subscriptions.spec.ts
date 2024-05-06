@@ -1,19 +1,15 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories } from '@hicommonwealth/core';
-import {
-  models,
-  SubscriptionValidationErrors,
-  tester,
-} from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { SubscriptionValidationErrors } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import Errors from '../../../server/routes/subscription/errors';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -21,29 +17,31 @@ const { expect } = chai;
 describe('Subscriptions Tests', () => {
   let jwtToken, loggedInAddr, loggedInSession, thread, comment, userId: number;
   const community_id = 'ethereum';
+  let server: TestServer;
 
   before('reset database', async () => {
-    await tester.seedDb();
+    server = await testServer();
     // get logged in address/user with JWT
-    const result = await modelUtils.createAndVerifyAddress({
-      chain: community_id,
-    });
+    const result = await server.seeder.createAndVerifyAddress(
+      { chain: community_id },
+      'Alice',
+    );
     loggedInAddr = result.address;
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET,
     );
-    userId = result.user_id;
+    userId = +result.user_id;
 
-    const topic = await models.Topic.findOne({
+    const topic = await server.models.Topic.findOne({
       where: {
         community_id,
         group_ids: [],
       },
     });
 
-    let res = await modelUtils.createThread({
+    let res = await server.seeder.createThread({
       chainId: community_id,
       address: loggedInAddr,
       jwt: jwtToken,
@@ -59,7 +57,7 @@ describe('Subscriptions Tests', () => {
     expect(res.status).to.be.equal('Success');
     thread = res.result;
 
-    res = await modelUtils.createComment({
+    res = await server.seeder.createComment({
       chain: community_id,
       address: loggedInAddr,
       jwt: jwtToken,
@@ -73,13 +71,17 @@ describe('Subscriptions Tests', () => {
     comment = res.result;
   });
 
+  after(async () => {
+    await dispose()();
+  });
+
   describe('/createSubscription test', () => {
     describe(`${NotificationCategories.NewThread} subscription tests`, () => {
       it('should create new-thread subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, community_id, is_active });
@@ -95,7 +97,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active });
@@ -104,7 +106,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
 
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -122,7 +124,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -137,7 +139,7 @@ describe('Subscriptions Tests', () => {
         const subscription = res.body.result;
 
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -161,7 +163,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -184,7 +186,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -207,7 +209,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -221,7 +223,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.id).to.be.equal(rootCommmentSubscription.id);
 
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -239,7 +241,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -258,7 +260,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -275,7 +277,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -295,7 +297,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -319,7 +321,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -342,7 +344,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -365,7 +367,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -379,7 +381,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.id).to.be.equal(rootCommmentSubscription.id);
 
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -397,7 +399,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -416,7 +418,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -433,7 +435,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -453,7 +455,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -475,7 +477,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewMention;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -494,7 +496,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.NewCollaboration;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -515,7 +517,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.ChainEvent;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active, community_id });
@@ -531,7 +533,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.ChainEvent;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active, community_id });
@@ -547,7 +549,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.ChainEvent;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active });
@@ -556,7 +558,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
 
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -572,20 +574,14 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.SnapshotProposal} subscription tests`, () => {
-      const snapshot_id = 'test_space';
+      const snapshot_id = 'dydxgov.eth';
       let snapshotSubscription;
-
-      before('create a snapshot space', async () => {
-        await models.SnapshotSpace.create({
-          snapshot_space: snapshot_id,
-        });
-      });
 
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active, snapshot_id });
@@ -601,7 +597,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active, snapshot_id });
@@ -616,7 +612,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active });
@@ -625,7 +621,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.be.equal(Errors.InvalidSnapshotSpace);
 
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({
@@ -645,7 +641,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         const category = 'unknown_category';
         const res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active });
@@ -658,7 +654,7 @@ describe('Subscriptions Tests', () => {
         const is_active = true;
         let category = NotificationCategories.ThreadEdit;
         let res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active });
@@ -668,7 +664,7 @@ describe('Subscriptions Tests', () => {
 
         category = NotificationCategories.ThreadEdit;
         res = await chai
-          .request(app)
+          .request(server.app)
           .post('/api/createSubscription')
           .set('Accept', 'application/json')
           .send({ jwt: jwtToken, category, is_active });
@@ -681,17 +677,17 @@ describe('Subscriptions Tests', () => {
   describe('/viewSubscriptions', () => {
     let threadSub, chainEventSub;
     before('Delete existing subscriptions and create new ones', async () => {
-      await models.Subscription.destroy({
+      await server.models.Subscription.destroy({
         where: {},
       });
 
-      threadSub = await modelUtils.createSubscription({
+      threadSub = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
         community_id: community_id,
       });
-      chainEventSub = await modelUtils.createSubscription({
+      chainEventSub = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: false,
         category: NotificationCategories.ChainEvent,
@@ -701,7 +697,7 @@ describe('Subscriptions Tests', () => {
 
     it('should retrieve all of a users subscriptions', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .get('/api/viewSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -724,15 +720,16 @@ describe('Subscriptions Tests', () => {
     });
 
     it('should not fetch subscriptions of another user', async () => {
-      const result = await modelUtils.createAndVerifyAddress({
-        chain: community_id,
-      });
+      const result = await server.seeder.createAndVerifyAddress(
+        { chain: community_id },
+        'Alice',
+      );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
         JWT_SECRET,
       );
 
-      await modelUtils.createSubscription({
+      await server.seeder.createSubscription({
         jwt: newJWT,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -740,7 +737,7 @@ describe('Subscriptions Tests', () => {
       });
 
       const res = await chai
-        .request(app)
+        .request(server.app)
         .get('/api/viewSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -766,7 +763,7 @@ describe('Subscriptions Tests', () => {
   describe('/disableSubscriptions + /enableSubscriptions', () => {
     let subscription: NotificationSubscription;
     before('creating a subscription', async () => {
-      subscription = await modelUtils.createSubscription({
+      subscription = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -777,7 +774,7 @@ describe('Subscriptions Tests', () => {
     it('should disable a subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
@@ -788,7 +785,7 @@ describe('Subscriptions Tests', () => {
     it('should enable a subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
@@ -798,7 +795,7 @@ describe('Subscriptions Tests', () => {
     it('should disable and enable a subscription with just the id as string (not array)', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({
@@ -808,7 +805,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableSubscriptions')
         .set('Accept', 'application/json')
         .send({
@@ -825,7 +822,7 @@ describe('Subscriptions Tests', () => {
         NotificationCategories.ChainEvent,
       ]) {
         subscriptions.push(
-          modelUtils.createSubscription({
+          server.seeder.createSubscription({
             jwt: jwtToken,
             is_active: true,
             category: category,
@@ -837,7 +834,7 @@ describe('Subscriptions Tests', () => {
         (s) => s.id,
       );
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': subscriptionIds });
@@ -845,7 +842,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
 
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': subscriptionIds });
@@ -854,15 +851,16 @@ describe('Subscriptions Tests', () => {
 
     it('should fail to enable and disable subscriptions not owned by the requester', async () => {
       expect(subscription).to.not.be.null;
-      const result = await modelUtils.createAndVerifyAddress({
-        chain: community_id,
-      });
+      const result = await server.seeder.createAndVerifyAddress(
+        { chain: community_id },
+        'Alice',
+      );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
         JWT_SECRET,
       );
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: newJWT, 'subscription_ids[]': [subscription.id] });
@@ -870,7 +868,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: newJWT, 'subscription_ids[]': [subscription.id] });
@@ -881,7 +879,7 @@ describe('Subscriptions Tests', () => {
 
     it('should fail to enable and disable subscription when no subscriptions are passed to route', async () => {
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -889,7 +887,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -902,7 +900,7 @@ describe('Subscriptions Tests', () => {
   describe('/enableImmediateEmails and /disableImmediateEmails', () => {
     let subscription: NotificationSubscription;
     before('creating a subscription', async () => {
-      subscription = await modelUtils.createSubscription({
+      subscription = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -913,7 +911,7 @@ describe('Subscriptions Tests', () => {
     it('should turn on immediate emails, /enableImmediateEmails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
@@ -924,7 +922,7 @@ describe('Subscriptions Tests', () => {
     it('should turn off immediate emails, /disableImmediateEmails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
@@ -934,14 +932,14 @@ describe('Subscriptions Tests', () => {
     it('should fail to enable and disable immediate emails when not passed ids', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -952,7 +950,7 @@ describe('Subscriptions Tests', () => {
     it('should successfully enable and disable with just a string id', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableImmediateEmails')
         .set('Accept', 'application/json')
         .send({
@@ -962,7 +960,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableImmediateEmails')
         .set('Accept', 'application/json')
         .send({
@@ -973,23 +971,24 @@ describe('Subscriptions Tests', () => {
     });
 
     it('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
-      const result = await modelUtils.createAndVerifyAddress({
-        chain: community_id,
-      });
+      const result = await server.seeder.createAndVerifyAddress(
+        { chain: community_id },
+        'Alice',
+      );
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
         JWT_SECRET,
       );
       expect(subscription).to.not.be.null;
       let res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/enableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
       res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/disableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
@@ -1001,7 +1000,7 @@ describe('Subscriptions Tests', () => {
     let subscription;
 
     before('make subscription', async () => {
-      subscription = await modelUtils.createSubscription({
+      subscription = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -1012,7 +1011,7 @@ describe('Subscriptions Tests', () => {
     it('should delete an active subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/deleteSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, subscription_id: subscription.id });
@@ -1022,7 +1021,7 @@ describe('Subscriptions Tests', () => {
     it('should fail to delete when no subscription id is passed', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/deleteSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -1033,7 +1032,7 @@ describe('Subscriptions Tests', () => {
     it('should fail to find an invalid subscription id', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/deleteSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, subscription_id: -999999 });
@@ -1047,7 +1046,7 @@ describe('Subscriptions Tests', () => {
     it('should fail to create a subscription with an invalid category', async () => {
       let category_id = 'invalid';
       try {
-        await models.Subscription.create({
+        await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });
@@ -1060,7 +1059,7 @@ describe('Subscriptions Tests', () => {
 
       category_id = NotificationCategories.ThreadEdit;
       try {
-        await models.Subscription.create({
+        await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });
@@ -1073,7 +1072,7 @@ describe('Subscriptions Tests', () => {
 
       category_id = NotificationCategories.CommentEdit;
       try {
-        await models.Subscription.create({
+        await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });
@@ -1088,7 +1087,7 @@ describe('Subscriptions Tests', () => {
     it(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
       const category_id = NotificationCategories.NewThread;
       try {
-        await models.Subscription.create({
+        await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });
@@ -1103,7 +1102,7 @@ describe('Subscriptions Tests', () => {
     it(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
       const category_id = NotificationCategories.ChainEvent;
       try {
-        await models.Subscription.create({
+        await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });
@@ -1119,7 +1118,7 @@ describe('Subscriptions Tests', () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
         const category_id = NotificationCategories.NewComment;
         try {
-          await models.Subscription.create({
+          await server.models.Subscription.create({
             subscriber_id: userId,
             category_id,
           });
@@ -1134,7 +1133,7 @@ describe('Subscriptions Tests', () => {
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewComment;
         try {
-          await models.Subscription.create({
+          await server.models.Subscription.create({
             subscriber_id: userId,
             category_id,
             community_id,
@@ -1152,7 +1151,7 @@ describe('Subscriptions Tests', () => {
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewComment;
         try {
-          await models.Subscription.create({
+          await server.models.Subscription.create({
             subscriber_id: userId,
             category_id,
             community_id,
@@ -1170,7 +1169,7 @@ describe('Subscriptions Tests', () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
         const category_id = NotificationCategories.NewReaction;
         try {
-          await models.Subscription.create({
+          await server.models.Subscription.create({
             subscriber_id: userId,
             category_id,
           });
@@ -1185,7 +1184,7 @@ describe('Subscriptions Tests', () => {
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewReaction;
         try {
-          await models.Subscription.create({
+          await server.models.Subscription.create({
             subscriber_id: userId,
             category_id,
             community_id,
@@ -1203,7 +1202,7 @@ describe('Subscriptions Tests', () => {
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewReaction;
         try {
-          await models.Subscription.create({
+          await server.models.Subscription.create({
             subscriber_id: userId,
             category_id,
             community_id,
@@ -1220,7 +1219,7 @@ describe('Subscriptions Tests', () => {
     it(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
       const category_id = NotificationCategories.NewMention;
       try {
-        const result = await models.Subscription.create({
+        const result = await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });
@@ -1233,7 +1232,7 @@ describe('Subscriptions Tests', () => {
     it(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
       const category_id = NotificationCategories.NewCollaboration;
       try {
-        const result = await models.Subscription.create({
+        const result = await server.models.Subscription.create({
           subscriber_id: userId,
           category_id,
         });

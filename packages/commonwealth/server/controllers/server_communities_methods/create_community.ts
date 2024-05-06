@@ -1,14 +1,5 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import {
-  AppError,
-  BalanceType,
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  DefaultPage,
-  NotificationCategories,
-  community as community_schemas,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -16,6 +7,15 @@ import type {
   RoleAttributes,
 } from '@hicommonwealth/model';
 import { UserInstance } from '@hicommonwealth/model';
+import { CreateCommunity } from '@hicommonwealth/schemas';
+import {
+  BalanceType,
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  DefaultPage,
+  NotificationCategories,
+} from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import axios from 'axios';
@@ -69,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof community_schemas.CreateCommunity.input>;
+  community: z.infer<typeof CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {
@@ -379,7 +379,7 @@ export async function __createCommunity(
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
     default_page: DefaultPage.Homepage,
-    has_homepage: true,
+    has_homepage: 'true',
   });
 
   const nodeJSON = node.toJSON();

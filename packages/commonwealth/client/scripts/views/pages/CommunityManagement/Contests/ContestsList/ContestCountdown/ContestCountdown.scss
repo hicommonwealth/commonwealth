@@ -1,0 +1,31 @@
+@import '../../../../../../../styles/shared';
+
+.ContestCountdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: fit-content;
+
+  svg {
+    margin-top: 4px;
+    color: $neutral-600;
+  }
+
+  .Text {
+    color: $neutral-600;
+  }
+
+  &.warning {
+    svg,
+    .Text {
+      color: $yellow-500;
+    }
+  }
+
+  &.critical {
+    svg,
+    .Text {
+      color: $rorange-500;
+    }
+  }
+}

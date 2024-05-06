@@ -1,8 +1,5 @@
-import {
-  BalanceSourceType,
-  CacheNamespaces,
-  cache,
-} from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { Balances, GetBalancesOptions } from '../types';
 
 const balanceTTL = process.env.TBC_BALANCE_TTL_SECONDS
@@ -79,6 +76,7 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
       );
     case BalanceSourceType.CosmosNative:
       return `${options.sourceOptions.cosmosChainId}_${address}`;
+    case BalanceSourceType.CW20:
     case BalanceSourceType.CW721:
       return (
         `${options.sourceOptions.cosmosChainId}_` +

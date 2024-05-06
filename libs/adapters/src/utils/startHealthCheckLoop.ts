@@ -1,4 +1,6 @@
-import { logger, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 
 const PING_INTERVAL = 1_000 * 20;
 
@@ -28,7 +30,8 @@ export function startHealthCheckLoop({
   if (!enabled) {
     return;
   }
-  const log = logger().getLogger(__filename);
+  const __filename = fileURLToPath(import.meta.url);
+  const log = logger(__filename);
   log.info(`starting health check loop for ${service}`);
   const key = `service.health.${service}`;
   // perform a loop that invokes 'checkFn' and sends status to stats
@@ -46,5 +49,5 @@ export function startHealthCheckLoop({
     const durationUntilNextCheck = nextCheckAt - Date.now();
     setTimeout(loop, durationUntilNextCheck);
   };
-  loop();
+  setTimeout(loop, PING_INTERVAL);
 }

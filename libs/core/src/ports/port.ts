@@ -1,14 +1,19 @@
+import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'url';
 import { ExitCode } from './enums';
-import { getInMemoryLogger } from './in-memory-logger';
+import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
   AdapterFactory,
   Analytics,
+  Broker,
   Cache,
   Disposable,
   Disposer,
-  Logger,
   Stats,
 } from './interfaces';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * Map of disposable adapter instances
@@ -25,9 +30,7 @@ export function port<T extends Disposable>(factory: AdapterFactory<T>) {
     if (!adapters.has(factory.name)) {
       const instance = factory(adapter);
       adapters.set(factory.name, instance);
-      logger()
-        .getLogger(__filename)
-        .info(`[binding adapter] ${instance.name || factory.name}`);
+      log.info(`[binding adapter] ${instance.name || factory.name}`);
       return instance;
     }
     return adapters.get(factory.name) as T;
@@ -51,16 +54,16 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   await Promise.all(disposers.map((disposer) => disposer()));
   await Promise.all(
     [...adapters].reverse().map(async ([key, adapter]) => {
-      logger()
-        .getLogger(__filename)
-        .info(`[disposing adapter] ${adapter.name || key}`);
+      log.info(`[disposing adapter] ${adapter.name || key}`);
       await adapter.dispose();
     }),
   );
   adapters.clear();
 
   // exit when not unit testing
-  code !== 'UNIT_TEST' && process.exit(code === 'ERROR' ? 1 : 0);
+  process.env.NODE_ENV !== 'test' &&
+    code !== 'UNIT_TEST' &&
+    process.exit(code === 'ERROR' ? 1 : 0);
 };
 
 /**
@@ -79,31 +82,20 @@ export const dispose = (
  * Handlers to dispose registered resources on exit or unhandled exceptions
  */
 process.once('SIGINT', async (arg?: any) => {
-  logger()
-    .getLogger(__filename)
-    .info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
+  log.info(`SIGINT ${arg !== 'SIGINT' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('SIGTERM', async (arg?: any) => {
-  logger()
-    .getLogger(__filename)
-    .info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
+  log.info(`SIGTERM ${arg !== 'SIGTERM' ? arg : ''}`);
   await disposeAndExit('EXIT');
 });
 process.once('uncaughtException', async (arg?: any) => {
-  logger().getLogger(__filename).error('Uncaught Exception', arg);
+  log.error('Uncaught Exception', arg);
   await disposeAndExit('ERROR');
 });
 process.once('unhandledRejection', async (arg?: any) => {
-  logger().getLogger(__filename).error('Unhandled Rejection', arg);
+  log.error('Unhandled Rejection', arg);
   await disposeAndExit('ERROR');
-});
-
-/**
- * Logger port factory
- */
-export const logger = port(function logger(logger?: Logger) {
-  return logger || getInMemoryLogger();
 });
 
 /**
@@ -122,6 +114,7 @@ export const stats = port(function stats(stats?: Stats) {
       decrementBy: () => {},
       on: () => {},
       off: () => {},
+      gauge: () => {},
       timing: () => {},
     }
   );
@@ -135,6 +128,8 @@ export const cache = port(function cache(cache?: Cache) {
     cache || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
+      ready: () => Promise.resolve(true),
+      isReady: () => true,
       getKey: () => Promise.resolve(''),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
@@ -154,7 +149,6 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-
 export const analytics = port(function analytics(analytics?: Analytics) {
   return (
     analytics || {
@@ -163,4 +157,11 @@ export const analytics = port(function analytics(analytics?: Analytics) {
       track: () => {},
     }
   );
+});
+
+/**
+ * Broker port factory
+ */
+export const broker = port(function broker(broker?: Broker) {
+  return broker || successfulInMemoryBroker;
 });

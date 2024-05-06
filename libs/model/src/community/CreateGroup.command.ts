@@ -1,4 +1,5 @@
-import { CommandMetadata, InvalidState, group } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { isCommunityAdminOrModerator } from '../middleware';
@@ -11,76 +12,81 @@ export const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export const CreateGroup = (): CommandMetadata<typeof group.CreateGroup> => ({
-  schemas: group.CreateGroup,
-  auth: [isCommunityAdminOrModerator],
-  body: async ({ id, payload }) => {
-    const groups = await models.Group.findAll({
-      where: { community_id: id },
-      attributes: ['metadata'],
-      raw: true,
-    });
+export function CreateGroup(): Command<typeof schemas.CreateGroup> {
+  return {
+    ...schemas.CreateGroup,
+    auth: [isCommunityAdminOrModerator],
+    body: async ({ id, payload }) => {
+      const groups = await models.Group.findAll({
+        where: { community_id: id },
+        attributes: ['metadata'],
+        raw: true,
+      });
 
-    mustNotExist(
-      'Group',
-      groups.find((g) => g.metadata.name === payload.metadata.name),
-    );
-
-    if (groups.length >= MAX_GROUPS_PER_COMMUNITY)
-      throw new InvalidState(Errors.MaxGroups);
-
-    const topicsToAssociate = await models.Topic.findAll({
-      where: {
-        id: {
-          [Op.in]: payload.topics || [],
-        },
-        community_id: id,
-      },
-    });
-    if (payload.topics?.length !== topicsToAssociate.length)
-      throw new InvalidState(Errors.InvalidTopics);
-
-    const newGroup = await models.sequelize.transaction(async (transaction) => {
-      // create group
-      const group = await models.Group.create(
-        {
-          community_id: id!,
-          metadata: payload.metadata,
-          requirements: payload.requirements,
-        } as GroupAttributes,
-        { transaction },
+      mustNotExist(
+        'Group',
+        groups.find((g) => g.metadata.name === payload.metadata.name),
       );
-      if (topicsToAssociate.length > 0) {
-        // add group to all specified topics
-        await models.Topic.update(
-          {
-            group_ids: sequelize.fn(
-              'array_append',
-              sequelize.col('group_ids'),
-              group.id,
-            ),
+
+      if (groups.length >= MAX_GROUPS_PER_COMMUNITY)
+        throw new InvalidState(Errors.MaxGroups);
+
+      const topicsToAssociate = await models.Topic.findAll({
+        where: {
+          id: {
+            [Op.in]: payload.topics || [],
           },
-          {
-            where: {
-              id: {
-                [Op.in]: topicsToAssociate.map(({ id }) => id!),
+          community_id: id,
+        },
+      });
+      if (payload.topics?.length !== topicsToAssociate.length)
+        throw new InvalidState(Errors.InvalidTopics);
+
+      const newGroup = await models.sequelize.transaction(
+        async (transaction) => {
+          // create group
+          const group = await models.Group.create(
+            {
+              community_id: id!,
+              metadata: payload.metadata,
+              requirements: payload.requirements,
+              is_system_managed: false,
+            } as GroupAttributes,
+            { transaction },
+          );
+          if (topicsToAssociate.length > 0) {
+            // add group to all specified topics
+            await models.Topic.update(
+              {
+                group_ids: sequelize.fn(
+                  'array_append',
+                  sequelize.col('group_ids'),
+                  group.id,
+                ),
               },
-            },
-            transaction,
-          },
-        );
-      }
-      return group.toJSON();
-    });
+              {
+                where: {
+                  id: {
+                    [Op.in]: topicsToAssociate.map(({ id }) => id!),
+                  },
+                },
+                transaction,
+              },
+            );
+          }
+          return group.toJSON();
+        },
+      );
 
-    // TODO: create domain service to refresh community memberships
-    // TODO: create integration policy to connect creation events (like groups) to service above
-    // TODO: creation integration test that validates this refresh flow
-    //.refreshCommunityMemberships({
-    //    communityId: id,
-    //    groupId: newGroup.id,
-    //  })
+      // TODO: create domain service to refresh community memberships
+      // TODO: create integration policy to connect creation events (like groups) to service above
+      // TODO: creation integration test that validates this refresh flow
+      //.refreshCommunityMemberships({
+      //    communityId: id,
+      //    groupId: newGroup.id,
+      //  })
 
-    return { id, groups: [newGroup] };
-  },
-});
+      return { id, groups: [newGroup] };
+    },
+  };
+}

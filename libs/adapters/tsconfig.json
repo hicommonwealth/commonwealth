@@ -1,11 +1,8 @@
 {
   "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "build",
-    "tsBuildInfoFile": "build/.tsbuildinfo",
-    "strict": true
-  },
-  "include": ["src"],
-  "references": [{ "path": "../core" }]
+  "references": [
+    { "path": "../core/tsconfig.build.json" },
+    { "path": "../logging/tsconfig.build.json" },
+    { "path": "../shared/tsconfig.build.json" }
+  ]
 }

@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
-import type { ChainNetwork } from '@hicommonwealth/core';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import type { ChainNetwork } from '@hicommonwealth/shared';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import React from 'react';
 import app from 'state';
@@ -41,8 +41,8 @@ const LinkAccountItem = ({
   const baseName = app.chain?.meta.base || walletChain;
 
   const capitalizedBaseName = `${baseName
-    .charAt(0)
-    .toUpperCase()}${baseName.slice(1)}`;
+    ?.charAt(0)
+    ?.toUpperCase()}${baseName?.slice(1)}`;
 
   const name =
     account.meta?.name ||
@@ -265,7 +265,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
           />
           <CWAuthButton
             type="twitter"
-            label="Twitter"
+            label="X (Twitter)"
             darkMode={darkMode}
             onClick={() =>
               onSocialLogin(

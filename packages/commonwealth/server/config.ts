@@ -1,7 +1,9 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
+
+export const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const PORT = process.env.PORT || '8080';
 
@@ -22,17 +24,7 @@ export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 
-export const DATABASE_URI = process.env.USES_DOCKER_DB
-  ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
-  : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-  ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-  : process.env.DATABASE_URL;
-
-export const RABBITMQ_URI = (() => {
-  if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    return 'amqp://127.0.0.1';
-  } else return process.env.CLOUDAMQP_URL;
-})();
+export const RABBITMQ_URI = process.env.CLOUDAMQP_URL ?? 'amqp://127.0.0.1';
 
 // if a tls redis url is provided then that takes priority over everything else
 // then if a normal non-tls url is provided that is the second best option (local/staging)
@@ -56,8 +48,6 @@ export const MAGIC_DEFAULT_CHAIN =
 
 export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/brand_assets/logo_stacked.png';
-
-export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
 
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
@@ -110,3 +100,26 @@ export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
 export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
   ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
   : 10;
+
+export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
+  .ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS
+  ? parseInt(process.env.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS, 10)
+  : 60;
+
+/*
+ * NOTE: (1000 / MESSAGE_RELAYER_TIMEOUT_MS) * MESSAGE_RELAYER_PREFETCH = the upperbound
+ * number of Outbox events (records) that can be processed per second.
+ * Defaults to 1000 events per second.
+ * This calculation does not account for the time it takes for messages to be
+ * fetched + published (hence upperbound assuming fetching + publishing takes 0ms).
+ */
+export const MESSAGE_RELAYER_TIMEOUT_MS =
+  parseInt(process.env.MESSAGE_RELAYER_TIMEOUT_MS) || 200;
+export const MESSAGE_RELAYER_PREFETCH =
+  parseInt(process.env.MESSAGE_RELAYER_PREFETCH) || 50;
+
+export const EVM_CE_POLL_INTERVAL_MS =
+  parseInt(process.env.EVM_CE_POLL_INTERVAL) || 120_000;
+
+export const NEW_SUBSCRIPTION_API_FLAG =
+  process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;

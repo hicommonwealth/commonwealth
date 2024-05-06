@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { parseInt } from 'lodash';
+import _ from 'lodash';
 import { PORT } from '../../../server/config';
-import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
-import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
+import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
 
-test.beforeEach(async () => {
-  await createTestEntities();
+let seeder: E2E_Seeder;
+
+test.beforeAll(async () => {
+  seeder = await e2eSeeder();
 });
 
 test.describe('Discussion Page Tests', () => {
@@ -13,7 +14,7 @@ test.describe('Discussion Page Tests', () => {
 
   test.beforeEach(async ({ page }) => {
     threadId = (
-      await testDb.query(`
+      await seeder.testDb.sequelize.query(`
         INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind, created_at, updated_at)
         VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;
@@ -21,9 +22,9 @@ test.describe('Discussion Page Tests', () => {
     )[0][0]['id'];
 
     await page.goto(
-      `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`,
+      `http://localhost:${PORT}/${seeder.testChains[0].id}/discussion/${threadId}`,
     );
-    await addAddressIfNone(testChains[0].id);
+    await seeder.addAddressIfNone(seeder.testChains[0].id);
     await login(page);
   });
 
@@ -46,7 +47,7 @@ test.describe('Discussion Page Tests', () => {
 
     // The 3 dots below the comment doesn't have a clear unique identifier.
     let commentOptionButton = await page.locator(
-      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]',
+      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[5]',
     );
     await commentOptionButton.click();
     await page.locator('div.PopoverMenuItem').first().click();
@@ -63,12 +64,12 @@ test.describe('Discussion Page Tests', () => {
 
     // The 3 dots below the comment doesn't have a clear unique identifier.
     commentOptionButton = await page.locator(
-      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[4]',
+      'xpath=(//div[@class="comment-footer"]//button[@class="ThreadAction"])[5]',
     );
     await commentOptionButton.click();
     await page.locator('div.PopoverMenuItem').nth(2).click();
 
-    const deleteButton = await page.locator('button.mini-red');
+    const deleteButton = page.locator('button.destructive');
     await deleteButton.click();
 
     let commentExists = await page.getByText(commentText).count();
@@ -113,7 +114,7 @@ async function performUpvote(page, parentClass: string) {
           `xpath=(//div[@class="${parentClass}"]//button[contains(@class,"ThreadAction")])[1]//div`,
         )
         .textContent(),
-    ).toEqual((parseInt(amountOfThreadLikes) + 1).toString());
+    ).toEqual((_.parseInt(amountOfThreadLikes) + 1).toString());
   }).toPass();
 
   threadLikeButton = await page.locator(

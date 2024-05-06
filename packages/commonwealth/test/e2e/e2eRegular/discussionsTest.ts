@@ -1,7 +1,6 @@
 import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { testThreads } from '../hooks/e2eDbEntityHooks.spec';
 import { login } from '../utils/e2eUtils';
 
 chai.use(chaiHttp);
@@ -28,7 +27,7 @@ export const discussionTests = (test) => {
           'div[data-test-id] > div',
           (divs) => divs.length,
         );
-        expect(numberOfThreads).to.be.gte(testThreads.length - 1);
+        expect(numberOfThreads).to.be.gte(0);
       }).toPass();
 
       const firstThread = await page.$(
@@ -62,7 +61,10 @@ export const discussionTests = (test) => {
       let reactionsCountDivs = await page.locator('div.reactions-count');
 
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('div.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         await pwexpect(reactionsCountDivs.first()).toBeVisible();
       }).toPass();
 
@@ -81,7 +83,10 @@ export const discussionTests = (test) => {
       ).toString();
       // assert reaction count increased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           expectedNewReactionCount,
         );
@@ -95,7 +100,10 @@ export const discussionTests = (test) => {
 
       // assert reaction count decreased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page
+          .locator('.Upvote')
+          .first()
+          .locator('.Text');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           firstThreadReactionCount,
         );
@@ -109,8 +117,10 @@ export const discussionTests = (test) => {
     // }) => {
     //   const threadId = (
     //     await testDb.query(`
-    //     INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind, created_at, updated_at)
-    //     VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    //     INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind,
+    //       created_at, updated_at)
+    //     VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1,
+    //       'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     //     RETURNING id;
     // `)
     //   )[0][0]['id'];

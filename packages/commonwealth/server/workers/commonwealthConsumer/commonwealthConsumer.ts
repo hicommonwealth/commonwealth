@@ -1,26 +1,32 @@
 import {
   HotShotsStats,
-  PinoLogger,
-  RabbitMQController,
-  RabbitMQSubscription,
+  RabbitMQAdapter,
   RascalConfigServices,
-  RascalSubscriptions,
-  ServiceConsumer,
   ServiceKey,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
-import type { BrokerConfig } from 'rascal';
+import {
+  Broker,
+  BrokerSubscriptions,
+  broker,
+  stats,
+} from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
+import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
+import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
+
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: __filename.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {
@@ -37,66 +43,68 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 
-export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
-  const { models } = await import('@hicommonwealth/model');
-  const { processSnapshotMessage } = await import(
-    './messageProcessors/snapshotConsumer'
-  );
-
-  let rmqController: RabbitMQController;
+export async function setupCommonwealthConsumer(): Promise<void> {
+  let brokerInstance: Broker;
   try {
-    rmqController = new RabbitMQController(
-      <BrokerConfig>(
-        getRabbitMQConfig(
-          RABBITMQ_URI,
-          RascalConfigServices.CommonwealthService,
-        )
-      ),
+    const rmqAdapter = new RabbitMQAdapter(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
     );
-    await rmqController.init();
+    await rmqAdapter.init();
+    broker(rmqAdapter);
+    brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration',
     );
     throw e;
   }
-  const context = {
-    models,
-    log,
-  };
 
-  const snapshotEventProcessorRmqSub: RabbitMQSubscription = {
-    messageProcessor: processSnapshotMessage,
-    subscriptionName: RascalSubscriptions.SnapshotListener,
-    msgProcessorContext: context,
-  };
-
-  const subscriptions: RabbitMQSubscription[] = [snapshotEventProcessorRmqSub];
-
-  const serviceConsumer = new ServiceConsumer(
-    'MainConsumer',
-    rmqController,
-    subscriptions,
-  );
-  await serviceConsumer.init();
-
-  log.info(
-    `Consumer started. Name: ${serviceConsumer.serviceName}, id: ${serviceConsumer.serviceId}`,
+  const snapshotSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.SnapshotListener,
+    SnapshotPolicy(),
   );
 
-  return serviceConsumer;
+  const chainEventSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ChainEvent,
+    ChainEventPolicy(),
+  );
+
+  if (!chainEventSubRes) {
+    log.fatal(
+      'Failed to subscribe to chain-events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ChainEvent,
+      },
+    );
+  }
+
+  if (!snapshotSubRes) {
+    log.fatal(
+      'Failed to subscribe to snapshot events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.SnapshotListener,
+      },
+    );
+  }
+
+  if (!snapshotSubRes && !chainEventSubRes) {
+    log.fatal('All subscriptions failed. Restarting...');
+    process.exit(1);
+  }
 }
 
 async function main() {
   try {
     log.info('Starting main consumer');
     await setupCommonwealthConsumer();
+    isServiceHealthy = true;
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
-  isServiceHealthy = true;
 }
 
-if (process.argv[2] === 'run-as-script') {
+if (import.meta.url.endsWith(process.argv[1])) {
   main();
 }

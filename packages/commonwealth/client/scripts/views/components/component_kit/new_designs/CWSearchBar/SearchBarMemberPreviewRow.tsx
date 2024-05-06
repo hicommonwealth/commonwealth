@@ -16,7 +16,7 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
   searchResult,
   onSearchItemClick,
 }) => {
-  const community = searchResult.addresses[0].chain;
+  const community_id = searchResult.addresses[0].community_id;
   const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();
@@ -30,7 +30,8 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
       <User
         userAddress={address}
-        userCommunityId={community}
+        userCommunityId={community_id}
+        shouldShowAsDeleted={!address && !community_id}
         shouldLinkProfile
       />
     </div>

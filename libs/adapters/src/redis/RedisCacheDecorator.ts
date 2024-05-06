@@ -1,12 +1,13 @@
-import { CacheNamespaces, ILogger, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { ILogger, logger } from '@hicommonwealth/logging';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { fileURLToPath } from 'url';
 import {
   CacheKeyDuration,
   CustomRequest,
   defaultKeyGenerator,
   isCacheKeyDuration,
 } from '../utils/cacheKeyUtils';
-import { RedisCache } from './RedisCacheAdapter';
 
 const XCACHE_HEADER = 'X-Cache';
 export enum XCACHE_VALUES {
@@ -31,16 +32,16 @@ export class FuncExecError extends Error {
 
 export class CacheDecorator {
   private _log?: ILogger;
-  private _redisCache?: RedisCache;
+  private _disabled = false;
 
-  constructor(redisCache: RedisCache) {
-    this._log = logger().getLogger(__filename);
+  constructor() {
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     // If cache is disabled, skip caching
     if (process.env.DISABLE_CACHE === 'true') {
       this._log.info(`cacheMiddleware: cache disabled`);
-      return;
+      this._disabled = true;
     }
-    this._redisCache = redisCache;
   }
 
   /**
@@ -212,7 +213,7 @@ export class CacheDecorator {
     duration: seconds,
     keyGenerator: (
       req: CustomRequest,
-    ) => string | CacheKeyDuration = defaultKeyGenerator,
+    ) => string | CacheKeyDuration | null = defaultKeyGenerator,
     namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): RequestHandler {
     return async function cache(
@@ -277,7 +278,7 @@ export class CacheDecorator {
         this._log!.warn(
           `calling next from cacheMiddleware catch ${req.originalUrl}`,
         );
-        err instanceof Error && this._log!.warn(err.message, err);
+        err instanceof Error && this._log!.warn(err.message, { err });
         if (!isNextCalled) {
           return next();
         }
@@ -325,12 +326,7 @@ export class CacheDecorator {
   ): Promise<boolean> {
     if (!this.isEnabled()) return false;
 
-    return await this._redisCache!.setKey(
-      namespace,
-      cacheKey,
-      valueToCache,
-      duration,
-    );
+    return await cache().setKey(namespace, cacheKey, valueToCache, duration);
   }
 
   // Check if the response is already cached, if yes, return it
@@ -338,7 +334,7 @@ export class CacheDecorator {
     cacheKey: string,
     namespace: CacheNamespaces = CacheNamespaces.Route_Response,
   ): Promise<string | undefined> {
-    const ret = await this._redisCache!.getKey(namespace, cacheKey);
+    const ret = await cache().getKey(namespace, cacheKey);
     if (ret) {
       return ret;
     }
@@ -401,7 +397,7 @@ export class CacheDecorator {
     req: Request,
     keyGenerator: (
       req: CustomRequest,
-    ) => string | CacheKeyDuration = defaultKeyGenerator,
+    ) => string | CacheKeyDuration | null = defaultKeyGenerator,
     duration: seconds,
   ) {
     // if you like to skip caching based on some condition, return null from keyGenerator
@@ -420,7 +416,7 @@ export class CacheDecorator {
     return { cacheKey, cacheDuration };
   }
 
-  private isEnabled(): boolean {
-    return (this._redisCache && this._redisCache.isInitialized()) || false;
+  private isEnabled() {
+    return !this._disabled && cache().isReady();
   }
 }

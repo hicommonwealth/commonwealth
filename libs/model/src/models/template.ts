@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type TemplateAttributes = {
@@ -19,20 +18,19 @@ export type TemplateInstance = ModelInstance<TemplateAttributes>;
 
 export type TemplateModelStatic = ModelStatic<TemplateInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): TemplateModelStatic => {
-  const Template = <TemplateModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <TemplateModelStatic>sequelize.define<TemplateInstance>(
     'Template',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      abi_id: { type: dataTypes.INTEGER, allowNull: false },
-      name: { type: dataTypes.STRING, allowNull: false },
-      template: { type: dataTypes.JSONB, allowNull: false },
-      created_by: { type: dataTypes.STRING, allowNull: true },
-      description: { type: dataTypes.STRING, allowNull: true },
-      created_for_community: { type: dataTypes.STRING, allowNull: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      abi_id: { type: Sequelize.INTEGER, allowNull: false },
+      name: { type: Sequelize.STRING, allowNull: false },
+      template: { type: Sequelize.JSONB, allowNull: false },
+      created_by: { type: Sequelize.STRING, allowNull: true },
+      description: { type: Sequelize.STRING, allowNull: true },
+      created_for_community: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: true },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
     },
     {
       tableName: 'Template',
@@ -42,17 +40,3 @@ export default (
       underscored: true,
     },
   );
-
-  Template.associate = (models) => {
-    models.Template.belongsTo(models.ContractAbi, {
-      foreignKey: 'abi_id',
-      targetKey: 'id',
-    });
-    models.Template.belongsTo(models.Community, {
-      foreignKey: 'created_for_community',
-      targetKey: 'id',
-    });
-  };
-
-  return Template;
-};

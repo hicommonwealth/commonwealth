@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import type {
   IAaveProposalResponse,
   IAaveVoteResponse,
@@ -10,9 +10,7 @@ import BN from 'bn.js';
 import bs58 from 'bs58';
 import { EventEmitter } from 'events';
 import { blocknumToTime } from 'helpers';
-import $ from 'jquery';
 import moment from 'moment';
-import Web3 from 'web3-utils';
 import { ProposalState } from '../../../../../../shared/chain/types/aave';
 import type ChainEvent from '../../../../models/ChainEvent';
 import Proposal from '../../../../models/Proposal';
@@ -30,6 +28,7 @@ import { attachSigner } from '../contractApi';
 import axios from 'axios';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { ApiEndpoints } from 'state/api/config';
+import { Web3 } from 'web3';
 import type AaveAPI from './api';
 import type AaveGovernance from './governance';
 
@@ -45,9 +44,9 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberLong(+Web3.fromWei(this.power.toString()))} ${
-      this.account.community.default_symbol
-    }`;
+    return `${formatNumberLong(
+      +Web3.utils.fromWei(this.power.toString(), 'ether'),
+    )} ${this.account.community.default_symbol}`;
   }
 }
 
@@ -240,12 +239,13 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.get(`${this._Gov.app.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
+    axios
+      .get(`${this._Gov.app.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
       .then((ipfsData) => {
-        if (typeof ipfsData === 'string') {
-          this._ipfsData = JSON.parse(ipfsData);
+        if (typeof ipfsData.data === 'string') {
+          this._ipfsData = JSON.parse(ipfsData.data);
         } else if (typeof ipfsData === 'object') {
-          this._ipfsData = ipfsData;
+          this._ipfsData = ipfsData.data;
         } else {
           throw new Error('Invalid IPFS data format');
         }

@@ -1,6 +1,5 @@
 import crypto from 'crypto';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export const LOGIN_TOKEN_EXPIRES_IN = 30;
@@ -30,20 +29,17 @@ export type LoginTokenCreationAttributes = LoginTokenAttributes & {
 export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> &
   LoginTokenCreationAttributes;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): LoginTokenModelStatic => {
+export default (sequelize: Sequelize.Sequelize): LoginTokenModelStatic => {
   const LoginToken = <LoginTokenModelStatic>sequelize.define(
     'LoginToken',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      token: { type: dataTypes.STRING, allowNull: false },
-      email: { type: dataTypes.STRING, allowNull: true },
-      expires: { type: dataTypes.DATE, allowNull: false },
-      redirect_path: { type: dataTypes.STRING, allowNull: true },
-      domain: { type: dataTypes.STRING, allowNull: true },
-      used: { type: dataTypes.DATE, allowNull: true },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      token: { type: Sequelize.STRING, allowNull: false },
+      email: { type: Sequelize.STRING, allowNull: false },
+      expires: { type: Sequelize.DATE, allowNull: false },
+      redirect_path: { type: Sequelize.STRING, allowNull: true },
+      domain: { type: Sequelize.STRING, allowNull: true },
+      used: { type: Sequelize.DATE, allowNull: true },
     },
     {
       timestamps: true,

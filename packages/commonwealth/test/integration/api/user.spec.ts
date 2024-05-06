@@ -1,22 +1,26 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import app from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('User Model Routes', () => {
+  let server: TestServer;
+
   before('reset database', async () => {
-    await tester.seedDb();
+    server = await testServer();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('/updateEmail', () => {
@@ -26,12 +30,15 @@ describe('User Model Routes', () => {
     let userEmail;
 
     beforeEach('create new user', async () => {
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await server.seeder.createAndVerifyAddress(
+        { chain },
+        'Alice',
+      );
       userAddress = res.address;
       userEmail = res.email;
       jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      const isAdmin = await modelUtils.updateRole({
-        address_id: res.address_id,
+      const isAdmin = await server.seeder.updateRole({
+        address_id: +res.address_id,
         chainOrCommObj: { chain_id: chain },
         role: 'admin',
       });
@@ -43,7 +50,7 @@ describe('User Model Routes', () => {
     it('should add an email to user with just an address', async () => {
       const email = 'test@commonwealth.im';
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({
@@ -56,7 +63,7 @@ describe('User Model Routes', () => {
 
     it('should fail to update without email', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({
@@ -68,7 +75,7 @@ describe('User Model Routes', () => {
 
     it('should fail to update if email in use by another user', async () => {
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({
@@ -82,7 +89,7 @@ describe('User Model Routes', () => {
     it('should fail with an invalid email', async () => {
       const email = 'testatcommonwealthdotim';
       const res = await chai
-        .request(app)
+        .request(server.app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({

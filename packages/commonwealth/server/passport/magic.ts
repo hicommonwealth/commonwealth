@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import {
-  ChainBase,
-  NotificationCategories,
-  ServerError,
-  WalletId,
-  WalletSsoSource,
-  logger,
-} from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   DB,
   ProfileAttributes,
@@ -22,8 +16,15 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  NotificationCategories,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
+import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
@@ -35,7 +36,8 @@ import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 type MagicLoginContext = {
   models: DB;
@@ -140,7 +142,6 @@ async function createNewMagicUser({
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.createWithProfile(
-      models,
       {
         // never use emails from magic, even for "email" login -- magic maintains the mapping
         // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
@@ -319,6 +320,10 @@ async function loginExistingMagicUser({
         `Created SsoToken for invalid state user ${existingUserInstance.id}`,
       );
     }
+
+    // TODO: we should also remove ghost addresses her, per code in /updateAddress...
+    // or we can leave it alone, although it wont migrate address ownership, most parameters
+    // are by profile anyway.
 
     return existingUserInstance;
   });
@@ -545,24 +550,44 @@ async function magicLoginRoute(
   // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
-  const existingUserInstance = await models.User.scope(
-    'withPrivateData',
-  ).findOne({
-    include: [
-      {
-        model: models.Address,
-        where: {
-          wallet_id: WalletId.Magic,
-          address: canonicalAddress,
-          verified: { [Op.ne]: null },
+  let existingUserInstance = await models.User.scope('withPrivateData').findOne(
+    {
+      include: [
+        {
+          model: models.Address,
+          where: {
+            wallet_id: WalletId.Magic,
+            address: canonicalAddress,
+            verified: { [Op.ne]: null },
+          },
+          required: true,
         },
-        required: true,
-      },
-      {
-        model: models.Profile,
-      },
-    ],
-  });
+        {
+          model: models.Profile,
+        },
+      ],
+    },
+  );
+
+  if (
+    !existingUserInstance &&
+    (!magicUserMetadata.oauthProvider ||
+      magicUserMetadata.oauthProvider === 'email') &&
+    magicUserMetadata.email
+  ) {
+    // if unable to locate a magic user by address, attempt to locate by email.
+    // the ONLY time this should trigger is for claiming ghost addresses on discourse communities,
+    // which requires the email-specific magic login, as the email usage on social providers
+    // is insecure.
+    existingUserInstance = await models.User.scope('withPrivateData').findOne({
+      where: { email: magicUserMetadata.email },
+      include: [
+        {
+          model: models.Profile,
+        },
+      ],
+    });
+  }
 
   log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,

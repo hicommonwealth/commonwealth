@@ -1,5 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
-import { ModelStatic, UserInstance, sequelize } from '@hicommonwealth/model';
+import {
+  ModelInstance,
+  ModelStatic,
+  UserInstance,
+  sequelize,
+} from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -117,8 +122,9 @@ export async function __deleteCommunity(
             },
           );
 
-          const models = [
-            this.models.CommunitySnapshotSpaces,
+          const models: Array<
+            ModelStatic<ModelInstance<{ community_id?: string }>>
+          > = [
             this.models.CommunityStake,
             this.models.DiscordBotConfig,
             this.models.Ban,
@@ -139,7 +145,7 @@ export async function __deleteCommunity(
           ];
 
           for (const model of models) {
-            await (model as ModelStatic<any>).destroy({
+            await model.destroy({
               where: { community_id: community.id },
               force: true,
               transaction: t,

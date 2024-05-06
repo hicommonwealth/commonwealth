@@ -1,11 +1,11 @@
+import { WebhookInstance, models } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   ProposalType,
   SupportedNetwork,
   WebhookCategory,
-} from '@hicommonwealth/core';
-import { WebhookInstance, models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
@@ -213,7 +213,7 @@ async function main() {
   await dispatchWebhooks(notification, webhooks);
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       // note this stops rollbar errors reports from completing in the `dispatchWebhooks` function

@@ -1,7 +1,7 @@
-import type { CommandMetadata, Schemas, User } from '@hicommonwealth/core';
+import type { CommandMetadata, User } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { z } from 'zod';
+import { ZodSchema, z } from 'zod';
 
 /**
  * Adapts commands to express handlers
@@ -12,15 +12,17 @@ import { z } from 'zod';
  * @returns express command handler
  */
 export const command =
-  <S extends Schemas>(md: CommandMetadata<S>): RequestHandler =>
+  <Input extends ZodSchema, Output extends ZodSchema>(
+    md: CommandMetadata<Input, Output>,
+  ): RequestHandler =>
   async (
     req: Request<
-      z.infer<S['input']> & {
+      z.infer<Input> & {
         id?: string;
         address_id?: string;
       }
     >,
-    res: Response<Partial<z.infer<S['output']>> | undefined>,
+    res: Response<Partial<z.infer<Output>> | undefined>,
     next: NextFunction,
   ) => {
     try {

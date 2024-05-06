@@ -52,14 +52,21 @@ const getNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const addresses = await profile.getAddresses({
-    include: [
-      {
-        model: models.Community,
-        required: true,
-        where: { active: true },
+  const inActiveCommunities = (
+    await models.Community.findAll({
+      where: {
+        active: false,
       },
-    ],
+      attributes: ['id'],
+    })
+  ).map((c) => c.id);
+
+  const addresses = await profile.getAddresses({
+    where: {
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
+      },
+    },
   });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
@@ -68,16 +75,11 @@ const getNewProfile = async (
       address_id: {
         [Op.in]: addressIds,
       },
-    },
-    include: [
-      { model: models.Address, as: 'Address' },
-      {
-        model: models.Community,
-        as: 'Community',
-        required: true,
-        where: { active: true },
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
       },
-    ],
+    },
+    include: [{ model: models.Address, as: 'Address' }],
   });
 
   const comments = await models.Comment.findAll({
@@ -85,30 +87,25 @@ const getNewProfile = async (
       address_id: {
         [Op.in]: addressIds,
       },
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
+      },
     },
-    include: [
-      { model: models.Address, as: 'Address' },
-      { model: models.Community, required: true, where: { active: true } },
-    ],
+    include: [{ model: models.Address, as: 'Address' }],
   });
 
   const commentThreadIds = [
-    ...new Set<number>(comments.map((c) => parseInt(c.thread_id, 10))),
+    ...new Set<number>(comments.map((c) => c.thread_id, 10)),
   ];
   const commentThreads = await models.Thread.findAll({
     where: {
       id: {
         [Op.in]: commentThreadIds,
       },
-    },
-    include: [
-      {
-        model: models.Community,
-        as: 'Community',
-        required: true,
-        where: { active: true },
+      community_id: {
+        [Op.notIn]: inActiveCommunities,
       },
-    ],
+    },
   });
 
   return success(res, {

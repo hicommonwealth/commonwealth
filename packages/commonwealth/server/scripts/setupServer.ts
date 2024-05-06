@@ -1,12 +1,13 @@
-import { logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type { Express } from 'express';
 import http from 'http';
-import { PORT } from '../config';
+import { fileURLToPath } from 'node:url';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
-const setupServer = (app: Express) => {
-  app.set('port', PORT);
+const setupServer = (app: Express, port: number) => {
+  app.set('port', port);
   const server = http.createServer(app);
 
   const onError = (error) => {
@@ -19,7 +20,7 @@ const setupServer = (app: Express) => {
         process.exit(1);
       // eslint-disable-next-line no-fallthrough
       case 'EADDRINUSE':
-        log.error(`Port ${PORT} is already in use`);
+        log.error(`Port ${port} is already in use`);
         process.exit(1);
       // eslint-disable-next-line no-fallthrough
       default:
@@ -36,9 +37,11 @@ const setupServer = (app: Express) => {
     }
   };
 
-  server.listen(PORT);
+  server.listen(port);
   server.on('error', onError);
   server.on('listening', onListen);
+
+  return server;
 };
 
 export default setupServer;

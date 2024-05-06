@@ -1,11 +1,8 @@
 import { CommunityInstance } from '@hicommonwealth/model';
+import { buildPaginatedResponse } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import {
-  PaginationSqlOptions,
-  buildPaginatedResponse,
-  buildPaginationSql,
-} from '../../util/queries';
+import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { ServerCommentsController } from '../server_comments_controller';
 
 export type SearchCommentsOptions = {

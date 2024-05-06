@@ -1,21 +1,25 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { useFlag } from '../hooks/useFlag';
+import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import useUserLoggedIn from '../hooks/useUserLoggedIn';
+import { useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { StakeGrowl } from './components/StakeGrowl';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -27,6 +31,7 @@ const Sublayout = ({
   hideFooter = true,
   isInsideCommunity,
 }: SublayoutProps) => {
+  const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
@@ -34,11 +39,49 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const communityStakeEnabled = useFlag('communityStake');
 
-  const { toggleMobileView } = useWindowResize({
+  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
+    useWelcomeOnboardModal();
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
+  useNecessaryEffect(() => {
+    if (isLoggedIn && userOnboardingEnabled && !isWelcomeOnboardModalOpen) {
+      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
+      const hasUsername = app?.user?.addresses?.find(
+        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
+      );
+
+      // open welcome modal if user is not onboarded
+      if (!hasUsername) {
+        setIsWelcomeOnboardModalOpen(true);
+      }
+    }
+
+    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
+      setIsWelcomeOnboardModalOpen(false);
+    }
+  }, [
+    userOnboardingEnabled,
+    isWelcomeOnboardModalOpen,
+    setIsWelcomeOnboardModalOpen,
+    isLoggedIn,
+  ]);
+
+  const location = useLocation();
+
+  useWindowResize({
     setMenu,
   });
+
+  const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -100,17 +143,20 @@ const Sublayout = ({
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
-            {!toggleMobileView && (
-              <div className="breadcrumbContainer">
-                <Breadcrumbs />
-              </div>
-            )}
+            {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
             {isInsideCommunity && <AdminOnboardingSlider />}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {communityStakeEnabled && !isWindowExtraSmall && <StakeGrowl />}
+        {userOnboardingEnabled && (
+          <WelcomeOnboardModal
+            isOpen={isWelcomeOnboardModalOpen}
+            onClose={() =>
+              setIsWelcomeOnboardModalOpen(!isWelcomeOnboardModalOpen)
+            }
+          />
+        )}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

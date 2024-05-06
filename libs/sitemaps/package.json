@@ -1,0 +1,24 @@
+{
+  "name": "@hicommonwealth/sitemaps",
+  "private": "true",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Sitemaps generator and related code",
+  "files": [
+    "build"
+  ],
+  "main": "build/index.js",
+  "types": "src/index",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "echo No tests for @hicommonwealth/sitemaps"
+  },
+  "dependencies": {
+    "@hicommonwealth/core": "*",
+    "@hicommonwealth/model": "*",
+    "@hicommonwealth/shared": "*",
+    "aws-sdk": "^2.814.0"
+  }
+}

@@ -5,7 +5,7 @@ import useForceRerender from 'hooks/useForceRerender';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
-import { matchRoutes } from 'react-router-dom';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
@@ -17,8 +17,8 @@ import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStak
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { useFlag } from '../../../../hooks/useFlag';
 import type Topic from '../../../../models/Topic';
@@ -28,8 +28,10 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
+import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useCommunityStakeStore from 'state/ui/communityStake';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
@@ -58,7 +60,9 @@ export const HeaderWithFilters = ({
   isOnArchivePage,
 }: HeaderWithFiltersProps) => {
   const communityStakeEnabled = useFlag('communityStake');
+  const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
+  const location = useLocation();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
     useState(false);
@@ -73,6 +77,7 @@ export const HeaderWithFilters = ({
     useEXCEPTION_CASE_threadCountersStore();
   const { stakeEnabled } = useCommunityStake();
   const { dismissBanner, isBannerVisible } = useCommunityStakeStore();
+  const { isContestAvailable, contestsData } = useCommunityContests();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -107,6 +112,10 @@ export const HeaderWithFilters = ({
     communityId: app.activeChainId(),
   });
 
+  const urlParams = Object.fromEntries(
+    new URLSearchParams(window.location.search),
+  );
+
   const featuredTopics = (topics || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -117,6 +126,13 @@ export const HeaderWithFilters = ({
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
+
+  const contestNameOptions = (contestsData || []).map((contest) => ({
+    label: contest?.name,
+    value: contest?.name,
+    id: contest?.contest_address,
+    type: 'contest',
+  }));
 
   const stages = !customStages
     ? [
@@ -135,6 +151,8 @@ export const HeaderWithFilters = ({
     location,
   );
 
+  const matchesContestFilterRoute = urlParams.contest;
+
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
     location,
@@ -145,9 +163,6 @@ export const HeaderWithFilters = ({
     filterKey = '',
     filterVal = '',
   }) => {
-    const urlParams = Object.fromEntries(
-      new URLSearchParams(window.location.search),
-    );
     urlParams[filterKey] = filterVal;
 
     if (filterVal === '') {
@@ -161,11 +176,30 @@ export const HeaderWithFilters = ({
             .map((x) => `${x}=${urlParams[x]}`)
             .join('&'),
       );
+    } else if (filterKey === 'contest') {
+      navigate(
+        `/discussions?` +
+          Object.keys(urlParams)
+            .map((param) => {
+              if (param === 'stage') {
+                return false;
+              }
+              return `${param}=${urlParams[param]}`;
+            })
+            .filter(Boolean)
+            .join('&'),
+      );
     } else {
       navigate(
         `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
           Object.keys(urlParams)
-            .map((x) => `${x}=${urlParams[x]}`)
+            .map((param) => {
+              if (pickedTopic && (param === 'contest' || param === 'status')) {
+                return false;
+              }
+              return `${param}=${urlParams[param]}`;
+            })
+            .filter(Boolean)
             .join('&'),
       );
     }
@@ -189,6 +223,8 @@ export const HeaderWithFilters = ({
     communityStakeEnabled &&
     stakeEnabled &&
     isBannerVisible(app.activeChainId());
+
+  const contestFiltersVisible = contestsEnabled && isContestAvailable;
 
   return (
     <div className="HeaderWithFilters">
@@ -234,7 +270,10 @@ export const HeaderWithFilters = ({
       </div>
 
       {selectedTopic?.description && (
-        <CWText className="subheader-text">{selectedTopic.description}</CWText>
+        <QuillRenderer
+          doc={selectedTopic.description}
+          customClass="subheader-text"
+        />
       )}
 
       {isOnArchivePage && (
@@ -298,15 +337,32 @@ export const HeaderWithFilters = ({
               {(topics || []).length > 0 && (
                 <Select
                   selected={
+                    matchesContestFilterRoute ||
                     matchesDiscussionsTopicRoute?.[0]?.params?.topic ||
                     'All Topics'
                   }
-                  onSelect={(item: any) =>
-                    onFilterSelect({
-                      pickedTopic: item === 'All Topics' ? '' : item.value,
-                    })
-                  }
+                  onSelect={(item) => {
+                    if (typeof item === 'string') {
+                      // All topics
+                      onFilterSelect({ pickedTopic: '' });
+                      return;
+                    }
+
+                    if (item.type === 'contest') {
+                      onFilterSelect({
+                        filterKey: 'contest',
+                        filterVal: item.value,
+                        pickedTopic: '',
+                      });
+                      return;
+                    }
+
+                    onFilterSelect({ pickedTopic: item.value });
+                  }}
                   options={[
+                    ...(contestFiltersVisible
+                      ? [{ type: 'header', label: 'Topics' }]
+                      : []),
                     {
                       id: 0,
                       label: 'All Topics',
@@ -317,6 +373,12 @@ export const HeaderWithFilters = ({
                       value: t.name,
                       label: t.name,
                     })),
+                    ...(contestFiltersVisible
+                      ? [
+                          { type: 'header-divider', label: 'Contests' },
+                          ...contestNameOptions,
+                        ]
+                      : []),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
@@ -331,33 +393,69 @@ export const HeaderWithFilters = ({
                   }
                 />
               )}
-              {stagesEnabled && (
+              {matchesContestFilterRoute ? (
                 <Select
-                  selected={selectedStage || 'All Stages'}
+                  selected={urlParams.status || 'all-statuses'}
                   onSelect={(item: any) =>
                     onFilterSelect({
-                      filterKey: 'stage',
-                      filterVal: item.value === 'All Stages' ? '' : item.value,
+                      filterKey: 'status',
+                      filterVal:
+                        item.value === 'all-statuses' ? '' : item.value,
                     })
                   }
                   options={[
                     {
                       id: 0,
-                      label: 'All Stages',
-                      value: 'All Stages',
+                      label: 'Active',
+                      value: 'active',
                     },
-                    ...stages.map((s) => ({
-                      id: s,
-                      value: s,
-                      label: `${threadStageToLabel(s)} ${
-                        s === ThreadStage.Voting
-                          ? totalThreadsInCommunityForVoting
-                          : ''
-                      }`,
-                    })),
+                    {
+                      id: 1,
+                      label: 'Past winners',
+                      value: 'past-winners',
+                    },
+                    {
+                      id: 2,
+                      label: 'All Statuses',
+                      value: 'all-statuses',
+                    },
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                 />
+              ) : (
+                stagesEnabled && (
+                  <Select
+                    selected={selectedStage || 'All Stages'}
+                    onSelect={(item) =>
+                      onFilterSelect({
+                        filterKey: 'stage',
+                        filterVal:
+                          typeof item !== 'string'
+                            ? item.value === 'All Stages'
+                              ? ''
+                              : item.value
+                            : '',
+                      })
+                    }
+                    options={[
+                      {
+                        id: 0,
+                        label: 'All Stages',
+                        value: 'All Stages',
+                      },
+                      ...stages.map((s) => ({
+                        id: s,
+                        value: s,
+                        label: `${threadStageToLabel(s)} ${
+                          s === ThreadStage.Voting
+                            ? totalThreadsInCommunityForVoting
+                            : ''
+                        }`,
+                      })),
+                    ]}
+                    dropdownPosition={rightFiltersDropdownPosition}
+                  />
+                )
               )}
               <Select
                 selected={dateRange || ThreadTimelineFilterTypes.AllTime}

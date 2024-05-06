@@ -1,12 +1,16 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { BalanceSourceType, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { BalanceSourceType } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'url';
 import { models } from '../../../database';
 import { Balances, GetCosmosBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
 import { __getCosmosNativeBalances } from './get_cosmos_balances';
+import { __getCw20Balances } from './get_cw20_balances';
 import { __getCw721Balances } from './get_cw721_balances';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function getCosmosBalances(
   options: GetCosmosBalancesOptions,
@@ -19,8 +23,10 @@ export async function getCosmosBalances(
   });
 
   if (!chainNode) {
-    const msg = `ChainNode with cosmos_chain_id ${options.sourceOptions.cosmosChainId} does not exist`;
-    log.error(msg);
+    const msg = `ChainNode with Cosmos chain id ${options.sourceOptions.cosmosChainId} does not exist`;
+    log.error(msg, undefined, {
+      cosmosChainId: options.sourceOptions.cosmosChainId,
+    });
     return {};
   }
 
@@ -35,8 +41,11 @@ export async function getCosmosBalances(
     } catch (e) {
       if (address != '0xdiscordbot') {
         log.error(
-          `Skipping address: ${address}`,
+          `Failed to decode Cosmos address`,
           e instanceof Error ? e : undefined,
+          {
+            address,
+          },
         );
       }
     }
@@ -53,6 +62,14 @@ export async function getCosmosBalances(
       freshBalances = await __getCosmosNativeBalances({
         chainNode,
         addresses: validatedAddresses,
+        batchSize: options.batchSize,
+      });
+      break;
+    case BalanceSourceType.CW20:
+      freshBalances = await __getCw20Balances({
+        chainNode,
+        addresses: validatedAddresses,
+        contractAddress: options.sourceOptions.contractAddress,
         batchSize: options.batchSize,
       });
       break;

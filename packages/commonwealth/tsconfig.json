@@ -1,30 +1,34 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "jsx": "react",
-    "skipLibCheck": true,
-    "sourceMap": true,
+    "baseUrl": ".",
     "rootDir": ".",
     "outDir": "build",
-    "baseUrl": ".",
+    "jsx": "react",
+    "sourceMap": true,
     "paths": {
-      "@hicommonwealth/*": ["../../libs/*/src"],
+      "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
   "include": [
-    "./client",
-    "./shared",
-    "./test",
-    "./globals.d.ts",
-    "./server",
-    "./server.ts",
-    "./scripts"
+    "client",
+    "globals.d.ts",
+    "server",
+    "server.ts",
+    "server-test.ts",
+    "scripts",
+    "shared",
+    "test"
   ],
   "references": [
-    { "path": "../../libs/adapters" },
-    { "path": "../../libs/chains" },
-    { "path": "../../libs/core" },
-    { "path": "../../libs/model" }
+    { "path": "../../libs/adapters/tsconfig.build.json" },
+    { "path": "../../libs/chains/tsconfig.build.json" },
+    { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/model/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" },
+    { "path": "../../libs/schemas/tsconfig.build.json" },
+    { "path": "../../libs/shared/tsconfig.build.json" },
+    { "path": "../../libs/evm-testing/tsconfig.build.json" }
   ]
 }

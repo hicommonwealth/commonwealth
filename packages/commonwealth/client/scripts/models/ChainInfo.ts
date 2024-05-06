@@ -1,16 +1,21 @@
-import type { ChainNetwork, DefaultPage } from '@hicommonwealth/core';
-import { ChainBase } from '@hicommonwealth/core';
+import type { ChainNetwork, DefaultPage } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
-import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
+import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
+import StakeInfo from './StakeInfo';
 
 class ChainInfo {
   public readonly id: string;
+  public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
+  public readonly CommunityStakes: StakeInfo[];
   public readonly tokenName: string;
+  public readonly threadCount: number;
+  public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -60,7 +65,6 @@ class ChainInfo {
     stagesEnabled,
     customStages,
     customDomain,
-    snapshot,
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
@@ -74,7 +78,9 @@ class ChainInfo {
     type,
     decimals,
     substrateSpec,
+    chain_node_id,
     ChainNode,
+    CommunityStakes,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
@@ -83,6 +89,9 @@ class ChainInfo {
     directoryPageChainNodeId,
     namespace,
     redirect,
+    thread_count,
+    address_count,
+    snapshot_spaces,
   }) {
     this.id = id;
     this.network = network;
@@ -96,7 +105,6 @@ class ChainInfo {
     this.customStages = customStages;
     this.customDomain = customDomain;
     this.terms = terms;
-    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
@@ -108,7 +116,9 @@ class ChainInfo {
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
+    this.CommunityStakes = CommunityStakes;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
@@ -118,6 +128,9 @@ class ChainInfo {
     this.directoryPageChainNodeId = directoryPageChainNodeId;
     this.namespace = namespace;
     this.redirect = redirect;
+    this.threadCount = thread_count;
+    this.addressCount = address_count;
+    this.snapshot = snapshot_spaces || [];
   }
 
   public static fromJSON({
@@ -131,7 +144,6 @@ class ChainInfo {
     stages_enabled,
     custom_stages,
     custom_domain,
-    snapshot,
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
@@ -146,6 +158,7 @@ class ChainInfo {
     substrate_spec,
     token_name,
     Contracts,
+    chain_node_id,
     ChainNode,
     admin_only_polling,
     discord_config_id,
@@ -154,6 +167,10 @@ class ChainInfo {
     directory_page_chain_node_id,
     namespace,
     redirect,
+    thread_count,
+    address_count,
+    CommunityStakes,
+    snapshot_spaces,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -168,7 +185,7 @@ class ChainInfo {
       ? 6
       : 18;
 
-    if (COSMOS_EVM_CHAINS.some((c) => c === id)) {
+    if (getCosmosChains(true)?.some((c) => c === id)) {
       decimals = 18;
     }
 
@@ -183,7 +200,6 @@ class ChainInfo {
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
-      snapshot,
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -198,7 +214,9 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      ChainNode,
+      chain_node_id,
+      ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
+      CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
@@ -206,6 +224,9 @@ class ChainInfo {
       directoryPageChainNodeId: directory_page_chain_node_id,
       namespace,
       redirect,
+      thread_count,
+      address_count,
+      snapshot_spaces,
     });
   }
 
@@ -320,6 +341,7 @@ class ChainInfo {
       discords: [],
       githubs: [],
       telegrams: [],
+      twitters: [],
       elements: [],
       remainingLinks: [],
     };
@@ -335,6 +357,8 @@ class ChainInfo {
           categorizedLinks.telegrams.push(link);
         } else if (link.includes('://matrix.to')) {
           categorizedLinks.elements.push(link);
+        } else if (link.includes('://twitter.com')) {
+          categorizedLinks.twitters.push(link);
         } else {
           categorizedLinks.remainingLinks.push(link);
         }
@@ -348,6 +372,7 @@ export type CategorizedSocialLinks = {
   discords: string[];
   githubs: string[];
   telegrams: string[];
+  twitters: string[];
   elements: string[];
   remainingLinks: string[];
 };

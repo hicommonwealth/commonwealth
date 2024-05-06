@@ -1,18 +1,20 @@
-import { PolicyMetadata, events } from '@hicommonwealth/core';
+import { events, type Policy } from '@hicommonwealth/core';
 
 const inputs = {
-  ThreadCreated: events.schemas.ThreadCreated,
-  CommentCreated: events.schemas.CommentCreated,
+  ThreadCreated: events.ThreadCreated,
+  CommentCreated: events.CommentCreated,
 };
 
-export const ContestWorker = (): PolicyMetadata<typeof inputs> => ({
-  inputs,
-  body: {
-    ThreadCreated: async ({ name, payload }) => {
-      console.log(name, payload.thread);
+export function ContestWorker(): Policy<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      ThreadCreated: async ({ name, payload }) => {
+        console.log(name, payload);
+      },
+      CommentCreated: async ({ name, payload }) => {
+        console.log(name, payload);
+      },
     },
-    CommentCreated: async ({ name, payload }) => {
-      console.log(name, payload.comment);
-    },
-  },
-});
+  };
+}

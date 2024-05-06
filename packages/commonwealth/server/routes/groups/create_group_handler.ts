@@ -1,11 +1,13 @@
-import { AppError, Requirement } from '@hicommonwealth/core';
-import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
+import { AppError } from '@hicommonwealth/core';
+import { GroupAttributes } from '@hicommonwealth/model';
+import { GroupMetadata } from '@hicommonwealth/schemas';
+import { Requirement } from '@hicommonwealth/shared';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type CreateGroupBody = {
-  metadata: GroupMetadata;
+  metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
 };
@@ -16,7 +18,7 @@ export const createGroupHandler = async (
   req: TypedRequestBody<CreateGroupBody>,
   res: TypedResponse<CreateGroupResponse>,
 ) => {
-  const { user, address, community } = req;
+  const { user, community } = req;
 
   // FIXME: this is the command schema
   const schema = z.object({
@@ -41,7 +43,6 @@ export const createGroupHandler = async (
   const [group, analyticsOptions] = await controllers.groups.createGroup({
     user,
     community,
-    address,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,

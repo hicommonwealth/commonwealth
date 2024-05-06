@@ -1,4 +1,5 @@
-import { tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
@@ -15,9 +16,16 @@ describe('scheduleNodeProcessing', () => {
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
   let singleSourceSuccess = false;
+  let models: DB;
 
   before(async () => {
     await tester.seedDb();
+    const res = await import('@hicommonwealth/model');
+    models = res['models'];
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   beforeEach(() => {
@@ -30,7 +38,7 @@ describe('scheduleNodeProcessing', () => {
   });
 
   it('should not schedule anything if there are no event sources', async () => {
-    await scheduleNodeProcessing(1000, processChainStub);
+    await scheduleNodeProcessing(models, 1000, processChainStub);
     clock.tick(1001);
     expect(processChainStub.called).to.be.false;
   });
@@ -44,7 +52,7 @@ describe('scheduleNodeProcessing', () => {
     await getTestSignatures();
 
     const interval = 10_000;
-    await scheduleNodeProcessing(interval, processChainStub);
+    await scheduleNodeProcessing(models, interval, processChainStub);
 
     expect(processChainStub.calledOnce).to.be.false;
 
@@ -63,7 +71,7 @@ describe('scheduleNodeProcessing', () => {
     await getTestSignatures('v2');
 
     const interval = 10_000;
-    await scheduleNodeProcessing(interval, processChainStub);
+    await scheduleNodeProcessing(models, interval, processChainStub);
 
     expect(processChainStub.calledOnce).to.be.false;
     clock.tick(1);

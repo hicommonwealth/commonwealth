@@ -18,21 +18,22 @@ const Errors = {
   NoCommunity: 'No community resolved to execute search',
 };
 
-type GetThreadsRequestQuery = {
+export type GetThreadsRequestQuery = {
   community_id: string;
   thread_ids?: string[];
   bulk?: string;
   active?: string;
   search?: string;
+  count?: boolean;
 };
-type ActiveThreadsRequestQuery = {
+export type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
 };
-type SearchThreadsRequestQuery = {
+export type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
 } & PaginationQueryParams;
-type BulkThreadsRequestQuery = {
+export type BulkThreadsRequestQuery = {
   topic_id: string;
   stage?: string;
   includePinnedThreads?: string;
@@ -43,7 +44,12 @@ type BulkThreadsRequestQuery = {
   to_date?: string;
   archived?: string;
 };
-type GetThreadsResponse = any;
+export type CountThreadsRequestQuery = {
+  limit?: number;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GetThreadsResponse = any;
 
 export const getThreadsHandler = async (
   controllers: ServerControllers,
@@ -53,6 +59,7 @@ export const getThreadsHandler = async (
         | ActiveThreadsRequestQuery
         | SearchThreadsRequestQuery
         | BulkThreadsRequestQuery
+        | CountThreadsRequestQuery
       )
   >,
   res: TypedResponse<GetThreadsResponse>,
@@ -65,7 +72,7 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const { thread_ids, bulk, active, search, community_id } =
+  const { thread_ids, bulk, active, search, count, community_id } =
     queryValidationResult.data;
 
   // get threads by IDs
@@ -95,6 +102,8 @@ export const getThreadsHandler = async (
       from_date,
       to_date,
       archived,
+      contestAddress,
+      status,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -108,6 +117,8 @@ export const getThreadsHandler = async (
       fromDate: from_date,
       toDate: to_date,
       archived: archived,
+      contestAddress,
+      status,
     });
     return success(res, bulkThreads);
   }
@@ -143,6 +154,16 @@ export const getThreadsHandler = async (
       orderDirection: order_direction as any,
     });
     return success(res, searchResults);
+  }
+
+  // count threads
+  if (count) {
+    const { limit } = req.query as CountThreadsRequestQuery;
+    const countResult = await controllers.threads.countThreads({
+      communityId: community_id,
+      limit,
+    });
+    return success(res, { count: countResult });
   }
 
   throw new AppError(Errors.InvalidRequest);

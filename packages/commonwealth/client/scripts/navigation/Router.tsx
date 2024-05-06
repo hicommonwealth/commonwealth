@@ -14,6 +14,8 @@ import GeneralRoutes from './GeneralRoutes';
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
   communityHomepageEnabled: boolean;
+  existingCommunityStakeIntegrationEnabled: boolean;
+  contestEnabled: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -26,16 +28,23 @@ const Router = (customDomain: string) => {
     'communityHomepage',
     false,
   );
+  const existingCommunityStakeIntegrationEnabled = client.getBooleanValue(
+    'existingCommunityStakeIntegrationEnabled',
+    false,
+  );
+  const contestEnabled = client.getBooleanValue('contest', false);
   const flags = {
     proposalTemplatesEnabled,
     communityHomepageEnabled,
+    contestEnabled,
+    existingCommunityStakeIntegrationEnabled,
   };
 
   return createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
       ...(customDomain ? CustomDomainRoutes(flags) : CommonDomainRoutes(flags)),
-      <Route path="*" element={withLayout(PageNotFound, {})} />,
+      <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );
 };

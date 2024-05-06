@@ -1,19 +1,24 @@
 {
   "name": "@hicommonwealth/adapters",
   "private": "true",
+  "type": "module",
   "version": "0.1.0",
   "description": "External adapters",
   "files": [
     "build"
   ],
-  "main": "build/index",
+  "main": "build/index.js",
+  "types": "src/index",
   "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf build",
+    "build": "tsc -b tsconfig.build.json",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test ts-mocha '__tests__/**/*.spec.ts'"
+    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "@hicommonwealth/core": "*",
+    "@hicommonwealth/logging": "*",
+    "@hicommonwealth/shared": "*",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
@@ -23,9 +28,6 @@
     "node-fetch": "2",
     "passport": "^0.4.0",
     "pg": "^8.11.3",
-    "pino": "^8.19.0",
-    "pino-http": "^9.0.0",
-    "pino-http-print": "^3.1.0",
     "rascal": "^14.4.5",
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
@@ -35,6 +37,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "pino-pretty": "^10.3.1"
+    "tsx": "^4.7.2"
   }
 }

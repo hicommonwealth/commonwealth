@@ -2,23 +2,22 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-len */
-require('dotenv').config();
-import { connectToRedis } from '@hicommonwealth/adapters';
-import { CacheNamespaces } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import dotenv from 'dotenv';
+import { TestServer, testServer } from 'server-test';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import app, { cacheDecorator, redisCache } from '../../../server-test';
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
 const V1BETA1_API = `/cosmosAPI`;
 const V1_API = `/cosmosAPI/v1`;
 
+dotenv.config();
 chai.use(chaiHttp);
 const expect = chai.expect;
 
@@ -28,26 +27,27 @@ function verifyNoCacheResponse(res) {
   expect(res).to.not.have.header('X-Cache', 'HIT');
 }
 
-async function verifyCacheResponse(key, res, resEarlier) {
-  expect(res).to.have.status(200);
-  expect(res).to.have.header('X-Cache', 'HIT');
-  const valFromRedis = await cacheDecorator.checkCache(key);
-  expect(valFromRedis).to.not.be.null;
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
-  expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
-}
-
 describe('Cosmos Cache', () => {
+  let server: TestServer;
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
+  async function verifyCacheResponse(key, res, resEarlier) {
+    expect(res).to.have.status(200);
+    expect(res).to.have.header('X-Cache', 'HIT');
+    const valFromRedis = await server.cacheDecorator.checkCache(key);
+    expect(valFromRedis).to.not.be.null;
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+    expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+  }
+
   before(async () => {
-    await tester.seedDb();
-    await connectToRedis(redisCache);
+    server = await testServer();
+    await cache().ready();
   });
 
   after(async () => {
-    await redisCache.deleteNamespaceKeys(route_namespace);
-    await redisCache.closeClient();
+    await cache().deleteNamespaceKeys(route_namespace);
+    await dispose()();
   });
 
   describe('cosmosAPI', () => {
@@ -59,7 +59,7 @@ describe('Cosmos Cache', () => {
         'accept-language': 'en-US,en;q=0.9',
       },
     ) {
-      return chai.request(app).post(path).set(headers).send(body);
+      return chai.request(server.app).post(path).set(headers).send(body);
     }
 
     async function rpcTestIsCached(body, key) {
@@ -275,10 +275,10 @@ describe('Cosmos Cache', () => {
     };
 
     async function lcdTestIsCached(url) {
-      const res1 = await chai.request(app).get(url);
+      const res1 = await chai.request(server.app).get(url);
       await verifyNoCacheResponse(res1);
 
-      const res2 = await await chai.request(app).get(url);
+      const res2 = await await chai.request(server.app).get(url);
       await verifyCacheResponse(url, res2, res1);
     }
 

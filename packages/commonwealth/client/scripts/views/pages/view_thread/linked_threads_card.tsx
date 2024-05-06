@@ -1,3 +1,4 @@
+import { slugify } from '@hicommonwealth/shared';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/view_thread/linked_threads_card.scss';
@@ -5,12 +6,11 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
-import { slugify } from '../../../../../shared/utils';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
@@ -35,7 +35,7 @@ export const LinkedThreadsCard = ({
   );
 
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     ids: linkedThreadIds.map(Number),
     apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
   });
@@ -74,7 +74,7 @@ export const LinkedThreadsCard = ({
               )}
               {allowLinking && (
                 <CWButton
-                  buttonType="mini-black"
+                  buttonHeight="sm"
                   label="Link discussion"
                   onClick={() => setIsModalOpen(true)}
                 />

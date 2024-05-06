@@ -1,20 +1,22 @@
 import moment from 'moment';
 
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  createThreadMentionNotifications,
+  parseUserMentions,
+  queryMentionedUsers,
+  uniqueMentions,
+} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -209,35 +211,15 @@ export async function __createThread(
     },
   ]);
 
-  // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
-  let mentionedAddresses;
-  try {
-    const mentions = parseUserMentions(bodyText);
-    if (mentions?.length > 0) {
-      mentionedAddresses = await Promise.all(
-        mentions.map(async (mention) => {
-          return this.models.Address.findOne({
-            where: {
-              community_id: mention[0] || null,
-              address: mention[1] || null,
-            },
-            include: [this.models.User],
-          });
-        }),
-      );
-      // filter null results
-      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-    }
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
+  const mentions = uniqueMentions(parseUserMentions(bodyText));
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
-  const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
-  excludedAddrs.push(finalThread.Address.address);
-
-  // dispatch notifications to subscribers of the given chain
   const allNotificationOptions: EmitOptions[] = [];
+
+  allNotificationOptions.push(
+    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
+  );
 
   allNotificationOptions.push({
     notification: {
@@ -253,33 +235,8 @@ export async function __createThread(
         author_community_id: finalThread.Address.community_id,
       },
     },
-    excludeAddresses: excludedAddrs,
+    excludeAddresses: [finalThread.Address.address],
   });
-
-  // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length > 0)
-    mentionedAddresses.forEach((mentionedAddress) => {
-      if (!mentionedAddress.User) {
-        return; // some Addresses may be missing users, e.g. if the user removed the address
-      }
-      allNotificationOptions.push({
-        notification: {
-          categoryId: NotificationCategories.NewMention,
-          data: {
-            mentioned_user_id: mentionedAddress.User.id,
-            created_at: new Date(),
-            thread_id: finalThread.id,
-            root_type: ProposalType.Thread,
-            root_title: finalThread.title,
-            comment_text: finalThread.body,
-            community_id: finalThread.community_id,
-            author_address: finalThread.Address.address,
-            author_community_id: finalThread.Address.community_id,
-          },
-        },
-        excludeAddresses: [finalThread.Address.address],
-      });
-    });
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,

@@ -1,14 +1,14 @@
 import {
+  MembershipRejectReason,
+  OptionsWithBalances,
+} from '@hicommonwealth/model';
+import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
-} from '@hicommonwealth/core';
-import {
-  MembershipRejectReason,
-  OptionsWithBalances,
-} from '@hicommonwealth/model';
-import { toBN } from 'web3-utils';
+} from '@hicommonwealth/shared';
+import { toBigInt } from 'web3-utils';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -80,9 +80,9 @@ export default function validateGroupMembership(
   if (numRequiredRequirements) {
     if (numRequirementsMet >= numRequiredRequirements) {
       // allow if minimum number of requirements met
-      return { isValid: true, numRequirementsMet };
+      return { ...response, isValid: true, numRequirementsMet };
     } else {
-      return { isValid: false, numRequirementsMet };
+      return { ...response, isValid: false, numRequirementsMet };
     }
   }
   return response;
@@ -129,6 +129,12 @@ function _thresholdCheck(
         chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
+      case 'cw20': {
+        balanceSourceType = BalanceSourceType.CW20;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.cosmos_chain_id;
+        break;
+      }
       case 'cw721': {
         balanceSourceType = BalanceSourceType.CW721;
         contractAddress = thresholdData.source.contract_address;
@@ -159,6 +165,7 @@ function _thresholdCheck(
             return b.options.sourceOptions.evmChainId.toString() === chainId;
           case BalanceSourceType.CosmosNative:
             return b.options.sourceOptions.cosmosChainId.toString() === chainId;
+          case BalanceSourceType.CW20:
           case BalanceSourceType.CW721:
             return (
               b.options.sourceOptions.contractAddress == contractAddress &&
@@ -173,7 +180,7 @@ function _thresholdCheck(
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = toBN(balance).gt(toBN(thresholdData.threshold));
+    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
     return {
       result,
       message: !result

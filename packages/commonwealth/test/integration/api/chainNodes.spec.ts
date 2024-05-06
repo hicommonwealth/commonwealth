@@ -1,12 +1,19 @@
-import { BalanceType } from '@hicommonwealth/core';
-import { models, tester, UserInstance } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
-  beforeEach(async () => {
-    await tester.seedDb();
+  let models: DB;
+
+  before(async () => {
+    models = await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('Creates new ChainNode when', async () => {
@@ -33,6 +40,7 @@ describe('ChainNode Tests', () => {
   });
 
   it('adds eth chain node to db', async () => {
+    await models.ChainNode.destroy({ where: { eth_chain_id: 123 } });
     assert.equal(
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
@@ -107,6 +115,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Osmosis',
         url: 'https://osmosis-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -133,6 +142,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Cosmos1',
         url: 'https://cosmos-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -143,6 +153,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Cosmos2',
           url: 'https://cosmos-mainnet.g.com/3',
+          slip44: 118,
         },
       });
 
@@ -196,6 +207,7 @@ describe('ChainNode Tests', () => {
       assert.equal(updatedNode.balance_type, 'ethereum');
       assert.equal(updatedNode.eth_chain_id, 123);
     });
+
     it('Cosmos', async () => {
       const cosmos_chain_id = 'osmosiz';
       const controller = new ServerCommunitiesController(models, null);
@@ -217,6 +229,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Osmosis',
           url: 'https://osmosis-mainnet.g.com/2',
+          slip44: 118,
         },
       });
 
@@ -226,6 +239,7 @@ describe('ChainNode Tests', () => {
         url: 'https://cosmos-mainnet.g.com/4',
         name: 'mmm',
         cosmos_chain_id,
+        slip44: 118,
       });
 
       const updatedNode = await models.ChainNode.findOne({
@@ -235,6 +249,7 @@ describe('ChainNode Tests', () => {
       assert.equal(updatedNode.name, 'mmm');
       assert.equal(updatedNode.balance_type, 'cosmos');
       assert.equal(updatedNode.cosmos_chain_id, 'osmosiz');
+      assert.equal(updatedNode.slip44, 118);
     });
   });
 });

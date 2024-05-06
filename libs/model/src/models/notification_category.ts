@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationCategoryAttributes = {
@@ -15,16 +14,15 @@ export type NotificationCategoryInstance =
 export type NotificationCategoryModelStatic =
   ModelStatic<NotificationCategoryInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): NotificationCategoryModelStatic => {
-  const NotificationCategory = <NotificationCategoryModelStatic>(
-    sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <NotificationCategoryModelStatic>(
+    sequelize.define<NotificationCategoryInstance>(
       'NotificationCategory',
       {
-        name: { type: dataTypes.STRING, primaryKey: true },
-        description: { type: dataTypes.TEXT, allowNull: false },
+        name: { type: Sequelize.STRING, primaryKey: true },
+        description: { type: Sequelize.TEXT, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: true },
+        updated_at: { type: Sequelize.DATE, allowNull: true },
       },
       {
         tableName: 'NotificationCategories',
@@ -34,13 +32,3 @@ export default (
       },
     )
   );
-  NotificationCategory.associate = (models) => {
-    models.NotificationCategory.hasMany(models.Notification, {
-      foreignKey: 'category_id',
-    });
-    models.NotificationCategory.hasMany(models.Subscription, {
-      foreignKey: 'category_id',
-    });
-  };
-  return NotificationCategory;
-};

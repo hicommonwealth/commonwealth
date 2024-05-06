@@ -1,4 +1,4 @@
-import { BalanceSourceType } from '@hicommonwealth/core';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import { ChainNodeInstance } from '../../models/chain_node';
 
 export type Balances = { [address: string]: string };
@@ -57,6 +57,13 @@ type GetCosmosNativeBalanceOptions = GetCosmosBalancesBase & {
   balanceSourceType: BalanceSourceType.CosmosNative;
 };
 
+export type GetCw20BalanceOptions = GetCosmosBalancesBase & {
+  balanceSourceType: BalanceSourceType.CW20;
+  sourceOptions: {
+    contractAddress: string;
+  };
+};
+
 export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
   balanceSourceType: BalanceSourceType.CW721;
   sourceOptions: {
@@ -75,6 +82,11 @@ export type GetEvmBalancesOptions =
 
 export type GetCosmosBalancesOptions =
   | GetCosmosNativeBalanceOptions
+  | GetCw20BalanceOptions
+  | GetCw721BalanceOptions;
+
+export type GetCwBalancesOptions =
+  | GetCw20BalanceOptions
   | GetCw721BalanceOptions;
 
 export type GetBalancesOptions =
@@ -84,4 +96,9 @@ export type GetBalancesOptions =
 export type GetTendermintClientOptions = {
   chainNode: ChainNodeInstance;
   batchSize?: number;
+};
+
+export type TokenAttributes = {
+  ticker: string | commonProtocol.Denominations;
+  decimals: number;
 };

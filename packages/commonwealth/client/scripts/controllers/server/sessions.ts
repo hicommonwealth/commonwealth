@@ -5,7 +5,7 @@ import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { chainBaseToCanvasChainId, createCanvasSessionPayload } from 'canvas';
 
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -119,7 +119,7 @@ export async function signSessionWithMagic(
     return { signature, sessionPayload };
   } else {
     // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    const siwe = await require('siwe');
+    const siwe = await import('siwe');
     const nonce = siwe.generateNonce();
     const domain = document.location.origin;
     const message = createSiweMessage(sessionPayload, domain, nonce);

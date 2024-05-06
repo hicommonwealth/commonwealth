@@ -11,7 +11,7 @@ import 'components/react_quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
-import { debounce } from 'lodash';
+import _ from 'lodash';
 import { marked } from 'marked';
 import markedFootnote from 'marked-footnote';
 import { markedSmartypants } from 'marked-smartypants';
@@ -53,6 +53,7 @@ marked
 
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
+  customClass?: string;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -61,6 +62,7 @@ export const MarkdownFormattedText = ({
   hideFormatting,
   searchTerm,
   cutoffLines,
+  customClass,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -117,8 +119,9 @@ export const MarkdownFormattedText = ({
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const convertTwitterLinks = useCallback(
-    debounce(async () => {
+    _.debounce(async () => {
       // walk through rendered markdown DOM elements
       const walker = document.createTreeWalker(
         containerRef.current,
@@ -168,7 +171,7 @@ export const MarkdownFormattedText = ({
     return () => {
       convertTwitterLinks.cancel();
     };
-  }, [finalDoc]);
+  }, [finalDoc, convertTwitterLinks]);
 
   return (
     <>
@@ -176,7 +179,7 @@ export const MarkdownFormattedText = ({
         ref={containerRef}
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },
-          'MarkdownFormattedText',
+          customClass || 'MarkdownFormattedText',
         )}
       >
         {finalDoc}

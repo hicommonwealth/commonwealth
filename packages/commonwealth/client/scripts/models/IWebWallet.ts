@@ -1,5 +1,5 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
-import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 
 import type Account from './Account';
 import type BlockInfo from './BlockInfo';

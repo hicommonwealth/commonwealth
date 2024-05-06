@@ -1,4 +1,4 @@
-import { CommunityCategoryType, ServerError } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -9,8 +9,10 @@ import type {
   UserInstance,
 } from '@hicommonwealth/model';
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
+import { CommunityCategoryType } from '@hicommonwealth/shared';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
+import { SESSION_EXPIRY_MILLIS } from '../../session';
 import { ETH_RPC, JWT_SECRET } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
@@ -58,7 +60,8 @@ const getCommunityStatus = async (models: DB) => {
   } = {};
   for (const community of communities) {
     if (community.category !== null) {
-      [community.id] = community.category as CommunityCategoryType[];
+      communityCategories[community.id] =
+        community.category as CommunityCategoryType[];
     }
   }
 
@@ -69,11 +72,11 @@ const getCommunityStatus = async (models: DB) => {
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query<{ communityId: string; count: number }>(
       `
-      SELECT "Threads".community_id as "communityId", COUNT("Threads".id)
-      FROM "Threads"
-      WHERE "Threads".created_at > :thirtyDaysAgo
-      AND "Threads".deleted_at IS NULL
-      GROUP BY "Threads".community_id;
+          SELECT "Threads".community_id as "communityId", COUNT("Threads".id)
+          FROM "Threads"
+          WHERE "Threads".created_at > :thirtyDaysAgo
+            AND "Threads".deleted_at IS NULL
+          GROUP BY "Threads".community_id;
       `,
       { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT },
     );
@@ -143,12 +146,15 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     }
 
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-    if (i != 0) query += ' UNION ';
+    if (query !== '') query += ' UNION ';
     // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT id, community_id FROM "Threads" WHERE
-    community_id = ? AND created_at > ? AND deleted_at IS NULL`;
+    query += `SELECT id, community_id
+              FROM "Threads"
+              WHERE community_id = ?
+                AND created_at > ?
+                AND deleted_at IS NULL`;
     if (i === communityActivity.length - 1) query += ';';
   }
 
@@ -197,11 +203,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     }
 
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-    if (i !== 0) query += ' UNION ';
+    if (query !== '') query += ' UNION ';
     // add the community and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > ?`;
+    query += `SELECT thread_id, community_id
+              FROM "Comments"
+              WHERE community_id = ?
+                AND created_at > ?`;
     if (i === communityActivity.length - 1) query += ';';
   }
 
@@ -321,7 +330,9 @@ export const status = async (
         threadCountQueryData,
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
+      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
+        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+      });
       user.jwt = jwtToken as string;
 
       return success(res, {

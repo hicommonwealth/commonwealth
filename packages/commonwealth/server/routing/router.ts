@@ -2,9 +2,9 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import apiRouter from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import ddd from '../routes/ddd';
 
 import {
   methodNotAllowedMiddleware,
@@ -80,14 +80,11 @@ import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB } from '@hicommonwealth/model';
+import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import { sendMessage } from '../routes/snapshotAPI';
-import startSsoLogin from '../routes/startSsoLogin';
 import updateAddress from '../routes/updateAddress';
 import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
@@ -96,10 +93,9 @@ import type DatabaseValidationService from '../middleware/databaseValidationServ
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import getDiscordChannels from '../routes/getDiscordChannels';
-import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
+import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
-import type GlobalActivityCache from '../util/globalActivityCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -156,6 +152,7 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
+import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
@@ -183,6 +180,7 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
+import { failure } from '../types';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -233,6 +231,9 @@ function setupRouter(
   const router = express.Router();
 
   router.use(useragent.express());
+
+  // Routes API
+  app.use('/api', apiRouter);
 
   // Updating the address
   registerRoute(
@@ -294,7 +295,7 @@ function setupRouter(
     router,
     'post',
     '/getAddressStatus',
-    databaseValidationService.validateAuthor,
+    passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
   );
   registerRoute(
@@ -349,6 +350,7 @@ function setupRouter(
     '/communities',
     getCommunitiesHandler.bind(this, serverControllers),
   );
+
   registerRoute(
     router,
     'get',
@@ -619,6 +621,15 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     getThreadsHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'get',
+    '/feed',
+    databaseValidationService.validateCommunity,
+    getFeedHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'get',
@@ -1093,6 +1104,7 @@ function setupRouter(
     router,
     'post',
     '/setDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
     setDiscordBotConfig.bind(this, models),
   );
   registerRoute(
@@ -1102,6 +1114,14 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     getDiscordChannels.bind(this, models),
+  );
+  registerRoute(
+    router,
+    'post',
+    '/removeDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
+    removeDiscordBotConfig.bind(this, models),
   );
 
   registerRoute(
@@ -1181,15 +1201,6 @@ function setupRouter(
     },
   );
 
-  registerRoute(router, 'post', '/auth/sso', startSsoLogin.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/auth/sso/callback',
-    // passport.authenticate('jwt', { session: false }),
-    finishSsoLogin.bind(this, models),
-  );
-
   registerRoute(
     router,
     'get',
@@ -1201,28 +1212,12 @@ function setupRouter(
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
-  // snapshotAPI
-  registerRoute(
-    router,
-    'post',
-    '/snapshotAPI/sendMessage',
-    sendMessage.bind(this),
-  );
-
   registerRoute(
     router,
     'get',
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  // snapshot-commonwealth
-  registerRoute(
-    router,
-    'get',
-    '/snapshot',
-    getSnapshotProposal.bind(this, models),
   );
 
   registerRoute(
@@ -1295,10 +1290,11 @@ function setupRouter(
 
   app.use(endpoint, router);
 
-  // new ddd routes
-  app.use('/ddd', ddd);
-
   app.use(methodNotAllowedMiddleware());
+  app.use('/api/*', function (_req, res) {
+    res.status(404);
+    return failure(res, 'Not Found');
+  });
 }
 
 export default setupRouter;

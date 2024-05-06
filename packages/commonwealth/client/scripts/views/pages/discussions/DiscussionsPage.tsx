@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import { useFetchThreadsQuery } from 'state/api/threads';
-import { useDateCursor } from 'state/api/threads/fetchThreads';
+import useFetchThreadsQuery, {
+  useDateCursor,
+} from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import { slugify } from 'utils';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -22,10 +20,15 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
+import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -33,6 +36,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -47,20 +51,19 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
   });
-  const [resizing, setResizing] = useState(false);
-  const { isWindowSmallInclusive } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
+
+  const containerRef = useRef();
+
+  useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -72,7 +75,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const isOnArchivePage =
-    location.pathname === `/${app.activeChainId()}/archived`;
+    location.pathname ===
+    (app.isCustomDomain() ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -81,25 +85,27 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       page: 1,
       limit: 20,
       topicId,
-      stage: stageName,
+      stage: stageName ?? undefined,
       includePinnedThreads: true,
-      orderBy: featuredFilter,
+      ...(featuredFilter && {
+        orderBy: featuredFilter,
+      }),
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
-  //
-  //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
-  //Checks both for mobile device and inner window size for desktop responsiveness
+
+  // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
+  // Checks both for mobile device and inner window size for desktop responsiveness
   const filteredThreads = threads.filter((t) => {
     if (!includeSpamThreads && t.markedAsSpamAt) return null;
 
-    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt !== null)
+    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
       return null;
 
-    if (isOnArchivePage && t.archivedAt === null) return null;
+    if (isOnArchivePage && !t.archivedAt) return null;
 
     return t;
   });
@@ -107,7 +113,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
-    <div className="DiscussionsPage">
+    <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
+      <DiscussionsFeedDiscovery
+        orderBy={featuredFilter}
+        community={communityId}
+        includePinnedThreads={true}
+      />
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
@@ -152,7 +163,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onBodyClick={() => {
                 const scrollEle = document.getElementsByClassName('Body')[0];
 
-                localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                localStorage[`${communityId}-discussions-scrollY`] =
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>
@@ -162,8 +173,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             />
           );
         }}
-        endReached={() => hasNextPage && fetchNextPage()}
-        overscan={200}
+        endReached={() => {
+          hasNextPage && fetchNextPage();
+        }}
+        overscan={50}
         components={{
           // eslint-disable-next-line react/no-multi-comp
           EmptyPlaceholder: () => (
@@ -175,11 +188,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
             <>
-              {isWindowSmallInclusive && (
-                <div className="mobileBreadcrumbs">
-                  <Breadcrumbs />
-                </div>
-              )}
+              <Breadcrumbs />
               <HeaderWithFilters
                 topic={topicName}
                 stage={stageName}
@@ -202,7 +211,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
         }}
       />
-    </div>
+    </CWPageLayout>
   );
 };
 

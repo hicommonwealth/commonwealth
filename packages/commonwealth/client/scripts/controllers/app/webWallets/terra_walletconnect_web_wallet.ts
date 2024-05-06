@@ -4,7 +4,7 @@ import type {
   WalletController,
 } from '@terra-money/wallet-provider';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 

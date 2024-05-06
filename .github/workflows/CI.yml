@@ -2,9 +2,12 @@ name: CI
 
 env:
   ROLLBAR_ENV: 'GitHubCI'
+  NODE_ENV: 'test'
+  TEST_WITHOUT_LOGS: 'true'
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - master
@@ -15,17 +18,17 @@ jobs:
   e2e-tests-Parallel:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -106,17 +109,17 @@ jobs:
   e2e-tests-Mature:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -196,17 +199,17 @@ jobs:
   e2e-tests-serial:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -270,7 +273,7 @@ jobs:
   commonwealth-code-quality-recommendations:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Code Quality Recommendations
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -307,7 +310,7 @@ jobs:
   commonwealth-code-quality:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Code Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -338,39 +341,43 @@ jobs:
       - name: Assert yarn.lock is correct
         run: |
           if ! git diff --quiet; then
-            echo 'You need to update the yarn.lock file'
+            echo 'You need to update the yarn.lock file (potentially after running: yarn global add node-gyp)'
             exit 1
           fi
 
-      - name: Build
-        run: yarn build
+      - name: build
+        run: yarn workspaces run build
+
+      - name: check-types
+        run: yarn workspaces run check-types
 
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
-      - name: Commonwealth Typecheck
-        run: yarn --cwd packages/commonwealth check-types
+      # To disable eslint-diff just comment the following two lines
+      - name: Run eslint-diff
+        run: yarn workspace commonwealth run lint-diff
 
-      - name: Discord-Bot Typecheck
-        run: yarn --cwd packages/discord-bot check-types
+      - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
+        run: yarn workspace commonwealth run lint-diff-canary
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -385,6 +392,11 @@ jobs:
         image: redis:latest
         ports:
           - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - name: Checkout
@@ -403,10 +415,10 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: NO_WEBPACK=true yarn build-ci
 
       - name: Run unit tests
-        run: yarn --cwd packages/commonwealth unit-test --forbid-only
+        run: yarn workspaces run test
 
       - name: Run API tests
         run: yarn --cwd packages/commonwealth test-api --forbid-only
@@ -417,22 +429,21 @@ jobs:
         run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
         env:
           NO_CLIENT: true
-          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
 
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
     name: Devnet Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       matrix:
-        node: [ 18 ]
+        node: [ 20 ]
     services:
       postgres:
-        image: postgres
+        image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -444,7 +455,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
       evm_test_app:
-        image: irowan/common_chain_tests
+        image: irowan/common_chain_tests_new
         ports:
          - 3000:3000
       cosmos_test_app:
@@ -481,7 +492,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build CI
-        run: yarn build-ci
+        run: NO_WEBPACK=true yarn build-ci
 
       ## EVM Section:
       - name: Start EVM Testnet
@@ -524,4 +535,4 @@ jobs:
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
-          COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
+          REDIS_URL: redis://localhost:6379

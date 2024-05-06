@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -29,25 +28,20 @@ export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
 
 export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-) => {
+export default (sequelize: Sequelize.Sequelize) => {
   const Collaboration = <CollaborationModelStatic>sequelize.define(
     'Collaboration',
     {
       address_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
       },
       thread_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Collaborations',
@@ -58,10 +52,8 @@ export default (
     },
   );
 
-  Collaboration.associate = (models) => {
-    models.Collaboration.belongsTo(models.Address);
-    models.Collaboration.belongsTo(models.Thread);
-  };
+  // sequelize requires a PK on "id" column when defining a model
+  Collaboration.removeAttribute('id');
 
   return Collaboration;
 };

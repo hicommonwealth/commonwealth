@@ -1,5 +1,6 @@
-import { AppError, BalanceType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import { UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -16,6 +17,7 @@ export type CreateChainNodeOptions = {
   url: string;
   name?: string;
   bech32?: string;
+  slip44?: number;
   balanceType?: string;
   eth_chain_id?: number;
   cosmos_chain_id?: string;
@@ -29,6 +31,7 @@ export async function __createChainNode(
     url,
     name,
     bech32,
+    slip44,
     balanceType,
     eth_chain_id,
     cosmos_chain_id,
@@ -68,6 +71,7 @@ export async function __createChainNode(
     name,
     balance_type: balanceType as BalanceType,
     bech32,
+    slip44,
     eth_chain_id,
     cosmos_chain_id,
   });

@@ -1,9 +1,4 @@
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-  ServerError,
-} from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
@@ -12,12 +7,18 @@ import {
   ThreadInstance,
   UserInstance,
 } from '@hicommonwealth/model';
-import { uniq } from 'lodash';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import _ from 'lodash';
 import moment from 'moment';
 import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  createThreadMentionNotifications,
+  findMentionDiff,
+  parseUserMentions,
+  queryMentionedUsers,
+} from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -269,10 +270,45 @@ export async function __updateThread(
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
     include: [
-      { model: this.models.Address, as: 'Address' },
+      {
+        model: this.models.Address,
+        as: 'Address',
+        include: [
+          {
+            model: this.models.User,
+            as: 'User',
+            required: true,
+            attributes: ['id'],
+            include: [
+              {
+                model: this.models.Profile,
+                as: 'Profiles',
+                required: true,
+                attributes: ['id', 'avatar_url', 'profile_name'],
+              },
+            ],
+          },
+        ],
+      },
       {
         model: this.models.Address,
         as: 'collaborators',
+        include: [
+          {
+            model: this.models.User,
+            as: 'User',
+            required: true,
+            attributes: ['id'],
+            include: [
+              {
+                model: this.models.Profile,
+                as: 'Profiles',
+                required: true,
+                attributes: ['id', 'avatar_url', 'profile_name'],
+              },
+            ],
+          },
+        ],
       },
       { model: this.models.Topic, as: 'topic' },
     ],
@@ -297,71 +333,15 @@ export async function __updateThread(
     excludeAddresses: [address.address],
   });
 
-  let mentions;
-  try {
-    const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-    mentions = currentDraftMentions.filter((addrArray) => {
-      let alreadyExists = false;
-      previousDraftMentions.forEach((addrArray_) => {
-        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-          alreadyExists = true;
-        }
-      });
-      return !alreadyExists;
-    });
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(
-      mentions.map(async (mention) => {
-        try {
-          const mentionedUser = await this.models.Address.findOne({
-            where: {
-              community_id: mention[0],
-              address: mention[1],
-            },
-            include: [this.models.User],
-          });
-          return mentionedUser;
-        } catch (err) {
-          return null;
-        }
-      }),
-    );
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
-  // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length > 0) {
-    mentionedAddresses.forEach((mentionedAddress) => {
-      if (!mentionedAddress.User) {
-        return; // some Addresses may be missing users, e.g. if the user removed the address
-      }
-      allNotificationOptions.push({
-        notification: {
-          categoryId: NotificationCategories.NewMention,
-          data: {
-            mentioned_user_id: mentionedAddress.User.id,
-            created_at: now,
-            thread_id: +finalThread.id,
-            root_type: ProposalType.Thread,
-            root_title: finalThread.title,
-            comment_text: finalThread.body,
-            community_id: finalThread.community_id,
-            author_address: finalThread.Address.address,
-            author_community_id: finalThread.Address.community_id,
-          },
-        },
-        excludeAddresses: [finalThread.Address.address],
-      });
-    });
-  }
+  allNotificationOptions.push(
+    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
+  );
 
   return [finalThread.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }
@@ -669,8 +649,8 @@ async function updateThreadCollaborators(
       isSuperAdmin: true,
     });
 
-    const toAddUnique = uniq(toAdd || []);
-    const toRemoveUnique = uniq(toRemove || []);
+    const toAddUnique = _.uniq(toAdd || []);
+    const toRemoveUnique = _.uniq(toRemove || []);
 
     // check for overlap between toAdd and toRemove
     for (const r of toRemoveUnique) {

@@ -72,7 +72,7 @@
   white-space: nowrap;
   align-items: center;
 
-  >a {
+  > a {
     // reset link styles
 
     &,
@@ -171,7 +171,7 @@
 
     a {
       text-decoration: none !important;
-      color: $neutral-800  !important;
+      color: $neutral-800 !important;
     }
 
     a:hover {
@@ -181,7 +181,7 @@
 
   .user-address,
   .user-chain {
-    color: $neutral-500  !important;
+    color: $neutral-500 !important;
   }
 
   .role-tag {
