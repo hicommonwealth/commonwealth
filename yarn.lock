@@ -3363,6 +3363,13 @@
     big-integer "^1.6.48"
     utility-types "^3.10.0"
 
+"@knocklabs/node@^0.6.10":
+  version "0.6.10"
+  resolved "https://registry.yarnpkg.com/@knocklabs/node/-/node-0.6.10.tgz#a473ba9fe7d46b226219dc6406a182a5c15ebd8b"
+  integrity sha512-oqp7WXsi2rJtvL4GBpwLpCZzH+7UEuKw+OjaV+CPDmtVBJL1FJFZsi3JVWvyjNoAU9lwWbaPugIg175B1kDfaQ==
+  dependencies:
+    jose "^5.2.0"
+
 "@libp2p/bootstrap@^8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@libp2p/bootstrap/-/bootstrap-8.0.0.tgz#dc9fc3f0367953b69c7b726a205ba5d17a8eac50"
@@ -15488,6 +15495,11 @@ jmespath@0.15.0:
   version "0.15.0"
   resolved "https://registry.npmjs.org/jmespath/-/jmespath-0.15.0.tgz"
   integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
+
+jose@^5.2.0:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.2.4.tgz#c0d296caeeed0b8444a8b8c3b68403d61aa4ed72"
+  integrity sha512-6ScbIk2WWCeXkmzF6bRPmEuaqy1m8SbsRFMa/FLrSCkGIhj8OLVG/IH+XHVmNMx/KUo8cVWEE6oKR4dJ+S0Rkg==
 
 joycon@^3.0.1:
   version "3.0.1"
