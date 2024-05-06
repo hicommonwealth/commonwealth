@@ -1,5 +1,7 @@
-import { BalanceSourceType, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { BalanceSourceType } from '@hicommonwealth/shared';
+import { fileURLToPath } from 'url';
 import { getCosmosBalances, getEvmBalances } from './providers';
 import {
   Balances,
@@ -9,6 +11,7 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**

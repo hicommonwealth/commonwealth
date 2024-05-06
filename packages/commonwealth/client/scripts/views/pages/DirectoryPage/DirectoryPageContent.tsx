@@ -1,3 +1,4 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import app from 'state';
@@ -6,6 +7,8 @@ import { CWRelatedCommunityCard } from 'views/components/component_kit/new_desig
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import './DirectoryPageContent.scss';
 
 type RowType = {
@@ -42,7 +45,7 @@ interface DirectoryPageContentProps {
   filteredRelatedCommunitiesData: CommunityData[];
 }
 
-const columnInfo = [
+const columns: CWTableColumnInfo[] = [
   {
     key: 'name',
     customElementKey: 'community',
@@ -80,6 +83,12 @@ const DirectoryPageContent = ({
   tableData,
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'members',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
+
   if (isLoading) {
     return (
       <div className="directory-loader-container">
@@ -106,9 +115,10 @@ const DirectoryPageContent = ({
 
   return selectedViewType === ViewType.Rows ? (
     <CWTable
-      columnInfo={columnInfo}
+      columnInfo={tableState.columns}
+      sortingState={tableState.sorting}
+      setSortingState={tableState.setSorting}
       rowData={tableData}
-      defaultSortColumnKey="members"
     />
   ) : (
     <div className="directory-tiles-container">

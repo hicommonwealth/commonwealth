@@ -1,3 +1,4 @@
+import { toBigInt } from 'web3-utils';
 import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -12,14 +13,25 @@ class CommunityStakes extends ContractBase {
   namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
   addressCache = { address: '0x0', name: '' };
+  chainId?: string;
 
-  constructor(contractAddress: string, factoryAddress: string, rpc: string) {
+  constructor(
+    contractAddress: string,
+    factoryAddress: string,
+    rpc: string,
+    chainId?: string,
+  ) {
     super(contractAddress, communityStakesAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
+    this.chainId = chainId;
   }
 
   async initialize(withWallet: boolean = false): Promise<void> {
-    await super.initialize(withWallet);
+    if (this.chainId) {
+      await super.initialize(withWallet, this.chainId);
+    } else {
+      await super.initialize(withWallet);
+    }
     this.namespaceFactory = new NamespaceFactory(
       this.namespaceFactoryAddress,
       this.rpc,
@@ -43,20 +55,20 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = this.toBN(
+    const totalPrice = toBigInt(
       await this.contract.methods
         .getBuyPriceAfterFee(namespaceAddress, id, amount)
         .call(),
     );
-    const feeFreePrice = this.toBN(
+    const feeFreePrice = toBigInt(
       await this.contract.methods
         .getBuyPrice(namespaceAddress, id, amount)
         .call(),
     );
     return {
-      price: this.web3.utils.fromWei(feeFreePrice),
-      fees: this.web3.utils.fromWei(totalPrice.sub(feeFreePrice)),
-      totalPrice: this.web3.utils.fromWei(totalPrice),
+      price: this.web3.utils.fromWei(feeFreePrice, 'ether'),
+      fees: this.web3.utils.fromWei(totalPrice - feeFreePrice, 'ether'),
+      totalPrice: this.web3.utils.fromWei(totalPrice, 'ether'),
     };
   }
 
@@ -76,20 +88,20 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = this.toBN(
+    const totalPrice = toBigInt(
       await this.contract.methods
         .getSellPriceAfterFee(namespaceAddress, id, amount)
         .call(),
     );
-    const feeFreePrice = this.toBN(
+    const feeFreePrice = toBigInt(
       await this.contract.methods
         .getSellPrice(namespaceAddress, id, amount)
         .call(),
     );
     return {
-      price: this.web3.utils.fromWei(feeFreePrice),
-      fees: this.web3.utils.fromWei(totalPrice.sub(feeFreePrice)),
-      totalPrice: this.web3.utils.fromWei(totalPrice),
+      price: this.web3.utils.fromWei(feeFreePrice, 'ether'),
+      fees: this.web3.utils.fromWei(totalPrice - feeFreePrice, 'ether'),
+      totalPrice: this.web3.utils.fromWei(totalPrice, 'ether'),
     };
   }
 
@@ -126,7 +138,7 @@ class CommunityStakes extends ContractBase {
           maxFeePerGas: null,
         });
       try {
-        await this.web3.givenProvider.request({
+        await this.web3.currentProvider.request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC1155',
@@ -255,7 +267,7 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const balance = await this.web3.eth.getBalance(walletAddress);
-    return this.web3.utils.fromWei(balance);
+    return this.web3.utils.fromWei(balance, 'ether');
   }
 }
 

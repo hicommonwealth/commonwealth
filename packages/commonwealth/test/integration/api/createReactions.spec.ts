@@ -1,5 +1,6 @@
 import { ActionArgument } from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -48,7 +49,6 @@ describe('createReaction Integration Tests', () => {
   };
 
   before(async () => {
-    Sinon.stub(Config, 'REACTION_WEIGHT_OVERRIDE').value('300');
     server = await testServer();
 
     const res = await server.seeder.createAndVerifyAddress(
@@ -56,6 +56,9 @@ describe('createReaction Integration Tests', () => {
       'Alice',
     );
     userAddress = res.address;
+    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
+      () => ({ [userAddress]: 300 }),
+    );
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     userSession = { session: res.session, sign: res.sign };
 

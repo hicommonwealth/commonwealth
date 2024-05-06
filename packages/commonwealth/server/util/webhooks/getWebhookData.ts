@@ -3,7 +3,7 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
 import { SERVER_URL } from '../../config';
@@ -35,7 +35,7 @@ export async function getWebhookData(
     const previewImage = await getPreviewImageUrl(notification, community);
 
     return {
-      title: `${eventLabel.heading} on ${capitalize(
+      title: `${eventLabel.heading} on ${_.capitalize(
         notification.data.community_id,
       )}`,
       description: eventLabel.label,

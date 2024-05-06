@@ -60,8 +60,11 @@ abstract class ContractBase {
     }
   }
 
-  protected toBN(number: string | number) {
-    return this.web3.utils.toBN(number);
+  protected reInitContract() {
+    this.contract = new this.web3.eth.Contract(
+      this.abi as AbiItem[],
+      this.contractAddress,
+    );
   }
 }
 

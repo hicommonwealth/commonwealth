@@ -1,58 +1,58 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
+import { Sequelize } from 'sequelize';
+import { Factories } from '../../src/models/factories';
 import {
   bootstrap_testing,
   create_db_from_migrations,
   get_info_schema,
+  type TABLE_INFO,
 } from '../../src/tester';
 
 const generateSchemas = async () => {
   const model = await bootstrap_testing();
   const migration = await create_db_from_migrations('common_migrated_test');
 
-  // TODO: resolve remaining conflicts
+  // TODO: resolve remaining conflicts!!!
   const model_schema = await get_info_schema(model.sequelize, {
     ignore_columns: {},
     ignore_constraints: {
-      // TODO: missing in migrations (removed FKs for performance reasons?)
-      Addresses: ['FOREIGN KEY(profile_id)'],
-      Comments: ['FOREIGN KEY(community_id)'],
-      CommunityContracts: ['UNIQUE(community_id)'],
-      CommunitySnapshotSpaces: [
-        'FOREIGN KEY(community_id)',
-        'FOREIGN KEY(snapshot_space_id)',
+      // TODO: missing in migrations - removed FKs for performance reasons?
+      Addresses: [
+        'FOREIGN KEY Profiles(profile_id) UPDATE CASCADE DELETE SET NULL',
       ],
-      Memberships: ['PRIMARY KEY(id)'],
-      Notifications: ['FOREIGN KEY(thread_id)'],
-      Profiles: ['FOREIGN KEY(user_id)'],
-      Reactions: ['FOREIGN KEY(address_id)', 'FOREIGN KEY(community_id)'],
-      SnapshotProposals: ['FOREIGN KEY(space)'],
-      SsoTokens: ['FOREIGN KEY(address_id)'],
-      StarredCommunities: ['FOREIGN KEY(community_id)', 'FOREIGN KEY(user_id)'],
+      Comments: [
+        'FOREIGN KEY Communities(community_id) UPDATE NO ACTION DELETE NO ACTION',
+      ],
+      Notifications: [
+        'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
+      ],
+      Reactions: [
+        'FOREIGN KEY Addresses(address_id) UPDATE CASCADE DELETE NO ACTION',
+        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
+      ],
       Subscriptions: [
-        'FOREIGN KEY(comment_id)',
-        'FOREIGN KEY(community_id)',
-        'FOREIGN KEY(thread_id)',
+        'FOREIGN KEY Comments(comment_id) UPDATE CASCADE DELETE SET NULL',
+        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE SET NULL',
+        'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
       ],
-      Templates: ['FOREIGN KEY(abi_id)'],
-      Threads: ['FOREIGN KEY(topic_id)'],
-      Topics: ['FOREIGN KEY(community_id)'],
+      Memberships: [
+        'PRIMARY KEY(id)', // TODO: should we remove this id with a migration?
+      ],
+      Outbox: [
+        'PRIMARY KEY(event_id)', // removed in migration
+      ],
     },
   });
   const migration_schema = await get_info_schema(migration, {
     ignore_columns: {
-      // TODO: missing in model
+      // TODO: missing in model - due to migrations with backups?
       Comments: ['body_backup', 'text_backup', 'root_id', '_search'],
       Profiles: ['bio_backup', 'profile_name_backup'],
       Threads: ['body_backup', '_search'],
       Topics: ['default_offchain_template_backup'],
     },
-    ignore_constraints: {
-      // TODO: missing in model
-      CommunityStakes: ['FOREIGN KEY(community_id)'],
-      LastProcessedEvmBlocks: ['FOREIGN KEY(chain_node_id)'],
-      StakeTransactions: ['FOREIGN KEY(community_id,stake_id)'],
-    },
+    ignore_constraints: {},
   });
 
   return Object.keys(model_schema)
@@ -61,11 +61,14 @@ const generateSchemas = async () => {
       model: model_schema[table],
       migration: migration_schema[table],
     }))
-    .reduce((p, c) => ({ ...p, [c.model.table_name]: c }), {});
+    .reduce(
+      (p, c) => ({ ...p, [c.model.table_name]: c }),
+      {} as Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>,
+    );
 };
 
 describe('Model schema', () => {
-  let schemas;
+  let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
   before(async () => {
     schemas = await generateSchemas();
@@ -75,53 +78,25 @@ describe('Model schema', () => {
     await dispose()();
   });
 
-  [
-    'Addresses',
-    'Bans',
-    'ChainNodes',
-    'Collaborations',
-    'Comments',
-    'Communities',
-    'CommunityBanners',
-    'CommunityContractTemplate',
-    'CommunityContractTemplateMetadata',
-    'CommunityContracts',
-    'CommunitySnapshotSpaces',
-    'CommunityStakes',
-    'ContractAbis',
-    'Contracts',
-    'DiscordBotConfig',
-    'EvmEventSources',
-    'Groups',
-    'LastProcessedEvmBlocks',
-    'LoginTokens',
-    'Memberships',
-    'NotificationCategories',
-    'Notifications',
-    'NotificationsRead',
-    'Polls',
-    'Profiles',
-    'Reactions',
-    'SnapshotProposals',
-    'SnapshotSpaces',
-    'SsoTokens',
-    'StakeTransactions',
-    'StarredCommunities',
-    'Subscriptions',
-    'Templates',
-    'Threads',
-    'Topics',
-    'Users',
-    'Votes',
-    'Webhooks',
-  ].forEach((name) => {
-    it(`Should match ${name}`, async () => {
-      const { model, migration } = schemas[name];
+  const s = new Sequelize({
+    dialect: 'postgres',
+    username: 'commonwealth',
+    password: 'edgeware',
+    logging: false,
+  });
+  Object.values(Factories).forEach((factory) => {
+    const m = factory(s);
+    it(`Should match ${m.tableName}`, async () => {
+      const { model, migration } = schemas[m.tableName];
 
       //console.log(model.columns, migration.columns);
       expect(model.columns).deep.equals(migration.columns);
 
-      //TODO: reconcile constraints - too many naming issues found
+      // model.table_name === 'Topics' &&
+      //   console.log(
+      //     [...model.constraints.values()],
+      //     [...migration.constraints.values()],
+      //   );
       expect([...model.constraints.values()]).deep.equals([
         ...migration.constraints.values(),
       ]);

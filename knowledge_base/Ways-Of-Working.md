@@ -18,7 +18,8 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 - [Sprint Cadence](#sprint-cadence)
   * [Standup Meetings](#standup-meetings)
   * [Deep Work Wednesdays](#deep-work-wednesdays)
-  * [Friday Meetings](#friday-meetings)
+  * [Fix-It & Fearless Fridays](#fix-it--fearless-fridays)
+    + [Friday Meetings](#friday-meetings)
 - [Agile Release Schedule](#agile-release-schedule)
   * [Release and Deploy Procedure](#release--deploy-procedure)
 - [Change Log](#change-log)
@@ -28,6 +29,7 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 1. We follow an Agile work philosophy. See [Agile Manifesto](https://agilemanifesto.org/) for context.
 2. We track work through GitHub's project board, using tickets' "Project" metadata. See [Project Management Flow](#project-management-flow) for full context.
 3. We use team standups to sync up on project status and share updates. Standups take place on Mondays, Tuesdays, and Thursdays at 12:00 EST. See [Standup Meetings](#standup-meetings) section for full context.
+4. Informally, we are divided into three teams. The Product team builds and maintains our UI; the Platform team is responsible for backend and business logic; and the Protocol team handles smart contracts.
 
 ## Project Management Flow
 
@@ -44,6 +46,8 @@ Next, a ticket is "Teed Up" (moved to the "Teed Up" stage) by a lead or project 
 Work should not begin on a ticket until (1) an engineer has been assigned to the ticket by a lead (2) the engineer has given the ticket a [story-point value](#story-point-estimation) (3) the engineer has moved the ticket to "In Progress."
 
 Typically, engineers should only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress").
+
+Tickets tagged `cleanup` and `cleanup-frontend` may be self-assigned and worked on during Fix-it Fridays.
 
 #### Triage
 
@@ -85,7 +89,7 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 - 8 points ~= 1 sprint / 1-week task
 - 13 points ~= more than a single sprint
 
-Points may always be increased mid-implementation, but a justification must be provided.
+Points may always be increased mid-implementation, but a justification must be provided. Moreover, the original point estimation _must_ be left as a tag, rather than deleted.
 
 ### Branches
 
@@ -156,7 +160,13 @@ Standup meetings are held Mondays, Tuesdays, and Thursdays. Wednesdays are inten
 
 Wednesdays are intended to be deep focus days, so recurring or long meetings are not scheduled for Wednesday. This your chance to work uninterrupted on your sprint stories.
 
-### Friday Meetings
+### Fix-it & Fearless Fridays
+
+Fridays are designated Fix-it or Fearless Fridays. These are reserved for codebase cleanup and long-term experimental work; they may be joined by engineers who have finished their regular sprint cycle work for the week.
+
+Tickets tagged `cleanup` and `cleanup-frontend` may be self-assigned and worked on during Fix-it Fridays, without following the sprint cycle's usual tee-up and assignation system. (_See [Project Management Flow](#project-management-flow) section._)
+
+#### Friday Meetings
 
 We try to keep all our regular 1:1's on Friday, the final day of the sprint. Our stated goal is to have sprint stories mostly completed by the Weekly Retro, which takes place every Friday at 12:00 (and where appropriate, demo things that were shipped at the the retro meeting for all to see).
 

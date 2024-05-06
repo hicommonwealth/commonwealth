@@ -1,11 +1,13 @@
-import { stats } from '@hicommonwealth/core';
+import { EventNames, events as coreEvents, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { NotificationInstance, models } from '@hicommonwealth/model';
-import { emitChainEventNotifs } from './emitChainEventNotifs';
+import { DB, emitEvent } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
+import { z } from 'zod';
 import { getEventSources } from './getEventSources';
-import { getEvents } from './logProcessing';
-import { EvmSource } from './types';
+import { getEvents, getProvider, migrateEvents } from './logProcessing';
+import { EvmEvent, EvmSource } from './types';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 /**
@@ -14,9 +16,10 @@ const log = logger(__filename);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
+  models: DB,
   chainNodeId: number,
   evmSource: EvmSource,
-): Promise<Promise<void | NotificationInstance>[] | void> {
+): Promise<void> {
   try {
     log.info(
       'Processing:\n' +
@@ -27,34 +30,69 @@ export async function processChainNode(
       chainNodeId: String(chainNodeId),
     });
 
-    const startBlock = await models.LastProcessedEvmBlock.findOne({
+    const lastProcessedBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
         chain_node_id: chainNodeId,
       },
     });
 
-    const startBlockNum = startBlock?.block_number
-      ? startBlock.block_number + 1
-      : null;
+    const provider = getProvider(evmSource.rpc);
+    const currentBlock = await provider.getBlockNumber();
 
-    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
-    const promises = await emitChainEventNotifs(chainNodeId, events);
-
-    if (!startBlock) {
-      await models.LastProcessedEvmBlock.create({
-        chain_node_id: chainNodeId,
-        block_number: lastBlockNum,
-      });
+    let startBlockNum: number;
+    if (lastProcessedBlock?.block_number < currentBlock) {
+      startBlockNum = lastProcessedBlock?.block_number + 1;
+    } else if (lastProcessedBlock?.block_number === undefined) {
+      startBlockNum = currentBlock - 10;
     } else {
-      startBlock.block_number = lastBlockNum;
-      startBlock.save();
+      // the last processed block is the same as the current block
+      // this occurs if the poll interval is shorter than the block time
+      return;
     }
 
-    log.info(
-      `Processed ${events.length} events for chainNodeId ${chainNodeId}`,
-    );
+    const allEvents: EvmEvent[] = [];
+    const migratedData = await migrateEvents(evmSource, startBlockNum);
+    if (migratedData?.events?.length > 0)
+      allEvents.push(...migratedData.events);
 
-    return promises;
+    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
+    allEvents.push(...events);
+
+    await models.sequelize.transaction(async (transaction) => {
+      if (!lastProcessedBlock) {
+        await models.LastProcessedEvmBlock.create(
+          {
+            chain_node_id: chainNodeId,
+            block_number: lastBlockNum,
+          },
+          { transaction },
+        );
+      } else if (lastProcessedBlock.block_number !== lastBlockNum) {
+        lastProcessedBlock.block_number = lastBlockNum;
+        await lastProcessedBlock.save({ transaction });
+      }
+
+      if (allEvents.length > 0) {
+        const records = allEvents.map(
+          (
+            event,
+          ): {
+            event_name: EventNames.ChainEventCreated;
+            event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
+          } => ({
+            event_name: EventNames.ChainEventCreated,
+            event_payload: event as z.infer<
+              typeof coreEvents.ChainEventCreated
+            >,
+          }),
+        );
+        await emitEvent(models.Outbox, records, transaction);
+      }
+    });
+
+    log.info(
+      `Processed ${allEvents.length} events for chainNodeId ${chainNodeId}`,
+    );
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
@@ -70,13 +108,15 @@ export async function processChainNode(
  * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
  */
 export async function scheduleNodeProcessing(
+  models: DB,
   interval: number,
   processFn: (
+    models: DB,
     chainNodeId: number,
     sources: EvmSource,
-  ) => Promise<Promise<void | NotificationInstance>[] | void>,
+  ) => Promise<void>,
 ) {
-  const evmSources = await getEventSources();
+  const evmSources = await getEventSources(models);
 
   const numEvmSources = Object.keys(evmSources).length;
   if (!numEvmSources) {
@@ -90,10 +130,7 @@ export async function scheduleNodeProcessing(
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      const promises = await processFn(+chainNodeId, evmSources[chainNodeId]);
-      if (promises) {
-        await Promise.allSettled(promises);
-      }
+      await processFn(models, +chainNodeId, evmSources[chainNodeId]);
     }, delay);
   });
 }

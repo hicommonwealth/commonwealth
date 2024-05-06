@@ -1,9 +1,11 @@
 import { ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { Express } from 'express';
+import { fileURLToPath } from 'url';
 import { CustomRequest, lookupKeyDurationInReq } from '../../src';
 import { CacheDecorator } from '../../src/redis';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export enum CACHE_ENDPOINTS {

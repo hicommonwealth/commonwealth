@@ -8,7 +8,7 @@ import Long from 'long';
 import * as _m0 from 'protobufjs/minimal';
 
 // @ts-ignore
-if (_m0.util.Long !== Long) {
+if (_m0.util && _m0.util.Long !== Long) {
   _m0.util.Long = Long as any;
 
   _m0.configure();

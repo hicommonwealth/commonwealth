@@ -18,6 +18,7 @@ import './ManageCommunityStakeModal.scss';
 const ManageCommunityStakeModal = ({
   onModalClose,
   mode,
+  denomination,
   community,
 }: ManageCommunityStakeModalProps) => {
   const [modalState, setModalState] = useState(
@@ -42,6 +43,7 @@ const ManageCommunityStakeModal = ({
             addressOptions={addressOptions}
             numberOfStakeToExchange={numberOfStakeToExchange}
             onSetNumberOfStakeToExchange={setNumberOfStakeToExchange}
+            denomination={denomination}
             community={community}
           />
         );

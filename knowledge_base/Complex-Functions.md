@@ -6,6 +6,17 @@ We can find many examples in our codebase!
 
 ![Complex Functions](./assets/Complex-Functions.png)
 
+## Contents
+
+- [Server Architecture Background](#server-architecture-background)
+  * [Project Structure](#project-structure)
+- [Refactoring Responsibilities](#refactoring-responsibilities)
+  * [Opportunity](#opportunity)
+  * [Example](#example)
+- [Solution](#solution)
+  * [Components](#components)
+- [Change Log](#change-log)
+
 ## Server Architecture Background
 
 Our server (API) adheres to a conventional technical architecture that relies on routes, controllers, and ORM-based data model abstractions. The REST API routes are configured in `/routing/router.ts`, where specific controller instances are linked to either models or server controllers, a form of dependency inversion.
@@ -359,3 +370,7 @@ const command = (actor, body, callback) => {
   }
 }
 ```
+
+## Change Log
+
+- 231026: Authored by Roger Torres (#5445).

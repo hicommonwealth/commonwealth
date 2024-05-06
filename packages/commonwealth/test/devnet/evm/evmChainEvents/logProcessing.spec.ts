@@ -5,6 +5,7 @@ import { AbiType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
+import Web3 from 'web3';
 import {
   getEvents,
   getLogs,
@@ -13,8 +14,8 @@ import {
 } from '../../../../server/workers/evmChainEvents/logProcessing';
 import {
   ContractSources,
+  EvmEvent,
   EvmSource,
-  RawEvmEvent,
 } from '../../../../server/workers/evmChainEvents/types';
 import {
   compoundPropCreatedSignature,
@@ -25,6 +26,8 @@ import {
 } from './util';
 
 chai.use(chaiAsPromised);
+
+const web3 = new Web3();
 
 /*
  * The main objective of these tests is to ensure log processing logic works
@@ -38,9 +41,15 @@ describe('EVM Chain Events Log Processing Tests', () => {
     propCreatedLog: Log,
     propQueuedLog: Log;
 
-  before(async () => {
+  before(async function () {
+    this.timeout(80_000);
+
     await tester.seedDb();
     abi = (await getTestAbi()).abi;
+
+    await sdk.getVotingPower(1, '400000');
+    propCreatedResult = await sdk.createProposal(1);
+    expect(propCreatedResult.block).to.not.be.undefined;
   });
 
   after(async () => {
@@ -50,34 +59,25 @@ describe('EVM Chain Events Log Processing Tests', () => {
   const expectAbi = () => expect(abi, 'ABI must be defined to run this test');
 
   describe('fetching logs', () => {
-    it('should not throw if a starting block number is not provided', async () => {
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          '0x1': {
-            abi: [],
-            sources: [],
-          },
-        },
-      };
-      await expect(getLogs(evmSource, null)).to.not.be.rejected;
-    });
-
     it('should not return any logs if no contract addresses are given', async () => {
-      const evmSource: EvmSource = {
+      const provider = getProvider(localRpc);
+      const currentBlockNum = await provider.getBlockNumber();
+      const { logs } = await getLogs({
         rpc: localRpc,
-        contracts: {},
-      };
-      const { logs } = await getLogs(evmSource);
+        contractAddresses: [],
+        startingBlockNum: currentBlockNum,
+      });
       expect(logs).to.be.empty;
     });
 
     it('should throw if the provider cannot be connected to', async () => {
-      const evmSource: EvmSource = {
-        rpc: 'http://fake',
-        contracts: {},
-      };
-      await expect(getLogs(evmSource))
+      await expect(
+        getLogs({
+          rpc: 'http://fake',
+          contractAddresses: ['0x1'],
+          startingBlockNum: 1,
+        }),
+      )
         .to.eventually.be.rejected.and.be.an.instanceof(Error)
         .and.have.property(
           'message',
@@ -85,83 +85,19 @@ describe('EVM Chain Events Log Processing Tests', () => {
         );
     });
 
-    it('should throw if the starting block number is greater than the current block number', async () => {
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          '0x1': {
-            abi: [],
-            sources: [],
-          },
-        },
-      };
-
-      const provider = getProvider(evmSource.rpc);
+    it('should not throw if the starting block number is greater than the current block number', async () => {
+      const provider = getProvider(localRpc);
       const currentBlockNum = await provider.getBlockNumber();
-      await expect(getLogs(evmSource, currentBlockNum + 1000)).to.not.be
-        .rejected;
+      await expect(
+        getLogs({
+          rpc: localRpc,
+          contractAddresses: ['0x1'],
+          startingBlockNum: currentBlockNum + 1000,
+        }),
+      ).to.not.be.rejected;
     });
 
-    it('should restrict the maximum block range fetched to 500 blocks', async () => {
-      expectAbi();
-
-      await sdk.getVotingPower(1, '400000');
-      propCreatedResult = await sdk.createProposal(1);
-      await sdk.safeAdvanceTime(propCreatedResult.block + 501);
-
-      // fetch logs
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          [sdk.contractAddrs.compound.governance]: {
-            abi,
-            sources: [
-              {
-                event_signature: compoundPropCreatedSignature,
-                kind: 'proposal-created',
-              },
-            ],
-          },
-        },
-      };
-
-      expect(propCreatedResult.block).to.not.be.undefined;
-      const { logs } = await getLogs(evmSource, propCreatedResult.block);
-      expect(logs).to.be.empty;
-    }).timeout(80_000);
-
-    it('should fetch logs with current block - maxOldBlocks if no starting block number is provided', async () => {
-      expectAbi();
-      expect(propCreatedResult, 'Must have created a proposal to run this test')
-        .to.not.be.undefined;
-
-      // fetch logs
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        contracts: {
-          [sdk.contractAddrs.compound.governance]: {
-            abi,
-            sources: [
-              {
-                event_signature: compoundPropCreatedSignature,
-                kind: 'proposal-created',
-              },
-            ],
-          },
-        },
-      };
-
-      const currentBlockNum = (await sdk.getBlock()).number;
-      const { logs } = await getLogs(
-        evmSource,
-        null,
-        currentBlockNum - propCreatedResult.block + 5,
-      );
-      expect(logs.length).to.equal(1);
-      propCreatedLog = logs[0];
-    });
-
-    it('should fetch logs from the starting block number if provided', async () => {
+    it('should fetch logs from the specified range', async () => {
       expectAbi();
       expect(propCreatedResult, 'Must have created a proposal to run this test')
         .to.not.be.undefined;
@@ -174,29 +110,38 @@ describe('EVM Chain Events Log Processing Tests', () => {
 
       propQueuedResult = await sdk.queueProposal(propCreatedResult.proposalId);
 
-      // fetch logs
-      const evmSource: EvmSource = {
+      const propCreatedLogs = await getLogs({
         rpc: localRpc,
-        contracts: {
-          [sdk.contractAddrs.compound.governance]: {
-            abi,
-            sources: [
-              {
-                event_signature: compoundPropQueuedSignature,
-                kind: 'proposal-queued',
-              },
-            ],
-          },
-        },
-      };
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propCreatedResult.block,
+        endingBlockNum: propCreatedResult.block + 1,
+      });
+      expect(propCreatedLogs.logs.length).to.equal(1);
+      propCreatedLog = propCreatedLogs.logs[0];
 
-      const { logs } = await getLogs(evmSource, propQueuedResult.block);
-      expect(logs.length).to.equal(1);
-      propQueuedLog = logs[0];
+      const propQueuedLogs = await getLogs({
+        rpc: localRpc,
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propQueuedResult.block,
+        endingBlockNum: propQueuedResult.block + 1,
+      });
+      expect(propQueuedLogs.logs.length).to.equal(1);
+      propQueuedLog = propQueuedLogs.logs[0];
     }).timeout(80_000);
 
-    // TODO: do we want to fetch only up to currentBlock - 7 blocks to account for micro-reorgs?
-    xit('should not fetch the most recent block', async () => {});
+    it('should restrict the maximum block range fetched to 500 blocks', async () => {
+      expectAbi();
+
+      expect(propQueuedResult.block).to.not.be.undefined;
+      await sdk.safeAdvanceTime(propQueuedResult.block + 501);
+
+      const { logs } = await getLogs({
+        rpc: localRpc,
+        contractAddresses: [sdk.contractAddrs.compound.governance],
+        startingBlockNum: propQueuedResult.block - 1,
+      });
+      expect(logs).to.be.empty;
+    }).timeout(80_000);
   });
 
   describe('parsing logs', () => {
@@ -220,6 +165,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -238,6 +186,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -256,6 +207,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -278,6 +232,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -298,7 +255,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         logIndex: 1,
       };
 
-      let events: RawEvmEvent[];
+      let events: EvmEvent[];
       try {
         events = await parseLogs(evmSource.contracts, [
           fakeLog,
@@ -309,14 +266,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
       }
 
       expect(events.length).to.equal(1);
-      expect(events[0].contractAddress).to.equal(
+      expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
         sdk.contractAddrs.compound.governance,
       );
-      expect(events[0].kind).to.equal('proposal-created');
-      expect(events[0].blockNumber).to.equal(
-        parseInt(propCreatedLog.blockNumber.toString()),
-      );
-      expect(events[0].args).to.exist;
+      expect(events[0].eventSource.kind).to.equal('proposal-created');
+      expect(events[0].rawLog.blockNumber).to.equal(propCreatedLog.blockNumber);
+      expect(events[0].parsedArgs).to.exist;
     });
 
     it('should only parse logs with a matching signature', async () => {
@@ -331,6 +286,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
@@ -342,14 +300,12 @@ describe('EVM Chain Events Log Processing Tests', () => {
         propQueuedLog,
       ]);
       expect(events.length).to.equal(1);
-      expect(events[0].contractAddress).to.equal(
+      expect(web3.utils.toChecksumAddress(events[0].rawLog.address)).to.equal(
         sdk.contractAddrs.compound.governance,
       );
-      expect(events[0].kind).to.equal('proposal-queued');
-      expect(events[0].blockNumber).to.equal(
-        parseInt(propQueuedLog.blockNumber.toString(), 16),
-      );
-      expect(events[0].args).to.exist;
+      expect(events[0].eventSource.kind).to.equal('proposal-queued');
+      expect(events[0].rawLog.blockNumber).to.equal(propQueuedLog.blockNumber);
+      expect(events[0].parsedArgs).to.exist;
     });
   });
 
@@ -376,47 +332,63 @@ describe('EVM Chain Events Log Processing Tests', () => {
               {
                 event_signature: compoundPropQueuedSignature,
                 kind: 'proposal-queued',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
               {
                 event_signature: compoundPropCreatedSignature,
                 kind: 'proposal-created',
+                abi_id: 1,
+                chain_node_id: 1,
+                contract_address: '0x1',
               },
             ],
           },
         },
       };
 
-      const currentBlockNum = (await sdk.getBlock()).number;
-      const { events } = await getEvents(
+      const createdEvent = await getEvents(
         evmSource,
-        null,
-        currentBlockNum - propCreatedResult.block + 5,
+        propCreatedResult.block - 1,
+        propCreatedResult.block + 5,
       );
-      expect(events.length).to.equal(2);
+      expect(createdEvent.events.length).to.equal(1);
+
+      const queuedEvent = await getEvents(
+        evmSource,
+        propQueuedResult.block - 1,
+        propQueuedResult.block + 5,
+      );
+      expect(queuedEvent.events.length).to.equal(1);
+
+      const events = createdEvent.events.concat(queuedEvent.events);
 
       const propCreatedEvent = events.find(
-        (e) => e.kind === 'proposal-created',
+        (e) => e.eventSource.kind === 'proposal-created',
       );
       expect(propCreatedEvent).to.exist;
-      expect(propCreatedEvent.contractAddress).to.equal(
-        sdk.contractAddrs.compound.governance,
+      expect(
+        web3.utils.toChecksumAddress(propCreatedEvent.rawLog.address),
+      ).to.equal(sdk.contractAddrs.compound.governance);
+      expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
+      expect(propCreatedEvent.rawLog.blockNumber).to.equal(
+        propCreatedLog.blockNumber,
       );
-      expect(propCreatedEvent.kind).to.equal('proposal-created');
-      expect(propCreatedEvent.blockNumber).to.equal(
-        parseInt(propCreatedLog.blockNumber.toString()),
-      );
-      expect(propCreatedEvent.args).to.exist;
+      expect(propCreatedEvent.parsedArgs).to.exist;
 
-      const propQueuedEvent = events.find((e) => e.kind === 'proposal-queued');
+      const propQueuedEvent = events.find(
+        (e) => e.eventSource.kind === 'proposal-queued',
+      );
       expect(propQueuedEvent).to.exist;
-      expect(propQueuedEvent.contractAddress).to.equal(
-        sdk.contractAddrs.compound.governance,
+      expect(
+        web3.utils.toChecksumAddress(propQueuedEvent.rawLog.address),
+      ).to.equal(sdk.contractAddrs.compound.governance);
+      expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
+      expect(propQueuedEvent.rawLog.blockNumber).to.equal(
+        propQueuedLog.blockNumber,
       );
-      expect(propQueuedEvent.kind).to.equal('proposal-queued');
-      expect(propQueuedEvent.blockNumber).to.equal(
-        parseInt(propQueuedLog.blockNumber.toString()),
-      );
-      expect(propQueuedEvent.args).to.exist;
+      expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });
 

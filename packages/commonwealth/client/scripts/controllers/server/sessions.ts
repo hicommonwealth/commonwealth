@@ -119,7 +119,7 @@ export async function signSessionWithMagic(
     return { signature, sessionPayload };
   } else {
     // signature format: https://docs.canvas.xyz/docs/formats#ethereum
-    const siwe = await require('siwe');
+    const siwe = await import('siwe');
     const nonce = siwe.generateNonce();
     const domain = document.location.origin;
     const message = createSiweMessage(sessionPayload, domain, nonce);

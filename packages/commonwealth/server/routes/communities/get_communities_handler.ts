@@ -1,4 +1,3 @@
-import { AppError } from '@hicommonwealth/core';
 import { GetActiveCommunitiesResult } from 'server/controllers/server_communities_methods/get_active_communities';
 import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
 import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
@@ -9,10 +8,6 @@ import {
   TypedResponse,
   success,
 } from '../../types';
-
-const Errors = {
-  InvalidRequest: 'Invalid request',
-};
 
 type GetCommunitiesRequestQuery = {
   active?: string;
@@ -40,12 +35,6 @@ export const getCommunitiesHandler = async (
     return success(res, results);
   }
 
-  // get communities, with snapshots
-  if (options.snapshots === 'true') {
-    const results = await controllers.communities.getCommunities({});
-    return success(res, results);
-  }
-
   // search communities
   if (options.search) {
     const results = await controllers.communities.searchCommunities({
@@ -58,5 +47,6 @@ export const getCommunitiesHandler = async (
     return success(res, results);
   }
 
-  throw new AppError(Errors.InvalidRequest);
+  const results = await controllers.communities.getCommunities({});
+  return success(res, results);
 };

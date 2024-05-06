@@ -1,8 +1,10 @@
 import { ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
 export default async function assertAddressOwnership(

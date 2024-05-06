@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
 
 import { AppError } from '@hicommonwealth/core';
@@ -14,6 +15,7 @@ import {
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
+import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
@@ -21,10 +23,9 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
 export const Errors = {
   NoChain: 'Must provide chain',
   InvalidCommunity: 'Invalid community',
@@ -101,7 +102,7 @@ const processAddress = async (
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      const newUser = await models.User.createWithProfile(models, {
+      const newUser = await models.User.createWithProfile({
         email: null,
       });
       addressInstance.profile_id = (

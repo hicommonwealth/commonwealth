@@ -2,8 +2,8 @@ import type { ChainNetwork, DefaultPage } from '@hicommonwealth/shared';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
-import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
+import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
@@ -65,7 +65,6 @@ class ChainInfo {
     stagesEnabled,
     customStages,
     customDomain,
-    snapshot,
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
@@ -92,6 +91,7 @@ class ChainInfo {
     redirect,
     thread_count,
     address_count,
+    snapshot_spaces,
   }) {
     this.id = id;
     this.network = network;
@@ -105,7 +105,6 @@ class ChainInfo {
     this.customStages = customStages;
     this.customDomain = customDomain;
     this.terms = terms;
-    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
@@ -131,6 +130,7 @@ class ChainInfo {
     this.redirect = redirect;
     this.threadCount = thread_count;
     this.addressCount = address_count;
+    this.snapshot = snapshot_spaces || [];
   }
 
   public static fromJSON({
@@ -144,7 +144,6 @@ class ChainInfo {
     stages_enabled,
     custom_stages,
     custom_domain,
-    snapshot,
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
@@ -171,6 +170,7 @@ class ChainInfo {
     thread_count,
     address_count,
     CommunityStakes,
+    snapshot_spaces,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -185,7 +185,7 @@ class ChainInfo {
       ? 6
       : 18;
 
-    if (COSMOS_EVM_CHAINS.some((c) => c === id)) {
+    if (getCosmosChains(true)?.some((c) => c === id)) {
       decimals = 18;
     }
 
@@ -200,7 +200,6 @@ class ChainInfo {
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
-      snapshot,
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -227,6 +226,7 @@ class ChainInfo {
       redirect,
       thread_count,
       address_count,
+      snapshot_spaces,
     });
   }
 
