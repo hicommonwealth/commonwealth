@@ -55,7 +55,7 @@ const useNotificationSettings = () => {
       }
     };
 
-    getSpaces();
+    getSpaces().catch(console.error);
   }, []);
 
   const handleSubscriptions = async (
@@ -129,10 +129,12 @@ const useNotificationSettings = () => {
       relevantSubscribedCommunities
         .sort((x, y) => x.name.localeCompare(y.name))
         .map((community) => {
-          app.user.notifications.subscribe({
-            categoryId: NotificationCategories.ChainEvent,
-            options: { communityId: community.id },
-          });
+          app.user.notifications
+            .subscribe({
+              categoryId: NotificationCategories.ChainEvent,
+              options: { communityId: community.id },
+            })
+            .catch(console.error);
         });
     }
   };
