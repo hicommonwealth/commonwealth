@@ -10,20 +10,6 @@ import type { ReactionAttributes } from './reaction';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
-export enum LinkSource {
-  Snapshot = 'snapshot',
-  Proposal = 'proposal',
-  Thread = 'thread',
-  Web = 'web',
-  Template = 'template',
-}
-
-export type Link = {
-  source: LinkSource;
-  identifier: string;
-  title?: string;
-};
-
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
