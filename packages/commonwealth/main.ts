@@ -31,6 +31,7 @@ import BanCache from './server/util/banCheckCache';
 import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
+import { SESSION_EXPIRY_MILLIS } from './session';
 
 const DEV = process.env.NODE_ENV !== 'production';
 
@@ -75,7 +76,7 @@ export async function main(
     db: db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 14 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+    expiration: SESSION_EXPIRY_MILLIS,
   });
 
   sessionStore.sync();
@@ -85,6 +86,9 @@ export async function main(
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: SESSION_EXPIRY_MILLIS,
+    },
   });
 
   const setupMiddleware = () => {
@@ -138,6 +142,7 @@ export async function main(
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
+    app.use('/robots.txt', express.static('robots.txt'));
     app.use('/static', express.static('static'));
 
     withLoggingMiddleware &&

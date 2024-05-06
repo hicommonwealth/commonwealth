@@ -13,5 +13,5 @@ export type CommunityRoleAttributes = {
 
   // associations
   RoleAssignments?: RoleAssignmentAttributes[];
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };

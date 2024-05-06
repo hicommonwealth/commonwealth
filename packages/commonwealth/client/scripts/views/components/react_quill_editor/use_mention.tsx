@@ -45,7 +45,7 @@ export const useMention = ({
       const delta = new Delta()
         .retain(beforeText.length)
         .delete(mentionLength)
-        .insert(`@${item.name}`, { link: item.link });
+        .insert(`[@${item.name}](${item.link})`, { link: item.link });
       if (!afterText.startsWith(' ')) delta.insert(' ');
       editor.updateContents(delta);
       editor.setSelection(

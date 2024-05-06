@@ -1,5 +1,10 @@
-import { delay, dispose, schemas } from '@hicommonwealth/core';
+import {
+  EventNames,
+  events as coreEvents,
+  dispose,
+} from '@hicommonwealth/core';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
+import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { z } from 'zod';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
@@ -86,12 +91,10 @@ describe('EVM Chain Events End to End Tests', () => {
 
     const events = await models.Outbox.findAll();
     expect(events.length).to.equal(1);
-    expect(events[0]?.event_name).to.equal(
-      schemas.EventNames.ChainEventCreated,
-    );
+    expect(events[0]?.event_name).to.equal(EventNames.ChainEventCreated);
 
     const event = events[0].event_payload as z.infer<
-      typeof schemas.events.ChainEventCreated
+      typeof coreEvents.ChainEventCreated
     >;
 
     expect(event.eventSource).to.deep.equal({

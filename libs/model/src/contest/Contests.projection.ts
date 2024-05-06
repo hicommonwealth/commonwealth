@@ -1,4 +1,4 @@
-import { Projection, schemas } from '@hicommonwealth/core';
+import { Projection, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
 import { models } from '../database';
@@ -20,13 +20,12 @@ export class MissingContestManager extends Error {
 }
 
 const inputs = {
-  RecurringContestManagerDeployed:
-    schemas.events.RecurringContestManagerDeployed,
-  OneOffContestManagerDeployed: schemas.events.OneOffContestManagerDeployed,
-  ContestStarted: schemas.events.ContestStarted,
-  ContestContentAdded: schemas.events.ContestContentAdded,
-  ContestContentUpvoted: schemas.events.ContestContentUpvoted,
-  ContestWinnersRecorded: schemas.events.ContestWinnersRecorded,
+  RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
+  OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  ContestStarted: events.ContestStarted,
+  ContestContentAdded: events.ContestContentAdded,
+  ContestContentUpvoted: events.ContestContentUpvoted,
+  ContestWinnersRecorded: events.ContestWinnersRecorded,
 };
 
 /**
@@ -75,85 +74,87 @@ async function updateOrCreateWithAlert(
   }
 }
 
-export const Contests: Projection<typeof inputs> = () => ({
-  inputs,
-  body: {
-    RecurringContestManagerDeployed: async ({ payload }) => {
-      // on-chain genesis event
-      await updateOrCreateWithAlert(
-        payload.namespace,
-        payload.contest_address,
-        payload.interval,
-      );
-    },
+export function Contests(): Projection<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      RecurringContestManagerDeployed: async ({ payload }) => {
+        // on-chain genesis event
+        await updateOrCreateWithAlert(
+          payload.namespace,
+          payload.contest_address,
+          payload.interval,
+        );
+      },
 
-    OneOffContestManagerDeployed: async ({ payload }) => {
-      // on-chain genesis event
-      await updateOrCreateWithAlert(
-        payload.namespace,
-        payload.contest_address,
-        0,
-      );
-    },
+      OneOffContestManagerDeployed: async ({ payload }) => {
+        // on-chain genesis event
+        await updateOrCreateWithAlert(
+          payload.namespace,
+          payload.contest_address,
+          0,
+        );
+      },
 
-    ContestStarted: async ({ payload }) => {
-      await models.Contest.create({
-        ...payload,
-        contest_id: payload.contest_id || 0,
-      });
-    },
-
-    ContestContentAdded: async ({ payload }) => {
-      // TODO: can we make this just one sql statement using subqueries?
-      const thread = await models.Thread.findOne({
-        where: { url: payload.content_url },
-        attributes: ['id'],
-        raw: true,
-      });
-      await models.ContestAction.create({
-        ...payload,
-        contest_id: payload.contest_id || 0,
-        actor_address: payload.creator_address,
-        action: 'added',
-        content_url: payload.content_url,
-        thread_id: thread?.id,
-        voting_power: 0,
-      });
-    },
-
-    ContestContentUpvoted: async ({ payload }) => {
-      // TODO: can we make this just one sql statement using subqueries?
-      const add_action = await models.ContestAction.findOne({
-        where: {
-          contest_address: payload.contest_address,
+      ContestStarted: async ({ payload }) => {
+        await models.Contest.create({
+          ...payload,
           contest_id: payload.contest_id || 0,
-          content_id: payload.content_id,
-          action: 'added',
-        },
-        attributes: ['thread_id'],
-        raw: true,
-      });
-      await models.ContestAction.create({
-        ...payload,
-        contest_id: payload.contest_id || 0,
-        actor_address: payload.voter_address,
-        action: 'upvoted',
-        thread_id: add_action?.thread_id,
-      });
-    },
+        });
+      },
 
-    ContestWinnersRecorded: async ({ payload }) => {
-      await models.Contest.update(
-        {
-          winners: payload.winners,
-        },
-        {
+      ContestContentAdded: async ({ payload }) => {
+        // TODO: can we make this just one sql statement using subqueries?
+        const thread = await models.Thread.findOne({
+          where: { url: payload.content_url },
+          attributes: ['id'],
+          raw: true,
+        });
+        await models.ContestAction.create({
+          ...payload,
+          contest_id: payload.contest_id || 0,
+          actor_address: payload.creator_address,
+          action: 'added',
+          content_url: payload.content_url,
+          thread_id: thread?.id,
+          voting_power: 0,
+        });
+      },
+
+      ContestContentUpvoted: async ({ payload }) => {
+        // TODO: can we make this just one sql statement using subqueries?
+        const add_action = await models.ContestAction.findOne({
           where: {
             contest_address: payload.contest_address,
             contest_id: payload.contest_id || 0,
+            content_id: payload.content_id,
+            action: 'added',
           },
-        },
-      );
+          attributes: ['thread_id'],
+          raw: true,
+        });
+        await models.ContestAction.create({
+          ...payload,
+          contest_id: payload.contest_id || 0,
+          actor_address: payload.voter_address,
+          action: 'upvoted',
+          thread_id: add_action?.thread_id,
+        });
+      },
+
+      ContestWinnersRecorded: async ({ payload }) => {
+        await models.Contest.update(
+          {
+            winners: payload.winners,
+          },
+          {
+            where: {
+              contest_address: payload.contest_address,
+              contest_id: payload.contest_id || 0,
+            },
+          },
+        );
+      },
     },
-  },
-});
+  };
+}
