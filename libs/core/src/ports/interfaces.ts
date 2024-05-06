@@ -1,10 +1,12 @@
 import { ILogger } from '@hicommonwealth/logging';
+import { z } from 'zod';
 import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
 } from '../framework';
 import { Events } from '../integration/events';
+import { CommentCreatedNotification } from '../integration/notifications.schemas';
 
 /**
  * Resource disposer function
@@ -31,17 +33,26 @@ export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
  */
 export interface Stats extends Disposable {
   histogram(key: string, value: number, tags?: Record<string, string>): void;
+
   // counters
   set(key: string, value: number): void;
+
   increment(key: string, tags?: Record<string, string>): void;
+
   incrementBy(key: string, value: number, tags?: Record<string, string>): void;
+
   decrement(key: string, tags?: Record<string, string>): void;
+
   decrementBy(key: string, value: number, tags?: Record<string, string>): void;
+
   // flags
   on(key: string): void;
+
   off(key: string): void;
+
   // gauge
   gauge(key: string, value: number): void;
+
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
 }
@@ -63,8 +74,11 @@ export enum CacheNamespaces {
  */
 export interface Cache extends Disposable {
   ready(): Promise<boolean>;
+
   isReady(): boolean;
+
   getKey(namespace: CacheNamespaces, key: string): Promise<string | null>;
+
   setKey(
     namespace: CacheNamespaces,
     key: string,
@@ -72,34 +86,44 @@ export interface Cache extends Disposable {
     duration?: number,
     notExists?: boolean,
   ): Promise<boolean>;
+
   getKeys(
     namespace: CacheNamespaces,
     keys: string[],
   ): Promise<false | Record<string, unknown>>;
+
   setKeys(
     namespace: CacheNamespaces,
     data: { [key: string]: string },
     duration?: number,
     transaction?: boolean,
   ): Promise<false | Array<'OK' | null>>;
+
   getNamespaceKeys(
     namespace: CacheNamespaces,
     maxResults?: number,
   ): Promise<{ [key: string]: string } | boolean>;
+
   deleteKey(namespace: CacheNamespaces, key: string): Promise<number>;
+
   deleteNamespaceKeys(namespace: CacheNamespaces): Promise<number | boolean>;
+
   flushAll(): Promise<void>;
+
   incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment?: number,
   ): Promise<number | null>;
+
   decrementKey(
     namespace: CacheNamespaces,
     key: string,
     decrement?: number,
   ): Promise<number | null>;
+
   getKeyTTL(namespace: CacheNamespaces, key: string): Promise<number>;
+
   setKeyTTL(
     namespace: CacheNamespaces,
     key: string,
@@ -150,4 +174,25 @@ export interface Broker extends Disposable {
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
   ): Promise<boolean>;
+}
+
+export enum WorkflowKeys {
+  CommentCreated = 'comment-created',
+}
+
+type BaseNotifProviderOptions = {
+  users: { id: string; email?: string }[];
+  actor?: { id: string; email?: string };
+};
+
+export type NotificationsProviderOptions = BaseNotifProviderOptions & {
+  data: z.infer<typeof CommentCreatedNotification>;
+  key: WorkflowKeys.CommentCreated;
+};
+
+/**
+ * Notifications Provider Port
+ */
+export interface NotificationsProvider extends Disposable {
+  triggerWorkflow(options: NotificationsProviderOptions): Promise<boolean>;
 }

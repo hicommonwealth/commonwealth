@@ -9,6 +9,7 @@ import {
   Cache,
   Disposable,
   Disposer,
+  NotificationsProvider,
   Stats,
 } from './interfaces';
 
@@ -164,4 +165,16 @@ export const analytics = port(function analytics(analytics?: Analytics) {
  */
 export const broker = port(function broker(broker?: Broker) {
   return broker || successfulInMemoryBroker;
+});
+
+export const notificationsProvider = port(function notificationsProvider(
+  notificationsProvider?: NotificationsProvider,
+) {
+  return (
+    notificationsProvider || {
+      name: 'in-memory-notifications-provider',
+      dispose: () => Promise.resolve(),
+      triggerWorkflow: () => Promise.resolve(true),
+    }
+  );
 });
