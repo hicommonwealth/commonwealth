@@ -1,5 +1,6 @@
 import * as core from '@hicommonwealth/core';
 import {
+  Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   type CommandMetadata,
@@ -138,7 +139,7 @@ export const event = <
         const [[name, payload]] = Object.entries(input as object);
         return await core.handleEvent(
           md,
-          { name: name as core.schemas.Events, payload },
+          { name: name as Events, payload },
           false,
         );
       } catch (error) {

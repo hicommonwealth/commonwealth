@@ -18,5 +18,5 @@ export type RoleAttributes = {
 
   // associations
   Address?: AddressAttributes;
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };

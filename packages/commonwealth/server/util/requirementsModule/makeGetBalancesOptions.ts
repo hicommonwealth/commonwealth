@@ -1,11 +1,4 @@
 import {
-  BalanceSourceType,
-  ContractSource,
-  CosmosContractSource,
-  CosmosSource,
-  NativeSource,
-} from '@hicommonwealth/core';
-import {
   GetBalancesOptions,
   GetCosmosBalancesOptions,
   GetCwBalancesOptions,
@@ -14,6 +7,13 @@ import {
   GetEthNativeBalanceOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
+import {
+  BalanceSourceType,
+  ContractSource,
+  CosmosContractSource,
+  CosmosSource,
+  NativeSource,
+} from '@hicommonwealth/shared';
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],

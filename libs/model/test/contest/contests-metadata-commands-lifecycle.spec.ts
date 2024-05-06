@@ -1,5 +1,6 @@
-import { Actor, command, dispose, schemas } from '@hicommonwealth/core';
+import { Actor, command, dispose } from '@hicommonwealth/core';
 import { Contest, TopicAttributes } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import z from 'zod';
@@ -21,22 +22,21 @@ describe('Contests metadata commands lifecycle', () => {
   const decimals = 18;
 
   let community: [
-    z.infer<typeof schemas.entities['Community']> | undefined,
+    z.infer<typeof schemas.Community> | undefined,
     Record<string, any>[],
   ];
-  let topics: z.infer<typeof schemas.entities['Topic']>[] = [];
+  let topics: z.infer<typeof schemas.Topic>[] = [];
   let communityAdminActor: Actor | null = null;
   let communityMemberActor: Actor | null = null;
 
   before(async () => {
     await bootstrap_testing();
-    const [chain] = await seed('ChainNode', { contracts: [] });
+    const [chain] = await seed('ChainNode', {});
 
     const [communityAdminUser] = await seed(
       'User',
       {
         isAdmin: false, // will be community admin, not super admin
-        selected_community_id: undefined,
       },
       //{ mock: true, log: true },
     );
@@ -45,7 +45,6 @@ describe('Contests metadata commands lifecycle', () => {
       'User',
       {
         isAdmin: false,
-        selected_community_id: undefined,
       },
       //{ mock: true, log: true },
     );
@@ -56,31 +55,24 @@ describe('Contests metadata commands lifecycle', () => {
         id: community_id,
         namespace,
         chain_node_id: chain!.id,
-        discord_config_id: undefined,
         Addresses: [
           {
             community_id,
             user_id: communityAdminUser!.id,
             role: 'admin',
-            profile_id: undefined,
           },
           {
             community_id,
             user_id: memberUser!.id,
             role: 'member',
-            profile_id: undefined,
           },
         ],
-        CommunityStakes: [],
         topics: [{}, {}, {}],
-        groups: [],
         contest_managers: [
           {
             contest_address: '0x1',
             name,
             interval,
-            topics: [],
-            contests: [],
             image_url,
             payout_structure,
             ticker,
@@ -93,8 +85,6 @@ describe('Contests metadata commands lifecycle', () => {
             contest_address: '0x2',
             name,
             interval,
-            topics: [],
-            contests: [],
             image_url,
             payout_structure,
             ticker,

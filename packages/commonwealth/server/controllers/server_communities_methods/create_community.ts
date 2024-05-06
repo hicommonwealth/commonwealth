@@ -1,5 +1,5 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { AppError, schemas } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -7,6 +7,7 @@ import type {
   RoleAttributes,
 } from '@hicommonwealth/model';
 import { UserInstance } from '@hicommonwealth/model';
+import { CreateCommunity } from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
@@ -68,7 +69,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof schemas.commands.CreateCommunity.input>;
+  community: z.infer<typeof CreateCommunity.input>;
 };
 
 export type CreateCommunityResult = {

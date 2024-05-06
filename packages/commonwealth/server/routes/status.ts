@@ -12,6 +12,7 @@ import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
+import { SESSION_EXPIRY_MILLIS } from '../../session';
 import { ETH_RPC, JWT_SECRET } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
@@ -331,7 +332,9 @@ export const status = async (
         threadCountQueryData,
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
+      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
+        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+      });
       user.jwt = jwtToken as string;
 
       return success(res, {

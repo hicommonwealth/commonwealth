@@ -1,0 +1,60 @@
+name: "Product: Feature Bucket"
+description: "For product team to outline a new feature."
+labels: ["refinement", "bucket 🪣", "enhancement"]
+title: "🪣 "
+projects: ["hicommonwealth/33"]
+body:
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Description
+      description: Describe the requested feature at a high level.
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Project Owner
+      description: Point of contact for questions.
+      placeholder: ex. @sachben91
+    validations:
+      required: true
+  - type: textarea
+    id: prd-link
+    attributes:
+      label: PRD
+      description: Place PRD link or contents (if brief) here.
+    validations:
+      required: true
+  - type: textarea
+    id: task-list
+    attributes:
+      label: Tasks
+      description: List tickets here that are owned by this bucket (can fill out later).
+    validations:
+      required: false
+  - type: textarea
+    id: design-link
+    attributes:
+      label: Design Links
+      description: Place Design link here if available.
+    validations:
+      required: false
+  - type: textarea
+    id: design-screenshot
+    attributes:
+      label: Design Screenshots
+      description: Upload screenshot here if available and not included in sub-tasks.
+    validations:
+      required: false
+  - type: textarea
+    id: addl-context
+    attributes:
+      label: Additional Context
+      description: Add any other info or links here.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        **Please ensure you add this ticket to the correct milestone before hitting submit. Thanks!**

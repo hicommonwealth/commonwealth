@@ -1,5 +1,5 @@
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractTemplateAttributes = {
   id: number;
@@ -16,25 +16,24 @@ export type CommunityContractTemplateStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
 ): CommunityContractTemplateStatic => {
   const CommunityContractTemplate = <CommunityContractTemplateStatic>(
     sequelize.define(
       'CommunityContractTemplate',
       {
-        id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         community_contract_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           primaryKey: true,
         },
         cctmd_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           primaryKey: true,
         },
         template_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           primaryKey: true,
         },
