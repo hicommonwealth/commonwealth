@@ -1,8 +1,10 @@
+import { WalletId } from '@hicommonwealth/shared';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
-import React, { useState } from 'react';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import {
@@ -14,7 +16,10 @@ import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import {
+  CWForm,
+  CWFormRef,
+} from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
@@ -27,12 +32,26 @@ type PersonalInformationStepProps = {
 const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
+  const formMethodsRef = useRef<CWFormRef>();
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
   const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
+
+  useNecessaryEffect(() => {
+    // if user authenticated with SSO, by default we show username granted by the SSO service
+    const addresses = app?.user?.addresses;
+    const defaultSSOUsername =
+      addresses?.length === 1 && addresses?.[0]?.walletId === WalletId.Magic
+        ? addresses?.[0]?.profile?.name
+        : '';
+
+    if (formMethodsRef.current && defaultSSOUsername) {
+      formMethodsRef.current.setValue('username', defaultSSOUsername);
+    }
+  }, []);
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
@@ -90,6 +109,7 @@ const PersonalInformationStep = ({
 
   return (
     <CWForm
+      ref={formMethodsRef}
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}
       initialValues={{

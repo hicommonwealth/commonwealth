@@ -7,8 +7,12 @@
   "files": [
     "build"
   ],
-  "main": "build/index.js",
-  "types": "src/index",
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
