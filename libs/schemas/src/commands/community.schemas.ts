@@ -5,11 +5,10 @@ import {
   CommunityCategoryType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
-  checkIconSize,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { PG_INT } from '..';
-import { Community, Group, StakeTransaction } from '../entities.schemas';
+import { Community, Group, StakeTransaction } from '../entities';
+import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({

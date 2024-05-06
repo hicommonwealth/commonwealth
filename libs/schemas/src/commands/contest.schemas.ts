@@ -1,6 +1,6 @@
 import z from 'zod';
-import { ContestManager } from '../entities.schemas';
-import { PG_INT } from '../utils.schemas';
+import { ContestManager } from '../entities';
+import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
   input: z.object({

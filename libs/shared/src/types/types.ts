@@ -70,3 +70,11 @@ export type RoleObject = {
   allow: number;
   deny: number;
 };
+
+export enum LinkSource {
+  Snapshot = 'snapshot',
+  Proposal = 'proposal',
+  Thread = 'thread',
+  Web = 'web',
+  Template = 'template',
+}

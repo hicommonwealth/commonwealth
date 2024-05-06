@@ -1,5 +1,5 @@
-import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { buildPaginatedResponse } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
@@ -129,5 +129,5 @@ export async function __searchComments(
 
   const totalResults = parseInt(count, 10);
 
-  return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
+  return buildPaginatedResponse(results, totalResults, bind);
 }

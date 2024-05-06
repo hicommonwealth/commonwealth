@@ -1,8 +1,8 @@
-import { schemas, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { IDiscordMeta } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
+import { IDiscordMeta } from '../types';
 import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
@@ -122,7 +122,7 @@ export default (sequelize: Sequelize.Sequelize): CommentModelStatic => {
             Outbox,
             [
               {
-                event_name: schemas.EventNames.CommentCreated,
+                event_name: EventNames.CommentCreated,
                 event_payload: comment.get({ plain: true }),
               },
             ],

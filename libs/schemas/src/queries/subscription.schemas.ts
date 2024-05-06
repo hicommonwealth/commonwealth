@@ -4,7 +4,7 @@ import {
   CommunityAlert,
   SubscriptionPreference,
   ThreadSubscription,
-} from '../entities.schemas';
+} from '../entities';
 
 export const GetSubscriptionPreferences = {
   input: z.object({}),
