@@ -11,6 +11,14 @@
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },
+  "tsc-alias": {
+    "replacers": {
+      "webpack": {
+        "enabled": true,
+        "file": "./webpackReplacer.cjs"
+      }
+    }
+  },
   "include": [
     "client",
     "globals.d.ts",
