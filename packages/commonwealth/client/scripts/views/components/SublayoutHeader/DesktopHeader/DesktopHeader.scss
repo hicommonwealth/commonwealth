@@ -41,17 +41,27 @@
       padding: 0 20px;
     }
 
-    .DesktopMenuContainer {
-      align-items: center;
+    .DesktopMenuContainerParent {
       display: flex;
-      gap: 12px;
-      height: 40px;
 
       &.isLoggedIn {
         padding-right: 20px;
         border-right: 1px solid $neutral-100;
         margin-right: 14px;
       }
+
+      div {
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 5px;
+      }
+    }
+
+    .DesktopMenuContainer {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      height: 40px;
 
       & > div {
         display: flex;

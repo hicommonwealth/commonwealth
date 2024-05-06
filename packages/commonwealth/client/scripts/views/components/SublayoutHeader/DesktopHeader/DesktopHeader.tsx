@@ -88,32 +88,38 @@ const DesktopHeader = ({
       </div>
       <div className="header-right">
         <div
-          className={clsx('DesktopMenuContainer', {
+          className={clsx('DesktopMenuContainerParent', {
             isLoggedIn,
           })}
         >
-          <CreateContentPopover />
-          <CWTooltip
-            content="Explore communities"
-            placement="bottom"
-            renderTrigger={(handleInteraction) => (
-              <CWIconButton
-                iconButtonTheme="black"
-                iconName="compassPhosphor"
-                onClick={() => navigate('/communities', {}, null)}
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
-          />
+          <div
+            className={clsx('DesktopMenuContainer', {
+              isLoggedIn,
+            })}
+          >
+            <CreateContentPopover />
+            <CWTooltip
+              content="Explore communities"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="compassPhosphor"
+                  onClick={() => navigate('/communities', {}, null)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
+            />
 
-          <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
+            <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
+
+            {isLoggedIn && !enableKnockInAppNotifications && (
+              <NotificationsMenuPopover />
+            )}
+          </div>
 
           {isLoggedIn && enableKnockInAppNotifications && <Knock />}
-
-          {isLoggedIn && !enableKnockInAppNotifications && (
-            <NotificationsMenuPopover />
-          )}
         </div>
 
         {isLoggedIn && (
