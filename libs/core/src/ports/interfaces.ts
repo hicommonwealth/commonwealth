@@ -177,7 +177,7 @@ export interface Broker extends Disposable {
 }
 
 export enum WorkflowKeys {
-  CommentCreated = 'comment-created',
+  CommentCreation = 'comment-creation',
 }
 
 type BaseNotifProviderOptions = {
@@ -187,7 +187,7 @@ type BaseNotifProviderOptions = {
 
 export type NotificationsProviderOptions = BaseNotifProviderOptions & {
   data: z.infer<typeof CommentCreatedNotification>;
-  key: WorkflowKeys.CommentCreated;
+  key: WorkflowKeys.CommentCreation;
 };
 
 /**

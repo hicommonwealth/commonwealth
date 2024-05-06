@@ -24,8 +24,8 @@ export const processCommentCreated: EventHandler<
     include: [{ model: models.Profile, required: true }],
   });
 
-  if (!author) {
-    log.error('Comment author with profile not found!', undefined, {
+  if (!author || !author.user_id) {
+    log.error('Full comment author with profile not found!', undefined, {
       payload,
     });
     return;
@@ -48,7 +48,7 @@ export const processCommentCreated: EventHandler<
     await models.CommentSubscription.findAll({
       where: {
         comment_id: payload.id,
-        user_id: { [Op.not]: author.user_id ?? null },
+        user_id: { [Op.not]: author.user_id },
       },
       attributes: ['user_id'],
     })
@@ -57,7 +57,7 @@ export const processCommentCreated: EventHandler<
   if (commentSubs.length > 0) {
     const provider = notificationsProvider();
     await provider.triggerWorkflow({
-      key: WorkflowKeys.CommentCreated,
+      key: WorkflowKeys.CommentCreation,
       users: commentSubs.map((u) => ({ id: String(u) })),
       data: {
         author: author.Profile.profile_name || author.address.substring(0, 8),
@@ -71,6 +71,7 @@ export const processCommentCreated: EventHandler<
         ),
         comment_created_event: payload,
       },
+      actor: { id: String(author.user_id) },
     });
   }
 };
