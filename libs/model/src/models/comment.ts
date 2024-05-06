@@ -1,5 +1,6 @@
-import { IDiscordMeta, schemas, stats } from '@hicommonwealth/core';
+import { schemas, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { IDiscordMeta } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
 import { emitEvent } from '../utils';

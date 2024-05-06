@@ -1,11 +1,9 @@
+import { InvalidState, schemas, type Command } from '@hicommonwealth/core';
 import {
   BalanceSourceType,
   ContractSource,
-  InvalidState,
   ThresholdData,
-  schemas,
-  type Command,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import { models } from '../database';
 import { GroupAttributes } from '../models';
 

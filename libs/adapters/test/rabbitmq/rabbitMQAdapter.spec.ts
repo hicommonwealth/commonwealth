@@ -1,16 +1,16 @@
 import {
   BrokerPublications,
   BrokerSubscriptions,
-  delay,
   EventContext,
   InvalidInput,
   Policy,
   schemas,
 } from '@hicommonwealth/core';
 import type { ILogger } from '@hicommonwealth/logging';
+import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import { AckOrNack } from 'rascal';
-import { getRabbitMQConfig, RascalConfigServices } from '../../src';
+import { RascalConfigServices, getRabbitMQConfig } from '../../src';
 import { RabbitMQAdapter } from '../../src/rabbitmq/RabbitMQAdapter';
 
 const expect = chai.expect;
