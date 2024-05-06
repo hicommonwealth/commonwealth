@@ -18,6 +18,7 @@ import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import UserDropdown from './UserDropdown';
 
+import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -109,6 +110,10 @@ const DesktopHeader = ({
           <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
 
           {isLoggedIn && enableKnockInAppNotifications && <Knock />}
+
+          {isLoggedIn && !enableKnockInAppNotifications && (
+            <NotificationsMenuPopover />
+          )}
         </div>
 
         {isLoggedIn && (
