@@ -17,7 +17,7 @@
 // *****************************************************************************
 // no-restricted-imports: import from outside the project root
 
-// Fixed by #7708: import { ServerError } from '../../../../libs/core/src/errors';
+import { ServerError } from '../../../../libs/core/src/errors';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function doSomething() {
