@@ -1,7 +1,6 @@
+import { ErrorMapperFn, withErrorMappers } from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { ErrorMapperFn } from 'core/src';
-import { withErrorMappers } from '../../src/utils';
 
 chai.use(chaiAsPromised);
 
