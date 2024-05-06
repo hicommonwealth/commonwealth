@@ -51,7 +51,7 @@ Upon the creation of a new entity/object within the system, such as a new thread
 
 Here is an example of the steps taken to create a new thread:
 
-```
+```txt
 ...execute new thread creation business logic
 ...manage subscription business logic
 ...emit notification

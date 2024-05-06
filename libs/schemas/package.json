@@ -1,0 +1,22 @@
+{
+  "name": "@hicommonwealth/schemas",
+  "private": "true",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Shared model schemas",
+  "files": [
+    "build"
+  ],
+  "main": "build/index.js",
+  "types": "src/index",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "echo No tests for @hicommonwealth/schemas"
+  },
+  "dependencies": {
+    "@hicommonwealth/shared": "*",
+    "zod": "^3.22.4"
+  }
+}
