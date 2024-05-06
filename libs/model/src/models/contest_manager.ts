@@ -1,11 +1,9 @@
-import { schemas } from '@hicommonwealth/core';
+import { ContestManager } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-type ContestManager = ModelInstance<
-  z.infer<typeof schemas.entities.ContestManager>
->;
+type ContestManager = ModelInstance<z.infer<typeof ContestManager>>;
 
 export default (sequelize: Sequelize.Sequelize) =>
   <ModelStatic<ContestManager>>sequelize.define<ContestManager>(
@@ -25,7 +23,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
       image_url: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       funding_token_address: { type: Sequelize.STRING },
       prize_percentage: { type: Sequelize.INTEGER },
@@ -38,7 +36,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       ticker: { type: Sequelize.STRING },
       decimals: { type: Sequelize.INTEGER },
       created_at: { type: Sequelize.DATE, allowNull: false },
-      paused: { type: Sequelize.BOOLEAN },
+      cancelled: { type: Sequelize.BOOLEAN },
     },
     {
       tableName: 'ContestManagers',

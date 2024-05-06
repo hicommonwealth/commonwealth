@@ -1,57 +1,57 @@
-import { schemas, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const SearchComments: Query<
-  typeof schemas.queries.SearchComments
-> = () => ({
-  ...schemas.queries.SearchComments,
-  auth: [],
-  body: async ({ payload }) => {
-    const { community_id, search, limit, page, orderBy, orderDirection } =
-      payload;
-    // sort by rank by default
-    let sortOptions: schemas.queries.PaginationSqlOptions = {
-      limit: Math.min(limit, 100) || 10,
-      page: page || 1,
-      orderDirection,
-    };
-    switch (orderBy) {
-      case 'created_at':
-        sortOptions = {
-          ...sortOptions,
-          orderBy: `"Comments".${orderBy}`,
-        };
-        break;
-      default:
-        sortOptions = {
-          ...sortOptions,
-          orderBy: `rank`,
-          orderBySecondary: `"Comments".created_at`,
-          orderDirectionSecondary: 'DESC',
-        };
-    }
+export function SearchComments(): Query<typeof schemas.SearchComments> {
+  return {
+    ...schemas.SearchComments,
+    auth: [],
+    body: async ({ payload }) => {
+      const { community_id, search, limit, page, orderBy, orderDirection } =
+        payload;
+      // sort by rank by default
+      let sortOptions: schemas.PaginationSqlOptions = {
+        limit: Math.min(limit, 100) || 10,
+        page: page || 1,
+        orderDirection,
+      };
+      switch (orderBy) {
+        case 'created_at':
+          sortOptions = {
+            ...sortOptions,
+            orderBy: `"Comments".${orderBy}`,
+          };
+          break;
+        default:
+          sortOptions = {
+            ...sortOptions,
+            orderBy: `rank`,
+            orderBySecondary: `"Comments".created_at`,
+            orderDirectionSecondary: 'DESC',
+          };
+      }
 
-    const { sql: paginationSort, bind: paginationBind } =
-      schemas.queries.buildPaginationSql(sortOptions);
+      const { sql: paginationSort, bind: paginationBind } =
+        schemas.buildPaginationSql(sortOptions);
 
-    const bind: {
-      searchTerm?: string;
-      community?: string;
-      limit?: number;
-    } = {
-      searchTerm: search,
-      ...paginationBind,
-    };
-    if (community_id) {
-      bind.community = community_id;
-    }
+      const bind: {
+        searchTerm?: string;
+        community?: string;
+        limit?: number;
+      } = {
+        searchTerm: search,
+        ...paginationBind,
+      };
+      if (community_id) {
+        bind.community = community_id;
+      }
 
-    const communityWhere = bind.community
-      ? '"Comments".community_id = $community AND'
-      : '';
+      const communityWhere = bind.community
+        ? '"Comments".community_id = $community AND'
+        : '';
 
-    const sqlBaseQuery = `
+      const sqlBaseQuery = `
     SELECT
       "Comments".id,
       "Threads".title,
@@ -75,7 +75,7 @@ export const SearchComments: Query<
     ${paginationSort}
   `;
 
-    const sqlCountQuery = `
+      const sqlCountQuery = `
     SELECT
       COUNT (*) as count
     FROM "Comments"
@@ -88,19 +88,20 @@ export const SearchComments: Query<
       query @@ "Comments"._search
   `;
 
-    const [results, [{ count }]]: [any[], any[]] = await Promise.all([
-      models.sequelize.query(sqlBaseQuery, {
-        bind,
-        type: QueryTypes.SELECT,
-      }),
-      models.sequelize.query(sqlCountQuery, {
-        bind,
-        type: QueryTypes.SELECT,
-      }),
-    ]);
+      const [results, [{ count }]]: [any[], any[]] = await Promise.all([
+        models.sequelize.query(sqlBaseQuery, {
+          bind,
+          type: QueryTypes.SELECT,
+        }),
+        models.sequelize.query(sqlCountQuery, {
+          bind,
+          type: QueryTypes.SELECT,
+        }),
+      ]);
 
-    const totalResults = parseInt(count, 10);
+      const totalResults = parseInt(count, 10);
 
-    return schemas.queries.buildPaginatedResponse(results, totalResults, bind);
-  },
-});
+      return schemas.buildPaginatedResponse(results, totalResults, bind);
+    },
+  };
+}

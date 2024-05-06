@@ -15,7 +15,11 @@
 
     "sourceMap": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+
+    "paths": {
+      "@hicommonwealth/*": ["*/src"]
+    }
   },
   "exclude": ["**/node_modules", "**/build"]
 }

@@ -1,23 +1,13 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "strict": true,
-    "rootDir": "src",
-    "outDir": "build",
-    "paths": {
-      "@hicommonwealth/adapters": ["../../libs/adapters/src"],
-      "@hicommonwealth/sitemaps": ["../../libs/sitemaps/src"],
-      "@hicommonwealth/core": ["../../libs/core/src"],
-      "@hicommonwealth/model": ["../../libs/model/src"],
-      "@hicommonwealth/logging": ["../../libs/logging/src"]
-    }
+    "strict": true
   },
   "include": ["src"],
   "references": [
-    { "path": "../../libs/adapters/tsconfig.build.json" },
-    { "path": "../../libs/sitemaps/tsconfig.build.json" },
     { "path": "../../libs/core/tsconfig.build.json" },
+    { "path": "../../libs/logging/tsconfig.build.json" },
     { "path": "../../libs/model/tsconfig.build.json" },
-    { "path": "../../libs/logging/tsconfig.build.json" }
+    { "path": "../../libs/sitemaps/tsconfig.build.json" }
   ]
 }

@@ -1,6 +1,6 @@
-import { schemas, stats } from '@hicommonwealth/core';
+import { EventNames, events as coreEvents, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { DB } from '@hicommonwealth/model';
+import { DB, emitEvent } from '@hicommonwealth/model';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { getEventSources } from './getEventSources';
@@ -77,16 +77,16 @@ export async function processChainNode(
           (
             event,
           ): {
-            event_name: schemas.EventNames.ChainEventCreated;
-            event_payload: z.infer<typeof schemas.events.ChainEventCreated>;
+            event_name: EventNames.ChainEventCreated;
+            event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
           } => ({
-            event_name: schemas.EventNames.ChainEventCreated,
+            event_name: EventNames.ChainEventCreated,
             event_payload: event as z.infer<
-              typeof schemas.events.ChainEventCreated
+              typeof coreEvents.ChainEventCreated
             >,
           }),
         );
-        await models.Outbox.bulkCreate(records, { transaction });
+        await emitEvent(models.Outbox, records, transaction);
       }
     });
 

@@ -1,5 +1,5 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import Sequelize from 'sequelize';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationCategoryAttributes = {
   name: string;
@@ -14,18 +14,15 @@ export type NotificationCategoryInstance =
 export type NotificationCategoryModelStatic =
   ModelStatic<NotificationCategoryInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): NotificationCategoryModelStatic => {
-  const NotificationCategory = <NotificationCategoryModelStatic>(
-    sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <NotificationCategoryModelStatic>(
+    sequelize.define<NotificationCategoryInstance>(
       'NotificationCategory',
       {
-        name: { type: dataTypes.STRING, primaryKey: true },
-        description: { type: dataTypes.TEXT, allowNull: false },
-        created_at: { type: dataTypes.DATE, allowNull: true },
-        updated_at: { type: dataTypes.DATE, allowNull: true },
+        name: { type: Sequelize.STRING, primaryKey: true },
+        description: { type: Sequelize.TEXT, allowNull: false },
+        created_at: { type: Sequelize.DATE, allowNull: true },
+        updated_at: { type: Sequelize.DATE, allowNull: true },
       },
       {
         tableName: 'NotificationCategories',
@@ -35,13 +32,3 @@ export default (
       },
     )
   );
-  NotificationCategory.associate = (models) => {
-    models.NotificationCategory.hasMany(models.Notification, {
-      foreignKey: 'category_id',
-    });
-    models.NotificationCategory.hasMany(models.Subscription, {
-      foreignKey: 'category_id',
-    });
-  };
-  return NotificationCategory;
-};

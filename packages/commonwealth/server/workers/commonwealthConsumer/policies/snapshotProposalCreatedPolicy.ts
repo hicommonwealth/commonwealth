@@ -1,12 +1,14 @@
-import { EventHandler, Policy, schemas, stats } from '@hicommonwealth/core';
+import { EventHandler, Policy, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
+  ISnapshotNotificationData,
   NotificationCategories,
   SnapshotEventType,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { fileURLToPath } from 'node:url';
+import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
@@ -27,97 +29,25 @@ export const processSnapshotProposalCreated: EventHandler<
     return;
   }
 
-  let snapshotNotificationData = {
+  const snapshotNotificationData: ISnapshotNotificationData = {
     space,
     id,
     title,
     body,
     choices,
-    start,
-    expire,
+    start: String(start),
+    expire: String(expire),
+    eventType: event as SnapshotEventType,
   };
 
   log.info(`Processing snapshot message`, payload);
 
-  let proposal;
-
-  try {
-    proposal = await models.SnapshotProposal.findOne({
-      where: { id },
-    });
-  } catch (e) {
-    log.error(`Error fetching proposal: ${e}`);
-  }
-
-  if (event === SnapshotEventType.Deleted) {
-    if (!proposal || proposal?.is_upstream_deleted) {
-      log.info(`Proposal ${id} does not exist, skipping`);
-      return;
-    }
-
-    log.info(`Proposal deleted, marking as deleted in DB`);
-
-    // Pull data from DB (not included in the webhook event)
-    snapshotNotificationData = {
-      space: proposal.space,
-      id: proposal.id,
-      title: proposal.title,
-      body: proposal.body,
-      choices: proposal.choices,
-      start: proposal.start,
-      expire: proposal.expire,
-    };
-
-    proposal.is_upstream_deleted = true;
-    await proposal.save();
-
-    stats().increment('cw.deleted_snapshot_proposal_record', {
-      event,
-      space,
-    });
-  }
-
-  try {
-    if (space || proposal.space) {
-      await models.SnapshotSpace.findOrCreate({
-        where: { snapshot_space: space ?? proposal.space },
-      });
-    }
-  } catch (e) {
-    log.error(`Error creating snapshot space: ${e}`);
-  }
-
-  if (
-    event === SnapshotEventType.Created &&
-    proposal &&
-    !proposal.is_upstream_deleted
-  ) {
-    log.info(`Proposal ${id} already exists`);
-    return;
-  }
-
-  if (!proposal && event !== SnapshotEventType.Deleted) {
-    log.info(`Proposal ${id} does not exist, creating record`);
-    proposal = await models.SnapshotProposal.create({
-      id,
-      title,
-      body,
-      choices,
-      space,
-      start,
-      expire,
-      event,
-      is_upstream_deleted: false,
-    });
-  }
-
-  stats().increment('cw.created_snapshot_proposal_record', {
-    event,
-    space,
-  });
-
-  const associatedCommunities = await models.CommunitySnapshotSpaces.findAll({
-    where: { snapshot_space_id: proposal?.space },
+  const associatedCommunities = await models.Community.findAll({
+    where: {
+      snapshot_spaces: {
+        [Op.contains]: [space],
+      },
+    },
   });
 
   log.info(
@@ -128,17 +58,14 @@ export const processSnapshotProposalCreated: EventHandler<
     // Notifications
     emitNotifications(models, {
       categoryId: NotificationCategories.SnapshotProposal,
-      data: {
-        eventType: event as SnapshotEventType,
-        ...snapshotNotificationData,
-      },
+      data: snapshotNotificationData,
     }).catch((err) => {
       log.error('Error sending snapshot notification', err);
     });
   }
 
   for (const community of associatedCommunities) {
-    const communityId = community.community_id;
+    const communityId = community.id;
     const communityDiscordConfig = await models.DiscordBotConfig.findAll({
       where: {
         community_id: communityId,
@@ -178,14 +105,13 @@ export const processSnapshotProposalCreated: EventHandler<
 };
 
 const snapshotInputs = {
-  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+  SnapshotProposalCreated: events.SnapshotProposalCreated,
 };
-export const SnapshotPolicy: Policy<
-  typeof snapshotInputs,
-  ZodUndefined
-> = () => ({
-  inputs: snapshotInputs,
-  body: {
-    SnapshotProposalCreated: processSnapshotProposalCreated,
-  },
-});
+export function SnapshotPolicy(): Policy<typeof snapshotInputs, ZodUndefined> {
+  return {
+    inputs: snapshotInputs,
+    body: {
+      SnapshotProposalCreated: processSnapshotProposalCreated,
+    },
+  };
+}

@@ -19,6 +19,8 @@ export const GetBulkThreadsParamsSchema = z.object({
   orderBy: z.string().optional(),
   from_date: z.string().optional(),
   to_date: z.string().optional(),
+  contestAddress: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export type GetThreadsParams = z.infer<typeof GetThreadsParamsSchema>;

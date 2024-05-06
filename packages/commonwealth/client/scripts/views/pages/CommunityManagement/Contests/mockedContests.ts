@@ -1,9 +1,9 @@
-import { schemas } from '@hicommonwealth/core';
+import { ContestResults } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
 const now = new Date();
 
-const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
+const mockedContests: Array<z.infer<typeof ContestResults>> = [
   {
     contest_address: '0x502607Eb8152E30Ac46902C898DBCaDC1508a9a5',
     community_id: 'basemas',
@@ -17,7 +17,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 0,
     created_at: new Date(),
-    paused: false,
+    cancelled: false,
     topics: [
       { id: 4423, name: 'General' },
       { id: 4425, name: 'bitcoin' },
@@ -49,7 +49,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 1,
     created_at: new Date(),
-    paused: false,
+    cancelled: false,
     topics: [{ id: 4425, name: 'bitcoin' }],
     contests: [
       {
@@ -87,7 +87,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 0,
     created_at: new Date(),
-    paused: false,
+    cancelled: false,
     topics: [
       { id: 4425, name: 'bitcoin' },
       { id: 4426, name: 'ethereum' },
@@ -117,7 +117,7 @@ const mockedContests: Array<z.infer<typeof schemas.queries.ContestResults>> = [
     decimals: 18,
     interval: 0,
     created_at: new Date(),
-    paused: true,
+    cancelled: true,
     topics: [
       { id: 4425, name: 'bitcoin' },
       { id: 4426, name: 'ethereum' },

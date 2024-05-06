@@ -11,7 +11,7 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ThreadAttributes } from './thread';
-import type { DataTypes, ModelInstance, ModelStatic } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
 export enum SubscriptionValidationErrors {
@@ -51,29 +51,26 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
   emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: DataTypes,
-): SubscriptionModelStatic => {
+export default (sequelize: Sequelize.Sequelize): SubscriptionModelStatic => {
   const Subscription = <SubscriptionModelStatic>sequelize.define(
     'Subscription',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
-      category_id: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      subscriber_id: { type: Sequelize.INTEGER, allowNull: false },
+      category_id: { type: Sequelize.STRING, allowNull: false },
       is_active: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: true,
         allowNull: false,
       },
       immediate_email: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      community_id: { type: dataTypes.STRING, allowNull: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
-      comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: true },
+      thread_id: { type: Sequelize.INTEGER, allowNull: true },
+      comment_id: { type: Sequelize.INTEGER, allowNull: true },
       snapshot_id: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -124,20 +121,11 @@ export default (
   );
 
   Subscription.associate = (models) => {
-    models.Subscription.belongsTo(models.User, {
-      foreignKey: 'subscriber_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.NotificationCategory, {
-      foreignKey: 'category_id',
-      targetKey: 'name',
-    });
     models.Subscription.hasMany(models.NotificationsRead, {
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
     models.Subscription.belongsTo(models.Community, {
-      as: 'Community',
       foreignKey: 'community_id',
       targetKey: 'id',
     });
