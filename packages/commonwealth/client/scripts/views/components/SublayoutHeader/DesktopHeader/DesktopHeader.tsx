@@ -3,7 +3,6 @@ import React from 'react';
 import app from 'state';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
-import { Knock } from 'Knock';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -18,6 +17,7 @@ import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import UserDropdown from './UserDropdown';
 
+import { Knock } from 'views/components/Knock/Knock';
 import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 import './DesktopHeader.scss';
 
