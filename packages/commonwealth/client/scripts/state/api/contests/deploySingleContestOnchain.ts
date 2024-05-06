@@ -9,9 +9,9 @@ interface DeploySingleContestOnchainProps {
   namespaceName: string;
   contestLength: number;
   winnerShares: number[];
-  stakeId: 2;
-  voterShare: 20;
-  weight: 1;
+  stakeId: number;
+  voterShare: number;
+  weight: number;
   walletAddress: string;
   exchangeToken: string;
 }
@@ -46,16 +46,10 @@ const deploySingleContestOnchain = async ({
   );
 };
 
-interface UseDeploySingleContestOnchainMutationProps {}
-
-const useDeploySingleContestOnchainMutation =
-  ({}: UseDeploySingleContestOnchainMutationProps) => {
-    return useMutation({
-      mutationFn: deploySingleContestOnchain,
-      onSuccess: async () => {
-        console.log('deploySingleContestOnchain success');
-      },
-    });
-  };
+const useDeploySingleContestOnchainMutation = () => {
+  return useMutation({
+    mutationFn: deploySingleContestOnchain,
+  });
+};
 
 export default useDeploySingleContestOnchainMutation;

@@ -219,7 +219,8 @@ export const CWContentPage = ({
       isRecurring: true,
     },
   ];
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const showContestWinnerTag = false;
+  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   const mainBody = (
     <div className="main-body-container">

@@ -9,11 +9,11 @@ interface DeployRecurringContestOnchainProps {
   namespaceName: string;
   contestInterval: number;
   winnerShares: number[];
-  stakeId: 2;
+  stakeId: number;
   prizeShare: number;
-  voterShare: 20;
-  feeShare: 100;
-  weight: 1;
+  voterShare: number;
+  feeShare: number;
+  weight: number;
   walletAddress: string;
 }
 
@@ -49,16 +49,10 @@ const deployRecurringContestOnchain = async ({
   );
 };
 
-interface UseDeployRecurringContestOnchainMutationProps {}
-
-const useDeployRecurringContestOnchainMutation =
-  ({}: UseDeployRecurringContestOnchainMutationProps) => {
-    return useMutation({
-      mutationFn: deployRecurringContestOnchain,
-      onSuccess: async () => {
-        console.log('deployRecurringContestOnchain success');
-      },
-    });
-  };
+const useDeployRecurringContestOnchainMutation = () => {
+  return useMutation({
+    mutationFn: deployRecurringContestOnchain,
+  });
+};
 
 export default useDeployRecurringContestOnchainMutation;

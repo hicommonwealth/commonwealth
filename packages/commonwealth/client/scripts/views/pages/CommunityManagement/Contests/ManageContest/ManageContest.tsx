@@ -10,7 +10,11 @@ import {
   DetailsFormStep,
   SignTransactionsStep,
 } from './steps';
-import { LaunchContestStep } from './types';
+import {
+  ContestFeeType,
+  ContestRecurringType,
+  LaunchContestStep,
+} from './types';
 import useManageContestForm from './useManageContestForm';
 
 import './ManageContest.scss';
@@ -58,7 +62,15 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
         return (
           <SignTransactionsStep
             onSetLaunchContestStep={setLaunchContestStep}
-            isDirectDepositSelected={false}
+            isDirectDepositSelected={
+              contestFormData.feeType === ContestFeeType.DirectDeposit
+            }
+            winnerShares={contestFormData.payoutStructure}
+            prizePercentage={contestFormData.prizePercentage}
+            fundingTokenAddress={contestFormData.fundingTokenAddress}
+            isContestRecurring={
+              contestFormData.contestRecurring === ContestRecurringType.Yes
+            }
           />
         );
 

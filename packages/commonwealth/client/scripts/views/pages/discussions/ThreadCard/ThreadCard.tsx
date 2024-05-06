@@ -103,7 +103,8 @@ export const ThreadCard = ({
       isRecurring: true,
     },
   ];
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const showContestWinnerTag = false;
+  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   return (
     <>

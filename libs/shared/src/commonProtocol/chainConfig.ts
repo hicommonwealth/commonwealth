@@ -7,6 +7,8 @@ export enum ValidChains {
 }
 
 export const STAKE_ID = 2;
+export const CONTEST_VOTER_SHARE = 20;
+export const CONTEST_FEE_SHARE = 100;
 
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.
 // WARNING: ADD THE CONTRACT IN EvmEventSources TABLE VIA MIGRATION IF ADDING HERE!
