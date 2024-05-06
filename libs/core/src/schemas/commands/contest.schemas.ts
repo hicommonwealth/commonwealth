@@ -22,12 +22,9 @@ export const CreateContestManagerMetadata = {
     payout_structure: z
       .array(z.number().int().min(0).max(100))
       .describe('Sorted array of percentages for prize, from first to last'),
-    interval: z
-      .number()
-      .int()
-      .min(0)
-      .max(100)
-      .describe('Recurring contest interval, 0 when one-off'),
+    interval: PG_INT.describe(
+      'Recurring contest interval in seconds, 0 when one-off',
+    ),
     ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
     decimals: PG_INT.optional().default(
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
