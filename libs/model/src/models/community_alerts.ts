@@ -1,11 +1,9 @@
-import { schemas } from '@hicommonwealth/core';
+import { CommunityAlert } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type CommunityAlertAttributes = z.infer<
-  typeof schemas.entities.CommunityAlert
->;
+export type CommunityAlertAttributes = z.infer<typeof CommunityAlert>;
 
 export type CommunityAlertInstance = ModelInstance<CommunityAlertAttributes>;
 

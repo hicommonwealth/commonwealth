@@ -1,6 +1,10 @@
+import {
+  Comment,
+  ETHERS_BIG_NUMBER,
+  EVM_ADDRESS,
+  Thread,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { Comment, Thread } from './entities.schemas';
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from './utils.schemas';
 
 export const ThreadCreated = Thread;
 export const CommentCreated = Comment;

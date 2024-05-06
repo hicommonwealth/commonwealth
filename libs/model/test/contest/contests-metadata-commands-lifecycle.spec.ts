@@ -1,5 +1,6 @@
-import { Actor, command, dispose, schemas } from '@hicommonwealth/core';
+import { Actor, command, dispose } from '@hicommonwealth/core';
 import { Contest, TopicAttributes } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import z from 'zod';
@@ -21,10 +22,10 @@ describe('Contests metadata commands lifecycle', () => {
   const decimals = 18;
 
   let community: [
-    z.infer<typeof schemas.entities['Community']> | undefined,
+    z.infer<typeof schemas.Community> | undefined,
     Record<string, any>[],
   ];
-  let topics: z.infer<typeof schemas.entities['Topic']>[] = [];
+  let topics: z.infer<typeof schemas.Topic>[] = [];
   let communityAdminActor: Actor | null = null;
   let communityMemberActor: Actor | null = null;
 

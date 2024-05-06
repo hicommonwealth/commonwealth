@@ -4,8 +4,8 @@ import {
   CommunityAlert,
   SubscriptionPreference,
   ThreadSubscription,
-} from '../entities.schemas';
-import { PG_INT } from '../utils.schemas';
+} from '../entities';
+import { PG_INT } from '../utils';
 
 export const UpdateSubscriptionPreferences = {
   input: z.object({

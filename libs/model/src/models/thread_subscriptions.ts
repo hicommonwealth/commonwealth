@@ -1,11 +1,9 @@
-import { schemas } from '@hicommonwealth/core';
+import { ThreadSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type ThreadSubscriptionAttributes = z.infer<
-  typeof schemas.entities.ThreadSubscription
->;
+export type ThreadSubscriptionAttributes = z.infer<typeof ThreadSubscription>;
 
 export type ThreadSubscriptionInstance =
   ModelInstance<ThreadSubscriptionAttributes>;

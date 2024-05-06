@@ -1,6 +1,6 @@
 import z from 'zod';
-import { Comment } from '../entities.schemas';
-import { PG_INT } from '../utils.schemas';
+import { Comment } from '../entities';
+import { PG_INT } from '../utils';
 import { PaginatedResultSchema } from './pagination';
 
 export const SearchComments = {

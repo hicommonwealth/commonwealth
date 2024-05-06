@@ -1,5 +1,4 @@
-import { ThreadAttributes } from '@hicommonwealth/model';
-import { IDiscordMeta } from '@hicommonwealth/shared';
+import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';

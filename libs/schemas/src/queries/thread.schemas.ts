@@ -1,11 +1,11 @@
-import { zBoolean } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import {
   discordMetaSchema,
   linksSchema,
   paginationSchema,
   PG_INT,
-} from '../utils.schemas';
+  zBoolean,
+} from '../utils';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
