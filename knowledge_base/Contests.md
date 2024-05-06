@@ -24,13 +24,9 @@ Common content that receives the most votes will be rewarded with the weekly con
 
 Prizes will be distributed based on the following variables:
 
-- Number of winners (`_numWinners`, uint256)
-- Number of winners' shares (`winnerShares`, Array of values)
-- Shares of each contest from the Namespace pool (int8)
-
-For Version 1 (V1), admins will set the distribution and prize percentage. The interval is fixed at 7 days with a prize distribution of 80/15/5.
-
-Version 2 (V2) will introduce the ability to change contest intervals and voting strategies.
+- `winnerShares` (`uint256[]`): The percentage of shares awarded to each respective placement in the contest, e.g. `[25, 15]` designates a `25%` and `15%` payout to first and second place.
+- `prizeShare` (`uint256`): The percentage of the prize pool payed out each interval, e.g. `5` designates `5%`.
+- `voterShare` (`uint256`): The percentage of the prize pool claimable by voters each week, e.g. `5` designates `5%`.
 
 ### Voting Weight Strategies
 
@@ -38,16 +34,6 @@ Initially, custom vote-weight strategies for the community are not available. Th
 
 NB: In the current off-chain topics, all community members start with 1 vote weight even if they do not have any community stake token. For on-chain contests, the amount of voting weight directly equals the amount of the community stake tokens the user owns.
 
-## Oracle and On-chain Updates
-
-Common will act as an oracle, updating contest information to on-chain.
-
-The platform will self-manage gas sponsorship for on-chain transactions related to contests. This includes content submission and votes.
-
-Content submission is deployed to blockchain to be able to open for voting.
-
-We can integrate voting data deployment strategies for gas optimization.
-
 ## Change Log
 
-240406: Authored by Ege Tekiner and Graham Johnson (#).
+- 240506: Authored by Ege Tekiner and Graham Johnson (#7699).
