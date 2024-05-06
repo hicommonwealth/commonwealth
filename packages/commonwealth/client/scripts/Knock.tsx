@@ -5,10 +5,9 @@ import {
   NotificationIconButton,
 } from '@knocklabs/react';
 import React, { useRef, useState } from 'react';
-
-import '@knocklabs/react-notification-feed/dist/index.css';
 import app from 'state';
 
+import '@knocklabs/react-notification-feed/dist/index.css';
 import './Knock.css';
 
 const KNOCK_PUBLIC_API_KEY =
@@ -16,27 +15,7 @@ const KNOCK_PUBLIC_API_KEY =
 
 const KNOCK_IN_APP_FEED_ID = 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb';
 
-// TODO: Now the problem is CSS is inheriting into the buttons so I just have to
-// fix that.
-
 function useUserId(): number | undefined {
-  // const [userId, setUserId] = useState(undefined);
-  //
-  // setUserId(app.user.id);
-
-  // useEffect(() => {
-  //   async function doAsync() {
-  //     if (app.user.id !== 0) {
-  //       setUserId(app.user.id);
-  //     } else {
-  //       await initAppState();
-  //       setUserId(app.user.id);
-  //     }
-  //   }
-  //
-  //   doAsync().catch(console.error);
-  // }, []);
-
   return app.user.id;
 }
 
@@ -49,7 +28,6 @@ export const Knock = () => {
   if (userId === 0) {
     return null;
   }
-
   return (
     <div className="knock-notifications-button">
       <KnockProvider apiKey={KNOCK_PUBLIC_API_KEY} userId={`${userId}`}>
