@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@hicommonwealth/logging": "*",
+    "@hicommonwealth/schemas": "*",
     "@hicommonwealth/shared": "*",
     "zod": "^3.22.4"
   },

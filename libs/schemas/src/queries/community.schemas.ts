@@ -1,7 +1,7 @@
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CommunityMember, CommunityStake } from '../entities.schemas';
-import { PG_INT } from '../utils.schemas';
+import { CommunityMember, CommunityStake } from '../entities';
+import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunityStake = {

@@ -1,9 +1,8 @@
+import { GroupMetadata } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-import { schemas } from '@hicommonwealth/core';
-
 export default function validateMetadata(
-  metadata: z.infer<typeof schemas.entities.GroupMetadata>,
+  metadata: z.infer<typeof GroupMetadata>,
 ): Error | null {
   const schema = z.object({
     name: z.string(),

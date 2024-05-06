@@ -3,7 +3,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { schemas, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
   emitEvent,
@@ -93,7 +93,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 
     await emitEvent(models.Outbox, [
       {
-        event_name: schemas.EventNames.SnapshotProposalCreated,
+        event_name: EventNames.SnapshotProposalCreated,
         event_payload: {
           id: parsedId,
           event: req.body.event,

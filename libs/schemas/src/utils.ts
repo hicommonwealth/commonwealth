@@ -1,13 +1,11 @@
-import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
+import {
+  LinkSource,
+  MAX_COMMUNITY_IMAGE_SIZE_KB,
+  MAX_SCHEMA_INT,
+  MIN_SCHEMA_INT,
+  getFileSizeBytes,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
-
-export enum LinkSource {
-  Snapshot = 'snapshot',
-  Proposal = 'proposal',
-  Thread = 'thread',
-  Web = 'web',
-  Template = 'template',
-}
 
 export const paginationSchema = {
   limit: z.coerce
@@ -38,26 +36,8 @@ export const linksSchema = {
   title: z.string().nullable().optional(),
 };
 
-export enum EventNames {
-  ChainEventCreated = 'ChainEventCreated',
-  CommentCreated = 'CommentCreated',
-  CommunityCreated = 'CommunityCreated',
-  DiscordMessageCreated = 'DiscordMessageCreated',
-  GroupCreated = 'GroupCreated',
-  SnapshotProposalCreated = 'SnapshotProposalCreated',
-  ThreadCreated = 'ThreadCreated',
-  UserMentioned = 'UserMentioned',
-
-  // Contests
-  RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
-  OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
-  ContestStarted = 'ContestStarted',
-  ContestContentAdded = 'ContestContentAdded',
-  ContestContentUpvoted = 'ContestContentUpvoted',
-  ContestWinnersRecorded = 'ContestWinnersRecorded',
-}
-
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
+export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
 
 export const ETHERS_BIG_NUMBER = z.object({
   hex: z.string().regex(/^0x[0-9a-fA-F]+$/),
@@ -65,3 +45,20 @@ export const ETHERS_BIG_NUMBER = z.object({
 });
 
 export const EVM_ADDRESS = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+
+export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
+  const fileSizeBytes = await getFileSizeBytes(val);
+  if (fileSizeBytes === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Image url provided doesn't exist",
+    });
+    return;
+  }
+  if (fileSizeBytes >= MAX_COMMUNITY_IMAGE_SIZE_KB * 1024) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_KB}kb`,
+    });
+  }
+}
