@@ -40,13 +40,14 @@ export async function cacheBalances(
   ttl?: number,
 ) {
   if (Object.keys(balances).length > 0) {
+    const data = Object.keys(balances).reduce((result, address) => {
+      const transformedKey = buildCacheKey(options, address);
+      result[transformedKey] = balances[address];
+      return result;
+    }, {} as Balances);
     await cache().setKeys(
       CacheNamespaces.Token_Balance,
-      Object.keys(balances).reduce((result, address) => {
-        const transformedKey = buildCacheKey(options, address);
-        result[transformedKey] = balances[address];
-        return result;
-      }, {} as Balances),
+      data,
       ttl ?? balanceTTL,
       false,
     );

@@ -20,9 +20,9 @@
     "test": "echo No tests for @hicommonwealth/sitemaps"
   },
   "dependencies": {
-    "@hicommonwealth/core": "*",
-    "@hicommonwealth/model": "*",
-    "@hicommonwealth/shared": "*",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/model": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*",
     "aws-sdk": "^2.814.0"
   }
 }

@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
-import AbiCoder from 'web3-eth-abi';
+import * as AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
@@ -100,7 +100,10 @@ async function getOnChainBatchErc1155Balances(
         log.error(msg, data.error);
         continue;
       }
-      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
+      const balances = AbiCoder.decodeParameter(
+        'uint256[]',
+        data.result,
+      ) as Balances;
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + batchSize, addresses.length);

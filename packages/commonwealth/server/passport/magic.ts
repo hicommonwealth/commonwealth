@@ -23,7 +23,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
-import { verify } from 'jsonwebtoken';
+import jsonwebtoken from 'jsonwebtoken';
 import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
@@ -448,7 +448,7 @@ async function magicLoginRoute(
   // check if the user is logged in already (provided valid JWT)
   if (req.body.jwt) {
     try {
-      const { id } = verify(req.body.jwt, JWT_SECRET) as {
+      const { id } = jsonwebtoken.verify(req.body.jwt, JWT_SECRET) as {
         id: number;
         email: string | null;
       };
