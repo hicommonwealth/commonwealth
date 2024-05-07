@@ -54,14 +54,16 @@ const SignTransactionsStep = ({
     const chainRpc = app?.chain?.meta?.ChainNode?.url;
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = SEVEN_DAYS_IN_SECONDS;
-    const stakeId = commonProtocol.STAKE_ID;
+    const stakeId = app?.chain?.meta?.CommunityStakes?.[0]?.stakeId;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = 1;
+    const weight = Number(app?.chain?.meta?.CommunityStakes?.[0]?.voteWeight);
     const contestInterval = SEVEN_DAYS_IN_SECONDS;
     const prizeShare = prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
-    const exchangeToken = isDirectDepositSelected ? fundingTokenAddress : '';
+    const exchangeToken = isDirectDepositSelected
+      ? fundingTokenAddress
+      : app?.chain?.meta?.CommunityStakes?.[0]?.stakeToken;
 
     const single = {
       ethChainId,

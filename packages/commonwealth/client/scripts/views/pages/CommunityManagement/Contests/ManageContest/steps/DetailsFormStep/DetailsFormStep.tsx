@@ -282,9 +282,14 @@ const DetailsFormStep = ({
                   The remaining prize pool will roll over week to week until you
                   end the contest.
                   <br />
-                  {watch('contestRecurring') === ContestRecurringType.Yes && (
+                  {watch('contestRecurring') === ContestRecurringType.Yes ? (
                     <>
                       Contests run using Community Stake funds must be
+                      recurring.
+                    </>
+                  ) : (
+                    <>
+                      Contests run using Direct deposit funds can not be
                       recurring.
                     </>
                   )}
