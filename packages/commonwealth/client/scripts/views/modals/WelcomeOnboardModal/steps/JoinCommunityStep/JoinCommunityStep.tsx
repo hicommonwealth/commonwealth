@@ -44,7 +44,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
       address: userAddress?.current?.address,
       communityId: community?.id,
       communityChainBase: community?.base,
-    });
+    }).catch(console.error);
 
     setSuggestedCommunities([
       ...suggestedCommunities.map((suggestion) => ({
@@ -65,7 +65,9 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
           <JoinCommunityCard
             key={index + community.id + isJoined}
             community={community}
-            onJoinClick={() => handleCommunityJoin(community)}
+            onJoinClick={() =>
+              handleCommunityJoin(community).catch(console.error)
+            }
             isJoined={isJoined}
           />
         ))}
