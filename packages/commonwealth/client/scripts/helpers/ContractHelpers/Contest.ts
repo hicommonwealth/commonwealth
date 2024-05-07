@@ -18,7 +18,7 @@ class Contest extends ContractBase {
       this.namespaceFactoryAddress,
       this.rpc,
     );
-    await this.namespaceFactory.initialize();
+    await this.namespaceFactory.initialize(true);
   }
 
   /**
@@ -62,9 +62,10 @@ class Contest extends ContractBase {
         feeShare,
         prizeShare,
       );
-      const newContestAddress = String(
-        txReceipt.events.NewContest.returnValues.contest,
-      );
+      const newContestAddress = this.web3.eth.abi.decodeParameters(
+        ['address', 'uint256'],
+        txReceipt.logs[0].data.toString(),
+      )['0'] as string;
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
@@ -108,9 +109,10 @@ class Contest extends ContractBase {
         walletAddress,
         exchangeToken,
       );
-      const newContestAddress = String(
-        txReceipt.events.NewContest.returnValues.contest,
-      );
+      const newContestAddress = this.web3.eth.abi.decodeParameters(
+        ['address', 'address', 'uint256', 'bool'],
+        txReceipt.logs[2].data.toString(),
+      )['0'] as string;
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
