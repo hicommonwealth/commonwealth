@@ -18,10 +18,8 @@ export type NotificationsReadInstance =
 export type NotificationsReadModelStatic =
   ModelStatic<NotificationsReadInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-): NotificationsReadModelStatic => {
-  const NotificationsRead = <NotificationsReadModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <NotificationsReadModelStatic>sequelize.define<NotificationsReadInstance>(
     'NotificationsRead',
     {
       subscription_id: { type: Sequelize.INTEGER, primaryKey: true },
@@ -40,17 +38,3 @@ export default (
       indexes: [{ fields: ['subscription_id'] }],
     },
   );
-
-  NotificationsRead.associate = (models) => {
-    models.NotificationsRead.belongsTo(models.Subscription, {
-      foreignKey: 'subscription_id',
-      targetKey: 'id',
-    });
-    models.NotificationsRead.belongsTo(models.Notification, {
-      foreignKey: 'notification_id',
-      targetKey: 'id',
-    });
-  };
-
-  return NotificationsRead;
-};

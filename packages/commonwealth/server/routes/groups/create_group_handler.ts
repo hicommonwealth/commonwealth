@@ -20,7 +20,7 @@ export const createGroupHandler = async (
 ) => {
   const { user, community } = req;
 
-  // FIXME: this is the command schema
+  // Warning: this is the command schema
   const schema = z.object({
     body: z.object({
       metadata: z.object({
@@ -48,7 +48,7 @@ export const createGroupHandler = async (
     topics,
   });
 
-  // FIXME: keep for now, but should be a debounced async integration policy that get's triggered by creation events
+  // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events
   // refresh memberships in background
   controllers.groups
     .refreshCommunityMemberships({
@@ -57,7 +57,7 @@ export const createGroupHandler = async (
     })
     .catch(console.error);
 
-  // FIXME: replace with analytics middleware
+  // Warning: replace with analytics middleware
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, group);

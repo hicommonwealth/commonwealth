@@ -1,8 +1,10 @@
+import { WalletId } from '@hicommonwealth/shared';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
-import React, { useState } from 'react';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import {
@@ -14,8 +16,12 @@ import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import {
+  CWForm,
+  CWFormRef,
+} from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -27,12 +33,36 @@ type PersonalInformationStepProps = {
 const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
+  const formMethodsRef = useRef<CWFormRef>();
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
   const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
+  const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
+
+  useNecessaryEffect(() => {
+    // if user authenticated with SSO, by default we show username granted by the SSO service
+    const addresses = app?.user?.addresses;
+    const defaultSSOUsername =
+      addresses?.length === 1 && addresses?.[0]?.walletId === WalletId.Magic
+        ? addresses?.[0]?.profile?.name
+        : '';
+
+    if (formMethodsRef.current) {
+      if (defaultSSOUsername) {
+        formMethodsRef.current.setValue('username', defaultSSOUsername);
+      }
+
+      if (app?.user?.email) {
+        formMethodsRef.current.setValue('email', app.user.email);
+        setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
+      }
+    }
+  }, []);
+
+  const { toggleAllInAppNotifications } = useNotificationSettings();
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
@@ -70,9 +100,13 @@ const PersonalInformationStep = ({
       await app.user.updateEmail(values.email);
     }
 
-    // TODO: update notification preferences here for
-    // values.enableAccountNotifications - does this mean all account notifications?
-    // values.enableProductUpdates - ?
+    // enable/disable all in-app notifications for user
+    await toggleAllInAppNotifications(values.enableAccountNotifications);
+
+    // TODO:
+    // values.enableProductUpdates - as per product, this should be just a checkbox
+    // right now that should do nothing, and needs to be work on.
+    // https://github.com/hicommonwealth/commonwealth/issues/6645#issuecomment-2078105164
 
     onComplete();
   };
@@ -90,6 +124,7 @@ const PersonalInformationStep = ({
 
   return (
     <CWForm
+      ref={formMethodsRef}
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}
       initialValues={{
@@ -139,6 +174,7 @@ const PersonalInformationStep = ({
             }
             name="email"
             hookToForm
+            disabled={isEmailChangeDisabled}
           />
 
           <div className="notification-section">
