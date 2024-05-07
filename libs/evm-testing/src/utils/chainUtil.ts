@@ -32,6 +32,7 @@ export async function advanceTime(seconds: number, blocks = 1) {
 }
 
 export async function mineBlocks(blocks: number) {
+  console.log('Mining ' + blocks + ' blocks');
   const provider = new Web3.providers.HttpProvider(PROVIDER_URL);
 
   // mine blocks
@@ -41,6 +42,8 @@ export async function mineBlocks(blocks: number) {
     method: 'anvil_mine',
     params: [blocks],
   });
+
+  console.log('Mining complete:', res);
 
   if (res.error) {
     throw new Error((res.error as { code: number; message: string }).message);
