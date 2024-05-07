@@ -250,6 +250,9 @@ const DetailsFormStep = ({
                     name="feeType"
                     hookToForm
                     disabled={editMode}
+                    onChange={() =>
+                      setValue('contestRecurring', ContestRecurringType.No)
+                    }
                   />
                 </div>
                 {watch('feeType') === ContestFeeType.DirectDeposit && (
@@ -292,7 +295,10 @@ const DetailsFormStep = ({
                     value={ContestRecurringType.Yes}
                     name="contestRecurring"
                     hookToForm
-                    disabled={editMode}
+                    disabled={
+                      editMode ||
+                      watch('feeType') === ContestFeeType.DirectDeposit
+                    }
                   />
                   <CWRadioButton
                     label="No"
