@@ -19,6 +19,7 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 import UserDropdown from './UserDropdown';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import AuthButtons from 'client/scripts/views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './DesktopHeader.scss';
 
@@ -122,24 +123,10 @@ const DesktopHeader = ({
         {!isLoggedIn && (
           <>
             {userOnboardingEnabled ? (
-              <>
-                <CWButton
-                  buttonType="secondary"
-                  buttonHeight="sm"
-                  label="Create account"
-                  buttonWidth="narrow"
-                  disabled={location.pathname.includes('/finishsociallogin')}
-                  onClick={() => onAuthModalOpen('create-account')}
-                />
-                <CWButton
-                  buttonType="primary"
-                  buttonHeight="sm"
-                  label="Sign in"
-                  buttonWidth="narrow"
-                  disabled={location.pathname.includes('/finishsociallogin')}
-                  onClick={() => onAuthModalOpen()}
-                />
-              </>
+              <AuthButtons
+                smallHeightButtons
+                onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}
+              />
             ) : (
               <CWButton
                 buttonType="primary"

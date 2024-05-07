@@ -19,7 +19,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { CWButton } from './components/component_kit/new_designs/CWButton';
+import AuthButtons from './components/SublayoutHeader/AuthButtons';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
@@ -167,19 +167,9 @@ const Sublayout = ({
               })}
               id="mobile-auth-buttons"
             >
-              <CWButton
-                buttonType="secondary"
-                label="Create account"
-                buttonWidth="full"
-                disabled={location.pathname.includes('/finishsociallogin')}
-                onClick={() => setAuthModalType('create-account')}
-              />
-              <CWButton
-                buttonType="primary"
-                label="Sign in"
-                buttonWidth="full"
-                disabled={location.pathname.includes('/finishsociallogin')}
-                onClick={() => setAuthModalType('sign-in')}
+              <AuthButtons
+                fullWidthButtons
+                onButtonClick={(selectedType) => setAuthModalType(selectedType)}
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
