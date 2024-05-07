@@ -1,4 +1,5 @@
-import { Actor, command, dispose, query, schemas } from '@hicommonwealth/core';
+import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import z from 'zod';
@@ -12,8 +13,8 @@ import { seed } from '../../src/tester';
 
 describe('Community alerts lifecycle', () => {
   let actor: Actor;
-  let community: z.infer<typeof schemas.entities.Community> | undefined;
-  let communityTwo: z.infer<typeof schemas.entities.Community> | undefined;
+  let community: z.infer<typeof schemas.Community> | undefined;
+  let communityTwo: z.infer<typeof schemas.Community> | undefined;
   before(async () => {
     const [user] = await seed('User', {
       isAdmin: false,

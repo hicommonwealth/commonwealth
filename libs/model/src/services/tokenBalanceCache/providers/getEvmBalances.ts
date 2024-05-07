@@ -1,5 +1,5 @@
-import { BalanceSourceType } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { models } from '../../../database';

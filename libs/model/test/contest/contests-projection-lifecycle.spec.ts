@@ -1,11 +1,12 @@
 import {
   Actor,
+  EventNames,
   InvalidState,
   dispose,
   handleEvent,
   query,
-  schemas,
 } from '@hicommonwealth/core';
+import { ContestResults } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -149,7 +150,7 @@ describe('Contests projection lifecycle', () => {
 
   it('should project events on multiple contests', async () => {
     await handleEvent(Contests(), {
-      name: schemas.EventNames.RecurringContestManagerDeployed,
+      name: EventNames.RecurringContestManagerDeployed,
       payload: {
         namespace,
         contest_address: recurring,
@@ -159,7 +160,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestStarted,
+      name: EventNames.ContestStarted,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -170,7 +171,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.OneOffContestManagerDeployed,
+      name: EventNames.OneOffContestManagerDeployed,
       payload: {
         namespace,
         contest_address: oneoff,
@@ -180,7 +181,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestStarted,
+      name: EventNames.ContestStarted,
       payload: {
         contest_address: oneoff,
         start_time,
@@ -190,7 +191,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentAdded,
+      name: EventNames.ContestContentAdded,
       payload: {
         contest_address: oneoff,
         content_id,
@@ -201,7 +202,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentAdded,
+      name: EventNames.ContestContentAdded,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -213,7 +214,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentUpvoted,
+      name: EventNames.ContestContentUpvoted,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -225,7 +226,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentUpvoted,
+      name: EventNames.ContestContentUpvoted,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -237,7 +238,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentUpvoted,
+      name: EventNames.ContestContentUpvoted,
       payload: {
         contest_address: oneoff,
         content_id,
@@ -248,7 +249,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestWinnersRecorded,
+      name: EventNames.ContestWinnersRecorded,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -326,13 +327,13 @@ describe('Contests projection lifecycle', () => {
           },
         ],
       },
-    ] as Array<z.infer<typeof schemas.queries.ContestResults>>);
+    ] as Array<z.infer<typeof ContestResults>>);
   });
 
   it('should raise invalid state when community with namespace not found', async () => {
     expect(
       handleEvent(Contests(), {
-        name: schemas.EventNames.RecurringContestManagerDeployed,
+        name: EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
           contest_address: 'new-address',
@@ -348,7 +349,7 @@ describe('Contests projection lifecycle', () => {
     getTokenAttributes.rejects(new Error());
     expect(
       handleEvent(Contests(), {
-        name: schemas.EventNames.RecurringContestManagerDeployed,
+        name: EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
           contest_address: 'new-address',

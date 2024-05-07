@@ -8,7 +8,7 @@ export const communityTypeOptions = [
     title: 'BASE',
     isRecommended: true,
     description:
-      'Base in an Ethereum layer 2 network with high TVL and low transaction fees',
+      'Base is an Ethereum Layer 2 network with high TVL and low transaction fees',
   },
   {
     type: CommunityType.Blast,

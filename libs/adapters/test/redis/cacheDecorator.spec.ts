@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
-import { CacheNamespaces, cache, delay, dispose } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
+import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import * as dotenv from 'dotenv';

@@ -1,4 +1,4 @@
-import { schemas } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import {
@@ -8,16 +8,18 @@ import {
 } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { z } from 'zod';
 import emitNotifications from '../../../../util/emitNotifications';
 
+const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 const web3 = new Web3();
 
 export async function handleGovernanceProposalEvents(
   models: DB,
-  event: z.infer<typeof schemas.events.ChainEventCreated>,
+  event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const community: {
     id: CommunityAttributes['id'];

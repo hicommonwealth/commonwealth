@@ -6,8 +6,8 @@ import type { ModelInstance, ModelStatic } from './types';
 export type CollaborationAttributes = {
   address_id: number;
   thread_id: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
 
   Address: AddressAttributes;
   Thread: ThreadAttributes;
@@ -34,11 +34,11 @@ export default (sequelize: Sequelize.Sequelize) => {
     {
       address_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       thread_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -51,9 +51,6 @@ export default (sequelize: Sequelize.Sequelize) => {
       underscored: true,
     },
   );
-
-  // sequelize requires a PK on "id" column when defining a model
-  Collaboration.removeAttribute('id');
 
   return Collaboration;
 };

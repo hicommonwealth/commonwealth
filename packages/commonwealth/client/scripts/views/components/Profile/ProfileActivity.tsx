@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import 'components/Profile/ProfileActivity.scss';
 
-import type Thread from 'models/Thread';
-import type Comment from 'models/Comment';
 import type AddressInfo from 'models/AddressInfo';
+import type Comment from 'models/Comment';
+import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
 import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import ProfileActivityContent from './ProfileActivityContent';
@@ -28,7 +28,7 @@ type ProfileActivityProps = {
 
 const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
   const [selectedActivity, setSelectedActivity] = useState(
-    ProfileActivityType.Comments
+    ProfileActivityType.Comments,
   );
 
   return (
