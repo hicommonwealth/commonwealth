@@ -1,0 +1,65 @@
+@import '../../../../../../styles/shared.scss';
+
+.PreferencesStep {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+
+  .header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+
+    .h4 {
+      color: $neutral-600;
+    }
+
+    .h5 {
+      color: $neutral-500;
+    }
+  }
+
+  .tags-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .tag {
+      &.isSelected {
+        background-color: $primary-100;
+
+        .Text,
+        button {
+          background-color: $primary-100;
+        }
+      }
+
+      .Text {
+        font-weight: 500 !important;
+        color: black !important;
+      }
+
+      &:focus,
+      &:focus-within {
+        border-width: 1px;
+      }
+    }
+  }
+
+  .action-btns {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    align-items: center;
+    gap: 24px;
+
+    @include extraSmall {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  }
+}
