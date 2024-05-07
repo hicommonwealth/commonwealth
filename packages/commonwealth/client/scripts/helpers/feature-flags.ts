@@ -27,7 +27,9 @@ const featureFlags = {
     process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
   ),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
-  knockInAppNotifications: buildFlag(process.env.KNOCK_IN_APP_NOTIFICATIONS),
+  knockInAppNotifications: buildFlag(
+    process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+  ),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

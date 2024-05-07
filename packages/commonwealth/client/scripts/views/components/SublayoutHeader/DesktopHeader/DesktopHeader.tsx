@@ -7,6 +7,7 @@ import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
+import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
@@ -15,11 +16,9 @@ import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearch
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import UserDropdown from './UserDropdown';
-
-import { Knock } from 'views/components/Knock/Knock';
 import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 import './DesktopHeader.scss';
+import UserDropdown from './UserDropdown';
 
 interface DesktopHeaderProps {
   onMobile: boolean;
@@ -119,7 +118,9 @@ const DesktopHeader = ({
             )}
           </div>
 
-          {isLoggedIn && enableKnockInAppNotifications && <Knock />}
+          {isLoggedIn && enableKnockInAppNotifications && (
+            <KnockNotifications />
+          )}
         </div>
 
         {isLoggedIn && (
