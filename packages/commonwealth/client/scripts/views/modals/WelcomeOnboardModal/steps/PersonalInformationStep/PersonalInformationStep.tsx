@@ -113,7 +113,13 @@ const PersonalInformationStep = ({
               name="username"
               hookToForm
               onInput={(e) => setCurrentUsername(e.target.value.trim())}
-              customError={isUsernameTaken ? 'Username already exists' : ''}
+              customError={
+                formState.isDirty &&
+                watch('username')?.trim() !== '' &&
+                isUsernameTaken
+                  ? 'Username already exists'
+                  : ''
+              }
             />
             <CWButton
               label="Generate random username"
