@@ -314,7 +314,7 @@ const StakeExchangeForm = ({
               fontWeight="medium"
               className={clsx({ error: insufficientFunds })}
             >
-              {capDecimals(userEthBalance)} ETH
+              {capDecimals(userEthBalance)} {denomination}
             </CWText>
           )}
         </div>
