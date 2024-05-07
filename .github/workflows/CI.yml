@@ -477,6 +477,8 @@ jobs:
 
       - name: Run EVM Devnet tests
         run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
+        env:
+          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
 
   # These tests run slowly, so run them in a separate job
   commonwealth-cosmos-tests:
