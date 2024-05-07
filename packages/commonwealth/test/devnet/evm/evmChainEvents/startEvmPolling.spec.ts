@@ -3,7 +3,7 @@ import {
   events as coreEvents,
   dispose,
 } from '@hicommonwealth/core';
-import { getAnvil } from '@hicommonwealth/evm-testing/src/utils/chainUtil';
+import { getAnvil } from '@hicommonwealth/evm-testing';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';

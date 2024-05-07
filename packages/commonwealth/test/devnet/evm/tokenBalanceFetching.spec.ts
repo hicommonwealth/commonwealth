@@ -1,7 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { ChainTesting, ERC1155, ERC721 } from '@hicommonwealth/evm-testing';
-import { getAnvil } from '@hicommonwealth/evm-testing/src/utils/chainUtil';
+import {
+  ChainTesting,
+  ERC1155,
+  ERC721,
+  getAnvil,
+} from '@hicommonwealth/evm-testing';
 import {
   tester,
   tokenBalanceCache,
