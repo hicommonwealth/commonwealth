@@ -34,7 +34,6 @@ export default async (
     },
     {
       model: models.Community,
-      as: 'Community',
       required: false,
       where: { active: true },
     },

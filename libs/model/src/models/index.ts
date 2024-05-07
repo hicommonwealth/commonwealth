@@ -46,16 +46,10 @@ export const buildDb = (sequelize: Sequelize): DB => {
   const db = { sequelize, Sequelize, ...models } as DB;
   buildAssociations(db);
 
-  // TODO: remove legacy associate hook
-  Object.keys(models).forEach((key) => {
-    const model = models[key as keyof typeof Factories];
-    'associate' in model && model.associate(db);
-  });
-
   return db;
 };
 
-// FIXME: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
+// TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
 export * from './ban';
 export * from './chain_node';
@@ -67,7 +61,6 @@ export * from './community_contract';
 export * from './community_contract_template';
 export * from './community_contract_template_metadata';
 export * from './community_role';
-export * from './community_snapshot_spaces';
 export * from './community_stake';
 export * from './contract';
 export * from './contract_abi';
@@ -86,8 +79,6 @@ export * from './profile';
 export * from './reaction';
 export * from './role';
 export * from './role_assignment';
-export * from './snapshot_proposal';
-export * from './snapshot_spaces';
 export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';

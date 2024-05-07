@@ -10,14 +10,16 @@ import {
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache } from '@hicommonwealth/adapters';
-import { BalanceSourceType, cache, delay, dispose } from '@hicommonwealth/core';
+import { cache, dispose } from '@hicommonwealth/core';
 import { tester, tokenBalanceCache, type DB } from '@hicommonwealth/model';
 import {
+  BalanceSourceType,
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
+  delay,
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
