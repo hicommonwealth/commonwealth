@@ -394,7 +394,7 @@ async function main() {
 
 /**
  * In order to execute this script on Frack, Frick, Beta, or any Heroku environment you must run
- * the yarn script (yarn emit-notification) on a Heroku one-off dyno.
+ * the pnpm script (pnpm emit-notification) on a Heroku one-off dyno.
  * To run a one-off dyno use `heroku run bash -a [app-name]`.
  *
  * If the mock (`-m`) option is used multiple times in succession, the same notification data will be re-emitted.
@@ -406,7 +406,7 @@ async function main() {
  * used in rare circumstances such as in local testing when implementing a new chain event or snapshot notification
  * type.
  *
- * Example usage: `yarn emit-notification -c dydx -w [your-wallet-address]`. This finds a random old dydx
+ * Example usage: `pnpm emit-notification -c dydx -w [your-wallet-address]`. This finds a random old dydx
  * chain-event notification and re-emits it as if it were a brand new notification. Since it replaces an old
  * (but real) notification, it links to a real proposal.
  */
