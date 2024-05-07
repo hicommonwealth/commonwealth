@@ -1,4 +1,5 @@
 import {
+  CommentCreated,
   EventNames,
   WorkflowKeys,
   dispose,
@@ -103,7 +104,7 @@ describe('CommentCreated Event Handler', () => {
   it('should not throw if a valid author is not found', async () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
-      payload: { address_id: -999999 },
+      payload: { address_id: -999999 } as z.infer<typeof CommentCreated>,
     });
     expect(res).to.be.undefined;
   });
@@ -114,7 +115,7 @@ describe('CommentCreated Event Handler', () => {
       payload: {
         address_id: rootComment.address_id,
         community_id: '2f92ekf2fjpe9svk23',
-      },
+      } as z.infer<typeof CommentCreated>,
     });
     expect(res).to.be.undefined;
   });
@@ -130,7 +131,7 @@ describe('CommentCreated Event Handler', () => {
         community_id: community.id,
         id: rootComment.id,
         thread_id: rootComment.thread_id,
-      },
+      } as z.infer<typeof CommentCreated>,
     });
     expect(res).to.be.false;
     expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
