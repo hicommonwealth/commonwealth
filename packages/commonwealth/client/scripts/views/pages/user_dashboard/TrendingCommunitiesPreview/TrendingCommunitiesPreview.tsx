@@ -10,6 +10,12 @@ export const TrendingCommunitiesPreview = () => {
 
   const sortedCommunities = app.config.chains
     .getAll()
+    .filter((community) => {
+      const name = community.name.toLowerCase();
+      return (
+        !['"', '>', '<'].includes(name[0]) && !['"', '>', '<'].includes(name[1])
+      );
+    })
     .sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
       const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
@@ -34,7 +40,7 @@ export const TrendingCommunitiesPreview = () => {
         onClick: () => navigate(`/${community.id}`),
       };
     });
-
+  console.log('sortedCommunities: ', sortedCommunities);
   return (
     <div className="TrendingCommunitiesPreview">
       <CWText type="h4" className="header">
