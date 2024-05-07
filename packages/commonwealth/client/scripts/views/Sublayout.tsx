@@ -34,6 +34,7 @@ const Sublayout = ({
   hideFooter = true,
   isInsideCommunity,
 }: SublayoutProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
@@ -41,7 +42,7 @@ const Sublayout = ({
   const [authModalType, setAuthModalType] = useState<AuthModalType>();
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
-    stickyBehaviourEnabled: true,
+    stickyBehaviourEnabled: userOnboardingEnabled,
     zIndex: 70,
   });
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
@@ -51,7 +52,6 @@ const Sublayout = ({
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
 
   useNecessaryEffect(() => {
     if (isLoggedIn && userOnboardingEnabled && !isWelcomeOnboardModalOpen) {
