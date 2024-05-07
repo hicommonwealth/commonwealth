@@ -14,6 +14,5 @@ export default function validateRequirements(
 ): Error | null {
   const result = z.array(schemas.Requirement).safeParse(requirements);
   const error = 'error' in result && JSON.stringify(result.error.format());
-  console.log(error);
   return error ? new Error(`${Errors.InvalidRequirements}: ${error}`) : null;
 }
