@@ -134,7 +134,7 @@ const PersonalInformationStep = ({
       onSubmit={handleSubmit}
       onWatch={handleWatch}
     >
-      {({ formState, watch, setValue }) => (
+      {({ formState, watch, setValue, trigger }) => (
         <>
           <div className="username-section">
             <CWTextInput
@@ -148,7 +148,13 @@ const PersonalInformationStep = ({
               name="username"
               hookToForm
               onInput={(e) => setCurrentUsername(e.target.value.trim())}
-              customError={isUsernameTaken ? 'Username already exists' : ''}
+              customError={
+                formState.isDirty &&
+                watch('username')?.trim() !== '' &&
+                isUsernameTaken
+                  ? 'Username already exists'
+                  : ''
+              }
             />
             <CWButton
               label="Generate random username"
@@ -158,7 +164,8 @@ const PersonalInformationStep = ({
               containerClassName="random-generate-btn"
               onClick={() => {
                 const randomUsername = generateUsername('', 2);
-                setValue('username', randomUsername);
+                setValue('username', randomUsername, { shouldDirty: true });
+                trigger('username');
                 setCurrentUsername(randomUsername);
               }}
             />
