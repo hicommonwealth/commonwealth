@@ -39,20 +39,24 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
     );
   }, []);
 
-  const handleCommunityJoin = async (community: ChainInfo) => {
-    await linkSpecificAddressToSpecificCommunity({
+  const handleCommunityJoin = (community: ChainInfo) => {
+    linkSpecificAddressToSpecificCommunity({
       address: userAddress?.current?.address,
       communityId: community?.id,
       communityChainBase: community?.base,
-    }).catch(console.error);
-
-    setSuggestedCommunities([
-      ...suggestedCommunities.map((suggestion) => ({
-        community: suggestion.community,
-        isJoined:
-          suggestion.community.id === community.id ? true : suggestion.isJoined,
-      })),
-    ]);
+    })
+      .then(() => {
+        setSuggestedCommunities([
+          ...suggestedCommunities.map((suggestion) => ({
+            community: suggestion.community,
+            isJoined:
+              suggestion.community.id === community.id
+                ? true
+                : suggestion.isJoined,
+          })),
+        ]);
+      })
+      .catch(console.error);
   };
 
   return (
@@ -65,11 +69,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
           <JoinCommunityCard
             key={index + community.id + isJoined}
             community={community}
-            onJoinClick={() =>
-              handleCommunityJoin(community)
-                .then(() => null)
-                .catch(console.error)
-            }
+            onJoinClick={() => handleCommunityJoin(community)}
             isJoined={isJoined}
           />
         ))}
