@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
-import * as AbiCoder from 'web3-eth-abi';
+import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmOffChainRpcBatching, evmRpcRequest } from '../util';
