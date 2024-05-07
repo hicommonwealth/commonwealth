@@ -47,7 +47,6 @@ async function updateOrCreateWithAlert(
   if (!community?.ChainNode?.url) {
     throw new AppError('Chain Node not found');
   }
-  console.log('env', process.env.NODE_ENV);
   const { ticker, decimals } =
     process.env.NODE_ENV === 'test'
       ? { ticker: 'ETH', decimals: 18 }
