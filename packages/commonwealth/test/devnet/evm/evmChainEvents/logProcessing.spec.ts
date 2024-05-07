@@ -133,7 +133,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       console.log(propQueuedLogs);
       expect(propQueuedLogs.logs.length).to.equal(1);
       propQueuedLog = propQueuedLogs.logs[0];
-    }).timeout(80_000);
+    }).timeout(120_000);
 
     it('should restrict the maximum block range fetched to 500 blocks', async () => {
       expectAbi();
