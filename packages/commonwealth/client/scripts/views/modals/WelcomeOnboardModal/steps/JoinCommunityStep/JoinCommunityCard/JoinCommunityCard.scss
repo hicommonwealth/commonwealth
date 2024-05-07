@@ -3,11 +3,17 @@
 .JoinCommunityCard {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   padding: 16px;
   gap: 16px;
   border-radius: 6px;
   border: 1px solid $neutral-200;
   width: 100%;
+
+  @include extraSmall {
+    padding: 8px 16px;
+    gap: 8px;
+  }
 
   .info {
     display: flex;
@@ -24,6 +30,10 @@
       align-items: center;
       gap: 8px;
 
+      @include extraSmall {
+        gap: 4px;
+      }
+
       .b2 {
         color: $neutral-500;
       }
@@ -38,6 +48,12 @@
 
   .join-btn {
     margin-left: auto;
+
+    @include extraSmall {
+      margin-top: -8px;
+      margin-left: 32px;
+      margin-right: auto;
+    }
 
     &.isJoined {
       button {
