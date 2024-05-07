@@ -528,9 +528,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
