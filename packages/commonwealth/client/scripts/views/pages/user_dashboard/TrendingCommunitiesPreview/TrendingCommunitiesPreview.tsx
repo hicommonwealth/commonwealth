@@ -40,7 +40,7 @@ export const TrendingCommunitiesPreview = () => {
         onClick: () => navigate(`/${community.id}`),
       };
     });
-  console.log('sortedCommunities: ', sortedCommunities);
+
   return (
     <div className="TrendingCommunitiesPreview">
       <CWText type="h4" className="header">
