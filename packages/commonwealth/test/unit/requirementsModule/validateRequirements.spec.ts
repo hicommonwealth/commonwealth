@@ -192,6 +192,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    console.log(err);
     expect(err.message).to.include('evm_chain_id');
   });
 

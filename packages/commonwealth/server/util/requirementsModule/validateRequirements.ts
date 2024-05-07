@@ -1,16 +1,9 @@
+import * as schemas from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
-import Ajv from 'ajv';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const requirementsSchema = require('./requirementsSchema_v1.json');
-
+import { z } from 'zod';
 const Errors = {
   InvalidRequirements: 'Invalid requirements',
 };
-
-const ajv = new Ajv();
-
 /**
  * validates a set of requirements against the schema
  * @param requirements an array of requirements types
@@ -19,12 +12,8 @@ const ajv = new Ajv();
 export default function validateRequirements(
   requirements: Requirement[],
 ): Error | null {
-  const validate = ajv.compile(requirementsSchema);
-  const isValid = validate(requirements);
-  if (!isValid) {
-    return new Error(
-      `${Errors.InvalidRequirements}: ${JSON.stringify(validate.errors)}`,
-    );
-  }
-  return null;
+  const result = z.array(schemas.Requirement).safeParse(requirements);
+  const error = 'error' in result && JSON.stringify(result.error.format());
+  console.log(error);
+  return error ? new Error(`${Errors.InvalidRequirements}: ${error}`) : null;
 }
