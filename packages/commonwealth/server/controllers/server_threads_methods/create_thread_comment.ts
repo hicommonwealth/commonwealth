@@ -158,6 +158,7 @@ export async function __createThreadComment(
   // the comment's first version, formatted on the backend with timestamps
   const firstVersion = {
     timestamp: moment(),
+    author: address,
     body: decodeURIComponent(text),
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
