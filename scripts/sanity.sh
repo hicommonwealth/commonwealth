@@ -8,25 +8,25 @@ function step() {
 }
 
 step 'Linting'
-yarn lint-branch-warnings
+pnpm lint-branch-warnings
 
 step 'Initial cleaning'
-yarn workspaces run clean
+pnpm -r clean
 
 step 'Building'
-yarn workspace commonwealth build
-yarn workspace @hicommonwealth/sitemaps build
+pnpm -F commonwealth build
+pnpm -F sitemaps build
 
 step 'Type checking'
-yarn workspaces run check-types
+pnpm -r check-types
 
 step 'Unit testing'
-yarn workspaces run test
+pnpm -r test
 
 step 'Integration testing'
-yarn workspace commonwealth test-api
-yarn workspace commonwealth test-integration-util
+pnpm -F commonwealth test-api
+pnpm -F commonwealth test-integration-util
 
 # we are aiming for a devx without builds
 step 'Final cleaning'
-yarn workspaces run clean
+pnpm -r clean

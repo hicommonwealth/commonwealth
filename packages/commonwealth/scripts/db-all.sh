@@ -2,4 +2,4 @@
 
 dumpName=${1:-latest.dump}
 
-yarn reset-db && yarn load-db $dumpName && yarn migrate-db
+pnpm reset-db && pnpm load-db $dumpName && pnpm migrate-db

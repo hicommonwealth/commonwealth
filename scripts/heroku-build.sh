@@ -4,7 +4,7 @@
 set -e
 
 # builds configured app
-yarn build
+pnpm build
 
 # clean other heroku apps - should we only keep /build folders?
 if [ "$CW_BUILD" = true ]; then
