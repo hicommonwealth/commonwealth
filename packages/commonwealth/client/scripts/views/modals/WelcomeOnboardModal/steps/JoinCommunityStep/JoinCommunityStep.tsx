@@ -58,7 +58,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   return (
     <section className="JoinCommunityStep">
       <CWText type="h4" fontWeight="semiBold">
-        Based on your interests with think you&apos;ll like...
+        Based on your interests we think you&apos;ll like...
       </CWText>
       <div className="communities-list">
         {suggestedCommunities.map(({ community, isJoined }, index) => (
