@@ -5,6 +5,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './WelcomeOnboardModal.scss';
 import { PersonalInformationStep } from './steps/PersonalInformationStep';
+import { PreferencesStep } from './steps/PreferencesStep';
 
 type WelcomeOnboardModalProps = {
   isOpen: boolean;
@@ -12,7 +13,7 @@ type WelcomeOnboardModalProps = {
 };
 
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(2);
 
   const handleClose = () => {
     // we require the user's to add their usernames.
@@ -46,6 +47,9 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           </div>
           {activeStep === 1 && (
             <PersonalInformationStep onComplete={() => setActiveStep(2)} />
+          )}
+          {activeStep === 2 && (
+            <PreferencesStep onComplete={() => setActiveStep(3)} />
           )}
         </section>
       }
