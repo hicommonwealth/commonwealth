@@ -17,7 +17,7 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "yarn build && NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
+    "test": "NODE_ENV=test NODE_OPTIONS='--import tsx/esm --conditions=devmode' mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
