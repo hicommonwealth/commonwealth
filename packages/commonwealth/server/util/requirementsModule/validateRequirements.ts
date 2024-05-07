@@ -1,9 +1,6 @@
 import { Requirement } from '@hicommonwealth/shared';
 import Ajv from 'ajv';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const requirementsSchema = require('./requirementsSchema_v1.json');
+import requirementsSchema from './requirementsSchema_v1.json' assert { type: 'json' };
 
 const Errors = {
   InvalidRequirements: 'Invalid requirements',
