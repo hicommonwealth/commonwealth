@@ -6,3 +6,8 @@
 .KnockNotifications .rnf-notification-feed__knock-branding {
   display: none;
 }
+
+.KnockNotifications button:focus,
+.KnockNotifications select:focus {
+  outline: none;
+}
