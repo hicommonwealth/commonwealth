@@ -51,6 +51,12 @@ Significant updates to knowledge base entries should be manually listed in a giv
 
 At least for the duration of 2023, as we implement this new system, any PR that updates or contributes to our knowledge base should tag @gdjohnson (the documentarian) on GitHub.
 
+### Tickets and PRs
+
+Substantial documentation work (both tickets and pull requests) must receive a `documentation` tag. The PR title should begin with `[Docs Improvement]`. The documentarian should be added as a reviewer.
+
+The #4800 general documentation ticket can be used as a linked issue for minor fixes and improvements.
+
 ### Inline Documentation
 
 We use a combination of TSDoc and comments for inline documentation. For more information, see our [Code Style Inline Documentation](./Code-Style.md#inline-documentation) section.

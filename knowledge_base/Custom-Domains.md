@@ -53,7 +53,8 @@ When adding a new custom domain, ensure you update the following external whitel
 
 ## Change Log
 
+- 240503: Updated by Jake Naviasky with post-Airplane instructions for adding domains to Heroku (#7679).
 - 240415: Flagged by Graham Johnson as possibly obsolete in light of abandoning Airplane.
-- 230515: Updated with Staging Testing section by Kurtis Assad
-- 230321: Updated with Airplane section by Alex Young
-- 230227: Authored by Jake Naviaski.
+- 230515: Updated with Staging Testing section by Kurtis Assad.
+- 230321: Updated with Airplane section by Alex Young.
+- 230227: Authored by Jake Naviasky.
