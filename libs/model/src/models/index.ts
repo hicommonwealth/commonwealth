@@ -55,7 +55,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
   return db;
 };
 
-// FIXME: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
+// TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
 export * from './ban';
 export * from './chain_node';
