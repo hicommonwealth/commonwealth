@@ -1,6 +1,10 @@
 # Contests
 
-Contests is a new feature available for communities on Common. This document outlines the implementation of Contests on our platform.
+Contests is a new feature, based on contest contracts, available for communities on Common. This document outlines the implementation of Contests on our platform.
+
+A contest contract is an on-chain, repeating game which receives (1) content submissions (2) votes on submitted content. It then determines the winning content based on relative voting power applied.
+
+Common Contests are an application of contest contracts using Common content. Winners receive a token-denominated prize from a community-designated pool.
 
 ## Basic Rules
 
@@ -24,7 +28,7 @@ Common content that receives the most votes will be rewarded with the weekly con
 
 Prizes will be distributed based on the following variables:
 
-- `winnerShares` (`uint256[]`): The percentage of shares awarded to each respective placement in the contest, e.g. `[25, 15]` designates a `25%` and `15%` payout to first and second place.
+- `winnerShares` (`uint256[]`): The percentage of shares awarded to each respective placement in the contest, e.g. `[50, 30, 20]` designates a 50%, 30%, and 20% payout to first, second, and third place.
 - `prizeShare` (`uint256`): The percentage of the prize pool payed out each interval, e.g. `5` designates `5%`.
 - `voterShare` (`uint256`): The percentage of the prize pool claimable by voters each week, e.g. `5` designates `5%`.
 
