@@ -46,12 +46,6 @@ export const buildDb = (sequelize: Sequelize): DB => {
   const db = { sequelize, Sequelize, ...models } as DB;
   buildAssociations(db);
 
-  // TODO: remove legacy associate hook
-  Object.keys(models).forEach((key) => {
-    const model = models[key as keyof typeof Factories];
-    'associate' in model && model.associate(db);
-  });
-
   return db;
 };
 

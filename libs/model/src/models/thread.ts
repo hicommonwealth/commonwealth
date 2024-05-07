@@ -7,17 +7,18 @@ import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
+import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
-  Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
   reactions?: ReactionAttributes[];
+  subscriptions?: ThreadSubscriptionAttributes[];
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -26,8 +27,8 @@ export type ThreadInstance = ModelInstance<ThreadAttributes> & {
 
 export type ThreadModelStatic = ModelStatic<ThreadInstance>;
 
-export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
-  const Thread = <ThreadModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <ThreadModelStatic>sequelize.define<ThreadInstance>(
     'Thread',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -165,25 +166,3 @@ export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
       },
     },
   );
-
-  Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Address, {
-      as: 'Address',
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Thread.hasMany(models.Comment, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
-    models.Thread.belongsTo(models.Topic, {
-      as: 'topic',
-      foreignKey: 'topic_id',
-    });
-    models.Thread.hasMany(models.Notification, {
-      foreignKey: 'thread_id',
-    });
-  };
-
-  return Thread;
-};

@@ -14,9 +14,8 @@ export default (sequelize: Sequelize.Sequelize) =>
   <CommentSubscriptionModelStatic>sequelize.define<CommentSubscriptionInstance>(
     'CommentSubscriptions',
     {
-      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-      user_id: { type: Sequelize.INTEGER, allowNull: false },
-      comment_id: { type: Sequelize.INTEGER, allowNull: false },
+      user_id: { type: Sequelize.INTEGER, primaryKey: true },
+      comment_id: { type: Sequelize.INTEGER, primaryKey: true },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -29,11 +28,10 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
     },
     {
+      tableName: 'CommentSubscriptions',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'CommentSubscriptions',
       underscored: false,
-      indexes: [{ fields: ['user_id', 'comment_id'], unique: true }],
     },
   );
