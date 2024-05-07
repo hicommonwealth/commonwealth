@@ -52,7 +52,7 @@ async function updateOrCreateWithAlert(
       ? { ticker: 'ETH', decimals: 18 }
       : await contractHelpers.getTokenAttributes(
           contest_address,
-          new Web3(community?.ChainNode?.url),
+          new Web3(community?.ChainNode?.private_url || community?.ChainNode?.url),
         );
   // TODO: evaluate errors from contract helpers and how to drive the event queue
 
