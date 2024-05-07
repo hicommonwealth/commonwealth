@@ -3,9 +3,13 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { schemas, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fetchNewSnapshotProposal, models } from '@hicommonwealth/model';
+import {
+  emitEvent,
+  fetchNewSnapshotProposal,
+  models,
+} from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
 import { Op } from 'sequelize';
@@ -87,21 +91,23 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       return res.status(200).json({ message: 'No associated community' });
     }
 
-    await models.Outbox.create({
-      event_name: schemas.EventNames.SnapshotProposalCreated,
-      event_payload: {
-        id: parsedId,
-        event: req.body.event,
-        title: response.data.proposal?.title ?? null,
-        body: response.data.proposal?.body ?? null,
-        choices: response.data.proposal?.choices ?? null,
-        space: space ?? null,
-        start: response.data.proposal?.start ?? null,
-        expire: response.data.proposal?.end ?? null,
-        token: req.body.token,
-        secret: req.body.secret,
+    await emitEvent(models.Outbox, [
+      {
+        event_name: EventNames.SnapshotProposalCreated,
+        event_payload: {
+          id: parsedId,
+          event: req.body.event,
+          title: response.data.proposal?.title ?? null,
+          body: response.data.proposal?.body ?? null,
+          choices: response.data.proposal?.choices ?? null,
+          space: space ?? null,
+          start: response.data.proposal?.start ?? null,
+          expire: response.data.proposal?.end ?? null,
+          token: req.body.token,
+          secret: req.body.secret,
+        },
       },
-    });
+    ]);
 
     stats().increment('snapshot_listener.received_snapshot_event', {
       event: eventType,

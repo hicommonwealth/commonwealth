@@ -14,11 +14,9 @@ export type CommunityContractTemplateInstance =
 export type CommunityContractTemplateStatic =
   ModelStatic<CommunityContractTemplateInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-): CommunityContractTemplateStatic => {
-  const CommunityContractTemplate = <CommunityContractTemplateStatic>(
-    sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <CommunityContractTemplateStatic>(
+    sequelize.define<CommunityContractTemplateInstance>(
       'CommunityContractTemplate',
       {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -45,24 +43,3 @@ export default (
       },
     )
   );
-
-  CommunityContractTemplate.associate = (models) => {
-    CommunityContractTemplate.belongsTo(models.CommunityContract, {
-      foreignKey: 'community_contract_id',
-      targetKey: 'id',
-    });
-    CommunityContractTemplate.belongsTo(models.Template, {
-      foreignKey: 'template_id',
-      targetKey: 'id',
-    });
-    CommunityContractTemplate.belongsTo(
-      models.CommunityContractTemplateMetadata,
-      {
-        foreignKey: 'cctmd_id',
-        targetKey: 'id',
-      },
-    );
-  };
-
-  return CommunityContractTemplate;
-};

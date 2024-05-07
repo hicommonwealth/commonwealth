@@ -5,6 +5,6 @@ export type WelcomeOnboardModalProps = {
 
 export enum WelcomeOnboardModalSteps {
   PersonalInformation = 'PersonalInformation',
-  Interests = 'Interests',
+  Preferences = 'Preferences',
   JoinCommunity = 'JoinCommunity',
 }

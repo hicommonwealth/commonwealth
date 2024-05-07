@@ -1,4 +1,5 @@
-import { ServerError, schemas, type Query } from '@hicommonwealth/core';
+import { ServerError, type Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
@@ -18,63 +19,62 @@ const getLastEdited = (post: CommentAttributes) => {
   return lastEdited;
 };
 
-export const GetBulkThreads: Query<
-  typeof schemas.queries.GetBulkThreads
-> = () => ({
-  ...schemas.queries.GetBulkThreads,
-  auth: [],
-  body: async ({ payload }) => {
-    const {
-      community_id,
-      stage,
-      topicId,
-      includePinnedThreads,
-      cursor,
-      limit,
-      orderBy,
-      fromDate,
-      toDate,
-      archived,
-    } = payload;
-    // query params that bind to sql query
-    const bind = (() => {
-      const _limit = limit ? (limit > 500 ? 500 : limit) : 20;
-      const _cursor = cursor || 1;
-      const _offset = _limit * (_cursor - 1) || 0;
-      const _to_date = toDate || moment().toISOString();
+export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
+  return {
+    ...schemas.GetBulkThreads,
+    auth: [],
+    body: async ({ payload }) => {
+      const {
+        community_id,
+        stage,
+        topicId,
+        includePinnedThreads,
+        cursor,
+        limit,
+        orderBy,
+        fromDate,
+        toDate,
+        archived,
+      } = payload;
+      // query params that bind to sql query
+      const bind = (() => {
+        const _limit = limit ? (limit > 500 ? 500 : limit) : 20;
+        const _cursor = cursor || 1;
+        const _offset = _limit * (_cursor - 1) || 0;
+        const _to_date = toDate || moment().toISOString();
 
-      return {
-        from_date: fromDate,
-        to_date: _to_date,
-        cursor: _cursor,
-        limit: _limit,
-        offset: _offset,
-        ...(community_id && { community_id: community_id }),
-        ...(stage && { stage }),
-        ...(topicId && { topic_id: topicId }),
+        return {
+          from_date: fromDate,
+          to_date: _to_date,
+          cursor: _cursor,
+          limit: _limit,
+          offset: _offset,
+          ...(community_id && { community_id: community_id }),
+          ...(stage && { stage }),
+          ...(topicId && { topic_id: topicId }),
+        };
+      })();
+
+      // sql query parts that order results by provided query param
+      const orderByQueries: Record<
+        z.infer<typeof schemas.OrderByQueriesKeys>,
+        string
+      > = {
+        'createdAt:asc': 'threads.thread_created ASC',
+        'createdAt:desc': 'threads.thread_created DESC',
+        'numberOfComments:asc': 'threads_number_of_comments ASC',
+        'numberOfComments:desc': 'threads_number_of_comments DESC',
+        'numberOfLikes:asc': 'threads_total_likes ASC',
+        'numberOfLikes:desc': 'threads_total_likes DESC',
+        'latestActivity:asc': 'latest_activity ASC',
+        'latestActivity:desc': 'latest_activity DESC',
       };
-    })();
 
-    // sql query parts that order results by provided query param
-    const orderByQueries: Record<
-      z.infer<typeof schemas.queries.OrderByQueriesKeys>,
-      string
-    > = {
-      'createdAt:asc': 'threads.thread_created ASC',
-      'createdAt:desc': 'threads.thread_created DESC',
-      'numberOfComments:asc': 'threads_number_of_comments ASC',
-      'numberOfComments:desc': 'threads_number_of_comments DESC',
-      'numberOfLikes:asc': 'threads_total_likes ASC',
-      'numberOfLikes:desc': 'threads_total_likes DESC',
-      'latestActivity:asc': 'latest_activity ASC',
-      'latestActivity:desc': 'latest_activity DESC',
-    };
-
-    // get response threads from query
-    let responseThreads: any;
-    try {
-      responseThreads = await models.sequelize.query(
-        `
+      // get response threads from query
+      let responseThreads: any;
+      try {
+        responseThreads = await models.sequelize.query(
+          `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
         addr.community_id AS addr_chain, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
@@ -179,100 +179,101 @@ export const GetBulkThreads: Query<
       }
       LIMIT $limit OFFSET $offset
     `,
-        {
-          bind,
-          type: QueryTypes.SELECT,
-        },
-      );
-    } catch (e) {
-      console.error(e);
-      throw new ServerError('Could not fetch threads');
-    }
-
-    // transform thread response
-    let threads = responseThreads.map(async (t: any) => {
-      const collaborators = JSON.parse(t.collaborators[0]).address?.length
-        ? t.collaborators.map((c: any) => JSON.parse(c))
-        : [];
-
-      const last_edited = getLastEdited(t);
-
-      const data: any = {
-        id: t.thread_id,
-        title: t.thread_title,
-        url: t.url,
-        body: t.body,
-        last_edited,
-        kind: t.kind,
-        stage: t.stage,
-        read_only: t.read_only,
-        discord_meta: t.discord_meta,
-        pinned: t.pinned,
-        chain: t.thread_chain,
-        created_at: t.thread_created,
-        updated_at: t.thread_updated,
-        locked_at: t.thread_locked,
-        links: t.links,
-        collaborators,
-        has_poll: t.has_poll,
-        last_commented_on: t.last_commented_on,
-        plaintext: t.plaintext,
-        Address: {
-          id: t.addr_id,
-          address: t.addr_address,
-          community_id: t.addr_chain,
-        },
-        numberOfComments: t.threads_number_of_comments,
-        reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
-        reactionTimestamps: t.reaction_timestamps
-          ? t.reaction_timestamps.split(',')
-          : [],
-        reactionWeights: t.reaction_weights
-          ? t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
-          : [],
-        reaction_weights_sum: t.reaction_weights_sum,
-        addressesReacted: t.addresses_reacted
-          ? t.addresses_reacted.split(',')
-          : [],
-        reactedProfileName: t.reacted_profile_name?.split(','),
-        reactedProfileAvatarUrl: t.reacted_profile_avatar_url?.split(','),
-        reactedAddressLastActive: t.reacted_address_last_active?.split(','),
-        reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
-        marked_as_spam_at: t.marked_as_spam_at,
-        archived_at: t.archived_at,
-        latest_activity: t.latest_activity,
-        profile_id: t.profile_id,
-        avatar_url: t.avatar_url,
-        address_last_active: t.address_last_active,
-        profile_name: t.profile_name,
-      };
-      if (t.topic_id) {
-        data['topic'] = {
-          id: t.topic_id,
-          name: t.topic_name,
-          description: t.topic_description,
-          chainId: t.topic_community_id,
-          telegram: t.telegram,
-        };
+          {
+            bind,
+            type: QueryTypes.SELECT,
+          },
+        );
+      } catch (e) {
+        console.error(e);
+        throw new ServerError('Could not fetch threads');
       }
-      return data;
-    });
 
-    const numVotingThreads = (await models.Thread.count({
-      where: {
-        community_id: community_id,
-        stage: 'voting',
-      },
-    })) as number;
+      // transform thread response
+      let threads = responseThreads.map(async (t: any) => {
+        const collaborators = JSON.parse(t.collaborators[0]).address?.length
+          ? t.collaborators.map((c: any) => JSON.parse(c))
+          : [];
 
-    threads = await Promise.all(threads);
+        const last_edited = getLastEdited(t);
 
-    return {
-      limit: bind.limit,
-      cursor: bind.cursor,
-      // data params
-      threads,
-      numVotingThreads,
-    };
-  },
-});
+        const data: any = {
+          id: t.thread_id,
+          title: t.thread_title,
+          url: t.url,
+          body: t.body,
+          last_edited,
+          kind: t.kind,
+          stage: t.stage,
+          read_only: t.read_only,
+          discord_meta: t.discord_meta,
+          pinned: t.pinned,
+          chain: t.thread_chain,
+          created_at: t.thread_created,
+          updated_at: t.thread_updated,
+          locked_at: t.thread_locked,
+          links: t.links,
+          collaborators,
+          has_poll: t.has_poll,
+          last_commented_on: t.last_commented_on,
+          plaintext: t.plaintext,
+          Address: {
+            id: t.addr_id,
+            address: t.addr_address,
+            community_id: t.addr_chain,
+          },
+          numberOfComments: t.threads_number_of_comments,
+          reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
+          reactionTimestamps: t.reaction_timestamps
+            ? t.reaction_timestamps.split(',')
+            : [],
+          reactionWeights: t.reaction_weights
+            ? t.reaction_weights.split(',').map((n: any) => parseInt(n, 10))
+            : [],
+          reaction_weights_sum: t.reaction_weights_sum,
+          addressesReacted: t.addresses_reacted
+            ? t.addresses_reacted.split(',')
+            : [],
+          reactedProfileName: t.reacted_profile_name?.split(','),
+          reactedProfileAvatarUrl: t.reacted_profile_avatar_url?.split(','),
+          reactedAddressLastActive: t.reacted_address_last_active?.split(','),
+          reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
+          marked_as_spam_at: t.marked_as_spam_at,
+          archived_at: t.archived_at,
+          latest_activity: t.latest_activity,
+          profile_id: t.profile_id,
+          avatar_url: t.avatar_url,
+          address_last_active: t.address_last_active,
+          profile_name: t.profile_name,
+        };
+        if (t.topic_id) {
+          data['topic'] = {
+            id: t.topic_id,
+            name: t.topic_name,
+            description: t.topic_description,
+            chainId: t.topic_community_id,
+            telegram: t.telegram,
+          };
+        }
+        return data;
+      });
+
+      const numVotingThreads = (await models.Thread.count({
+        where: {
+          community_id: community_id,
+          stage: 'voting',
+        },
+      })) as number;
+
+      threads = await Promise.all(threads);
+
+      return {
+        limit: bind.limit,
+        cursor: bind.cursor,
+        // data params
+        threads,
+        numVotingThreads,
+      };
+    },
+  };
+}

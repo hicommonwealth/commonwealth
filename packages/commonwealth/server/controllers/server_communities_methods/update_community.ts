@@ -19,6 +19,7 @@ export const Errors = {
   NotLoggedIn: 'Not signed in',
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',
+  CantChangeCustomDomain: 'Custom domain change not permitted',
   CantChangeNetwork: 'Cannot change community network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
@@ -227,11 +228,14 @@ export async function __updateCommunity(
   // is left un-updated? Is there a better approach?
   community.default_summary_view = default_summary_view || false;
 
-  // Under our current security policy, custom domains must be set by trusted
-  // administrators only. Otherwise an attacker could configure a custom domain and
-  // use the code they run to steal login tokens for arbitrary users.
-  //
-  // chain.custom_domain = custom_domain;
+  // Only permit site admins to update custom domain field on communities, as it requires
+  // external configuration (via heroku + whitelists).
+  // Currently does not permit unsetting the custom domain; must be done manually.
+  if (user.isAdmin && custom_domain) {
+    community.custom_domain = custom_domain;
+  } else if (custom_domain && custom_domain !== community.custom_domain) {
+    throw new AppError(Errors.CantChangeCustomDomain);
+  }
 
   await community.save();
 

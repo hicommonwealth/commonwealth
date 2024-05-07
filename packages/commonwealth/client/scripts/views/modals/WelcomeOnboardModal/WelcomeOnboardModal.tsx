@@ -6,6 +6,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './WelcomeOnboardModal.scss';
 import { JoinCommunityStep } from './steps/JoinCommunityStep';
 import { PersonalInformationStep } from './steps/PersonalInformationStep';
+import { PreferencesStep } from './steps/PreferencesStep';
 import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
@@ -29,19 +30,24 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           component: (
             <PersonalInformationStep
               onComplete={() =>
-                setActiveStep(WelcomeOnboardModalSteps.Interests)
+                setActiveStep(WelcomeOnboardModalSteps.Preferences)
               }
             />
           ),
         };
       }
 
-      case WelcomeOnboardModalSteps.Interests: {
+      case WelcomeOnboardModalSteps.Preferences: {
         return {
-          // TODO: in https://github.com/hicommonwealth/commonwealth/issues/6647
           index: 2,
-          title: '',
-          component: <></>,
+          title: 'Customize your experience',
+          component: (
+            <PreferencesStep
+              onComplete={() =>
+                setActiveStep(WelcomeOnboardModalSteps.Preferences)
+              }
+            />
+          ),
         };
       }
 

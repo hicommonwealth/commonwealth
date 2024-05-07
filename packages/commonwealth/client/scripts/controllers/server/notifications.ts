@@ -8,10 +8,11 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import type { SubscriptionInstance } from '@hicommonwealth/model';
+import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
+import { z } from 'zod';
 import Notification from '../../models/Notification';
 
 const post = async (route, args, callback) => {
@@ -130,7 +131,7 @@ class NotificationsController {
           is_active: true,
           ...requestData,
         },
-        (result: SubscriptionInstance) => {
+        (result: z.infer<typeof Subscription>) => {
           const newSubscription = modelFromServer(result);
           this._subscriptions.push(newSubscription);
         },
