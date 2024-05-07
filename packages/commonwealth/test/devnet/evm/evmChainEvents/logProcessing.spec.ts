@@ -1,6 +1,6 @@
 import { Log } from '@ethersproject/providers';
 import { dispose } from '@hicommonwealth/core';
-import { getAnvil } from '@hicommonwealth/evm-testing/src/utils/chainUtil';
+import { getAnvil } from '@hicommonwealth/evm-testing';
 import { tester } from '@hicommonwealth/model';
 import { AbiType } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
