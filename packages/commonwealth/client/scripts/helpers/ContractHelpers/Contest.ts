@@ -62,9 +62,14 @@ class Contest extends ContractBase {
         feeShare,
         prizeShare,
       );
+      const eventLog = txReceipt.logs.find(
+        (log) =>
+          log.topics[0] ==
+          '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
+      );
       const newContestAddress = this.web3.eth.abi.decodeParameters(
-        ['address', 'uint256'],
-        txReceipt.logs[0].data.toString(),
+        ['address', 'address', 'uint256', 'bool'],
+        eventLog.data.toString(),
       )['0'] as string;
       this.contractAddress = newContestAddress;
       return newContestAddress;
@@ -109,9 +114,14 @@ class Contest extends ContractBase {
         walletAddress,
         exchangeToken,
       );
+      const eventLog = txReceipt.logs.find(
+        (log) =>
+          log.topics[0] ==
+          '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
+      );
       const newContestAddress = this.web3.eth.abi.decodeParameters(
         ['address', 'address', 'uint256', 'bool'],
-        txReceipt.logs[2].data.toString(),
+        eventLog.data.toString(),
       )['0'] as string;
       this.contractAddress = newContestAddress;
       return newContestAddress;
