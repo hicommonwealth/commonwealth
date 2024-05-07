@@ -20,6 +20,10 @@ const JoinCommunityCard = ({
   isJoined = false,
   onJoinClick = () => {},
 }: JoinCommunityCardProps) => {
+  const roundedAddressCount =
+    community?.addressCount > 1000
+      ? `${(community?.addressCount / 1000) | 0}K+`
+      : community?.addressCount;
   return (
     <div className="JoinCommunityCard">
       <CWCommunityAvatar community={community} size="xl" />
@@ -31,7 +35,7 @@ const JoinCommunityCard = ({
 
         <div className="counts">
           <CWText type="b2" title={`${community?.addressCount}`}>
-            {community?.addressCount}&nbsp;
+            {roundedAddressCount}&nbsp;
             {pluralizeWithoutNumberPrefix(community?.addressCount, 'Member')}
           </CWText>
 
