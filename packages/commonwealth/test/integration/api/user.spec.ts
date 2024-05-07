@@ -11,7 +11,6 @@ import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail'
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('User Model Routes', () => {
   let server: TestServer;

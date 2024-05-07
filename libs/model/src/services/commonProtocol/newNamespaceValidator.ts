@@ -1,8 +1,5 @@
-import {
-  AppError,
-  BalanceSourceType,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { getBalances } from '../tokenBalanceCache';

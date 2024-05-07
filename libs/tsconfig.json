@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "module": "es2020",
+    "target": "esnext",
     "baseUrl": ".",
     "composite": true,
+    "strict": true,
 
     "forceConsistentCasingInFileNames": true,
     "preserveConstEnums": true,
@@ -16,8 +18,8 @@
     "declarationMap": true,
 
     "paths": {
-      "@hicommonwealth/*": ["libs/*/src"]
+      "@hicommonwealth/*": ["*/src"]
     }
   },
-  "exclude": ["**/node_modules", "**/build", "**/test", "**/__mocks__"]
+  "exclude": ["**/node_modules", "**/build"]
 }

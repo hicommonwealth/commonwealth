@@ -1,13 +1,15 @@
-import { logger, stats } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import Sequelize from 'sequelize';
+import { fileURLToPath } from 'url';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export type NotificationAttributes = {
   id: number;
@@ -28,24 +30,21 @@ export type NotificationInstance = ModelInstance<NotificationAttributes> & {
 
 export type NotificationModelStatic = ModelStatic<NotificationInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): NotificationModelStatic => {
-  const Notification = <NotificationModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <NotificationModelStatic>sequelize.define<NotificationInstance>(
     'Notification',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      notification_data: { type: dataTypes.TEXT, allowNull: true },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      notification_data: { type: Sequelize.TEXT, allowNull: true },
       chain_event_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: true,
         unique: true,
       },
-      entity_id: { type: dataTypes.INTEGER, allowNull: true },
-      community_id: { type: dataTypes.STRING, allowNull: true },
-      category_id: { type: dataTypes.STRING, allowNull: false },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      entity_id: { type: Sequelize.INTEGER, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: true },
+      category_id: { type: Sequelize.STRING, allowNull: false },
+      thread_id: { type: Sequelize.INTEGER, allowNull: true },
     },
     {
       hooks: {
@@ -85,26 +84,3 @@ export default (
       indexes: [{ fields: ['thread_id'] }],
     },
   );
-
-  Notification.associate = (models) => {
-    models.Notification.hasMany(models.NotificationsRead, {
-      foreignKey: 'notification_id',
-      onDelete: 'cascade',
-      hooks: true,
-    });
-    models.Notification.belongsTo(models.NotificationCategory, {
-      foreignKey: 'category_id',
-      targetKey: 'name',
-    });
-    models.Notification.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Notification.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Notification;
-};

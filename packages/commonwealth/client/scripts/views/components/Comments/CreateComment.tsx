@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -8,6 +8,7 @@ import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import Thread from '../../../models/Thread';
+import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
@@ -51,9 +52,19 @@ export const CreateComment = ({
 
   const editorValue = getTextFromDelta(contentDelta);
 
-  const author = app.user.activeAccount;
-
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
+
+  const { data: profile } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [app.user.activeAccount?.community?.id],
+    profileAddresses: [app.user.activeAccount?.address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!app.user.activeAccount?.profile,
+  });
+
+  if (app.user.activeAccount) {
+    app.user.activeAccount.profile = profile?.[0];
+  }
+  const author = app.user.activeAccount;
 
   const {
     mutateAsync: createComment,

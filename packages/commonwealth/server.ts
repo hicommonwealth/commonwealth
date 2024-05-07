@@ -1,13 +1,14 @@
 import {
   HotShotsStats,
   MixpanelAnalytics,
-  PinoLogger,
   RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { analytics, cache, logger, stats } from '@hicommonwealth/core';
+import { analytics, cache, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import express from 'express';
+import { fileURLToPath } from 'url';
 import {
   DATABASE_CLEAN_HOUR,
   PORT,
@@ -16,13 +17,17 @@ import {
 } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
+// handle exceptions thrown in express routes
+import 'express-async-errors';
+
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const SEND_EMAILS = process.env.SEND_EMAILS === 'true';
 const NO_CLIENT = process.env.NO_CLIENT === 'true' || SEND_EMAILS;
 const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT;
 
 // bootstrap production adapters
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 REDIS_URL && cache(new RedisCache(REDIS_URL));

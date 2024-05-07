@@ -36,7 +36,7 @@ export const ViewCommentUpvotesDrawer = ({
       contentBody={comment.text}
       header="Comment upvotes"
       reactorData={reactorData}
-      author={app.chain.accounts.get(comment.author)}
+      author={comment?.author ? app.chain.accounts.get(comment?.author) : null}
       publishDate={comment.createdAt}
     />
   );

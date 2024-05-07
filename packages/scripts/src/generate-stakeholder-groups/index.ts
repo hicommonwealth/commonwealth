@@ -1,13 +1,18 @@
 import { command } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 async function main() {
   const stakedCommunities = await models.Community.findAll({
     where: {
       ...(process.env.COMMUNITY_ID && { id: process.env.COMMUNITY_ID }),
       namespace: {
-        [Op.ne]: null,
+        [Op.ne]: undefined,
       },
     },
     include: [
@@ -22,24 +27,21 @@ async function main() {
   // generate stakeholder group for each staked community
   for (const c of stakedCommunities) {
     if ((c.CommunityStakes || []).length > 0) {
-      const { groups, created } = await command(
-        Community.GenerateStakeholderGroups(),
-        {
-          id: c.id,
-          actor: {
-            user: undefined,
-          },
-          payload: {},
+      const result = await command(Community.GenerateStakeholderGroups(), {
+        id: c.id,
+        actor: {
+          user: { email: 'generate-stakeholder-groups' },
         },
-      );
+        payload: {},
+      });
 
-      if (created) {
-        console.log(
-          `created ${groups.length} stakeholder groups for ${c.id} – refreshing memberships...`,
+      if (result?.created) {
+        log.info(
+          `created ${result.groups?.length} stakeholder groups for ${c.id} – refreshing memberships...`,
         );
       } else {
-        console.log(
-          `stakeholder groups (${groups.length}) already exist for ${c.id}`,
+        log.info(
+          `stakeholder groups (${result?.groups?.length}) already exist for ${c.id}`,
         );
       }
     }
@@ -49,6 +51,10 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
+  if (err instanceof Error) {
+    log.fatal('Fatal error occurred', err);
+  } else {
+    log.fatal('Fatal error occurred', undefined, { err });
+  }
   process.exit(1);
 });

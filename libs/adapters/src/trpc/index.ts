@@ -1,5 +1,6 @@
 import * as core from '@hicommonwealth/core';
 import {
+  Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   type CommandMetadata,
@@ -20,7 +21,7 @@ import {
 } from 'trpc-openapi';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
 
-interface Context {
+export interface Context {
   req: Request;
 }
 
@@ -69,9 +70,8 @@ export enum Tag {
   Comment = 'Comment',
   Reaction = 'Reaction',
   Query = 'Query',
-  Policy = 'Policy',
-  Projection = 'Projection',
   Integration = 'Integration',
+  Subscription = 'Subscription',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
@@ -92,7 +92,9 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .input(md.input.extend({ id: z.string() })) // this might cause client typing issues
     .output(md.output)
     .mutation(async ({ ctx, input }) => {
-      if (md.secure) await authenticate(ctx.req);
+      // md.secure must explicitly be false if the route requires no authentication
+      // if we provide any authorization method we force authentication as well
+      if (md.secure !== false || md.auth?.length) await authenticate(ctx.req);
       try {
         return await core.command(
           md,
@@ -100,6 +102,7 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
             id: input?.id,
             actor: {
               user: ctx.req.user as core.User,
+              // TODO: get from JWT?
               address_id: ctx.req.headers['address_id'] as string,
             },
             payload: input!,
@@ -118,7 +121,7 @@ export const event = <
   Output extends ZodSchema | ZodUndefined = ZodUndefined,
 >(
   factory: () => EventsHandlerMetadata<Input, Output>,
-  tag: Tag.Policy | Tag.Projection | Tag.Integration,
+  tag: Tag.Integration,
 ) => {
   const md = factory();
   return trpc.procedure
@@ -134,9 +137,9 @@ export const event = <
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await core.eventHandler(
+        return await core.handleEvent(
           md,
-          { name: name as core.schemas.Events, payload },
+          { name: name as Events, payload },
           false,
         );
       } catch (error) {
@@ -186,17 +189,19 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
 export const toExpress = (router: OpenApiRouter) =>
   createExpressMiddleware({
     router,
-    createContext: ({ req }) => ({ req }),
+    createContext: ({ req }: { req: any }) => ({ req }),
   });
 
 // used for REST like routes (External)
 export const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
-    createContext: ({ req }) => ({ req }),
-    onError: ({ error }) => {
+    createContext: ({ req }: { req: any }) => ({ req }),
+    onError: ({ error }: { error: any }) => {
       console.error(error.code, JSON.stringify(error.cause));
     },
+    responseMeta: undefined,
+    maxBodySize: undefined,
   });
 
 export const toOpenApiDocument = (

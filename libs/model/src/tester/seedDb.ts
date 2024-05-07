@@ -5,7 +5,7 @@ import {
   ChainType,
   CosmosGovernanceVersion,
   NotificationCategories,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import { bootstrap_testing } from './bootstrap';
 
 /**
@@ -70,6 +70,7 @@ export const seedDb = async () => {
           balance_type: BalanceType.Cosmos,
           cosmos_chain_id: 'osmosis',
           bech32: 'osmo',
+          slip44: 118,
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
@@ -78,6 +79,7 @@ export const seedDb = async () => {
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
           cosmos_chain_id: 'csdkbetaci',
           bech32: 'cosmos',
+          slip44: 118,
         },
         csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
@@ -87,6 +89,7 @@ export const seedDb = async () => {
           cosmos_chain_id: 'csdkv1',
           bech32: 'cosmos',
           cosmos_gov_version: CosmosGovernanceVersion.v1,
+          slip44: 118,
         },
         csdkBetaLocal: {
           url: 'http://localhost:5050/rpc',
@@ -96,6 +99,7 @@ export const seedDb = async () => {
           cosmos_chain_id: 'csdkbetalocal',
           bech32: 'cosmos',
           cosmos_gov_version: CosmosGovernanceVersion.v1beta1,
+          slip44: 118,
         },
         csdkV1CLocal: {
           url: 'http://localhost:5051/rpc',
@@ -105,6 +109,7 @@ export const seedDb = async () => {
           cosmos_chain_id: 'csdkv1local',
           bech32: 'cosmos',
           cosmos_gov_version: CosmosGovernanceVersion.v1,
+          slip44: 118,
         },
         ethermintLocal: {
           url: 'http://localhost:5052/rpc',
@@ -113,6 +118,7 @@ export const seedDb = async () => {
           alt_wallet_url: 'http://localhost:5052/lcd/',
           cosmos_chain_id: 'evmosdevlocal',
           bech32: 'cosmos',
+          slip44: 60,
         },
       }),
     );
@@ -356,14 +362,20 @@ export const seedDb = async () => {
       {
         community_id: alex.id!,
         contract_id: alexContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         community_id: yearn.id!,
         contract_id: yearnContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         community_id: sushi.id!,
         contract_id: sushiContract.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ]);
 
@@ -496,23 +508,6 @@ export const seedDb = async () => {
         is_active: true,
       },
     ]);
-
-    await models.SnapshotSpace.create({
-      snapshot_space: 'test space',
-    });
-
-    await models.SnapshotProposal.create({
-      id: '1',
-      title: 'Test Snapshot Proposal',
-      body: 'This is a test proposal',
-      choices: ['Yes', 'No'],
-      space: 'test space',
-      event: 'proposal/created',
-      start: new Date().toString(),
-      expire: new Date(
-        new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
-      ).toString(),
-    });
 
     return models;
   } catch (error) {

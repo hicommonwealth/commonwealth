@@ -1,5 +1,4 @@
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractTemplateAttributes = {
@@ -15,27 +14,24 @@ export type CommunityContractTemplateInstance =
 export type CommunityContractTemplateStatic =
   ModelStatic<CommunityContractTemplateInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommunityContractTemplateStatic => {
-  const CommunityContractTemplate = <CommunityContractTemplateStatic>(
-    sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <CommunityContractTemplateStatic>(
+    sequelize.define<CommunityContractTemplateInstance>(
       'CommunityContractTemplate',
       {
-        id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         community_contract_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           primaryKey: true,
         },
         cctmd_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           primaryKey: true,
         },
         template_id: {
-          type: dataTypes.INTEGER,
+          type: Sequelize.INTEGER,
           allowNull: false,
           primaryKey: true,
         },
@@ -47,24 +43,3 @@ export default (
       },
     )
   );
-
-  CommunityContractTemplate.associate = (models) => {
-    CommunityContractTemplate.belongsTo(models.CommunityContract, {
-      foreignKey: 'community_contract_id',
-      targetKey: 'id',
-    });
-    CommunityContractTemplate.belongsTo(models.Template, {
-      foreignKey: 'template_id',
-      targetKey: 'id',
-    });
-    CommunityContractTemplate.belongsTo(
-      models.CommunityContractTemplateMetadata,
-      {
-        foreignKey: 'cctmd_id',
-        targetKey: 'id',
-      },
-    );
-  };
-
-  return CommunityContractTemplate;
-};

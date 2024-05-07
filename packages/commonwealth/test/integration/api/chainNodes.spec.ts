@@ -1,5 +1,6 @@
-import { BalanceType, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
@@ -114,6 +115,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Osmosis',
         url: 'https://osmosis-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -140,6 +142,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Cosmos1',
         url: 'https://cosmos-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -150,6 +153,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Cosmos2',
           url: 'https://cosmos-mainnet.g.com/3',
+          slip44: 118,
         },
       });
 
@@ -225,6 +229,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Osmosis',
           url: 'https://osmosis-mainnet.g.com/2',
+          slip44: 118,
         },
       });
 
@@ -234,6 +239,7 @@ describe('ChainNode Tests', () => {
         url: 'https://cosmos-mainnet.g.com/4',
         name: 'mmm',
         cosmos_chain_id,
+        slip44: 118,
       });
 
       const updatedNode = await models.ChainNode.findOne({
@@ -243,6 +249,7 @@ describe('ChainNode Tests', () => {
       assert.equal(updatedNode.name, 'mmm');
       assert.equal(updatedNode.balance_type, 'cosmos');
       assert.equal(updatedNode.cosmos_chain_id, 'osmosiz');
+      assert.equal(updatedNode.slip44, 118);
     });
   });
 });

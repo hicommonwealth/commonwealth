@@ -1,4 +1,5 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
+import { findDenominationString } from 'helpers/findDenomination';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -13,6 +14,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { useFlag } from '../../../../hooks/useFlag';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
@@ -39,19 +41,27 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
   const {
+    selectedAddress,
+    selectedCommunity,
+    modeOfManageCommunityStakeModal,
+    setModeOfManageCommunityStakeModal,
+  } = useManageCommunityStakeModalStore();
+  const {
     stakeEnabled,
     stakeBalance,
     currentVoteWeight,
     stakeValue,
     isLoading,
-  } = useCommunityStake();
-  const {
-    modeOfManageCommunityStakeModal,
-    setModeOfManageCommunityStakeModal,
-    selectedCommunity,
-  } = useManageCommunityStakeModalStore();
+    activeChainId,
+  } = useCommunityStake({
+    // if user is not a community member but logged in, use an address that matches community chain base
+    ...(selectedAddress &&
+      !app?.user?.activeAccount && { walletAddress: selectedAddress }),
+  });
+  const { isContestAvailable, isContestDataLoading } = useCommunityContests();
 
-  if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
+  if (showSkeleton || isLoading || isContestDataLoading)
+    return <CommunitySectionSkeleton />;
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -73,7 +83,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
-                denomination="ETH"
+                denomination={findDenominationString(activeChainId) || 'ETH'}
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
@@ -99,7 +109,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         )}
 
         <CWDivider />
-        <DiscussionSection />
+        <DiscussionSection
+          isContestAvailable={stakeEnabled && isContestAvailable}
+        />
         <CWDivider />
         <GovernanceSection />
         <CWDivider />
@@ -129,6 +141,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            denomination={findDenominationString(activeChainId) || 'ETH'}
             {...(selectedCommunity && { community: selectedCommunity })}
           />
         }

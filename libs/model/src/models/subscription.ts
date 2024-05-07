@@ -1,5 +1,7 @@
-import { EmitNotification, NotificationCategories } from '@hicommonwealth/core';
-import type { DataTypes } from 'sequelize';
+import {
+  EmitNotification,
+  NotificationCategories,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import type { CommentAttributes } from './comment';
 import type { CommunityAttributes } from './community';
@@ -49,29 +51,26 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
   emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): SubscriptionModelStatic => {
-  const Subscription = <SubscriptionModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <SubscriptionModelStatic>sequelize.define<SubscriptionInstance>(
     'Subscription',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
-      category_id: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      subscriber_id: { type: Sequelize.INTEGER, allowNull: false },
+      category_id: { type: Sequelize.STRING, allowNull: false },
       is_active: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: true,
         allowNull: false,
       },
       immediate_email: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      community_id: { type: dataTypes.STRING, allowNull: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
-      comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: true },
+      thread_id: { type: Sequelize.INTEGER, allowNull: true },
+      comment_id: { type: Sequelize.INTEGER, allowNull: true },
       snapshot_id: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -120,34 +119,3 @@ export default (
       },
     },
   );
-
-  Subscription.associate = (models) => {
-    models.Subscription.belongsTo(models.User, {
-      foreignKey: 'subscriber_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.NotificationCategory, {
-      foreignKey: 'category_id',
-      targetKey: 'name',
-    });
-    models.Subscription.hasMany(models.NotificationsRead, {
-      foreignKey: 'subscription_id',
-      onDelete: 'cascade',
-    });
-    models.Subscription.belongsTo(models.Community, {
-      as: 'Community',
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.Comment, {
-      foreignKey: 'comment_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Subscription;
-};

@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
@@ -16,6 +16,12 @@ interface UseCommunityStakeProps {
   walletAddress?: string;
 }
 
+const chainIds = {
+  1397: 'Blast',
+  1322: 'Base',
+  37: 'Ethereum',
+};
+
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
@@ -29,13 +35,17 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const ethChainId =
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
+  const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
 
-  const { isInitialLoading: communityStakeLoading, data: stakeResponse } =
-    useFetchCommunityStakeQuery({
-      communityId: activeCommunityId,
-      stakeId,
-      apiEnabled: communityStakeEnabled && !!activeCommunityId,
-    });
+  const {
+    isInitialLoading: communityStakeLoading,
+    data: stakeResponse,
+    refetch: refetchStakeQuery,
+  } = useFetchCommunityStakeQuery({
+    communityId: activeCommunityId,
+    stakeId,
+    apiEnabled: communityStakeEnabled && !!activeCommunityId,
+  });
 
   const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
@@ -87,6 +97,8 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     currentVoteWeight,
     stakeValue,
     isLoading,
+    activeChainId,
+    refetchStakeQuery,
   };
 };
 

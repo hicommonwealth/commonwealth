@@ -1,4 +1,4 @@
-import type { ISnapshotNotification } from '@hicommonwealth/core';
+import type { ISnapshotNotification } from '@hicommonwealth/shared';
 
 export abstract class EventHandler<DBEventType = ISnapshotNotification> {
   public abstract handle(

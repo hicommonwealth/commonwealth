@@ -1,13 +1,12 @@
+import { dispose, type DeepPartial } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
   NotificationCategories,
-  dispose,
-  schemas,
-  type DeepPartial,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { step } from 'mocha-steps';
@@ -22,21 +21,22 @@ chai.use(chaiAsPromised);
 // then attempts to find the entity and validate it
 async function testSeed<T extends schemas.Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<typeof schemas.entities[T]>>,
+  values?: DeepPartial<z.infer<typeof schemas[T]>>,
   options: SeedOptions = { mock: true },
-): Promise<z.infer<typeof schemas.entities[T]>> {
+): Promise<z.infer<typeof schemas[T]>> {
   const [record, records] = await seed(name, values, options);
   expect(records.length, 'failed to create entity').to.be.gt(0);
 
   // perform schema validation on created entity (throws)
-  const schema = schemas.entities[name];
+  const schema = schemas[name];
   const model = models[name];
-  const data = await schema.parse(record);
+  const data: ReturnType<typeof schema.parse> = schema.parse(record);
 
   // attempt to find entity that was created
   const existingEntity = await (model as ModelStatic<Model>).findOne({
     where: {
-      [model.primaryKeyAttribute]: data[model.primaryKeyAttribute],
+      [model.primaryKeyAttribute]:
+        data[model.primaryKeyAttribute as keyof typeof data],
     },
   });
   expect(existingEntity, 'failed to find created entity after creation').not.to
@@ -62,7 +62,6 @@ describe('Seed functions', () => {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
-        selected_community_id: null,
       };
       // NOTE: some props like emailVerified and isAdmin
       // are explicitly excluded via sequelize model config
@@ -124,8 +123,6 @@ describe('Seed functions', () => {
             is_user_default: false,
           },
         ],
-        CommunityStakes: [],
-        discord_config_id: null,
       });
 
       const community = await testSeed('Community', {
@@ -152,7 +149,6 @@ describe('Seed functions', () => {
             is_user_default: false,
           },
         ],
-        CommunityStakes: [],
         groups: [
           {
             metadata: {
@@ -162,7 +158,6 @@ describe('Seed functions', () => {
           },
         ],
         topics: [{}, {}],
-        discord_config_id: null,
       });
 
       await testSeed('NotificationCategory', {
@@ -184,41 +179,6 @@ describe('Seed functions', () => {
       expect(
         seed('Community', {}, { mock: false }),
       ).to.eventually.be.rejectedWith(ValidationError);
-    });
-  });
-
-  describe('SnapshotSpace', () => {
-    step('Should seed with overrides', async () => {
-      await testSeed('SnapshotSpace', {
-        snapshot_space: 'test space',
-      });
-    });
-  });
-
-  describe('SnapshotProposal', () => {
-    step('Should seed with defaults', async () => {
-      await testSeed('SnapshotProposal', {
-        space: 'test space',
-      });
-      await testSeed('SnapshotProposal', {
-        space: 'test space',
-      });
-    });
-
-    step('Should seed with overrides', async () => {
-      await testSeed('SnapshotProposal', {
-        id: '1',
-        title: 'Test Snapshot Proposal',
-        body: 'This is a test proposal',
-        // TODO: fix equivalence assertion in test
-        // choices: ['Yes', 'No'],
-        space: 'test space',
-        event: 'proposal/created',
-        start: new Date().toString(),
-        expire: new Date(
-          new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
-        ).toString(),
-      });
     });
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { chainBaseToCanvasChainId } from 'canvas';
 import app from 'state';
 
@@ -16,7 +16,7 @@ const useCheckAuthenticatedAddresses = ({
   const idOrPrefix =
     chainBase === ChainBase.CosmosSDK
       ? app.chain?.meta.bech32Prefix
-      : app.chain?.meta.node?.ethChainId;
+      : app.chain?.meta.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
 
   const [authenticatedAddresses, setAuthenticatedAddresses] = useState<{

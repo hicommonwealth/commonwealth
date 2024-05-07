@@ -1,25 +1,21 @@
 import {
   HotShotsStats,
-  PinoLogger,
-  RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
-  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
+import { EventNames, stats } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
-  Broker,
-  BrokerTopics,
-  EventContext,
-  broker,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
+  emitEvent,
+  fetchNewSnapshotProposal,
+  models,
+} from '@hicommonwealth/model';
 import type { Request, RequestHandler, Response } from 'express';
 import express, { json } from 'express';
+import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
-import { DEFAULT_PORT, NODE_ENV, RABBITMQ_URI } from './config';
-import fetchNewSnapshotProposal from './utils/fetchSnapshot';
+import { DEFAULT_PORT } from './config';
 import {
   methodNotAllowedMiddleware,
   registerRoute,
@@ -27,7 +23,8 @@ import {
 
 let isServiceHealthy = false;
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 stats(HotShotsStats());
 
 startHealthCheckLoop({
@@ -49,8 +46,6 @@ export const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
 app.use(json() as RequestHandler);
 
-let controller: Broker;
-
 registerRoute(app, 'get', '/', (req: Request, res: Response) => {
   res.send('OK!');
 });
@@ -62,7 +57,7 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       res.status(400).send('Error sending snapshot event');
     }
 
-    log.debug('Snapshot received', undefined, { requestBody: req.body });
+    log.info('Snapshot received', { requestBody: req.body });
 
     const parsedId = req.body.id?.replace(/.*\//, '');
     const eventType = req.body.event?.split('/')[1];
@@ -74,42 +69,52 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
       res.status(400).send('Error sending snapshot event');
     }
 
-    const response = await fetchNewSnapshotProposal(parsedId, eventType);
+    const response = await fetchNewSnapshotProposal(parsedId);
 
-    const event: EventContext<'SnapshotProposalCreated'> = {
-      name: 'SnapshotProposalCreated',
-      payload: {
-        id: parsedId,
-        event: req.body.event,
-        title: response.data.proposal?.title ?? null,
-        body: response.data.proposal?.body ?? null,
-        choices: response.data.proposal?.choices ?? null,
-        space: response.data.proposal?.space.id ?? null,
-        start: response.data.proposal?.start ?? null,
-        expire: response.data.proposal?.end ?? null,
-        token: req.body.token,
-        secret: req.body.secret,
-      },
-    };
+    const space = response.data.proposal?.space.id;
 
-    const result = await controller?.publish(
-      BrokerTopics.SnapshotListener,
-      event,
-    );
-
-    if (!result) {
-      log.error('Failed to publish snapshot message', undefined, {
-        event,
-      });
-      res.status(500).send('Failed to publish snapshot');
+    if (!space) {
+      log.error('Space not defined!');
+      return res.status(400).send('Error getting snapshot space');
     }
+
+    const associatedCommunities = await models.Community.findOne({
+      where: {
+        snapshot_spaces: {
+          [Op.contains]: [space],
+        },
+      },
+    });
+
+    if (!associatedCommunities) {
+      log.info(`No associated communities found for space ${space}`);
+      return res.status(200).json({ message: 'No associated community' });
+    }
+
+    await emitEvent(models.Outbox, [
+      {
+        event_name: EventNames.SnapshotProposalCreated,
+        event_payload: {
+          id: parsedId,
+          event: req.body.event,
+          title: response.data.proposal?.title ?? null,
+          body: response.data.proposal?.body ?? null,
+          choices: response.data.proposal?.choices ?? null,
+          space: space ?? null,
+          start: response.data.proposal?.start ?? null,
+          expire: response.data.proposal?.end ?? null,
+          token: req.body.token,
+          secret: req.body.secret,
+        },
+      },
+    ]);
 
     stats().increment('snapshot_listener.received_snapshot_event', {
       event: eventType,
-      space: event.payload.space,
+      space: space,
     });
 
-    res.status(200).send({ message: 'Snapshot event received', event });
+    res.status(200).send({ message: 'Snapshot event received' });
   } catch (err) {
     log.error('Error sending snapshot event', err);
     res.status(500).send('error: ' + err);
@@ -119,22 +124,6 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 app.use(methodNotAllowedMiddleware());
 
 app.listen(port, async () => {
-  const log = logger().getLogger(__filename);
   log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
-
-  if (NODE_ENV !== 'test') {
-    try {
-      const rmqAdapter = new RabbitMQAdapter(
-        getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.SnapshotService),
-      );
-      await rmqAdapter.init();
-      broker(rmqAdapter);
-      isServiceHealthy = true;
-    } catch (err) {
-      log.fatal(`Error starting server: ${err}`);
-      isServiceHealthy = false;
-    }
-  }
-
-  controller = broker();
+  isServiceHealthy = true;
 });

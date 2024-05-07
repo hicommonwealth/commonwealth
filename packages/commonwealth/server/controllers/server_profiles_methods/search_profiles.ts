@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
-import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { uniq } from 'lodash';
+import { buildPaginatedResponse } from '@hicommonwealth/schemas';
+import _ from 'lodash';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { ServerProfilesController } from '../server_profiles_controller';
@@ -138,7 +138,7 @@ export async function __searchProfiles(
       user_id: profile.user_id,
       profile_name: profile.profile_name,
       avatar_url: profile.avatar_url,
-      addresses: profile.address_ids.map((_, i) => ({
+      addresses: profile.address_ids.map((unused1, i) => ({
         id: profile.address_ids[i],
         community_id: profile.community_ids[i],
         address: profile.addresses[i],
@@ -159,7 +159,7 @@ export async function __searchProfiles(
       {
         where: {
           address_id: {
-            [Op.in]: uniq(profileAddressIds),
+            [Op.in]: _.uniq(profileAddressIds),
           },
         },
       },
@@ -185,9 +185,5 @@ export async function __searchProfiles(
     }
   }
 
-  return schemas.queries.buildPaginatedResponse(
-    profilesWithAddresses,
-    totalResults,
-    bind,
-  );
+  return buildPaginatedResponse(profilesWithAddresses, totalResults, bind);
 }

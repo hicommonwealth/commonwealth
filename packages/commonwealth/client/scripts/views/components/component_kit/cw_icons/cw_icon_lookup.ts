@@ -27,6 +27,7 @@ import {
   Code,
   Coins,
   Compass,
+  Copy,
   DotsThreeVertical,
   Export,
   Eye,
@@ -56,7 +57,9 @@ import {
   SignOut,
   Sparkle,
   SquaresFour,
+  Timer,
   Trash,
+  Trophy,
   TwitterLogo,
   Users,
   UsersThree,
@@ -124,6 +127,7 @@ export const iconLookup = {
   compass: Icons.CWCompass,
   compassPhosphor: withPhosphorIcon(Compass),
   copy: Icons.CWCopy,
+  copyNew: withPhosphorIcon(Copy),
   clockCounterClockwise: withPhosphorIcon(ClockCounterClockwise),
   cosmos: Icons.CWCosmos,
   cow: Icons.CWCow,
@@ -213,6 +217,8 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  trophy: withPhosphorIcon(Trophy),
+  timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,
   // trash: Icons.CWTrash,
   trash: withPhosphorIcon(Trash),
@@ -235,6 +241,8 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
+  base: CustomIcons.CWBase,
+  blast: CustomIcons.CWBlast,
   email: CustomIcons.CWEmail,
   eth: CustomIcons.CWEth,
   cosmos: CustomIcons.CWCosmos,

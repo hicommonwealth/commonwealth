@@ -12,7 +12,6 @@ export type ContestStatus = {
   startTime: number;
   endTime: number;
   contestInterval: number;
-  currWinners: string[];
   lastContentId: string;
 };
 
@@ -37,8 +36,8 @@ export const addContent = async (
   let txReceipt;
   try {
     txReceipt = await contestInstance.methods
-      .addContent(creator, url, '')
-      .send();
+      .addContent(creator, url, [])
+      .send({ from: web3.eth.defaultAccount, gasLimit: 200000 });
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -77,7 +76,7 @@ export const voteContent = async (
   try {
     txReceipt = await contestInstance.methods
       .voteContent(voter, contentId)
-      .send();
+      .send({ from: web3.eth.defaultAccount, gasLimit: 200000 });
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -104,21 +103,19 @@ export const getContestStatus = async (
     contestInstance.methods.startTime().call(),
     contestInstance.methods.endTime().call(),
     contestInstance.methods.contestInterval().call(),
-    contestInstance.methods.winnerIds().call(),
-    contestInstance.methods.currContentId().call(),
+    contestInstance.methods.currentContentId().call(),
   ]);
 
   return {
     startTime: promise[0],
     endTime: promise[1],
     contestInterval: promise[2],
-    currWinners: promise[3],
-    lastContentId: promise[4],
+    lastContentId: promise[3],
   };
 };
 
 /**
- * A (potential) helper for creating the web3 provider via an RPC, including private key import
+ * A helper for creating the web3 provider via an RPC, including private key import
  * @param rpc the rpc of the network to use helper with
  * @returns
  */

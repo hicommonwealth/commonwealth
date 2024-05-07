@@ -1,20 +1,22 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  logger,
-} from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import {
   CommunityInstance,
   ProfileAttributes,
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  slugify,
+} from '@hicommonwealth/shared';
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
-import { slugify } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import { WebhookDestinations } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export const REGEX_IMAGE =
   /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;

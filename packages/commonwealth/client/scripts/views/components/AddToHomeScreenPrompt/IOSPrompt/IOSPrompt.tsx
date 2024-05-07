@@ -1,7 +1,8 @@
+import { useAnimation } from 'hooks/useAnimation';
 import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './IOSPrompt.scss';
 
 interface IOSPromptProps {
@@ -10,14 +11,14 @@ interface IOSPromptProps {
   setShowPrompt: (showPrompt: boolean) => void;
 }
 
-export const IOSPrompt = ({
-  hidePromptAction,
-  showPrompt,
-  setShowPrompt,
-}: IOSPromptProps) => {
+export const IOSPrompt = ({ hidePromptAction }: IOSPromptProps) => {
+  const { animationStyles } = useAnimation({
+    transitionDuration: '0.5s',
+    transformNumber: 'translateY(100%)',
+  });
   return (
     <div className="IOSPrompt">
-      <div className="prompt-content">
+      <div className="prompt-content" style={animationStyles}>
         <div className="header">
           <div className="icon">
             <img src="/static/img/branding/common.svg" alt="Commonwealth" />

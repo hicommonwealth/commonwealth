@@ -1,10 +1,10 @@
+import { ILogger } from '@hicommonwealth/logging';
 import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
 } from '../framework';
-import { Events } from '../schemas';
-import { AnalyticsOptions, BrokerTopics, CacheNamespaces } from '../types';
+import { Events } from '../integration/events';
 
 /**
  * Resource disposer function
@@ -23,33 +23,6 @@ export interface Disposable {
  * Adapter factory
  */
 export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
-
-export type LogContext = {
-  // fingerprint is a Rollbar concept that helps Rollbar group error occurrences together
-  fingerprint?: string;
-  [key: string]: unknown;
-};
-
-/**
- * Logger port
- * Logs messages at different levels
- */
-export interface ILogger {
-  trace(msg: string, error?: Error, context?: LogContext): void;
-  debug(msg: string, error?: Error, context?: LogContext): void;
-  info(msg: string, error?: Error, context?: LogContext): void;
-  warn(msg: string, error?: Error, context?: LogContext): void;
-  error(msg: string, error?: Error, context?: LogContext): void;
-  fatal(msg: string, error?: Error, context?: LogContext): void;
-}
-
-/**
- * Logger factory
- * Builds a named logger
- */
-export interface Logger extends Disposable {
-  getLogger(...ids: string[]): ILogger;
-}
 
 /**
  * Stats port
@@ -71,6 +44,18 @@ export interface Stats extends Disposable {
   gauge(key: string, value: number): void;
   // traces
   timing(key: string, duration: number, tags?: Record<string, string>): void;
+}
+
+export enum CacheNamespaces {
+  Route_Response = 'route_response',
+  Function_Response = 'function_response',
+  Global_Response = 'global_response',
+  Test_Redis = 'test_redis',
+  Database_Cleaner = 'database_cleaner',
+  Compound_Gov_Version = 'compound_gov_version',
+  Token_Balance = 'token_balance',
+  Activity_Cache = 'activity_cache',
+  Rate_Limiter = 'rate_limiter',
 }
 
 /**
@@ -122,6 +107,8 @@ export interface Cache extends Disposable {
   ): Promise<boolean>;
 }
 
+export type AnalyticsOptions = Record<string, any>;
+
 /**
  * Analytics port
  */
@@ -131,23 +118,35 @@ export interface Analytics extends Disposable {
 
 export type RetryStrategyFn = (
   err: Error | undefined,
-  topic: BrokerTopics,
+  topic: BrokerSubscriptions,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
 ) => void;
+
+export enum BrokerPublications {
+  MessageRelayer = 'MessageRelayer',
+  DiscordListener = 'DiscordMessage',
+}
+
+export enum BrokerSubscriptions {
+  SnapshotListener = 'SnapshotListener',
+  DiscordListener = 'DiscordMessage',
+  ChainEvent = 'ChainEvent',
+  NotificationsProvider = 'NotificationsProvider',
+}
 
 /**
  * Broker Port
  */
 export interface Broker extends Disposable {
   publish<Name extends Events>(
-    topic: BrokerTopics,
+    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    topic: BrokerTopics,
+    topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
   ): Promise<boolean>;

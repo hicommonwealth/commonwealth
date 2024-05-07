@@ -1,11 +1,7 @@
-import {
-  AppError,
-  ChainBase,
-  WalletId,
-  WalletSsoSource,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB, UserInstance } from '@hicommonwealth/model';
 import { AddressInstance } from '@hicommonwealth/model';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
@@ -90,8 +86,8 @@ export async function createAddressHelper(
       // use the latest active address with this hex to assign profile
       existingAddressWithHex = existingHexesSorted?.[0];
     } else if (community.base === ChainBase.Ethereum) {
-      const Web3 = (await import('web3-utils')).default;
-      if (!Web3.isAddress(encodedAddress)) {
+      const { isAddress } = await import('web3-validator');
+      if (!isAddress(encodedAddress)) {
         throw new AppError('Eth address is not valid');
       }
     } else if (community.base === ChainBase.NEAR) {

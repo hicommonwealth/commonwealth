@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import {
   getADR036SignableAction,
   getADR036SignableSession,

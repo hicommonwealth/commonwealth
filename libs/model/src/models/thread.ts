@@ -1,34 +1,24 @@
-import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { EventNames } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/schemas';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import { NotificationAttributes } from './notification';
+import type { NotificationAttributes } from './notification';
+import type { ReactionAttributes } from './reaction';
+import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
-export enum LinkSource {
-  Snapshot = 'snapshot',
-  Proposal = 'proposal',
-  Thread = 'thread',
-  Web = 'web',
-  Template = 'template',
-}
-
-export type Link = {
-  source: LinkSource;
-  identifier: string;
-  title?: string;
-};
-
-export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
+export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
-  Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
+  reactions?: ReactionAttributes[];
+  subscriptions?: ThreadSubscriptionAttributes[];
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -37,89 +27,86 @@ export type ThreadInstance = ModelInstance<ThreadAttributes> & {
 
 export type ThreadModelStatic = ModelStatic<ThreadInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ThreadModelStatic => {
-  const Thread = <ThreadModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <ThreadModelStatic>sequelize.define<ThreadInstance>(
     'Thread',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: true },
-      created_by: { type: dataTypes.STRING, allowNull: true },
-      title: { type: dataTypes.TEXT, allowNull: false },
-      body: { type: dataTypes.TEXT, allowNull: true },
-      plaintext: { type: dataTypes.TEXT, allowNull: true },
-      kind: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: true },
+      created_by: { type: Sequelize.STRING, allowNull: true },
+      title: { type: Sequelize.TEXT, allowNull: false },
+      body: { type: Sequelize.TEXT, allowNull: true },
+      plaintext: { type: Sequelize.TEXT, allowNull: true },
+      kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
-        type: dataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: 'discussion',
       },
-      url: { type: dataTypes.TEXT, allowNull: true },
-      topic_id: { type: dataTypes.INTEGER, allowNull: true },
+      url: { type: Sequelize.TEXT, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: true },
       pinned: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       view_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       read_only: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       version_history: {
-        type: dataTypes.ARRAY(dataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         defaultValue: [],
         allowNull: false,
       },
-      links: { type: dataTypes.JSONB, allowNull: true },
-      discord_meta: { type: dataTypes.JSONB, allowNull: true },
-      has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
+      links: { type: Sequelize.JSONB, allowNull: true },
+      discord_meta: { type: Sequelize.JSONB, allowNull: true },
+      has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
 
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      canvas_action: { type: Sequelize.JSONB, allowNull: true },
+      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      canvas_hash: { type: Sequelize.STRING, allowNull: true },
       // timestamps
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      last_edited: { type: dataTypes.DATE, allowNull: true },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      last_commented_on: { type: dataTypes.DATE, allowNull: true },
-      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
-      archived_at: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+      last_edited: { type: Sequelize.DATE, allowNull: true },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
+      last_commented_on: { type: Sequelize.DATE, allowNull: true },
+      marked_as_spam_at: { type: Sequelize.DATE, allowNull: true },
+      archived_at: { type: Sequelize.DATE, allowNull: true },
       locked_at: {
-        type: dataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: true,
       },
 
       //counts
       reaction_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       comment_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
 
       //notifications
       max_notif_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
@@ -146,82 +133,36 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          // when thread created, increment Community.thread_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET thread_count = thread_count + 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: thread.community_id,
+          const { Community, Outbox } = sequelize.models;
+
+          await Community.increment('thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
+
+          await emitEvent(
+            Outbox,
+            [
+              {
+                event_name: EventNames.ThreadCreated,
+                event_payload: thread.get({ plain: true }),
               },
-              transaction: options.transaction,
-            },
+            ],
+            options.transaction,
           );
         },
         afterDestroy: async (
           thread: ThreadInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          // when thread deleted, decrement Community.thread_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET thread_count = thread_count - 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: thread.community_id,
-              },
-              transaction: options.transaction,
-            },
-          );
+          const { Community } = sequelize.models;
+          await Community.increment('thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
         },
       },
     },
   );
-
-  Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-      as: 'Community',
-    });
-    models.Thread.belongsTo(models.Address, {
-      as: 'Address',
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Thread.hasMany(models.Comment, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
-    models.Thread.belongsTo(models.Topic, {
-      as: 'topic',
-      foreignKey: 'topic_id',
-    });
-    models.Thread.belongsToMany(models.Address, {
-      through: models.Collaboration,
-      as: 'collaborators',
-      foreignKey: { name: 'thread_id', allowNull: false },
-    });
-    models.Thread.hasMany(models.Reaction, {
-      foreignKey: 'thread_id',
-      as: 'reactions',
-    });
-    models.Thread.hasMany(models.Collaboration, {
-      foreignKey: 'thread_id',
-    });
-    models.Thread.hasMany(models.Poll, {
-      foreignKey: 'thread_id',
-    });
-    models.Thread.hasMany(models.Notification, {
-      foreignKey: 'thread_id',
-    });
-  };
-
-  return Thread;
-};

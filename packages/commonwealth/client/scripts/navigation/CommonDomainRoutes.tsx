@@ -78,9 +78,19 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+const CommunityStakeIntegration = lazy(
+  () => import('views/pages/CommunityManagement/StakeIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
+const AdminContestsPage = lazy(
+  () => import('views/pages/CommunityManagement/Contests/AdminContestsPage'),
+);
+const ManageContest = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ManageContest'),
+);
+const Contests = lazy(() => import('views/pages/Contests'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -105,7 +115,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
-  myCommunityStakePageEnabled,
+  contestEnabled,
+  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -146,17 +157,11 @@ const CommonDomainRoutes = ({
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
-  ...[
-    myCommunityStakePageEnabled ? (
-      <Route
-        key="/myCommunityStake"
-        path="/myCommunityStake"
-        element={withLayout(MyCommunityStake, { type: 'common' })}
-      />
-    ) : (
-      []
-    ),
-  ],
+  <Route
+    key="/myCommunityStake"
+    path="/myCommunityStake"
+    element={withLayout(MyCommunityStake, { type: 'common' })}
+  />,
   // scoped
   <Route
     key="/:scope/overview"
@@ -310,13 +315,14 @@ const CommonDomainRoutes = ({
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
+      renderDefaultMetatags: false,
     })}
   />,
   <Route
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
-      scope: false,
+      scoped: false,
     })}
   />,
   <Route
@@ -428,6 +434,17 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+  ...(existingCommunityStakeIntegrationEnabled
+    ? [
+        <Route
+          key="/:scope/manage/integrations/stake"
+          path="/:scope/manage/integrations/stake"
+          element={withLayout(CommunityStakeIntegration, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
@@ -442,6 +459,38 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+  ...(contestEnabled
+    ? [
+        <Route
+          key="/:scope/manage/contests"
+          path="/:scope/manage/contests"
+          element={withLayout(AdminContestsPage, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/contests/launch"
+          path="/:scope/manage/contests/launch"
+          element={withLayout(ManageContest, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/manage/contests/:contestAddress"
+          path="/:scope/manage/contests/:contestAddress"
+          element={withLayout(ManageContest, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          key="/:scope/contests"
+          path="/:scope/contests"
+          element={withLayout(Contests, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"

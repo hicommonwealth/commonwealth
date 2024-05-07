@@ -1,11 +1,8 @@
-import {
-  AppError,
-  BalanceSourceType,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { Balances, getBalances } from '../tokenBalanceCache';
+import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
 
 export const getNamespace = async (
   web3: Web3,
@@ -38,7 +35,9 @@ export const getNamespace = async (
   );
 
   const hexString = web3.utils.utf8ToHex(namespace);
-  const activeNamespace = await factory.methods.getNamespace(hexString).call();
+  const activeNamespace = await factory.methods
+    .getNamespace(hexString.padEnd(66, '0'))
+    .call();
   return activeNamespace;
 };
 
@@ -76,4 +75,18 @@ export const getNamespaceBalance = async (
   } else {
     throw new AppError('ChainNode not found');
   }
+};
+
+/**
+ * @ianrowan TODO: finish and test
+ * Gets token ticker and decimal places to wei
+ */
+export const getTokenAttributes = (
+  contestAddress: string,
+): Promise<TokenAttributes> => {
+  console.log('TODO:', contestAddress);
+  return Promise.resolve({
+    ticker: commonProtocol.Denominations.ETH,
+    decimals: commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
+  });
 };

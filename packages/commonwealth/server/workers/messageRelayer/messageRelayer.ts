@@ -1,23 +1,24 @@
 import {
   getRabbitMQConfig,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { broker, logger } from '@hicommonwealth/core';
-import { QueryTypes } from 'sequelize';
+import { broker } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
+import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: import.meta.url.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
@@ -43,16 +44,11 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  const count = parseInt(
-    (
-      await models.sequelize.query<{ count: string }>(
-        `
-        SELECT COUNT(*) FROM "Outbox";
-      `,
-        { type: QueryTypes.SELECT, raw: true },
-      )
-    )[0].count,
-  );
+  const count = await models.Outbox.count({
+    where: {
+      relayed: false,
+    },
+  });
   incrementNumUnrelayedEvents(count);
 
   await setupListener();
@@ -61,7 +57,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   return relayForever(maxRelayIterations);
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   startMessageRelayer().catch((err) => {
     log.fatal(
       'Unknown error fatal requires immediate attention. Restart REQUIRED!',

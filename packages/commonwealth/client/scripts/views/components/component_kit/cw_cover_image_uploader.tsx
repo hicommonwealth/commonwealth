@@ -3,9 +3,8 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
-import { CWButton as OldCWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
-import { CWButton } from './new_designs/cw_button';
+import { CWButton } from './new_designs/CWButton';
 
 import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
@@ -102,7 +101,7 @@ export const CWCoverImageUploader = ({
       attachButton.current.style.display = 'flex';
 
       setImageURL(defaultFormContext.value);
-      setImageBehavior(ImageBehavior.Circle);
+      setImageBehavior(defaultImageBehaviour || ImageBehavior.Circle);
       setDefaultFormContext({
         isSet: true,
         value: defaultFormContext.value,
@@ -353,9 +352,9 @@ export const CWCoverImageUploader = ({
         {uploadStatus === 'success' &&
           enableGenerativeAI &&
           !showUploadAndGenerateText && (
-            <OldCWButton
+            <CWButton
               label="retry"
-              buttonType="mini-black"
+              buttonHeight="sm"
               className="retry-button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -399,9 +398,9 @@ export const CWCoverImageUploader = ({
                   }}
                   containerClassName="prompt-input"
                 />
-                <OldCWButton
+                <CWButton
                   label="Generate"
-                  buttonType="mini-black"
+                  buttonHeight="sm"
                   className="generate-btn"
                   onClick={async () => {
                     if (prompt.length < 1) return;

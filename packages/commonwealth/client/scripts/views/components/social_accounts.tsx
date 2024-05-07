@@ -24,6 +24,8 @@ export const SocialAccounts = (props: SocialAccountsProps) => {
           return <SocialAccount link={social} iconName="discord" key={i} />;
         } else if (social.includes('telegram')) {
           return <SocialAccount link={social} iconName="telegram" key={i} />;
+        } else if (social.includes('t.me')) {
+          return <SocialAccount link={social} iconName="telegram" key={i} />;
         } else if (social.includes('github')) {
           return <SocialAccount link={social} iconName="github" key={i} />;
         } else {

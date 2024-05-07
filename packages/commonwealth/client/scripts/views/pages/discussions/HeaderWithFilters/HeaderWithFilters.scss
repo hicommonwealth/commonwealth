@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 16px;
 
   .header-row {
     display: flex;
@@ -64,6 +65,8 @@
   }
 
   @include extraSmall {
+    margin-top: 0;
+
     .filter-section-right {
       flex-direction: column;
       align-items: flex-start;

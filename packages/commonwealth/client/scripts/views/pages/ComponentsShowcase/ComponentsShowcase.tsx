@@ -1,9 +1,10 @@
 import clsx from 'clsx';
-import { groupBy } from 'lodash';
+import _ from 'lodash';
 import React from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 
 import { componentItems } from './componentsList';
 import { alphabetically, pascalCaseToNormalText } from './utils';
@@ -26,7 +27,7 @@ const ComponentsShowcase = () => {
   };
 
   const sortedComponentItems = componentItems.sort(alphabetically);
-  const groupedComponentItems = groupBy(
+  const groupedComponentItems = _.groupBy(
     sortedComponentItems,
     ({ type }) => type,
   );
@@ -34,61 +35,67 @@ const ComponentsShowcase = () => {
   const componentTypesKeys = Object.keys(groupedComponentItems).reverse();
 
   return (
-    <div className="ComponentsShowcase">
-      {/* Sidebar */}
-      <div className="page-sidebar">
-        {componentTypesKeys.map((key) => (
-          <React.Fragment key={key}>
-            {/* List Headers */}
-            <CWText type="caption" fontWeight="medium" className="list-header">
-              {key}
-            </CWText>
-
-            {/* List Items */}
-            {groupedComponentItems[key].map(({ displayName }) => (
+    <CWPageLayout>
+      <div className="ComponentsShowcase">
+        {/* Sidebar */}
+        <div className="page-sidebar">
+          {componentTypesKeys.map((key) => (
+            <React.Fragment key={key}>
+              {/* List Headers */}
               <CWText
-                key={displayName}
-                className="list-item"
-                onClick={() => handleClick(displayName)}
+                type="caption"
+                fontWeight="medium"
+                className="list-header"
               >
-                {pascalCaseToNormalText(displayName)}
+                {key}
               </CWText>
-            ))}
 
-            <CWDivider className="showcase-sidebar-divider" />
-          </React.Fragment>
-        ))}
-      </div>
+              {/* List Items */}
+              {groupedComponentItems[key].map(({ displayName }) => (
+                <CWText
+                  key={displayName}
+                  className="list-item"
+                  onClick={() => handleClick(displayName)}
+                >
+                  {pascalCaseToNormalText(displayName)}
+                </CWText>
+              ))}
 
-      {/* Body */}
-      <div className={BODY_CLASS_NAME}>
-        {componentTypesKeys.map((key) => (
-          <React.Fragment key={key}>
-            <div className="page-header">
-              <CWText type="h3">{key}</CWText>
-              <CWText>Our collection of reusable {key.toLowerCase()}</CWText>
-              <CWDivider className="showcase-body-divider" />
-            </div>
+              <CWDivider className="showcase-sidebar-divider" />
+            </React.Fragment>
+          ))}
+        </div>
 
-            {groupedComponentItems[key].map(
-              ({ displayName, ComponentPage }) => (
-                <div key={displayName} id={displayName}>
-                  <CWText className="component-header" type="h4">
-                    {pascalCaseToNormalText(displayName).toUpperCase()}
-                  </CWText>
+        {/* Body */}
+        <div className={BODY_CLASS_NAME}>
+          {componentTypesKeys.map((key) => (
+            <React.Fragment key={key}>
+              <div className="page-header">
+                <CWText type="h3">{key}</CWText>
+                <CWText>Our collection of reusable {key.toLowerCase()}</CWText>
+                <CWDivider className="showcase-body-divider" />
+              </div>
 
-                  <div className={clsx(displayName, 'component-content')}>
-                    <ComponentPage />
+              {groupedComponentItems[key].map(
+                ({ displayName, ComponentPage }) => (
+                  <div key={displayName} id={displayName}>
+                    <CWText className="component-header" type="h4">
+                      {pascalCaseToNormalText(displayName).toUpperCase()}
+                    </CWText>
+
+                    <div className={clsx(displayName, 'component-content')}>
+                      <ComponentPage />
+                    </div>
+
+                    <CWDivider className="showcase-body-divider" />
                   </div>
-
-                  <CWDivider className="showcase-body-divider" />
-                </div>
-              ),
-            )}
-          </React.Fragment>
-        ))}
+                ),
+              )}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
-    </div>
+    </CWPageLayout>
   );
 };
 

@@ -7,15 +7,18 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import type {
   CommunityAttributes,
   DB,
-  Link,
-  LinkSource,
-  Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import {
+  ChainBase,
+  ChainNetwork,
+  type Link,
+  type LinkSource,
+  type Role,
+} from '@hicommonwealth/shared';
 import {
   SignTypedDataVersion,
   personalSign,
@@ -26,12 +29,11 @@ import { stringToU8a } from '@polkadot/util';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
-import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import type { Application } from 'express';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import * as siwe from 'siwe';
-import Web3 from 'web3-utils';
+import Web3 from 'web3';
 import { createRole, findOneRole } from '../../server/util/roles';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
@@ -158,6 +160,10 @@ export interface JoinCommunityArgs {
   originChain: string;
 }
 
+export interface SetSiteAdminArgs {
+  user_id: number;
+}
+
 const sortedStringify = configureStableStringify({
   bigint: false,
   circularValue: Error,
@@ -166,14 +172,15 @@ const sortedStringify = configureStableStringify({
 });
 
 const generateEthAddress = () => {
-  const keypair = wallet.generate();
-  const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
-  const address = Web3.toChecksumAddress(lowercaseAddress);
-  return { keypair, address };
+  const keypair = ethers.Wallet.createRandom();
+  const lowercaseAddress = keypair.address.toString();
+  const address = Web3.utils.toChecksumAddress(lowercaseAddress);
+  const privateKey = Buffer.from(keypair.privateKey.slice(2), 'hex');
+  return { privateKey, address };
 };
 
 export type ModelSeeder = {
-  generateEthAddress: () => { keypair: wallet; address: string };
+  generateEthAddress: () => { privateKey: Buffer; address: string };
   getTopicId: (args: { chain: string }) => Promise<string>;
   createAndVerifyAddress: (
     args: { chain: string },
@@ -216,6 +223,7 @@ export type ModelSeeder = {
   ) => Promise<NotificationSubscription>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
+  setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
 
 export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
@@ -236,7 +244,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createAndVerifyAddress: async ({ chain }, mnemonic = 'Alice') => {
     if (chain === 'ethereum' || chain === 'alex') {
       const wallet_id = 'metamask';
-      const { keypair, address } = generateEthAddress();
+      const { privateKey, address } = generateEthAddress();
       let res = await chai.request
         .agent(app)
         .post('/api/createAddress')
@@ -263,7 +271,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       const domain = 'https://commonwealth.test';
       const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
       const signatureData = personalSign({
-        privateKey: keypair.getPrivateKey(),
+        privateKey,
         data: siweMessage,
       });
       const signature = `${domain}/${nonce}/${signatureData}`;
@@ -788,6 +796,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       return false;
     }
 
+    return true;
+  },
+
+  setSiteAdmin: async (args: SetSiteAdminArgs) => {
+    const { user_id } = args;
+    const user = await models.User.findOne({ where: { id: user_id } });
+    if (!user) {
+      console.error('User not found');
+      return false;
+    }
+    user.isAdmin = true;
+    try {
+      await user.save();
+    } catch (e) {
+      console.error('Failed to set user as site admin');
+      console.error(e);
+      return false;
+    }
     return true;
   },
 });

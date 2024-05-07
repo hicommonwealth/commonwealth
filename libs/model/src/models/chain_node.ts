@@ -1,42 +1,39 @@
-import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
+import { ChainNode } from '@hicommonwealth/schemas';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type ChainNodeAttributes = z.infer<typeof schemas.entities.ChainNode>;
+export type ChainNodeAttributes = z.infer<typeof ChainNode>;
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ChainNodeModelStatic => {
-  const ChainNode = <ChainNodeModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize): ChainNodeModelStatic =>
+  <ChainNodeModelStatic>sequelize.define<ChainNodeInstance>(
     'ChainNode',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      url: { type: dataTypes.STRING, allowNull: false, unique: true },
-      eth_chain_id: { type: dataTypes.INTEGER, allowNull: true, unique: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      url: { type: Sequelize.STRING, allowNull: false, unique: true },
+      eth_chain_id: { type: Sequelize.INTEGER, allowNull: true, unique: true },
       cosmos_chain_id: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true,
         unique: true,
       },
-      alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
-      private_url: { type: dataTypes.STRING, allowNull: true },
-      balance_type: { type: dataTypes.STRING, allowNull: false },
-      name: { type: dataTypes.STRING, allowNull: false },
-      description: { type: dataTypes.STRING, allowNull: true },
-      health: { type: dataTypes.STRING, allowNull: true },
-      ss58: { type: dataTypes.INTEGER, allowNull: true },
-      bech32: { type: dataTypes.STRING, allowNull: true },
-      cosmos_gov_version: { type: dataTypes.STRING(64), allowNull: true },
-      block_explorer: { type: dataTypes.STRING, allowNull: true },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      alt_wallet_url: { type: Sequelize.STRING, allowNull: true },
+      private_url: { type: Sequelize.STRING, allowNull: true },
+      balance_type: { type: Sequelize.STRING, allowNull: false },
+      name: { type: Sequelize.STRING, allowNull: false },
+      description: { type: Sequelize.STRING, allowNull: true },
+      health: { type: Sequelize.STRING, allowNull: true },
+      ss58: { type: Sequelize.INTEGER, allowNull: true },
+      bech32: { type: Sequelize.STRING, allowNull: true },
+      cosmos_gov_version: { type: Sequelize.STRING(64), allowNull: true },
+      block_explorer: { type: Sequelize.STRING, allowNull: true },
+      slip44: { type: Sequelize.INTEGER, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'ChainNodes',
@@ -54,14 +51,3 @@ export default (
       },
     },
   );
-
-  ChainNode.associate = (models) => {
-    models.ChainNode.hasMany(models.Community, { foreignKey: 'chain_node_id' });
-    models.ChainNode.hasMany(models.Contract, {
-      foreignKey: 'chain_node_id',
-      as: 'contracts',
-    });
-  };
-
-  return ChainNode;
-};
