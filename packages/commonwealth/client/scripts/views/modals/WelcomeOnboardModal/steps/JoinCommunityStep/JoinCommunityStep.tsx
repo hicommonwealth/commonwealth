@@ -66,7 +66,9 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
             key={index + community.id + isJoined}
             community={community}
             onJoinClick={() =>
-              handleCommunityJoin(community).catch(console.error)
+              handleCommunityJoin(community)
+                .then(() => null)
+                .catch(console.error)
             }
             isJoined={isJoined}
           />
