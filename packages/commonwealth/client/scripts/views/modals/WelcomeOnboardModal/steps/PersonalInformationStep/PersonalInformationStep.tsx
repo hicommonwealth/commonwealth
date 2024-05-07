@@ -99,7 +99,7 @@ const PersonalInformationStep = ({
       onSubmit={handleSubmit}
       onWatch={handleWatch}
     >
-      {({ formState, watch, setValue }) => (
+      {({ formState, watch, setValue, trigger }) => (
         <>
           <div className="username-section">
             <CWTextInput
@@ -129,7 +129,8 @@ const PersonalInformationStep = ({
               containerClassName="random-generate-btn"
               onClick={() => {
                 const randomUsername = generateUsername('', 2);
-                setValue('username', randomUsername);
+                setValue('username', randomUsername, { shouldDirty: true });
+                trigger('username');
                 setCurrentUsername(randomUsername);
               }}
             />
