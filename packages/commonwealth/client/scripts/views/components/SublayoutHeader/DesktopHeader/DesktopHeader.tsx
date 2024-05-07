@@ -18,11 +18,13 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
   onMobile: boolean;
-  onAuthModalOpen: () => void;
+  onAuthModalOpen: (modalType?: AuthModalType) => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -39,6 +41,7 @@ const DesktopHeader = ({
   onRevalidationModalData,
   onFeedbackModalOpen,
 }: DesktopHeaderProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
@@ -111,20 +114,43 @@ const DesktopHeader = ({
 
         {isLoggedIn && (
           <UserDropdown
-            onAuthModalOpen={onAuthModalOpen}
+            onAuthModalOpen={() => onAuthModalOpen}
             onRevalidationModalData={onRevalidationModalData}
           />
         )}
 
         {!isLoggedIn && (
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Sign in"
-            buttonWidth="wide"
-            disabled={location.pathname.includes('/finishsociallogin')}
-            onClick={onAuthModalOpen}
-          />
+          <>
+            {userOnboardingEnabled ? (
+              <>
+                <CWButton
+                  buttonType="secondary"
+                  buttonHeight="sm"
+                  label="Create account"
+                  buttonWidth="narrow"
+                  disabled={location.pathname.includes('/finishsociallogin')}
+                  onClick={() => onAuthModalOpen('create-account')}
+                />
+                <CWButton
+                  buttonType="primary"
+                  buttonHeight="sm"
+                  label="Sign in"
+                  buttonWidth="narrow"
+                  disabled={location.pathname.includes('/finishsociallogin')}
+                  onClick={() => onAuthModalOpen()}
+                />
+              </>
+            ) : (
+              <CWButton
+                buttonType="primary"
+                buttonHeight="sm"
+                label="Sign in"
+                buttonWidth="wide"
+                disabled={location.pathname.includes('/finishsociallogin')}
+                onClick={() => onAuthModalOpen()}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

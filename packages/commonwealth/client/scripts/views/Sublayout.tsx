@@ -18,7 +18,9 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
+import { CWButton } from './components/component_kit/new_designs/CWButton';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import { AuthModal, AuthModalType } from './modals/AuthModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
@@ -35,6 +37,7 @@ const Sublayout = ({
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const [authModalType, setAuthModalType] = useState<AuthModalType>();
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
@@ -120,6 +123,14 @@ const Sublayout = ({
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
         isInsideCommunity={isInsideCommunity}
+        onAuthModalOpen={(modalType) =>
+          setAuthModalType(modalType || 'sign-in')
+        }
+      />
+      <AuthModal
+        type={authModalType}
+        onClose={() => setAuthModalType(undefined)}
+        isOpen={!!authModalType}
       />
       <div className="sidebar-and-body-container">
         <Sidebar
@@ -143,6 +154,27 @@ const Sublayout = ({
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
+            <div
+              className={clsx('mobile-auth-buttons', {
+                isVisible:
+                  !isLoggedIn && userOnboardingEnabled && isWindowExtraSmall,
+              })}
+            >
+              <CWButton
+                buttonType="secondary"
+                label="Create account"
+                buttonWidth="full"
+                disabled={location.pathname.includes('/finishsociallogin')}
+                onClick={() => setAuthModalType('create-account')}
+              />
+              <CWButton
+                buttonType="primary"
+                label="Sign in"
+                buttonWidth="full"
+                disabled={location.pathname.includes('/finishsociallogin')}
+                onClick={() => setAuthModalType('sign-in')}
+              />
+            </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
             {isInsideCommunity && <AdminOnboardingSlider />}
             {children}
