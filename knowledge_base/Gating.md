@@ -7,7 +7,7 @@
 
 – Run latest migrations, it will generate groups from existing topic thresholds
 
-– Run `yarn refresh-all-memberships` to create membership records across all communities; may take a few minutes
+– Run `pnpm refresh-all-memberships` to create membership records across all communities; may take a few minutes
 
 – In the app, navigate to a community, on the sidebar go to `Governance -> Members`
 

@@ -22,7 +22,7 @@
 - **Environment**: All app environment variables, including DATABASE_URL, are readily available.
 - **Entry Point**: Post-installation, the user's script serves as the dyno's entry point.
 - **Integration with Datadog**: There's a possibility that one-off dynos may not integrate seamlessly with Datadog. However, this can be confirmed upon testing.
-- **Commandline**: Tools like psql, yarn, and others are accessible via the command line. This flexibility allows for the scheduling of raw commands. For instance:
+- **Commandline**: Tools like psql, pnpm, and others are accessible via the command line. This flexibility allows for the scheduling of raw commands. For instance:
 
 ```bash
 psql $DATABASE_URL -c "SELECT * FROM \"Threads\" LIMIT 1"
@@ -89,7 +89,7 @@ heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
 - **Package Installation**: All required packages are installed automatically similarly to the main app dyno. Tasks can be executed using npm scripts, for example:
 
 ```bash
-yarn --cwd packages/commonwealth recompute-counts
+pnpm --cwd packages/commonwealth recompute-counts
 ```
 
 ## Scheduling externally vs in-memory

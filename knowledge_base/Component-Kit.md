@@ -13,7 +13,7 @@ As of 240109, components page has been revamped and this also means that we will
 
 ### How to add component to components showcase page?
 
-1. From within the `/commonwealth` package, run the `yarn add-component-showcase` command
+1. From within the `/commonwealth` package, run the `pnpm add-component-showcase` command
 2. Type a name for the new component. Make sure it is aligned with the design team. This name will be used as a file name in the codebase and a display name in component showcase page.
 3. Pick if new component should be of type "Foundations" or "Components". This should be aligned with the design team.
 4. New file is created in `/ComponentsShowcase/components` directory and `/ComponentsShowcase/componentsList.ts` file is updated.

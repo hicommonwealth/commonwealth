@@ -62,9 +62,9 @@ For a practical example, see [this pull request](https://github.com/hicommonweal
 
 ```bash
 git checkout load-testing
-yarn --cwd load-testing install
+pnpm --cwd load-testing install
 #set up env.sh by copying env.local.sh
-yarn test-load
+pnpm test-load
 ```
 
 #### Geographic Performance Assessment - Upcoming

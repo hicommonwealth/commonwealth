@@ -57,7 +57,7 @@ To set up Datadog monitoring for Heroku Postgres, follow the [Heroku Postgres Da
 A helper script is available to complete the setup from a local machine logged into Heroku via CLI. It creates new Datadog user credentials for the DATABASE_URL and creates a new DATADOG schema in Postgres to collect metrics. Use the following command to run the script:
 
 ```bash
-yarn --packages/commonwealth datadog-db-setup commonwealth-staging packages/commonwealth/datadog
+pnpm --packages/commonwealth datadog-db-setup commonwealth-staging packages/commonwealth/datadog
 ```
 
 ## Datadog Postgres Dashboards

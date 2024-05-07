@@ -12,8 +12,8 @@ and executes them, inserting them into the CRDT database.
 
 ### Testing
 
-- Start Commonwealth in packages/commonwealth: `yarn run start`
-- Start Canvas node here in packages/canvas-node: `yarn run dev`
+- Start Commonwealth in packages/commonwealth: `pnpm run start`
+- Start Canvas node here in packages/canvas-node: `pnpm run dev`
 - As you make actions on different chains and communities,
   they should sync to the Canvas node.
 

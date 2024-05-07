@@ -25,7 +25,7 @@ Within the local database instance, run:
 INSERT INTO public."ChainNodes" (url, eth_chain_id, alt_wallet_url, balance_type, name) VALUES ('https://eth-sepolia.g.alchemy.com/v2/G-9qTX3nSlAcihqA056hwGHiiolrUQj2', 11155111, 'https://eth-sepolia.g.alchemy.com/v2/G-9qTX3nSlAcihqA056hwGHiiolrUQj2', 'ethereum', 'Sepolia');
 ```
 
-Then migrate the database (`yarn migrate-db`) and create a new community within the Common app. From the `Select chain` dropdown in the Create Community Form, select `Sepolia`.
+Then migrate the database (`pnpm migrate-db`) and create a new community within the Common app. From the `Select chain` dropdown in the Create Community Form, select `Sepolia`.
 
 Sepolia testnet must be enabled in your web wallet, with some Sepolia to pay for gas fees. This can be obtained from a [Sepolia faucet](https://sepoliafaucet.com/).
 

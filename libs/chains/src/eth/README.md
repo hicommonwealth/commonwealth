@@ -35,6 +35,6 @@ Mining occurs in a loop, so be careful of the argument size as it could take a l
 Reset your server and load the app:
 
 ```bash
-commonwealth$ yarn reset-server
-yarn start
+commonwealth$ pnpm reset-server
+pnpm start
 ```

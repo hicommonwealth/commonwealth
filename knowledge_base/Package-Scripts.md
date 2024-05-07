@@ -82,7 +82,7 @@ Description:
 
 ### build-ci
 
-Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db`
+Definition: `pnpm global add node-gyp && pnpm --ignore-engines && pnpm build && pnpm workspace commonwealth migrate-db`
 
 Description:
 
@@ -93,7 +93,7 @@ Description:
 
 ### heroku-prebuild
 
-Definition: `yarn global add node-gyp`
+Definition: `pnpm global add node-gyp`
 
 Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
@@ -132,11 +132,11 @@ Contributor: Timothee Legros
 
 Definition: `npx sequelize migration:generate --name`
 
-Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `yarn create-migration remove-user-last-visited-col`).
+Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `pnpm create-migration remove-user-last-visited-col`).
 
 ### db-all
 
-Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
+Definition: `pnpm reset-db && pnpm load-db && pnpm migrate-db`
 
 Description: Resets, loads, and migrates db (composite script).
 
@@ -208,13 +208,13 @@ Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WAL
 
 Examples:
 
-- `yarn set-super-admin`
+- `pnpm set-super-admin`
   - This sets the local user specified by the environment variables to a super admin.
-- `yarn set-super-admin false`
+- `pnpm set-super-admin false`
   - This disables super admin for the local user.
-- `yarn set-super-admin [frick | frack | beta | demo]`
+- `pnpm set-super-admin [frick | frack | beta | demo]`
   - This enables super admin for the specified user on the specified app.
-- `yarn set-super-admin [frick | frack | beta | demo] false`
+- `pnpm set-super-admin [frick | frack | beta | demo] false`
   - This disables super admin for the specified user on the specified app.
 
 ## Docker
@@ -271,7 +271,7 @@ Considerations: Why lint styles separately? Why not just include `.scss` file ex
 
 ### e2e-start-server
 
-Definition: `ETH_RPC=e2e-test yarn start`
+Definition: `ETH_RPC=e2e-test pnpm start`
 
 Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
 
@@ -281,7 +281,7 @@ Contributor: Kurtis Assad
 
 Definition: `tsx  server/scripts/emitTestNotification.ts`
 
-Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
+Description: Emits a chain-event or snapshot notification. Run `pnpm emit-notification --help` to see options.
 
 Contributor: Timothee Legros
 
@@ -399,7 +399,7 @@ Description: Sanity scripts developers should run locally before pushing code, c
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 
-Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
+Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `pnpm build` , and finally `pnpm bundle-report`.
 ### start
 
 Definition: `tsx watch  --max-old-space-size=4096 server.ts`
@@ -408,9 +408,9 @@ Description: Windows-compatible start script. Used to start the Commonwealth app
 
 ### start-all
 
-Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'`
+Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'pnpm start' 'pnpm start-consumer'`
 
-Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
+Description: Runs `pnpm start` and `pnpm start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
 
 ### start-consumer
 
