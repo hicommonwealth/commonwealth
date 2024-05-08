@@ -3,15 +3,15 @@
 ## Contents
 
 - [Heroku Scheduler](#heroku-scheduler)
-  + [Overview](#overview)
-  + [Best Practice](#best-practice)
-  + [Sample Code](#sample-code)
-  + [Debugging](#debugging)
-  + [Scheduling Options](#scheduling-options)
-  + [Deployment](#deployment)
+  - [Overview](#overview)
+  - [Best Practice](#best-practice)
+  - [Sample Code](#sample-code)
+  - [Debugging](#debugging)
+  - [Scheduling Options](#scheduling-options)
+  - [Deployment](#deployment)
 - [Scheduling externally vs in-memory](#scheduling-externally-vs-in-memory)
 - [Cron To Go: An Alternative](#cron-to-go-an-alternative)
-  + [Features](#features)
+  - [Features](#features)
 
 ## Heroku Scheduler
 
@@ -42,7 +42,7 @@ psql $DATABASE_URL -c "SELECT * FROM \"Threads\" LIMIT 1"
 
 - **Purpose**: The sample code demonstrates how to structure a script to ensure it runs correctly when executed directly or imported. This structure aids in integrating scripts with unit tests and ensures proper exit when running on the scheduler.
 - **Error Handling**: The code includes a try-catch block to handle any potential errors during execution.
-  
+
 ```javascript
 export async function recomputeCounts() {
   // Your code here
@@ -89,14 +89,14 @@ heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
 - **Package Installation**: All required packages are installed automatically similarly to the main app dyno. Tasks can be executed using npm scripts, for example:
 
 ```bash
-pnpm --cwd packages/commonwealth recompute-counts
+pnpm -F commonwealth recompute-counts
 ```
 
 ## Scheduling externally vs in-memory
 
 In general, scheduling externally is better than using javascript `settimeout`
 
- `settimeout`
+`settimeout`
 
 - it can be unreliable, especially during server restarts.
 - Coordinating tasks across multiple servers using locks in Redis can be complex.
