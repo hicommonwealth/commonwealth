@@ -9,5 +9,4 @@ export const DATABASE_URI =
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
 
-console.log('\n\n', TEST_DB_NAME, DATABASE_URI, '\n\n');
 export const TESTING = DATABASE_URI.endsWith(TEST_DB_NAME);
