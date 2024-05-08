@@ -10,12 +10,15 @@ import type {
 import type {
   CommunityAttributes,
   DB,
-  Link,
-  LinkSource,
-  Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  type Link,
+  type LinkSource,
+  type Role,
+} from '@hicommonwealth/shared';
 import {
   SignTypedDataVersion,
   personalSign,
