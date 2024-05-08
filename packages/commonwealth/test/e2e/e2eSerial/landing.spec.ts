@@ -10,6 +10,12 @@ test.beforeAll(async () => {
 
 test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
+    page.on('request', (request) =>
+      console.log('>>', request.method(), request.url()),
+    );
+    page.on('response', (response) =>
+      console.log('<<', response.status(), response.url()),
+    );
     await page.goto(`http://localhost:${PORT}/`);
 
     // await login(page);
