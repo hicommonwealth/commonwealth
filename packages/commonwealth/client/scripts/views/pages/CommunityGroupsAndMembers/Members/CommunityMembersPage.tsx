@@ -3,6 +3,7 @@ import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
@@ -33,6 +34,7 @@ import { useMemberData } from '../common/memberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
+import { Member } from './MembersSection/MembersSection';
 import { BaseGroupFilter, SearchFilters } from './index.types';
 
 const TABS = [
@@ -256,6 +258,19 @@ const CommunityMembersPage = () => {
 
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
+  const extraRows = (member: Member) => {
+    return {
+      lastActive: {
+        sortValue: moment(member.lastActive).unix(),
+        customElement: (
+          <div className="table-cell">
+            {moment(member.lastActive).fromNow()}
+          </div>
+        ),
+      },
+    };
+  };
+
   return (
     <CWPageLayout>
       <section className="CommunityMembersPage">
@@ -381,6 +396,7 @@ const CommunityMembersPage = () => {
             }}
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
+            extraRows={extraRows}
           />
         )}
       </section>

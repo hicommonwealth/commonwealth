@@ -1,14 +1,15 @@
+import { RowData } from '@tanstack/table-core/src/types';
 import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
-import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWCheckbox } from '../../../../components/component_kit/cw_checkbox';
 import './MembersSection.scss';
 
-type Member = {
+export type Member = {
   id: number;
   avatarUrl: string;
   name: string;
@@ -16,6 +17,7 @@ type Member = {
   groups: string[];
   stakeBalance?: string;
   lastActive?: string;
+  address?: string;
 };
 
 type MembersSectionProps = {
@@ -23,6 +25,9 @@ type MembersSectionProps = {
   onLoadMoreMembers: () => any;
   isLoadingMoreMembers?: boolean;
   tableState: CWTableState;
+  selectedAccounts?: number[];
+  handleCheckboxChange?: (id: number) => void;
+  extraRows?: (member: Member) => RowData;
 };
 
 const MembersSection = ({
@@ -30,6 +35,9 @@ const MembersSection = ({
   onLoadMoreMembers,
   isLoadingMoreMembers,
   tableState,
+  selectedAccounts,
+  handleCheckboxChange,
+  extraRows,
 }: MembersSectionProps) => {
   return (
     <div className="MembersSection">
@@ -42,6 +50,12 @@ const MembersSection = ({
             sortValue: member.name + (member.role || ''),
             customElement: (
               <div className="table-cell">
+                {handleCheckboxChange && (
+                  <CWCheckbox
+                    checked={selectedAccounts.includes(member.id)}
+                    onChange={() => handleCheckboxChange(member.id)}
+                  />
+                )}
                 <Link to={`/profile/id/${member.id}`} className="user-info">
                   <Avatar
                     url={member.avatarUrl}
@@ -78,14 +92,7 @@ const MembersSection = ({
               <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
-          lastActive: {
-            sortValue: moment(member.lastActive).unix(),
-            customElement: (
-              <div className="table-cell">
-                {moment(member.lastActive).fromNow()}
-              </div>
-            ),
-          },
+          ...extraRows(member),
         }))}
         onScrollEnd={onLoadMoreMembers}
         isLoadingMoreRows={isLoadingMoreMembers}
