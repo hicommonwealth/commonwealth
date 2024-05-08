@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { MAX_SCHEMA_INT, commonProtocol } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Contest } from '../projections';
 import { PG_INT } from '../utils';
@@ -28,7 +28,7 @@ export const ContestManager = z
       .number()
       .int()
       .min(0)
-      .max(100)
+      .max(MAX_SCHEMA_INT)
       .describe('Recurring contest interval, 0 when one-off'),
     ticker: z.string().optional().default(commonProtocol.Denominations.ETH),
     decimals: PG_INT.optional().default(

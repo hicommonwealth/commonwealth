@@ -26,7 +26,7 @@ export function UpdateContestManagerMetadata(): Command<
         },
       });
 
-      if (mustExist('ContestManager', contestManager)) {
+      if (mustExist('Contest Manager', contestManager)) {
         let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
 
         if (Array.isArray(topic_ids) && topic_ids.length > 0) {
