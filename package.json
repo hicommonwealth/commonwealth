@@ -17,7 +17,7 @@
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "build-ci": "pnpm global add node-gyp && pnpm --ignore-engines && pnpm build",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "clean": "find . -name node_modules -exec rm -rf {} \\;; pnpm --ignore-engines",
+    "clean": "find . -type d -name node_modules -maxdepth 3 | grep -v \"\\.pnpm\" | awk '{ print length($0) \" \" $0; }' | sort -nr | cut -d' ' -f2- | xargs -I {} rm -rf {}",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
     "db-all": "pnpm --cwd packages/commonwealth db-all",
     "dump-db": "pnpm --cwd packages/commonwealth dump-db",

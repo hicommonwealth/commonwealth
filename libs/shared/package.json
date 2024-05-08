@@ -18,5 +18,11 @@
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/shared"
+  },
+  "dependencies": {
+    "moment": "^2.23.0"
+  },
+  "devDependencies": {
+    "@types/moment": "^2.13.0"
   }
 }

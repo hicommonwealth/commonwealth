@@ -21,6 +21,10 @@
   },
   "dependencies": {
     "@hicommonwealth/shared": "workspace:*",
+    "moment": "^2.23.0",
     "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/moment": "^2.13.0"
   }
 }

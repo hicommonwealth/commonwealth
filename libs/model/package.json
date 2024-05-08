@@ -20,16 +20,19 @@
     "test": "NODE_ENV=test NODE_OPTIONS='--import tsx/esm --conditions=devmode' mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "@anatine/zod-mock": "^3.13.3",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/encoding": "0.32.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@faker-js/faker": "^8.4.1",
     "@hicommonwealth/chains": "workspace:*",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/logging": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "dotenv": "^16.0.3",
+    "ethers": "5.7.2",
     "moment": "^2.23.0",
     "node-object-hash": "^3.0.0",
     "pg": "^8.11.3",
@@ -38,13 +41,12 @@
     "web3-core": "1.8.2",
     "web3-eth-abi": "1.8.2",
     "web3-utils": "1.8.2",
+    "umzug": "^3.7.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@anatine/zod-mock": "^3.13.3",
-    "@faker-js/faker": "^8.4.1",
+    "@types/moment": "^2.13.0",
     "mocha-steps": "^1.3.0",
-    "tsx": "^4.7.2",
-    "umzug": "^3.7.0"
+    "tsx": "^4.7.2"
   }
 }
