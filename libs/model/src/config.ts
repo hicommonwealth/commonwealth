@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-export const TEST_DB_NAME = 'common_test';
+export const TEST_DB_NAME = process.env.TEST_DB_NAME || 'common_test';
 export const DATABASE_URI =
   process.env.NODE_ENV === 'test'
     ? `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`
