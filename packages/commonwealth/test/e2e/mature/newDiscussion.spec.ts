@@ -21,12 +21,12 @@ test.describe('New Discussion Page Tests', () => {
   });
 
   test('Check User can create a thread', async ({ page }) => {
-    await page.locator('#undefinedInput').fill('Test thread');
-    await page.locator('.ql-editor').fill('Test thread text');
-    await page.locator('.SelectList').click();
+    await page.locator('.TextInput').locator('input').fill('Test thread');
+    await page.locator('.CWSelectList').locator('.SelectList').click();
     await page.getByText('testTopic', { exact: true }).click();
+    await page.locator('.ql-editor').fill('Test thread text');
 
-    await page.getByRole('button', { name: 'Submit' }).click();
+    await page.getByRole('button', { name: 'Create thread' }).click();
 
     await page.waitForURL(/^.*-test-thread$/i);
 

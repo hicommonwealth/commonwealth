@@ -7,8 +7,12 @@
   "files": [
     "build"
   ],
-  "main": "build/index.js",
-  "types": "src/index",
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
@@ -16,6 +20,9 @@
     "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
+    "@hicommonwealth/core": "*",
+    "@hicommonwealth/logging": "*",
+    "@hicommonwealth/shared": "*",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
@@ -30,9 +37,10 @@
     "rollbar": "^2.6.1",
     "sequelize": "^6.32.1",
     "trpc-openapi": "1.1.2",
-    "tsx": "^4.7.2",
     "typescript-logging": "^0.6.4",
     "zod": "^3.22.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "tsx": "^4.7.2"
+  }
 }

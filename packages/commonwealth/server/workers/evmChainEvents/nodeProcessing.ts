@@ -1,4 +1,4 @@
-import { schemas, stats } from '@hicommonwealth/core';
+import { EventNames, events as coreEvents, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { fileURLToPath } from 'node:url';
@@ -77,12 +77,12 @@ export async function processChainNode(
           (
             event,
           ): {
-            event_name: schemas.EventNames.ChainEventCreated;
-            event_payload: z.infer<typeof schemas.events.ChainEventCreated>;
+            event_name: EventNames.ChainEventCreated;
+            event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
           } => ({
-            event_name: schemas.EventNames.ChainEventCreated,
+            event_name: EventNames.ChainEventCreated,
             event_payload: event as z.infer<
-              typeof schemas.events.ChainEventCreated
+              typeof coreEvents.ChainEventCreated
             >,
           }),
         );

@@ -1,0 +1,1 @@
+export { JoinCommunityStep } from './JoinCommunityStep';

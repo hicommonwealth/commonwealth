@@ -1,6 +1,8 @@
 import type { Command } from '@hicommonwealth/core';
-import { InvalidState, schemas } from '@hicommonwealth/core';
+import { InvalidState } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+import z from 'zod';
 import { models } from '../database';
 import { isCommunityAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
@@ -10,63 +12,68 @@ const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export const CreateContestManagerMetadata: Command<
-  typeof schemas.commands.CreateContestManagerMetadata
-> = () => ({
-  ...schemas.commands.CreateContestManagerMetadata,
-  auth: [isCommunityAdmin],
-  body: async ({ id, payload }) => {
-    const { topic_ids, ...rest } = payload;
+export function CreateContestManagerMetadata(): Command<
+  typeof schemas.CreateContestManagerMetadata
+> {
+  return {
+    ...schemas.CreateContestManagerMetadata,
+    auth: [isCommunityAdmin],
+    body: async ({ id, payload }) => {
+      const { topic_ids, ...rest } = payload;
 
-    // verify topics exist
-    const topics = await models.Topic.findAll({
-      where: {
-        id: {
-          [Op.in]: topic_ids,
-        },
-      },
-    });
-    if (topics.length !== topic_ids.length) {
-      throw new InvalidState(Errors.InvalidTopics);
-    }
+      let contestTopics: TopicAttributes[] = [];
+      let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
 
-    const contestTopicsToCreate = topics.map((t) => ({
-      contest_address: rest.contest_address,
-      topic_id: t.id!,
-      created_at: new Date(),
-    }));
-
-    const contestManager = await models.sequelize.transaction(
-      async (transaction) => {
-        const manager = await models.ContestManager.create(
-          {
-            ...rest,
-            community_id: id!,
-            created_at: new Date(),
-            cancelled: false,
+      if (topic_ids) {
+        // verify topics exist
+        const topics = await models.Topic.findAll({
+          where: {
+            id: {
+              [Op.in]: topic_ids,
+            },
           },
-          { transaction },
-        );
-
-        await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
-          transaction,
         });
+        if (topics.length !== topic_ids.length) {
+          throw new InvalidState(Errors.InvalidTopics);
+        }
+        contestTopics = topics.map((t) => t.get({ plain: true }));
+        contestTopicsToCreate = topics.map((t) => ({
+          contest_address: rest.contest_address,
+          topic_id: t.id!,
+          created_at: new Date(),
+        }));
+      }
 
-        return manager;
-      },
-    );
+      const contestManager = await models.sequelize.transaction(
+        async (transaction) => {
+          const manager = await models.ContestManager.create(
+            {
+              ...rest,
+              community_id: id!,
+              created_at: new Date(),
+              cancelled: false,
+            },
+            { transaction },
+          );
 
-    if (mustExist('ContestManager', contestManager)) {
-      return {
-        contest_managers: [
-          {
-            ...contestManager.get({ plain: true }),
-            topics: topics.map((t) =>
-              t.get({ plain: true }),
-            ) as Required<TopicAttributes>[],
-          },
-        ],
-      };
-    }
-  },
-});
+          await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
+            transaction,
+          });
+
+          return manager;
+        },
+      );
+
+      if (mustExist('ContestManager', contestManager)) {
+        return {
+          contest_managers: [
+            {
+              ...contestManager.get({ plain: true }),
+              topics: contestTopics as Required<TopicAttributes>[],
+            },
+          ],
+        };
+      }
+    },
+  };
+}

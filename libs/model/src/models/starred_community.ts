@@ -5,7 +5,6 @@ import type { UserAttributes } from './user';
 
 export type StarredCommunityAttributes = {
   user_id: number;
-  id?: number;
   community_id: string;
   created_at?: Date;
   updated_at?: Date;
@@ -31,8 +30,7 @@ export default (sequelize: Sequelize.Sequelize) =>
     },
     {
       tableName: 'StarredCommunities',
+      timestamps: true,
       underscored: true,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
     },
   );
