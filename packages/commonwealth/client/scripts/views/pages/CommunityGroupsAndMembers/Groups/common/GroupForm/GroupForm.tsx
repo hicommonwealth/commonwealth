@@ -22,6 +22,7 @@ import {
   conditionTypes,
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
+import AllowList from './AllowList';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
@@ -162,24 +163,7 @@ const GroupForm = ({
     useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
-  >([
-    {
-      defaultValues: {
-        requirementCondition: conditionTypes.find(
-          (x) => x.value === AMOUNT_CONDITIONS.MORE,
-        ),
-      },
-      values: {
-        requirementAmount: '',
-        requirementChain: '',
-        requirementCondition: AMOUNT_CONDITIONS.MORE,
-        requirementContractAddress: '',
-        requirementType: '',
-        requirementTokenId: '',
-      },
-      errors: {},
-    },
-  ]);
+  >([]);
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -464,7 +448,6 @@ const GroupForm = ({
                   defaultValues={subForm.defaultValues}
                   errors={subForm.errors}
                   onChange={(val) => validateChangedValue(val, index)}
-                  isRemoveable={index > 0}
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
@@ -562,6 +545,7 @@ const GroupForm = ({
             </section>
           </section>
 
+          <AllowList />
           {(formType === 'create' || formType === 'edit') && (
             <TopicGatingHelpMessage />
           )}
