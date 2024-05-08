@@ -10,12 +10,12 @@ test.beforeAll(async () => {
 
 test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
-    page.on('request', (request) =>
-      console.log('>>', request.method(), request.url()),
-    );
-    page.on('response', (response) =>
-      console.log('<<', response.status(), response.url()),
-    );
+    page.on('response', (response) => {
+      if (response.url().startsWith('http://localhost:8080/api/')) {
+        expect(response.status()).toBeGreaterThanOrEqual(400);
+      }
+    });
+
     await page.goto(`http://localhost:${PORT}/`);
 
     // await login(page);
