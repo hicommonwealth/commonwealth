@@ -15,6 +15,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
+import { useFlag } from '../../../../../../hooks/useFlag';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
@@ -137,6 +138,8 @@ const GroupForm = ({
   initialValues = {},
   onDelete = () => {},
 }: GroupFormProps) => {
+  const allowlistEnabled = useFlag('allowlist');
+
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -545,7 +548,7 @@ const GroupForm = ({
             </section>
           </section>
 
-          <AllowList />
+          {allowlistEnabled && <AllowList />}
           {(formType === 'create' || formType === 'edit') && (
             <TopicGatingHelpMessage />
           )}

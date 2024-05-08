@@ -7,9 +7,8 @@ import { ApiEndpoints, queryClient } from '../../../../../../state/api/config';
 import { useRefreshMembershipQuery } from '../../../../../../state/api/groups/index';
 import { SearchProfilesResponse } from '../../../../../../state/api/profiles/searchProfiles';
 import app from '../../../../../../state/index';
-import Permissions from '../../../../../../utils/Permissions';
-import { Select } from '../../../../../components/Select';
 import { CWText } from '../../../../../components/component_kit/cw_text';
+import { CWSelectList } from '../../../../../components/component_kit/new_designs/CWSelectList/index';
 import { CWTableColumnInfo } from '../../../../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../../../../components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from '../../../../../components/component_kit/new_designs/CWTextInput/index';
@@ -19,17 +18,6 @@ import MembersSection, {
 import '../../../Members/MembersSection/MembersSection.scss';
 import { BaseGroupFilter, SearchFilters } from '../../../Members/index.types';
 import { useMemberData } from '../../../common/memberData';
-
-const filterOptions = [
-  { type: 'header', label: 'Filters' },
-  { label: 'All community', value: 'all' },
-  { label: 'Allowlisted', value: 'all' },
-  { label: 'Not allowlisted', value: 'all' },
-  { type: 'header-divider', label: 'Groups' },
-  { label: 'Admins', value: 'all' },
-  { label: 'Moderators', value: 'all' },
-  { label: 'Hedgies', value: 'all' },
-];
 
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
@@ -72,8 +60,6 @@ const AllowList = () => {
 
   const [selectedAccounts, setSelectedAccounts] = useState([]);
 
-  console.log(selectedAccounts);
-
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0],
@@ -106,29 +92,24 @@ const AllowList = () => {
       membersPerPage: 10,
     });
 
-  const filterOptions = useMemo(
-    () => [
-      {
-        // base filters
-        label: 'Filters',
-        options: GROUP_AND_MEMBER_FILTERS.map((x) => ({
-          id: x,
-          label: x,
-          value: x,
-        })),
-      },
-      {
-        // filters by group name
-        label: 'Groups',
-        options: (groups || []).map((group) => ({
-          id: group.id,
-          label: group.name,
-          value: group.id,
-        })),
-      },
-    ],
-    [groups],
-  );
+  // TODO: Hook this up to the pagination buttons
+  const totalPages = members?.pages?.[0].totalPages ?? 0;
+
+  const filterOptions = [
+    { type: 'header', label: 'Filters' },
+    { label: 'All community', value: 'All groups' },
+    { label: 'Allowlisted', value: 'allowlisted' },
+    { label: 'Not allowlisted', value: 'notAllowlisted' },
+    { type: 'header-divider', label: 'Groups' },
+    { label: 'All groups', value: 'All groups' },
+    { label: 'Ungrouped', value: 'Ungrouped' },
+    ...(groups || []).map((group) => {
+      return {
+        label: group.name,
+        value: group.id,
+      };
+    }),
+  ];
 
   const formattedMembers = useMemo(() => {
     if (!members?.pages?.length) {
@@ -200,8 +181,6 @@ const AllowList = () => {
     };
   };
 
-  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
-
   return (
     <section className="form-section">
       <div className="header-row">
@@ -219,9 +198,17 @@ const AllowList = () => {
           Filter & Search
         </CWText>
         <div className="filter-section-right">
-          <Select
+          <CWSelectList
+            isSearchable={false}
+            isClearable={false}
             options={filterOptions}
             placeholder={filterOptions[0].label}
+            onChange={(option) => {
+              setSearchFilters((g) => ({
+                ...g,
+                groupFilter: option.value,
+              }));
+            }}
           />
         </div>
         <div className="community-search">
