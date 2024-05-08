@@ -38,6 +38,10 @@ type EmitEventValues =
   | {
       event_name: EventNames.SnapshotProposalCreated;
       event_payload: z.infer<typeof events.SnapshotProposalCreated>;
+    }
+  | {
+      event_name: EventNames.ThreadUpvoted;
+      event_payload: any; // TODO: set to events.ThreadUpvoted
     };
 
 // Load with env var?
