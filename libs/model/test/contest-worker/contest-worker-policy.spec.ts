@@ -7,10 +7,6 @@ import { bootstrap_testing, seed } from 'model/src/tester';
 import Sinon from 'sinon';
 import Web3 from 'web3';
 
-Sinon.stub(commonProtocol.ContestHelper, 'createWeb3Provider').resolves(
-  new Web3(),
-);
-
 describe('Contest Worker Policy', () => {
   const addressId = 444;
   const address = '0x0';
@@ -56,14 +52,16 @@ describe('Contest Worker Policy', () => {
       deleted_at: undefined,
     });
   });
-  afterEach(() => {
-    Sinon.resetHistory();
-  });
   after(async () => {
+    Sinon.restore();
     await dispose()();
   });
 
   it('Policy should handle ThreadCreated and ThreadUpvoted events', async () => {
+    Sinon.stub(commonProtocol.ContestHelper, 'createWeb3Provider').resolves(
+      new Web3(),
+    );
+
     {
       const addContentStub = Sinon.stub(
         commonProtocol.ContestHelper,
