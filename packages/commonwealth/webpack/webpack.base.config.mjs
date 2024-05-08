@@ -96,6 +96,9 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
+    }),
+    new webpack.DefinePlugin({
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
     }),
     new webpack.DefinePlugin({
