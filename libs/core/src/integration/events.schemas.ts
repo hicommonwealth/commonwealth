@@ -2,12 +2,13 @@ import {
   Comment,
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
+  Reaction,
   Thread,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
 export const ThreadCreated = Thread;
-export const ThreadUpvoted = z.object({}); // TODO: use Reaction schema
+export const ThreadUpvoted = Reaction;
 export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),

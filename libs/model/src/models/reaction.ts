@@ -80,7 +80,10 @@ export default (sequelize: Sequelize.Sequelize) =>
                     [
                       {
                         event_name: EventNames.ThreadUpvoted,
-                        event_payload: reaction.get({ plain: true }),
+                        event_payload: {
+                          ...reaction.get({ plain: true }),
+                          reaction: 'like',
+                        },
                       },
                     ],
                     options.transaction,
