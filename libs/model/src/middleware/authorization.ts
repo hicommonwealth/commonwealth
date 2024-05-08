@@ -5,9 +5,10 @@ import {
   type CommandHandler,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
-import { AddressAttributes, Role, models } from '..';
+import { AddressAttributes, models } from '..';
 
 /**
  * TODO: review rules

@@ -1,10 +1,10 @@
 import {
   CommentAttributes,
   DB,
-  Role,
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import type { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { findAllRoles } from './roles';
 

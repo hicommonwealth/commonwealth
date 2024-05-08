@@ -1,6 +1,6 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useEffect, useMemo, useRef } from 'react';
-
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWIconButton } from './cw_icon_button';
@@ -81,6 +81,8 @@ export const CWCoverImageUploader = ({
   const attachZone = React.useRef<HTMLDivElement>(null);
   const attachButton = React.useRef<HTMLDivElement>(null);
   const pseudoInput = React.useRef<HTMLInputElement>(null);
+
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   const formContext = useFormContext();
   hookToForm && name && formContext.register(name);
@@ -437,11 +439,12 @@ export const CWCoverImageUploader = ({
           )}
           {showUploadAndGenerateText && !isUploading && !imageURL && (
             <CWText
-              type="caption"
+              type={isWindowExtraSmall ? 'caption' : 'b1'}
               fontWeight="medium"
               className="upload-generate-text"
             >
-              Drag an image here or generate one below
+              {isWindowExtraSmall ? 'Tap ' : 'Click or drag '}
+              to upload an image here or generate one below
             </CWText>
           )}
           {enableGenerativeAI && !isUploading && (

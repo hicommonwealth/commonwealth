@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Link, LinkSource } from '@hicommonwealth/model';
+import { LinkSource, type Link } from '@hicommonwealth/shared';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
