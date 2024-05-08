@@ -137,6 +137,8 @@ const GroupForm = ({
   onSubmit,
   initialValues = {},
   onDelete = () => {},
+  allowListIds,
+  setAllowListIds,
 }: GroupFormProps) => {
   const allowlistEnabled = useFlag('allowlist');
 
@@ -548,7 +550,12 @@ const GroupForm = ({
             </section>
           </section>
 
-          {allowlistEnabled && <AllowList />}
+          {allowlistEnabled && (
+            <AllowList
+              allowListIds={allowListIds}
+              setAllowListIds={setAllowListIds}
+            />
+          )}
           {(formType === 'create' || formType === 'edit') && (
             <TopicGatingHelpMessage />
           )}

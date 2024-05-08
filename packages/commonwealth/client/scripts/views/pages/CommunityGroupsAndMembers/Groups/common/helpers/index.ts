@@ -10,6 +10,7 @@ import { GroupResponseValuesType } from '../GroupForm/index.types';
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
+  allowListIds?: number[],
 ) => {
   const payload = {
     communityId: app.activeChainId(),
@@ -22,6 +23,7 @@ export const makeGroupDataBaseAPIPayload = (
         ? formSubmitValues.requirements.length
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
+    allowListIds,
   };
 
   // map requirements and add to payload

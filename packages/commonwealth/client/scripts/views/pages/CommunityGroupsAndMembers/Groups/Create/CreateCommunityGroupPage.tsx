@@ -1,7 +1,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import { useCreateGroupMutation } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
@@ -14,6 +14,8 @@ import './CreateCommunityGroupPage.scss';
 
 const CreateCommunityGroupPage = () => {
   const navigate = useCommonNavigate();
+  const [allowListIds, setAllowListIds] = useState([]);
+
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
   const { mutateAsync: createGroup } = useCreateGroupMutation({
@@ -38,7 +40,7 @@ const CreateCommunityGroupPage = () => {
         requirementsToFulfill: 'ALL',
       }}
       onSubmit={(values) => {
-        const payload = makeGroupDataBaseAPIPayload(values);
+        const payload = makeGroupDataBaseAPIPayload(values, allowListIds);
 
         createGroup(payload)
           .then(() => {
@@ -53,6 +55,8 @@ const CreateCommunityGroupPage = () => {
             notifyError('Failed to create group');
           });
       }}
+      allowListIds={allowListIds}
+      setAllowListIds={setAllowListIds}
     />
   );
 };

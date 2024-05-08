@@ -41,6 +41,7 @@ export type GroupResponseValuesType = {
   requirementsToFulfill: 'ALL' | number;
   requirements?: RequirementSubType[];
   topics: LabelType[];
+  allowlist?: number[];
 };
 
 export type GroupInitialValuesTypeWithLabel = {
@@ -63,4 +64,8 @@ export type GroupFormProps = {
   onSubmit: (values: GroupResponseValuesType) => any;
   initialValues?: Partial<GroupInitialValuesTypeWithLabel>;
   onDelete?: () => any;
+  allowListIds: number[];
+  setAllowListIds: (
+    value: ((prevState: number[]) => number[]) | number[],
+  ) => void;
 };

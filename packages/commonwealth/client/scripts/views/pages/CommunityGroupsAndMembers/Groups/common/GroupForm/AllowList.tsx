@@ -55,10 +55,15 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
 
 const GROUP_AND_MEMBER_FILTERS: BaseGroupFilter[] = ['All groups', 'Ungrouped'];
 
-const AllowList = () => {
-  useUserActiveAccount();
+type AllowListProps = {
+  allowListIds: number[];
+  setAllowListIds: (
+    value: ((prevState: number[]) => number[]) | number[],
+  ) => void;
+};
 
-  const [selectedAccounts, setSelectedAccounts] = useState([]);
+const AllowList = ({ allowListIds, setAllowListIds }: AllowListProps) => {
+  useUserActiveAccount();
 
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
@@ -156,12 +161,10 @@ const AllowList = () => {
   }, []);
 
   const handleCheckboxChange = (id: number) => {
-    if (selectedAccounts.includes(id)) {
-      setSelectedAccounts((prevItems) =>
-        prevItems.filter((item) => item !== id),
-      );
+    if (allowListIds.includes(id)) {
+      setAllowListIds((prevItems) => prevItems.filter((item) => item !== id));
     } else {
-      setSelectedAccounts((prevItems) => [...prevItems, id]);
+      setAllowListIds((prevItems) => [...prevItems, id]);
     }
   };
 
@@ -229,7 +232,7 @@ const AllowList = () => {
         isLoadingMoreMembers={isLoadingMembers}
         tableState={tableState}
         extraRows={extraRows}
-        selectedAccounts={selectedAccounts}
+        selectedAccounts={allowListIds}
         handleCheckboxChange={handleCheckboxChange}
       />
     </section>

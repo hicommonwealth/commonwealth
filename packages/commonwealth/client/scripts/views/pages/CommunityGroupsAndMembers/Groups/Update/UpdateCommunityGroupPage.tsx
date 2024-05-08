@@ -25,6 +25,7 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
+  const [allowListIds, setAllowListIds] = useState<number[]>([]);
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -135,6 +136,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             });
         }}
         onDelete={() => setIsDeleteModalOpen(true)}
+        allowListIds={allowListIds}
+        setAllowListIds={setAllowListIds}
       />
       <DeleteGroupModal
         isOpen={isDeleteModalOpen}
