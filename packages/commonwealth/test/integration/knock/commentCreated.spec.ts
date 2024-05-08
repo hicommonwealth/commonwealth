@@ -97,8 +97,8 @@ describe('CommentCreated Event Handler', () => {
     await models.CommentSubscription.truncate();
   });
 
-  after(() => {
-    dispose()();
+  after(async () => {
+    await dispose()();
   });
 
   it('should not throw if a valid author is not found', async () => {
