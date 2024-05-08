@@ -33,9 +33,6 @@ export default (sequelize: Sequelize.Sequelize) =>
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
-      indexes: [
-        { fields: ['user_id', 'comment_id'], unique: true },
-        { fields: ['comment_id'] },
-      ],
+      indexes: [{ fields: ['comment_id'] }],
     },
   );
