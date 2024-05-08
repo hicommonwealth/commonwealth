@@ -22,7 +22,7 @@ export type Member = {
 
 type MembersSectionProps = {
   filteredMembers: Member[];
-  onLoadMoreMembers: () => any;
+  onLoadMoreMembers?: () => any;
   isLoadingMoreMembers?: boolean;
   tableState: CWTableState;
   selectedAccounts?: number[];

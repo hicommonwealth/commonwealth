@@ -10,9 +10,15 @@ interface useMemberDataProps {
   memberships?: Memberships[];
   tableState?: CWTableState;
   searchFilters?: SearchFilters;
+  membersPerPage: number;
 }
 
-export const useMemberData = ({ memberships, tableState, searchFilters }) => {
+export const useMemberData = ({
+  memberships,
+  tableState,
+  searchFilters,
+  membersPerPage,
+}) => {
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
     500,
@@ -24,7 +30,7 @@ export const useMemberData = ({ memberships, tableState, searchFilters }) => {
     isLoading: isLoadingMembers,
   } = trpc.community.getMembers.useInfiniteQuery(
     {
-      limit: 30,
+      limit: membersPerPage,
       order_by: tableState.orderBy,
       order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,

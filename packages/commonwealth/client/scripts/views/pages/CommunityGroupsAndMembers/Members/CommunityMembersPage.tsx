@@ -118,7 +118,12 @@ const CommunityMembersPage = () => {
   });
 
   const { fetchNextMembersPage, groups, isLoadingMembers, members } =
-    useMemberData({ tableState, searchFilters, memberships });
+    useMemberData({
+      tableState,
+      searchFilters,
+      memberships,
+      membersPerPage: 30,
+    });
 
   const filterOptions = useMemo(
     () => [

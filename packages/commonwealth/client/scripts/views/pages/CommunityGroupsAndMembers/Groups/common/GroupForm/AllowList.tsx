@@ -7,6 +7,7 @@ import { ApiEndpoints, queryClient } from '../../../../../../state/api/config';
 import { useRefreshMembershipQuery } from '../../../../../../state/api/groups/index';
 import { SearchProfilesResponse } from '../../../../../../state/api/profiles/searchProfiles';
 import app from '../../../../../../state/index';
+import Permissions from '../../../../../../utils/Permissions';
 import { Select } from '../../../../../components/Select';
 import { CWText } from '../../../../../components/component_kit/cw_text';
 import { CWTableColumnInfo } from '../../../../../components/component_kit/new_designs/CWTable/CWTable';
@@ -98,7 +99,12 @@ const AllowList = () => {
   });
 
   const { fetchNextMembersPage, groups, isLoadingMembers, members } =
-    useMemberData({ tableState, searchFilters, memberships });
+    useMemberData({
+      tableState,
+      searchFilters,
+      memberships,
+      membersPerPage: 10,
+    });
 
   const filterOptions = useMemo(
     () => [
@@ -194,6 +200,8 @@ const AllowList = () => {
     };
   };
 
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+
   return (
     <section className="form-section">
       <div className="header-row">
@@ -218,20 +226,19 @@ const AllowList = () => {
         </div>
         <div className="community-search">
           <CWTextInput
-            // value={communitySearch}
-            // onInput={(e: any) => setCommunitySearch(e.target.value)}
-            placeholder="Search communities"
+            placeholder="Search members"
             iconLeft={<MagnifyingGlass size={24} weight="regular" />}
+            onInput={(e) =>
+              setSearchFilters((g) => ({
+                ...g,
+                searchText: e.target.value?.trim(),
+              }))
+            }
           />
         </div>
       </div>
       <MembersSection
         filteredMembers={formattedMembers}
-        onLoadMoreMembers={() => {
-          if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-            fetchNextMembersPage?.().catch(console.error);
-          }
-        }}
         isLoadingMoreMembers={isLoadingMembers}
         tableState={tableState}
         extraRows={extraRows}
