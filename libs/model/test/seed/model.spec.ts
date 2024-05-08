@@ -17,36 +17,38 @@ const generateSchemas = async () => {
   const model_schema = await get_info_schema(model.sequelize, {
     ignore_columns: {},
     ignore_constraints: {
-      // TODO: missing in migrations - removed FKs for performance reasons?
-      Addresses: [
-        'FOREIGN KEY Profiles(profile_id) UPDATE CASCADE DELETE SET NULL',
-      ],
+      // Removed in production for performance reasons
       Comments: [
-        'FOREIGN KEY Communities(community_id) UPDATE NO ACTION DELETE NO ACTION',
-      ],
-      Notifications: [
-        'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
-      ],
-      Reactions: [
-        'FOREIGN KEY Addresses(address_id) UPDATE CASCADE DELETE NO ACTION',
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
       ],
+      Reactions: [
+        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE NO ACTION',
+      ],
+
+      // These will be deprecated soon
+      Notifications: [
+        'FOREIGN KEY Threads(thread_id) UPDATE NO ACTION DELETE NO ACTION',
+      ],
       Subscriptions: [
-        'FOREIGN KEY Comments(comment_id) UPDATE CASCADE DELETE SET NULL',
         'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE SET NULL',
         'FOREIGN KEY Threads(thread_id) UPDATE CASCADE DELETE SET NULL',
+        'FOREIGN KEY Comments(comment_id) UPDATE CASCADE DELETE SET NULL',
       ],
-      Memberships: [
-        'PRIMARY KEY(id)', // TODO: should we remove this id with a migration?
+      NotificationsRead: [
+        'FOREIGN KEY Notifications(notification_id) UPDATE NO ACTION DELETE CASCADE',
+        'FOREIGN KEY Subscriptions(subscription_id) UPDATE NO ACTION DELETE CASCADE',
       ],
-      Outbox: [
-        'PRIMARY KEY(event_id)', // removed in migration
+      Addresses: [
+        'FOREIGN KEY Profiles(profile_id) UPDATE NO ACTION DELETE NO ACTION',
       ],
+
+      // Removed in migration
+      Outbox: ['PRIMARY KEY(event_id)'],
     },
   });
   const migration_schema = await get_info_schema(migration, {
     ignore_columns: {
-      // TODO: missing in model - due to migrations with backups?
+      // Missing in model - migrations with backups
       Comments: ['body_backup', 'text_backup', 'root_id', '_search'],
       Profiles: ['bio_backup', 'profile_name_backup'],
       Threads: ['body_backup', '_search'],
