@@ -105,7 +105,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ).to.not.be.rejected;
     });
 
-    it.only('should fetch logs from the specified range', async () => {
+    it('should fetch logs from the specified range', async () => {
       expectAbi();
       expect(propCreatedResult, 'Must have created a proposal to run this test')
         .to.not.be.undefined;
