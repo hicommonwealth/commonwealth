@@ -1,4 +1,4 @@
-import { AppError, Projection, schemas } from '@hicommonwealth/core';
+import { AppError, Projection, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';
@@ -51,7 +51,9 @@ async function updateOrCreateWithAlert(
       ? { ticker: 'ETH', decimals: 18 }
       : await contractHelpers.getTokenAttributes(
           contest_address,
-          new Web3(community?.ChainNode?.private_url || community?.ChainNode?.url),
+          new Web3(
+            community?.ChainNode?.private_url || community?.ChainNode?.url,
+          ),
         );
   // TODO: evaluate errors from contract helpers and how to drive the event queue
 
