@@ -1,19 +1,14 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDebounce } from 'usehooks-ts';
 import { APIOrderDirection } from '../../../../../../helpers/constants';
 import useUserActiveAccount from '../../../../../../hooks/useUserActiveAccount';
 import { ApiEndpoints, queryClient } from '../../../../../../state/api/config';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from '../../../../../../state/api/groups/index';
+import { useRefreshMembershipQuery } from '../../../../../../state/api/groups/index';
 import { SearchProfilesResponse } from '../../../../../../state/api/profiles/searchProfiles';
 import app from '../../../../../../state/index';
 import Permissions from '../../../../../../utils/Permissions';
-import { trpc } from '../../../../../../utils/trpcClient';
 import { Avatar } from '../../../../../components/Avatar/index';
 import { Select } from '../../../../../components/Select';
 import { CWCheckbox } from '../../../../../components/component_kit/cw_checkbox';
@@ -27,6 +22,7 @@ import { CWTag } from '../../../../../components/component_kit/new_designs/CWTag
 import { CWTextInput } from '../../../../../components/component_kit/new_designs/CWTextInput/index';
 import '../../../Members/MembersSection/MembersSection.scss';
 import { BaseGroupFilter, SearchFilters } from '../../../Members/index.types';
+import { useMemberData } from '../../../common/memberData';
 
 const filterOptions = [
   { type: 'header', label: 'Filters' },
@@ -54,7 +50,7 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
     header: 'Address',
     hasCustomSortValue: true,
     numeric: false,
-    sortable: false,
+    sortable: true,
   },
   {
     key: 'stakeBalance',
@@ -107,44 +103,8 @@ const AllowList = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const {
-    data: members,
-    fetchNextPage,
-    isLoading: isLoadingMembers,
-  } = trpc.community.getMembers.useInfiniteQuery(
-    {
-      limit: 30,
-      order_by: tableState.orderBy,
-      order_direction: tableState.orderDirection,
-      search: debouncedSearchTerm,
-      community_id: app.activeChainId(),
-      include_roles: true,
-      ...(!['All groups', 'Ungrouped'].includes(
-        `${searchFilters.groupFilter}`,
-      ) &&
-        searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        memberships: 'not-in-group',
-      }),
-      include_group_ids: true,
-      // only include stake balances if community has staking enabled
-      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-        .namespace,
-    },
-    {
-      initialCursor: 1,
-      getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-    },
-  );
-
-  const { data: groups } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
-    includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-  });
+  const { fetchNextMembersPage, groups, isLoadingMembers, members } =
+    useMemberData({ tableState, searchFilters, memberships });
 
   const filterOptions = useMemo(
     () => [
@@ -194,7 +154,7 @@ const AllowList = () => {
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
-        lastActive: p.last_active,
+        address: p.addresses[0].address,
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -307,18 +267,24 @@ const AllowList = () => {
                 </div>
               ),
             },
-            lastActive: {
-              sortValue: moment(member.lastActive).unix(),
+            address: {
+              sortValue: member.address,
               customElement: (
                 <div className="table-cell">
-                  {moment(member.lastActive).fromNow()}
+                  {`${member.address.substring(
+                    0,
+                    6,
+                  )}...${member.address.substring(
+                    member.address.length - 6,
+                    member.address.length,
+                  )}`}
                 </div>
               ),
             },
           }))}
           onScrollEnd={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-              fetchNextPage?.().catch(console.error);
+              fetchNextMembersPage?.().catch(console.error);
             }
           }}
           isLoadingMoreRows={isLoadingMembers}

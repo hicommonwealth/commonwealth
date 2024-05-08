@@ -1,5 +1,4 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { trpc } from 'client/scripts/utils/trpcClient';
 import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -9,10 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useRefreshMembershipQuery } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
@@ -33,6 +29,7 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
 } from '../../../../../../shared/analytics/types';
+import { useMemberData } from '../common/memberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -118,44 +115,8 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const {
-    data: members,
-    fetchNextPage,
-    isLoading: isLoadingMembers,
-  } = trpc.community.getMembers.useInfiniteQuery(
-    {
-      limit: 30,
-      order_by: tableState.orderBy,
-      order_direction: tableState.orderDirection,
-      search: debouncedSearchTerm,
-      community_id: app.activeChainId(),
-      include_roles: true,
-      ...(!['All groups', 'Ungrouped'].includes(
-        `${searchFilters.groupFilter}`,
-      ) &&
-        searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        memberships: 'not-in-group',
-      }),
-      include_group_ids: true,
-      // only include stake balances if community has staking enabled
-      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-        .namespace,
-    },
-    {
-      initialCursor: 1,
-      getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-    },
-  );
-
-  const { data: groups } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
-    includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-  });
+  const { fetchNextMembersPage, groups, isLoadingMembers, members } =
+    useMemberData({ tableState, searchFilters, memberships });
 
   const filterOptions = useMemo(
     () => [
@@ -415,7 +376,7 @@ const CommunityMembersPage = () => {
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-                fetchNextPage?.().catch(console.error);
+                fetchNextMembersPage?.().catch(console.error);
               }
             }}
             isLoadingMoreMembers={isLoadingMembers}
