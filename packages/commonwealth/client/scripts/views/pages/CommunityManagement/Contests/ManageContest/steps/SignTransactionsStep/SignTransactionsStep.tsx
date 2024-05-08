@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { commonProtocol } from '@hicommonwealth/shared';
 import app from 'state';
 import {
+  useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleContestOnchainMutation,
 } from 'state/api/contests';
@@ -16,28 +17,25 @@ import {
   ActionStepsProps,
 } from 'views/pages/CreateCommunity/components/ActionSteps/types';
 
-import { ContestFormData, LaunchContestStep } from '../../types';
+import {
+  ContestFeeType,
+  ContestFormData,
+  ContestRecurringType,
+  LaunchContestStep,
+} from '../../types';
 
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
-  isDirectDepositSelected: boolean;
-  winnerShares: ContestFormData['payoutStructure'];
-  prizePercentage: ContestFormData['prizePercentage'];
-  fundingTokenAddress: ContestFormData['fundingTokenAddress'];
-  isContestRecurring: boolean;
+  contestFormData: ContestFormData;
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
-  isDirectDepositSelected,
-  winnerShares,
-  prizePercentage,
-  fundingTokenAddress,
-  isContestRecurring,
+  contestFormData,
 }: SignTransactionsStepProps) => {
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
@@ -48,6 +46,12 @@ const SignTransactionsStep = ({
     useDeploySingleContestOnchainMutation();
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
+  const { mutateAsync: createContestMutation } = useCreateContestMutation();
+
+  const isContestRecurring =
+    contestFormData.contestRecurring === ContestRecurringType.Yes;
+  const isDirectDepositSelected =
+    contestFormData.feeType === ContestFeeType.DirectDeposit;
 
   const signTransaction = async () => {
     const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
@@ -59,11 +63,12 @@ const SignTransactionsStep = ({
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = Number(app?.chain?.meta?.CommunityStakes?.[0]?.voteWeight);
     const contestInterval = SEVEN_DAYS_IN_SECONDS;
-    const prizeShare = prizePercentage;
+    const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
-      ? fundingTokenAddress
+      ? contestFormData?.fundingTokenAddress
       : app?.chain?.meta?.CommunityStakes?.[0]?.stakeToken;
+    const winnerShares = contestFormData?.payoutStructure;
 
     const single = {
       ethChainId,
@@ -92,14 +97,29 @@ const SignTransactionsStep = ({
       walletAddress,
     };
 
-    let tx;
+    let contestAddress: string;
 
     try {
       isContestRecurring
-        ? (tx = await deployRecurringContestOnchainMutation(recurring))
-        : (tx = await deploySingleContestOnchainMutation(single));
+        ? (contestAddress = await deployRecurringContestOnchainMutation(
+            recurring,
+          ))
+        : (contestAddress = await deploySingleContestOnchainMutation(single));
 
-      console.log('tx', tx);
+      const response = await createContestMutation({
+        contest_address: contestAddress,
+        name: contestFormData?.contestName,
+        image_url: contestFormData?.contestImage,
+        funding_token_address: contestFormData?.fundingTokenAddress,
+        prize_percentage: contestFormData?.prizePercentage,
+        payout_structure: contestFormData?.payoutStructure,
+        interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
+        ticker: 'ETH',
+        decimals: 18,
+        topic_ids: contestFormData?.toggledTopicList.map((topic) => topic.id),
+      });
+
+      console.log('response', response);
     } catch (error) {
       console.log('error', error);
       setLaunchContestData((prevState) => ({
