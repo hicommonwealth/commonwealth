@@ -41,7 +41,7 @@ type EmitEventValues =
     }
   | {
       event_name: EventNames.ThreadUpvoted;
-      event_payload: any; // TODO: set to events.ThreadUpvoted
+      event_payload: z.infer<typeof events.ThreadUpvoted>;
     };
 
 // Load with env var?

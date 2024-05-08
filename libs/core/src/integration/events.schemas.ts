@@ -7,6 +7,7 @@ import {
 import { z } from 'zod';
 
 export const ThreadCreated = Thread;
+export const ThreadUpvoted = z.object({}); // TODO: use Reaction schema
 export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),

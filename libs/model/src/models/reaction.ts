@@ -74,16 +74,18 @@ export default (sequelize: Sequelize.Sequelize) =>
                     transaction: options.transaction,
                   });
                 }
-                await emitEvent(
-                  Outbox,
-                  [
-                    {
-                      event_name: EventNames.ThreadUpvoted,
-                      event_payload: reaction.get({ plain: true }),
-                    },
-                  ],
-                  options.transaction,
-                );
+                if (reaction.reaction === 'like') {
+                  await emitEvent(
+                    Outbox,
+                    [
+                      {
+                        event_name: EventNames.ThreadUpvoted,
+                        event_payload: reaction.get({ plain: true }),
+                      },
+                    ],
+                    options.transaction,
+                  );
+                }
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
                 });
