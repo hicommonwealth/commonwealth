@@ -340,7 +340,7 @@ const CommunityProfileForm = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setSelectedCommunityTags((prevTags) =>
-                        !!prevTags.find(({ tag }) => tag === option)
+                        prevTags.find(({ tag }) => tag === option)
                           ? [...prevTags].filter(({ tag }) => tag !== option)
                           : [...prevTags, { id: 1, tag: option }],
                       );
