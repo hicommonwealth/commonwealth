@@ -21,6 +21,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -36,6 +37,7 @@ const PersonalInformationStep = ({
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
   const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
+  const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
@@ -48,10 +50,19 @@ const PersonalInformationStep = ({
         ? addresses?.[0]?.profile?.name
         : '';
 
-    if (formMethodsRef.current && defaultSSOUsername) {
-      formMethodsRef.current.setValue('username', defaultSSOUsername);
+    if (formMethodsRef.current) {
+      if (defaultSSOUsername) {
+        formMethodsRef.current.setValue('username', defaultSSOUsername);
+      }
+
+      if (app?.user?.email) {
+        formMethodsRef.current.setValue('email', app.user.email);
+        setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
+      }
     }
   }, []);
+
+  const { toggleAllInAppNotifications } = useNotificationSettings();
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
@@ -89,9 +100,13 @@ const PersonalInformationStep = ({
       await app.user.updateEmail(values.email);
     }
 
-    // TODO: update notification preferences here for
-    // values.enableAccountNotifications - does this mean all account notifications?
-    // values.enableProductUpdates - ?
+    // enable/disable all in-app notifications for user
+    await toggleAllInAppNotifications(values.enableAccountNotifications);
+
+    // TODO:
+    // values.enableProductUpdates - as per product, this should be just a checkbox
+    // right now that should do nothing, and needs to be work on.
+    // https://github.com/hicommonwealth/commonwealth/issues/6645#issuecomment-2078105164
 
     onComplete();
   };
@@ -119,7 +134,7 @@ const PersonalInformationStep = ({
       onSubmit={handleSubmit}
       onWatch={handleWatch}
     >
-      {({ formState, watch, setValue }) => (
+      {({ formState, watch, setValue, trigger }) => (
         <>
           <div className="username-section">
             <CWTextInput
@@ -133,7 +148,13 @@ const PersonalInformationStep = ({
               name="username"
               hookToForm
               onInput={(e) => setCurrentUsername(e.target.value.trim())}
-              customError={isUsernameTaken ? 'Username already exists' : ''}
+              customError={
+                formState.isDirty &&
+                watch('username')?.trim() !== '' &&
+                isUsernameTaken
+                  ? 'Username already exists'
+                  : ''
+              }
             />
             <CWButton
               label="Generate random username"
@@ -143,7 +164,8 @@ const PersonalInformationStep = ({
               containerClassName="random-generate-btn"
               onClick={() => {
                 const randomUsername = generateUsername('', 2);
-                setValue('username', randomUsername);
+                setValue('username', randomUsername, { shouldDirty: true });
+                trigger('username');
                 setCurrentUsername(randomUsername);
               }}
             />
@@ -159,6 +181,7 @@ const PersonalInformationStep = ({
             }
             name="email"
             hookToForm
+            disabled={isEmailChangeDisabled}
           />
 
           <div className="notification-section">

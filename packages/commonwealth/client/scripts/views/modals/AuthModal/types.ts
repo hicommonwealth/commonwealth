@@ -19,8 +19,10 @@ export type ModalVariantProps = {
   onSignInClick?: () => void;
 };
 
+export type AuthModalType = 'create-account' | 'sign-in';
+
 export type ModalBaseProps = {
-  layoutType: 'create-account' | 'sign-in';
+  layoutType: AuthModalType;
   hideDescription?: boolean;
   customBody?: ReactNode;
   showAuthenticationOptionsFor?: ('wallets' | 'sso')[];
@@ -29,5 +31,5 @@ export type ModalBaseProps = {
 
 export type AuthModalProps = {
   isOpen: boolean;
-  type?: 'create-account' | 'sign-in';
+  type?: AuthModalType;
 } & ModalVariantProps;

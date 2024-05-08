@@ -45,7 +45,8 @@ export const Thread = z.object({
   //notifications
   max_notif_id: PG_INT,
 
-  profile_name: z.string(),
+  created_by: z.string(),
+  profile_name: z.string().optional(),
 });
 
 export const Comment = z.object({

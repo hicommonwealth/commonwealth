@@ -35,8 +35,8 @@ export type ProfileInstance = ModelInstance<ProfileAttributes> & {
 
 export type ProfileModelStatic = ModelStatic<ProfileInstance>;
 
-export default (sequelize: Sequelize.Sequelize): ProfileModelStatic => {
-  const Profile = <ProfileModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <ProfileModelStatic>sequelize.define<ProfileInstance>(
     'Profile',
     {
       id: {
@@ -66,14 +66,3 @@ export default (sequelize: Sequelize.Sequelize): ProfileModelStatic => {
       indexes: [{ fields: ['user_id'] }],
     },
   );
-
-  Profile.associate = (models) => {
-    models.Profile.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      targetKey: 'id',
-    });
-    models.Profile.hasMany(models.Address, { foreignKey: 'profile_id' });
-  };
-
-  return Profile;
-};
