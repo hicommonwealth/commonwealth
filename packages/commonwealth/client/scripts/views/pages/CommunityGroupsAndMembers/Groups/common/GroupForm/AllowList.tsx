@@ -94,7 +94,6 @@ const AllowList = () => {
 
   const tableState = useCWTableState({
     columns: tableColumns(isStakedCommunity),
-    initialSortColumn: 'lastActive',
     initialSortDirection: APIOrderDirection.Desc,
   });
 
