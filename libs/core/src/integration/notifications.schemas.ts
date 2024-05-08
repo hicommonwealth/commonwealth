@@ -24,3 +24,17 @@ export const CommentCreatedNotification = z.object({
     'The full comment record',
   ),
 });
+
+export const SnapshotProposalCreatedNotification = z.object({
+  community_name: z
+    .string()
+    .max(255)
+    .describe('The user-friendly name of the community'),
+  space_name: z
+    .string()
+    .max(255)
+    .describe('The user-friendly name of the Snapshot space'),
+  snapshot_proposal_url: z
+    .string()
+    .describe('The url to the snapshot proposal on Common'),
+});

@@ -1,4 +1,8 @@
-import { EventHandler, Policy, events } from '@hicommonwealth/core';
+import {
+  EventHandler,
+  notificationsProvider,
+  WorkflowKeys,
+} from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
@@ -8,15 +12,17 @@ import {
 } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
-import { ZodUndefined } from 'zod';
+import z from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+const output = z.boolean();
+
 export const processSnapshotProposalCreated: EventHandler<
   'SnapshotProposalCreated',
-  ZodUndefined
+  typeof output
 > = async ({ payload }) => {
   const { space, id, title, body, choices, start, expire, event } = payload;
 
@@ -53,7 +59,27 @@ export const processSnapshotProposalCreated: EventHandler<
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `,
   );
 
+  const users = (await models.CommunityAlert.findAll({
+    where: {
+      community_id: {
+        [Op.in]: associatedCommunities.map((c) => c.id),
+      },
+    },
+    attributes: ['community_id', 'user_id'],
+    raw: true,
+  })) as { user_id: number }[];
+
   if (associatedCommunities.length > 0) {
+    const provider = notificationsProvider();
+    return await provider.triggerWorkflow({
+      key: WorkflowKeys.SnapshotProposals,
+      users: users.map((u) => ({ id: String(u.user_id) })),
+      data: {
+        space_name: space,
+        snapshot_proposal_url: '',
+      },
+    });
+
     // Notifications
     emitNotifications(models, {
       categoryId: NotificationCategories.SnapshotProposal,
@@ -63,15 +89,3 @@ export const processSnapshotProposalCreated: EventHandler<
     });
   }
 };
-
-const snapshotInputs = {
-  SnapshotProposalCreated: events.SnapshotProposalCreated,
-};
-export function SnapshotPolicy(): Policy<typeof snapshotInputs, ZodUndefined> {
-  return {
-    inputs: snapshotInputs,
-    body: {
-      SnapshotProposalCreated: processSnapshotProposalCreated,
-    },
-  };
-}
