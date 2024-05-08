@@ -1,5 +1,6 @@
 import { events, Policy } from '@hicommonwealth/core';
 import { getThreadUrl } from '@hicommonwealth/shared';
+import { URL } from 'url';
 import { models } from '../database';
 import { ContestHelper } from '../services/commonProtocol';
 
@@ -22,9 +23,7 @@ export function ContestWorker(): Policy<typeof inputs> {
               },
               {
                 model: models.ContestManager,
-              },
-              {
-                model: models.Address,
+                as: 'contest_managers',
               },
             ],
           },
@@ -36,14 +35,19 @@ export function ContestWorker(): Policy<typeof inputs> {
           process.env.PRIVATE_KEY!,
         );
 
-        const contentUrl = getThreadUrl({
+        const fullContentUrl = getThreadUrl({
           chain: community!.id!,
           id: payload.id,
           title: payload.title,
         });
 
+        // content url only contains path
+        const contentUrl = new URL(fullContentUrl).pathname;
+
         const contestAddress = community!.contest_managers![0].contest_address;
-        const userAddress = payload.Address!.address;
+        const { address: userAddress } = (await models.Address.findByPk(
+          payload!.address_id,
+        ))!;
         await ContestHelper.addContent(
           web3Client,
           contestAddress!,
@@ -61,9 +65,7 @@ export function ContestWorker(): Policy<typeof inputs> {
               },
               {
                 model: models.ContestManager,
-              },
-              {
-                model: models.Address,
+                as: 'contest_managers',
               },
             ],
           },
