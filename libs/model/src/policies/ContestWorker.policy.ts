@@ -1,66 +1,97 @@
-import { CommentCreated, Policy, ThreadCreated, ThreadUpvoted } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/model';
-import * as schemas from '@hicommonwealth/schemas'
+import { events, Policy } from '@hicommonwealth/core';
+import { getThreadUrl } from '@hicommonwealth/shared';
+import { models } from '../database';
 import { ContestHelper } from '../services/commonProtocol';
 
-// TODO: clarify the inputs
-
 const inputs = {
-  ThreadCreated: ThreadCreated,
-  ThreadUpvoted: ThreadUpvoted,
-  CommentCreated: CommentCreated,
+  ThreadCreated: events.ThreadCreated,
+  ThreadUpvoted: events.ThreadUpvoted,
 };
 
-// export const ThreadEvent = z.object({
-//   userAddress: z.string(),
-//   chainNodeUrl: z
-//     .string()
-//     .optional()
-//     .describe('used for onchain contract calls'),
-//   contestAddress: z
-//     .string()
-//     .optional()
-//     .describe('the contest contract address'),
-// });
-// export const ThreadCreated = ThreadEvent.extend({
-//   contentUrl: z.string().describe('the CW content URL'),
-// });
-// export const ThreadUpvoted = ThreadEvent.extend({
-//   contentId: z.string().optional().describe('the onchain content ID'),
-// });
+export function ContestWorker(): Policy<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      ThreadCreated: async ({ payload }) => {
+        const community = await models.Community.findByPk(
+          payload.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode,
+              },
+              {
+                model: models.ContestManager,
+              },
+              {
+                model: models.Address,
+              },
+            ],
+          },
+        );
+        const chainNodeUrl = community!.ChainNode!.private_url!;
 
-export const ContestWorker: Policy<typeof inputs> = ({
-  inputs,
-  body: {
-    ThreadCreated: async ({ payload }) => {
-      const { userAddress, contentUrl, chainNodeUrl, contestAddress } = payload;
+        const web3Client = await ContestHelper.createWeb3Provider(
+          chainNodeUrl,
+          process.env.PRIVATE_KEY!,
+        );
 
-      const web3Client = await ContestHelper.createWeb3Provider(
-        chainNodeUrl!,
-        process.env.PRIVATE_KEY!,
-      );
+        const contentUrl = getThreadUrl({
+          chain: community!.id!,
+          id: payload.id,
+          title: payload.title,
+        });
 
-      await ContestHelper.addContent(
-        web3Client,
-        contestAddress!,
-        userAddress,
-        contentUrl,
-      );
-    },
-    ThreadUpvoted: async ({ payload }) => {
-      const { userAddress, chainNodeUrl, contestAddress, contentId } = payload;
+        const contestAddress = community!.contest_managers![0].contest_address;
+        const userAddress = payload.Address!.address;
+        await ContestHelper.addContent(
+          web3Client,
+          contestAddress!,
+          userAddress,
+          contentUrl,
+        );
+      },
+      ThreadUpvoted: async ({ payload }) => {
+        const community = await models.Community.findByPk(
+          payload.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode,
+              },
+              {
+                model: models.ContestManager,
+              },
+              {
+                model: models.Address,
+              },
+            ],
+          },
+        );
+        const chainNodeUrl = community!.ChainNode!.private_url!;
 
-      const web3Client = await ContestHelper.createWeb3Provider(
-        chainNodeUrl!,
-        process.env.PRIVATE_KEY!,
-      );
+        const web3Client = await ContestHelper.createWeb3Provider(
+          chainNodeUrl!,
+          process.env.PRIVATE_KEY!,
+        );
 
-      await ContestHelper.voteContent(
-        web3Client,
-        contestAddress!,
-        userAddress,
-        contentId!,
-      );
+        const contestAddress = community!.contest_managers![0].contest_address;
+
+        const addAction = await models.ContestAction.findOne({
+          where: {
+            contest_address: contestAddress,
+            action: 'added',
+          },
+        });
+        const userAddress = addAction!.actor_address!;
+        const contentId = addAction!.content_id!;
+        await ContestHelper.voteContent(
+          web3Client,
+          contestAddress!,
+          userAddress,
+          contentId.toString(),
+        );
+      },
     },
   };
 }
