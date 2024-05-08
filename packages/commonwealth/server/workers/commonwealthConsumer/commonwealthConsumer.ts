@@ -16,7 +16,6 @@ import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'node:url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
-import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -59,11 +58,6 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  const snapshotSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.SnapshotListener,
-    SnapshotPolicy(),
-  );
-
   const chainEventSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ChainEvent,
     ChainEventPolicy(),
@@ -77,21 +71,6 @@ export async function setupCommonwealthConsumer(): Promise<void> {
         topic: BrokerSubscriptions.ChainEvent,
       },
     );
-  }
-
-  if (!snapshotSubRes) {
-    log.fatal(
-      'Failed to subscribe to snapshot events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.SnapshotListener,
-      },
-    );
-  }
-
-  if (!snapshotSubRes && !chainEventSubRes) {
-    log.fatal('All subscriptions failed. Restarting...');
-    process.exit(1);
   }
 }
 
