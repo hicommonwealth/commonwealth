@@ -256,7 +256,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: (cd packages/commonwealth && NODE_ENV=production TEST_DB_NAME=commonwealth NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
+        run: (cd packages/commonwealth && NODE_ENV=production TEST_DB_NAME=commonwealth NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) & (yarn --cwd packages/commonwealth wait-server && TEST_DB_NAME=commonwealth yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
