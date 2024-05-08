@@ -25,16 +25,13 @@ const fundContestOnchain = async ({
   return await contest.deposit(amount, walletAddress);
 };
 
-interface UseFundContestOnchainMutationProps {}
-
-const useFundContestOnchainMutation =
-  ({}: UseFundContestOnchainMutationProps) => {
-    return useMutation({
-      mutationFn: fundContestOnchain,
-      onSuccess: async () => {
-        console.log('fundContestOnchain success');
-      },
-    });
-  };
+const useFundContestOnchainMutation = () => {
+  return useMutation({
+    mutationFn: fundContestOnchain,
+    onSuccess: async () => {
+      console.log('fundContestOnchain success');
+    },
+  });
+};
 
 export default useFundContestOnchainMutation;

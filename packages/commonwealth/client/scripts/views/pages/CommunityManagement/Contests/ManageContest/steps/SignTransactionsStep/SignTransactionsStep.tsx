@@ -100,22 +100,30 @@ const SignTransactionsStep = ({
     let contestAddress: string;
 
     try {
+      setLaunchContestData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
       isContestRecurring
         ? (contestAddress = await deployRecurringContestOnchainMutation(
             recurring,
           ))
         : (contestAddress = await deploySingleContestOnchainMutation(single));
 
+      console.log('contestAddress', contestAddress);
+
       const response = await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
+        id: app.activeChainId(),
         image_url: contestFormData?.contestImage,
         funding_token_address: contestFormData?.fundingTokenAddress,
         prize_percentage: contestFormData?.prizePercentage,
         payout_structure: contestFormData?.payoutStructure,
         interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
-        ticker: 'ETH',
-        decimals: 18,
+        // ticker: 'ETH',
+        // decimals: 18,
         topic_ids: contestFormData?.toggledTopicList.map((topic) => topic.id),
       });
 

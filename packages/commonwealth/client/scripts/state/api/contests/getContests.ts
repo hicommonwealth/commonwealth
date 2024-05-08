@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
-import { schemas } from '@hicommonwealth/core';
+import { GetAllContests } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
 
-type UseGetContestsQueryProps = z.infer<
-  typeof schemas.queries.GetAllContests.input
->;
+type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input>;
 
 const useGetContestsQuery = ({
   contest_id,
