@@ -37,11 +37,11 @@
     "node-object-hash": "^3.0.0",
     "pg": "^8.11.3",
     "sequelize": "^6.32.1",
+    "umzug": "^3.7.0",
     "web3": "1.8.2",
     "web3-core": "1.8.2",
     "web3-eth-abi": "1.8.2",
     "web3-utils": "1.8.2",
-    "umzug": "^3.7.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
