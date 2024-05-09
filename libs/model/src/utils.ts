@@ -38,6 +38,10 @@ type EmitEventValues =
   | {
       event_name: EventNames.SnapshotProposalCreated;
       event_payload: z.infer<typeof events.SnapshotProposalCreated>;
+    }
+  | {
+      event_name: EventNames.UserMentioned;
+      event_payload: z.infer<typeof events.UserMentioned>;
     };
 
 // Load with env var?

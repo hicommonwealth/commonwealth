@@ -13,10 +13,11 @@ export const GroupCreated = z.object({
   userId: z.string(),
 });
 export const UserMentioned = z.object({
-  authorId: z.number(),
-  userMentionedId: z.number(),
-  threadId: z.string().optional(),
-  commentId: z.string().optional(),
+  authorUserId: z.number(),
+  mentionedUserId: z.number(),
+  communityId: z.string(),
+  threadId: z.number().optional(),
+  commentId: z.number().optional(),
 });
 export const CommunityCreated = z.object({
   communityId: z.string(),
