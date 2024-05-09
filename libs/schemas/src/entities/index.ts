@@ -4,6 +4,7 @@ export * from './contest-manager.schemas';
 export * from './contract.schemas';
 export * from './group.schemas';
 export * from './notification.schemas';
+export * from './reaction.schemas';
 export * from './snapshot.schemas';
 export * from './stake.schemas';
 export * from './thread.schemas';
