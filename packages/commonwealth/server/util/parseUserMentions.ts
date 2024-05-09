@@ -1,6 +1,9 @@
-import { ServerError } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { EventNames, events, ServerError } from '@hicommonwealth/core';
+import { DB, emitEvent } from '@hicommonwealth/model';
+import { Comment, Thread } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import { Transaction } from 'sequelize';
+import z from 'zod';
 import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
 export type UserMention = {
@@ -84,11 +87,13 @@ export const queryMentionedUsers = async (
     const mentionQueries = mentions.map(async ({ profileId, profileName }) => {
       const result = await models.sequelize.query(
         `
-        SELECT a.address, a.user_id
-        FROM "Addresses" as a
-        INNER JOIN "Profiles" as p ON a.profile_id = p.id
-        WHERE a.user_id IS NOT NULL AND p.id = :profileId AND p.profile_name = :profileName
-      `,
+            SELECT a.address, a.user_id
+            FROM "Addresses" as a
+                     INNER JOIN "Profiles" as p ON a.profile_id = p.id
+            WHERE a.user_id IS NOT NULL
+              AND p.id = :profileId
+              AND p.profile_name = :profileName
+        `,
         {
           replacements: {
             profileId,
@@ -157,4 +162,43 @@ export const createThreadMentionNotifications = (
       excludeAddresses: [finalThread.Address.address],
     };
   }) as EmitOptions[];
+};
+
+type EmitMentionsData = {
+  authorUserId: number;
+  mentions: UserMentionQuery;
+} & (
+  | {
+      thread: z.infer<typeof Thread>;
+    }
+  | {
+      comment: z.infer<typeof Comment>;
+    }
+);
+
+export const emitMentions = async (
+  models: DB,
+  transaction: Transaction,
+  data: EmitMentionsData,
+) => {
+  if (data.mentions.length) {
+    const communityId =
+      'thread' in data ? data.thread.community_id : data.comment.community_id;
+
+    const values = data.mentions.map<{
+      event_name: EventNames.UserMentioned;
+      event_payload: z.infer<typeof events.UserMentioned>;
+    }>(({ user_id }) => ({
+      event_name: EventNames.UserMentioned,
+      event_payload: {
+        authorUserId: data.authorUserId,
+        mentionedUserId: user_id,
+        communityId,
+        commentId: 'comment' in data && data.comment.id,
+        threadId: 'thread' in data && data.thread.id,
+      },
+    }));
+
+    await emitEvent(models.Outbox, values, transaction);
+  }
 };

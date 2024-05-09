@@ -1,18 +1,17 @@
-import { AppError, EventNames, events } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   UserInstance,
-  emitEvent,
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
-import z from 'zod';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createCommentMentionNotifications,
+  emitMentions,
   findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
@@ -130,21 +129,11 @@ export async function __updateComment(
   await this.models.sequelize.transaction(async (transaction) => {
     await comment.save({ transaction });
 
-    if (mentionedAddresses.length) {
-      const values = ({} = mentionedAddresses.map<{
-        event_name: EventNames.UserMentioned;
-        event_payload: z.infer<typeof events.UserMentioned>;
-      }>(({ user_id }) => ({
-        event_name: EventNames.UserMentioned,
-        event_payload: {
-          authorUserId: user.id,
-          mentionedUserId: user_id,
-          communityId: comment.community_id,
-          commentId: comment.id,
-        },
-      })));
-      await emitEvent(this.models.Outbox, values, transaction);
-    }
+    await emitMentions(this.models, transaction, {
+      authorUserId: user.id,
+      mentions: mentionedAddresses,
+      comment,
+    });
   });
 
   const finalComment = await this.models.Comment.findOne({

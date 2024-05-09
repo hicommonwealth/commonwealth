@@ -13,6 +13,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createThreadMentionNotifications,
+  emitMentions,
   parseUserMentions,
   queryMentionedUsers,
   uniqueMentions,
@@ -163,6 +164,10 @@ export async function __createThread(
     }
   }
 
+  const bodyText = decodeURIComponent(body);
+  const mentions = uniqueMentions(parseUserMentions(bodyText));
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
     async (transaction) => {
@@ -172,6 +177,12 @@ export async function __createThread(
 
       address.last_active = new Date();
       await address.save({ transaction });
+
+      await emitMentions(this.models, transaction, {
+        authorUserId: user.id,
+        mentions: mentionedAddresses,
+        thread,
+      });
 
       return thread.id;
       // end of transaction
@@ -210,10 +221,6 @@ export async function __createThread(
       is_active: true,
     },
   ]);
-
-  const bodyText = decodeURIComponent(body);
-  const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   const allNotificationOptions: EmitOptions[] = [];
 
