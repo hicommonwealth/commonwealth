@@ -22,7 +22,7 @@ import {
 
 chai.use(chaiAsPromised);
 
-describe.only('CommentCreated Event Handler', () => {
+describe('CommentCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined,
     author: z.infer<typeof schemas.User> | undefined,
     subscriber: z.infer<typeof schemas.User> | undefined,
