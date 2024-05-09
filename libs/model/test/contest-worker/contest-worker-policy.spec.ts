@@ -1,11 +1,11 @@
-import { dispose, handleEvent } from '@hicommonwealth/core';
-import { ContestWorker, models } from '@hicommonwealth/model';
-
-import { commonProtocol } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
 import Sinon from 'sinon';
 import Web3 from 'web3';
+
+import { dispose, handleEvent } from '@hicommonwealth/core';
+import { commonProtocol, models } from '../../src';
+import { ContestWorker } from '../../src/policies';
+import { bootstrap_testing, seed } from '../../src/tester';
 
 describe('Contest Worker Policy', () => {
   const addressId = 444;

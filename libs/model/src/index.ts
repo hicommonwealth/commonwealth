@@ -12,9 +12,6 @@ export * as User from './user';
 export * from './services';
 export * from './types';
 
-// Policies
-export * from './policies';
-
 // Test Service
 export * as tester from './tester';
 export type { E2E_TestEntities } from './tester';
