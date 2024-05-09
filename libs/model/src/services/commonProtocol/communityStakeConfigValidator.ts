@@ -19,6 +19,7 @@ export const validateCommunityStakeConfig = async (
   const factoryData =
     commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
   const web3 = new Web3(community.ChainNode.url);
+
   const abiItem = {
     inputs: [
       {
@@ -43,15 +44,17 @@ export const validateCommunityStakeConfig = async (
       },
     ],
   } as AbiFunctionFragment;
+
   const calldata = web3.eth.abi.encodeFunctionCall(abiItem, [
     community.namespace_address,
     id,
   ]);
   const whitelistResponse = await web3.eth.call({
-    to: community.namespace_address!,
+    to: factoryData.communityStake,
     data: calldata,
   });
   const whitelisted = web3.eth.abi.decodeParameter('bool', whitelistResponse);
+
   if (!whitelisted) {
     return new AppError('Community Stake not configured');
   }
