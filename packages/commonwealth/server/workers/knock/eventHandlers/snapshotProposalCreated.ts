@@ -23,12 +23,20 @@ export const processSnapshotProposalCreated: EventHandler<
 
   const { space, id, event } = payload;
 
+  if (!event || event !== SnapshotEventType.Created) {
+    log.warn(
+      'Unsupported Snapshot proposal event. No notification will be emitted',
+      { event },
+    );
+    return false;
+  }
+
   // Sometimes snapshot-listener will receive a webhook event from a
   // proposal that no longer exists. In that event, we will receive null data
   // from the listener. We can't do anything with that data, so we skip it.
-  if (!space && event !== SnapshotEventType.Deleted) {
+  if (!space || !id) {
     log.info('Event received with invalid proposal, skipping');
-    return;
+    return false;
   }
 
   const communityAlerts = await models.sequelize.query<{
@@ -37,8 +45,8 @@ export const processSnapshotProposalCreated: EventHandler<
     users: { id: string }[];
   }>(
     `
-        SELECT C.id as community_id,
-               C.name as community_name,
+        SELECT C.id                                                      as community_id,
+               C.name                                                    as community_name,
                array_agg(JSON_BUILD_OBJECT('user_id', CA.user_id::TEXT)) as users
         FROM "Communities" C
                  JOIN "CommunityAlerts" CA ON C.id = CA.community_id
@@ -57,7 +65,8 @@ export const processSnapshotProposalCreated: EventHandler<
   for (const { community_id, community_name, users } of communityAlerts) {
     if (users.length) {
       const provider = notificationsProvider();
-      await provider.triggerWorkflow({
+      // TODO: retries + error handling
+      return await provider.triggerWorkflow({
         key: WorkflowKeys.SnapshotProposals,
         users,
         data: {
@@ -68,4 +77,6 @@ export const processSnapshotProposalCreated: EventHandler<
       });
     }
   }
+
+  return true;
 };
