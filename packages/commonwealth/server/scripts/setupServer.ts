@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/logging';
 import type { Express } from 'express';
 import http from 'http';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
