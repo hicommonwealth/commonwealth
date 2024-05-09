@@ -247,7 +247,7 @@ describe('Contests metadata commands lifecycle', () => {
           name: 'xxx',
         },
       });
-      expect(promise).to.be.rejectedWith('ContestManager must exist');
+      expect(promise).to.be.rejectedWith('Contest Manager must exist');
     });
 
     it('should update contest manager metadata', async () => {
@@ -367,7 +367,7 @@ describe('Contests metadata commands lifecycle', () => {
           contest_address: 'does-not-exist',
         },
       });
-      expect(promise).to.be.rejectedWith('ContestManager must exist');
+      expect(promise).to.be.rejectedWith('Contest Manager must exist');
     });
 
     it('should cancel contest manager metadata', async () => {
