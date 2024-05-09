@@ -12,8 +12,6 @@ const usePreferenceTags = ({
     })),
   );
 
-  console.log('selectedTags => ', selectedTags);
-
   const toggleTagFromSelection = (item: Tag, isSelected: boolean) => {
     const updatedTags = [...selectedTags];
     const foundTag = updatedTags.find((t) => t.item.tag === item.tag);
