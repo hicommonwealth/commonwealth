@@ -62,3 +62,24 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
     });
   }
 }
+
+export type ErrorMapperFn = (err: Error) => Error | null;
+
+export async function withErrorMappers<T>(
+  errorMapperFns: ErrorMapperFn[],
+  fn: () => Promise<T>,
+): Promise<T> {
+  let result: T | undefined = undefined;
+  try {
+    result = await fn();
+  } catch (err) {
+    for (const mapper of errorMapperFns) {
+      const mappedError = mapper(err as Error);
+      if (mappedError) {
+        throw mappedError;
+      }
+    }
+    throw err;
+  }
+  return result;
+}
