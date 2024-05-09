@@ -17,6 +17,7 @@ const KNOCK_IN_APP_FEED_ID = 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb';
 
 export const KnockNotifications = () => {
   const userId = app.user.id;
+  const knockJWT = app.user.knockJWT;
   const [isVisible, setIsVisible] = useState(false);
 
   const notifButtonRef = useRef(null);
@@ -24,9 +25,18 @@ export const KnockNotifications = () => {
   if (userId === 0) {
     return null;
   }
+
+  if (!knockJWT || knockJWT === '') {
+    return null;
+  }
+
   return (
     <div className="KnockNotifications">
-      <KnockProvider apiKey={KNOCK_PUBLIC_API_KEY} userId={`${userId}`}>
+      <KnockProvider
+        apiKey={KNOCK_PUBLIC_API_KEY}
+        userId={`${userId}`}
+        userToken={knockJWT}
+      >
         {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
         <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
           <div>

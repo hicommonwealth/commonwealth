@@ -62,6 +62,15 @@ export class UserController {
     this._emailVerified = emailVerified;
   }
 
+  private _knockJWT: string;
+  public get knockJWT(): string {
+    return this._knockJWT;
+  }
+
+  private _setKnockJWT(knockJWT: string): void {
+    this._knockJWT = knockJWT;
+  }
+
   private _jwt: string;
   public get jwt(): string {
     return this._jwt;
@@ -192,6 +201,10 @@ export class UserController {
 
   public setEmailVerified(verified: boolean): void {
     this._setEmailVerified(verified);
+  }
+
+  public setKnockJWT(knockJWT: string): void {
+    this._setKnockJWT(knockJWT);
   }
 
   public setJWT(JWT: string): void {
