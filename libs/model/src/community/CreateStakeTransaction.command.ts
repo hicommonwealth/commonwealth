@@ -72,7 +72,11 @@ export function CreateStakeTransaction(): Command<
         (await web3.eth.getBlock(transaction.blockHash as string)).timestamp,
       );
 
-      if (![txReceipt.from, txReceipt.to].includes(communityStakeAddress)) {
+      if (
+        ![txReceipt.from, txReceipt.to].includes(
+          communityStakeAddress.toLowerCase(),
+        )
+      ) {
         throw new Error(
           'This transaction is not associated with a community stake',
         );
@@ -91,7 +95,7 @@ export function CreateStakeTransaction(): Command<
 
       const callData = {
         to: txReceipt.logs[0].address, // src of Transfer single
-        data: '06fdde03', // name function selector
+        data: '0x06fdde03', // name function selector
       };
 
       const response = await web3.eth.call(callData);
