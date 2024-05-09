@@ -12,7 +12,7 @@ Each community may have only one contest running. Contests continue to run even 
 
 Admins cannot interfere with the content submission and voting processes. To be able to change constructor variables, admins must deploy a new contest contract with their new desired variables.
 
-On-chain data submission will be conducted and sponsored by Commonwealth Labs. The Common platform will not get any fee or share from the contests.
+On-chain data submission will be conducted and sponsored by Commonwealth Labs. As of 240509, Common takes a 10% fee from contest distributions.
 
 Contests logic is managed by `Contest.sol`, and financial processes by the `FeeManager.sol` contract.
 
