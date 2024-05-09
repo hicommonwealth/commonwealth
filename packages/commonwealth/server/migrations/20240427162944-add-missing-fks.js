@@ -21,13 +21,13 @@ ADD CONSTRAINT "Topics_community_id_fkey"
 FOREIGN KEY (community_id) REFERENCES public."Communities"(id)
 ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY public."Templates"
-ADD CONSTRAINT "Templates_contractabi_id_fkey"
+ALTER TABLE ONLY public."Template"
+ADD CONSTRAINT "Template_contractabi_id_fkey"
 FOREIGN KEY (abi_id) REFERENCES public."ContractAbis"(id)
 ON UPDATE CASCADE ON DELETE NO ACTION;
 
-ALTER TABLE ONLY public."Templates"
-ADD CONSTRAINT "Templates_community_id_fkey"
+ALTER TABLE ONLY public."Template"
+ADD CONSTRAINT "Template_community_id_fkey"
 FOREIGN KEY (created_for_community) REFERENCES public."Communities"(id)
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 
@@ -119,8 +119,8 @@ FOREIGN KEY (contest_address) REFERENCES public."ContestManagers"(contest_addres
       await queryInterface.sequelize.query(
         `
 ALTER TABLE ONLY public."Topics" DROP CONSTRAINT IF EXISTS "Topics_community_id_fkey";
-ALTER TABLE ONLY public."Templates" DROP CONSTRAINT IF EXISTS "Templates_contractabi_id_fkey";
-ALTER TABLE ONLY public."Templates" DROP CONSTRAINT IF EXISTS "Templates_community_id_fkey";
+ALTER TABLE ONLY public."Template" DROP CONSTRAINT IF EXISTS "Template_contractabi_id_fkey";
+ALTER TABLE ONLY public."Template" DROP CONSTRAINT IF EXISTS "Template_community_id_fkey";
 ALTER TABLE ONLY public."Threads" DROP CONSTRAINT IF EXISTS "Threads_topic_id_fkey";
 ALTER TABLE ONLY public."Profiles" DROP CONSTRAINT IF EXISTS "Profiles_user_id_fkey";
 ALTER TABLE ONLY public."CommunitySnapshotSpaces" DROP CONSTRAINT IF EXISTS "CommunitySnapshotSpaces_community_id_fkey";
