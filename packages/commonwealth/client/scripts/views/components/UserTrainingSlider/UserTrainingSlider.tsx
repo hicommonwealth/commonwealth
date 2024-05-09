@@ -47,6 +47,13 @@ export const UserTrainingSlider = () => {
     setShouldHideTrainingCardsPermanently,
   } = useUserOnboardingSliderMutationStore();
 
+  const hideAllCards = () => {
+    setShouldHideTrainingCardsPermanently(profileId, 'give-upvote');
+    setShouldHideTrainingCardsPermanently(profileId, 'create-content');
+    setShouldHideTrainingCardsPermanently(profileId, 'finish-profile');
+    setShouldHideTrainingCardsPermanently(profileId, 'explore-communities');
+  };
+
   const redirectToPage = (
     pageName:
       | 'give-upvote'
@@ -85,21 +92,7 @@ export const UserTrainingSlider = () => {
             buttonType="tertiary"
             buttonWidth="narrow"
             buttonHeight="sm"
-            onClick={() => {
-              setShouldHideTrainingCardsPermanently(profileId, 'give-upvote');
-              setShouldHideTrainingCardsPermanently(
-                profileId,
-                'create-content',
-              );
-              setShouldHideTrainingCardsPermanently(
-                profileId,
-                'finish-profile',
-              );
-              setShouldHideTrainingCardsPermanently(
-                profileId,
-                'explore-communities',
-              );
-            }}
+            onClick={hideAllCards}
             label="Dismiss all"
           />
         </div>
