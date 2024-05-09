@@ -12,18 +12,32 @@
   min-width: 245px;
   flex: 1;
 
-  .section-icon {
-    width: 40px;
-    height: 40px;
-  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 
-  .check-icon {
-    background-color: #0079cc;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    color: $white;
-    padding: 8px;
+    .section-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .check-icon {
+      background-color: #0079cc;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: $white;
+      padding: 8px;
+    }
+
+    .close-btn {
+      margin-bottom: auto;
+      color: $neutral-500;
+      cursor: pointer;
+      font-size: 20px;
+    }
   }
 
   .content {

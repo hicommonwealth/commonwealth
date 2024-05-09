@@ -20,6 +20,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
@@ -173,6 +174,7 @@ const Sublayout = ({
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
+            {userOnboardingEnabled && <UserTrainingSlider />}
             {isInsideCommunity && <AdminOnboardingSlider />}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}

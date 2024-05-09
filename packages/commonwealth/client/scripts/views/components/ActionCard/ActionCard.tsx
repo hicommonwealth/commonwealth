@@ -10,6 +10,8 @@ type ActionCardProps = {
   title: string;
   description: string;
   isActionCompleted?: boolean;
+  canClose?: boolean;
+  onClose?: () => void;
   ctaText: string;
   onCTAClick: () => any;
 };
@@ -20,16 +22,29 @@ export const ActionCard = ({
   title,
   description,
   isActionCompleted,
+  canClose,
+  onClose,
   ctaText,
   onCTAClick,
 }: ActionCardProps) => {
   return (
     <section className="ActionCard">
-      {isActionCompleted ? (
-        <CWIcon iconName="checkNew" className="check-icon" weight="bold" />
-      ) : (
-        <img className="section-icon" src={iconURL} alt={iconAlt} />
-      )}
+      <div className="header">
+        {isActionCompleted ? (
+          <CWIcon iconName="checkNew" className="check-icon" weight="bold" />
+        ) : (
+          <img className="section-icon" src={iconURL} alt={iconAlt} />
+        )}
+
+        {canClose && (
+          <CWIcon
+            iconName="close"
+            onClick={onClose}
+            iconSize="medium"
+            className="close-btn"
+          />
+        )}
+      </div>
       <div className="content">
         <CWText type="h4" disabled={isActionCompleted}>
           {title}
