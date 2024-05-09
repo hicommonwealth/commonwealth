@@ -1,7 +1,7 @@
 import {
   Broker,
   BrokerPublications,
-  schemas,
+  Outbox,
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
@@ -17,9 +17,7 @@ const log = logger(__filename);
 export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];
   await models.sequelize.transaction(async (transaction) => {
-    const events = await models.sequelize.query<
-      z.infer<typeof schemas.entities.Outbox>
-    >(
+    const events = await models.sequelize.query<z.infer<typeof Outbox>>(
       `
       SELECT *
       FROM "Outbox"

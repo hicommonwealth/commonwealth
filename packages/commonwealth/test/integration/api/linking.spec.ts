@@ -6,7 +6,8 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
-import { LinkSource, ThreadAttributes } from '@hicommonwealth/model';
+import { ThreadAttributes } from '@hicommonwealth/model';
+import { LinkSource } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';

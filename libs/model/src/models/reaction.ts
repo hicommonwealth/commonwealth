@@ -35,8 +35,8 @@ export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
 export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
-export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
-  const Reaction = <ReactionModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <ReactionModelStatic>sequelize.define<ReactionInstance>(
     'Reaction',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -188,17 +188,3 @@ export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
       ],
     },
   );
-
-  Reaction.associate = (models) => {
-    models.Reaction.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Reaction;
-};

@@ -1,10 +1,10 @@
-import { schemas } from '@hicommonwealth/core';
+import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type SubscriptionPreferenceAttributes = z.infer<
-  typeof schemas.entities.SubscriptionPreference
+  typeof SubscriptionPreference
 >;
 
 export type SubscriptionPreferenceInstance =

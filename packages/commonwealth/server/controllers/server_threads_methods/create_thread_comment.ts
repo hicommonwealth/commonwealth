@@ -172,6 +172,7 @@ export async function __createThreadComment(
     discord_meta: discordMeta,
     reaction_count: 0,
     reaction_weights_sum: 0,
+    created_by: '',
   };
 
   if (parentId) {

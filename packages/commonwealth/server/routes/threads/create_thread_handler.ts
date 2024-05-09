@@ -1,5 +1,4 @@
-import { IDiscordMeta } from '@hicommonwealth/core';
-import { ThreadAttributes } from '@hicommonwealth/model';
+import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
 import {
   fromCanvasSignedDataApiArgs,

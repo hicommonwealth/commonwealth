@@ -1,5 +1,5 @@
+import { Role } from '@hicommonwealth/shared';
 import type { CommunityAttributes } from './community';
-import type { Role } from './role';
 import type { RoleAssignmentAttributes } from './role_assignment';
 
 export type CommunityRoleAttributes = {

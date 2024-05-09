@@ -14,7 +14,6 @@ export type MembershipRejectReason =
   | null;
 
 export type MembershipAttributes = {
-  id?: number;
   group_id: number;
   address_id: number;
   reject_reason?: MembershipRejectReason;
@@ -32,28 +31,18 @@ export default (sequelize: Sequelize.Sequelize) =>
   <MembershipModelStatic>sequelize.define<MembershipInstance>(
     'Membership',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      group_id: { type: Sequelize.INTEGER, allowNull: false },
+      group_id: { type: Sequelize.INTEGER, primaryKey: true },
       address_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       reject_reason: { type: Sequelize.JSONB, allowNull: true },
       last_checked: { type: Sequelize.DATE, allowNull: false },
     },
     {
+      tableName: 'Memberships',
       underscored: true,
       timestamps: false,
-      tableName: 'Memberships',
-      indexes: [
-        { fields: ['address_id'] },
-        { fields: ['group_id'] },
-        { fields: ['address_id', 'group_id'], unique: true },
-      ],
+      indexes: [{ fields: ['address_id'] }, { fields: ['group_id'] }],
     },
   );

@@ -1,4 +1,4 @@
-import { schemas } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import {
@@ -19,7 +19,7 @@ const web3 = new Web3();
 
 export async function handleGovernanceProposalEvents(
   models: DB,
-  event: z.infer<typeof schemas.events.ChainEventCreated>,
+  event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const community: {
     id: CommunityAttributes['id'];

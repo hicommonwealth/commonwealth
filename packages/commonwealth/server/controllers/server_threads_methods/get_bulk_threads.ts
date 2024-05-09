@@ -222,7 +222,7 @@ export async function __getBulkThreads(
     LEFT JOIN contest_data COND ON TT.id = COND.thread_id;
   `,
     {
-      logging: true,
+      //logging: true,
       replacements,
       type: QueryTypes.SELECT,
     },

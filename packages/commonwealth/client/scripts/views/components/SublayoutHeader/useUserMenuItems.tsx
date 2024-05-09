@@ -52,7 +52,7 @@ export const handleLogout = async () => {
 };
 
 interface UseUserMenuItemsProps {
-  onAuthModalOpen: (open: boolean) => void;
+  onAuthModalOpen: () => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -203,7 +203,7 @@ const useUserMenuItems = ({
             type: 'default',
             label: 'Connect a new address',
             onClick: () => {
-              onAuthModalOpen(true);
+              onAuthModalOpen();
               onAddressItemClick?.();
             },
           },

@@ -13,11 +13,9 @@ import type {
 import type {
   CommunityAttributes,
   DB,
-  Link,
-  LinkSource,
-  Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import { type Link, type LinkSource, type Role } from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
