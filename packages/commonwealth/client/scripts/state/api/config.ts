@@ -25,6 +25,7 @@ export const ApiEndpoints = {
   FETCH_GROUPS: '/groups',
   REFRESH_MEMBERSHIP: '/refresh-membership',
   FETCH_WEBHOOKS: '/getWebhooks',
+  FETCH_SELF_PROFILE: '/profile/v2',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
