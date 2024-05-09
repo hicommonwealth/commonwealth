@@ -13,7 +13,20 @@ module.exports = {
       `,
         { transaction },
       );
-      ``;
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Templates"
+        RENAME CONSTRAINT "Template_contractabi_id_fkey" TO "Templates_contractabi_id_fkey";
+      `,
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Templates"
+        RENAME CONSTRAINT "Template_community_id_fkey" TO "Templates_community_id_fkey";
+      `,
+        { transaction },
+      );
     });
   },
 
@@ -26,6 +39,20 @@ module.exports = {
         `
         ALTER TABLE "Template"
         RENAME CONSTRAINT "Templates_created_for_community_fkey" TO "Template_created_for_community_fkey";
+      `,
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Template"
+        RENAME CONSTRAINT "Templates_contractabi_id_fkey" TO "Template_contractabi_id_fkey";
+      `,
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Template"
+        RENAME CONSTRAINT "Templates_community_id_fkey" TO "Template_community_id_fkey";
       `,
         { transaction },
       );
