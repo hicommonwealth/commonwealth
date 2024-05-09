@@ -1,4 +1,6 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { ActionCard } from '../ActionCard';
 import { CWText } from '../component_kit/cw_text';
@@ -34,6 +36,28 @@ const CARD_TYPES = {
 };
 
 export const UserTrainingSlider = () => {
+  const navigate = useCommonNavigate();
+
+  const redirectToPage = (
+    pageName:
+      | 'give-upvote'
+      | 'create-content'
+      | 'finish-profile'
+      | 'explore-communities',
+  ) => {
+    const defaultCommunityId = app?.user?.addresses?.[0]?.community?.id;
+    const communityIdForRedirection = app.activeChainId()
+      ? `/${app.activeChainId()}`
+      : `/${defaultCommunityId}`;
+
+    pageName === 'give-upvote' &&
+      navigate(`${communityIdForRedirection}/discussions`, {}, null);
+    pageName === 'create-content' &&
+      navigate(`${communityIdForRedirection}/new/discussion`, {}, null);
+    pageName === 'finish-profile' && navigate(`/profile/edit`, {}, null);
+    pageName === 'explore-communities' && navigate(`/communities`, {}, null);
+  };
+
   return (
     <CWPageLayout className="UserTrainingSliderPageLayout">
       <section className="UserTrainingSlider">
@@ -62,8 +86,7 @@ export const UserTrainingSlider = () => {
             description={CARD_TYPES['give-upvote'].description}
             iconURL={CARD_TYPES['give-upvote'].iconURL}
             iconAlt="give-upvote-icon"
-            canClose
-            onCTAClick={() => {}}
+            onCTAClick={() => redirectToPage('give-upvote')}
           />
           <ActionCard
             ctaText={CARD_TYPES['create-content'].ctaText}
@@ -71,8 +94,7 @@ export const UserTrainingSlider = () => {
             description={CARD_TYPES['create-content'].description}
             iconURL={CARD_TYPES['create-content'].iconURL}
             iconAlt="create-content-icon"
-            canClose
-            onCTAClick={() => {}}
+            onCTAClick={() => redirectToPage('create-content')}
           />
           <ActionCard
             ctaText={CARD_TYPES['finish-profile'].ctaText}
@@ -80,8 +102,7 @@ export const UserTrainingSlider = () => {
             description={CARD_TYPES['finish-profile'].description}
             iconURL={CARD_TYPES['finish-profile'].iconURL}
             iconAlt="finish-profile-icon"
-            canClose
-            onCTAClick={() => {}}
+            onCTAClick={() => redirectToPage('finish-profile')}
           />
           <ActionCard
             ctaText={CARD_TYPES['explore-communities'].ctaText}
@@ -89,8 +110,7 @@ export const UserTrainingSlider = () => {
             description={CARD_TYPES['explore-communities'].description}
             iconURL={CARD_TYPES['explore-communities'].iconURL}
             iconAlt="explore-communities-icon"
-            canClose
-            onCTAClick={() => {}}
+            onCTAClick={() => redirectToPage('explore-communities')}
           />
         </div>
       </section>
