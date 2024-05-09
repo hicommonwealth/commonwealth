@@ -72,7 +72,7 @@ export function CreateStakeTransaction(): Command<
         (await web3.eth.getBlock(transaction.blockHash as string)).timestamp,
       );
 
-      if (![transaction.from, transaction.to].includes(communityStakeAddress)) {
+      if (![txReceipt.from, txReceipt.to].includes(communityStakeAddress)) {
         throw new Error(
           'This transaction is not associated with a community stake',
         );

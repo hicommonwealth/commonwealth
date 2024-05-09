@@ -155,10 +155,7 @@ async function getErc1155Balance(
     return {};
   } else {
     return {
-      [address]: AbiCoder.decodeParameter(
-        'uint256',
-        data.result,
-      ) as unknown as string,
+      [address]: String(AbiCoder.decodeParameter('uint256', data.result)),
     };
   }
 }
