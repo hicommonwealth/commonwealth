@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import { WebpackDeduplicationPlugin } from 'webpack-deduplication-plugin';
 import { merge } from 'webpack-merge';
 import baseConfig from './webpack.base.config.mjs';
 
@@ -23,9 +22,9 @@ export default merge(baseConfig, {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
     }),
-    new WebpackDeduplicationPlugin({
-      cacheDir: './cache',
-    }),
+    // new WebpackDeduplicationPlugin({
+    //   cacheDir: './cache',
+    // }),
     new CopyWebpackPlugin({
       patterns: [
         {

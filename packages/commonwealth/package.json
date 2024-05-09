@@ -163,6 +163,7 @@
     "ethereumjs-util": "7.1.0",
     "ethereumjs-wallet": "^1.0.2",
     "ethers": "5.7.2",
+    "events": "^3.3.0",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "express-http-to-https": "^1.1.4",
@@ -261,6 +262,7 @@
     "zustand": "^4.3.8"
   },
   "devDependencies": {
+    "@ethersproject/keccak256": "5.7.0",
     "@types/express": "^4.17.21",
     "@types/moment": "^2.13.0",
     "@types/passport": "^1.0.16",
