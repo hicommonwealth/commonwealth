@@ -84,7 +84,7 @@ export async function __deleteCommunity(
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
-                SELECT id 
+                SELECT id
                 FROM "Addresses"
                 WHERE community_id = :community_id
             ) DELETE FROM "Memberships" M
@@ -102,7 +102,7 @@ export async function __deleteCommunity(
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
-                SELECT id 
+                SELECT id
                 FROM "Addresses"
                 WHERE community_id = :community_id
             ) DELETE FROM "Collaborations" C
@@ -117,7 +117,7 @@ export async function __deleteCommunity(
             },
           );
 
-          const models = [
+          const models: ModelStatic<Model>[] = [
             this.models.CommunityStake,
             this.models.DiscordBotConfig,
             this.models.Ban,

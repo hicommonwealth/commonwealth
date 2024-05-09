@@ -10,7 +10,7 @@ import {
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { step } from 'mocha-steps';
-import { ValidationError } from 'sequelize';
+import { Model, ValidationError, type ModelStatic } from 'sequelize';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
@@ -29,7 +29,7 @@ async function testSeed<T extends schemas.Aggregates>(
 
   // perform schema validation on created entity (throws)
   const schema = schemas[name];
-  const model = models[name];
+  const model: ModelStatic<Model> = models[name];
   const data: ReturnType<typeof schema.parse> = schema.parse(record);
 
   // attempt to find entity that was created

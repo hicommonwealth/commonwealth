@@ -1,6 +1,6 @@
 import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { createRequire } from 'node:module';
+import { createRequire } from 'module';
 import path from 'path';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';

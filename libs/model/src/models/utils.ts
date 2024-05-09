@@ -26,7 +26,7 @@ export function oneToOne<Source extends State, Target extends State>(
   target: ModelStatic<Model<Target>> & Associable<Target>,
   keys: [keyof Source & string, keyof Target & string],
   options?: OneToOneOptions<Source>,
-) {
+): ModelStatic<Model<Source>> & Associable<Source> {
   this.belongsTo(target, {
     foreignKey: keys[0],
     as: options?.as,
@@ -62,7 +62,7 @@ export function oneToMany<Parent extends State, Child extends State>(
   child: ModelStatic<Model<Child>> & Associable<Child>,
   foreignKey: (keyof Child & string) | Array<keyof Child & string>,
   options?: OneToManyOptions<Parent, Child>,
-) {
+): ModelStatic<Model<Parent>> & Associable<Parent> {
   const fk = Array.isArray(foreignKey) ? foreignKey[0] : foreignKey;
   this.hasMany(child, {
     foreignKey: { name: fk, allowNull: options?.optional },
@@ -104,7 +104,7 @@ export function manyToMany<X extends State, A extends State, B extends State>(
   this: ModelStatic<Model<X>> & Associable<X>,
   a: ManyToManyOptions<X, A> & Associable<A>,
   b: ManyToManyOptions<X, B> & Associable<B>,
-) {
+): ModelStatic<Model<X>> & Associable<X> {
   this.belongsTo(a.model, {
     foreignKey: { name: a.key, allowNull: false },
     as: a.asOne,
