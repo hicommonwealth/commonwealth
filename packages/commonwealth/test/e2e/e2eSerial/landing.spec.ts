@@ -12,7 +12,7 @@ test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
     page.on('response', (response) => {
       if (response.url().startsWith('http://localhost:8080/api/')) {
-        expect(response.status()).toBeLessThanOrEqual(400);
+        expect(response.status()).toBeLessThan(400);
       }
     });
 
