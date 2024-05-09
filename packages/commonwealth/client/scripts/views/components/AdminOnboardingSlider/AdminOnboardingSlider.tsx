@@ -11,12 +11,45 @@ import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { ActionCard } from '../ActionCard';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-import { AdminOnboardingCard } from './AdminOnboardingCard/AdminOnboardingCard';
 import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';
+
+const CARD_TYPES = {
+  'launch-contest': {
+    iconURL: '/static/img/shapes/shape1.svg',
+    title: 'Launch a contest',
+    description: 'Get your community engaged by launching a weekly contest',
+    ctaText: 'Launch contest',
+  },
+  'create-topic': {
+    iconURL: '/static/img/shapes/shape3.svg',
+    title: 'Create a topic',
+    description: 'Add custom topics to keep your discussions organized',
+    ctaText: 'Create topic',
+  },
+  'make-group': {
+    iconURL: '/static/img/shapes/shape4.svg',
+    title: 'Make a group',
+    description: 'Set user access permissions with custom parameters',
+    ctaText: 'Make group',
+  },
+  'enable-integrations': {
+    iconURL: '/static/img/shapes/shape5.svg',
+    title: 'Enable integrations',
+    description: 'Integrate your Discord, Snapshot, webhooks, etc.',
+    ctaText: 'Integrate apps',
+  },
+  'create-thread': {
+    iconURL: '/static/img/shapes/shape6.svg',
+    title: 'Create a thread',
+    description: 'Organize your discussions with topics',
+    ctaText: 'Create thread',
+  },
+};
 
 export const AdminOnboardingSlider = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -123,29 +156,49 @@ export const AdminOnboardingSlider = () => {
           </div>
           <div className="cards">
             {contestEnabled && isEvmCommunity && (
-              <AdminOnboardingCard
-                cardType="launch-contest"
+              <ActionCard
+                ctaText={CARD_TYPES['launch-contest'].ctaText}
+                title={CARD_TYPES['launch-contest'].title}
+                description={CARD_TYPES['launch-contest'].description}
+                iconURL={CARD_TYPES['launch-contest'].iconURL}
+                iconAlt="launch-contest-icon"
                 isActionCompleted={contestsData.length > 0}
                 onCTAClick={() => redirectToPage('launch-contest')}
               />
             )}
-            <AdminOnboardingCard
-              cardType="create-topic"
+            <ActionCard
+              ctaText={CARD_TYPES['create-topic'].ctaText}
+              title={CARD_TYPES['create-topic'].title}
+              description={CARD_TYPES['create-topic'].description}
+              iconURL={CARD_TYPES['create-topic'].iconURL}
+              iconAlt="create-topic-icon"
               isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
               onCTAClick={() => redirectToPage('create-topic')}
             />
-            <AdminOnboardingCard
-              cardType="make-group"
+            <ActionCard
+              ctaText={CARD_TYPES['make-group'].ctaText}
+              title={CARD_TYPES['make-group'].title}
+              description={CARD_TYPES['make-group'].description}
+              iconURL={CARD_TYPES['make-group'].iconURL}
+              iconAlt="make-group-icon"
               isActionCompleted={groups.length > 0}
               onCTAClick={() => redirectToPage('create-group')}
             />
-            <AdminOnboardingCard
-              cardType="enable-integrations"
+            <ActionCard
+              ctaText={CARD_TYPES['enable-integrations'].ctaText}
+              title={CARD_TYPES['enable-integrations'].title}
+              description={CARD_TYPES['enable-integrations'].description}
+              iconURL={CARD_TYPES['enable-integrations'].iconURL}
+              iconAlt="enable-integrations-icon"
               isActionCompleted={hasAnyIntegration}
               onCTAClick={() => redirectToPage('manage-integrations')}
             />
-            <AdminOnboardingCard
-              cardType="create-thread"
+            <ActionCard
+              ctaText={CARD_TYPES['create-thread'].ctaText}
+              title={CARD_TYPES['create-thread'].title}
+              description={CARD_TYPES['create-thread'].description}
+              iconURL={CARD_TYPES['create-thread'].iconURL}
+              iconAlt="create-thread-icon"
               isActionCompleted={threadCount > 0}
               onCTAClick={() => redirectToPage('create-thread')}
             />
