@@ -154,7 +154,8 @@ export const UserTrainingSlider = () => {
   if (
     !isLoggedIn ||
     isLoadingProfile ||
-    shouldHideTrainingCardsPermanently?.[profileId]?.length === 4
+    (shouldHideTrainingCardsPermanently?.[profileId]?.length === 4 &&
+      cardTempMarkedAsCompleted.length === 0)
   ) {
     return;
   }
@@ -218,6 +219,9 @@ export const UserTrainingSlider = () => {
               onClose={() =>
                 hideCardPermanently(UserTrainingCardTypes.GiveUpvote)
               }
+              isActionCompleted={cardTempMarkedAsCompleted.includes(
+                UserTrainingCardTypes.GiveUpvote,
+              )}
               onCTAClick={() =>
                 redirectToPage(UserTrainingCardTypes.GiveUpvote)
               }
@@ -236,6 +240,9 @@ export const UserTrainingSlider = () => {
               onClose={() =>
                 hideCardPermanently(UserTrainingCardTypes.CreateContent)
               }
+              isActionCompleted={cardTempMarkedAsCompleted.includes(
+                UserTrainingCardTypes.CreateContent,
+              )}
               onCTAClick={() =>
                 redirectToPage(UserTrainingCardTypes.CreateContent)
               }
@@ -254,6 +261,9 @@ export const UserTrainingSlider = () => {
               onClose={() =>
                 hideCardPermanently(UserTrainingCardTypes.FinishProfile)
               }
+              isActionCompleted={cardTempMarkedAsCompleted.includes(
+                UserTrainingCardTypes.FinishProfile,
+              )}
               onCTAClick={() =>
                 redirectToPage(UserTrainingCardTypes.FinishProfile)
               }

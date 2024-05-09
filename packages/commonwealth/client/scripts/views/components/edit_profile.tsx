@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
@@ -6,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import _ from 'underscore';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -16,6 +18,7 @@ import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
+import { UserTrainingCardTypes } from './UserTrainingSlider/types';
 import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
@@ -42,6 +45,7 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<EditProfileError>(EditProfileError.None);
@@ -62,6 +66,11 @@ const EditProfileComponent = () => {
       chain: a.community.id,
     })),
   });
+
+  const {
+    setCardTempMarkedAsCompleted,
+    setShouldHideTrainingCardsPermanently,
+  } = useUserOnboardingSliderMutationStore();
 
   const getProfile = async () => {
     try {
@@ -138,6 +147,14 @@ const EditProfileComponent = () => {
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
+
+          if (userOnboardingEnabled && socials.length > 0) {
+            setCardTempMarkedAsCompleted(UserTrainingCardTypes.FinishProfile);
+            setShouldHideTrainingCardsPermanently(
+              profile.id,
+              UserTrainingCardTypes.FinishProfile,
+            );
+          }
         })
         .catch((err) => {
           notifyError(err?.response?.data?.error || 'Something went wrong.');
