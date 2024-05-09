@@ -113,6 +113,11 @@ const baseConfig = {
         process.env.HEROKU_APP_NAME,
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS': JSON.stringify(
+        process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {

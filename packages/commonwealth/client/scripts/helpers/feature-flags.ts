@@ -7,14 +7,14 @@ import { InMemoryProvider } from '@openfeature/web-sdk';
 import { UnleashClient } from 'unleash-proxy-client';
 import { UnleashProvider } from '../../../shared/UnleashProvider';
 
-const buildFlag = (env: string, defaultValue: 'on' | 'off' = 'off') => {
+const buildFlag = (env: string) => {
   return {
     variants: {
       on: true,
       off: false,
     },
     disabled: false,
-    defaultVariant: env === 'true' ? 'on' : defaultValue,
+    defaultVariant: env === 'true' || env === 'on' ? 'on' : 'off',
   };
 };
 
