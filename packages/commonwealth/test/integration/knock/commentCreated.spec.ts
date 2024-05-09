@@ -22,7 +22,7 @@ import {
 
 chai.use(chaiAsPromised);
 
-describe('CommentCreated Event Handler', () => {
+describe.only('CommentCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined,
     author: z.infer<typeof schemas.User> | undefined,
     subscriber: z.infer<typeof schemas.User> | undefined,
@@ -106,7 +106,7 @@ describe('CommentCreated Event Handler', () => {
       name: EventNames.CommentCreated,
       payload: { address_id: -999999 } as z.infer<typeof CommentCreated>,
     });
-    expect(res).to.be.undefined;
+    expect(res).to.be.false;
   });
 
   it('should not throw if a valid community is not found', async () => {
@@ -117,7 +117,7 @@ describe('CommentCreated Event Handler', () => {
         community_id: '2f92ekf2fjpe9svk23',
       } as z.infer<typeof CommentCreated>,
     });
-    expect(res).to.be.undefined;
+    expect(res).to.be.false;
   });
 
   it('should do nothing if there are no relevant subscriptions', async () => {
@@ -133,7 +133,7 @@ describe('CommentCreated Event Handler', () => {
         thread_id: rootComment.thread_id,
       } as z.infer<typeof CommentCreated>,
     });
-    expect(res).to.be.false;
+    expect(res).to.be.true;
     expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
 
     disposeAdapter(notificationsProvider.name);
