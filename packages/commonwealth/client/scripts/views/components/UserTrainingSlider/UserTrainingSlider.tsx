@@ -1,6 +1,7 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { ActionCard } from '../ActionCard';
 import { CWText } from '../component_kit/cw_text';
@@ -38,6 +39,11 @@ const CARD_TYPES = {
 export const UserTrainingSlider = () => {
   const navigate = useCommonNavigate();
 
+  const {
+    shouldHideTrainingCardsTemporary,
+    setShouldHideTrainingCardsTemporary,
+  } = useUserOnboardingSliderMutationStore();
+
   const redirectToPage = (
     pageName:
       | 'give-upvote'
@@ -58,6 +64,10 @@ export const UserTrainingSlider = () => {
     pageName === 'explore-communities' && navigate(`/communities`, {}, null);
   };
 
+  if (shouldHideTrainingCardsTemporary.length === 4) {
+    return;
+  }
+
   return (
     <CWPageLayout className="UserTrainingSliderPageLayout">
       <section className="UserTrainingSlider">
@@ -76,42 +86,72 @@ export const UserTrainingSlider = () => {
             buttonType="tertiary"
             buttonWidth="narrow"
             buttonHeight="sm"
+            onClick={() => {
+              setShouldHideTrainingCardsTemporary('give-upvote');
+              setShouldHideTrainingCardsTemporary('create-content');
+              setShouldHideTrainingCardsTemporary('finish-profile');
+              setShouldHideTrainingCardsTemporary('explore-communities');
+            }}
             label="Dismiss all"
           />
         </div>
         <div className="cards">
-          <ActionCard
-            ctaText={CARD_TYPES['give-upvote'].ctaText}
-            title={CARD_TYPES['give-upvote'].title}
-            description={CARD_TYPES['give-upvote'].description}
-            iconURL={CARD_TYPES['give-upvote'].iconURL}
-            iconAlt="give-upvote-icon"
-            onCTAClick={() => redirectToPage('give-upvote')}
-          />
-          <ActionCard
-            ctaText={CARD_TYPES['create-content'].ctaText}
-            title={CARD_TYPES['create-content'].title}
-            description={CARD_TYPES['create-content'].description}
-            iconURL={CARD_TYPES['create-content'].iconURL}
-            iconAlt="create-content-icon"
-            onCTAClick={() => redirectToPage('create-content')}
-          />
-          <ActionCard
-            ctaText={CARD_TYPES['finish-profile'].ctaText}
-            title={CARD_TYPES['finish-profile'].title}
-            description={CARD_TYPES['finish-profile'].description}
-            iconURL={CARD_TYPES['finish-profile'].iconURL}
-            iconAlt="finish-profile-icon"
-            onCTAClick={() => redirectToPage('finish-profile')}
-          />
-          <ActionCard
-            ctaText={CARD_TYPES['explore-communities'].ctaText}
-            title={CARD_TYPES['explore-communities'].title}
-            description={CARD_TYPES['explore-communities'].description}
-            iconURL={CARD_TYPES['explore-communities'].iconURL}
-            iconAlt="explore-communities-icon"
-            onCTAClick={() => redirectToPage('explore-communities')}
-          />
+          {!shouldHideTrainingCardsTemporary.includes('give-upvote') && (
+            <ActionCard
+              ctaText={CARD_TYPES['give-upvote'].ctaText}
+              title={CARD_TYPES['give-upvote'].title}
+              description={CARD_TYPES['give-upvote'].description}
+              iconURL={CARD_TYPES['give-upvote'].iconURL}
+              iconAlt="give-upvote-icon"
+              canClose
+              onClose={() => setShouldHideTrainingCardsTemporary('give-upvote')}
+              onCTAClick={() => redirectToPage('give-upvote')}
+            />
+          )}
+          {!shouldHideTrainingCardsTemporary.includes('create-content') && (
+            <ActionCard
+              ctaText={CARD_TYPES['create-content'].ctaText}
+              title={CARD_TYPES['create-content'].title}
+              description={CARD_TYPES['create-content'].description}
+              iconURL={CARD_TYPES['create-content'].iconURL}
+              iconAlt="create-content-icon"
+              canClose
+              onClose={() =>
+                setShouldHideTrainingCardsTemporary('create-content')
+              }
+              onCTAClick={() => redirectToPage('create-content')}
+            />
+          )}
+          {!shouldHideTrainingCardsTemporary.includes('finish-profile') && (
+            <ActionCard
+              ctaText={CARD_TYPES['finish-profile'].ctaText}
+              title={CARD_TYPES['finish-profile'].title}
+              description={CARD_TYPES['finish-profile'].description}
+              iconURL={CARD_TYPES['finish-profile'].iconURL}
+              iconAlt="finish-profile-icon"
+              canClose
+              onClose={() =>
+                setShouldHideTrainingCardsTemporary('finish-profile')
+              }
+              onCTAClick={() => redirectToPage('finish-profile')}
+            />
+          )}
+          {!shouldHideTrainingCardsTemporary.includes(
+            'explore-communities',
+          ) && (
+            <ActionCard
+              ctaText={CARD_TYPES['explore-communities'].ctaText}
+              title={CARD_TYPES['explore-communities'].title}
+              description={CARD_TYPES['explore-communities'].description}
+              iconURL={CARD_TYPES['explore-communities'].iconURL}
+              iconAlt="explore-communities-icon"
+              canClose
+              onClose={() =>
+                setShouldHideTrainingCardsTemporary('explore-communities')
+              }
+              onCTAClick={() => redirectToPage('explore-communities')}
+            />
+          )}
         </div>
       </section>
     </CWPageLayout>
