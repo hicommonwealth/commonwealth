@@ -13,7 +13,7 @@ type ActionCardProps = {
   canClose?: boolean;
   onClose?: () => void;
   ctaText: string;
-  onCTAClick: () => any;
+  onCTAClick: () => void;
 };
 
 export const ActionCard = ({

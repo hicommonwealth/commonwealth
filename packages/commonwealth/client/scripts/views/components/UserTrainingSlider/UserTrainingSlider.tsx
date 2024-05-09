@@ -116,7 +116,12 @@ export const UserTrainingSlider = () => {
         UserTrainingCardTypes.FinishProfile,
       );
     }
-  }, [isLoggedIn, profileId, shouldHideTrainingCardsPermanently]);
+  }, [
+    isLoggedIn,
+    profileId,
+    shouldHideTrainingCardsPermanently,
+    setShouldHideTrainingCardsPermanently,
+  ]);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -148,7 +153,9 @@ export const UserTrainingSlider = () => {
     isLoggedIn,
     isLoadingProfile,
     profile,
+    profileId,
     shouldHideTrainingCardsPermanently,
+    setShouldHideTrainingCardsPermanently,
   ]);
 
   if (
