@@ -1,3 +1,4 @@
+import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -37,6 +38,7 @@ const CARD_TYPES = {
 };
 
 export const UserTrainingSlider = () => {
+  const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
 
   const {
@@ -64,7 +66,7 @@ export const UserTrainingSlider = () => {
     pageName === 'explore-communities' && navigate(`/communities`, {}, null);
   };
 
-  if (shouldHideTrainingCardsTemporary.length === 4) {
+  if (!isLoggedIn || shouldHideTrainingCardsTemporary.length === 4) {
     return;
   }
 
