@@ -27,8 +27,6 @@ dotenv.config();
 
 const KNOCK_SIGNING_KEY = process.env.KNOCK_SIGNING_KEY;
 
-console.log('FIXME: KNOCK_SIGNING_KEY', KNOCK_SIGNING_KEY);
-
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
