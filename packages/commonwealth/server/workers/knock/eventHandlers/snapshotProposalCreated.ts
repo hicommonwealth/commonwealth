@@ -47,7 +47,7 @@ export const processSnapshotProposalCreated: EventHandler<
     `
         SELECT C.id                                                      as community_id,
                C.name                                                    as community_name,
-               array_agg(JSON_BUILD_OBJECT('user_id', CA.user_id::TEXT)) as users
+               array_agg(JSON_BUILD_OBJECT('id', CA.user_id::TEXT)) as users
         FROM "Communities" C
                  JOIN "CommunityAlerts" CA ON C.id = CA.community_id
         WHERE :snapshotSpace = ANY (C.snapshot_spaces)

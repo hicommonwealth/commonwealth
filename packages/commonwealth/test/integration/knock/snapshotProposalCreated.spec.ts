@@ -123,7 +123,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
     ).to.deep.equal({
       key: WorkflowKeys.SnapshotProposals,
-      users: [{ user_id: String(user!.id) }],
+      users: [{ id: String(user!.id) }],
       data: {
         community_name: community.name,
         space_name: space,
