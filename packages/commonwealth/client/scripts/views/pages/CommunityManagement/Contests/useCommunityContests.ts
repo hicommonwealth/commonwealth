@@ -15,8 +15,6 @@ const useCommunityContests = () => {
     { enabled: !!app.activeChainId() },
   );
 
-  console.log('data', data);
-
   const { data: contestsData, isLoading: isContestDataLoading } = useQuery<
     typeof mockedContests
   >({

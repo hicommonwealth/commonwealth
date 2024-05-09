@@ -5,6 +5,7 @@ import {
   useFetchEthUsdRateQuery,
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
+import { useFundContestOnchainMutation } from 'state/api/contests';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
@@ -24,19 +25,6 @@ interface FundContestDrawerProps {
   onClose: () => void;
   contestAddress: string;
 }
-
-const fakeApiCall = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const randomNum = Math.random();
-      if (randomNum < 0.5) {
-        resolve('API call successful');
-      } else {
-        reject(new Error('API call failed'));
-      }
-    }, 2000);
-  });
-};
 
 export type FundContestStep = 'Form' | 'Loading' | 'Success' | 'Failure';
 
@@ -67,6 +55,8 @@ const FundContestDrawer = ({
 
   const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+
+  const { mutateAsync: fundContest } = useFundContestOnchainMutation();
 
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
@@ -99,7 +89,14 @@ const FundContestDrawer = ({
   const handleTransferFunds = async () => {
     try {
       setFundContestDrawerStep('Loading');
-      await fakeApiCall();
+
+      await fundContest({
+        ethChainId,
+        chainRpc,
+        amount: Number(amountEth),
+        walletAddress: selectedAddress.value,
+      });
+
       setFundContestDrawerStep('Success');
     } catch (err) {
       setFundContestDrawerStep('Failure');

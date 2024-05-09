@@ -28,9 +28,6 @@ const fundContestOnchain = async ({
 const useFundContestOnchainMutation = () => {
   return useMutation({
     mutationFn: fundContestOnchain,
-    onSuccess: async () => {
-      console.log('fundContestOnchain success');
-    },
   });
 };
 
