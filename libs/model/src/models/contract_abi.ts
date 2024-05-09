@@ -1,7 +1,7 @@
 import type { AbiType } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { hashAbi } from '../utils';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type ContractAbiAttributes = {
   id: number;
@@ -15,10 +15,10 @@ export type ContractAbiAttributes = {
 
 export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
 
-export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <ContractAbiModelStatic>sequelize.define<ContractAbiInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ContractAbiInstance> =>
+  sequelize.define<ContractAbiInstance>(
     'ContractAbi',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },

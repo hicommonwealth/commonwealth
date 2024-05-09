@@ -1,7 +1,7 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Model, ModelStatic } from 'sequelize';
+import { Model, type ModelStatic } from 'sequelize';
 import z, { ZodNullable, ZodObject, ZodUnknown } from 'zod';
 import type { State } from '../models';
 import { bootstrap_testing } from './bootstrap';
