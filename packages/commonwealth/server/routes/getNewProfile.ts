@@ -20,6 +20,7 @@ type GetNewProfileReq = {
 };
 type GetNewProfileResp = {
   profile: ProfileInstance;
+  totalUpvotes: number;
   addresses: AddressAttributes[];
   threads: ThreadAttributes[];
   comments: CommentAttributes[];
@@ -70,6 +71,15 @@ const getNewProfile = async (
   });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
+
+  const totalUpvotes = await models.Reaction.count({
+    where: {
+      address_id: {
+        [Op.in]: addressIds,
+      },
+    },
+  });
+
   const threads = await models.Thread.findAll({
     where: {
       address_id: {
@@ -110,6 +120,7 @@ const getNewProfile = async (
 
   return success(res, {
     profile,
+    totalUpvotes,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),

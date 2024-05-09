@@ -109,29 +109,21 @@ export const UserTrainingSlider = () => {
   }, [isLoggedIn, cardTempMarkedAsCompleted, clearCardsTempMarkedAsCompleted]);
 
   useEffect(() => {
-    // if user has email, then hide `finish-profile` card
-    if (isLoggedIn && app?.user?.email && profileId) {
-      setShouldHideTrainingCardsPermanently(
-        profileId,
-        UserTrainingCardTypes.FinishProfile,
-      );
-    }
-  }, [
-    isLoggedIn,
-    profileId,
-    shouldHideTrainingCardsPermanently,
-    setShouldHideTrainingCardsPermanently,
-  ]);
+    if (isLoggedIn && !isLoadingProfile && profile && profileId) {
+      // if user has already given any upvotes, then hide `give-upvote` card
+      if (profile?.totalUpvotes > 0) {
+        setShouldHideTrainingCardsPermanently(
+          profileId,
+          UserTrainingCardTypes.GiveUpvote,
+        );
+      }
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      // if user has any social links, then hide `finish-profile` card
-      if (
+      // if user has any social links or email, then hide `finish-profile` card
+      const hasSocialLinks =
         (profile?.profile?.socials || []).filter(
           (link) => link.trim().length > 0,
-        )?.length > 0 &&
-        profileId
-      ) {
+        )?.length > 0;
+      if (hasSocialLinks || app?.user?.email) {
         setShouldHideTrainingCardsPermanently(
           profileId,
           UserTrainingCardTypes.FinishProfile,
@@ -139,10 +131,7 @@ export const UserTrainingSlider = () => {
       }
 
       // if user has created any comment/thread, then hide `create-content` card
-      if (
-        !isLoadingProfile &&
-        (profile?.comments?.length > 0 || profile?.threads?.length > 0)
-      ) {
+      if (profile?.comments?.length > 0 || profile?.threads?.length > 0) {
         setShouldHideTrainingCardsPermanently(
           profileId,
           UserTrainingCardTypes.CreateContent,
