@@ -550,7 +550,7 @@ describe('ServerCommentsController', () => {
         },
         Comment: {
           findOne: async () => data,
-          update: () => null,
+          update: () => (data.text = 'Hello'),
         },
       };
       const banCache = {
