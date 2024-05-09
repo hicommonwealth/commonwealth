@@ -1,3 +1,5 @@
+import { SERVER_URL } from 'discord-bot/src/utils/config';
+
 export function foo() {}
 
 export const slugify = (str: string): string => {
@@ -30,6 +32,14 @@ export const getThreadUrl = (
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
     : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+};
+
+export const getSnapshotUrl = (
+  communityId: string,
+  space: string,
+  proposalId: string,
+): string => {
+  return SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
 };
 
 export function timeoutPromise(timeout: number) {

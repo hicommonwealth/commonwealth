@@ -5,15 +5,10 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import {
-  ISnapshotNotificationData,
-  NotificationCategories,
-  SnapshotEventType,
-} from '@hicommonwealth/shared';
+import { getSnapshotUrl, SnapshotEventType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'node:url';
-import { Op } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import emitNotifications from '../../../util/emitNotifications';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -24,7 +19,9 @@ export const processSnapshotProposalCreated: EventHandler<
   'SnapshotProposalCreated',
   typeof output
 > = async ({ payload }) => {
-  const { space, id, title, body, choices, start, expire, event } = payload;
+  log.info(`Processing snapshot message`, payload);
+
+  const { space, id, event } = payload;
 
   // Sometimes snapshot-listener will receive a webhook event from a
   // proposal that no longer exists. In that event, we will receive null data
@@ -34,58 +31,41 @@ export const processSnapshotProposalCreated: EventHandler<
     return;
   }
 
-  const snapshotNotificationData: ISnapshotNotificationData = {
-    space,
-    id,
-    title,
-    body,
-    choices,
-    start: String(start),
-    expire: String(expire),
-    eventType: event as SnapshotEventType,
-  };
-
-  log.info(`Processing snapshot message`, payload);
-
-  const associatedCommunities = await models.Community.findAll({
-    where: {
-      snapshot_spaces: {
-        [Op.contains]: [space],
+  const communityAlerts = await models.sequelize.query<{
+    community_id: string;
+    community_name: string;
+    users: { id: string }[];
+  }>(
+    `
+        SELECT C.id as community_id,
+               C.name as community_name,
+               array_agg(JSON_BUILD_OBJECT('user_id', CA.user_id::TEXT)) as users
+        FROM "Communities" C
+                 JOIN "CommunityAlerts" CA ON C.id = CA.community_id
+        WHERE :snapshotSpace = ANY (C.snapshot_spaces)
+        GROUP BY C.id, C.name;
+    `,
+    {
+      raw: true,
+      type: QueryTypes.SELECT,
+      replacements: {
+        snapshotSpace: space,
       },
     },
-  });
-
-  log.info(
-    `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `,
   );
 
-  const users = (await models.CommunityAlert.findAll({
-    where: {
-      community_id: {
-        [Op.in]: associatedCommunities.map((c) => c.id),
-      },
-    },
-    attributes: ['community_id', 'user_id'],
-    raw: true,
-  })) as { user_id: number }[];
-
-  if (associatedCommunities.length > 0) {
-    const provider = notificationsProvider();
-    return await provider.triggerWorkflow({
-      key: WorkflowKeys.SnapshotProposals,
-      users: users.map((u) => ({ id: String(u.user_id) })),
-      data: {
-        space_name: space,
-        snapshot_proposal_url: '',
-      },
-    });
-
-    // Notifications
-    emitNotifications(models, {
-      categoryId: NotificationCategories.SnapshotProposal,
-      data: snapshotNotificationData,
-    }).catch((err) => {
-      log.error('Error sending snapshot notification', err);
-    });
+  for (const { community_id, community_name, users } of communityAlerts) {
+    if (users.length) {
+      const provider = notificationsProvider();
+      await provider.triggerWorkflow({
+        key: WorkflowKeys.SnapshotProposals,
+        users,
+        data: {
+          community_name,
+          space_name: space,
+          snapshot_proposal_url: getSnapshotUrl(community_id, space, id),
+        },
+      });
+    }
   }
 };
