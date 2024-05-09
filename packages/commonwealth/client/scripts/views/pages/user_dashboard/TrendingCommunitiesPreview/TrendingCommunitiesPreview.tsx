@@ -12,6 +12,8 @@ export const TrendingCommunitiesPreview = () => {
     .getAll()
     .filter((community) => {
       const name = community.name.toLowerCase();
+      //this filter is meant to not include any de facto communities that are actually xss attempts.
+      //It's a way of keeping the front facing parts of the app clean looking for users
       return (
         !['"', '>', '<'].includes(name[0]) && !['"', '>', '<'].includes(name[1])
       );
