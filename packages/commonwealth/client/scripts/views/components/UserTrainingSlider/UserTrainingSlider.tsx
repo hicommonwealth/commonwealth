@@ -1,4 +1,5 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
+import app from 'client/scripts/state';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -39,10 +40,11 @@ const CARD_TYPES = {
 export const UserTrainingSlider = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
+  const profileId = app?.user?.addresses?.[0]?.profile?.id;
 
   const {
-    shouldHideTrainingCardsTemporary,
-    setShouldHideTrainingCardsTemporary,
+    shouldHideTrainingCardsPermanently,
+    setShouldHideTrainingCardsPermanently,
   } = useUserOnboardingSliderMutationStore();
 
   const redirectToPage = (
@@ -58,7 +60,10 @@ export const UserTrainingSlider = () => {
     pageName === 'explore-communities' && navigate(`/communities`, {}, null);
   };
 
-  if (!isLoggedIn || shouldHideTrainingCardsTemporary.length === 4) {
+  if (
+    !isLoggedIn ||
+    shouldHideTrainingCardsPermanently?.[profileId]?.length === 4
+  ) {
     return;
   }
 
@@ -81,16 +86,27 @@ export const UserTrainingSlider = () => {
             buttonWidth="narrow"
             buttonHeight="sm"
             onClick={() => {
-              setShouldHideTrainingCardsTemporary('give-upvote');
-              setShouldHideTrainingCardsTemporary('create-content');
-              setShouldHideTrainingCardsTemporary('finish-profile');
-              setShouldHideTrainingCardsTemporary('explore-communities');
+              setShouldHideTrainingCardsPermanently(profileId, 'give-upvote');
+              setShouldHideTrainingCardsPermanently(
+                profileId,
+                'create-content',
+              );
+              setShouldHideTrainingCardsPermanently(
+                profileId,
+                'finish-profile',
+              );
+              setShouldHideTrainingCardsPermanently(
+                profileId,
+                'explore-communities',
+              );
             }}
             label="Dismiss all"
           />
         </div>
         <div className="cards">
-          {!shouldHideTrainingCardsTemporary.includes('give-upvote') && (
+          {!shouldHideTrainingCardsPermanently?.[profileId]?.includes(
+            'give-upvote',
+          ) && (
             <ActionCard
               ctaText={CARD_TYPES['give-upvote'].ctaText}
               title={CARD_TYPES['give-upvote'].title}
@@ -98,11 +114,15 @@ export const UserTrainingSlider = () => {
               iconURL={CARD_TYPES['give-upvote'].iconURL}
               iconAlt="give-upvote-icon"
               canClose
-              onClose={() => setShouldHideTrainingCardsTemporary('give-upvote')}
+              onClose={() =>
+                setShouldHideTrainingCardsPermanently(profileId, 'give-upvote')
+              }
               onCTAClick={() => redirectToPage('give-upvote')}
             />
           )}
-          {!shouldHideTrainingCardsTemporary.includes('create-content') && (
+          {!shouldHideTrainingCardsPermanently?.[profileId]?.includes(
+            'create-content',
+          ) && (
             <ActionCard
               ctaText={CARD_TYPES['create-content'].ctaText}
               title={CARD_TYPES['create-content'].title}
@@ -111,12 +131,17 @@ export const UserTrainingSlider = () => {
               iconAlt="create-content-icon"
               canClose
               onClose={() =>
-                setShouldHideTrainingCardsTemporary('create-content')
+                setShouldHideTrainingCardsPermanently(
+                  profileId,
+                  'create-content',
+                )
               }
               onCTAClick={() => redirectToPage('create-content')}
             />
           )}
-          {!shouldHideTrainingCardsTemporary.includes('finish-profile') && (
+          {!shouldHideTrainingCardsPermanently?.[profileId]?.includes(
+            'finish-profile',
+          ) && (
             <ActionCard
               ctaText={CARD_TYPES['finish-profile'].ctaText}
               title={CARD_TYPES['finish-profile'].title}
@@ -125,12 +150,15 @@ export const UserTrainingSlider = () => {
               iconAlt="finish-profile-icon"
               canClose
               onClose={() =>
-                setShouldHideTrainingCardsTemporary('finish-profile')
+                setShouldHideTrainingCardsPermanently(
+                  profileId,
+                  'finish-profile',
+                )
               }
               onCTAClick={() => redirectToPage('finish-profile')}
             />
           )}
-          {!shouldHideTrainingCardsTemporary.includes(
+          {!shouldHideTrainingCardsPermanently?.[profileId]?.includes(
             'explore-communities',
           ) && (
             <ActionCard
@@ -141,7 +169,10 @@ export const UserTrainingSlider = () => {
               iconAlt="explore-communities-icon"
               canClose
               onClose={() =>
-                setShouldHideTrainingCardsTemporary('explore-communities')
+                setShouldHideTrainingCardsPermanently(
+                  profileId,
+                  'explore-communities',
+                )
               }
               onCTAClick={() => redirectToPage('explore-communities')}
             />
