@@ -24,10 +24,10 @@ import {
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
-import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
