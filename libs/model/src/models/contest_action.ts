@@ -1,12 +1,14 @@
 import { CONTEST_ACTIONS, ContestAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 type ContestAction = ModelInstance<z.infer<typeof ContestAction>>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <ModelStatic<ContestAction>>sequelize.define<ContestAction>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ContestAction> =>
+  sequelize.define<ContestAction>(
     'ContestAction',
     {
       contest_address: {

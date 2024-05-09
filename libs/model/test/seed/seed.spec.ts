@@ -10,7 +10,7 @@ import {
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { step } from 'mocha-steps';
-import { Model, ModelStatic, ValidationError } from 'sequelize';
+import { ValidationError } from 'sequelize';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
@@ -33,7 +33,7 @@ async function testSeed<T extends schemas.Aggregates>(
   const data: ReturnType<typeof schema.parse> = schema.parse(record);
 
   // attempt to find entity that was created
-  const existingEntity = await (model as ModelStatic<Model>).findOne({
+  const existingEntity = await model.findOne({
     where: {
       [model.primaryKeyAttribute]:
         data[model.primaryKeyAttribute as keyof typeof data],
