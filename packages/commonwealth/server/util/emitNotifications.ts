@@ -8,8 +8,8 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import Sequelize, { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import {
   createImmediateNotificationEmailObject,

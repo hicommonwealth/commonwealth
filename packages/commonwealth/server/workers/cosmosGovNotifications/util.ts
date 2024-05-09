@@ -6,7 +6,7 @@ import {
   NotificationCategories,
   SupportedNetwork,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
