@@ -140,6 +140,10 @@ class Contest extends ContractBase {
     amount: number,
     walletAddress: string,
   ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
     this.reInitContract();
     const tokenAddress = await this.contract.methods.contestToken().call();
 

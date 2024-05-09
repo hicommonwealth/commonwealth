@@ -29,7 +29,7 @@ const deploySingleContestOnchain = async ({
   exchangeToken,
 }: DeploySingleContestOnchainProps) => {
   const contest = new Contest(
-    commonProtocol.factoryContracts[ethChainId].communityStake,
+    '',
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );

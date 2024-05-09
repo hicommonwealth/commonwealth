@@ -4,6 +4,7 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import Contest from 'helpers/ContractHelpers/Contest';
 
 interface FundContestOnchainProps {
+  contestAddress: string;
   ethChainId: number;
   chainRpc: string;
   amount: number;
@@ -11,13 +12,14 @@ interface FundContestOnchainProps {
 }
 
 const fundContestOnchain = async ({
+  contestAddress,
   ethChainId,
   chainRpc,
   amount,
   walletAddress,
 }: FundContestOnchainProps) => {
   const contest = new Contest(
-    commonProtocol.factoryContracts[ethChainId].communityStake,
+    contestAddress,
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );

@@ -31,7 +31,7 @@ const deployRecurringContestOnchain = async ({
   walletAddress,
 }: DeployRecurringContestOnchainProps) => {
   const contest = new Contest(
-    commonProtocol.factoryContracts[ethChainId].communityStake,
+    '',
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
   );

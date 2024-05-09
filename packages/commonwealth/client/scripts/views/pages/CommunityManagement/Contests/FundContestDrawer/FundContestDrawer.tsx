@@ -91,6 +91,7 @@ const FundContestDrawer = ({
       setFundContestDrawerStep('Loading');
 
       await fundContest({
+        contestAddress,
         ethChainId,
         chainRpc,
         amount: Number(amountEth),
