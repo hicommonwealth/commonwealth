@@ -26,8 +26,8 @@ export const syncDb = async (db: DB, log = false) => {
  * @returns built db model
  */
 export const buildDb = (sequelize: Sequelize): DB => {
-  const models = Object.values(Factories).map((factory) => [
-    factory.name,
+  const models = Object.entries(Factories).map(([key, factory]) => [
+    key,
     Object.assign(factory(sequelize), {
       _fks: [],
       withOne: oneToOne,
@@ -35,10 +35,8 @@ export const buildDb = (sequelize: Sequelize): DB => {
       withManyToMany: manyToMany,
     }),
   ]);
-
   const db = { sequelize, Sequelize, ...Object.fromEntries(models) } as DB;
   buildAssociations(db);
-
   return db;
 };
 

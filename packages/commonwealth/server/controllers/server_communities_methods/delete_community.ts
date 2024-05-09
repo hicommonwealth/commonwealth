@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { UserInstance, sequelize } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { Model, Op, type ModelStatic } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -135,7 +135,7 @@ export async function __deleteCommunity(
             this.models.Notification,
             this.models.Group,
             this.models.Address,
-          ];
+          ] as Array<ModelStatic<Model>>;
 
           for (const model of models) {
             await model.destroy({

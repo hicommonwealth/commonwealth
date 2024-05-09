@@ -1,11 +1,11 @@
 {
   "private": true,
   "keywords": [],
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
+  "type": "module",
   "workspaces": [
     "packages/commonwealth",
     "packages/discord-bot",
@@ -18,8 +18,8 @@
     "build-ci": "pnpm global add node-gyp && pnpm --ignore-engines && pnpm build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
-    "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
     "db-all": "pnpm -F commonwealth db-all",
+    "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
     "dump-db": "pnpm -F commonwealth dump-db",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
@@ -34,7 +34,7 @@
     "psql": "pnpm -F commonwealth psql",
     "reset-db": "pnpm -F commonwealth reset-db",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
-    "start": "pnpm workspace commonwealth start",
+    "start": "pnpm -F commonwealth start",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",
@@ -46,6 +46,9 @@
     "js-sha3": "^0.8.0",
     "quill": "^1.3.6",
     "resolve": "^1.20.0"
+  },
+  "dependencies": {
+    "extensionless": "^1.9.6"
   },
   "devDependencies": {
     "@aave/aave-token": "^1.0.4",
@@ -173,8 +176,5 @@
   },
   "engines": {
     "node": "20.x"
-  },
-  "dependencies": {
-    "extensionless": "^1.9.6"
   }
 }

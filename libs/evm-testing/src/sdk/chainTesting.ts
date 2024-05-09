@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Web3 from 'web3';
+import { RegisteredSubscription } from 'web3-eth';
 import {
   chainAdvanceTime,
   chainGetEth,
@@ -417,7 +418,7 @@ export class ChainTesting {
    * Gets a web3 provider instance for the running test chain
    * @returns live web3 http provider
    */
-  public async getProvider() {
+  public async getProvider(): Promise<Web3<RegisteredSubscription>> {
     return new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'));
   }
 }

@@ -30,6 +30,7 @@
     "dotenv": "^16.0.3",
     "hot-shots": "^9",
     "mixpanel": "^0.14.0",
+    "moment": "^2.23.0",
     "node-fetch": "2",
     "passport": "^0.4.0",
     "pg": "^8.11.3",

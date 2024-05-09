@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommunityAttributes, CommunityInstance } from '@hicommonwealth/model';
+import { Model, type ModelStatic } from 'sequelize';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -83,7 +84,8 @@ export async function __updateCommunityId(
       this.models.DiscordBotConfig,
       this.models.Group,
       this.models.Subscription,
-    ];
+    ] as Array<ModelStatic<Model>>;
+
     for (const model of models) {
       await model.update(
         {

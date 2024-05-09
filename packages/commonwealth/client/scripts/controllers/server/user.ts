@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { EventEmitter } from 'events';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -12,6 +11,7 @@ import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import axios from 'axios';
+import EventEmitter from 'events';
 import NotificationsController from './notifications';
 
 export class UserController {
