@@ -1,7 +1,6 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { ActionCard } from '../ActionCard';
@@ -53,15 +52,8 @@ export const UserTrainingSlider = () => {
       | 'finish-profile'
       | 'explore-communities',
   ) => {
-    const defaultCommunityId = app?.user?.addresses?.[0]?.community?.id;
-    const communityIdForRedirection = app.activeChainId()
-      ? `/${app.activeChainId()}`
-      : `/${defaultCommunityId}`;
-
-    pageName === 'give-upvote' &&
-      navigate(`${communityIdForRedirection}/discussions`, {}, null);
-    pageName === 'create-content' &&
-      navigate(`${communityIdForRedirection}/new/discussion`, {}, null);
+    pageName === 'give-upvote' && navigate(`/dashboard/for-you`, {}, null);
+    pageName === 'create-content' && navigate(`/dashboard/for-you`, {}, null);
     pageName === 'finish-profile' && navigate(`/profile/edit`, {}, null);
     pageName === 'explore-communities' && navigate(`/communities`, {}, null);
   };
