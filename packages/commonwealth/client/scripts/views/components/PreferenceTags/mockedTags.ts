@@ -15,4 +15,5 @@ export const preferenceTags = [
   { id: 13, tag: 'Security/Auditing' },
   { id: 14, tag: 'Governance' },
   { id: 15, tag: 'Marketplace' },
+  { id: 16, tag: 'DAO' },
 ];
