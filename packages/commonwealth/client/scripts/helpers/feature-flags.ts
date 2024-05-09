@@ -18,6 +18,8 @@ const buildFlag = (env: string) => {
   };
 };
 
+// WARN: for frontend work you MUST define these feature flags in
+// webpack.base.config.mjs or they won't be passed to the frontend.
 const featureFlags = {
   contest: buildFlag(process.env.FLAG_CONTEST),
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
