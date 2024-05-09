@@ -29,6 +29,7 @@ import './SignTransactionsStep.scss';
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
   contestFormData: ContestFormData;
+  onSetCreatedContestAddress: (address: string) => void;
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -36,6 +37,7 @@ const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
   contestFormData,
+  onSetCreatedContestAddress,
 }: SignTransactionsStepProps) => {
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
@@ -111,9 +113,7 @@ const SignTransactionsStep = ({
           ))
         : (contestAddress = await deploySingleContestOnchainMutation(single));
 
-      console.log('contestAddress', contestAddress);
-
-      const response = await createContestMutation({
+      await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
         id: app.activeChainId(),
@@ -122,12 +122,11 @@ const SignTransactionsStep = ({
         prize_percentage: contestFormData?.prizePercentage,
         payout_structure: contestFormData?.payoutStructure,
         interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
-        // ticker: 'ETH',
-        // decimals: 18,
         topic_ids: contestFormData?.toggledTopicList.map((topic) => topic.id),
       });
 
-      console.log('response', response);
+      onSetLaunchContestStep('ContestLive');
+      onSetCreatedContestAddress(contestAddress);
     } catch (error) {
       console.log('error', error);
       setLaunchContestData((prevState) => ({

@@ -11,13 +11,15 @@ import FundContestDrawer from '../../../FundContestDrawer';
 
 import './ContestLiveStep.scss';
 
-const ContestLiveStep = () => {
+interface ContestLiveStepProps {
+  createdContestAddress: string;
+}
+
+const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const navigate = useCommonNavigate();
   const { animationStyles } = useAnimation();
-
-  const createdContestAddress = '0xb794f5ea0ba39494ce839613fffba74279579268';
 
   return (
     <>

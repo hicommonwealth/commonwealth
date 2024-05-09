@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 
 import app from 'state';
+import {
+  useFetchEthUsdRateQuery,
+  useGetUserEthBalanceQuery,
+} from 'state/api/communityStake';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
+import { convertEthToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import {
   FundContestFailure,
@@ -50,23 +55,42 @@ const FundContestDrawer = ({
     label: app?.user?.activeAccount?.address,
   };
 
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+
+  const { data: userEthBalance } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: activeAccountOption.value,
+    apiEnabled: !!activeAccountOption.value,
+    ethChainId,
+  });
+
+  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
+  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
   const [amountEth, setAmountEth] = useState('0.0001');
 
-  const userEthBalance = '113.456';
   const contestEthBalance = '56.102';
-  const amountEthInUsd = '1.23';
+  const amountEthInUsd = convertEthToUsd(amountEth, ethUsdRate);
+
   const amountError =
     (parseFloat(userEthBalance) < parseFloat(amountEth) &&
       'Not enough funds in wallet') ||
-    (amountEth === '' && 'Please enter an amount') ||
+    ((amountEth === '' || parseFloat(amountEth) === 0) &&
+      'Please enter an amount') ||
     (parseFloat(amountEth) < 0 && 'Please enter non negative amount');
-  const newContestBalanceInEth = '56.102';
-  const newContestBalanceInUsd = '1.12';
-  const transferFeesInEth = '1.12';
-  const transferFeesInUsd = '56.102';
+  const newContestBalanceInEth = String(
+    parseFloat(contestEthBalance) + parseFloat(amountEth) || '',
+  );
+  const newContestBalanceInUsd = convertEthToUsd(
+    newContestBalanceInEth,
+    ethUsdRate,
+  );
+  const transferFeesInEth = String(parseFloat(amountEth) * 0.02 || '');
+  const transferFeesInUsd = convertEthToUsd(transferFeesInEth, ethUsdRate);
 
   const handleChangeEthAmount = (e) => {
     setAmountEth(e.target.value);
@@ -85,7 +109,7 @@ const FundContestDrawer = ({
   const handleClose = () => {
     onClose();
     setFundContestDrawerStep('Form');
-    setAmountEth('0');
+    setAmountEth('0.0001');
     setSelectedAddress(activeAccountOption);
   };
 

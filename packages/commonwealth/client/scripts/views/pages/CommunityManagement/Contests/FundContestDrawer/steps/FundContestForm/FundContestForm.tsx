@@ -126,7 +126,7 @@ const FundContestForm = ({
           )}
 
           <CWText type="b2" fontWeight="medium">
-            {amountEthInUsd} USD
+            {amountEthInUsd || '0.00'} USD
           </CWText>
         </div>
 
@@ -134,11 +134,11 @@ const FundContestForm = ({
           <div className="first-row">
             <CWText type="caption">New Contest Balance:</CWText>
             <CWText type="caption" fontWeight="medium">
-              {newContestBalanceInEth} ETH
+              {newContestBalanceInEth || '0.00'} ETH
             </CWText>
           </div>
           <CWText type="caption" fontWeight="medium">
-            {newContestBalanceInUsd} USD
+            {newContestBalanceInUsd || '0.00'} USD
           </CWText>
         </div>
 
@@ -146,11 +146,11 @@ const FundContestForm = ({
           <div className="first-row">
             <CWText type="caption">Transfer Fees:</CWText>
             <CWText type="caption" fontWeight="medium">
-              {transferFeesInEth} ETH
+              {transferFeesInEth || '0.00'} ETH
             </CWText>
           </div>
           <CWText type="caption" fontWeight="medium">
-            {transferFeesInUsd} USD
+            {transferFeesInUsd || '0.00'} USD
           </CWText>
         </div>
       </div>
@@ -164,6 +164,7 @@ const FundContestForm = ({
             buttonType="secondary"
             buttonAlt="green"
             onClick={handleTransferFunds}
+            disabled={!!amountError}
           />
         </div>
       </div>
