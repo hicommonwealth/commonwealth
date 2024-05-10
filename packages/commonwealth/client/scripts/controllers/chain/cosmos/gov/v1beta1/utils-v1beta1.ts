@@ -228,7 +228,7 @@ export const encodeMsgSubmitProposal = (
 
 export const encodeMsgVote = (
   voter: string,
-  proposalId: number | Long | string,
+  proposalId: number | Long.Long | string,
   option: number,
 ): MsgVoteEncodeObject => {
   return {
