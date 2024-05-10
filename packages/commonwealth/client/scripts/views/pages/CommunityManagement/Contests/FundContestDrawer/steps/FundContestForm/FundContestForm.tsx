@@ -100,7 +100,7 @@ const FundContestForm = ({
             Current Balance
           </CWText>
           <CWText type="caption" fontWeight="medium">
-            {capDecimals(contestEthBalance)} ETH
+            {capDecimals(contestEthBalance) || '0.00'} ETH
           </CWText>
         </div>
 

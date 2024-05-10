@@ -265,7 +265,7 @@ const DetailsFormStep = ({
                       containerClassName="funding-token-address-input"
                       name="fundingTokenAddress"
                       hookToForm
-                      placeholder="Enter funding token address"
+                      placeholder="Enter funding token address e.g. 0x0000000000000000000000000000000000000000"
                       fullWidth
                       label="Token Address"
                       disabled={editMode}

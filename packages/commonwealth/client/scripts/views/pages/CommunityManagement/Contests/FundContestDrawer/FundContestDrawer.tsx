@@ -61,20 +61,18 @@ const FundContestDrawer = ({
 
   const { mutateAsync: fundContest } = useFundContestOnchainMutation();
 
-  const { data: contestBalance } = useGetContestBalanceQuery({
+  const { data: contestBalanceData } = useGetContestBalanceQuery({
     contestAddress,
     chainRpc,
     ethChainId,
   });
-
-  console.log('contestBalance', contestBalance);
 
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
   const [amountEth, setAmountEth] = useState('0.0001');
 
-  const contestEthBalance = '56.102';
+  const contestEthBalance = String(contestBalanceData || '');
   const amountEthInUsd = convertEthToUsd(amountEth, ethUsdRate);
 
   const amountError =

@@ -208,7 +208,7 @@ class Contest extends ContractBase {
     const tokenAddress = await this.contract.methods.contestToken().call();
     if (tokenAddress === '0x0000000000000000000000000000000000000000') {
       const balance = await this.web3.eth.getBalance(this.contractAddress);
-      return parseInt(this.web3.utils.fromWei(balance, 'ether'));
+      return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
     } else {
       const calldata =
         '0x70a08231' +

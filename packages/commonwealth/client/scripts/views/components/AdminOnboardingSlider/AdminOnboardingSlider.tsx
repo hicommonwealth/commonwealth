@@ -125,7 +125,7 @@ export const AdminOnboardingSlider = () => {
             {contestEnabled && isEvmCommunity && (
               <AdminOnboardingCard
                 cardType="launch-contest"
-                isActionCompleted={contestsData.length > 0}
+                isActionCompleted={contestsData?.length > 0}
                 onCTAClick={() => redirectToPage('launch-contest')}
               />
             )}
