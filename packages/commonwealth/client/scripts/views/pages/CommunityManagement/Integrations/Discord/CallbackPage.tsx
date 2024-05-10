@@ -1,5 +1,6 @@
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSetDiscordBotConfigMutation } from 'state/api/discord';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
@@ -16,8 +17,8 @@ const CallbackPage = () => {
   const state = params.get('state');
   const guildId = params.get('guild_id');
 
-  useEffect(() => {
-    if (state && guildId) {
+  useNecessaryEffect(() => {
+    if (state && guildId && !failed) {
       const stateJSON = JSON.parse(decodeURI(state));
       setDiscordBotConfig({
         communityId: stateJSON.cw_chain_id,
@@ -48,7 +49,7 @@ const CallbackPage = () => {
           } else setFailureMessage(e.message);
         });
     }
-  }, [state, guildId, setDiscordBotConfig]);
+  }, [failed, guildId, state]);
 
   if (!state || !guildId) {
     return <PageNotFound message="No callback data provided." />;
