@@ -29,7 +29,7 @@ const FinishSocialLoginPage = lazy(
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings'),
+  () => import('views/pages/notification_settings2'),
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
