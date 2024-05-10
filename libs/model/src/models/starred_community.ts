@@ -32,5 +32,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'StarredCommunities',
       timestamps: true,
       underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     },
   );
