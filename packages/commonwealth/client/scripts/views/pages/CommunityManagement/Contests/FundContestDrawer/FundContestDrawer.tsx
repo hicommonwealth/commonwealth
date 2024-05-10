@@ -5,7 +5,10 @@ import {
   useFetchEthUsdRateQuery,
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
-import { useFundContestOnchainMutation } from 'state/api/contests';
+import {
+  useFundContestOnchainMutation,
+  useGetContestBalanceQuery,
+} from 'state/api/contests';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
@@ -57,6 +60,14 @@ const FundContestDrawer = ({
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const { mutateAsync: fundContest } = useFundContestOnchainMutation();
+
+  const { data: contestBalance } = useGetContestBalanceQuery({
+    contestAddress,
+    chainRpc,
+    ethChainId,
+  });
+
+  console.log('contestBalance', contestBalance);
 
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');

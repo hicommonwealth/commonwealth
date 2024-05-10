@@ -37,6 +37,7 @@ export const ContractMethods = {
   GET_USER_ETH_BALANCE: 'getUserEthBalance',
   GET_BUY_PRICE: 'getBuyPrice',
   GET_SELL_PRICE: 'getSellPrice',
+  GET_CONTEST_BALANCE: 'getContestBalance',
 };
 
 export const ExternalEndpoints = {

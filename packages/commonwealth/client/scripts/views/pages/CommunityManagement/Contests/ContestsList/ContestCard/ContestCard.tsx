@@ -110,7 +110,7 @@ const ContestCard = ({
           Current Prizes
         </CWText>
         <div className="prizes">
-          {winners.map((winner, index) => (
+          {winners?.map((winner, index) => (
             <div className="prize-row" key={winner.creator_address}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize

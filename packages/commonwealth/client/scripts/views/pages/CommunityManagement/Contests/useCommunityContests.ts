@@ -8,14 +8,14 @@ import mockedContests from './mockedContests';
 const useCommunityContests = () => {
   const { stakeEnabled } = useCommunityStake();
 
-  const { data } = trpc.contest.getAllContests.useQuery(
+  const { data: contestsData } = trpc.contest.getAllContests.useQuery(
     {
       community_id: app.activeChainId(),
     },
     { enabled: !!app.activeChainId() },
   );
 
-  const { data: contestsData, isLoading: isContestDataLoading } = useQuery<
+  const { data: contestsData1, isLoading: isContestDataLoading } = useQuery<
     typeof mockedContests
   >({
     queryKey: ['contests'],

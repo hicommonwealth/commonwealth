@@ -118,8 +118,10 @@ const SignTransactionsStep = ({
         name: contestFormData?.contestName,
         id: app.activeChainId(),
         image_url: contestFormData?.contestImage,
-        funding_token_address: contestFormData?.fundingTokenAddress,
-        prize_percentage: contestFormData?.prizePercentage,
+        funding_token_address: exchangeToken,
+        prize_percentage: isContestRecurring
+          ? contestFormData?.prizePercentage
+          : 0,
         payout_structure: contestFormData?.payoutStructure,
         interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
         topic_ids: contestFormData?.toggledTopicList.map((topic) => topic.id),
