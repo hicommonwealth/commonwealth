@@ -44,6 +44,15 @@ const authenticate = async (req: Request) => {
   }
 };
 
+const logError = (path: string | undefined, error: TRPCError) => {
+  log.error(
+    `[${error.cause?.name ?? error.name}] ${path}: ${
+      error.cause?.message ?? error.message
+    }`,
+    error.cause,
+  );
+};
+
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
     const { name, message, ...other } = error;
@@ -58,10 +67,7 @@ const trpcerror = (error: unknown): TRPCError => {
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message,
-          cause:
-            process.env.NODE_ENV !== 'production'
-              ? { name, ...other }
-              : undefined,
+          cause: error,
         });
     }
   }
@@ -198,6 +204,7 @@ export const toExpress = (router: OpenApiRouter) =>
   createExpressMiddleware({
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
+    onError: ({ path, error }) => logError(path, error),
   });
 
 // used for REST like routes (External)
@@ -205,9 +212,8 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
   createOpenApiExpressMiddleware({
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
-    onError: ({ error }: { error: any }) => {
-      log.error(error.name, error, error.cause);
-    },
+    onError: ({ path, error }: { path: string; error: TRPCError }) =>
+      logError(path, error),
     responseMeta: undefined,
     maxBodySize: undefined,
   });
