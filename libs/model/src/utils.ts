@@ -45,8 +45,8 @@ type EmitEventValues =
     };
 
 // Load with env var?
-const DISALLOWED_EVENTS = process.env.DISALLOWED_EVENTS
-  ? process.env.DISALLOWED_EVENTS.split(',')
+const ALLOWED_EVENTS = process.env.ALLOWED_EVENTS
+  ? process.env.ALLOWED_EVENTS.split(',')
   : [];
 
 /**
@@ -63,13 +63,17 @@ export async function emitEvent(
 ) {
   const records: Array<EmitEventValues> = [];
   for (const event of values) {
-    if (!DISALLOWED_EVENTS.includes(event.event_name)) {
+    if (ALLOWED_EVENTS.includes(event.event_name)) {
       records.push(event);
     } else {
-      log.warn('Event not inserted into outbox!', {
-        event_name: event.event_name,
-        disallowed_events: DISALLOWED_EVENTS,
-      });
+      log.warn(
+        `Event not inserted into outbox! ` +
+          `Add ${event.event_name} to the ALLOWED_EVENTS env var to enable emitting this event.`,
+        {
+          event_name: event.event_name,
+          allowed_events: ALLOWED_EVENTS,
+        },
+      );
     }
   }
 
