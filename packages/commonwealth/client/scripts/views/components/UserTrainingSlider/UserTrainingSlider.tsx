@@ -1,6 +1,7 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import app from 'client/scripts/state';
 import { useFetchSelfProfileQuery } from 'client/scripts/state/api/profiles';
+import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -21,6 +22,8 @@ export const UserTrainingSlider = () => {
     useFetchSelfProfileQuery({
       apiCallEnabled: isLoggedIn,
     });
+
+  const { isVisible: isAdminSliderVisible } = useAdminActionCardsStore();
 
   const {
     completedActions,
@@ -121,7 +124,8 @@ export const UserTrainingSlider = () => {
     !isLoggedIn ||
     isLoadingProfile ||
     (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
-      completedActions.length === 0)
+      completedActions.length === 0) ||
+    isAdminSliderVisible // if admin slider is visible, we hide user training slider
   ) {
     return;
   }

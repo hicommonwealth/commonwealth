@@ -2,7 +2,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -69,6 +69,7 @@ export const AdminOnboardingSlider = () => {
     integrations.discordBotWebhooksEnabled;
 
   const {
+    setIsVisible,
     shouldHideAdminCardsTemporary,
     shouldHideAdminCardsPermanently,
     setShouldHideAdminOnboardingCardsForCommunity,
@@ -117,7 +118,7 @@ export const AdminOnboardingSlider = () => {
   const isContestActionCompleted =
     contestEnabled && isEvmCommunity && contestsData?.length > 0;
 
-  if (
+  const isSliderHidden =
     !app.activeChainId() ||
     isContestDataLoading ||
     isLoadingTopics ||
@@ -132,8 +133,13 @@ export const AdminOnboardingSlider = () => {
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,
-    ].includes(app.activeChainId())
-  ) {
+    ].includes(app.activeChainId());
+
+  useEffect(() => {
+    setIsVisible(!isSliderHidden);
+  }, [isSliderHidden]);
+
+  if (isSliderHidden) {
     return;
   }
 
