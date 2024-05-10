@@ -31,9 +31,8 @@ export class SessionKeyError extends Error {
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,
   account: Account,
-  timestamp: number,
 ) {
-  const session = await getSessionFromWallet(wallet, { timestamp });
+  const session = await getSessionFromWallet(wallet);
   const walletAddress = session.address.split(':')[2];
   if (walletAddress !== account.address) {
     throw new Error(
@@ -68,13 +67,15 @@ export const getMagicCosmosSessionSigner = (
 export async function getSessionFromWallet(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wallet: IWebWallet<any>,
-  opts?: { timestamp?: number },
 ) {
   const sessionSigner = await wallet.getSessionSigner();
-  const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-    timestamp: opts?.timestamp,
-  });
-  return session;
+  let session = await sessionSigner.getSession(CANVAS_TOPIC);
+
+  if (session == null) {
+    session = await sessionSigner.newSession(CANVAS_TOPIC);
+  }
+
+  return session.payload;
 }
 
 function getCaip2Address(address: string) {
@@ -118,7 +119,31 @@ async function sign(
         lookupAddress = `polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
       }
 
-      const { session } = signer.getCachedSession(CANVAS_TOPIC, lookupAddress);
+      const savedData = await signer.getSession(CANVAS_TOPIC, {
+        address: lookupAddress,
+      });
+      if (!savedData) {
+        throw new SessionKeyError({
+          name: 'Authentication Error',
+          message: `No session found for address ${address}`,
+          address,
+          ssoSource: WalletSsoSource.Unknown,
+        });
+      }
+      const { payload: session, signer: messageSigner } = savedData;
+
+      // check if session is expired
+      if (session.duration !== null) {
+        const sessionExpirationTime = session.timestamp + session.duration;
+        if (Date.now() > sessionExpirationTime) {
+          throw new SessionKeyError({
+            name: 'Authentication Error',
+            message: `Session expired for address ${address}`,
+            address,
+            ssoSource: WalletSsoSource.Unknown,
+          });
+        }
+      }
 
       const sessionMessage: Message<Session> = {
         clock: 0,
@@ -127,7 +152,7 @@ async function sign(
         payload: session,
       };
 
-      const sessionMessageSignature = await signer.sign(sessionMessage);
+      const sessionMessageSignature = await messageSigner.sign(sessionMessage);
 
       const actionMessage: Message<Action> = {
         clock: 0,
@@ -143,7 +168,7 @@ async function sign(
         },
       };
 
-      const actionMessageSignature = await signer.sign(actionMessage);
+      const actionMessageSignature = await messageSigner.sign(actionMessage);
 
       return {
         canvasSignedData: {
