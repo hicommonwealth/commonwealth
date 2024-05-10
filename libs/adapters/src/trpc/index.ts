@@ -8,6 +8,7 @@ import {
   type EventsHandlerMetadata,
   type QueryMetadata,
 } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request } from 'express';
@@ -19,7 +20,11 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
+import { fileURLToPath } from 'url';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export interface Context {
   req: Request;
@@ -53,7 +58,10 @@ const trpcerror = (error: unknown): TRPCError => {
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message,
-          cause: process.env.NODE_ENV !== 'production' ? error : undefined,
+          cause:
+            process.env.NODE_ENV !== 'production'
+              ? { name, ...other }
+              : undefined,
         });
     }
   }
@@ -198,7 +206,7 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
     onError: ({ error }: { error: any }) => {
-      console.error(error.code, JSON.stringify(error.cause));
+      log.error(error.name, error, error.cause);
     },
     responseMeta: undefined,
     maxBodySize: undefined,
