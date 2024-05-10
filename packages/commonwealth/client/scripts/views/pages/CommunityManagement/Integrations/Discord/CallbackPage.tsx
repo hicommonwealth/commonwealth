@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useState } from 'react';
-import app from 'state';
+import React, { useEffect, useState } from 'react';
+import { useSetDiscordBotConfigMutation } from 'state/api/discord';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 
@@ -11,45 +10,7 @@ const CallbackPage = () => {
   const [failureMessage, setFailureMessage] = useState<string>('');
   const redirectPath = 'manage/integrations';
 
-  const setBotConfig = useCallback(
-    async (state: string, guildId: string) => {
-      const stateJSON = JSON.parse(decodeURI(state));
-
-      try {
-        const res = await axios.post(
-          `${app.serverUrl()}/setDiscordBotConfig`,
-          {
-            community_id: stateJSON.cw_chain_id,
-            guild_id: guildId,
-            verification_token: stateJSON.verification_token,
-            jwt: app.user.jwt,
-          },
-          {
-            headers: { 'Content-Type': 'application/json' },
-          },
-        );
-
-        const idParam = res?.data?.result?.discordConfigId
-          ? `?discordConfigId=${res?.data?.result?.discordConfigId}`
-          : '';
-
-        if (stateJSON.redirect_domain) {
-          window.location.href =
-            `${stateJSON.redirect_domain}/${redirectPath}` + `${idParam}`;
-        } else {
-          navigate(
-            `/${stateJSON.cw_chain_id}/${redirectPath}${idParam}`,
-            {},
-            null,
-          );
-        }
-      } catch (e) {
-        console.error(e);
-        throw new Error(e.response.data.error);
-      }
-    },
-    [navigate],
-  );
+  const { mutateAsync: setDiscordBotConfig } = useSetDiscordBotConfigMutation();
 
   const params = new URLSearchParams(window.location.search);
   const state = params.get('state');
@@ -57,12 +18,37 @@ const CallbackPage = () => {
 
   useEffect(() => {
     if (state && guildId) {
-      setBotConfig(state, guildId).catch((e) => {
-        setFailed(true);
-        setFailureMessage(e.message);
-      });
+      const stateJSON = JSON.parse(decodeURI(state));
+      setDiscordBotConfig({
+        communityId: stateJSON.cw_chain_id,
+        guildId,
+        verificationToken: stateJSON.verification_token,
+      })
+        .then((res) => {
+          const idParam = res.discordConfigId
+            ? `?discordConfigId=${res.discordConfigId}`
+            : '';
+
+          if (stateJSON.redirect_domain) {
+            window.location.href =
+              `${stateJSON.redirect_domain}/${redirectPath}` + `${idParam}`;
+          } else {
+            navigate(
+              `/${stateJSON.cw_chain_id}/${redirectPath}${idParam}`,
+              {},
+              null,
+            );
+          }
+        })
+        .catch((e) => {
+          setFailed(true);
+
+          if (e.response && e.response.data && e.response.data.error) {
+            setFailureMessage(e.response.data.error);
+          } else setFailureMessage(e.message);
+        });
     }
-  }, [state, guildId, setBotConfig]);
+  }, [state, guildId, setDiscordBotConfig]);
 
   if (!state || !guildId) {
     return <PageNotFound message="No callback data provided." />;

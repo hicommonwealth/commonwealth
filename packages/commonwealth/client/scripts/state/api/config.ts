@@ -20,6 +20,7 @@ export const ApiEndpoints = {
   FETCH_THREADS: '/threads',
   FETCH_PROFILES: '/getAddressProfile',
   DISCORD_CHANNELS: '/getDiscordChannels',
+  SET_DISCORD_CONFIG: '/setDiscordBotConfig',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',

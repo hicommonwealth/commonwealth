@@ -13,7 +13,7 @@ const log = logger(__filename);
 enum SetDiscordBotConfigErrors {
   NoCommunity = 'Must supply a community ID',
   NotAdmin = 'Not an admin',
-  CommonbotConnected = 'Discord is already connected to another Commonwealth community',
+  CommonbotConnected = 'Discord server is already connected to another Commonwealth community',
   Error = 'Could not set discord bot config',
   TokenExpired = 'Token expired',
 }
