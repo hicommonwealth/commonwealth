@@ -90,12 +90,12 @@ import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import createDiscordBotConfig from '../routes/createDiscordBotConfig';
+import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
+import getDiscordChannels from '../routes/discord/getDiscordChannels';
+import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
+import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
-import getDiscordChannels from '../routes/getDiscordChannels';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
-import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
-import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 
 import {
   createCommunityContractTemplateAndMetadata,

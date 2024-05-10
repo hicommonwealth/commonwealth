@@ -2,10 +2,10 @@ import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
-import { validateCommunity } from '../middleware/validateCommunity';
-import type { TypedRequestBody, TypedResponse } from '../types';
-import { success } from '../types';
-import { validateOwner } from '../util/validateOwner';
+import { validateCommunity } from '../../middleware/validateCommunity';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
+import { validateOwner } from '../../util/validateOwner';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -91,22 +91,30 @@ const setDiscordBotConfig = async (
     where: { id: community_id },
   });
 
+  const transaction = await models.sequelize.transaction();
   if (
     existingCommunityWithGuildConnected &&
     existingCommunityWithGuildConnected.length > 0
   ) {
     // Handle discord already linked to another CW community
     communityInstance.discord_config_id = null;
-    await communityInstance.save();
+    await communityInstance.save({ transaction });
 
     await models.DiscordBotConfig.destroy({
       where: {
         community_id,
       },
+      transaction,
     });
     log.info(
       'Attempted to add a guild that was already connected to another CW community.',
     );
+
+    try {
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+    }
 
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
   } else {
@@ -114,6 +122,7 @@ const setDiscordBotConfig = async (
       where: {
         profile_name: 'Discord Bot',
       },
+      transaction,
     });
 
     const [address, created] = await models.Address.findOrCreate({
@@ -130,15 +139,16 @@ const setDiscordBotConfig = async (
         verified: new Date(),
         last_active: new Date(),
       },
+      transaction,
     });
 
     if (!created && address.role !== 'admin') {
       address.role = 'admin';
-      await address.save();
+      await address.save({ transaction });
     }
 
     communityInstance.discord_config_id = configEntry.id;
-    await communityInstance.save();
+    await communityInstance.save({ transaction });
   }
 
   try {
@@ -154,14 +164,17 @@ const setDiscordBotConfig = async (
         where: {
           guild_id,
         },
+        transaction,
       },
     );
 
+    await transaction.commit();
     return success(res, {
       message: 'created a new discord bot config',
       discordConfigId: communityInstance.discord_config_id,
     });
   } catch (e) {
+    await transaction.rollback();
     console.log(e);
     throw new AppError(SetDiscordBotConfigErrors.Error);
   }

@@ -1,8 +1,8 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import type { TypedRequestBody, TypedResponse } from '../types';
-import { success } from '../types';
-import { validateOwner } from '../util/validateOwner';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
+import { validateOwner } from '../../util/validateOwner';
 
 enum CreateDiscordBotConfigErrors {
   NoCommunity = 'Must supply a community ID',

@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { TypedRequestBody, TypedResponse, success } from '../types';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type RemoveDiscordBotConfigReq = {
   community_id: string;
