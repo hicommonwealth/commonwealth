@@ -137,7 +137,7 @@ export const AdminOnboardingSlider = () => {
 
   useEffect(() => {
     setIsVisible(!isSliderHidden);
-  }, [isSliderHidden]);
+  }, [isSliderHidden, setIsVisible]);
 
   if (isSliderHidden) {
     return;
