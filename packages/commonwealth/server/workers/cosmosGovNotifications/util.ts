@@ -86,7 +86,7 @@ export function filterProposals(proposals: AllCosmosProposals) {
     const chainProposals = proposals.v1Beta1[chainId];
     filteredProposals.v1Beta1[chainId] = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
-      const submitTime = fromTimestamp(p.submitTime);
+      const submitTime = fromTimestamp(p.submitTime as any);
       return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
   }

@@ -65,7 +65,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
 
       try {
         const proposalResponse = await lcd.cosmos.gov.v1.proposal({
-          proposalId: longify(proposalId),
+          proposalId: longify(proposalId) as any,
         });
         newProposal = proposalResponse.proposal;
       } catch (e) {
