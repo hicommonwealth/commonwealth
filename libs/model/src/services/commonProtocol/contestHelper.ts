@@ -37,10 +37,15 @@ export const addContent = async (
   try {
     txReceipt = await contestInstance.methods
       .addContent(creator, url, [])
-      .send({ from: web3.eth.defaultAccount, gasLimit: 200000 });
+      .send({ from: web3.eth.defaultAccount, gas: '200000' });
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
+
+  if (!txReceipt.events?.ContentAdded) {
+    throw new AppError('Event not included in receipt');
+  }
+
   const event = txReceipt.events['ContentAdded'];
 
   if (!event) {
@@ -49,7 +54,7 @@ export const addContent = async (
 
   return {
     txReceipt,
-    contentId: event.returnValues.contentId,
+    contentId: String(event.returnValues.contentId),
   };
 };
 
@@ -76,7 +81,7 @@ export const voteContent = async (
   try {
     txReceipt = await contestInstance.methods
       .voteContent(voter, contentId)
-      .send({ from: web3.eth.defaultAccount, gasLimit: 200000 });
+      .send({ from: web3.eth.defaultAccount, gas: '200000' });
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -107,10 +112,10 @@ export const getContestStatus = async (
   ]);
 
   return {
-    startTime: promise[0],
-    endTime: promise[1],
-    contestInterval: promise[2],
-    lastContentId: promise[3],
+    startTime: Number(promise[0]),
+    endTime: Number(promise[1]),
+    contestInterval: Number(promise[2]),
+    lastContentId: String(promise[3]),
   };
 };
 

@@ -12,7 +12,6 @@ import { logger } from '@hicommonwealth/logging';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request } from 'express';
-import { fileURLToPath } from 'node:url';
 import passport from 'passport';
 import {
   createOpenApiExpressMiddleware,
@@ -21,6 +20,7 @@ import {
   type OpenApiMeta,
   type OpenApiRouter,
 } from 'trpc-openapi';
+import { fileURLToPath } from 'url';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
 
 const __filename = fileURLToPath(import.meta.url);
