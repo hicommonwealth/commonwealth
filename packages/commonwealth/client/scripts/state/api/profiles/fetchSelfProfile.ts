@@ -43,7 +43,6 @@ const useFetchSelfProfileQuery = ({
   apiCallEnabled = true,
 }: UseFetchSelfProfileQuery) => {
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [ApiEndpoints.FETCH_PROFILES],
     queryFn: fetchSelfProfile,
     staleTime: PROFILES_STALE_TIME,
