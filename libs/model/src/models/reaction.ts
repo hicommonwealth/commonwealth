@@ -1,7 +1,8 @@
-import { stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
@@ -35,8 +36,8 @@ export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
 export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
-export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
-  const Reaction = <ReactionModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize) =>
+  <ReactionModelStatic>sequelize.define<ReactionInstance>(
     'Reaction',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -57,7 +58,7 @@ export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
         afterCreate: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
-          const { Thread, Comment } = sequelize.models;
+          const { Thread, Comment, Outbox } = sequelize.models;
           try {
             if (thread_id) {
               const thread = await Thread.findOne({
@@ -72,6 +73,21 @@ export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
                     by: reaction.calculated_voting_weight,
                     transaction: options.transaction,
                   });
+                }
+                if (reaction.reaction === 'like') {
+                  await emitEvent(
+                    Outbox,
+                    [
+                      {
+                        event_name: EventNames.ThreadUpvoted,
+                        event_payload: {
+                          ...reaction.get({ plain: true }),
+                          reaction: 'like',
+                        },
+                      },
+                    ],
+                    options.transaction,
+                  );
                 }
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
@@ -189,17 +205,3 @@ export default (sequelize: Sequelize.Sequelize): ReactionModelStatic => {
       ],
     },
   );
-
-  Reaction.associate = (models) => {
-    models.Reaction.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Reaction;
-};

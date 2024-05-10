@@ -6,8 +6,8 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { MESSAGE_RELAYER_PREFETCH } from '../../config';
 

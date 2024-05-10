@@ -3,9 +3,9 @@ import type {
   AddressInstance,
   CommunityRoleAttributes,
   DB,
-  Role,
   RoleAssignmentAttributes,
 } from '@hicommonwealth/model';
+import type { Role } from '@hicommonwealth/shared';
 import type { FindOptions, Transaction, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 
