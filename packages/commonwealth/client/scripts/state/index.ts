@@ -221,6 +221,8 @@ export async function initAppState(
         app.config.nodes.add(NodeInfo.fromJSON(node));
       });
 
+    console.log('FIXME: communities: ', communities);
+
     communities.result
       .filter((c) => c.community.active)
       .forEach((c) => {

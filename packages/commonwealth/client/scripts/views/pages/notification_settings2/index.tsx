@@ -17,9 +17,7 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
-import useNotificationSettings, {
-  SnapshotInfo,
-} from './useNotificationSettings';
+import useNotificationSettings from './useNotificationSettings';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -62,6 +60,17 @@ const NotificationSettingsPage2 = () => {
     return <PageLoading />;
   }
 
+  console.log('FIXME: ', JSON.stringify(bundledSubs, null, '  '));
+
+  // const threads = useMemo(() => {
+  //   bundledSubs
+  // })
+  //
+  // app.
+
+  const discussionSubscriptions =
+    app?.user.notifications.discussionSubscriptions || [];
+
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage">
@@ -71,6 +80,12 @@ const NotificationSettingsPage2 = () => {
         <CWText className="page-subheader-text">
           Manage the emails and alerts you receive about your activity
         </CWText>
+
+        {discussionSubscriptions
+          .filter((current) => current.Thread)
+          .map((current) => (
+            <div>{current.Thread.title}</div>
+          ))}
 
         <CWText
           type="h4"
@@ -102,6 +117,7 @@ const NotificationSettingsPage2 = () => {
             In-App
           </CWText>
         </div>
+
         {Object.entries(bundledSubs)
           .sort((x, y) => x[0].localeCompare(y[0]))
           .map(([communityName, subs]) => {
@@ -259,84 +275,6 @@ const NotificationSettingsPage2 = () => {
                     </div>
                   }
                 />
-              </div>
-            );
-          })}
-        <div>
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="chain-events-section-margin"
-          >
-            Snapshot Subscriptions
-          </CWText>
-          <div className="column-header-row">
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="column-header-text"
-            >
-              Community
-            </CWText>
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="column-header-text"
-            >
-              Email
-            </CWText>
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="last-column-header-text"
-            >
-              In-App
-            </CWText>
-          </div>
-        </div>
-        {snapshotsInfo &&
-          snapshotsInfo.map((snapshot: SnapshotInfo) => {
-            //destructuring snapshotInfo for readability
-            const { snapshotId, space, subs } = snapshot;
-            if (!snapshotId) return null; // handles incomplete loading case
-
-            //remove ipfs:// from avatar
-            const avatar = space.avatar.replace('ipfs://', '');
-
-            const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-            const hasSomeInAppSubs = subs.some((s) => s.isActive);
-
-            return (
-              <div
-                className="notification-row chain-events-subscriptions-padding"
-                key={snapshotId}
-              >
-                <div className="notification-row-header">
-                  <div className="left-content-container">
-                    <div className="avatar-and-name">
-                      <img
-                        className="snapshot-icon"
-                        src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
-                      />
-                      <CWText type="h5" fontWeight="medium">
-                        {space.name}
-                      </CWText>
-                    </div>
-                  </div>
-                  <CWCheckbox
-                    label="Receive Emails"
-                    checked={hasSomeEmailSubs}
-                    onChange={() => {
-                      handleEmailSubscriptions(hasSomeEmailSubs, subs);
-                    }}
-                  />
-                  <CWToggle
-                    checked={hasSomeInAppSubs}
-                    onChange={() => {
-                      handleSubscriptions(hasSomeInAppSubs, subs);
-                    }}
-                  />
-                </div>
               </div>
             );
           })}
