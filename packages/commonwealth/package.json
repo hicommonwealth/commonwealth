@@ -70,6 +70,7 @@
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {
+    "@viem/anvil": "^0.0.10",
     "@apollo/client": "^3.3.18",
     "@brillout/import": "^0.2.2",
     "@canvas-js/interfaces": "0.5.0-alpha4",

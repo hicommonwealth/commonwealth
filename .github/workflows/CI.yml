@@ -209,7 +209,7 @@ jobs:
         image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
+          POSTGRES_DB: commonwealth
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -407,7 +407,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
+      - name: Cache d ependencies
         id: cache
         uses: actions/cache@v3
         with:
@@ -433,6 +433,61 @@ jobs:
   # These tests run slowly, so run them in a separate job
   commonwealth-devnet-tests:
     name: Devnet Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [20]
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Build CI
+        run: yarn global add node-gyp && yarn --ignore-engines
+
+      - name: Run EVM Devnet tests
+        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
+        env:
+          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+
+  # These tests run slowly, so run them in a separate job
+  commonwealth-cosmos-tests:
+    name: Cosmos Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
