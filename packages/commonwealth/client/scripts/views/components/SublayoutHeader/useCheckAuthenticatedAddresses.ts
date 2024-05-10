@@ -54,7 +54,9 @@ const useCheckAuthenticatedAddresses = ({
       // check if it has an authorised session
       let hasSession = false;
       try {
-        matchedSessionSigner.getCachedSession(CANVAS_TOPIC, caip2Address);
+        matchedSessionSigner.getSession(CANVAS_TOPIC, {
+          address: caip2Address,
+        });
         hasSession = true;
       } catch (e) {
         // do nothing

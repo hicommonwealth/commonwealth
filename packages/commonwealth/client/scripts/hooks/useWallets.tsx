@@ -21,7 +21,6 @@ import {
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { CANVAS_TOPIC } from 'shared/canvas';
 import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
@@ -367,11 +366,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     // Handle receiving and caching wallet signature strings
     if (!newlyCreated && !linking) {
       try {
-        const timestamp = +new Date();
-        const sessionSigner = await walletToUse.getSessionSigner();
-        const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-          timestamp,
-        });
+        const session = await getSessionFromWallet(walletToUse);
         await account.validate(session);
 
         await onLogInWithAccount(account, true, newlyCreated);
@@ -381,12 +376,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } else {
       if (!linking) {
         try {
-          const timestamp = +new Date();
-          const session = await signSessionWithAccount(
-            walletToUse,
-            account,
-            timestamp,
-          );
+          const session = await signSessionWithAccount(walletToUse, account);
           // Can't call authSession now, since chain.base is unknown, so we wait till action
           setCachedSession(session);
           walletProps.onSuccess?.(account.address, newlyCreated);
@@ -462,11 +452,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
   // Validates both linking (secondary) and primary accounts
   const onPerformLinking = async () => {
     try {
-      const secondaryTimestamp = +new Date();
       const secondarySession = await signSessionWithAccount(
         selectedLinkingWallet,
         secondaryLinkAccount,
-        secondaryTimestamp,
       );
 
       await secondaryLinkAccount.validate(secondarySession);

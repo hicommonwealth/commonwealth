@@ -212,17 +212,12 @@ export async function updateActiveAddresses({
       if (!matchedSessionSigner) {
         continue;
       }
-      let hasSession = false;
-      try {
-        matchedSessionSigner.getCachedSession(
-          CANVAS_TOPIC,
-          communityAccount.address,
-        );
-        hasSession = true;
-      } catch (e) {
-        // do nothing
-      }
-      if (hasSession) {
+
+      const savedData = await matchedSessionSigner.getSession(CANVAS_TOPIC, {
+        address: communityAccount.address,
+      });
+
+      if (savedData !== null) {
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }
@@ -483,7 +478,7 @@ export async function handleSocialLoginCallback({
         magicAddress,
         canvasChainId,
       );
-      session = await sessionSigner.getSession(CANVAS_TOPIC);
+      session = (await sessionSigner.getSession(CANVAS_TOPIC)).payload;
 
       console.log(
         'Reauthenticated Cosmos session from magic address:',
@@ -502,7 +497,7 @@ export async function handleSocialLoginCallback({
         chainId: app.chain?.meta.node?.ethChainId || 1,
       });
       // TODO: provide blockhash
-      session = await sessionSigner.getSession(CANVAS_TOPIC);
+      session = (await sessionSigner.getSession(CANVAS_TOPIC)).payload;
       console.log(
         'Reauthenticated Ethereum session from magic address:',
         checksumAddress,
