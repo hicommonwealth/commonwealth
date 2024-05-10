@@ -74,10 +74,8 @@ const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-  const {
-    setCardTempMarkedAsCompleted,
-    setShouldHideTrainingCardsPermanently,
-  } = useUserOnboardingSliderMutationStore();
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   return useMutation({
     mutationFn: createThread,
@@ -96,10 +94,9 @@ const useCreateThreadMutation = ({
 
       if (userOnboardingEnabled) {
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        setCardTempMarkedAsCompleted(UserTrainingCardTypes.CreateContent);
-        setShouldHideTrainingCardsPermanently(
-          profileId,
+        markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
+          profileId,
         );
       }
 

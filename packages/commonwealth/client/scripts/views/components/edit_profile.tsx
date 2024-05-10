@@ -69,10 +69,8 @@ const EditProfileComponent = () => {
   });
   const { selectedTags, toggleTagFromSelection } = usePreferenceTags({});
 
-  const {
-    setCardTempMarkedAsCompleted,
-    setShouldHideTrainingCardsPermanently,
-  } = useUserOnboardingSliderMutationStore();
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   const getProfile = async () => {
     try {
@@ -152,10 +150,9 @@ const EditProfileComponent = () => {
           navigate(`/profile/id/${profile.id}`);
 
           if (userOnboardingEnabled && socials.length > 0) {
-            setCardTempMarkedAsCompleted(UserTrainingCardTypes.FinishProfile);
-            setShouldHideTrainingCardsPermanently(
-              profile.id,
+            markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
+              profile.id,
             );
           }
         })

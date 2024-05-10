@@ -59,10 +59,8 @@ const useCreateCommentReactionMutation = ({
     threadId,
   });
 
-  const {
-    setCardTempMarkedAsCompleted,
-    setShouldHideTrainingCardsPermanently,
-  } = useUserOnboardingSliderMutationStore();
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   return useMutation({
     mutationFn: createReaction,
@@ -84,10 +82,9 @@ const useCreateCommentReactionMutation = ({
 
       if (userOnboardingEnabled) {
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        setCardTempMarkedAsCompleted(UserTrainingCardTypes.GiveUpvote);
-        setShouldHideTrainingCardsPermanently(
-          profileId,
+        markTrainingActionAsComplete(
           UserTrainingCardTypes.GiveUpvote,
+          profileId,
         );
       }
 

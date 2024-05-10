@@ -50,44 +50,26 @@ export const UserTrainingSlider = () => {
     });
 
   const {
-    cardTempMarkedAsCompleted,
-    setCardTempMarkedAsCompleted,
-    unsetCardTempMarkedAsCompleted,
-    clearCardsTempMarkedAsCompleted,
-    shouldHideTrainingCardsPermanently,
-    setShouldHideTrainingCardsPermanently,
+    completedActions,
+    clearCompletedActionsState,
+    markTrainingActionAsComplete,
+    trainingActionPermanentlyHidden,
+    markTrainingActionAsPermanentlyHidden,
   } = useUserOnboardingSliderMutationStore();
 
   const hideAllCards = () => {
-    setShouldHideTrainingCardsPermanently(
-      profileId,
+    [
       UserTrainingCardTypes.GiveUpvote,
-    );
-    setShouldHideTrainingCardsPermanently(
-      profileId,
       UserTrainingCardTypes.CreateContent,
-    );
-    setShouldHideTrainingCardsPermanently(
-      profileId,
       UserTrainingCardTypes.FinishProfile,
-    );
-    setShouldHideTrainingCardsPermanently(
-      profileId,
       UserTrainingCardTypes.ExploreCommunities,
-    );
+    ].map((card) => markTrainingActionAsPermanentlyHidden(card, profileId));
   };
 
-  const hideCardPermanently = (cardName: UserTrainingCardTypes) => {
-    setShouldHideTrainingCardsPermanently(profileId, cardName);
-    unsetCardTempMarkedAsCompleted(cardName);
-  };
-
-  const markExploreCommunitiesActionAsComplete = () => {
-    // once a user visits communities page, this action is complete
-    setCardTempMarkedAsCompleted(UserTrainingCardTypes.ExploreCommunities);
-    setShouldHideTrainingCardsPermanently(
-      profileId,
-      UserTrainingCardTypes.ExploreCommunities,
+  const isCardVisible = (cardName: UserTrainingCardTypes) => {
+    return (
+      completedActions.includes(cardName) ||
+      !trainingActionPermanentlyHidden?.[profileId]?.includes(cardName)
     );
   };
 
@@ -103,18 +85,23 @@ export const UserTrainingSlider = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn && cardTempMarkedAsCompleted.length > 0) {
-      clearCardsTempMarkedAsCompleted();
+    if (!isLoggedIn && completedActions.length > 0) {
+      clearCompletedActionsState();
     }
-  }, [isLoggedIn, cardTempMarkedAsCompleted, clearCardsTempMarkedAsCompleted]);
+  }, [isLoggedIn, completedActions, clearCompletedActionsState]);
 
   useEffect(() => {
     if (isLoggedIn && !isLoadingProfile && profile && profileId) {
       // if user has already given any upvotes, then hide `give-upvote` card
-      if (profile?.totalUpvotes > 0) {
-        setShouldHideTrainingCardsPermanently(
-          profileId,
+      if (
+        profile?.totalUpvotes > 0 &&
+        !trainingActionPermanentlyHidden?.[profileId]?.includes(
           UserTrainingCardTypes.GiveUpvote,
+        )
+      ) {
+        markTrainingActionAsPermanentlyHidden(
+          UserTrainingCardTypes.GiveUpvote,
+          profileId,
         );
       }
 
@@ -123,18 +110,28 @@ export const UserTrainingSlider = () => {
         (profile?.profile?.socials || []).filter(
           (link) => link.trim().length > 0,
         )?.length > 0;
-      if (hasSocialLinks || app?.user?.email) {
-        setShouldHideTrainingCardsPermanently(
-          profileId,
+      if (
+        (hasSocialLinks || app?.user?.email) &&
+        !trainingActionPermanentlyHidden?.[profileId]?.includes(
           UserTrainingCardTypes.FinishProfile,
+        )
+      ) {
+        markTrainingActionAsPermanentlyHidden(
+          UserTrainingCardTypes.FinishProfile,
+          profileId,
         );
       }
 
       // if user has created any comment/thread, then hide `create-content` card
-      if (profile?.comments?.length > 0 || profile?.threads?.length > 0) {
-        setShouldHideTrainingCardsPermanently(
-          profileId,
+      if (
+        (profile?.comments?.length > 0 || profile?.threads?.length > 0) &&
+        !trainingActionPermanentlyHidden?.[profileId]?.includes(
           UserTrainingCardTypes.CreateContent,
+        )
+      ) {
+        markTrainingActionAsPermanentlyHidden(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
         );
       }
     }
@@ -143,41 +140,18 @@ export const UserTrainingSlider = () => {
     isLoadingProfile,
     profile,
     profileId,
-    shouldHideTrainingCardsPermanently,
-    setShouldHideTrainingCardsPermanently,
+    trainingActionPermanentlyHidden,
+    markTrainingActionAsPermanentlyHidden,
   ]);
 
   if (
     !isLoggedIn ||
     isLoadingProfile ||
-    (shouldHideTrainingCardsPermanently?.[profileId]?.length === 4 &&
-      cardTempMarkedAsCompleted.length === 0)
+    (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
+      completedActions.length === 0)
   ) {
     return;
   }
-
-  const isGiveUpvoteCardVisible =
-    cardTempMarkedAsCompleted.includes(UserTrainingCardTypes.GiveUpvote) ||
-    !shouldHideTrainingCardsPermanently?.[profileId]?.includes(
-      UserTrainingCardTypes.GiveUpvote,
-    );
-  const isCreateContentCardVisible =
-    cardTempMarkedAsCompleted.includes(UserTrainingCardTypes.CreateContent) ||
-    !shouldHideTrainingCardsPermanently?.[profileId]?.includes(
-      UserTrainingCardTypes.CreateContent,
-    );
-  const isFinishProfileCardVisible =
-    cardTempMarkedAsCompleted.includes(UserTrainingCardTypes.FinishProfile) ||
-    !shouldHideTrainingCardsPermanently?.[profileId]?.includes(
-      UserTrainingCardTypes.FinishProfile,
-    );
-  const isExploreCommunitiesCardVisible =
-    cardTempMarkedAsCompleted.includes(
-      UserTrainingCardTypes.ExploreCommunities,
-    ) ||
-    !shouldHideTrainingCardsPermanently?.[profileId]?.includes(
-      UserTrainingCardTypes.ExploreCommunities,
-    );
 
   return (
     <CWPageLayout className="UserTrainingSliderPageLayout">
@@ -202,7 +176,7 @@ export const UserTrainingSlider = () => {
           />
         </div>
         <div className="cards">
-          {isGiveUpvoteCardVisible && (
+          {isCardVisible(UserTrainingCardTypes.GiveUpvote) && (
             <ActionCard
               ctaText={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].ctaText}
               title={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].title}
@@ -213,9 +187,12 @@ export const UserTrainingSlider = () => {
               iconAlt="give-upvote-icon"
               canClose
               onClose={() =>
-                hideCardPermanently(UserTrainingCardTypes.GiveUpvote)
+                markTrainingActionAsPermanentlyHidden(
+                  UserTrainingCardTypes.GiveUpvote,
+                  profileId,
+                )
               }
-              isActionCompleted={cardTempMarkedAsCompleted.includes(
+              isActionCompleted={completedActions.includes(
                 UserTrainingCardTypes.GiveUpvote,
               )}
               onCTAClick={() =>
@@ -223,7 +200,7 @@ export const UserTrainingSlider = () => {
               }
             />
           )}
-          {isCreateContentCardVisible && (
+          {isCardVisible(UserTrainingCardTypes.CreateContent) && (
             <ActionCard
               ctaText={CARD_TYPES[UserTrainingCardTypes.CreateContent].ctaText}
               title={CARD_TYPES[UserTrainingCardTypes.CreateContent].title}
@@ -234,9 +211,12 @@ export const UserTrainingSlider = () => {
               iconAlt="create-content-icon"
               canClose
               onClose={() =>
-                hideCardPermanently(UserTrainingCardTypes.CreateContent)
+                markTrainingActionAsPermanentlyHidden(
+                  UserTrainingCardTypes.CreateContent,
+                  profileId,
+                )
               }
-              isActionCompleted={cardTempMarkedAsCompleted.includes(
+              isActionCompleted={completedActions.includes(
                 UserTrainingCardTypes.CreateContent,
               )}
               onCTAClick={() =>
@@ -244,7 +224,7 @@ export const UserTrainingSlider = () => {
               }
             />
           )}
-          {isFinishProfileCardVisible && (
+          {isCardVisible(UserTrainingCardTypes.FinishProfile) && (
             <ActionCard
               ctaText={CARD_TYPES[UserTrainingCardTypes.FinishProfile].ctaText}
               title={CARD_TYPES[UserTrainingCardTypes.FinishProfile].title}
@@ -255,9 +235,12 @@ export const UserTrainingSlider = () => {
               iconAlt="finish-profile-icon"
               canClose
               onClose={() =>
-                hideCardPermanently(UserTrainingCardTypes.FinishProfile)
+                markTrainingActionAsPermanentlyHidden(
+                  UserTrainingCardTypes.FinishProfile,
+                  profileId,
+                )
               }
-              isActionCompleted={cardTempMarkedAsCompleted.includes(
+              isActionCompleted={completedActions.includes(
                 UserTrainingCardTypes.FinishProfile,
               )}
               onCTAClick={() =>
@@ -265,7 +248,7 @@ export const UserTrainingSlider = () => {
               }
             />
           )}
-          {isExploreCommunitiesCardVisible && (
+          {isCardVisible(UserTrainingCardTypes.ExploreCommunities) && (
             <ActionCard
               ctaText={
                 CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].ctaText
@@ -280,15 +263,21 @@ export const UserTrainingSlider = () => {
               iconAlt="explore-communities-icon"
               canClose
               onClose={() =>
-                hideCardPermanently(UserTrainingCardTypes.ExploreCommunities)
+                markTrainingActionAsPermanentlyHidden(
+                  UserTrainingCardTypes.ExploreCommunities,
+                  profileId,
+                )
               }
-              isActionCompleted={cardTempMarkedAsCompleted.includes(
+              isActionCompleted={completedActions.includes(
                 UserTrainingCardTypes.ExploreCommunities,
               )}
               onCTAClick={() => {
                 redirectToPage(UserTrainingCardTypes.ExploreCommunities);
 
-                markExploreCommunitiesActionAsComplete();
+                markTrainingActionAsComplete(
+                  UserTrainingCardTypes.ExploreCommunities,
+                  profileId,
+                );
               }}
             />
           )}

@@ -4,16 +4,18 @@ import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface UserTrainingCardsStore {
-  cardTempMarkedAsCompleted: UserTrainingCardTypes[];
-  setCardTempMarkedAsCompleted: (cardName: UserTrainingCardTypes) => void;
-  unsetCardTempMarkedAsCompleted: (cardName: UserTrainingCardTypes) => void;
-  clearCardsTempMarkedAsCompleted: () => void;
-  shouldHideTrainingCardsPermanently: {
+  completedActions: UserTrainingCardTypes[];
+  markTrainingActionAsComplete: (
+    action: UserTrainingCardTypes,
+    profileId: string | number,
+  ) => void;
+  clearCompletedActionsState: () => void;
+  trainingActionPermanentlyHidden: {
     [profileId: string]: UserTrainingCardTypes[]; // a list of cards to hide
   };
-  setShouldHideTrainingCardsPermanently: (
-    profileId: number,
-    cardName: UserTrainingCardTypes,
+  markTrainingActionAsPermanentlyHidden: (
+    action: UserTrainingCardTypes,
+    profileId: string | number,
   ) => void;
 }
 
@@ -21,59 +23,57 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
   devtools(
     persist(
       (set) => ({
-        cardTempMarkedAsCompleted: [],
-        setCardTempMarkedAsCompleted: (cardName) => {
+        completedActions: [],
+        markTrainingActionAsComplete: (action, profileId) => {
           set((state) => {
-            if (state.cardTempMarkedAsCompleted?.includes(cardName)) {
-              return state;
-            }
-
             return {
               ...state,
-              cardTempMarkedAsCompleted: [
-                ...state.cardTempMarkedAsCompleted,
-                cardName,
+              // once an action is complete, it should show us with a completed checkmark
+              completedActions: [
+                ...state.completedActions,
+                ...(state.completedActions?.includes(action) ? [] : [action]),
               ],
-            };
-          });
-        },
-        unsetCardTempMarkedAsCompleted: (cardName) => {
-          set((state) => {
-            return {
-              ...state,
-              cardTempMarkedAsCompleted: [
-                ...state.cardTempMarkedAsCompleted,
-              ].filter((name) => name !== cardName),
-            };
-          });
-        },
-        clearCardsTempMarkedAsCompleted: () => {
-          set((state) => {
-            return {
-              ...state,
-              cardTempMarkedAsCompleted: [],
-            };
-          });
-        },
-        shouldHideTrainingCardsPermanently: {},
-        setShouldHideTrainingCardsPermanently: (profileId, cardName) => {
-          set((state) => {
-            if (
-              state.shouldHideTrainingCardsPermanently?.[profileId]?.includes(
-                cardName,
-              )
-            ) {
-              return state;
-            }
-
-            return {
-              ...state,
-              shouldHideTrainingCardsPermanently: {
-                ...state.shouldHideTrainingCardsPermanently,
+              // and the next time, the page is reloaded it shouldn't be visible
+              trainingActionPermanentlyHidden: {
+                ...state.trainingActionPermanentlyHidden,
                 [profileId]: [
-                  ...(state.shouldHideTrainingCardsPermanently[profileId] ||
-                    []),
-                  cardName,
+                  ...(state.trainingActionPermanentlyHidden[profileId] || []),
+                  ...(state.trainingActionPermanentlyHidden?.[
+                    profileId
+                  ]?.includes(action)
+                    ? []
+                    : [action]),
+                ],
+              },
+            };
+          });
+        },
+        clearCompletedActionsState: () => {
+          set((state) => {
+            return {
+              ...state,
+              completedActions: [],
+            };
+          });
+        },
+        trainingActionPermanentlyHidden: {},
+        markTrainingActionAsPermanentlyHidden: (action, profileId) => {
+          // hide the action card even if it is showed with a completed checkmark
+          set((state) => {
+            return {
+              ...state,
+              completedActions: [...state.completedActions].filter(
+                (name) => name !== action,
+              ),
+              trainingActionPermanentlyHidden: {
+                ...state.trainingActionPermanentlyHidden,
+                [profileId]: [
+                  ...(state.trainingActionPermanentlyHidden[profileId] || []),
+                  ...(state.trainingActionPermanentlyHidden?.[
+                    profileId
+                  ]?.includes(action)
+                    ? []
+                    : [action]),
                 ],
               },
             };
@@ -83,9 +83,9 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
       {
         name: 'user-training-cards-store', // unique name
         partialize: (state) => ({
-          shouldHideTrainingCardsPermanently:
-            state.shouldHideTrainingCardsPermanently,
-        }), // persist shouldHideTrainingCardsPermanently
+          trainingActionPermanentlyHidden:
+            state.trainingActionPermanentlyHidden,
+        }), // persist trainingActionPermanentlyHidden
       },
     ),
   ),
