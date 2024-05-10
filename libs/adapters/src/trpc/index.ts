@@ -11,7 +11,8 @@ import {
 import { logger } from '@hicommonwealth/logging';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { Request } from 'express';
+import { Handler, Request } from 'express';
+import { OpenAPIV3 } from 'openapi-types';
 import passport from 'passport';
 import {
   createOpenApiExpressMiddleware,
@@ -200,7 +201,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
 };
 
 // used for TRPC like routes (Internal)
-export const toExpress = (router: OpenApiRouter) =>
+export const toExpress = (router: OpenApiRouter): Handler =>
   createExpressMiddleware({
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
@@ -208,7 +209,7 @@ export const toExpress = (router: OpenApiRouter) =>
   });
 
 // used for REST like routes (External)
-export const toOpenApiExpress = (router: OpenApiRouter) =>
+export const toOpenApiExpress = (router: OpenApiRouter): Handler =>
   createOpenApiExpressMiddleware({
     router,
     createContext: ({ req }: { req: any }) => ({ req }),
@@ -221,6 +222,7 @@ export const toOpenApiExpress = (router: OpenApiRouter) =>
 export const toOpenApiDocument = (
   router: OpenApiRouter,
   opts: GenerateOpenApiDocumentOptions,
-) => generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
+): OpenAPIV3.Document =>
+  generateOpenApiDocument(router, { ...opts, tags: Object.keys(Tag) });
 
 export const router = trpc.router;

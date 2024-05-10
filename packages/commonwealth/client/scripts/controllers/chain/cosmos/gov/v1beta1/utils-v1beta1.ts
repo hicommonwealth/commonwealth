@@ -25,6 +25,7 @@ import type {
   ICosmosProposalTally,
 } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import Long from 'long';
 import Cosmos from '../../adapter';
 import { CosmosApiType } from '../../chain';
 import CosmosGovernance from './governance-v1beta1';
