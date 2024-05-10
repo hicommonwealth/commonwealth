@@ -78,9 +78,23 @@
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/crypto": "0.31.3",
     "@cosmjs/encoding": "0.32.3",
+    "@cosmjs/crypto": "0.31.3",
+    "@cosmjs/encoding": "0.32.3",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@cosmjs/utils": "^0.31.3",
+    "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/address": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/bytes": "^5.7.0",
+    "@ethersproject/constants": "^5.7.0",
+    "@ethersproject/contracts": "^5.7.0",
+    "@ethersproject/hash": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/strings": "^5.7.0",
+    "@ethersproject/units": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
     "@cosmjs/utils": "^0.31.3",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/address": "^5.7.0",
@@ -268,8 +282,5 @@
     "@types/moment": "^2.13.0",
     "@types/passport": "^1.0.16",
     "@types/uuid": "^9.0.7"
-  },
-  "engines": {
-    "node": "20.x"
   }
 }

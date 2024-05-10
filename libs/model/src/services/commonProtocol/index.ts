@@ -1,4 +1,3 @@
-export * as ContestHelper from './contestHelper';
 export * as newNamespaceValidator from './newNamespaceValidator';
 
 import * as communityStakeConfigValidatorModule from './communityStakeConfigValidator';
@@ -9,3 +8,7 @@ export const contractHelpers: any = { ...contractHelpersModule };
 export const communityStakeConfigValidator = {
   ...communityStakeConfigValidatorModule,
 };
+
+// esm stub fix
+import * as contestHelpersModule from './contestHelper';
+export const ContestHelper = { ...contestHelpersModule };
