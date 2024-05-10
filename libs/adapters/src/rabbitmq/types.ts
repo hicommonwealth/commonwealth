@@ -15,6 +15,7 @@ export enum RascalSubscriptions {
   DiscordListener = BrokerSubscriptions.DiscordListener,
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
+  ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
 }
 
 export enum RascalExchanges {
@@ -29,6 +30,7 @@ export enum RascalQueues {
   DiscordListener = 'DiscordMessageQueueV2',
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',
+  ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
 }
 
 export enum RascalBindings {
@@ -36,6 +38,7 @@ export enum RascalBindings {
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
+  ContestWorkerPolicy = 'ContestWorkerPolicy',
 }
 
 export enum RascalRoutingKeys {
@@ -43,4 +46,5 @@ export enum RascalRoutingKeys {
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
+  ContestWorkerPolicy = EventNames.ThreadUpvoted,
 }
