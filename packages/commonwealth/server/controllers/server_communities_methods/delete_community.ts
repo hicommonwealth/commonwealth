@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
-import { UserInstance, sequelize } from '@hicommonwealth/model';
-import { Model, Op, type ModelStatic } from 'sequelize';
+import { ModelInstance, UserInstance, sequelize } from '@hicommonwealth/model';
+import { Op, type ModelStatic } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -117,7 +117,9 @@ export async function __deleteCommunity(
             },
           );
 
-          const models: ModelStatic<Model>[] = [
+          const models: ModelStatic<
+            ModelInstance<{ community_id?: string }>
+          >[] = [
             this.models.CommunityStake,
             this.models.DiscordBotConfig,
             this.models.Ban,

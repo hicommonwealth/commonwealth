@@ -1,6 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
-import { CommunityAttributes, CommunityInstance } from '@hicommonwealth/model';
-import { Model, type ModelStatic } from 'sequelize';
+import {
+  CommunityAttributes,
+  CommunityInstance,
+  ModelInstance,
+} from '@hicommonwealth/model';
+import { type ModelStatic } from 'sequelize';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -66,7 +70,7 @@ export async function __updateCommunityId(
     //  in the long-term. Alternative is to gradually duplicate the data
     //  and then delete the old data once redirect from old to new community
     //  is enabled
-    const models: ModelStatic<Model>[] = [
+    const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
       this.models.Address,
       this.models.Ban,
       this.models.Comment,
