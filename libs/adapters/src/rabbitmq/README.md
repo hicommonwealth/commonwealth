@@ -2,7 +2,7 @@
 
 ## Locally via Docker
 
-- Simply run `start-rmq` from the root of the repo. This will download and run a rabbitmq image on your local machine inside a docker container. Make sure you have docker installed locally before running and that rabbitmq, as configured below, is NOT running simultaneously.
+- Simply run `pnpm start-rmq` from the root of the repo. This will download and run a rabbitmq image on your local machine inside a docker container. Make sure you have docker installed locally before running and that rabbitmq, as configured below, is NOT running simultaneously.
 
 ## Locally
 
@@ -28,7 +28,7 @@ NB: If running with docker, the instance running on your machine is at `amqp://l
 
 If not using Docker, follow the steps below:
 
-- Follow instructions at <https://www.rabbitmq.com/install-debian.html#apt> to install Erlang and RabbitMQ make sure to install for the correct linux distribution!
+- Follow instructions at https://www.rabbitmq.com/install-debian.html#apt to install Erlang and RabbitMQ make sure to install for the correct linux distribution!
 
 ### RabbitMQ Server Commands (stops erlang + rabbitmq)
 
@@ -36,9 +36,9 @@ If not using Docker, follow the steps below:
 - Check server status: `sudo systemctl status rabbitmq-server`
 - Stop server: `sudo systemctl stop rabbitmq-server`
 
-For more commands check: <https://www.rabbitmq.com/rabbitmqctl.8.html#COMMANDS>
+For more commands check: https://www.rabbitmq.com/rabbitmqctl.8.html#COMMANDS
 
-### Create an admin RabbitMQ User
+### Create an admin RabbitMQ User:
 
 1. `sudo rabbitmqctl add_user admin password`
 2. `sudo rabbitmqctl set_user_tags admin administrator`
