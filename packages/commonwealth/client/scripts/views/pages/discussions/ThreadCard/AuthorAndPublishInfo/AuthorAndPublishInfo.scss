@@ -53,6 +53,24 @@
     }
   }
 
+  .version-history {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;
+    gap: 16px;
+
+    .CWSelectList {
+      min-width: 202px;
+      margin-left: -20px;
+      margin-right: -8px;
+
+      .SelectList:not(:focus):not(:focus-within) {
+        border-color: transparent !important;
+      }
+    }
+  }
+
   .proposal-stage-text.Text {
     font-weight: 500;
 
