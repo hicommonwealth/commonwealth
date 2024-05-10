@@ -11,7 +11,7 @@ import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import axios from 'axios';
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import NotificationsController from './notifications';
 
 export class UserController {
