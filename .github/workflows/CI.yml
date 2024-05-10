@@ -4,6 +4,7 @@ env:
   ROLLBAR_ENV: 'GitHubCI'
   NODE_ENV: 'test'
   TEST_WITHOUT_LOGS: 'true'
+  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadUpvoted'
 
 on:
   pull_request:
