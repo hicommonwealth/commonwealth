@@ -3,10 +3,10 @@ import { logger } from '@hicommonwealth/logging';
 import * as schemas from '@hicommonwealth/schemas';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
-import { Model, ModelCtor, Transaction } from 'sequelize';
+import { Model, ModelStatic, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { OutboxAttributes, OutboxModelStatic } from './models';
+import { OutboxAttributes } from './models';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -57,7 +57,7 @@ const DISALLOWED_EVENTS = process.env.DISALLOWED_EVENTS
  * a specific event, this function can be updated without having to update the emitter code.
  */
 export async function emitEvent(
-  outbox: ModelCtor<Model<OutboxAttributes>> | OutboxModelStatic,
+  outbox: ModelStatic<Model<OutboxAttributes>>,
   values: Array<EmitEventValues>,
   transaction?: Transaction | null,
 ) {

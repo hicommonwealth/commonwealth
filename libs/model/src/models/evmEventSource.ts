@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
 import { ContractAttributes } from './contract';
 import { ContractAbiAttributes } from './contract_abi';
-import { ModelInstance, ModelStatic } from './types';
+import { ModelInstance } from './types';
 
 export type EvmEventSourceAttributes = {
   id?: number;
@@ -22,10 +22,10 @@ export type EvmEventSourceAttributes = {
 
 export type EvmEventSourceInstance = ModelInstance<EvmEventSourceAttributes>;
 
-export type EvmEventSourceModelStatic = ModelStatic<EvmEventSourceInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <EvmEventSourceModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<EvmEventSourceInstance> =>
+  sequelize.define(
     'EvmEventSource',
     {
       id: {

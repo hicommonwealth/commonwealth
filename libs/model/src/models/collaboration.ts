@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;
@@ -26,10 +26,10 @@ export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
   >;
 };
 
-export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
-
-export default (sequelize: Sequelize.Sequelize) => {
-  const Collaboration = <CollaborationModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CollaborationInstance> =>
+  sequelize.define(
     'Collaboration',
     {
       address_id: {
@@ -51,6 +51,3 @@ export default (sequelize: Sequelize.Sequelize) => {
       underscored: true,
     },
   );
-
-  return Collaboration;
-};
