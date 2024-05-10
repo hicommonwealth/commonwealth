@@ -76,7 +76,7 @@ const setDiscordBotConfig = async (
     },
   });
 
-  if (!configEntry || community_id !== configEntry.community_id) {
+  if (!configEntry) {
     throw new AppError(SetDiscordBotConfigErrors.NotAdmin);
   }
 
