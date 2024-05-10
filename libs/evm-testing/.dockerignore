@@ -1,7 +1,0 @@
-node_modules
-src/sdk
-npm-debug.log
-docker-compose.yml
-dockerfile
-README.md
-test_sdk.ts
