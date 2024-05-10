@@ -126,7 +126,7 @@ async function sign(
         throw new SessionKeyError({
           name: 'Authentication Error',
           message: `No session found for address ${address}`,
-          address,
+          address: walletAddress,
           ssoSource: WalletSsoSource.Unknown,
         });
       }
@@ -139,7 +139,7 @@ async function sign(
           throw new SessionKeyError({
             name: 'Authentication Error',
             message: `Session expired for address ${address}`,
-            address,
+            address: walletAddress,
             ssoSource: WalletSsoSource.Unknown,
           });
         }
