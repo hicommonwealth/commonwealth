@@ -14,6 +14,8 @@ export type UserMention = {
 export type UserMentionQuery = {
   address: string;
   user_id: number;
+  profile_id: number;
+  profile_name: string;
 }[];
 
 const hash = (mention: UserMention) =>
@@ -87,7 +89,7 @@ export const queryMentionedUsers = async (
     const mentionQueries = mentions.map(async ({ profileId, profileName }) => {
       const result = await models.sequelize.query(
         `
-            SELECT a.address, a.user_id
+            SELECT a.address, a.user_id, p.id as profile_id, p.profile_name
             FROM "Addresses" as a
                      INNER JOIN "Profiles" as p ON a.profile_id = p.id
             WHERE a.user_id IS NOT NULL
@@ -185,17 +187,22 @@ export const emitMentions = async (
     const communityId =
       'thread' in data ? data.thread.community_id : data.comment.community_id;
 
-    const values = data.mentions.map<{
+    const values: {
       event_name: EventNames.UserMentioned;
       event_payload: z.infer<typeof events.UserMentioned>;
-    }>(({ user_id }) => ({
+    }[] = data.mentions.map(({ user_id, address, profile_name }) => ({
       event_name: EventNames.UserMentioned,
       event_payload: {
         authorUserId: data.authorUserId,
+        authorAddress: address,
+        authorProfileName: profile_name,
         mentionedUserId: user_id,
-        communityId,
-        commentId: 'comment' in data && data.comment.id,
-        threadId: 'thread' in data && data.thread.id,
+        communityId:
+          'comment' in data
+            ? data.comment.community_id
+            : data.thread.community_id,
+        comment: 'comment' in data && data.comment,
+        thread: 'thread' in data && data.thread,
       },
     }));
 

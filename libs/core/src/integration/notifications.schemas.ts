@@ -38,3 +38,18 @@ export const SnapshotProposalCreatedNotification = z.object({
     .string()
     .describe('The url to the snapshot proposal on Common'),
 });
+
+export const UserMentionedNotification = z.object({
+  community_name: z
+    .string()
+    .max(255)
+    .describe('The user-friendly name of the community'),
+  author: z
+    .string()
+    .describe('The profile name or first 8 characters of a users address'),
+  object_body: z
+    .string()
+    .max(255)
+    .describe('A truncated version of the comment body'),
+  object_url: z.string().describe('The url of the comment'),
+});

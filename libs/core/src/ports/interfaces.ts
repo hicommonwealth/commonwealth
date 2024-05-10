@@ -9,6 +9,7 @@ import { Events } from '../integration/events';
 import {
   CommentCreatedNotification,
   SnapshotProposalCreatedNotification,
+  UserMentionedNotification,
 } from '../integration/notifications.schemas';
 
 /**
@@ -182,6 +183,7 @@ export interface Broker extends Disposable {
 export enum WorkflowKeys {
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',
+  UserMentioned = 'user-mentioned',
 }
 
 type BaseNotifProviderOptions = {
@@ -198,6 +200,10 @@ export type NotificationsProviderOptions = BaseNotifProviderOptions &
     | {
         data: z.infer<typeof SnapshotProposalCreatedNotification>;
         key: WorkflowKeys.SnapshotProposals;
+      }
+    | {
+        data: z.infer<typeof UserMentionedNotification>;
+        key: WorkflowKeys.UserMentioned;
       }
   );
 
