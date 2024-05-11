@@ -14,15 +14,31 @@ on:
       - master
 
 jobs:
-  # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
-  # Its references in this file
-  e2e-tests-Parallel:
+  setup:
     strategy:
       matrix:
         node: [ 20 ]
+    uses: ./.github/workflows/setup.yml
+    secrets: inherit
+    with:
+      node-version: ${{ matrix.node }}
+
+  setup-deep:
+    strategy:
+      matrix:
+        node: [ 20 ]
+    uses: ./.github/workflows/setup-deep.yml
+    secrets: inherit
+    with:
+      node-version: ${{ matrix.node }}
+
+  # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
+  # Its references in this file
+  e2e-tests-Parallel:
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: setup
 
     services:
       postgres:
@@ -46,12 +62,6 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Setup
-        uses: ./setup.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Build CI
         run: pnpm build-ci
 
@@ -99,12 +109,10 @@ jobs:
 
   # The tests that this job runs should not be flaky. If they are, move them back into the regular suite.
   e2e-tests-Mature:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: setup
 
     services:
       postgres:
@@ -128,12 +136,6 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Setup
-        uses: ./setup.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Build CI
         run: pnpm build-ci
 
@@ -180,12 +182,10 @@ jobs:
           path: packages/commonwealth/test-results/
 
   e2e-tests-serial:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: setup
 
     services:
       postgres:
@@ -209,12 +209,6 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Setup
-        uses: ./setup.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Build CI
         run: pnpm build-ci
 
@@ -245,19 +239,12 @@ jobs:
 
   # Lint with recommendations
   commonwealth-code-quality-recommendations:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Code Quality Recommendations
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    steps:
-      - name: Setup Deep
-        uses: ./setup-deep.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
+    needs: setup-deep
 
+    steps:
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
@@ -265,19 +252,12 @@ jobs:
 
   # Lint and Typecheck
   commonwealth-code-quality:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Code Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    steps:
-      - name: Setup Deep
-        uses: ./setup-deep.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
+    needs: setup-deep
 
+    steps:
       - name: Assert pnpm-lock.yaml is correct
         run: |
           if ! git diff --quiet; then
@@ -305,12 +285,10 @@ jobs:
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: setup
 
     services:
       postgres:
@@ -339,12 +317,6 @@ jobs:
           - 15672:15672
 
     steps:
-      - name: Setup
-        uses: ./setup.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
 
@@ -365,9 +337,8 @@ jobs:
     name: EVM Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      matrix:
-        node: [ 20 ]
+    needs: setup
+
     services:
       postgres:
         image: hicommonwealth/cw_postgres:latest
@@ -389,12 +360,6 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - name: Setup
-        uses: ./
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
@@ -411,9 +376,8 @@ jobs:
     name: Cosmos Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    strategy:
-      matrix:
-        node: [ 20 ]
+    needs: setup
+
     services:
       postgres:
         image: hicommonwealth/cw_postgres:latest
@@ -448,12 +412,6 @@ jobs:
          - 6379:6379
 
     steps:
-      - name: Setup
-        uses: ./setup.yml
-        secrets: inherit
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
 
