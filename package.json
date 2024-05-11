@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "build-ci": "pnpm global add node-gyp && pnpm --ignore-engines && pnpm build",
+    "build-ci": "pnpm add -g node-gyp && pnpm --ignore-engines && pnpm build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F commonwealth db-all",
@@ -24,7 +24,7 @@
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "heroku-postbuild": "chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh",
-    "heroku-prebuild": "pnpm global add node-gyp",
+    "heroku-prebuild": "pnpm add -g node-gyp",
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",

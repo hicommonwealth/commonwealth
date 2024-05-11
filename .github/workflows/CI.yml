@@ -290,7 +290,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Add node-gyp
-        run: pnpm global add node-gyp
+        run: pnpm add -g node-gyp
 
       - name: Cache dependencies
         id: cache
@@ -334,7 +334,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
 
       - name: Add node-gyp
-        run: pnpm global add node-gyp
+        run: pnpm add -g node-gyp
 
       - name: Install dependencies
         run: pnpm --ignore-engines
@@ -342,7 +342,7 @@ jobs:
       - name: Assert pnpm.lock is correct
         run: |
           if ! git diff --quiet; then
-            echo 'You need to update the pnpm.lock file (potentially after running: pnpm global add node-gyp)'
+            echo 'You need to update the pnpm.lock file (potentially after running: pnpm add -g node-gyp)'
             exit 1
           fi
 
@@ -478,7 +478,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
 
       - name: Build CI
-        run: pnpm global add node-gyp && pnpm i --ignore-engines
+        run: pnpm add -g node-gyp && pnpm i --ignore-engines
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet evm --forbid-only

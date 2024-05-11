@@ -82,7 +82,7 @@ Description:
 
 ### build-ci
 
-Definition: `pnpm global add node-gyp && pnpm --ignore-engines && pnpm build && pnpm workspace commonwealth migrate-db`
+Definition: `pnpm add -g node-gyp && pnpm --ignore-engines && pnpm build && pnpm workspace commonwealth migrate-db`
 
 Description:
 
@@ -93,7 +93,7 @@ Description:
 
 ### heroku-prebuild
 
-Definition: `pnpm global add node-gyp`
+Definition: `pnpm add -g node-gyp`
 
 Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
