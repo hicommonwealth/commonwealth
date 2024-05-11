@@ -43,6 +43,7 @@ jobs:
           - 6379:6379
 
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -120,6 +121,10 @@ jobs:
           - 6379:6379
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -196,6 +201,7 @@ jobs:
           - 6379:6379
 
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -238,9 +244,15 @@ jobs:
         node: [ 20 ]
 
     steps:
-      - uses: ./.github/actions/setup-deep
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/install
 
       - name: Run linter
         env:
@@ -257,9 +269,16 @@ jobs:
         node: [ 20 ]
 
     steps:
-      - uses: ./.github/actions/setup-deep
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/install
 
       - name: Assert pnpm-lock.yaml is correct
         run: |
@@ -319,6 +338,7 @@ jobs:
           - 15672:15672
 
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -365,6 +385,7 @@ jobs:
         ports:
           - 6379:6379
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -420,6 +441,7 @@ jobs:
          - 6379:6379
 
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
