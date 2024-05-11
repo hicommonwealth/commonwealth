@@ -82,7 +82,7 @@ Description:
 
 ### build-ci
 
-Definition: `pnpm add -g node-gyp && pnpm --ignore-scripts && pnpm build && pnpm workspace commonwealth migrate-db`
+Definition: `pnpm add -g node-gyp && pnpm i --ignore-scripts && pnpm build && pnpm -F commonwealth migrate-db`
 
 Description:
 
