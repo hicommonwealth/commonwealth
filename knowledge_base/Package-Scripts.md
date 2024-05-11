@@ -8,7 +8,6 @@ If you add a script to the `package.json` file, please add documentation for it 
 
 * [Build Scripts](#build-scripts)
   + [build](#build)
-  + [build-ci](#build-ci)
   + [heroku-prebuild](#heroku-prebuild)
   + [heroku-postbuild](#heroku-postbuild)
 * [CI/CD](#cicd)
@@ -79,17 +78,6 @@ Description:
 - Default: Runs webpack on our front-end code with 4096MB memory allocated to Node
 - Default: If successful, fires the commonwalth app build script
 - Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
-
-### build-ci
-
-Definition: `pnpm add -g node-gyp && pnpm i --ignore-scripts && pnpm build && pnpm -F commonwealth migrate-db`
-
-Description:
-
-- Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
-- Installs node modules, ignoring engine errors
-- Runs the default application build script (above)
-- Runs db migrations
 
 ### heroku-prebuild
 

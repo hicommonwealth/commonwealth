@@ -30,3 +30,13 @@ runs:
         key: ${{ inputs.node-version }}-${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ inputs.node-version }}-${{ runner.os }}-pnpm-store-
+
+    - name: Install
+      shell: bash
+      run: |
+        pnpm add -g node-gyp && pnpm i --ignore-scripts
+        
+    - name: Build
+      shell: bash
+      run: |
+        pnpm -F commonwealth build

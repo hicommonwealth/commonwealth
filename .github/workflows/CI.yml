@@ -48,8 +48,8 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build CI
-        run: pnpm build-ci
+      - name: Bundle
+        run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
 
       - name: Cache browsers
         id: playwright-cache
@@ -129,8 +129,8 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build CI
-        run: pnpm build-ci
+      - name: Bundle
+        run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
 
       - name: Cache browsers
         id: playwright-cache
@@ -206,8 +206,8 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build CI
-        run: pnpm build-ci
+      - name: Bundle
+        run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
 
       - name: Cache browsers
         id: playwright-cache
@@ -252,9 +252,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Build CI
-        run: NO_WEBPACK=true pnpm build-ci
-
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
@@ -278,9 +275,6 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
-
-      - name: Build CI
-        run: NO_WEBPACK=true pnpm build-ci
 
       - name: Assert pnpm-lock.yaml is correct
         run: |
@@ -345,9 +339,6 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build CI
-        run: NO_WEBPACK=true pnpm build-ci
-
       - name: Run unit tests
         run: pnpm -r test
 
@@ -394,9 +385,6 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-
-      - name: Build CI
-        run: NO_WEBPACK=true pnpm build-ci
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet evm --forbid-only
@@ -447,9 +435,6 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
-
-      - name: Build CI
-        run: NO_WEBPACK=true pnpm build-ci
 
       ## Cosmos Section:
       # We only run Cosmos devnet tests if any files in the following folders changes
