@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "build-ci": "pnpm add -g node-gyp && pnpm --ignore-engines && pnpm build",
+    "build-ci": "pnpm add -g node-gyp && pnpm --ignore-scripts && pnpm build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F commonwealth db-all",

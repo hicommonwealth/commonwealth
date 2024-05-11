@@ -82,7 +82,7 @@ Description:
 
 ### build-ci
 
-Definition: `pnpm add -g node-gyp && pnpm --ignore-engines && pnpm build && pnpm workspace commonwealth migrate-db`
+Definition: `pnpm add -g node-gyp && pnpm --ignore-scripts && pnpm build && pnpm workspace commonwealth migrate-db`
 
 Description:
 
@@ -400,6 +400,7 @@ Description: Sanity scripts developers should run locally before pushing code, c
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `pnpm build` , and finally `pnpm bundle-report`.
+
 ### start
 
 Definition: `tsx watch  --max-old-space-size=4096 server.ts`

@@ -252,7 +252,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - uses: ./.github/actions/install
+      - name: Build CI
+        run: NO_WEBPACK=true pnpm build-ci
 
       - name: Run linter
         env:
@@ -278,7 +279,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - uses: ./.github/actions/install
+      - name: Build CI
+        run: NO_WEBPACK=true pnpm build-ci
 
       - name: Assert pnpm-lock.yaml is correct
         run: |
@@ -394,7 +396,7 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Build CI
-        run: pnpm add -g node-gyp && pnpm i --ignore-scripts
+        run: NO_WEBPACK=true pnpm build-ci
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet evm --forbid-only
