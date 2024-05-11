@@ -11,4 +11,4 @@ export const communityStakeConfigValidator = {
 
 // esm stub fix
 import * as contestHelpersModule from './contestHelper';
-export const ContestHelper = { ...contestHelpersModule };
+export const ContestHelper: any = { ...contestHelpersModule };
