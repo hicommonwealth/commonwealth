@@ -43,7 +43,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: ./actions/setup
+      - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
@@ -120,7 +120,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: ./actions/setup
+      - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
@@ -196,7 +196,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: ./actions/setup
+      - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
@@ -238,7 +238,7 @@ jobs:
         node: [ 20 ]
 
     steps:
-      - uses: ./actions/setup-deep
+      - uses: ./.github/actions/setup-deep
         with:
           node-version: ${{ matrix.node }}
 
@@ -257,7 +257,7 @@ jobs:
         node: [ 20 ]
 
     steps:
-      - uses: ./actions/setup-deep
+      - uses: ./.github/actions/setup-deep
         with:
           node-version: ${{ matrix.node }}
 
@@ -319,7 +319,7 @@ jobs:
           - 15672:15672
 
     steps:
-      - uses: ./actions/setup
+      - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
@@ -365,7 +365,7 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - uses: ./actions/setup
+      - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
@@ -420,7 +420,7 @@ jobs:
          - 6379:6379
 
     steps:
-      - uses: ./actions/setup
+      - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
