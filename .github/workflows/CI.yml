@@ -46,20 +46,8 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
+      - name: Setup
+        uses: ./setup.yml
 
       - name: Build CI
         run: pnpm build-ci
@@ -137,20 +125,8 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
+      - name: Setup
+        uses: ./setup.yml
 
       - name: Build CI
         run: pnpm build-ci
@@ -227,20 +203,8 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
+      - name: Setup
+        uses: ./setup.yml
 
       - name: Build CI
         run: pnpm build-ci
@@ -279,28 +243,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Add node-gyp
-        run: pnpm add -g node-gyp
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
-
-      - name: Install dependencies
-        run: pnpm i --ignore-engines
+      - name: Setup Deep
+        uses: ./setup-deep.yml
 
       - name: Run linter
         env:
@@ -316,33 +260,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Setup Deep
+        uses: ./setup-deep.yml
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
-
-      - name: Add node-gyp
-        run: pnpm add -g node-gyp
-
-      - name: Install dependencies
-        run: pnpm --ignore-engines
-
-      - name: Assert pnpm.lock is correct
+      - name: Assert pnpm-lock.yaml is correct
         run: |
           if ! git diff --quiet; then
-            echo 'You need to update the pnpm.lock file (potentially after running: pnpm add -g node-gyp)'
+            echo 'You need to update the pnpm-lock.yaml file (potentially after running: pnpm add -g node-gyp)'
             exit 1
           fi
 
@@ -400,20 +324,8 @@ jobs:
           - 15672:15672
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache d ependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
+      - name: Setup
+        uses: ./setup.yml
 
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
@@ -459,23 +371,11 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
+      - name: Setup
+        uses: ./setup.yml
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
 
       - name: Build CI
         run: pnpm add -g node-gyp && pnpm i --ignore-engines
@@ -527,20 +427,8 @@ jobs:
          - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/pnpm.lock') }}
+      - name: Setup
+        uses: ./setup.yml
 
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
