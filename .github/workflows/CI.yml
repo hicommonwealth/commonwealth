@@ -394,7 +394,7 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Build CI
-        run: pnpm add -g node-gyp && pnpm i --ignore-engines
+        run: pnpm add -g node-gyp && pnpm i --ignore-scripts
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet evm --forbid-only
