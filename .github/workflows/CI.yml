@@ -14,31 +14,12 @@ on:
       - master
 
 jobs:
-  setup:
-    strategy:
-      matrix:
-        node: [ 20 ]
-    uses: ./.github/workflows/setup.yml
-    secrets: inherit
-    with:
-      node-version: ${{ matrix.node }}
-
-  setup-deep:
-    strategy:
-      matrix:
-        node: [ 20 ]
-    uses: ./.github/workflows/setup-deep.yml
-    secrets: inherit
-    with:
-      node-version: ${{ matrix.node }}
-
   # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
   # Its references in this file
   e2e-tests-Parallel:
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: setup
 
     services:
       postgres:
@@ -62,6 +43,10 @@ jobs:
           - 6379:6379
 
     steps:
+      - uses: ./actions/setup
+        with:
+          node-version: "20"
+
       - name: Build CI
         run: pnpm build-ci
 
@@ -112,7 +97,6 @@ jobs:
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: setup
 
     services:
       postgres:
@@ -136,6 +120,10 @@ jobs:
           - 6379:6379
 
     steps:
+      - uses: ./actions/setup
+        with:
+          node-version: "20"
+
       - name: Build CI
         run: pnpm build-ci
 
@@ -185,7 +173,6 @@ jobs:
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: setup
 
     services:
       postgres:
@@ -209,6 +196,10 @@ jobs:
           - 6379:6379
 
     steps:
+      - uses: ./actions/setup
+        with:
+          node-version: "20"
+
       - name: Build CI
         run: pnpm build-ci
 
@@ -242,9 +233,15 @@ jobs:
     name: Code Quality Recommendations
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: setup-deep
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     steps:
+      - uses: ./actions/setup-deep
+        with:
+          node-version: ${{ matrix.node }}
+
       - name: Run linter
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
@@ -255,9 +252,15 @@ jobs:
     name: Code Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: setup-deep
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     steps:
+      - uses: ./actions/setup-deep
+        with:
+          node-version: ${{ matrix.node }}
+
       - name: Assert pnpm-lock.yaml is correct
         run: |
           if ! git diff --quiet; then
@@ -288,7 +291,6 @@ jobs:
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: setup
 
     services:
       postgres:
@@ -317,6 +319,10 @@ jobs:
           - 15672:15672
 
     steps:
+      - uses: ./actions/setup
+        with:
+          node-version: "20"
+
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
 
@@ -337,7 +343,6 @@ jobs:
     name: EVM Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: setup
 
     services:
       postgres:
@@ -360,6 +365,10 @@ jobs:
         ports:
           - 6379:6379
     steps:
+      - uses: ./actions/setup
+        with:
+          node-version: "20"
+
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
@@ -376,7 +385,6 @@ jobs:
     name: Cosmos Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    needs: setup
 
     services:
       postgres:
@@ -412,6 +420,10 @@ jobs:
          - 6379:6379
 
     steps:
+      - uses: ./actions/setup
+        with:
+          node-version: "20"
+
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
 
