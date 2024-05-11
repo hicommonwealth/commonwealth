@@ -48,6 +48,9 @@ jobs:
     steps:
       - name: Setup
         uses: ./setup.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Build CI
         run: pnpm build-ci
@@ -127,6 +130,9 @@ jobs:
     steps:
       - name: Setup
         uses: ./setup.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Build CI
         run: pnpm build-ci
@@ -205,6 +211,9 @@ jobs:
     steps:
       - name: Setup
         uses: ./setup.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Build CI
         run: pnpm build-ci
@@ -245,6 +254,9 @@ jobs:
     steps:
       - name: Setup Deep
         uses: ./setup-deep.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Run linter
         env:
@@ -262,6 +274,9 @@ jobs:
     steps:
       - name: Setup Deep
         uses: ./setup-deep.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Assert pnpm-lock.yaml is correct
         run: |
@@ -326,6 +341,9 @@ jobs:
     steps:
       - name: Setup
         uses: ./setup.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
@@ -372,7 +390,10 @@ jobs:
           - 6379:6379
     steps:
       - name: Setup
-        uses: ./setup.yml
+        uses: ./
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -429,6 +450,9 @@ jobs:
     steps:
       - name: Setup
         uses: ./setup.yml
+        secrets: inherit
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Build CI
         run: NO_WEBPACK=true pnpm build-ci
