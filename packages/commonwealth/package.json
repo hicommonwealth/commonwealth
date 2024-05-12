@@ -65,7 +65,7 @@
     "test-select": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha",
     "test-suite": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'",
     "ts-exec": "tsx ",
-    "unit-test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/unit/seed_hack.spec.ts' && NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true mocha './test/unit/**/*.spec.ts'",
+    "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' mocha ./test/unit/seed_hack.spec.ts ./test/unit/**/*.spec.ts",
     "unit-test:watch": "NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
