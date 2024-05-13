@@ -65,7 +65,9 @@ const EditProfileComponent = () => {
       chain: a.community.id,
     })),
   });
-  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags({});
+
+  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
+    usePreferenceTags({});
 
   const getProfile = async () => {
     try {
@@ -80,6 +82,13 @@ const EditProfileComponent = () => {
       setEmail(response.data.result.profile.email || '');
       setSocials(response.data.result.profile.socials);
       setAvatarUrl(response.data.result.profile.avatar_url);
+      const profileTags = response.data.result.tags;
+      setPreferenceTags((tags) =>
+        [...(tags || [])].map((t) => ({
+          ...t,
+          isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
+        })),
+      );
       setBio(deserializeDelta(response.data.result.profile.bio));
       backgroundImageRef.current =
         response.data.result.profile.background_image;
@@ -140,6 +149,9 @@ const EditProfileComponent = () => {
         profileId: profile.id,
         address: app.user.activeAccount?.address,
         chain: app.user.activeAccount?.community,
+        tagIds: preferenceTags
+          .filter((tag) => tag.isSelected)
+          .map((tag) => tag.item.id),
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
