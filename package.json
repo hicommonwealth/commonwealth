@@ -167,6 +167,7 @@
     "esbuild-darwin-64": "^0.15.12"
   },
   "engines": {
-    "node": "20.x"
+    "node": "20.x",
+    "pnpm": "9.1"
   }
 }
