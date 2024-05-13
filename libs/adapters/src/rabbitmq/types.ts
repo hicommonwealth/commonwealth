@@ -38,7 +38,7 @@ export enum RascalBindings {
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
-  ContestWorkerPolicy = 'ContestWorkerPolicy',
+  ContestWorkerPolicy = 'ContestWorkerPolicyBinding',
 }
 
 export enum RascalRoutingKeys {

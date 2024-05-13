@@ -1,4 +1,4 @@
-import type * as Rascal from 'rascal';
+import * as Rascal from 'rascal';
 import { getAllRascalConfigs } from './configuration/rascalConfig';
 import {
   RascalBindings,
@@ -74,10 +74,12 @@ export function getRabbitMQConfig(
       RascalQueues.SnapshotListener,
       RascalQueues.ChainEvent,
       RascalQueues.NotificationsProvider,
+      RascalQueues.ContestWorkerPolicy,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.SnapshotListener,
       RascalBindings.ChainEvent,
+      RascalBindings.ContestWorkerPolicy,
       // TODO: add notifications provider binding
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [

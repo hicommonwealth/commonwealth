@@ -126,6 +126,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.ContestWorkerPolicy]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
@@ -151,7 +157,7 @@ export function getAllRascalConfigs(
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestWorkerPolicy,
       destinationType: 'queue',
-      bindingKey: '*',
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicy,
     },
     // TODO: add a binding from the MessageRelayer to NotificationsProvider queue with * binding key
   };
