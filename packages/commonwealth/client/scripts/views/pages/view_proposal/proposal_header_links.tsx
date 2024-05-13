@@ -48,7 +48,11 @@ type SnapshotThreadLinkProps = {
 };
 
 export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {
-  const proposalLink = getProposalUrlPath(ProposalType.Thread, thread.id, true);
+  const proposalLink = getProposalUrlPath(
+    ProposalType.Thread,
+    thread.id,
+    false,
+  );
 
   return (
     <div className="HeaderLink">
