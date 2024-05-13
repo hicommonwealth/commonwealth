@@ -4,7 +4,7 @@ import {
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import React, { useRef, useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import {
@@ -36,7 +36,6 @@ const PersonalInformationStep = ({
   const formMethodsRef = useRef<CWFormRef>();
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
-  const [emailBoundCheckboxKey, setEmailBoundCheckboxKey] = useState(1);
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
@@ -52,11 +51,17 @@ const PersonalInformationStep = ({
 
     if (formMethodsRef.current) {
       if (defaultSSOUsername) {
-        formMethodsRef.current.setValue('username', defaultSSOUsername);
+        formMethodsRef.current.setValue('username', defaultSSOUsername, {
+          shouldDirty: true,
+        });
+        formMethodsRef.current.trigger('username');
       }
 
       if (app?.user?.email) {
-        formMethodsRef.current.setValue('email', app.user.email);
+        formMethodsRef.current.setValue('email', app.user.email, {
+          shouldDirty: true,
+        });
+        formMethodsRef.current.trigger('email');
         setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
       }
     }
@@ -81,6 +86,23 @@ const PersonalInformationStep = ({
     currentUsername.toLowerCase(),
   );
 
+  const handleGenerateUsername = () => {
+    const randomUsername = generateUsername('', 2);
+    formMethodsRef.current.setValue('username', randomUsername, {
+      shouldDirty: true,
+    });
+    formMethodsRef.current.trigger('username');
+    setCurrentUsername(randomUsername);
+  };
+
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+    if (value === '' && formMethodsRef.current) {
+      formMethodsRef.current.setValue('enableAccountNotifications', false);
+      formMethodsRef.current.setValue('enableProductUpdates', false);
+    }
+  };
+
   const handleSubmit = async (
     values: z.infer<typeof personalInformationFormValidation>,
   ) => {
@@ -93,6 +115,7 @@ const PersonalInformationStep = ({
       ...(values.email && {
         email: values.email,
       }),
+      promotionalEmailsEnabled: values.enableProductUpdates,
     });
 
     // set email for notifications
@@ -103,23 +126,7 @@ const PersonalInformationStep = ({
     // enable/disable all in-app notifications for user
     await toggleAllInAppNotifications(values.enableAccountNotifications);
 
-    // TODO:
-    // values.enableProductUpdates - as per product, this should be just a checkbox
-    // right now that should do nothing, and needs to be work on.
-    // https://github.com/hicommonwealth/commonwealth/issues/6645#issuecomment-2078105164
-
     onComplete();
-  };
-
-  const handleWatch = (
-    values: z.infer<typeof personalInformationFormValidation>,
-  ) => {
-    // if user enables an email bounded checkbox, we reset the checkbox
-    // when user clears the email field, as email is required for those
-    // bounded checkboxes
-    if (values.email.trim() === '') {
-      setEmailBoundCheckboxKey((key) => key + 1);
-    }
   };
 
   return (
@@ -132,9 +139,8 @@ const PersonalInformationStep = ({
         enableProductUpdates: false,
       }}
       onSubmit={handleSubmit}
-      onWatch={handleWatch}
     >
-      {({ formState, watch, setValue, trigger }) => (
+      {({ formState, watch }) => (
         <>
           <div className="username-section">
             <CWTextInput
@@ -162,12 +168,7 @@ const PersonalInformationStep = ({
               buttonHeight="sm"
               type="button"
               containerClassName="random-generate-btn"
-              onClick={() => {
-                const randomUsername = generateUsername('', 2);
-                setValue('username', randomUsername, { shouldDirty: true });
-                trigger('username');
-                setCurrentUsername(randomUsername);
-              }}
+              onClick={handleGenerateUsername}
             />
           </div>
 
@@ -181,19 +182,18 @@ const PersonalInformationStep = ({
             }
             name="email"
             hookToForm
+            onInput={handleEmailChange}
             disabled={isEmailChangeDisabled}
           />
 
           <div className="notification-section">
             <CWCheckbox
-              key={emailBoundCheckboxKey}
               name="enableAccountNotifications"
               hookToForm
               label="Send me notifications about my account"
               disabled={watch('email')?.trim() === '' || !formState.isDirty}
             />
             <CWCheckbox
-              key={emailBoundCheckboxKey + 1}
               name="enableProductUpdates"
               hookToForm
               label="Send me product updates and news"
@@ -209,7 +209,11 @@ const PersonalInformationStep = ({
             label="Next"
             buttonWidth="full"
             type="submit"
-            disabled={isUpdatingProfile || !formState.isDirty}
+            disabled={
+              isUpdatingProfile ||
+              !formState.isDirty ||
+              watch('username')?.trim() === ''
+            }
           />
 
           <CWText isCentered className="footer">

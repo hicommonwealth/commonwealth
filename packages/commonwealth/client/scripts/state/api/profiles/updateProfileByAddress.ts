@@ -14,6 +14,7 @@ interface UpdateProfileByAddressProps {
   avatarUrl?: string;
   socials?: string;
   backgroundImage?: string;
+  promotionalEmailsEnabled?: boolean;
 }
 
 const updateProfileByAddress = async ({
@@ -26,6 +27,7 @@ const updateProfileByAddress = async ({
   backgroundImage,
   avatarUrl,
   socials,
+  promotionalEmailsEnabled,
 }: UpdateProfileByAddressProps) => {
   // TODO: ideally this should return a response
   const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
@@ -36,6 +38,9 @@ const updateProfileByAddress = async ({
     backgroundImage,
     avatarUrl,
     socials,
+    ...(typeof promotionalEmailsEnabled === 'boolean' && {
+      promotionalEmailsEnabled,
+    }),
     jwt: app.user.jwt,
   });
 
@@ -47,7 +52,7 @@ const updateProfileByAddress = async ({
     responseProfile.avatarUrl,
     profileId,
     chain,
-    responseProfile.lastActive
+    responseProfile.lastActive,
   );
   return updatedProfile;
 };
