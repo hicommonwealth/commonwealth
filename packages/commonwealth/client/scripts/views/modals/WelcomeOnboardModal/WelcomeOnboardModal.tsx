@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
+import app from 'state';
+import { useWelcomeOnboardModal } from 'state/ui/modals';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -13,6 +15,8 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
     WelcomeOnboardModalSteps.PersonalInformation,
   );
+
+  const { setProfileAsOnboarded } = useWelcomeOnboardModal();
 
   const handleClose = () => {
     // we require the user's to add their usernames in personal information step
@@ -29,9 +33,13 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           title: 'Welcome to Common!',
           component: (
             <PersonalInformationStep
-              onComplete={() =>
-                setActiveStep(WelcomeOnboardModalSteps.Preferences)
-              }
+              onComplete={() => {
+                // set profile as onboarded, once this step is complete
+                const profileId = app?.user?.addresses?.[0]?.profile?.id;
+                setProfileAsOnboarded(profileId);
+
+                setActiveStep(WelcomeOnboardModalSteps.Preferences);
+              }}
             />
           ),
         };
