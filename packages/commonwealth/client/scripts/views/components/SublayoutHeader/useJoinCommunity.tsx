@@ -130,12 +130,12 @@ const useJoinCommunity = () => {
         );
 
         // set verification token for the newly created account
-        const account = app.chain.accounts.get(
+        const account = app?.chain?.accounts?.get?.(
           encodedAddress,
           addressInfo.keytype,
         );
-        if (app.chain) {
-          account.setValidationToken(verification_token);
+        if (account && app.chain) {
+          account?.setValidationToken?.(verification_token);
         }
 
         // set active address if in a community
@@ -153,10 +153,11 @@ const useJoinCommunity = () => {
             });
           }
 
-          await setActiveAccount(account);
+          account && (await setActiveAccount(account));
 
           // update active accounts
           if (
+            account &&
             app.user.activeAccounts.filter((a) => isSameAccount(a, account))
               .length === 0
           ) {

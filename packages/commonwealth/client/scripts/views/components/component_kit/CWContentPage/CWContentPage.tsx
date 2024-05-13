@@ -79,6 +79,7 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
+  setThreadBody?: (body: string) => void;
 };
 
 export const CWContentPage = ({
@@ -115,6 +116,7 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
+  setThreadBody,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -199,6 +201,8 @@ export const CWContentPage = ({
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
         profile={thread?.profile}
+        versionHistory={thread?.versionHistory}
+        changeContentText={setThreadBody}
       />
     </div>
   );

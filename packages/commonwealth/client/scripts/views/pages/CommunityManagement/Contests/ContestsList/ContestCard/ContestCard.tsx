@@ -1,15 +1,16 @@
+import moment from 'moment';
 import React from 'react';
 
 import { CWCard } from 'views/components/component_kit/cw_card';
 
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopover } from 'views/components/share_popover';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import ContestCountdown from '../ContestCountdown';
 
@@ -42,8 +43,24 @@ const ContestCard = ({
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const handleCancelContest = () => {
-    // TODO open warning modal
-    console.log('Cancel contest');
+    openConfirmation({
+      title: 'You are about to end your contest',
+      description:
+        'Are you sure you want to cancel your contest? You cannot restart a contest once it has ended.',
+      buttons: [
+        {
+          label: 'Keep contest',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
+          label: 'Cancel contest',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: () => console.log('cancel contest'),
+        },
+      ],
+    });
   };
 
   const handleEditContest = () => {
@@ -51,17 +68,11 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    // Leaderboard Button takes user to the Thread Listing Page, filtered by Contest + sorted by Upvote.
-    // TODO open threads view with proper filter
-    // navigate('/discussions');
-    console.log('navigate to discussions');
+    navigate(`/discussions?featured=mostLikes&contest=${name}`);
   };
 
   const handleWinnersClick = () => {
-    // Previous Winners button takes user to the Thread Listing Page, filtered by Contest.
-    // TODO open threads view with proper filter
-    // navigate('/discussions');
-    console.log('navigate to discussions');
+    navigate(`/discussions?contest=${name}`);
   };
 
   const handleFundClick = () => {

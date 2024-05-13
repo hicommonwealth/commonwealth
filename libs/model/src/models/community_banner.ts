@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CommunityBannerAttributes = {
   id?: number;
@@ -11,10 +11,10 @@ export type CommunityBannerAttributes = {
 
 export type CommunityBannerInstance = ModelInstance<CommunityBannerAttributes>;
 
-export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommunityBannerModelStatic>sequelize.define<CommunityBannerInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityBannerInstance> =>
+  sequelize.define<CommunityBannerInstance>(
     'CommunityBanner',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },

@@ -1,23 +1,21 @@
-import { schemas } from '@hicommonwealth/core';
+import { StakeTransaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-export type StakeTransactionAttributes = z.infer<
-  typeof schemas.entities.StakeTransaction
-> & {
+export type StakeTransactionAttributes = z.infer<typeof StakeTransaction> & {
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };
 
 export type StakeTransactionInstance =
   ModelInstance<StakeTransactionAttributes>;
 
-export type StakeTransactionModelStatic = ModelStatic<StakeTransactionInstance>;
-
-export default (sequelize: Sequelize.Sequelize): StakeTransactionModelStatic =>
-  <StakeTransactionModelStatic>sequelize.define<StakeTransactionInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<StakeTransactionInstance> =>
+  sequelize.define<StakeTransactionInstance>(
     'StakeTransaction',
     {
       transaction_hash: {

@@ -170,7 +170,7 @@ describe('Daemon', () => {
       expect(fn.calledOnce).to.be.true;
       clock.tick(60 * 1000);
       expect(fn.calledTwice).to.be.true;
-      clearInterval(jobId);
+      clearInterval(jobId!);
       clock.tick(60 * 1000);
       expect(fn.calledThrice).to.be.false;
       expect(daemons['tasks'].size).to.equal(1);
@@ -186,7 +186,7 @@ describe('Daemon', () => {
       const fn = sinon.spy();
       const jobId = daemons.backgroundJob('test', fn, 59 * 1000);
       expect(jobId).to.be.undefined;
-      clearInterval(jobId);
+      clearInterval(jobId!);
     });
 
     it('should accept to run jobs more often than 1 minute', () => {
@@ -194,7 +194,7 @@ describe('Daemon', () => {
       const fn = sinon.spy();
       const jobId = daemons.backgroundJob('test', fn, 60 * 1000);
       expect(jobId).to.not.be.undefined;
-      clearInterval(jobId);
+      clearInterval(jobId!);
     });
 
     it('should clear interval, if fn throw error', () => {

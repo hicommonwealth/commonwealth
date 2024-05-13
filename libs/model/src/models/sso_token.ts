@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type SsoTokenAttributes = {
   id?: number;
@@ -11,15 +11,15 @@ export type SsoTokenAttributes = {
   state_id?: string;
   created_at?: Date;
   updated_at?: Date;
-  Address: AddressAttributes;
+  Address?: AddressAttributes;
 };
 
 export type SsoTokenInstance = ModelInstance<SsoTokenAttributes>;
 
-export type SsoTokenModelStatic = ModelStatic<SsoTokenInstance>;
-
-export default (sequelize: Sequelize.Sequelize): SsoTokenModelStatic => {
-  const SsoToken = <SsoTokenModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<SsoTokenInstance> =>
+  sequelize.define<SsoTokenInstance>(
     'SsoToken',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -53,13 +53,3 @@ export default (sequelize: Sequelize.Sequelize): SsoTokenModelStatic => {
       },
     },
   );
-
-  SsoToken.associate = (models) => {
-    models.SsoToken.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-  };
-
-  return SsoToken;
-};

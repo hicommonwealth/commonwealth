@@ -1,14 +1,9 @@
 import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
-import { Factories } from './factories';
-import type { Models } from './types';
+import { Factories, type DB } from './factories';
 import { createFk, dropFk, manyToMany, oneToMany, oneToOne } from './utils';
 
-export type DB = Models<typeof Factories> & {
-  sequelize: Sequelize;
-  Sequelize: typeof Sequelize;
-};
-
+export type { DB };
 /**
  * Wraps sequelize sync with the process of building composite foreign key constraints
  * - This is not yet supported by sequelize
@@ -31,31 +26,21 @@ export const syncDb = async (db: DB, log = false) => {
  * @returns built db model
  */
 export const buildDb = (sequelize: Sequelize): DB => {
-  const models = Object.fromEntries(
-    Object.entries(Factories).map(([key, factory]) => {
-      const model = factory(sequelize);
-      model._fks = [];
-      // TODO: can we make this work without any?
-      model.withOne = oneToOne as any;
-      model.withMany = oneToMany as any;
-      model.withManyToMany = manyToMany as any;
-      return [key, model];
+  const models = Object.entries(Factories).map(([key, factory]) => [
+    key,
+    Object.assign(factory(sequelize), {
+      _fks: [],
+      withOne: oneToOne,
+      withMany: oneToMany,
+      withManyToMany: manyToMany,
     }),
-  );
-
-  const db = { sequelize, Sequelize, ...models } as DB;
+  ]);
+  const db = { sequelize, Sequelize, ...Object.fromEntries(models) } as DB;
   buildAssociations(db);
-
-  // TODO: remove legacy associate hook
-  Object.keys(models).forEach((key) => {
-    const model = models[key as keyof typeof Factories];
-    'associate' in model && model.associate(db);
-  });
-
   return db;
 };
 
-// FIXME: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
+// TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
 export * from './ban';
 export * from './chain_node';
@@ -67,7 +52,6 @@ export * from './community_contract';
 export * from './community_contract_template';
 export * from './community_contract_template_metadata';
 export * from './community_role';
-export * from './community_snapshot_spaces';
 export * from './community_stake';
 export * from './contract';
 export * from './contract_abi';
@@ -86,8 +70,6 @@ export * from './profile';
 export * from './reaction';
 export * from './role';
 export * from './role_assignment';
-export * from './snapshot_proposal';
-export * from './snapshot_spaces';
 export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';

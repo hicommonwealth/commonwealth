@@ -1,5 +1,5 @@
-import { AppError, BalanceSourceType } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/shared';
+import { AppError } from '@hicommonwealth/core';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { getBalances } from '../tokenBalanceCache';
@@ -63,7 +63,7 @@ export const validateNamespace = async (
     factoryData.factory,
   );
 
-  if (activeNamespace !== txReceipt.logs[0].address) {
+  if (activeNamespace.toLowerCase() !== txReceipt.logs[0].address) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 

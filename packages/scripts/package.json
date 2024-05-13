@@ -8,15 +8,20 @@
   ],
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
     "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha './test/**/*.spec.ts'",
     "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
+    "@hicommonwealth/core": "*",
+    "@hicommonwealth/logging": "*",
+    "@hicommonwealth/model": "*",
+    "@hicommonwealth/sitemaps": "*",
     "sequelize": "^6.32.1",
     "mocha": "^10.4.0",
+    "moment": "^2.23.0",
     "tsx": "^4.7.2"
   }
 }

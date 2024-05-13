@@ -1,8 +1,9 @@
-import { AppError, BalanceSourceType } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/shared';
+import { AppError } from '@hicommonwealth/core';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
+import { contestABI } from './abi/contestAbi';
 
 export const getNamespace = async (
   web3: Web3,
@@ -38,7 +39,7 @@ export const getNamespace = async (
   const activeNamespace = await factory.methods
     .getNamespace(hexString.padEnd(66, '0'))
     .call();
-  return activeNamespace;
+  return String(activeNamespace);
 };
 
 /**
@@ -78,15 +79,56 @@ export const getNamespaceBalance = async (
 };
 
 /**
- * @ianrowan TODO: finish and test
  * Gets token ticker and decimal places to wei
  */
-export const getTokenAttributes = (
+export const getTokenAttributes = async (
   contestAddress: string,
+  web3: Web3,
 ): Promise<TokenAttributes> => {
-  console.log('TODO:', contestAddress);
-  return Promise.resolve({
-    ticker: commonProtocol.Denominations.ETH,
-    decimals: commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
-  });
+  const contest = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contestAddress,
+  );
+  const contestToken: string = await contest.methods.contestToken().call();
+
+  if (contestToken === '0x0000000000000000000000000000000000000000') {
+    return Promise.resolve({
+      ticker: commonProtocol.Denominations.ETH,
+      decimals: commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
+    });
+  }
+
+  const contract = new web3.eth.Contract(
+    [
+      {
+        constant: true,
+        inputs: [],
+        name: 'symbol',
+        outputs: [{ name: '', type: 'string' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        constant: true,
+        inputs: [],
+        name: 'decimals',
+        outputs: [{ name: '', type: 'uint8' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ] as AbiItem[],
+    contestToken,
+  );
+
+  const [symbol, decimals] = await Promise.all([
+    contract.methods.symbol().call(),
+    contract.methods.decimals().call(),
+  ]);
+
+  return {
+    ticker: String(symbol),
+    decimals: parseInt(String(decimals)),
+  };
 };

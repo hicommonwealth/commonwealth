@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
 const __filename = fileURLToPath(import.meta.url);

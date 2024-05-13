@@ -1,13 +1,13 @@
 import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;
   thread_id: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
 
   Address: AddressAttributes;
   Thread: ThreadAttributes;
@@ -26,19 +26,19 @@ export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
   >;
 };
 
-export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
-
-export default (sequelize: Sequelize.Sequelize) => {
-  const Collaboration = <CollaborationModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CollaborationInstance> =>
+  sequelize.define(
     'Collaboration',
     {
       address_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       thread_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -51,9 +51,3 @@ export default (sequelize: Sequelize.Sequelize) => {
       underscored: true,
     },
   );
-
-  // sequelize requires a PK on "id" column when defining a model
-  Collaboration.removeAttribute('id');
-
-  return Collaboration;
-};

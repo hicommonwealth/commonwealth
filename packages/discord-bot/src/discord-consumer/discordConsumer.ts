@@ -8,17 +8,19 @@ import {
 } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerTopics,
-  CommentDiscordActions,
+  BrokerSubscriptions,
   EventHandler,
-  IDiscordMessage,
   Policy,
-  ThreadDiscordActions,
   broker,
-  schemas,
+  events,
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import {
+  CommentDiscordActions,
+  IDiscordMessage,
+  ThreadDiscordActions,
+} from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
 import { ZodUndefined } from 'zod';
@@ -126,23 +128,27 @@ async function main() {
   }
 
   const inputs = {
-    DiscordMessageCreated: schemas.events.DiscordMessageCreated,
+    DiscordMessageCreated: events.DiscordMessageCreated,
   };
 
-  const Discord: Policy<typeof inputs> = () => ({
-    inputs,
-    body: {
-      DiscordMessageCreated: processDiscordMessageCreated,
-    },
-  });
+  function Discord(): Policy<typeof inputs> {
+    return {
+      inputs,
+      body: {
+        DiscordMessageCreated: processDiscordMessageCreated,
+      },
+    };
+  }
 
   const result = await brokerInstance.subscribe(
-    BrokerTopics.DiscordListener,
+    BrokerSubscriptions.DiscordListener,
     Discord(),
   );
 
   if (!result) {
-    throw new Error(`Failed to subscribe to ${BrokerTopics.DiscordListener}`);
+    throw new Error(
+      `Failed to subscribe to ${BrokerSubscriptions.DiscordListener}`,
+    );
   }
 
   isServiceHealthy = true;

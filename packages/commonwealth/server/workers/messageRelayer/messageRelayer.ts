@@ -7,7 +7,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
@@ -18,7 +18,7 @@ const log = logger(__filename);
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: import.meta.url.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {

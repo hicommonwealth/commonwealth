@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
@@ -10,7 +8,13 @@ import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  createCommentMentionNotifications,
+  findMentionDiff,
+  parseUserMentions,
+  queryMentionedUsers,
+} from '../../util/parseUserMentions';
+import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
@@ -86,24 +90,14 @@ export async function __updateComment(
     throw new AppError(Errors.NotAuthor);
   }
 
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(comment.version_history[0]).body;
-  } catch (e) {
-    console.log(e);
-  }
-  // If new comment body text has been submitted, create another version history entry
-  if (decodeURIComponent(commentBody) !== latestVersion) {
-    const recentEdit = {
-      timestamp: moment(),
-      body: decodeURIComponent(commentBody),
-    };
-    const arr = comment.version_history;
-    arr.unshift(JSON.stringify(recentEdit));
-    comment.version_history = arr;
-  }
-  comment.text = commentBody;
-  comment.plaintext = (() => {
+  const { latestVersion, versionHistory } = addVersionHistory(
+    comment.version_history,
+    commentBody,
+    address,
+  );
+
+  const text = commentBody;
+  const plaintext = (() => {
     try {
       return renderQuillDeltaToText(
         JSON.parse(decodeURIComponent(commentBody)),
@@ -112,7 +106,18 @@ export async function __updateComment(
       return decodeURIComponent(commentBody);
     }
   })();
-  await comment.save();
+
+  await this.models.Comment.update(
+    {
+      text,
+      plaintext,
+      version_history: versionHistory ?? undefined,
+    },
+    {
+      where: { id: comment.id },
+    },
+  );
+
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
     include: [this.models.Address],
@@ -140,70 +145,21 @@ export async function __updateComment(
     excludeAddresses: [finalComment.Address.address],
   });
 
-  let mentions;
-  try {
-    const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(
-      decodeURIComponent(commentBody),
-    );
-    mentions = currentDraftMentions.filter((addrArray) => {
-      let alreadyExists = false;
-      previousDraftMentions.forEach((addrArray_) => {
-        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-          alreadyExists = true;
-        }
-      });
-      return !alreadyExists;
-    });
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(
+    decodeURIComponent(commentBody),
+  );
 
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(
-      mentions.map(async (mention) => {
-        const mentionedUser = await this.models.Address.findOne({
-          where: {
-            community_id: mention[0],
-            address: mention[1],
-          },
-          include: [this.models.User],
-        });
-        return mentionedUser;
-      }),
-    );
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
-  // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length > 0) {
-    mentionedAddresses.forEach((mentionedAddress) => {
-      if (!mentionedAddress.User) {
-        return; // some Addresses may be missing users, e.g. if the user removed the address
-      }
-      allNotificationOptions.push({
-        notification: {
-          categoryId: NotificationCategories.NewMention,
-          data: {
-            mentioned_user_id: mentionedAddress.User.id,
-            created_at: new Date(),
-            thread_id: +comment.thread_id,
-            root_title,
-            root_type: ProposalType.Thread,
-            comment_id: +finalComment.id,
-            comment_text: finalComment.text,
-            community_id: finalComment.community_id,
-            author_address: finalComment.Address.address,
-            author_community_id: finalComment.Address.community_id,
-          },
-        },
-        excludeAddresses: [finalComment.Address.address],
-      });
-    });
-  }
+  allNotificationOptions.push(
+    ...createCommentMentionNotifications(
+      mentionedAddresses,
+      finalComment,
+      finalComment.Address,
+    ),
+  );
 
   // update address last active
   address.last_active = new Date();

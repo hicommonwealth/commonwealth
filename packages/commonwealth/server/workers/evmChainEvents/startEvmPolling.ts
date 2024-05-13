@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { EVM_CE_POLL_INTERVAL_MS } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
@@ -40,7 +40,7 @@ export async function startEvmPolling(
 
 if (import.meta.url.endsWith(process.argv[1])) {
   startEvmPolling(EVM_CE_POLL_INTERVAL_MS).catch((e) => {
-    log.error('Evm poller shutting down due to a critical error:', e);
+    log.fatal('Evm poller shutting down due to a critical error:', e);
     process.exit(1);
   });
 }
