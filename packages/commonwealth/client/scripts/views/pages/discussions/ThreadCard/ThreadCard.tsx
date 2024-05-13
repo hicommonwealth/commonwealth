@@ -3,7 +3,6 @@ import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteD
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
@@ -61,7 +60,6 @@ export const ThreadCard = ({
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const contestsEnabled = useFlag('contest');
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {

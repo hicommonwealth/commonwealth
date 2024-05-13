@@ -1,6 +1,5 @@
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
-import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
@@ -122,7 +121,6 @@ export const CWContentPage = ({
   const [urlQueryParams] = useSearchParams();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const contestsEnabled = useFlag('contest');
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
