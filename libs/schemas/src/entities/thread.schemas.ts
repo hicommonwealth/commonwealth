@@ -1,41 +1,41 @@
 import { z } from 'zod';
-import { PG_INT, discordMetaSchema, linksSchema } from '../utils';
+import { PG_INT, discordMetaSchema, linksSchema, zDate } from '../utils';
 import { Address } from './user.schemas';
 
 export const Thread = z.object({
-  Address: Address.optional(),
+  Address: Address.nullish(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
-  id: PG_INT.optional(),
-  body: z.string().optional(),
-  plaintext: z.string().optional(),
-  url: z.string().optional(),
-  topic_id: PG_INT.optional(),
-  pinned: z.boolean().optional(),
+  id: PG_INT.nullish(),
+  body: z.string().nullish(),
+  plaintext: z.string().nullish(),
+  url: z.string().nullish(),
+  topic_id: PG_INT.nullish(),
+  pinned: z.boolean().nullish(),
   community_id: z.string(),
   view_count: PG_INT,
-  links: z.object(linksSchema).array().optional(),
+  links: z.object(linksSchema).array().nullish(),
 
-  read_only: z.boolean().optional(),
-  version_history: z.array(z.string()).optional(),
+  read_only: z.boolean().nullish(),
+  version_history: z.array(z.string()).nullish(),
 
-  has_poll: z.boolean().optional(),
+  has_poll: z.boolean().nullish(),
 
   canvas_action: z.string(),
   canvas_session: z.string(),
   canvas_hash: z.string(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  last_edited: z.date().optional(),
-  deleted_at: z.date().optional(),
-  last_commented_on: z.date().optional(),
-  marked_as_spam_at: z.date().optional(),
-  archived_at: z.date().optional(),
-  locked_at: z.date().optional(),
-  discord_meta: z.object(discordMetaSchema).optional(),
+  created_at: zDate.nullish(),
+  updated_at: zDate.nullish(),
+  last_edited: zDate.nullish(),
+  deleted_at: zDate.nullish(),
+  last_commented_on: zDate.nullish(),
+  marked_as_spam_at: zDate.nullish(),
+  archived_at: zDate.nullish(),
+  locked_at: zDate.nullish(),
+  discord_meta: z.object(discordMetaSchema).nullish(),
 
   //counts
   reaction_count: PG_INT,
@@ -45,8 +45,8 @@ export const Thread = z.object({
   //notifications
   max_notif_id: PG_INT,
 
-  created_by: z.string(),
-  profile_name: z.string().optional(),
+  created_by: z.string().nullish(),
+  profile_name: z.string().nullish(),
 });
 
 export const Comment = z.object({
