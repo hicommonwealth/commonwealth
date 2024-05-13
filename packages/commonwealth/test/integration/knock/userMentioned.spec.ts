@@ -1,5 +1,6 @@
 import {
   EventNames,
+  UserMentioned,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -86,7 +87,7 @@ describe('userMentioned Event Handler', () => {
       name: EventNames.UserMentioned,
       payload: {
         communityId: 'nonexistent',
-      },
+      } as z.infer<typeof UserMentioned>,
     });
     expect(res).to.be.false;
   });

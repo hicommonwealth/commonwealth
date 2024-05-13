@@ -222,9 +222,7 @@ describe('CommentCreated Event Handler', () => {
 
   it('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      ThrowingSpyNotificationsProvider(sandbox),
-    );
+    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
     await tester.seed('ThreadSubscription', {
       user_id: subscriber.id,

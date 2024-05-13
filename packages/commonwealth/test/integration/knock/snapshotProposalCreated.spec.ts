@@ -142,9 +142,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   it('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      ThrowingSpyNotificationsProvider(sandbox),
-    );
+    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
     await tester.seed('CommunityAlert', {
       community_id: community.id,
