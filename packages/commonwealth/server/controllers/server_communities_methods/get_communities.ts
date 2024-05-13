@@ -18,6 +18,14 @@ export async function __getCommunities(
     {
       model: this.models.CommunityStake,
     },
+    {
+      model: this.models.CommunityTags,
+      include: [
+        {
+          model: this.models.Tags,
+        },
+      ],
+    },
   ];
   if (hasGroups) {
     communitiesInclude.push({
@@ -32,5 +40,13 @@ export async function __getCommunities(
     include: communitiesInclude,
   });
 
-  return communities.map((c) => ({ community: c }));
+  // TODO: fix type
+  return communities.map((c) => ({
+    community: {
+      ...c.toJSON(),
+      CommunityTags: (c.toJSON().CommunityTags || []).map(
+        (ct) => (ct as any).Tag,
+      ),
+    },
+  })) as any;
 }
