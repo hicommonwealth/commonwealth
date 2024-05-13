@@ -5,6 +5,8 @@ export const TOKENS = {
   EVM_TOKEN: 'eth_native',
 };
 
+export const SPL_SPECIFICATION = 'spl';
+
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
@@ -37,6 +39,7 @@ export const requirementTypes = [
   { value: ERC_SPECIFICATIONS.ERC_721, label: 'ERC-721' },
   { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
+  { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
 ];
 
 export const conditionTypes = [

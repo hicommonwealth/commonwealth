@@ -6,7 +6,7 @@ export default {
       properties: {
         source_type: {
           type: 'string',
-          enum: ['erc20', 'erc721', 'erc1155'],
+          enum: ['erc20', 'erc721', 'erc1155', 'spl'],
         },
         evm_chain_id: {
           type: 'number',
