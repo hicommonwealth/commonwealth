@@ -115,7 +115,7 @@ const DesktopHeader = ({
 
         {isLoggedIn && (
           <UserDropdown
-            onAuthModalOpen={() => onAuthModalOpen}
+            onAuthModalOpen={() => onAuthModalOpen()}
             onRevalidationModalData={onRevalidationModalData}
           />
         )}

@@ -5,7 +5,6 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import moment from 'moment';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
@@ -15,6 +14,7 @@ import {
   parseUserMentions,
   queryMentionedUsers,
 } from '../../util/parseUserMentions';
+import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
@@ -90,24 +90,14 @@ export async function __updateComment(
     throw new AppError(Errors.NotAuthor);
   }
 
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(comment.version_history[0]).body;
-  } catch (e) {
-    console.log(e);
-  }
-  // If new comment body text has been submitted, create another version history entry
-  if (decodeURIComponent(commentBody) !== latestVersion) {
-    const recentEdit = {
-      timestamp: moment(),
-      body: decodeURIComponent(commentBody),
-    };
-    const arr = comment.version_history;
-    arr.unshift(JSON.stringify(recentEdit));
-    comment.version_history = arr;
-  }
-  comment.text = commentBody;
-  comment.plaintext = (() => {
+  const { latestVersion, versionHistory } = addVersionHistory(
+    comment.version_history,
+    commentBody,
+    address,
+  );
+
+  const text = commentBody;
+  const plaintext = (() => {
     try {
       return renderQuillDeltaToText(
         JSON.parse(decodeURIComponent(commentBody)),
@@ -116,7 +106,18 @@ export async function __updateComment(
       return decodeURIComponent(commentBody);
     }
   })();
-  await comment.save();
+
+  await this.models.Comment.update(
+    {
+      text,
+      plaintext,
+      version_history: versionHistory ?? undefined,
+    },
+    {
+      where: { id: comment.id },
+    },
+  );
+
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
     include: [this.models.Address],
