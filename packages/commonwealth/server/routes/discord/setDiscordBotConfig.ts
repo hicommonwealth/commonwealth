@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
+import { Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { validateCommunity } from '../../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../../types';
@@ -91,33 +92,31 @@ const setDiscordBotConfig = async (
     where: { id: community_id },
   });
 
-  const transaction = await models.sequelize.transaction();
+  let transaction: Transaction;
   if (
     existingCommunityWithGuildConnected &&
     existingCommunityWithGuildConnected.length > 0
   ) {
-    // Handle discord already linked to another CW community
-    communityInstance.discord_config_id = null;
-    await communityInstance.save({ transaction });
+    await models.sequelize.transaction(async (transaction) => {
+      // Handle discord already linked to another CW community
+      communityInstance.discord_config_id = null;
+      await communityInstance.save({ transaction });
 
-    await models.DiscordBotConfig.destroy({
-      where: {
-        community_id,
-      },
-      transaction,
+      await models.DiscordBotConfig.destroy({
+        where: {
+          community_id,
+        },
+        transaction,
+      });
     });
+
     log.info(
       'Attempted to add a guild that was already connected to another CW community.',
     );
 
-    try {
-      await transaction.commit();
-    } catch (err) {
-      await transaction.rollback();
-    }
-
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
   } else {
+    transaction = await models.sequelize.transaction();
     const profile = await models.Profile.findOne({
       where: {
         profile_name: 'Discord Bot',
