@@ -72,7 +72,7 @@ const CommunityProfileForm = () => {
       error: '',
     })),
   );
-  const { selectedTags, setSelectedTags, toggleTagFromSelection } =
+  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags({
       initialSelectedTag: currentCommunityTags,
     });
@@ -109,8 +109,8 @@ const CommunityProfileForm = () => {
           ...(userOnboardingEnabled
             ? {
                 // TODO: build and implement api to support other new tags
-                DAO: !!selectedTags.find(({ item }) => item.tag === 'DAO'),
-                DeFi: !!selectedTags.find(({ item }) => item.tag === 'DeFi'),
+                DAO: !!preferenceTags.find(({ item }) => item.tag === 'DAO'),
+                DeFi: !!preferenceTags.find(({ item }) => item.tag === 'DeFi'),
               }
             : {
                 DAO: !!selectedCommunityTags.find(({ tag }) => tag === 'DAO'),
@@ -143,7 +143,7 @@ const CommunityProfileForm = () => {
       setCurrentCommunityTags(
         userOnboardingEnabled
           ? [
-              ...selectedTags
+              ...preferenceTags
                 .filter(({ isSelected }) => isSelected)
                 .map(({ item }) => ({ ...item })),
             ]
@@ -321,7 +321,7 @@ const CommunityProfileForm = () => {
             <div className="controls">
               {userOnboardingEnabled ? (
                 <PreferenceTags
-                  selectedTags={selectedTags}
+                  preferenceTags={preferenceTags}
                   onTagClick={toggleTagFromSelection}
                   maxSelectableTags={4}
                 />
@@ -428,7 +428,7 @@ const CommunityProfileForm = () => {
                 !formState.isDirty &&
                 (userOnboardingEnabled
                   ? currentCommunityTags.length ===
-                    selectedTags.filter(({ isSelected }) => isSelected).length
+                    preferenceTags.filter(({ isSelected }) => isSelected).length
                   : currentCommunityTags.length ===
                     selectedCommunityTags.length) &&
                 links.filter((x) => x.value).length ===
@@ -445,8 +445,8 @@ const CommunityProfileForm = () => {
                 });
                 setLinks(initialLinks);
                 if (userOnboardingEnabled) {
-                  setSelectedTags(
-                    [...selectedTags].map(({ item }) => ({
+                  setPreferenceTags(
+                    [...preferenceTags].map(({ item }) => ({
                       isSelected: !!currentCommunityTags.find(
                         (t) => t.tag === item.tag,
                       ),

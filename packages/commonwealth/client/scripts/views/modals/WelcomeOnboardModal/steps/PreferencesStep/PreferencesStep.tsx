@@ -12,11 +12,11 @@ type PreferencesStepProps = {
 };
 
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
-  const { selectedTags, toggleTagFromSelection } = usePreferenceTags({});
+  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags({});
 
   const handleSavePreferences = () => {
     // TODO: save tags to api here
-    // const finalTags = selectedTags.filter(tag => tag.isSelected)
+    // const finalTags = preferenceTags.filter(tag => tag.isSelected)
 
     onComplete();
   };
@@ -31,7 +31,7 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
       </div>
 
       <PreferenceTags
-        selectedTags={selectedTags}
+        preferenceTags={preferenceTags}
         onTagClick={toggleTagFromSelection}
       />
 

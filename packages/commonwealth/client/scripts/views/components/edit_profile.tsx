@@ -65,7 +65,7 @@ const EditProfileComponent = () => {
       chain: a.community.id,
     })),
   });
-  const { selectedTags, toggleTagFromSelection } = usePreferenceTags({});
+  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags({});
 
   const getProfile = async () => {
     try {
@@ -403,7 +403,7 @@ const EditProfileComponent = () => {
                   <CWText type="h5">(Select all that apply)</CWText>
                 </div>
                 <PreferenceTags
-                  selectedTags={selectedTags}
+                  preferenceTags={preferenceTags}
                   onTagClick={toggleTagFromSelection}
                 />
               </CWFormSection>
