@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 
+import * as schemas from '@hicommonwealth/schemas';
 import { Skeleton } from 'views/components/Skeleton';
+import { z } from 'zod';
 
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
-import mockedContests from '../mockedContests';
 import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
 interface ContestsListProps {
-  contests: typeof mockedContests;
+  contests: z.infer<typeof schemas.ContestResults>[];
   isAdmin: boolean;
   isLoading: boolean;
   stakeEnabled: boolean;
