@@ -4,6 +4,10 @@ inputs:
   node-version:
     description: Node version
     required: true
+  fetch-depth:
+    description: Number of commits to fetch
+    required: false
+    default: '1'
 runs:
   using: composite
   steps:
