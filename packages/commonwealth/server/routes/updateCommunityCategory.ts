@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
+import { Op } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -50,7 +51,7 @@ const updateCommunityCategory = async (
     if (tag_ids.length > 0) {
       const tagCount = await models.Tags.count({
         where: {
-          id: tag_ids,
+          id: { [Op.in]: tag_ids },
         },
       });
 

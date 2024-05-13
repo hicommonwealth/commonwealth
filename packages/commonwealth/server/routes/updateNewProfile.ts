@@ -1,6 +1,7 @@
 import type { DB } from '@hicommonwealth/model';
 import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
@@ -85,7 +86,7 @@ const updateNewProfile = async (
     if (tag_ids.length > 0) {
       const tagCount = await models.Tags.count({
         where: {
-          id: tag_ids,
+          id: { [Op.in]: tag_ids },
         },
       });
 
