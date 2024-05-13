@@ -3,7 +3,7 @@ import Sequelize from 'sequelize';
 import z from 'zod';
 import type { CommunityAttributes } from './community';
 import type { MembershipAttributes } from './membership';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type GroupAttributes = z.infer<typeof Group> & {
   // associations
@@ -12,10 +12,11 @@ export type GroupAttributes = z.infer<typeof Group> & {
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;
-export type GroupModelStatic = ModelStatic<GroupInstance>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <GroupModelStatic>sequelize.define<GroupInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<GroupInstance> =>
+  sequelize.define<GroupInstance>(
     'Group',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

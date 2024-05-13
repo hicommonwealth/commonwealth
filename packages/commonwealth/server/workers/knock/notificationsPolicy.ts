@@ -1,6 +1,6 @@
 import { Policy, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { processCommentCreated } from './eventHandlers/commentCreated';
 
 const __filename = fileURLToPath(import.meta.url);
