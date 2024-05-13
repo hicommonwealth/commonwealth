@@ -6,8 +6,10 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import CopyAddressInput from 'views/pages/CommunityManagement/Contests/CopyAddressInput';
+
+import { displayAmount } from '../../utils';
+
 import './FundContestForm.scss';
 
 interface FundContestFormProps {
@@ -36,9 +38,7 @@ interface FundContestFormProps {
   amountEthInUsd: string;
   newContestBalanceInEth: string;
   newContestBalanceInUsd: string;
-  transferFeesInEth: string;
-  transferFeesInUsd: string;
-  handleTransferFunds: () => void;
+  handleTransferFunds: () => Promise<void>;
 }
 
 const FundContestForm = ({
@@ -55,8 +55,6 @@ const FundContestForm = ({
   amountEthInUsd,
   newContestBalanceInEth,
   newContestBalanceInUsd,
-  transferFeesInEth,
-  transferFeesInUsd,
   handleTransferFunds,
 }: FundContestFormProps) => {
   const amountEthValue = amountEth ? Number(amountEth) : '';
@@ -86,7 +84,7 @@ const FundContestForm = ({
             Current Balance
           </CWText>
           <CWText type="caption" fontWeight="medium">
-            {capDecimals(userEthBalance)} ETH
+            {displayAmount(userEthBalance)} ETH
           </CWText>
         </div>
 
@@ -100,7 +98,7 @@ const FundContestForm = ({
             Current Balance
           </CWText>
           <CWText type="caption" fontWeight="medium">
-            {capDecimals(contestEthBalance) || '0.00'} ETH
+            {displayAmount(contestEthBalance)} ETH
           </CWText>
         </div>
 
@@ -126,7 +124,7 @@ const FundContestForm = ({
           )}
 
           <CWText type="b2" fontWeight="medium">
-            {amountEthInUsd || '0.00'} USD
+            {displayAmount(amountEthInUsd)} USD
           </CWText>
         </div>
 
@@ -134,23 +132,11 @@ const FundContestForm = ({
           <div className="first-row">
             <CWText type="caption">New Contest Balance:</CWText>
             <CWText type="caption" fontWeight="medium">
-              {newContestBalanceInEth || '0.00'} ETH
+              {displayAmount(newContestBalanceInEth)} ETH
             </CWText>
           </div>
           <CWText type="caption" fontWeight="medium">
-            {newContestBalanceInUsd || '0.00'} USD
-          </CWText>
-        </div>
-
-        <div className="summary-balance-row">
-          <div className="first-row">
-            <CWText type="caption">Transfer Fees:</CWText>
-            <CWText type="caption" fontWeight="medium">
-              {transferFeesInEth || '0.00'} ETH
-            </CWText>
-          </div>
-          <CWText type="caption" fontWeight="medium">
-            {transferFeesInUsd || '0.00'} USD
+            {displayAmount(newContestBalanceInUsd)} USD
           </CWText>
         </div>
       </div>

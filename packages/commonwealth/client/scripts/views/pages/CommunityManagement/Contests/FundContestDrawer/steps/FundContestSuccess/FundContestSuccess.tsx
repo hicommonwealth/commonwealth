@@ -3,6 +3,7 @@ import React from 'react';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import CopyAddressInput from '../../../CopyAddressInput';
 
@@ -11,9 +12,16 @@ import './FundContestSuccess.scss';
 interface FundContestSuccessProps {
   onClose: () => void;
   address: string;
+  txHash: string;
 }
 
-const FundContestSuccess = ({ onClose, address }: FundContestSuccessProps) => {
+const FundContestSuccess = ({
+  onClose,
+  address,
+  txHash,
+}: FundContestSuccessProps) => {
+  const etherscanLink = buildEtherscanLink(txHash);
+
   return (
     <div className="FundContestSuccess">
       <div className="content">
@@ -36,7 +44,7 @@ const FundContestSuccess = ({ onClose, address }: FundContestSuccessProps) => {
           <CWButton label="Close" onClick={onClose} buttonType="secondary" />
           <CWButton
             label="View transactions"
-            onClick={() => window.open('https://etherscan.io', '_blank')}
+            onClick={() => window.open(etherscanLink, '_blank')}
           />
         </div>
       </div>

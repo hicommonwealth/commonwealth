@@ -20,8 +20,11 @@ import {
   FundContestLoading,
   FundContestSuccess,
 } from './steps';
+import { calculateNewContractBalance, getAmountError } from './utils';
 
 import './FundContestDrawer.scss';
+
+const INITIAL_AMOUNT = '0.0001';
 
 interface FundContestDrawerProps {
   isOpen: boolean;
@@ -49,13 +52,6 @@ const FundContestDrawer = ({
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
 
-  const { data: userEthBalance } = useGetUserEthBalanceQuery({
-    chainRpc,
-    walletAddress: activeAccountOption.value,
-    apiEnabled: !!activeAccountOption.value,
-    ethChainId,
-  });
-
   const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
@@ -70,26 +66,30 @@ const FundContestDrawer = ({
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
   const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
-  const [amountEth, setAmountEth] = useState('0.0001');
+  const [amountEth, setAmountEth] = useState(INITIAL_AMOUNT);
+  const [txHash, setTxHash] = useState('');
+
+  const { data: userEthBalance } = useGetUserEthBalanceQuery({
+    chainRpc,
+    walletAddress: selectedAddress.value,
+    apiEnabled: !!selectedAddress.value,
+    ethChainId,
+  });
 
   const contestEthBalance = String(contestBalanceData || '');
   const amountEthInUsd = convertEthToUsd(amountEth, ethUsdRate);
 
-  const amountError =
-    (parseFloat(userEthBalance) < parseFloat(amountEth) &&
-      'Not enough funds in wallet') ||
-    ((amountEth === '' || parseFloat(amountEth) === 0) &&
-      'Please enter an amount') ||
-    (parseFloat(amountEth) < 0 && 'Please enter non negative amount');
-  const newContestBalanceInEth = String(
-    parseFloat(contestEthBalance) + parseFloat(amountEth) || '',
+  const newContestBalanceInEth = calculateNewContractBalance(
+    contestEthBalance,
+    amountEth,
   );
+
   const newContestBalanceInUsd = convertEthToUsd(
     newContestBalanceInEth,
     ethUsdRate,
   );
-  const transferFeesInEth = String(parseFloat(amountEth) * 0.02 || '');
-  const transferFeesInUsd = convertEthToUsd(transferFeesInEth, ethUsdRate);
+
+  const amountError = getAmountError(userEthBalance, amountEth);
 
   const handleChangeEthAmount = (e) => {
     setAmountEth(e.target.value);
@@ -99,7 +99,7 @@ const FundContestDrawer = ({
     try {
       setFundContestDrawerStep('Loading');
 
-      await fundContest({
+      const tx = await fundContest({
         contestAddress,
         ethChainId,
         chainRpc,
@@ -108,6 +108,7 @@ const FundContestDrawer = ({
       });
 
       setFundContestDrawerStep('Success');
+      setTxHash(tx.transactionHash as string);
     } catch (err) {
       setFundContestDrawerStep('Failure');
     }
@@ -116,8 +117,9 @@ const FundContestDrawer = ({
   const handleClose = () => {
     onClose();
     setFundContestDrawerStep('Form');
-    setAmountEth('0.0001');
+    setAmountEth(INITIAL_AMOUNT);
     setSelectedAddress(activeAccountOption);
+    setTxHash('');
   };
 
   const getCurrentStep = () => {
@@ -126,7 +128,6 @@ const FundContestDrawer = ({
         return (
           <FundContestForm
             onClose={handleClose}
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             handleTransferFunds={handleTransferFunds}
             amountEth={amountEth}
             amountError={amountError}
@@ -139,8 +140,6 @@ const FundContestDrawer = ({
             amountEthInUsd={amountEthInUsd}
             newContestBalanceInEth={newContestBalanceInEth}
             newContestBalanceInUsd={newContestBalanceInUsd}
-            transferFeesInEth={transferFeesInEth}
-            transferFeesInUsd={transferFeesInUsd}
             contestAddress={contestAddress}
           />
         );
@@ -157,7 +156,11 @@ const FundContestDrawer = ({
 
       case 'Success':
         return (
-          <FundContestSuccess onClose={handleClose} address={contestAddress} />
+          <FundContestSuccess
+            onClose={handleClose}
+            address={contestAddress}
+            txHash={txHash}
+          />
         );
     }
   };
