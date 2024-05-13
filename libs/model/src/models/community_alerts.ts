@@ -1,16 +1,16 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CommunityAlertAttributes = z.infer<typeof CommunityAlert>;
 
 export type CommunityAlertInstance = ModelInstance<CommunityAlertAttributes>;
 
-export type CommunityAlertModelStatic = ModelStatic<CommunityAlertInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommunityAlertModelStatic>sequelize.define<CommunityAlertInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityAlertInstance> =>
+  sequelize.define<CommunityAlertInstance>(
     'CommunityAlerts',
     {
       user_id: {
