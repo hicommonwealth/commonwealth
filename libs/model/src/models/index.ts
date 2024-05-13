@@ -53,6 +53,7 @@ export * from './community_contract_template';
 export * from './community_contract_template_metadata';
 export * from './community_role';
 export * from './community_stake';
+export * from './community_tags';
 export * from './contract';
 export * from './contract_abi';
 export * from './discord_bot_config';

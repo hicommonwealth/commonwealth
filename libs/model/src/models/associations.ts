@@ -16,14 +16,11 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.Profile.withMany(db.Address, 'profile_id').withMany(
-    db.SsoToken,
-    'profile_id',
-  );
-
-  db.Profile.withMany(db.ProfileTags, 'profile_id', {
-    onDelete: 'CASCADE',
-  });
+  db.Profile.withMany(db.Address, 'profile_id')
+    .withMany(db.SsoToken, 'profile_id')
+    .withMany(db.ProfileTags, 'profile_id', {
+      onDelete: 'CASCADE',
+    });
 
   db.Address.withMany(db.Thread, 'address_id', {
     asOne: 'Address',
@@ -76,9 +73,14 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Template, 'created_for_community')
     .withOne(db.DiscordBotConfig, ['discord_config_id', 'community_id'], {
       onDelete: 'CASCADE',
+    })
+    .withMany(db.CommunityTags, 'community_id', {
+      onDelete: 'CASCADE',
     });
 
   db.Tags.withMany(db.ProfileTags, 'tag_id', {
+    onDelete: 'CASCADE',
+  }).withMany(db.CommunityTags, 'tag_id', {
     onDelete: 'CASCADE',
   });
 

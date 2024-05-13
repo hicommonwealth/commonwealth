@@ -14,6 +14,7 @@ import CommunityContract from './community_contract';
 import CommunityContractTemplate from './community_contract_template';
 import CommunityContractTemplateMetadata from './community_contract_template_metadata';
 import CommunityStake from './community_stake';
+import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
@@ -62,6 +63,7 @@ export const Factories = {
   CommunityContractTemplate,
   CommunityContractTemplateMetadata,
   CommunityStake,
+  CommunityTags,
   Contest,
   ContestAction,
   ContestManager,
