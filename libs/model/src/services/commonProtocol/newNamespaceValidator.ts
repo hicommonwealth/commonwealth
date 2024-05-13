@@ -63,7 +63,7 @@ export const validateNamespace = async (
     factoryData.factory,
   );
 
-  if (activeNamespace !== txReceipt.logs[0].address) {
+  if (activeNamespace.toLowerCase() !== txReceipt.logs[0].address) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 
