@@ -133,7 +133,8 @@ const baseConfig = {
   optimization: {
     splitChunks: {
       chunks: 'all',
-      // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
+      // TODO: Commented out packages need to be code split.
+      // Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
         ethersAsync: {
           test: /[\\/]node_modules[\\/](ethers)[\\/]/,
@@ -201,6 +202,7 @@ const baseConfig = {
     fallback: {
       fs: false,
       net: false,
+      buffer: false,
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),

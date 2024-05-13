@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import { DatabaseCleaner } from 'commonwealth/server/util/databaseCleaner';
 import { fileURLToPath } from 'url';
+import { DatabaseCleaner } from '../util/databaseCleaner';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
