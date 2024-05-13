@@ -19,7 +19,7 @@ Forum actions are always topic-scoped; whenever a user creates a new thread, rea
 
 Groups are defined by sets of `Requirements`. A Requirement is a rule or logical statement that qualifies a given address for Group membership. As of 231031, the two Requirements supported on our backend are token thresholds (i.e., that a given address has a certain token balance) and allowlists (i.e., whitelists manually constructed by a community admin).
 
-From a database perspective, Groups consist of a metadata object, an associated Community (chain), an associated Membership, and an array of Requirements. Requirement objects consist of a `rule` string (e.g. "threshold") and a data object (e.g. `ThresholdData`). Requirement objects must conform to the latest JSON schema; as of 231109, that is [v1](../packages/commonwealth/server/util/requirementsModule/requirementsSchema_v1.json). Membership validation checks, and requirement types can be found in the `/server/util/requirementsModule` directory.
+From a database perspective, Groups consist of a metadata object, an associated Community (chain), an associated Membership, and an array of Requirements. Requirement objects consist of a `rule` string (e.g. "threshold") and a data object (e.g. `ThresholdData`). Requirement objects must conform to the latest JSON schema; as of 231109, that is [v1](../packages/commonwealth/server/util/requirementsModule/requirementsSchema_v1.ts). Membership validation checks, and requirement types can be found in the `/server/util/requirementsModule` directory.
 
 ## API Diagrams
 

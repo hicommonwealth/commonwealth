@@ -9,6 +9,7 @@ export type Aggregates = Extract<
   | 'NotificationCategory'
   | 'Subscription'
   | 'Thread'
+  | 'Reaction'
   | 'User'
   | 'StakeTransaction'
   | 'SubscriptionPreference'

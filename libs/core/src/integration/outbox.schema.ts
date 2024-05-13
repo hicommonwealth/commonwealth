@@ -43,6 +43,12 @@ export const Outbox = z.union([
     .merge(BaseOutboxProperties),
   z
     .object({
+      event_name: z.literal(EventNames.ThreadUpvoted),
+      event_payload: events.ThreadUpvoted,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
       event_name: z.literal(EventNames.DiscordMessageCreated),
       event_payload: events.DiscordMessageCreated,
     })

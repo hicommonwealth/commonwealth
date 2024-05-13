@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { GroupAttributes } from './group';
-import { ModelInstance, ModelStatic } from './types';
+import { ModelInstance } from './types';
 
 export type MembershipRejectReason =
   | {
@@ -25,10 +25,11 @@ export type MembershipAttributes = {
 };
 
 export type MembershipInstance = ModelInstance<MembershipAttributes>;
-export type MembershipModelStatic = ModelStatic<MembershipInstance>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <MembershipModelStatic>sequelize.define<MembershipInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<MembershipInstance> =>
+  sequelize.define<MembershipInstance>(
     'Membership',
     {
       group_id: { type: Sequelize.INTEGER, primaryKey: true },

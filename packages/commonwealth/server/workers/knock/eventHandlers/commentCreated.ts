@@ -5,8 +5,8 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 import z from 'zod';
 import { getCommentUrl } from '../util';
 

@@ -23,6 +23,7 @@
     "@hicommonwealth/core": "*",
     "@hicommonwealth/logging": "*",
     "@hicommonwealth/shared": "*",
+    "@knocklabs/node": "^0.6.10",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",

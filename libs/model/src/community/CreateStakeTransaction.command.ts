@@ -68,24 +68,34 @@ export function CreateStakeTransaction(): Command<
         web3.eth.getTransaction(transaction_hash),
         web3.eth.getTransactionReceipt(transaction_hash),
       ]);
-      const timestamp: number = (
-        await web3.eth.getBlock(transaction.blockHash as string)
-      ).timestamp as number;
+      const timestamp: number = Number(
+        (await web3.eth.getBlock(transaction.blockHash as string)).timestamp,
+      );
 
-      if (![transaction.from, transaction.to].includes(communityStakeAddress)) {
+      if (
+        ![txReceipt.from, txReceipt.to].includes(
+          communityStakeAddress.toLowerCase(),
+        )
+      ) {
         throw new Error(
           'This transaction is not associated with a community stake',
         );
       }
-
+      if (
+        !txReceipt.logs[0].data ||
+        !txReceipt.logs[0].address ||
+        !txReceipt.logs[1].data
+      ) {
+        throw new Error('No logs returned from transaction');
+      }
       const { 0: stakeId, 1: value } = web3.eth.abi.decodeParameters(
         ['uint256', 'uint256'],
-        txReceipt.logs[0].data,
+        txReceipt.logs[0].data.toString(),
       );
 
       const callData = {
         to: txReceipt.logs[0].address, // src of Transfer single
-        data: '06fdde03', // name function selector
+        data: '0x06fdde03', // name function selector
       };
 
       const response = await web3.eth.call(callData);
@@ -117,16 +127,16 @@ export function CreateStakeTransaction(): Command<
           'uint256',
           'uint256',
         ],
-        txReceipt.logs[1].data,
+        txReceipt.logs[1].data.toString(),
       );
 
       const stakeAggregate = await models.StakeTransaction.create({
         transaction_hash: transaction_hash,
         community_id: community!.id!,
-        stake_id: parseInt(stakeId),
-        stake_amount: parseInt(value),
-        stake_price: ethAmount,
-        address: trader,
+        stake_id: Number(stakeId),
+        stake_amount: Number(value),
+        stake_price: Number(ethAmount).toString(),
+        address: String(trader),
         stake_direction: isBuy ? 'buy' : 'sell',
         timestamp: timestamp,
       });

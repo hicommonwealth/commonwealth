@@ -64,7 +64,7 @@ export function CreateContestManagerMetadata(): Command<
         },
       );
 
-      if (mustExist('ContestManager', contestManager)) {
+      if (mustExist('Contest Manager', contestManager)) {
         return {
           contest_managers: [
             {

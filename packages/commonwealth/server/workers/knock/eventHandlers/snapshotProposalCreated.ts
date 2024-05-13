@@ -6,8 +6,8 @@ import {
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import { getSnapshotUrl, SnapshotEventType } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import z from 'zod';
 
 const __filename = fileURLToPath(import.meta.url);
