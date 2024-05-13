@@ -14,6 +14,7 @@ import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
+import Mava from './views/components/Mava/Mava';
 
 OpenFeature.setProvider(openFeatureProvider);
 
@@ -32,6 +33,7 @@ const App = () => {
                 <Splash />
               ) : (
                 <>
+                  <Mava />
                   <RouterProvider router={router(customDomain)} />
                   {isAddedToHomeScreen || isMarketingPage ? null : (
                     <AddToHomeScreenPrompt
