@@ -6,13 +6,6 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "type": "module",
-  "workspaces": [
-    "packages/commonwealth",
-    "packages/discord-bot",
-    "packages/scripts",
-    "packages/snapshot-listener",
-    "libs/*"
-  ],
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "chromatic": "chromatic --exit-zero-on-changes",
