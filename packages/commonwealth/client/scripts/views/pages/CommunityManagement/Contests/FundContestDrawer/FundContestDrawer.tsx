@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
 
 import app from 'state';
-import {
-  useFetchEthUsdRateQuery,
-  useGetUserEthBalanceQuery,
-} from 'state/api/communityStake';
-import {
-  useFundContestOnchainMutation,
-  useGetContestBalanceQuery,
-} from 'state/api/contests';
+import { useFundContestOnchainMutation } from 'state/api/contests';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
-import { convertEthToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import {
   FundContestFailure,
@@ -20,11 +12,10 @@ import {
   FundContestLoading,
   FundContestSuccess,
 } from './steps';
-import { calculateNewContractBalance, getAmountError } from './utils';
+import useFundContestForm, { INITIAL_AMOUNT } from './useFundContestForm';
+import useUserAddressesForFundForm from './useUserAddressesForFundForm';
 
 import './FundContestDrawer.scss';
-
-const INITIAL_AMOUNT = '0.0001';
 
 interface FundContestDrawerProps {
   isOpen: boolean;
@@ -39,57 +30,33 @@ const FundContestDrawer = ({
   onClose,
   contestAddress,
 }: FundContestDrawerProps) => {
-  const addressOptions = app?.user?.activeAccounts?.map((account) => ({
-    value: String(account.address),
-    label: account.address,
-  }));
-
-  const activeAccountOption = {
-    value: String(app.user?.activeAccount?.address),
-    label: app?.user?.activeAccount?.address,
-  };
+  const [fundContestDrawerStep, setFundContestDrawerStep] =
+    useState<FundContestStep>('Form');
+  const [txHash, setTxHash] = useState('');
 
   const chainRpc = app?.chain?.meta?.ChainNode?.url;
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
 
-  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
-  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+  const { addressOptions, selectedAddress, setSelectedAddress } =
+    useUserAddressesForFundForm();
 
-  const { mutateAsync: fundContest } = useFundContestOnchainMutation();
-
-  const { data: contestBalanceData } = useGetContestBalanceQuery({
+  const {
+    amountEth,
+    amountEthInUsd,
+    setAmountEth,
+    amountError,
+    contestEthBalance,
+    newContestBalanceInUsd,
+    newContestBalanceInEth,
+    userEthBalance,
+  } = useFundContestForm({
     contestAddress,
     chainRpc,
     ethChainId,
+    userAddress: selectedAddress.value,
   });
 
-  const [fundContestDrawerStep, setFundContestDrawerStep] =
-    useState<FundContestStep>('Form');
-  const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
-  const [amountEth, setAmountEth] = useState(INITIAL_AMOUNT);
-  const [txHash, setTxHash] = useState('');
-
-  const { data: userEthBalance } = useGetUserEthBalanceQuery({
-    chainRpc,
-    walletAddress: selectedAddress.value,
-    apiEnabled: !!selectedAddress.value,
-    ethChainId,
-  });
-
-  const contestEthBalance = String(contestBalanceData || '');
-  const amountEthInUsd = convertEthToUsd(amountEth, ethUsdRate);
-
-  const newContestBalanceInEth = calculateNewContractBalance(
-    contestEthBalance,
-    amountEth,
-  );
-
-  const newContestBalanceInUsd = convertEthToUsd(
-    newContestBalanceInEth,
-    ethUsdRate,
-  );
-
-  const amountError = getAmountError(userEthBalance, amountEth);
+  const { mutateAsync: fundContest } = useFundContestOnchainMutation();
 
   const handleChangeEthAmount = (e) => {
     setAmountEth(e.target.value);
@@ -118,7 +85,6 @@ const FundContestDrawer = ({
     onClose();
     setFundContestDrawerStep('Form');
     setAmountEth(INITIAL_AMOUNT);
-    setSelectedAddress(activeAccountOption);
     setTxHash('');
   };
 
