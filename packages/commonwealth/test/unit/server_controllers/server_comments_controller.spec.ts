@@ -519,7 +519,7 @@ describe('ServerCommentsController', () => {
     });
   });
 
-  describe('#updateComment', () => {
+  describe.only('#updateComment', () => {
     it('should update a comment', async () => {
       const data = {
         id: 123,
@@ -553,10 +553,14 @@ describe('ServerCommentsController', () => {
           update: () => (data.text = 'Hello'),
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback?: () => any) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: async () => ({}),
+                commit: async () => ({}),
+              };
+          },
         },
       };
       const banCache = {
@@ -636,10 +640,14 @@ describe('ServerCommentsController', () => {
           update: () => null,
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback?: () => any) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: async () => ({}),
+                commit: async () => ({}),
+              };
+          },
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -692,10 +700,14 @@ describe('ServerCommentsController', () => {
           findOne: async () => null,
         },
         sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
+          transaction: async (callback?: () => any) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: async () => ({}),
+                commit: async () => ({}),
+              };
+          },
         },
       };
       const banCache = {
@@ -745,12 +757,6 @@ describe('ServerCommentsController', () => {
         },
         Subscription: {
           destroy: async () => ({}),
-        },
-        sequelize: {
-          transaction: async () => ({
-            rollback: async () => ({}),
-            commit: async () => ({}),
-          }),
         },
       };
       const banCache = {
