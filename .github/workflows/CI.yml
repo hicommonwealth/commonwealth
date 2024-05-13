@@ -43,32 +43,13 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
-      - name: Bundle
-        run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
+      - uses: ./.github/actions/e2e
 
-      - name: Cache browsers
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.cache/ms-playwright/chromium-1045'
-          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
-
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Install proxy
-        run: npm install -g local-ssl-proxy
-
-      - name: Add custom domain to /etc/hosts
-        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
-
-      - name: Run e2e tests (pnpm test-e2e)
+      - name: Run e2e tests
         env:
           PORT: 8080
           IS_CI: true
@@ -121,35 +102,14 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
+          fetch-depth: '0'
 
-      - name: Bundle
-        run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
+      - uses: ./.github/actions/e2e
 
-      - name: Cache browsers
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.cache/ms-playwright/chromium-1045'
-          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
-
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Install proxy
-        run: npm install -g local-ssl-proxy
-
-      - name: Add custom domain to /etc/hosts
-        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
-
-      - name: Run e2e tests (pnpm test-e2e)
+      - name: Run e2e tests
         env:
           PORT: 8080
           IS_CI: true
@@ -201,26 +161,16 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
 
-      - name: Bundle
-        run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
+      - uses: ./.github/actions/e2e
 
-      - name: Cache browsers
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.cache/ms-playwright/chromium-1045'
-          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
+      - name: Build server
+        run: pnpm -F commonwealth build
 
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Run serial e2e tests (pnpm test-e2e-serial)
+      - name: Run serial e2e tests
         run: (cd packages/commonwealth && NODE_ENV=production TEST_DB_NAME=commonwealth NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) & (pnpm -F commonwealth wait-server && TEST_DB_NAME=commonwealth pnpm -F commonwealth test-e2e-serial --forbid-only)
         env:
           PORT: 8080
@@ -244,13 +194,10 @@ jobs:
         node: [ 20 ]
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
+          fetch-depth: '0'
 
       - name: Run linter
         env:
@@ -267,14 +214,10 @@ jobs:
         node: [ 20 ]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
+          fetch-depth: '0'
 
       - name: Assert pnpm-lock.yaml is correct
         run: |
@@ -334,7 +277,6 @@ jobs:
           - 15672:15672
 
     steps:
-      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -378,7 +320,6 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"
@@ -431,7 +372,6 @@ jobs:
          - 6379:6379
 
     steps:
-      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
           node-version: "20"

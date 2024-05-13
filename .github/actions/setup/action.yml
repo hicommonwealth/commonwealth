@@ -1,43 +1,29 @@
 name: Setup
-description: Setup Node & Install pnpm
+description: Node/pnpm setup + install
 inputs:
   node-version:
     description: Node version
     required: true
+  fetch-depth:
+    description: Number of commits to fetch
+    required: false
+    default: '1'
 runs:
   using: composite
   steps:
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+    - uses: pnpm/action-setup@v4
       with:
         version: 9
         run_install: false
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'pnpm'
-
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV    
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ inputs.node-version }}-${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ inputs.node-version }}-${{ runner.os }}-pnpm-store-
-
     - name: Install
       shell: bash
       run: |
-        pnpm add -g node-gyp && pnpm i --ignore-scripts
-        
-    - name: Build
-      shell: bash
-      run: |
-        pnpm -F commonwealth build
+        pnpm add -g node-gyp && 
+        pnpm i --ignore-scripts
