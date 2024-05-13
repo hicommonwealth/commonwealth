@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
-import app from './state';
+import app from 'state';
 
 // eslint-disable-next-line no-var
 declare var window: any;
