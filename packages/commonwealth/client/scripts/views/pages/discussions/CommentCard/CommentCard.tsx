@@ -82,7 +82,10 @@ export const CommentCard = ({
   comment,
   isThreadArchived,
 }: CommentCardProps) => {
-  const commentBody = deserializeDelta(editDraft || comment.text);
+  const [commentText, setCommentText] = useState(comment.text);
+  const commentBody = deserializeDelta(
+    (editDraft || commentText) ?? comment.text,
+  );
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
   const author = comment?.author
     ? app.chain.accounts.get(comment?.author)
@@ -138,6 +141,8 @@ export const CommentCard = ({
             popoverPlacement="top"
             showUserAddressWithInfo={false}
             profile={comment.profile}
+            versionHistory={comment.versionHistory}
+            changeContentText={setCommentText}
           />
         )}
       </div>
@@ -176,7 +181,7 @@ export const CommentCard = ({
         <div className="comment-content">
           {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
-            <QuillRenderer doc={comment.text} />
+            <QuillRenderer doc={commentText} />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
