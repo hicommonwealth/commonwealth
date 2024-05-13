@@ -5,7 +5,7 @@ import {
 } from 'client/scripts/views/components/PreferenceTags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import getLinkType from 'helpers/linkType';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
@@ -36,7 +36,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
-  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const userOnboardingEnabled = true; //useFlag('userOnboardingEnabled');
   const communityStakeEnabled = useFlag('communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
@@ -51,16 +51,9 @@ const CommunityProfileForm = () => {
     isDisabled: true,
     canDisable: true,
   });
-  const [currentCommunityTags, setCurrentCommunityTags] = useState(
-    Object.entries(getCommunityTags(community.id))
-      .filter(({ 1: value }) => value)
-      .map(({ 0: key }, index) => ({ id: index, tag: key })),
-  );
   const [isCustomStagesEnabled, setIsCustomStagesEnabled] = useState(
     community.stagesEnabled,
   );
-  const [selectedCommunityTags, setSelectedCommunityTags] =
-    useState(currentCommunityTags);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,10 +65,71 @@ const CommunityProfileForm = () => {
       error: '',
     })),
   );
-  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
-    usePreferenceTags({
-      initialSelectedTag: currentCommunityTags,
-    });
+
+  // TODO: this should be removed when /updateCommunityCategory route is updated to
+  // use only the newer tags schema
+  const [deprecatedCurrentCommunityTags, setDeprecatedCurrentCommunityTags] =
+    useState(
+      Object.entries(getCommunityTags(community.id))
+        .filter(({ 1: value }) => value)
+        .map(({ 0: key }, index) => ({ id: index, tag: key })),
+    );
+  const [deprecatedSelectedCommunityTags, setDeprecatedSelectedCommunityTags] =
+    useState(deprecatedCurrentCommunityTags);
+  const areTagsInitiallySet = useRef(false);
+  const {
+    isLoadingTags,
+    preferenceTags,
+    setPreferenceTags,
+    toggleTagFromSelection,
+  } = usePreferenceTags({});
+
+  const updatePreferenceTags = useCallback(() => {
+    const isOlderTagSelected = (tag: string, name: string) => {
+      return (
+        tag.toLowerCase() === name &&
+        !!deprecatedCurrentCommunityTags.find(
+          (dct) => dct.tag.toLowerCase() === name,
+        )
+      );
+    };
+
+    const updatedTags = [...preferenceTags].map((tag) => ({
+      ...tag,
+      isSelected:
+        // if `defi` or `dao` is in older tags, mark it selected in newer ones
+        isOlderTagSelected(tag.item.tag, 'defi') ||
+        isOlderTagSelected(tag.item.tag, 'dao') ||
+        !!(community.CommunityTags || []).find((t) => t.id === tag.item.id),
+    }));
+    setPreferenceTags(updatedTags);
+  }, [
+    preferenceTags,
+    setPreferenceTags,
+    community,
+    deprecatedCurrentCommunityTags,
+  ]);
+
+  useEffect(() => {
+    if (
+      !isLoadingTags &&
+      preferenceTags?.length > 0 &&
+      community &&
+      deprecatedCurrentCommunityTags &&
+      !areTagsInitiallySet.current
+    ) {
+      updatePreferenceTags();
+
+      areTagsInitiallySet.current = true;
+    }
+  }, [
+    isLoadingTags,
+    preferenceTags,
+    setPreferenceTags,
+    community,
+    updatePreferenceTags,
+    deprecatedCurrentCommunityTags,
+  ]);
 
   const {
     links,
@@ -108,15 +162,31 @@ const CommunityProfileForm = () => {
         selectedTags: {
           ...(userOnboardingEnabled
             ? {
-                // TODO: build and implement api to support other new tags
-                DAO: !!preferenceTags.find(({ item }) => item.tag === 'DAO'),
-                DeFi: !!preferenceTags.find(({ item }) => item.tag === 'DeFi'),
+                DAO: !!preferenceTags.find(
+                  ({ item, isSelected }) =>
+                    item.tag.toLowerCase() === 'dao' && isSelected,
+                ),
+                DeFi: !!preferenceTags.find(
+                  ({ item, isSelected }) =>
+                    item.tag.toLowerCase() === 'defi' && isSelected,
+                ),
               }
             : {
-                DAO: !!selectedCommunityTags.find(({ tag }) => tag === 'DAO'),
-                DeFi: !!selectedCommunityTags.find(({ tag }) => tag === 'DeFi'),
+                DAO: !!deprecatedSelectedCommunityTags.find(
+                  ({ tag }) => tag === 'DAO',
+                ),
+                DeFi: !!deprecatedSelectedCommunityTags.find(
+                  ({ tag }) => tag === 'DeFi',
+                ),
               }),
         },
+        ...(userOnboardingEnabled
+          ? {
+              tagIds: preferenceTags
+                .filter((pt) => pt.isSelected)
+                .map((pt) => pt.item.id),
+            }
+          : {}),
       });
 
       await editBanner({
@@ -136,18 +206,29 @@ const CommunityProfileForm = () => {
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
 
+      community.updateTags(
+        preferenceTags
+          .filter((t) => t.isSelected)
+          .map((t) => ({
+            id: t.item.id,
+            name: t.item.tag,
+          })),
+      );
+
       setNameFieldDisabledState({
         isDisabled: true,
         canDisable: true,
       });
-      setCurrentCommunityTags(
+      setDeprecatedCurrentCommunityTags(
         userOnboardingEnabled
-          ? [
-              ...preferenceTags
-                .filter(({ isSelected }) => isSelected)
-                .map(({ item }) => ({ ...item })),
-            ]
-          : [...selectedCommunityTags],
+          ? preferenceTags
+              .filter((t) => t.isSelected)
+              .filter((t) => ['defi', 'dao'].includes(t.item.tag.toLowerCase()))
+              .map((t) => ({
+                id: t.item.id,
+                tag: t.item.tag,
+              }))
+          : [...deprecatedSelectedCommunityTags],
       );
       const updatedLinks = links.map((link) => ({
         value: link.value.trim(),
@@ -333,13 +414,15 @@ const CommunityProfileForm = () => {
                     label={option}
                     buttonWidth="narrow"
                     buttonType={
-                      selectedCommunityTags.find(({ tag }) => tag === option)
+                      deprecatedSelectedCommunityTags.find(
+                        ({ tag }) => tag === option,
+                      )
                         ? 'primary'
                         : 'secondary'
                     }
                     onClick={(e) => {
                       e.preventDefault();
-                      setSelectedCommunityTags((prevTags) =>
+                      setDeprecatedSelectedCommunityTags((prevTags) =>
                         prevTags.find(({ tag }) => tag === option)
                           ? [...prevTags].filter(({ tag }) => tag !== option)
                           : [...prevTags, { id: 1, tag: option }],
@@ -427,10 +510,10 @@ const CommunityProfileForm = () => {
               disabled={
                 !formState.isDirty &&
                 (userOnboardingEnabled
-                  ? currentCommunityTags.length ===
+                  ? (community.CommunityTags || []).length ===
                     preferenceTags.filter(({ isSelected }) => isSelected).length
-                  : currentCommunityTags.length ===
-                    selectedCommunityTags.length) &&
+                  : deprecatedCurrentCommunityTags.length ===
+                    deprecatedSelectedCommunityTags.length) &&
                 links.filter((x) => x.value).length ===
                   (community.socialLinks || []).length &&
                 links.every((x) =>
@@ -444,17 +527,16 @@ const CommunityProfileForm = () => {
                   canDisable: true,
                 });
                 setLinks(initialLinks);
+
+                // TODO: this reset state is a bit buggy for the tags section, update this
+                // when api is updated to use newer tags schema
                 if (userOnboardingEnabled) {
-                  setPreferenceTags(
-                    [...preferenceTags].map(({ item }) => ({
-                      isSelected: !!currentCommunityTags.find(
-                        (t) => t.tag === item.tag,
-                      ),
-                      item: item,
-                    })),
-                  );
+                  // this reset selected preference tags to original state
+                  updatePreferenceTags();
                 } else {
-                  setSelectedCommunityTags(currentCommunityTags);
+                  setDeprecatedSelectedCommunityTags(
+                    deprecatedCurrentCommunityTags,
+                  );
                 }
               }}
             />
