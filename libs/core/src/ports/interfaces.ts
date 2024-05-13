@@ -158,7 +158,6 @@ export enum BrokerPublications {
 }
 
 export enum BrokerSubscriptions {
-  SnapshotListener = 'SnapshotListener',
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
