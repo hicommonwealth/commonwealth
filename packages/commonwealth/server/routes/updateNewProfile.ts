@@ -21,6 +21,7 @@ type UpdateNewProfileReq = {
   avatarUrl: string;
   socials: string;
   backgroundImage: string;
+  promotionalEmailsEnabled?: boolean;
 };
 type UpdateNewProfileResp = {
   status: string;
@@ -41,8 +42,16 @@ const updateNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const { email, slug, name, website, avatarUrl, socials, backgroundImage } =
-    req.body;
+  const {
+    email,
+    slug,
+    name,
+    website,
+    avatarUrl,
+    socials,
+    backgroundImage,
+    promotionalEmailsEnabled,
+  } = req.body;
 
   let { bio } = req.body;
   bio = sanitizeQuillText(bio);
@@ -61,6 +70,9 @@ const updateNewProfile = async (
       ...(avatarUrl && { avatar_url: avatarUrl }),
       ...(socials && { socials: JSON.parse(socials) }),
       ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
+      ...(typeof promotionalEmailsEnabled === 'boolean' && {
+        promotional_emails_enabled: promotionalEmailsEnabled,
+      }),
     },
     {
       where: {

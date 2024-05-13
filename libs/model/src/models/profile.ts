@@ -16,6 +16,7 @@ export type ProfileAttributes = {
   updated_at?: Date;
   profile_name?: string;
   email?: string;
+  promotional_emails_enabled?: boolean | undefined;
   website?: string;
   bio?: string;
   avatar_url?: string;
@@ -50,6 +51,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       updated_at: { type: Sequelize.DATE, allowNull: true },
       profile_name: { type: Sequelize.STRING, allowNull: true },
       email: { type: Sequelize.STRING, allowNull: true },
+      promotional_emails_enabled: { type: Sequelize.BOOLEAN, allowNull: true },
       website: { type: Sequelize.STRING, allowNull: true },
       bio: { type: Sequelize.TEXT, allowNull: true },
       avatar_url: { type: Sequelize.STRING, allowNull: true },
