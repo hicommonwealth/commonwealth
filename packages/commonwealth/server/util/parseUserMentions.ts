@@ -184,9 +184,6 @@ export const emitMentions = async (
   data: EmitMentionsData,
 ) => {
   if (data.mentions.length) {
-    const communityId =
-      'thread' in data ? data.thread.community_id : data.comment.community_id;
-
     const values: {
       event_name: EventNames.UserMentioned;
       event_payload: z.infer<typeof events.UserMentioned>;
@@ -201,8 +198,8 @@ export const emitMentions = async (
           'comment' in data
             ? data.comment.community_id
             : data.thread.community_id,
-        comment: 'comment' in data && data.comment,
-        thread: 'thread' in data && data.thread,
+        comment: 'comment' in data ? data.comment : undefined,
+        thread: 'thread' in data ? data.thread : undefined,
       },
     }));
 
