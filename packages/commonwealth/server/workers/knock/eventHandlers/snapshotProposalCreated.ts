@@ -5,10 +5,11 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import { getSnapshotUrl, SnapshotEventType } from '@hicommonwealth/shared';
+import { SnapshotEventType } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import z from 'zod';
+import { getSnapshotUrl } from '../util';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);

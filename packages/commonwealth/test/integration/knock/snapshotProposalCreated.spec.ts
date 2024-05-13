@@ -8,12 +8,13 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { SnapshotEventType, getSnapshotUrl } from '@hicommonwealth/shared';
+import { SnapshotEventType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
+import { getSnapshotUrl } from '../../../server/workers/knock/util';
 import {
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
