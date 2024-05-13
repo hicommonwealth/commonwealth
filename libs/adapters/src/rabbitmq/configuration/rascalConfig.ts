@@ -153,11 +153,17 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.DiscordListener,
     },
-    [RascalBindings.ContestWorkerPolicy]: {
+    [RascalBindings.ContestWorkerPolicyThreadCreated]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestWorkerPolicy,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicy,
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadCreated,
+    },
+    [RascalBindings.ContestWorkerPolicyThreadUpvoted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestWorkerPolicy,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadUpvoted,
     },
     // TODO: add a binding from the MessageRelayer to NotificationsProvider queue with * binding key
   };

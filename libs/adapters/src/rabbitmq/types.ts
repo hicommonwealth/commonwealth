@@ -38,7 +38,8 @@ export enum RascalBindings {
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
-  ContestWorkerPolicy = 'ContestWorkerPolicyBinding',
+  ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
+  ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
 }
 
 export enum RascalRoutingKeys {
@@ -46,5 +47,6 @@ export enum RascalRoutingKeys {
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
-  ContestWorkerPolicy = EventNames.ThreadUpvoted,
+  ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
+  ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
 }

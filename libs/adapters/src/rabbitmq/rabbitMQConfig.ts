@@ -79,7 +79,8 @@ export function getRabbitMQConfig(
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.SnapshotListener,
       RascalBindings.ChainEvent,
-      RascalBindings.ContestWorkerPolicy,
+      RascalBindings.ContestWorkerPolicyThreadCreated,
+      RascalBindings.ContestWorkerPolicyThreadUpvoted,
       // TODO: add notifications provider binding
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
