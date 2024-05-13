@@ -9,7 +9,6 @@ import {
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import _ from 'lodash';
-import moment from 'moment';
 import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
@@ -21,6 +20,7 @@ import {
   queryMentionedUsers,
 } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
+import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -164,26 +164,11 @@ export async function __updateThread(
     isCollaborator,
   };
 
-  const now = new Date();
-
-  // update version history
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(thread.version_history[0]).body;
-  } catch (err) {
-    console.log(err);
-  }
-  if (decodeURIComponent(body) !== latestVersion) {
-    const recentEdit: any = {
-      timestamp: moment(now),
-      author: address.address,
-      body: decodeURIComponent(body),
-    };
-    const versionHistory: string = JSON.stringify(recentEdit);
-    const arr = thread.version_history;
-    arr.unshift(versionHistory);
-    thread.version_history = arr;
-  }
+  const { latestVersion, versionHistory } = addVersionHistory(
+    thread.version_history,
+    body,
+    address,
+  );
 
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
@@ -247,6 +232,19 @@ export async function __updateThread(
       },
       { transaction },
     );
+
+    if (versionHistory) {
+      // The update above doesn't work because it can't detect array changes so doesn't write it to db
+      await this.models.Thread.update(
+        {
+          version_history: versionHistory,
+        },
+        {
+          where: { id: threadId },
+          transaction,
+        },
+      );
+    }
 
     await updateThreadCollaborators(
       permissions,
@@ -327,6 +325,7 @@ export async function __updateThread(
     ],
   });
 
+  const now = new Date();
   // build notifications
   const allNotificationOptions: EmitOptions[] = [];
 

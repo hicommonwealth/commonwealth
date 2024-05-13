@@ -21,6 +21,7 @@
     "@hicommonwealth/sitemaps": "*",
     "sequelize": "^6.32.1",
     "mocha": "^10.4.0",
+    "moment": "^2.23.0",
     "tsx": "^4.7.2"
   }
 }
