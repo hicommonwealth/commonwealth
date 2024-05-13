@@ -89,6 +89,7 @@ export function getRabbitMQConfig(
       RascalSubscriptions.SnapshotListener,
       RascalSubscriptions.ChainEvent,
       RascalSubscriptions.NotificationsProvider,
+      RascalSubscriptions.ContestWorkerPolicy,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
