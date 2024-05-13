@@ -5,6 +5,7 @@ import {
   GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
+  GetSPLBalancesOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
 import {
@@ -146,6 +147,24 @@ export function makeGetBalancesOptions(
                   contractAddress: castedSource.contract_address,
                   cosmosChainId: castedSource.cosmos_chain_id,
                 },
+                addresses,
+              });
+            }
+            break;
+          }
+          case BalanceSourceType.SPL: {
+            const castedSource = requirement.data.source as ContractSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetSPLBalancesOptions;
+              return (
+                castedOpt.balanceSourceType === castedSource.source_type &&
+                castedOpt.mintAddress === castedSource.contract_address
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: castedSource.source_type as any,
+                mintAddress: castedSource.contract_address,
                 addresses,
               });
             }

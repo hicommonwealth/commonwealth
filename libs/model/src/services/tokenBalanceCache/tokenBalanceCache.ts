@@ -3,12 +3,14 @@ import { logger } from '@hicommonwealth/logging';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { getCosmosBalances, getEvmBalances } from './providers';
+import { getSolanaBalances } from './providers/getSolanaBalances';
 import {
   Balances,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
   GetErcBalanceOptions,
   GetEvmBalancesOptions,
+  GetSPLBalancesOptions,
 } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,15 +35,21 @@ export async function getBalances(
       options.balanceSourceType === BalanceSourceType.CW721
     ) {
       balances = await getCosmosBalances(options, ttl);
+    } else if (options.balanceSourceType == BalanceSourceType.SPL) {
+      balances = await getSolanaBalances(options, ttl);
     } else {
       balances = await getEvmBalances(options, ttl);
     }
   } catch (e) {
+    console.log(e);
     const chainId =
-      (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
-      (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
-    const contractAddress = (options as GetErcBalanceOptions).sourceOptions
-      .contractAddress;
+      options.balanceSourceType == BalanceSourceType.SPL
+        ? 'solana'
+        : (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
+          (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
+    const contractAddress =
+      (options as GetSPLBalancesOptions).mintAddress ||
+      (options as GetErcBalanceOptions).sourceOptions.contractAddress;
     const msg =
       `Failed to fetch balance(s) for ${options.addresses.length} address(es)` +
       `on chain ${chainId}${contractAddress && ' for contract '}${

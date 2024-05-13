@@ -7,9 +7,10 @@ const ContractSource = z.object({
     BalanceSourceType.ERC20,
     BalanceSourceType.ERC721,
     BalanceSourceType.ERC1155,
+    BalanceSourceType.SPL,
   ]),
   evm_chain_id: PG_INT,
-  contract_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
+  contract_address: z.string(),
   token_id: z
     .string()
     .regex(/^[0-9]+$/)

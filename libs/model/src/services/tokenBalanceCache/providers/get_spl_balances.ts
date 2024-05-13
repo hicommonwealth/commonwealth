@@ -1,25 +1,19 @@
 import { logger } from '@hicommonwealth/logging';
-import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { ChainNodeInstance } from 'model/src/models/chain_node';
 import { fileURLToPath } from 'url';
-import { Balances } from '../types';
+import { Balances, GetSPLBalancesOptions } from '../types';
 import { failingChainNodeError } from '../util';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-export type GetSPLBalancesOptions = {
-  chainNode: ChainNodeInstance;
-  addresses: string[];
-  mintAddress: string;
-  batchSize?: number;
-};
-
 export async function __get_spl_balances(
+  chainNode: ChainNodeInstance,
   options: GetSPLBalancesOptions,
 ): Promise<Balances> {
-  const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
+  const rpcEndpoint = chainNode.private_url || chainNode.url;
   if (options.addresses.length === 1) {
     const balances: Balances = {};
     balances[options.addresses[0]] = await getSingleSPLBalance(
@@ -94,10 +88,15 @@ async function getSingleSPLBalance(
     new PublicKey(mintAddress),
     new PublicKey(address),
   );
+  try {
+    const info = await getAccount(connection, addressATA);
 
-  const info = await connection.getTokenAccountBalance(addressATA);
-  if (info.value.uiAmount == null) {
+    if (info.amount == null) {
+      return '0';
+    }
+
+    return info.amount.toString();
+  } catch (e) {
     return '0';
   }
-  return info.value.amount;
 }

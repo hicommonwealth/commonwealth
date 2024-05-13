@@ -99,6 +99,12 @@ function _thresholdCheck(
     let chainId: string;
     let tokenId: string;
     switch (thresholdData.source.source_type) {
+      case 'spl': {
+        balanceSourceType = BalanceSourceType.SPL;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id.toString();
+        break;
+      }
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
@@ -171,6 +177,8 @@ function _thresholdCheck(
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.cosmosChainId.toString() === chainId
             );
+          case BalanceSourceType.SPL:
+            return b.options.mintAddress == contractAddress;
           default:
             return null;
         }

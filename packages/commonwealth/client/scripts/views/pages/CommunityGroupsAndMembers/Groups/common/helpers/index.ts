@@ -2,6 +2,7 @@ import app from 'state';
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
+  SPL_SPECIFICATION,
   TOKENS,
 } from '../../../common/constants';
 import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
@@ -31,7 +32,8 @@ export const makeGroupDataBaseAPIPayload = (
       x.requirementType === ERC_SPECIFICATIONS.ERC_20 ||
       x.requirementType === ERC_SPECIFICATIONS.ERC_721 ||
       x.requirementType === ERC_SPECIFICATIONS.ERC_1155 ||
-      x.requirementType === TOKENS.EVM_TOKEN
+      x.requirementType === TOKENS.EVM_TOKEN ||
+      x.requirementType === SPL_SPECIFICATION
     ) {
       payload.requirements.push({
         rule: 'threshold',
