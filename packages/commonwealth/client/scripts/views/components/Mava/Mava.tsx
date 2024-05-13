@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import { memo, useEffect, useRef } from 'react';
 import app from 'state';
 
@@ -9,8 +10,10 @@ export default memo(function Mava() {
 
   const email = app.user.email;
 
+  const mavaEnabled = useFlag('mavaEnabled');
+
   useEffect(() => {
-    if (window.Mava) {
+    if (window.Mava && mavaEnabled) {
       if (!initializedRef.current) {
         console.log('Initializing Mava');
         window.Mava.initialize();
@@ -24,7 +27,7 @@ export default memo(function Mava() {
         console.log('Identified with mava.');
       }
     }
-  }, [email]);
+  }, [email, mavaEnabled]);
 
   return null;
 });
