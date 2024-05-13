@@ -17,6 +17,7 @@
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "heroku-postbuild": "chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh",
+    "heroku-prebuild": "npm install -g node-gyp",
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
