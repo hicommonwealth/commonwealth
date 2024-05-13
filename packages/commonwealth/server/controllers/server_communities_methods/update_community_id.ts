@@ -3,8 +3,8 @@ import {
   CommunityAttributes,
   CommunityInstance,
   ModelInstance,
-  ModelStatic,
 } from '@hicommonwealth/model';
+import { type ModelStatic } from 'sequelize';
 import { z } from 'zod';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -70,26 +70,25 @@ export async function __updateCommunityId(
     //  in the long-term. Alternative is to gradually duplicate the data
     //  and then delete the old data once redirect from old to new community
     //  is enabled
-    const models: Array<ModelStatic<ModelInstance<{ community_id?: string }>>> =
-      [
-        this.models.Address,
-        this.models.Ban,
-        this.models.Comment,
-        this.models.CommunityBanner,
-        this.models.Topic,
-        this.models.Thread,
-        this.models.Notification,
-        this.models.Poll,
-        this.models.Reaction,
-        this.models.StarredCommunity,
-        this.models.Vote,
-        this.models.Webhook,
-        this.models.CommunityContract,
-        this.models.CommunityStake,
-        this.models.DiscordBotConfig,
-        this.models.Group,
-        this.models.Subscription,
-      ];
+    const models: ModelStatic<ModelInstance<{ community_id?: string }>>[] = [
+      this.models.Address,
+      this.models.Ban,
+      this.models.Comment,
+      this.models.CommunityBanner,
+      this.models.Topic,
+      this.models.Thread,
+      this.models.Notification,
+      this.models.Poll,
+      this.models.Reaction,
+      this.models.StarredCommunity,
+      this.models.Vote,
+      this.models.Webhook,
+      this.models.CommunityContract,
+      this.models.CommunityStake,
+      this.models.DiscordBotConfig,
+      this.models.Group,
+      this.models.Subscription,
+    ];
     for (const model of models) {
       await model.update(
         {

@@ -16,7 +16,8 @@ export function KnockProvider(): NotificationsProvider {
       const runId = await knock.workflows.trigger(options.key, {
         recipients: options.users,
         data: options.data,
-        actor: options.actor,
+        // TODO: disabled pending Knock support
+        // actor: options.actor,
       });
 
       return !!runId;

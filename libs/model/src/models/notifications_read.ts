@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import type { NotificationAttributes } from './notification';
 import type { SubscriptionAttributes } from './subscription';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type NotificationsReadAttributes = {
   subscription_id: number;
@@ -15,11 +15,10 @@ export type NotificationsReadAttributes = {
 export type NotificationsReadInstance =
   ModelInstance<NotificationsReadAttributes>;
 
-export type NotificationsReadModelStatic =
-  ModelStatic<NotificationsReadInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <NotificationsReadModelStatic>sequelize.define<NotificationsReadInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<NotificationsReadInstance> =>
+  sequelize.define<NotificationsReadInstance>(
     'NotificationsRead',
     {
       subscription_id: { type: Sequelize.INTEGER, primaryKey: true },

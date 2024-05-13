@@ -11,8 +11,8 @@ import {
   tokenBalanceCache,
 } from '@hicommonwealth/model';
 import moment from 'moment';
-import { fileURLToPath } from 'node:url';
 import { Op, Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
 import {
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,

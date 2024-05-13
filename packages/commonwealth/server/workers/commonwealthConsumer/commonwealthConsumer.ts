@@ -13,7 +13,7 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
