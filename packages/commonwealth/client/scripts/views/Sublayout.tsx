@@ -181,9 +181,7 @@ const Sublayout = ({
         {userOnboardingEnabled && (
           <WelcomeOnboardModal
             isOpen={isWelcomeOnboardModalOpen}
-            onClose={() =>
-              setIsWelcomeOnboardModalOpen(!isWelcomeOnboardModalOpen)
-            }
+            onClose={() => setIsWelcomeOnboardModalOpen(false)}
           />
         )}
       </div>

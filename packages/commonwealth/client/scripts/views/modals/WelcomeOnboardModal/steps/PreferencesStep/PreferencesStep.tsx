@@ -9,6 +9,7 @@ import {
 } from 'client/scripts/views/components/PreferenceTags';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import AddressInfo from 'models/AddressInfo';
 import React, { useEffect, useRef } from 'react';
 import './PreferencesStep.scss';
 
@@ -37,6 +38,23 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
           isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
         })),
       );
+      profile.addresses &&
+        app.user.setAddresses(
+          profile.addresses.map(
+            (a) =>
+              new AddressInfo({
+                address: a.address,
+                communityId: a.community_id,
+                id: a.id,
+                ghostAddress: a.ghost_address,
+                keytype: a.keytype,
+                lastActive: a.last_active,
+                profileId: a.profile_id,
+                walletId: a.wallet_id,
+                walletSsoSource: a.wallet_sso_source,
+              }),
+          ),
+        );
       initialTagsSet.current = true;
     }
   }, [profile, isLoading, setPreferenceTags]);
