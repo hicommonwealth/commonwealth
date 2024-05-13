@@ -4,7 +4,7 @@ import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
@@ -47,10 +47,10 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
-export type AddressModelStatic = ModelStatic<AddressInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <AddressModelStatic>sequelize.define<AddressInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<AddressInstance> =>
+  sequelize.define<AddressInstance>(
     'Address',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

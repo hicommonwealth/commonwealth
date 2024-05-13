@@ -1,11 +1,11 @@
 {
   "private": true,
   "keywords": [],
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
+  "type": "module",
   "workspaces": [
     "packages/commonwealth",
     "packages/discord-bot",
@@ -47,6 +47,9 @@
     "quill": "^1.3.6",
     "resolve": "^1.20.0"
   },
+  "dependencies": {
+    "extensionless": "^1.9.6"
+  },
   "devDependencies": {
     "@aave/aave-token": "^1.0.4",
     "@babel/core": "^7.2.2",
@@ -62,7 +65,7 @@
     "@canvas-js/core": "0.5.0-alpha4",
     "@hicommonwealth/eslint-plugin": "*",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
-    "@openfeature/web-sdk": "^0.4.12",
+    "@openfeature/web-sdk": "^1.0.2",
     "@openzeppelin/contracts": "^2.4.0",
     "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
     "@osmonauts/lcd": "^0.10.0",
@@ -88,7 +91,7 @@
     "@types/morgan": "^1.9.4",
     "@types/node": "^20.11.25",
     "@types/node-fetch": "2.x",
-    "@types/passport": "^1.0.5",
+    "@types/passport": "^1.0.16",
     "@types/passport-jwt": "^3.0.3",
     "@types/pg": "^8.6.1",
     "@types/pg-format": "^1.0.2",
@@ -173,8 +176,5 @@
   },
   "engines": {
     "node": "20.x"
-  },
-  "dependencies": {
-    "extensionless": "^1.9.6"
   }
 }

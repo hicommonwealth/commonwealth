@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { UserAttributes } from './user';
 
 export type StarredCommunityAttributes = {
@@ -17,10 +17,10 @@ export type StarredCommunityAttributes = {
 export type StarredCommunityInstance =
   ModelInstance<StarredCommunityAttributes>;
 
-export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <StarredCommunityModelStatic>sequelize.define<StarredCommunityInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<StarredCommunityInstance> =>
+  sequelize.define<StarredCommunityInstance>(
     'StarredCommunity',
     {
       user_id: { type: Sequelize.INTEGER, primaryKey: true },

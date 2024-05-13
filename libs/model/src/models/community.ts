@@ -9,7 +9,7 @@ import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { UserAttributes } from './user';
 
 export type CommunityAttributes = z.infer<typeof Community> & {
@@ -42,10 +42,10 @@ export type CommunityInstance = ModelInstance<CommunityAttributes> & {
   getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
-export type CommunityModelStatic = ModelStatic<CommunityInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommunityModelStatic>sequelize.define<CommunityInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityInstance> =>
+  sequelize.define<CommunityInstance>(
     // Leave this as is for now so that we don't need to alias and models can join
     // with this model using .Chain rather than .Community. Models should incrementally
     // be aliased via `as: 'Community'` until all models use Community at which point,

@@ -34,7 +34,8 @@ export const Contest = z
         }),
       )
       .describe('Contest winners, sorted from first to last')
-      .optional(),
+      .optional()
+      .nullish(),
     actions: z.array(ContestAction).optional(),
   })
   .describe('On-Chain contest instance');

@@ -1,5 +1,3 @@
-import { addressSwapper } from 'commonwealth/shared/utils';
-
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
@@ -7,6 +5,7 @@ import { chainBaseToCanvasChainId, createCanvasSessionPayload } from 'canvas';
 
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import app from 'state';
+import { addressSwapper } from '../../../../shared/utils';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import {

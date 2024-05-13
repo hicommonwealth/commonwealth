@@ -1,0 +1,19 @@
+@import '../../../../styles/shared';
+
+.PreferenceTags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .tag {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    &:focus,
+    &:focus-within {
+      margin: 0 !important;
+      border-width: 1px !important;
+    }
+  }
+}

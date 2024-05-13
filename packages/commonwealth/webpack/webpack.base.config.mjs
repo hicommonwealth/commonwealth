@@ -1,6 +1,6 @@
 import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { createRequire } from 'node:module';
+import { createRequire } from 'module';
 import path from 'path';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
@@ -101,6 +101,9 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
+    }),
+    new webpack.DefinePlugin({
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
     }),
     new webpack.DefinePlugin({
@@ -143,7 +146,8 @@ const baseConfig = {
   optimization: {
     splitChunks: {
       chunks: 'all',
-      // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
+      // TODO: Commented out packages need to be code split.
+      // Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
         ethersAsync: {
           test: /[\\/]node_modules[\\/](ethers)[\\/]/,
@@ -211,6 +215,7 @@ const baseConfig = {
     fallback: {
       fs: false,
       net: false,
+      buffer: false,
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),

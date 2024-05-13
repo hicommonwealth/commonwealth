@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CommunityContractTemplateMetadataAttributes = {
   id: number;
@@ -16,15 +16,10 @@ export type CommunityContractTemplateMetadataAttributes = {
 export type CommunityContractTemplateMetadataInstance =
   ModelInstance<CommunityContractTemplateMetadataAttributes>;
 
-export type CommunityContractTemplateMetadataStatic =
-  ModelStatic<CommunityContractTemplateMetadataInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-): CommunityContractTemplateMetadataStatic => {
-  const CommunityContractTemplateMetadata = <
-    CommunityContractTemplateMetadataStatic
-  >sequelize.define(
+): Sequelize.ModelStatic<CommunityContractTemplateMetadataInstance> =>
+  sequelize.define(
     'CommunityContractTemplateMetadata',
     {
       id: {
@@ -51,6 +46,3 @@ export default (
       updatedAt: 'updated_at',
     },
   );
-
-  return CommunityContractTemplateMetadata;
-};

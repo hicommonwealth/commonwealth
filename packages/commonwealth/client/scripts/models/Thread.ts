@@ -102,7 +102,7 @@ function processAssociatedReactions(
 }
 
 export interface VersionHistory {
-  author?: MinimumProfile;
+  author?: MinimumProfile & { profile_id: number };
   timestamp: Moment;
   body: string;
 }
