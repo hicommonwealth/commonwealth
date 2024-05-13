@@ -20,6 +20,9 @@ jobs:
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -48,7 +51,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
 
       - uses: ./.github/actions/e2e
 
@@ -82,6 +85,9 @@ jobs:
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -112,7 +118,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
 
       - uses: ./.github/actions/e2e
 
@@ -145,6 +151,9 @@ jobs:
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -173,7 +182,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
 
       - uses: ./.github/actions/e2e
 
@@ -212,7 +221,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
-          fetch-depth: '0'
 
       - name: Run linter
         env:
@@ -233,12 +241,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - 
-        name: Setup
+      - name: Setup
         uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
-          fetch-depth: '0'
 
       - name: Assert pnpm-lock.yaml is correct
         run: |
@@ -270,6 +276,9 @@ jobs:
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -304,7 +313,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
 
       # TODO: use devmode instead to avoid building
       - name: Build
@@ -327,6 +336,9 @@ jobs:
     name: EVM Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -354,7 +366,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -369,6 +381,9 @@ jobs:
     name: Cosmos Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -409,7 +424,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
 
       ## Cosmos Section:
       # We only run Cosmos devnet tests if any files in the following folders changes
