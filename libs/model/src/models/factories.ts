@@ -32,6 +32,7 @@ import NotificationsRead from './notifications_read';
 import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
+import ProfileTags from './profile_tags';
 import Reaction from './reaction';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
@@ -79,6 +80,7 @@ export const Factories = {
   Outbox,
   Poll,
   Profile,
+  ProfileTags,
   Reaction,
   SsoToken,
   StakeTransaction,

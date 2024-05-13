@@ -21,6 +21,10 @@ export const buildAssociations = (db: DB) => {
     'profile_id',
   );
 
+  db.Profile.withMany(db.ProfileTags, 'profile_id', {
+    onDelete: 'CASCADE',
+  });
+
   db.Address.withMany(db.Thread, 'address_id', {
     asOne: 'Address',
     onUpdate: 'CASCADE',
@@ -73,6 +77,10 @@ export const buildAssociations = (db: DB) => {
     .withOne(db.DiscordBotConfig, ['discord_config_id', 'community_id'], {
       onDelete: 'CASCADE',
     });
+
+  db.Tags.withMany(db.ProfileTags, 'tag_id', {
+    onDelete: 'CASCADE',
+  });
 
   db.Topic.withMany(db.Thread, 'topic_id', {
     asOne: 'topic',
