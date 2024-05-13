@@ -44,7 +44,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           component: (
             <PreferencesStep
               onComplete={() =>
-                setActiveStep(WelcomeOnboardModalSteps.Preferences)
+                setActiveStep(WelcomeOnboardModalSteps.JoinCommunity)
               }
             />
           ),

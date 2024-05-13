@@ -1,10 +1,15 @@
+import app from 'client/scripts/state';
+import {
+  useFetchSelfProfileQuery,
+  useUpdateProfileByAddressMutation,
+} from 'client/scripts/state/api/profiles';
 import {
   PreferenceTags,
   usePreferenceTags,
 } from 'client/scripts/views/components/PreferenceTags';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import './PreferencesStep.scss';
 
 type PreferencesStepProps = {
@@ -12,11 +17,40 @@ type PreferencesStepProps = {
 };
 
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
-  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags({});
+  const initialTagsSet = useRef(false);
+  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
+    usePreferenceTags({});
 
-  const handleSavePreferences = () => {
-    // TODO: save tags to api here
-    // const finalTags = preferenceTags.filter(tag => tag.isSelected)
+  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
+    useUpdateProfileByAddressMutation();
+
+  const { data: profile, isLoading } = useFetchSelfProfileQuery({
+    apiCallEnabled: true,
+  });
+
+  useEffect(() => {
+    if (!isLoading && profile && !initialTagsSet.current) {
+      const profileTags = profile.tags;
+      setPreferenceTags((tags) =>
+        [...(tags || [])].map((t) => ({
+          ...t,
+          isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
+        })),
+      );
+      initialTagsSet.current = true;
+    }
+  }, [profile, isLoading, setPreferenceTags]);
+
+  const handleSavePreferences = async () => {
+    if (isUpdatingProfile) return;
+
+    await updateProfile({
+      address: app.user.activeAccount?.profile?.address,
+      chain: app.user.activeAccount?.profile?.chain,
+      tagIds: preferenceTags
+        .filter((tag) => tag.isSelected)
+        .map((tag) => tag.item.id),
+    });
 
     onComplete();
   };
