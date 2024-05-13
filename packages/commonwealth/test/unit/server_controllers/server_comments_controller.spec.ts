@@ -519,7 +519,7 @@ describe('ServerCommentsController', () => {
     });
   });
 
-  describe.only('#updateComment', () => {
+  describe('#updateComment', () => {
     it('should update a comment', async () => {
       const data = {
         id: 123,
