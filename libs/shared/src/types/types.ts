@@ -1,5 +1,7 @@
 import { ThresholdData } from './protocol';
 
+export type Role = 'admin' | 'moderator' | 'member';
+
 export enum DefaultPage {
   Discussions = 'default_all_discussions_view',
   Overview = 'default_summary_view',
@@ -69,4 +71,18 @@ export type RoleObject = {
   permission: AccessLevel;
   allow: number;
   deny: number;
+};
+
+export enum LinkSource {
+  Snapshot = 'snapshot',
+  Proposal = 'proposal',
+  Thread = 'thread',
+  Web = 'web',
+  Template = 'template',
+}
+
+export type Link = {
+  source: LinkSource;
+  identifier: string;
+  title?: string;
 };

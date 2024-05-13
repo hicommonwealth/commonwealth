@@ -14,8 +14,8 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import { dirname } from 'node:path';
 import passport from 'passport';
+import { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import favicon from 'serve-favicon';
@@ -142,6 +142,7 @@ export async function main(
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
+    app.use('/robots.txt', express.static('robots.txt'));
     app.use('/static', express.static('static'));
 
     withLoggingMiddleware &&

@@ -1,4 +1,4 @@
-import { EventHandler, Policy, schemas } from '@hicommonwealth/core';
+import { EventHandler, Policy, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import {
@@ -7,8 +7,8 @@ import {
   SnapshotEventType,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 
@@ -105,14 +105,13 @@ export const processSnapshotProposalCreated: EventHandler<
 };
 
 const snapshotInputs = {
-  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+  SnapshotProposalCreated: events.SnapshotProposalCreated,
 };
-export const SnapshotPolicy: Policy<
-  typeof snapshotInputs,
-  ZodUndefined
-> = () => ({
-  inputs: snapshotInputs,
-  body: {
-    SnapshotProposalCreated: processSnapshotProposalCreated,
-  },
-});
+export function SnapshotPolicy(): Policy<typeof snapshotInputs, ZodUndefined> {
+  return {
+    inputs: snapshotInputs,
+    body: {
+      SnapshotProposalCreated: processSnapshotProposalCreated,
+    },
+  };
+}

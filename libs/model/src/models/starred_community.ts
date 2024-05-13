@@ -1,11 +1,10 @@
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { UserAttributes } from './user';
 
 export type StarredCommunityAttributes = {
   user_id: number;
-  id?: number;
   community_id: string;
   created_at?: Date;
   updated_at?: Date;
@@ -18,10 +17,10 @@ export type StarredCommunityAttributes = {
 export type StarredCommunityInstance =
   ModelInstance<StarredCommunityAttributes>;
 
-export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <StarredCommunityModelStatic>sequelize.define<StarredCommunityInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<StarredCommunityInstance> =>
+  sequelize.define<StarredCommunityInstance>(
     'StarredCommunity',
     {
       user_id: { type: Sequelize.INTEGER, primaryKey: true },
@@ -31,8 +30,7 @@ export default (sequelize: Sequelize.Sequelize) =>
     },
     {
       tableName: 'StarredCommunities',
+      timestamps: true,
       underscored: true,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
     },
   );

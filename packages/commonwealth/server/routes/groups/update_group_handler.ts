@@ -1,13 +1,14 @@
-import { AppError, schemas } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import { GroupAttributes, models } from '@hicommonwealth/model';
+import { GroupMetadata } from '@hicommonwealth/schemas';
 import { Requirement } from '@hicommonwealth/shared';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
-import { TypedRequest, TypedResponse, success } from '../../types';
+import { success, type TypedRequest, type TypedResponse } from '../../types';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
-  metadata: z.infer<typeof schemas.entities.GroupMetadata>;
+  metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
 };
@@ -34,6 +35,7 @@ export const updateGroupHandler = async (
         .optional(),
       requirements: z.array(z.any()).optional(), // validated in controller
       topics: z.array(z.number()).optional(),
+      allowList: z.array(z.number()).default([]),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -42,7 +44,7 @@ export const updateGroupHandler = async (
   }
   const {
     params: { id: groupId },
-    body: { metadata, requirements, topics },
+    body: { metadata, requirements, topics, allowList },
   } = validationResult.data;
 
   const { metadata: oldGroupMetadata } = await models.Group.findByPk(groupId, {
@@ -56,6 +58,7 @@ export const updateGroupHandler = async (
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
+    allowList,
   });
 
   // refresh memberships in background if requirements or

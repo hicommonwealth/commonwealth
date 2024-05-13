@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 import type { UserAttributes, UserInstance } from './user';
 
@@ -33,10 +33,10 @@ export type ProfileInstance = ModelInstance<ProfileAttributes> & {
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
 };
 
-export type ProfileModelStatic = ModelStatic<ProfileInstance>;
-
-export default (sequelize: Sequelize.Sequelize): ProfileModelStatic => {
-  const Profile = <ProfileModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ProfileInstance> =>
+  sequelize.define<ProfileInstance>(
     'Profile',
     {
       id: {
@@ -66,14 +66,3 @@ export default (sequelize: Sequelize.Sequelize): ProfileModelStatic => {
       indexes: [{ fields: ['user_id'] }],
     },
   );
-
-  Profile.associate = (models) => {
-    models.Profile.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      targetKey: 'id',
-    });
-    models.Profile.hasMany(models.Address, { foreignKey: 'profile_id' });
-  };
-
-  return Profile;
-};

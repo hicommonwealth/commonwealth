@@ -1,14 +1,15 @@
-import { schemas, stats } from '@hicommonwealth/core';
+import { EventNames, stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { IDiscordMeta } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
+import { IDiscordMeta } from '../types';
 import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
+import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes } from './community';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -27,6 +28,7 @@ export type CommentAttributes = {
   canvas_session: string;
   canvas_hash: string;
 
+  created_by: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -38,6 +40,7 @@ export type CommentAttributes = {
   Address?: AddressAttributes;
   Thread?: ThreadAttributes;
   reactions?: ReactionAttributes[];
+  subscriptions?: CommentSubscriptionAttributes[];
 
   //counts
   reaction_count: number;
@@ -46,10 +49,10 @@ export type CommentAttributes = {
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
 
-export type CommentModelStatic = ModelStatic<CommentInstance>;
-
-export default (sequelize: Sequelize.Sequelize): CommentModelStatic => {
-  const Comment = <CommentModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommentInstance> =>
+  sequelize.define<CommentInstance>(
     'Comment',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -122,7 +125,7 @@ export default (sequelize: Sequelize.Sequelize): CommentModelStatic => {
             Outbox,
             [
               {
-                event_name: schemas.EventNames.CommentCreated,
+                event_name: EventNames.CommentCreated,
                 event_payload: comment.get({ plain: true }),
               },
             ],
@@ -170,22 +173,3 @@ export default (sequelize: Sequelize.Sequelize): CommentModelStatic => {
       ],
     },
   );
-
-  Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Comment.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Comment.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      constraints: false,
-      targetKey: 'id',
-    });
-  };
-
-  return Comment;
-};

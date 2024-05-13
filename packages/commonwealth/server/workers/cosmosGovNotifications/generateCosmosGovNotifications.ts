@@ -3,7 +3,7 @@ import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import * as dotenv from 'dotenv';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,

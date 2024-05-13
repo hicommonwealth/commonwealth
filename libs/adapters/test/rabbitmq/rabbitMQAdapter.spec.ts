@@ -2,9 +2,10 @@ import {
   BrokerPublications,
   BrokerSubscriptions,
   EventContext,
+  Events,
   InvalidInput,
   Policy,
-  schemas,
+  events,
 } from '@hicommonwealth/core';
 import type { ILogger } from '@hicommonwealth/logging';
 import { delay } from '@hicommonwealth/shared';
@@ -17,21 +18,23 @@ const expect = chai.expect;
 
 const idInput = '123';
 let idOutput: string | undefined;
-const eventName: schemas.Events = 'SnapshotProposalCreated';
+const eventName: Events = 'SnapshotProposalCreated';
 
 const inputs = {
-  SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+  SnapshotProposalCreated: events.SnapshotProposalCreated,
 };
 
-const Snapshot: Policy<typeof inputs> = () => ({
-  inputs,
-  body: {
-    SnapshotProposalCreated: async ({ payload }) => {
-      const { id } = payload;
-      idOutput = id;
+function Snapshot(): Policy<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      SnapshotProposalCreated: async ({ payload }) => {
+        const { id } = payload;
+        idOutput = id;
+      },
     },
-  },
-});
+  };
+}
 
 describe('RabbitMQ', () => {
   let rmqAdapter: RabbitMQAdapter;
@@ -165,17 +168,19 @@ describe('RabbitMQ', () => {
     it('should execute a retry strategy if the payload schema is invalid', async () => {
       let shouldNotExecute = true;
       const inputs = {
-        SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
+        SnapshotProposalCreated: events.SnapshotProposalCreated,
       };
 
-      const FailingSnapshot: Policy<typeof inputs> = () => ({
-        inputs,
-        body: {
-          SnapshotProposalCreated: async () => {
-            shouldNotExecute = false;
+      function FailingSnapshot(): Policy<typeof inputs> {
+        return {
+          inputs,
+          body: {
+            SnapshotProposalCreated: async () => {
+              shouldNotExecute = false;
+            },
           },
-        },
-      });
+        };
+      }
 
       let retryExecuted;
       const subRes = await rmqAdapter.subscribe(

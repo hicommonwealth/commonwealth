@@ -1,14 +1,14 @@
-import { schemas } from '@hicommonwealth/core';
+import { CONTEST_ACTIONS, ContestAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-type ContestAction = ModelInstance<
-  z.infer<typeof schemas.projections.ContestAction>
->;
+type ContestAction = ModelInstance<z.infer<typeof ContestAction>>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <ModelStatic<ContestAction>>sequelize.define<ContestAction>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ContestAction> =>
+  sequelize.define<ContestAction>(
     'ContestAction',
     {
       contest_address: {
@@ -28,7 +28,7 @@ export default (sequelize: Sequelize.Sequelize) =>
         primaryKey: true,
       },
       action: {
-        type: Sequelize.ENUM(...schemas.projections.CONTEST_ACTIONS),
+        type: Sequelize.ENUM(...CONTEST_ACTIONS),
         primaryKey: true,
       },
       content_url: {

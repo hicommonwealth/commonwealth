@@ -7,8 +7,12 @@
   "files": [
     "build"
   ],
-  "main": "build/index.js",
-  "types": "src/index",
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
@@ -23,11 +27,14 @@
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
     "express": "^4.18.2",
+    "dotenv": "^16.0.3",
     "hot-shots": "^9",
     "mixpanel": "^0.14.0",
+    "moment": "^2.23.0",
     "node-fetch": "2",
-    "passport": "^0.4.0",
+    "passport": "^0.7.0",
     "pg": "^8.11.3",
+    "openapi-types": "=12.1.3",
     "rascal": "^14.4.5",
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
@@ -37,6 +44,13 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/express-serve-static-core": "^4.19.0",
+    "@types/qs": "^6.9.14",
+    "@types/sinon": "^17.0.3",
+    "@types/superagent": "4.1.13",
+    "sinon": "^17.0.2",
+    "superagent": "^5.2.2",
     "tsx": "^4.7.2"
   }
 }
