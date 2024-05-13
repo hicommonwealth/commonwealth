@@ -1,10 +1,14 @@
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import {
   createAsyncWriterS3,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 const log = logger(__filename);
 
 async function doExec() {
@@ -19,6 +23,8 @@ async function doExec() {
     // URLs and that might be very destructive to our SEO
     throw new Error('Must run with NODE_ENV=production');
   }
+
+  stats(HotShotsStats()).increment('cw.scheduler.email-digest');
 
   log.info('Creating writer... ');
   const writer = createAsyncWriterS3();
