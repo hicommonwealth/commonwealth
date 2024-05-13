@@ -553,12 +553,12 @@ describe('ServerCommentsController', () => {
           update: () => (data.text = 'Hello'),
         },
         sequelize: {
-          transaction: async (callback?: () => any) => {
+          transaction: (callback?: () => Promise<void>) => {
             if (callback) return callback();
             else
               return {
-                rollback: async () => ({}),
-                commit: async () => ({}),
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
               };
           },
         },
@@ -640,12 +640,12 @@ describe('ServerCommentsController', () => {
           update: () => null,
         },
         sequelize: {
-          transaction: async (callback?: () => any) => {
+          transaction: (callback?: () => Promise<void>) => {
             if (callback) return callback();
             else
               return {
-                rollback: async () => ({}),
-                commit: async () => ({}),
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
               };
           },
         },
@@ -700,12 +700,12 @@ describe('ServerCommentsController', () => {
           findOne: async () => null,
         },
         sequelize: {
-          transaction: async (callback?: () => any) => {
+          transaction: (callback?: () => Promise<void>) => {
             if (callback) return callback();
             else
               return {
-                rollback: async () => ({}),
-                commit: async () => ({}),
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
               };
           },
         },

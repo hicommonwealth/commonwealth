@@ -69,7 +69,7 @@ describe('userMentioned Event Handler', () => {
     });
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
 

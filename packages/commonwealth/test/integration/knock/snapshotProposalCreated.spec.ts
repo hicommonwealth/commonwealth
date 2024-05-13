@@ -53,7 +53,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     await models.CommunityAlert.truncate();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
 
