@@ -82,10 +82,6 @@ const useJoinCommunity = () => {
     } else {
       setIsAuthModalOpen(true);
     }
-
-    await toggleCommunityStar({
-      community: activeCommunityId,
-    });
   };
 
   // Handles linking the specified address to the specified community
