@@ -38,6 +38,7 @@ import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
 import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
+import Tags from './tags';
 import Template from './template';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
@@ -83,6 +84,7 @@ export const Factories = {
   StakeTransaction,
   StarredCommunity,
   Subscription,
+  Tags,
   SubscriptionPreference,
   Template,
   Thread,
