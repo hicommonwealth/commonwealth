@@ -16,13 +16,12 @@ export default memo(function Mava() {
         window.Mava.initialize();
         initializedRef.current = true;
       }
-
-      console.log('Identify with mava: ' + email);
-
       if (email && email !== '') {
         window.Mava.identify({
           emailAddress: email,
         });
+
+        console.log('Identified with mava.');
       }
     }
   }, [email]);
