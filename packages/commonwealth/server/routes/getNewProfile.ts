@@ -5,8 +5,10 @@ import type {
   ProfileInstance,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import { Tag } from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import z from 'zod';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -25,6 +27,7 @@ type GetNewProfileResp = {
   comments: CommentAttributes[];
   commentThreads: ThreadAttributes[];
   isOwner: boolean;
+  tags: z.infer<typeof Tag>[];
 };
 
 const getNewProfile = async (
@@ -108,6 +111,17 @@ const getNewProfile = async (
     },
   });
 
+  const profileTags = await models.ProfileTags.findAll({
+    where: {
+      profile_id: profileId || profile.id,
+    },
+    include: [
+      {
+        model: models.Tags,
+      },
+    ],
+  });
+
   return success(res, {
     profile,
     addresses: addresses.map((a) => a.toJSON()),
@@ -115,6 +129,7 @@ const getNewProfile = async (
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
     isOwner: req.user?.id === profile.user_id,
+    tags: profileTags.map((t) => t.toJSON()).map((t) => (t as any).Tag),
   });
 };
 
