@@ -54,14 +54,14 @@ const PersonalInformationStep = ({
         formMethodsRef.current.setValue('username', defaultSSOUsername, {
           shouldDirty: true,
         });
-        formMethodsRef.current.trigger('username');
+        formMethodsRef.current.trigger('username').catch(console.error);
       }
 
       if (app?.user?.email) {
         formMethodsRef.current.setValue('email', app.user.email, {
           shouldDirty: true,
         });
-        formMethodsRef.current.trigger('email');
+        formMethodsRef.current.trigger('email').catch(console.error);
         setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
       }
     }
@@ -91,7 +91,7 @@ const PersonalInformationStep = ({
     formMethodsRef.current.setValue('username', randomUsername, {
       shouldDirty: true,
     });
-    formMethodsRef.current.trigger('username');
+    formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
   };
 
