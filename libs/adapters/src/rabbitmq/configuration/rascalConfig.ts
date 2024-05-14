@@ -147,7 +147,12 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.DiscordListener,
     },
-    // TODO: add a binding from the MessageRelayer to NotificationsProvider queue with * binding key
+    [RascalBindings.NotificationsProvider]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProvider,
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
