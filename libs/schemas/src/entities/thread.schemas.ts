@@ -56,7 +56,7 @@ export const Comment = z.object({
   plaintext: z.string(),
   id: PG_INT.optional(),
   community_id: z.string(),
-  parent_id: z.string().optional(),
+  parent_id: z.string().nullish(),
   version_history: z.array(z.string()).optional(),
 
   canvas_action: z.string(),
@@ -77,7 +77,7 @@ export const Comment = z.object({
       channel_id: z.string(),
       message_id: z.string(),
     })
-    .optional(),
+    .nullish(),
 
   reaction_count: PG_INT,
   reaction_weights_sum: PG_INT.optional(),

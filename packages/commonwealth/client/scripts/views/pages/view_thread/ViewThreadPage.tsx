@@ -117,6 +117,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = data?.[0];
+  const [threadBody, setThreadBody] = useState(thread?.body);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -538,6 +539,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsEditingBody(false);
           }}
           hasPendingEdits={!!editsToSave}
+          setThreadBody={setThreadBody}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {isEditingBody ? (
@@ -561,7 +563,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               ) : (
                 <>
-                  <QuillRenderer doc={thread.body} cutoffLines={50} />
+                  <QuillRenderer
+                    doc={threadBody ?? thread?.body}
+                    cutoffLines={50}
+                  />
                   {showLinkedTemplateOptions &&
                     linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
                       <ViewTemplate

@@ -1,0 +1,13 @@
+.KnockNotifications svg {
+  color: rgb(117, 117, 117);
+  fill: rgb(255, 255, 255) !important;
+}
+
+.KnockNotifications .rnf-notification-feed__knock-branding {
+  display: none;
+}
+
+.KnockNotifications button:focus,
+.KnockNotifications select:focus {
+  outline: none;
+}

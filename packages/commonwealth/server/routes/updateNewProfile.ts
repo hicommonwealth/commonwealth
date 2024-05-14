@@ -2,6 +2,7 @@ import type { DB } from '@hicommonwealth/model';
 import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
+import { updateTags } from 'server/util/updateTags';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -10,6 +11,7 @@ export const Errors = {
   NoProfileFound: 'No profile found',
   UsernameAlreadyExists: 'Username already exists',
   NoProfileIdProvided: 'No profile id provided in query',
+  InvalidTagIds: 'Some tag ids are invalid',
 };
 
 type UpdateNewProfileReq = {
@@ -21,6 +23,7 @@ type UpdateNewProfileReq = {
   avatarUrl: string;
   socials: string;
   backgroundImage: string;
+  tag_ids?: number[];
 };
 type UpdateNewProfileResp = {
   status: string;
@@ -41,8 +44,16 @@ const updateNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const { email, slug, name, website, avatarUrl, socials, backgroundImage } =
-    req.body;
+  const {
+    email,
+    slug,
+    name,
+    website,
+    avatarUrl,
+    socials,
+    backgroundImage,
+    tag_ids,
+  } = req.body;
 
   let { bio } = req.body;
   bio = sanitizeQuillText(bio);
@@ -69,6 +80,8 @@ const updateNewProfile = async (
       returning: true,
     },
   );
+
+  await updateTags(tag_ids, models, profile.id, 'profile_id');
 
   if (!updateStatus || !rows) {
     return failure(res.status(400), {
