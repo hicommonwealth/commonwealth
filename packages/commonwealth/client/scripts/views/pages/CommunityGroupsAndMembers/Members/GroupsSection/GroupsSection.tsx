@@ -5,6 +5,7 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import MinimumProfile from '../../../../../models/MinimumProfile';
 import { useFetchProfilesByAddressesQuery } from '../../../../../state/api/profiles/index';
 import { chainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
@@ -35,6 +36,10 @@ const GroupsSection = ({
     profileChainIds: [app.activeChainId()],
     apiCallEnabled: profileAddresses.length > 0,
   });
+
+  const profileMap = new Map<string, MinimumProfile>(
+    profiles?.map((p) => [p.address, p]),
+  );
 
   return (
     <section className="GroupsSection">
@@ -94,6 +99,7 @@ const GroupsSection = ({
                   requirementCondition: 'More than', // hardcoded in api
                 }))}
               requirementsToFulfill={
+                !group.requirementsToFulfill ||
                 group.requirementsToFulfill === group.requirements.length
                   ? 'ALL'
                   : group.requirementsToFulfill
@@ -101,7 +107,7 @@ const GroupsSection = ({
               allowLists={
                 group.requirements.find((r) => r.rule === 'allow').data.allow
               }
-              profiles={profiles}
+              profiles={profileMap}
               isJoined={group.isJoined}
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,

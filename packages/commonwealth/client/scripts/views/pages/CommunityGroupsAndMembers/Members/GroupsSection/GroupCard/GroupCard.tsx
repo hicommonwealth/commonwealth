@@ -1,9 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import MinimumProfile from '../../../../../../models/MinimumProfile';
+import { Avatar } from '../../../../../components/Avatar/index';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 
@@ -22,11 +24,11 @@ type GroupCardProps = {
   groupDescription?: string;
   requirements?: RequirementCardProps[]; // This represents erc requirements
   requirementsToFulfill: 'ALL' | number;
-  allowLists?: number[];
+  allowLists?: string[];
   topics: { id: number; name: string }[];
   canEdit?: boolean;
   onEditClick?: () => any;
-  profiles?: MinimumProfile[];
+  profiles?: Map<string, MinimumProfile>;
 };
 
 const GroupCard = ({
@@ -41,7 +43,7 @@ const GroupCard = ({
   onEditClick = () => {},
   profiles,
 }: GroupCardProps) => {
-  console.log(allowLists);
+  console.log(profiles);
   return (
     <section className="GroupCard">
       {/* Join status */}
@@ -77,12 +79,53 @@ const GroupCard = ({
         <RequirementCard key={index} {...r} />
       ))}
 
-      {/* Allow list */}
-      <CWText type="h5">Allow List</CWText>
-      <CWText type="b2">
-        These users are added directly to the group and may bypass additional
-        requirements
-      </CWText>
+      {allowLists && (
+        <>
+          <CWText type="h5">Allow List</CWText>
+          <CWText type="b2">
+            These users are added directly to the group and may bypass
+            additional requirements
+          </CWText>
+          <div className="allowlist-table">
+            <table className="table-spacing">
+              <thead>
+                <tr className="column-header">
+                  <th>
+                    <CWText type="b2">Username</CWText>
+                  </th>
+                  <th>
+                    <CWText type="b2">Address</CWText>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {allowLists.map((address, index) => (
+                  <tr key={index}>
+                    <Link
+                      to={`/profile/id/${profiles.get(address)?.id}`}
+                      className="user-info"
+                    >
+                      <Avatar
+                        url={profiles.get(address)?.avatarUrl}
+                        size={24}
+                        address={profiles.get(address)?.id}
+                      />
+                      <CWText type="b2">
+                        {profiles.get(address)?.name ?? 'undefined'}
+                      </CWText>
+                    </Link>
+                    <td>
+                      <CWText type="b2">
+                        {profiles.get(address)?.address ?? 'error'}
+                      </CWText>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       {/* Gated topics */}
       {topics.length > 0 && (

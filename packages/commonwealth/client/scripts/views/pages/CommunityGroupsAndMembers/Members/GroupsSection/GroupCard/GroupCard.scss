@@ -41,6 +41,31 @@
     }
   }
 
+  .allowlist-table {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .table-spacing {
+      border-spacing: 0 20px;
+      margin-top: -30px;
+    }
+
+    .user-info {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: black;
+
+      :hover,
+      :focus,
+      :visited {
+        text-decoration: underline;
+      }
+    }
+  }
+
   .gating-tags {
     display: flex;
     flex-wrap: wrap;
