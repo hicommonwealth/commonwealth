@@ -3374,7 +3374,7 @@
     phoenix "1.6.16"
     zustand "^3.7.2"
 
-"@knocklabs/node@^0.6.11":
+"@knocklabs/node@^0.6.10", "@knocklabs/node@^0.6.11":
   version "0.6.11"
   resolved "https://registry.yarnpkg.com/@knocklabs/node/-/node-0.6.11.tgz#dbae6602ba7861a0f5605a154664e08a000aad4a"
   integrity sha512-eCln5vHE/QTonDAK13ci5RCJ9el5snq/NQeAAmbVyZI7CsrHPUGW2sEOH6D9z/HyEKYki2sUHbTC0xG383EMhg==
