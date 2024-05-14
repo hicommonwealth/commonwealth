@@ -81,7 +81,10 @@ export function getRabbitMQConfig(
       RascalBindings.ChainEvent,
       RascalBindings.ContestWorkerPolicyThreadCreated,
       RascalBindings.ContestWorkerPolicyThreadUpvoted,
-      RascalBindings.NotificationsProvider,
+      RascalBindings.NotificationsProviderCommentCreated,
+      RascalBindings.NotificationsProviderChainEventCreated,
+      RascalBindings.NotificationsProviderSnapshotProposalCreated,
+      RascalBindings.NotificationsProviderUserMentioned,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
