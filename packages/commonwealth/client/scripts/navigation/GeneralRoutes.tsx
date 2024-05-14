@@ -1,10 +1,10 @@
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
-
 const TermsPage = lazy(() => import('views/pages/terms'));
 const OldTermsPage = lazy(() => import('views/pages/old_terms'));
 const PrivacyPage = lazy(() => import('views/pages/privacy'));
+
 const ComponentsShowcasePage = lazy(
   () => import('views/pages/ComponentsShowcase'),
 );

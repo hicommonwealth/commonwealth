@@ -25,6 +25,7 @@ import type {
   ICosmosProposalTally,
 } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import Long from 'long';
 import Cosmos from '../../adapter';
 import { CosmosApiType } from '../../chain';
 import CosmosGovernance from './governance-v1beta1';
@@ -227,7 +228,7 @@ export const encodeMsgSubmitProposal = (
 
 export const encodeMsgVote = (
   voter: string,
-  proposalId: number | Long | string,
+  proposalId: number | Long.Long | string,
   option: number,
 ): MsgVoteEncodeObject => {
   return {
