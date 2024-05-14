@@ -82,7 +82,7 @@ const CommunityProfileForm = () => {
     preferenceTags,
     setPreferenceTags,
     toggleTagFromSelection,
-  } = usePreferenceTags({});
+  } = usePreferenceTags();
 
   const updatePreferenceTags = useCallback(() => {
     const isOlderTagSelected = (tag: string, name: string) => {

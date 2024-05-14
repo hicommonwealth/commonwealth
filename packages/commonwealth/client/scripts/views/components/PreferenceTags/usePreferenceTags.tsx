@@ -1,10 +1,8 @@
 import { useFetchTagsQuery } from 'client/scripts/state/api/tags';
 import { useEffect, useRef, useState } from 'react';
-import { PreferenceTagsHookProps, SelectedTag, Tag } from './types';
+import { SelectedTag, Tag } from './types';
 
-const usePreferenceTags = ({
-  initialSelectedTag = [],
-}: PreferenceTagsHookProps) => {
+const usePreferenceTags = () => {
   const isInitialTagsSet = useRef(false);
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
 
@@ -18,12 +16,12 @@ const usePreferenceTags = ({
             id: item.id,
             tag: item.name,
           },
-          isSelected: !!initialSelectedTag.find((x) => x.tag === item.name),
+          isSelected: false,
         })),
       );
       isInitialTagsSet.current = true;
     }
-  }, [tags, isLoadingTags, initialSelectedTag]);
+  }, [tags, isLoadingTags]);
 
   const toggleTagFromSelection = (item: Tag, isSelected: boolean) => {
     const updatedTags = [...preferenceTags];

@@ -19,7 +19,7 @@ type PreferencesStepProps = {
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
   const initialTagsSet = useRef(false);
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
-    usePreferenceTags({});
+    usePreferenceTags();
 
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();

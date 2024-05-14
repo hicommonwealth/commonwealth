@@ -68,7 +68,7 @@ const EditProfileComponent = () => {
   });
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
-    usePreferenceTags({});
+    usePreferenceTags();
 
   const getProfile = useCallback(async () => {
     try {

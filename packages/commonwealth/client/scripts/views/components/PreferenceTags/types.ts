@@ -14,7 +14,3 @@ export type PreferenceTagsProps = {
   containerClassName?: string;
   maxSelectableTags?: number;
 };
-
-export type PreferenceTagsHookProps = {
-  initialSelectedTag?: Tag[];
-};
