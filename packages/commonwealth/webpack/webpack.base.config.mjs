@@ -30,8 +30,13 @@ const baseConfig = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
+      'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
+        process.env.KNOCK_PUBLIC_API_KEY,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
+        process.env.KNOCK_IN_APP_FEED_ID,
       ),
     }),
     new webpack.DefinePlugin({
@@ -114,6 +119,11 @@ const baseConfig = {
     new webpack.DefinePlugin({
       'process.env.HEROKU_APP_NAME': JSON.stringify(
         process.env.HEROKU_APP_NAME,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS': JSON.stringify(
+        process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
       ),
     }),
     new HtmlWebpackPlugin({

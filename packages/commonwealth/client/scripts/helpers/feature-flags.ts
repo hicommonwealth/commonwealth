@@ -14,10 +14,12 @@ const buildFlag = (env: string) => {
       off: false,
     },
     disabled: false,
-    defaultVariant: env === 'true' ? 'on' : 'off',
+    defaultVariant: env === 'true' || env === 'on' ? 'on' : 'off',
   };
 };
 
+// WARN: for frontend work you MUST define these feature flags in
+// webpack.base.config.mjs or they won't be passed to the frontend.
 const featureFlags = {
   allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
   contest: buildFlag(process.env.FLAG_CONTEST),
@@ -28,6 +30,9 @@ const featureFlags = {
     process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
   ),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
+  knockInAppNotifications: buildFlag(
+    process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+  ),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
