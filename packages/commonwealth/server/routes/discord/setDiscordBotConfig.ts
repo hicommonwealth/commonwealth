@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
-import { Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { validateCommunity } from '../../middleware/validateCommunity';
 import type { TypedRequestBody, TypedResponse } from '../../types';
@@ -92,7 +91,6 @@ const setDiscordBotConfig = async (
     where: { id: community_id },
   });
 
-  let transaction: Transaction;
   if (
     existingCommunityWithGuildConnected &&
     existingCommunityWithGuildConnected.length > 0
@@ -115,8 +113,9 @@ const setDiscordBotConfig = async (
     );
 
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
-  } else {
-    transaction = await models.sequelize.transaction();
+  }
+
+  await models.sequelize.transaction(async (transaction) => {
     const profile = await models.Profile.findOne({
       where: {
         profile_name: 'Discord Bot',
@@ -148,9 +147,7 @@ const setDiscordBotConfig = async (
 
     communityInstance.discord_config_id = configEntry.id;
     await communityInstance.save({ transaction });
-  }
 
-  try {
     await configEntry.update(
       {
         community_id,
@@ -166,17 +163,12 @@ const setDiscordBotConfig = async (
         transaction,
       },
     );
+  });
 
-    await transaction.commit();
-    return success(res, {
-      message: 'created a new discord bot config',
-      discordConfigId: communityInstance.discord_config_id,
-    });
-  } catch (e) {
-    await transaction.rollback();
-    console.log(e);
-    throw new AppError(SetDiscordBotConfigErrors.Error);
-  }
+  return success(res, {
+    message: 'created a new discord bot config',
+    discordConfigId: communityInstance.discord_config_id,
+  });
 };
 
 export default setDiscordBotConfig;
