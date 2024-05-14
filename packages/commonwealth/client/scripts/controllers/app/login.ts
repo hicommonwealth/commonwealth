@@ -229,9 +229,11 @@ export async function updateActiveAddresses({
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
+    app.user.setId(0);
     app.user.setEmail(null);
     app.user.setEmailInterval(null);
     app.user.setEmailVerified(null);
+    app.user.setKnockJWT(null);
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
@@ -242,9 +244,11 @@ export function updateActiveUser(data) {
     app.user.setActiveAccounts([]);
     app.user.ephemerallySetActiveAccount(null);
   } else {
+    app.user.setId(data.id);
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
+    app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 
     app.user.setAddresses(

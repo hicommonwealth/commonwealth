@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { EventEmitter } from 'events';
-
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -12,6 +10,7 @@ import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import axios from 'axios';
+import { EventEmitter } from 'events';
 import NotificationsController from './notifications';
 
 export class UserController {
@@ -24,6 +23,15 @@ export class UserController {
 
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
+  }
+
+  private _id: number;
+  public get id(): number {
+    return this._id;
+  }
+
+  public setId(id: number): void {
+    this._id = id;
   }
 
   private _email: string;
@@ -51,6 +59,15 @@ export class UserController {
 
   private _setEmailVerified(emailVerified: boolean): void {
     this._emailVerified = emailVerified;
+  }
+
+  private _knockJWT: string;
+  public get knockJWT(): string {
+    return this._knockJWT;
+  }
+
+  private _setKnockJWT(knockJWT: string): void {
+    this._knockJWT = knockJWT;
   }
 
   private _jwt: string;
@@ -183,6 +200,10 @@ export class UserController {
 
   public setEmailVerified(verified: boolean): void {
     this._setEmailVerified(verified);
+  }
+
+  public setKnockJWT(knockJWT: string): void {
+    this._setKnockJWT(knockJWT);
   }
 
   public setJWT(JWT: string): void {

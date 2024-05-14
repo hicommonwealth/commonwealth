@@ -5,14 +5,14 @@ import './PreferenceTags.scss';
 import { PreferenceTagsProps } from './types';
 
 const PreferenceTags = ({
-  selectedTags,
+  preferenceTags,
   onTagClick,
   containerClassName,
   maxSelectableTags,
 }: PreferenceTagsProps) => {
   return (
     <div className={clsx('PreferenceTags', containerClassName)}>
-      {selectedTags.map(({ item, isSelected }) => (
+      {preferenceTags.map(({ item, isSelected }) => (
         <CWButton
           key={`${item.id}-${isSelected}`}
           label={item.tag}
@@ -22,10 +22,10 @@ const PreferenceTags = ({
           containerClassName={clsx('tag', { isSelected })}
           onClick={() => onTagClick(item, !isSelected)}
           disabled={
-            maxSelectableTags === selectedTags.length &&
-            !!selectedTags.find(
-              (selectedTag) => selectedTag.item.tag === item.tag,
-            )
+            isSelected
+              ? false
+              : maxSelectableTags ===
+                preferenceTags.filter((t) => t.isSelected).length
           }
           buttonHeight="sm"
         />

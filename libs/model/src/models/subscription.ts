@@ -11,7 +11,7 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { UserAttributes } from './user';
 
 export enum SubscriptionValidationErrors {
@@ -45,14 +45,13 @@ export type SubscriptionAttributes = {
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
-};
-
-export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
   emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <SubscriptionModelStatic>sequelize.define<SubscriptionInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<SubscriptionInstance> =>
+  sequelize.define<SubscriptionInstance>(
     'Subscription',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },

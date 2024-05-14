@@ -33,6 +33,7 @@ export type UpdateGroupOptions = {
   metadata?: z.infer<typeof GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
+  allowList?: number[];
 };
 
 export type UpdateGroupResult = [GroupAttributes, TrackOptions];

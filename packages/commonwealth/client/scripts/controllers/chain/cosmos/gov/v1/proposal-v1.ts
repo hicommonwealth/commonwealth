@@ -13,6 +13,7 @@ import type {
   CosmosVoteChoice,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
+import Long from 'long';
 import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';
 import {
@@ -149,7 +150,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async fetchDeposits(): Promise<QueryDepositsResponseSDKType> {
-    const proposalId = longify(this.data.identifier);
+    const proposalId = longify(this.data.identifier) as Long;
     const deposits = await this._Chain.lcd.cosmos.gov.v1.deposits({
       proposalId,
     });
@@ -158,7 +159,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
-    const proposalId = longify(this.data.identifier);
+    const proposalId = longify(this.data.identifier) as Long;
     const tally = await this._Chain.lcd.cosmos.gov.v1.tallyResult({
       proposalId,
     });
@@ -167,7 +168,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
-    const proposalId = longify(this.data.identifier);
+    const proposalId = longify(this.data.identifier) as Long;
     const votes = await this._Chain.lcd.cosmos.gov.v1.votes({ proposalId });
     this.setVotes(votes);
     return votes;

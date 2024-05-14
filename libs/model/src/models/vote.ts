@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import type { PollAttributes } from './poll';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type VoteAttributes = {
   poll_id: number;
@@ -18,10 +18,10 @@ export type VoteAttributes = {
 
 export type VoteInstance = ModelInstance<VoteAttributes>;
 
-export type VoteModelStatic = ModelStatic<VoteInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <VoteModelStatic>sequelize.define<VoteInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<VoteInstance> =>
+  sequelize.define<VoteInstance>(
     'Vote',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

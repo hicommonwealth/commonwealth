@@ -23,6 +23,8 @@
     "@hicommonwealth/core": "*",
     "@hicommonwealth/model": "*",
     "@hicommonwealth/shared": "*",
-    "aws-sdk": "^2.814.0"
+    "aws-sdk": "^2.814.0",
+    "moment": "^2.23.0",
+    "sequelize": "^6.32.1"
   }
 }

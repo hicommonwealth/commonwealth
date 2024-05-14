@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 import type { UserAttributes, UserInstance } from './user';
 
@@ -33,10 +33,10 @@ export type ProfileInstance = ModelInstance<ProfileAttributes> & {
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
 };
 
-export type ProfileModelStatic = ModelStatic<ProfileInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <ProfileModelStatic>sequelize.define<ProfileInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ProfileInstance> =>
+  sequelize.define<ProfileInstance>(
     'Profile',
     {
       id: {

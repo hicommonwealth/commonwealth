@@ -4,7 +4,7 @@ import AddressInfo from 'client/scripts/models/AddressInfo';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 
-const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes
+const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
 const fetchSelfProfile = async () => {
   const response = await axios.get(
@@ -38,14 +38,40 @@ const fetchSelfProfile = async () => {
 
 interface UseFetchSelfProfileQuery {
   apiCallEnabled?: boolean;
+  updateAddressesOnSuccess?: boolean;
 }
 const useFetchSelfProfileQuery = ({
   apiCallEnabled = true,
+  updateAddressesOnSuccess = false,
 }: UseFetchSelfProfileQuery) => {
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_PROFILES],
     queryFn: fetchSelfProfile,
-    staleTime: PROFILES_STALE_TIME,
+    onSuccess: (profile) => {
+      if (
+        updateAddressesOnSuccess &&
+        profile?.addresses &&
+        profile?.addresses?.length > 0
+      ) {
+        app.user.setAddresses(
+          profile.addresses.map(
+            (a) =>
+              new AddressInfo({
+                id: a?.id,
+                walletId: a?.wallet_id,
+                profileId: a?.profile_id,
+                communityId: a?.community_id,
+                keytype: a?.keytype,
+                address: a?.address,
+                ghostAddress: a?.ghost_address,
+                lastActive: a?.last_active,
+                walletSsoSource: a?.wallet_sso_source,
+              }),
+          ),
+        );
+      }
+    },
+    staleTime: PROFILE_STALE_TIME,
     enabled: apiCallEnabled,
   });
 };
