@@ -62,23 +62,24 @@ const FundContestDrawer = ({
     setAmountEth(e.target.value);
   };
 
-  const handleTransferFunds = async () => {
-    try {
-      setFundContestDrawerStep('Loading');
+  const handleTransferFunds = () => {
+    setFundContestDrawerStep('Loading');
 
-      const tx = await fundContest({
-        contestAddress,
-        ethChainId,
-        chainRpc,
-        amount: Number(amountEth),
-        walletAddress: selectedAddress.value,
+    fundContest({
+      contestAddress,
+      ethChainId,
+      chainRpc,
+      amount: Number(amountEth),
+      walletAddress: selectedAddress.value,
+    })
+      .then((tx) => {
+        setFundContestDrawerStep('Success');
+        setTxHash(tx.transactionHash as string);
+      })
+      .catch((err) => {
+        console.log('Failed to fund contest', err);
+        setFundContestDrawerStep('Failure');
       });
-
-      setFundContestDrawerStep('Success');
-      setTxHash(tx.transactionHash as string);
-    } catch (err) {
-      setFundContestDrawerStep('Failure');
-    }
   };
 
   const handleClose = () => {

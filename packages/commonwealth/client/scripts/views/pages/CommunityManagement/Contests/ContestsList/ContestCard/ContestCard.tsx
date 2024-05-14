@@ -45,15 +45,13 @@ const ContestCard = ({
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
 
-  const handleCancel = async () => {
-    try {
-      await cancelContest({
-        contest_address: address,
-        id: app.activeChainId(),
-      });
-    } catch (error) {
+  const handleCancel = () => {
+    cancelContest({
+      contest_address: address,
+      id: app.activeChainId(),
+    }).catch((error) => {
       console.error('Failed to cancel contest: ', error);
-    }
+    });
   };
 
   const handleCancelContest = () => {

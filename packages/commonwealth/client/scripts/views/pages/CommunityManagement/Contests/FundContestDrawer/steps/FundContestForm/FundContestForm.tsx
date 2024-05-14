@@ -38,7 +38,7 @@ interface FundContestFormProps {
   amountEthInUsd: string;
   newContestBalanceInEth: string;
   newContestBalanceInUsd: string;
-  handleTransferFunds: () => Promise<void>;
+  handleTransferFunds: () => void;
 }
 
 const FundContestForm = ({

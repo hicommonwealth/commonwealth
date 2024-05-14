@@ -157,6 +157,7 @@ const SignTransactionsStep = ({
           disabled:
             launchContestData.state === 'loading' ||
             launchContestData.state === 'completed',
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick: signTransaction,
         },
       },
