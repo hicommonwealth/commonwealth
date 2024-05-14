@@ -55,7 +55,7 @@ export async function __getCommunities(
     community: {
       ...c.toJSON(),
       CommunityTags: (c.toJSON().CommunityTags || []).map(
-        (ct) => (ct as CommunityWithTags).Tag,
+        (ct) => (ct as unknown as CommunityWithTags).Tag,
       ),
     },
   })) as GetCommunitiesResult;
