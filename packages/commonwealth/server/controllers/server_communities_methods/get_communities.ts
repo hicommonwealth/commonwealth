@@ -14,7 +14,7 @@ export type GetCommunitiesOptions = {
 type CommunityWithTags = CommunityTagsAttributes & { Tag: TagsAttributes };
 
 type CommunityInstanceWithTags = CommunityInstance & {
-  CommunityTags: CommunityWithTags;
+  CommunityTags: TagsAttributes;
 };
 
 export type GetCommunitiesResult = {
