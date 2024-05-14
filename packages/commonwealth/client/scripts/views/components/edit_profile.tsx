@@ -183,7 +183,7 @@ const EditProfileComponent = () => {
 
   useEffect(() => {
     if (!isFetchedOnMount.current) {
-      getProfile();
+      getProfile().catch(console.error);
       isFetchedOnMount.current = true;
     }
   }, [getProfile]);
