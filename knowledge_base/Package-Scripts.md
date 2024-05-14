@@ -79,12 +79,6 @@ Description:
 - Default: If successful, fires the commonwalth app build script
 - Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
 
-### heroku-prebuild
-
-Definition: `pnpm add -g node-gyp`
-
-Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
-
 ### heroku-postbuild
 
 Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
