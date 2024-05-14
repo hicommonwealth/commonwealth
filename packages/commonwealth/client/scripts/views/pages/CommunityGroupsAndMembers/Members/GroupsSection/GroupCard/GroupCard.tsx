@@ -19,8 +19,9 @@ type GroupCardProps = {
   isJoined?: boolean;
   groupName: string;
   groupDescription?: string;
-  requirements: RequirementCardProps[];
+  requirements?: RequirementCardProps[]; // This represents erc requirements
   requirementsToFulfill: 'ALL' | number;
+  allowLists?: number[];
   topics: { id: number; name: string }[];
   canEdit?: boolean;
   onEditClick?: () => any;
@@ -32,6 +33,7 @@ const GroupCard = ({
   groupDescription,
   requirements,
   requirementsToFulfill,
+  allowLists,
   topics,
   canEdit,
   onEditClick = () => {},
@@ -70,6 +72,14 @@ const GroupCard = ({
       {requirements.map((r, index) => (
         <RequirementCard key={index} {...r} />
       ))}
+
+      {/* Allow list */}
+      <CWText type="h5">Allow List</CWText>
+      <CWText type="b2">
+        These users are added directly to the group and may bypass additional
+        requirements
+      </CWText>
+      {/*{allowLists.}*/}
 
       {/* Gated topics */}
       {topics.length > 0 && (

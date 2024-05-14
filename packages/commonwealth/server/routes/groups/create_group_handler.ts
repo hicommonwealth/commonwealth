@@ -30,7 +30,6 @@ export const createGroupHandler = async (
       }),
       requirements: z.array(z.any()), // validated in controller
       topics: z.array(z.number()).optional(),
-      allowList: z.array(z.number()).default([]),
     }),
   });
   const validationResult = schema.safeParse(req);

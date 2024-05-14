@@ -53,35 +53,40 @@ const GroupsSection = ({
               key={index}
               groupName={group.name}
               groupDescription={group.description}
-              requirements={group.requirements.map((r) => ({
-                requirementType: requirementTypes?.find(
-                  (x) => x.value === r?.data?.source?.source_type,
-                )?.label,
-                requirementChain:
-                  chainTypes
-                    .find(
-                      (x) =>
-                        `${x.value}` ===
-                        `${
-                          r?.data?.source?.evm_chain_id ||
-                          r?.data?.source?.cosmos_chain_id ||
-                          ''
-                        }`,
-                    )
-                    ?.label?.split('-')
-                    ?.join(' ') || '',
-                requirementContractAddress: r.data.source.contract_address,
-                requirementTokenId: r.data.source.token_id,
-                requirementAmount: `${convertRequirementAmountFromWeiToTokens(
-                  r?.data?.source?.source_type,
-                  r.data.threshold,
-                )}`,
-                requirementCondition: 'More than', // hardcoded in api
-              }))}
+              requirements={group.requirements
+                .filter((r) => r?.data?.source) // filter erc groups
+                .map((r) => ({
+                  requirementType: requirementTypes?.find(
+                    (x) => x.value === r?.data?.source?.source_type,
+                  )?.label,
+                  requirementChain:
+                    chainTypes
+                      .find(
+                        (x) =>
+                          `${x.value}` ===
+                          `${
+                            r?.data?.source?.evm_chain_id ||
+                            r?.data?.source?.cosmos_chain_id ||
+                            ''
+                          }`,
+                      )
+                      ?.label?.split('-')
+                      ?.join(' ') || '',
+                  requirementContractAddress: r.data.source.contract_address,
+                  requirementTokenId: r.data.source.token_id,
+                  requirementAmount: `${convertRequirementAmountFromWeiToTokens(
+                    r?.data?.source?.source_type,
+                    r.data.threshold,
+                  )}`,
+                  requirementCondition: 'More than', // hardcoded in api
+                }))}
               requirementsToFulfill={
                 group.requirementsToFulfill === group.requirements.length
                   ? 'ALL'
                   : group.requirementsToFulfill
+              }
+              allowLists={
+                group.requirements.find((r) => r.rule === 'allow').data.allow
               }
               isJoined={group.isJoined}
               topics={(group?.topics || []).map((x) => ({

@@ -25,8 +25,8 @@ type MembersSectionProps = {
   onLoadMoreMembers?: () => any;
   isLoadingMoreMembers?: boolean;
   tableState: CWTableState;
-  selectedAccounts?: number[];
-  handleCheckboxChange?: (id: number) => void;
+  selectedAccounts?: string[];
+  handleCheckboxChange?: (address: string) => void;
   extraRows?: (member: Member) => RowData;
 };
 
@@ -52,8 +52,8 @@ const MembersSection = ({
               <div className="table-cell">
                 {handleCheckboxChange && (
                   <CWCheckbox
-                    checked={selectedAccounts.includes(member.id)}
-                    onChange={() => handleCheckboxChange(member.id)}
+                    checked={selectedAccounts.includes(member.address)}
+                    onChange={() => handleCheckboxChange(member.address)}
                   />
                 )}
                 <Link to={`/profile/id/${member.id}`} className="user-info">

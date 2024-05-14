@@ -64,8 +64,8 @@ export type GroupFormProps = {
   onSubmit: (values: GroupResponseValuesType) => any;
   initialValues?: Partial<GroupInitialValuesTypeWithLabel>;
   onDelete?: () => any;
-  allowListIds: number[];
-  setAllowListIds: (
-    value: ((prevState: number[]) => number[]) | number[],
+  allowedAddresses: string[];
+  setAllowedAddresses: (
+    value: ((prevState: string[]) => string[]) | string[],
   ) => void;
 };

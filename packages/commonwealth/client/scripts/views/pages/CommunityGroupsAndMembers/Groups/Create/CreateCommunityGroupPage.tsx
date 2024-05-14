@@ -14,7 +14,7 @@ import './CreateCommunityGroupPage.scss';
 
 const CreateCommunityGroupPage = () => {
   const navigate = useCommonNavigate();
-  const [allowListIds, setAllowListIds] = useState([]);
+  const [allowedAddresses, setAllowedAddresses] = useState([]);
 
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
@@ -40,7 +40,7 @@ const CreateCommunityGroupPage = () => {
         requirementsToFulfill: 'ALL',
       }}
       onSubmit={(values) => {
-        const payload = makeGroupDataBaseAPIPayload(values, allowListIds);
+        const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
 
         createGroup(payload)
           .then(() => {
@@ -55,8 +55,8 @@ const CreateCommunityGroupPage = () => {
             notifyError('Failed to create group');
           });
       }}
-      allowListIds={allowListIds}
-      setAllowListIds={setAllowListIds}
+      allowedAddresses={allowedAddresses}
+      setAllowedAddresses={setAllowedAddresses}
     />
   );
 };

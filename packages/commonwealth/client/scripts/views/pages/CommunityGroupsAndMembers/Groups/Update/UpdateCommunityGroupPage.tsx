@@ -137,7 +137,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         }}
         onDelete={() => setIsDeleteModalOpen(true)}
         allowListIds={allowListIds}
-        setAllowListIds={setAllowListIds}
+        setAllowedAddresses={setAllowListIds}
       />
       <DeleteGroupModal
         isOpen={isDeleteModalOpen}

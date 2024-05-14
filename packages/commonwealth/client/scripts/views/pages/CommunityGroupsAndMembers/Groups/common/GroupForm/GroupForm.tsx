@@ -137,8 +137,8 @@ const GroupForm = ({
   onSubmit,
   initialValues = {},
   onDelete = () => {},
-  allowListIds,
-  setAllowListIds,
+  allowedAddresses,
+  setAllowedAddresses,
 }: GroupFormProps) => {
   const allowlistEnabled = useFlag('allowlist');
 
@@ -552,8 +552,8 @@ const GroupForm = ({
 
           {allowlistEnabled && (
             <AllowList
-              allowListIds={allowListIds}
-              setAllowListIds={setAllowListIds}
+              allowedAddresses={allowedAddresses}
+              setAllowedAddresses={setAllowedAddresses}
             />
           )}
           {(formType === 'create' || formType === 'edit') && (

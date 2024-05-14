@@ -21,7 +21,6 @@ const createGroup = async ({
   topicIds,
   requirementsToFulfill,
   requirements = [],
-  allowListIds = [],
 }: CreateGroupProps) => {
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
@@ -37,7 +36,6 @@ const createGroup = async ({
     },
     requirements,
     topics: topicIds,
-    allowList: allowListIds,
   });
 };
 

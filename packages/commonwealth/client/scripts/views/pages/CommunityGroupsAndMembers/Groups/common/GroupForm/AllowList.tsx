@@ -56,13 +56,16 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
 const GROUP_AND_MEMBER_FILTERS: BaseGroupFilter[] = ['All groups', 'Ungrouped'];
 
 type AllowListProps = {
-  allowListIds: number[];
-  setAllowListIds: (
-    value: ((prevState: number[]) => number[]) | number[],
+  allowedAddresses: string[];
+  setAllowedAddresses: (
+    value: ((prevState: string[]) => string[]) | string[],
   ) => void;
 };
 
-const AllowList = ({ allowListIds, setAllowListIds }: AllowListProps) => {
+const AllowList = ({
+  allowedAddresses,
+  setAllowedAddresses,
+}: AllowListProps) => {
   useUserActiveAccount();
 
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
@@ -160,11 +163,13 @@ const AllowList = ({ allowListIds, setAllowListIds }: AllowListProps) => {
     queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
   }, []);
 
-  const handleCheckboxChange = (id: number) => {
-    if (allowListIds.includes(id)) {
-      setAllowListIds((prevItems) => prevItems.filter((item) => item !== id));
+  const handleCheckboxChange = (address: string) => {
+    if (allowedAddresses.includes(address)) {
+      setAllowedAddresses((prevItems) =>
+        prevItems.filter((item) => item !== address),
+      );
     } else {
-      setAllowListIds((prevItems) => [...prevItems, id]);
+      setAllowedAddresses((prevItems) => [...prevItems, address]);
     }
   };
 
@@ -232,7 +237,7 @@ const AllowList = ({ allowListIds, setAllowListIds }: AllowListProps) => {
         isLoadingMoreMembers={isLoadingMembers}
         tableState={tableState}
         extraRows={extraRows}
-        selectedAccounts={allowListIds}
+        selectedAccounts={allowedAddresses}
         handleCheckboxChange={handleCheckboxChange}
       />
     </section>
