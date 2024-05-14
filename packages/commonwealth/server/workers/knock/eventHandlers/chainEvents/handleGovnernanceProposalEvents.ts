@@ -25,7 +25,7 @@ export async function handleGovernanceProposalEvents(
     name: CommunityAttributes['name'];
   }>(
     `
-        SELECT CH.id, CH.network
+        SELECT CH.id as id, CH.name as name
         FROM "Contracts" C
                  JOIN "CommunityContracts" CC on C.id = CC.contract_id
                  JOIN "Communities" CH ON CC.community_id = CH.id
@@ -49,7 +49,7 @@ export async function handleGovernanceProposalEvents(
       undefined,
       { event },
     );
-    return;
+    return false;
   }
 
   const users = await models.sequelize.query<{
@@ -69,22 +69,26 @@ export async function handleGovernanceProposalEvents(
     },
   );
 
-  const provider = notificationsProvider();
+  if (users.length) {
+    const provider = notificationsProvider();
 
-  return await provider.triggerWorkflow({
-    key: WorkflowKeys.ChainProposals,
-    users,
-    data: {
-      community_name: community[0].name,
-      proposal_kind: event.eventSource.kind as
-        | 'proposal-created'
-        | 'proposal-canceled'
-        | 'proposal-executed'
-        | 'proposal-queued',
-      proposal_url: getChainProposalUrl(
-        community[0].id,
-        String(event.parsedArgs[0] as z.infer<typeof ETHERS_BIG_NUMBER>),
-      ),
-    },
-  });
+    return await provider.triggerWorkflow({
+      key: WorkflowKeys.ChainProposals,
+      users,
+      data: {
+        community_name: community[0].name,
+        proposal_kind: event.eventSource.kind as
+          | 'proposal-created'
+          | 'proposal-canceled'
+          | 'proposal-executed'
+          | 'proposal-queued',
+        proposal_url: getChainProposalUrl(
+          community[0].id,
+          String(event.parsedArgs[0] as z.infer<typeof ETHERS_BIG_NUMBER>),
+        ),
+      },
+    });
+  }
+
+  return true;
 }

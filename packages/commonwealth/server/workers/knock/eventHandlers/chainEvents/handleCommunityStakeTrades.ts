@@ -20,17 +20,19 @@ export async function handleCommunityStakeTrades(
   const { 1: namespaceAddress, 2: isBuy } = event.parsedArgs as z.infer<
     typeof events.CommunityStakeTrade
   >;
+
   const community = await models.Community.findOne({
     where: {
       namespace_address: namespaceAddress,
     },
   });
+
   if (!community) {
     // Could also be a warning if namespace was created outside of CW
     log.error('Namespace could not be resolved to a community!', undefined, {
       event,
     });
-    return;
+    return false;
   }
 
   const users = await models.sequelize.query<{ id: string }>(
@@ -41,6 +43,7 @@ export async function handleCommunityStakeTrades(
           AND role = 'admin';
     `,
     {
+      raw: true,
       type: QueryTypes.SELECT,
       replacements: {
         communityId: community.id,
@@ -48,14 +51,20 @@ export async function handleCommunityStakeTrades(
     },
   );
 
-  const provider = notificationsProvider();
-  return await provider.triggerWorkflow({
-    key: WorkflowKeys.CommunityStake,
-    users,
-    data: {
-      transaction_type: isBuy ? 'minted' : 'burned',
-      community_name: community.name,
-      community_stakes_url: getCommunityUrl(community.id),
-    },
-  });
+  console.log(users);
+
+  if (users.length) {
+    const provider = notificationsProvider();
+    return await provider.triggerWorkflow({
+      key: WorkflowKeys.CommunityStake,
+      users,
+      data: {
+        transaction_type: isBuy ? 'minted' : 'burned',
+        community_name: community.name,
+        community_stakes_url: getCommunityUrl(community.id),
+      },
+    });
+  }
+
+  return true;
 }
