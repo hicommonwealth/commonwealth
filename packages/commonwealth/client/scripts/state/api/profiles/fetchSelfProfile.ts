@@ -53,7 +53,6 @@ const useFetchSelfProfileQuery = ({
         profile?.addresses &&
         profile?.addresses?.length > 0
       ) {
-        console.log('profile => ', profile);
         app.user.setAddresses(
           profile.addresses.map(
             (a) =>
