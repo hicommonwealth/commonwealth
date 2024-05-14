@@ -34,7 +34,6 @@ module.exports = {
           fields: ['id'],
         },
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
         transaction: t,
       });
 
@@ -47,7 +46,6 @@ module.exports = {
           fields: ['id'],
         },
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
         transaction: t,
       });
     });
