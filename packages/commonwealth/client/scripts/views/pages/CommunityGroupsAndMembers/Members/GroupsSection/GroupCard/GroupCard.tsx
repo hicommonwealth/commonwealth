@@ -3,6 +3,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import MinimumProfile from '../../../../../../models/MinimumProfile';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 
@@ -25,6 +26,7 @@ type GroupCardProps = {
   topics: { id: number; name: string }[];
   canEdit?: boolean;
   onEditClick?: () => any;
+  profiles?: MinimumProfile[];
 };
 
 const GroupCard = ({
@@ -37,7 +39,9 @@ const GroupCard = ({
   topics,
   canEdit,
   onEditClick = () => {},
+  profiles,
 }: GroupCardProps) => {
+  console.log(allowLists);
   return (
     <section className="GroupCard">
       {/* Join status */}
@@ -79,7 +83,6 @@ const GroupCard = ({
         These users are added directly to the group and may bypass additional
         requirements
       </CWText>
-      {/*{allowLists.}*/}
 
       {/* Gated topics */}
       {topics.length > 0 && (

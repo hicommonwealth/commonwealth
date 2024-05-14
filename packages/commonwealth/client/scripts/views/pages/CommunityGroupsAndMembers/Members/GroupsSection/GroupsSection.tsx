@@ -5,6 +5,7 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { useFetchProfilesByAddressesQuery } from '../../../../../state/api/profiles/index';
 import { chainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
@@ -22,6 +23,18 @@ const GroupsSection = ({
   hasNoGroups,
 }: GroupSectionProps) => {
   const navigate = useCommonNavigate();
+
+  const profileAddresses = filteredGroups
+    .map((g) => g.requirements) // Extract requirements from each group
+    .filter((r) => r[0]?.rule === 'allow') // Filter only the allowlist rules
+    .flatMap((r) => r[0]?.data?.allow || []); // Flatten and aggregate all addresses
+
+  const { data: profiles } = useFetchProfilesByAddressesQuery({
+    currentChainId: app.activeChainId(),
+    profileAddresses,
+    profileChainIds: [app.activeChainId()],
+    apiCallEnabled: profileAddresses.length > 0,
+  });
 
   return (
     <section className="GroupsSection">
@@ -88,6 +101,7 @@ const GroupsSection = ({
               allowLists={
                 group.requirements.find((r) => r.rule === 'allow').data.allow
               }
+              profiles={profiles}
               isJoined={group.isJoined}
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
