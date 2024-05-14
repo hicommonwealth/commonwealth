@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
+import { updateTags } from 'server/util/updateTags';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -46,43 +46,7 @@ const updateCommunityCategory = async (
   });
 
   const { tag_ids } = req.body;
-  if (tag_ids) {
-    // verify all tag ids exist
-    if (tag_ids.length > 0) {
-      const tagCount = await models.Tags.count({
-        where: {
-          id: { [Op.in]: tag_ids },
-        },
-      });
-
-      const allTagsFound = tagCount === tag_ids.length;
-
-      if (!allTagsFound) {
-        throw new AppError(Errors.InvalidTagIds);
-      }
-    }
-
-    // remove all existing tags
-    await models.CommunityTags.destroy({
-      where: {
-        community_id: community.id,
-      },
-    });
-
-    // create new tags
-    if (tag_ids.length > 0) {
-      const [status, newRows] = await models.CommunityTags.bulkCreate(
-        tag_ids.map((id) => ({
-          tag_id: id,
-          community_id: community.id,
-        })),
-      );
-
-      if (!status || !newRows) {
-        throw new AppError('Failed');
-      }
-    }
-  }
+  await updateTags(tag_ids, models, community.id, 'community_id');
 
   if (
     existingCategories.length !== updateCategories.length ||

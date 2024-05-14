@@ -1,8 +1,8 @@
 import type { DB } from '@hicommonwealth/model';
 import { ProfileAttributes } from '@hicommonwealth/model';
 import type { NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
+import { updateTags } from 'server/util/updateTags';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -81,47 +81,7 @@ const updateNewProfile = async (
     },
   );
 
-  if (tag_ids) {
-    // verify all tag ids exist
-    if (tag_ids.length > 0) {
-      const tagCount = await models.Tags.count({
-        where: {
-          id: { [Op.in]: tag_ids },
-        },
-      });
-
-      const allTagsFound = tagCount === tag_ids.length;
-
-      if (!allTagsFound) {
-        return failure(res.status(400), {
-          status: Errors.InvalidTagIds,
-        });
-      }
-    }
-
-    // remove all existing tags
-    await models.ProfileTags.destroy({
-      where: {
-        profile_id: profile.id,
-      },
-    });
-
-    // create new tags
-    if (tag_ids.length > 0) {
-      const [status, newRows] = await models.ProfileTags.bulkCreate(
-        tag_ids.map((id) => ({
-          tag_id: id,
-          profile_id: profile.id,
-        })),
-      );
-
-      if (!status || !newRows) {
-        return failure(res.status(400), {
-          status: 'Failed',
-        });
-      }
-    }
-  }
+  await updateTags(tag_ids, models, profile.id, 'profile_id');
 
   if (!updateStatus || !rows) {
     return failure(res.status(400), {
