@@ -9,7 +9,7 @@ import {
 } from 'client/scripts/views/components/PreferenceTags';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import './PreferencesStep.scss';
 
 type PreferencesStepProps = {
@@ -17,30 +17,15 @@ type PreferencesStepProps = {
 };
 
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
-  const initialTagsSet = useRef(false);
-  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
-    usePreferenceTags();
+  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
 
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
 
-  const { data: profile, isLoading } = useFetchSelfProfileQuery({
+  useFetchSelfProfileQuery({
     apiCallEnabled: true,
     updateAddressesOnSuccess: true,
   });
-
-  useEffect(() => {
-    if (!isLoading && profile && !initialTagsSet.current) {
-      const profileTags = profile.tags;
-      setPreferenceTags((tags) =>
-        [...(tags || [])].map((t) => ({
-          ...t,
-          isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
-        })),
-      );
-      initialTagsSet.current = true;
-    }
-  }, [profile, isLoading, setPreferenceTags]);
 
   const handleSavePreferences = () => {
     if (isUpdatingProfile) return;
