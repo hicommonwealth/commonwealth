@@ -165,11 +165,30 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadUpvoted,
     },
-    [RascalBindings.NotificationsProvider]: {
+    [RascalBindings.NotificationsProviderCommentCreated]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.NotificationsProvider,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.NotificationsProvider,
+      bindingKey: RascalRoutingKeys.NotificationsProviderCommentCreated,
+    },
+    [RascalBindings.NotificationsProviderChainEventCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderChainEventCreated,
+    },
+    [RascalBindings.NotificationsProviderSnapshotProposalCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey:
+        RascalRoutingKeys.NotificationsProviderSnapshotProposalCreated,
+    },
+    [RascalBindings.NotificationsProviderUserMentioned]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderUserMentioned,
     },
   };
 
