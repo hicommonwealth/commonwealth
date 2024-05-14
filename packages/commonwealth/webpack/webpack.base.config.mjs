@@ -30,8 +30,13 @@ const baseConfig = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
+      'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
+        process.env.KNOCK_PUBLIC_API_KEY,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
+        process.env.KNOCK_IN_APP_FEED_ID,
       ),
     }),
     new webpack.DefinePlugin({
@@ -96,6 +101,9 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
+    }),
+    new webpack.DefinePlugin({
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
     }),
     new webpack.DefinePlugin({
@@ -111,6 +119,11 @@ const baseConfig = {
     new webpack.DefinePlugin({
       'process.env.HEROKU_APP_NAME': JSON.stringify(
         process.env.HEROKU_APP_NAME,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS': JSON.stringify(
+        process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
       ),
     }),
     new HtmlWebpackPlugin({
@@ -133,7 +146,8 @@ const baseConfig = {
   optimization: {
     splitChunks: {
       chunks: 'all',
-      // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
+      // TODO: Commented out packages need to be code split.
+      // Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
         ethersAsync: {
           test: /[\\/]node_modules[\\/](ethers)[\\/]/,
@@ -201,6 +215,7 @@ const baseConfig = {
     fallback: {
       fs: false,
       net: false,
+      buffer: false,
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),
