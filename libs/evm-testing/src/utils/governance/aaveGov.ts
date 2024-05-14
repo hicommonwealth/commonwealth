@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { advanceEvmTime } from '../../routes/chain';
+import { advanceTime } from '../chainUtil';
 import { aave_gov, erc20 } from '../contracts';
 import getProvider from '../getProvider';
 import { IGovernor } from './IGovernor';
@@ -52,7 +52,7 @@ export class aaveGovernor implements IGovernor {
       // Advance time to make active
       const secs = Number(advanceDays) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
 
     return {
@@ -67,7 +67,7 @@ export class aaveGovernor implements IGovernor {
   ): Promise<any> {
     const secs = 3 * 86400;
     const blocks = secs / 12 + 500;
-    await advanceEvmTime(secs, blocks);
+    await advanceTime(secs, blocks);
 
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
@@ -122,7 +122,7 @@ export class aaveGovernor implements IGovernor {
   ): Promise<any> {
     const secs = 86400;
     const blocks = secs / 12 + 500;
-    await advanceEvmTime(secs, blocks);
+    await advanceTime(secs, blocks);
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
     const accounts = (await provider.eth.getAccounts())[0];

@@ -1,4 +1,4 @@
-import { DB } from '.';
+import type { DB } from './factories';
 
 /**
  * Associates models with type safety
@@ -230,17 +230,4 @@ export const buildAssociations = (db: DB) => {
   db.Subscription.belongsTo(db.Comment, {
     foreignKey: 'comment_id',
   });
-
-  // TODO: find a better place for these
-  db.User.createWithProfile = async (attrs, options) => {
-    const newUser = await db.User.create(attrs, options);
-    const profile = await db.Profile.create(
-      {
-        user_id: newUser.id!,
-      },
-      options,
-    );
-    newUser.Profiles = [profile];
-    return newUser;
-  };
 };

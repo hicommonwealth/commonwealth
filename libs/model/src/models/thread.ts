@@ -9,7 +9,7 @@ import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { TopicAttributes } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
@@ -25,10 +25,10 @@ export type ThreadInstance = ModelInstance<ThreadAttributes> & {
   // no mixins used
 };
 
-export type ThreadModelStatic = ModelStatic<ThreadInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <ThreadModelStatic>sequelize.define<ThreadInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ThreadInstance> =>
+  sequelize.define<ThreadInstance>(
     'Thread',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

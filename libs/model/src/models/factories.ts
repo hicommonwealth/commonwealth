@@ -1,3 +1,6 @@
+import Sequelize from 'sequelize';
+import type { Associable } from './types';
+
 import Address from './address';
 import Ban from './ban';
 import ChainNode from './chain_node';
@@ -88,4 +91,12 @@ export const Factories = {
   User,
   Vote,
   Webhook,
+};
+
+export type DB = {
+  [K in keyof typeof Factories]: ReturnType<typeof Factories[K]> &
+    Associable<ReturnType<typeof Factories[K]>>;
+} & {
+  sequelize: Sequelize.Sequelize;
+  Sequelize: typeof Sequelize.Sequelize;
 };

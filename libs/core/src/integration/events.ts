@@ -10,6 +10,7 @@ export enum EventNames {
   GroupCreated = 'GroupCreated',
   SnapshotProposalCreated = 'SnapshotProposalCreated',
   ThreadCreated = 'ThreadCreated',
+  ThreadUpvoted = 'ThreadUpvoted',
   UserMentioned = 'UserMentioned',
 
   // Contests

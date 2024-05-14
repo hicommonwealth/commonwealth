@@ -96,8 +96,8 @@ export async function __updateComment(
     address,
   );
 
-  comment.text = commentBody;
-  comment.plaintext = (() => {
+  const text = commentBody;
+  const plaintext = (() => {
     try {
       return renderQuillDeltaToText(
         JSON.parse(decodeURIComponent(commentBody)),
@@ -106,19 +106,17 @@ export async function __updateComment(
       return decodeURIComponent(commentBody);
     }
   })();
-  await comment.save();
 
-  if (versionHistory) {
-    // The update above doesn't work because it can't detect array changes so doesn't write it to db
-    await this.models.Comment.update(
-      {
-        version_history: versionHistory,
-      },
-      {
-        where: { id: comment.id },
-      },
-    );
-  }
+  await this.models.Comment.update(
+    {
+      text,
+      plaintext,
+      version_history: versionHistory ?? undefined,
+    },
+    {
+      where: { id: comment.id },
+    },
+  );
 
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },

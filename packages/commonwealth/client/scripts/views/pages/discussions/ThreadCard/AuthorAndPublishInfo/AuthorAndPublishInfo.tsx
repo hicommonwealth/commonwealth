@@ -23,6 +23,7 @@ import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
+import { formatVersionText } from './utils';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
@@ -85,10 +86,21 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
+  const collaboratorLookupInfo: Record<string, string> =
+    collaboratorsInfo?.reduce((acc, collaborator) => {
+      acc[collaborator.address] = collaborator.User.Profiles[0].name;
+      return acc;
+    }, {}) ?? {};
+
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
   const versionHistoryOptions = versionHistory?.map((v) => ({
     value: v.body,
-    label: v.timestamp.format('MMMM D, YYYY h:mmA'),
+    label: formatVersionText(
+      v.timestamp,
+      v.author?.address,
+      profile,
+      collaboratorLookupInfo,
+    ),
   }));
 
   return (
@@ -169,6 +181,10 @@ export const AuthorAndPublishInfo = ({
                 onChange={({ value }) => {
                   changeContentText(value);
                 }}
+                formatOptionLabel={(option) => {
+                  return option.label.split('\n')[0];
+                }}
+                isSearchable={false}
               />
             </div>
           ) : (

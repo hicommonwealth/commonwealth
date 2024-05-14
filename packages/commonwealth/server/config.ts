@@ -114,12 +114,12 @@ export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
  * fetched + published (hence upperbound assuming fetching + publishing takes 0ms).
  */
 export const MESSAGE_RELAYER_TIMEOUT_MS =
-  parseInt(process.env.MESSAGE_RELAYER_TIMEOUT_MS) || 200;
+  parseInt(process.env.MESSAGE_RELAYER_TIMEOUT_MS || '') || 200;
 export const MESSAGE_RELAYER_PREFETCH =
-  parseInt(process.env.MESSAGE_RELAYER_PREFETCH) || 50;
+  parseInt(process.env.MESSAGE_RELAYER_PREFETCH || '') || 50;
 
 export const EVM_CE_POLL_INTERVAL_MS =
-  parseInt(process.env.EVM_CE_POLL_INTERVAL) || 120_000;
+  parseInt(process.env.EVM_CE_POLL_INTERVAL || '') || 120_000;
 
 export const NEW_SUBSCRIPTION_API_FLAG =
   process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;

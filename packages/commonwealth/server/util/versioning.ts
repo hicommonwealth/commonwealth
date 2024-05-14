@@ -19,7 +19,7 @@ export function addVersionHistory(
     parsedBody = JSON.parse(decodeURIComponent(body)).ops[0].insert;
   } catch (error) {
     // If parsing fails, or the property doesn't exist, assign the original body
-    parsedBody = body;
+    parsedBody = decodeURIComponent(body);
   }
 
   if (parsedBody !== latestVersion) {

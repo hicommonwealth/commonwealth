@@ -1,4 +1,8 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import {
+  PreferenceTags,
+  usePreferenceTags,
+} from 'client/scripts/views/components/PreferenceTags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import getLinkType from 'helpers/linkType';
 import React, { useState } from 'react';
@@ -32,6 +36,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityStakeEnabled = useFlag('communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
@@ -49,13 +54,13 @@ const CommunityProfileForm = () => {
   const [currentCommunityTags, setCurrentCommunityTags] = useState(
     Object.entries(getCommunityTags(community.id))
       .filter(({ 1: value }) => value)
-      .map(({ 0: key }) => key) as CommunityTags[],
+      .map(({ 0: key }, index) => ({ id: index, tag: key })),
   );
   const [isCustomStagesEnabled, setIsCustomStagesEnabled] = useState(
     community.stagesEnabled,
   );
   const [selectedCommunityTags, setSelectedCommunityTags] =
-    useState<CommunityTags[]>(currentCommunityTags);
+    useState(currentCommunityTags);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,6 +72,10 @@ const CommunityProfileForm = () => {
       error: '',
     })),
   );
+  const { selectedTags, setSelectedTags, toggleTagFromSelection } =
+    usePreferenceTags({
+      initialSelectedTag: currentCommunityTags,
+    });
 
   const {
     links,
@@ -97,8 +106,16 @@ const CommunityProfileForm = () => {
       await editTags({
         communityId: community.id,
         selectedTags: {
-          DAO: selectedCommunityTags.includes('DAO'),
-          DeFi: selectedCommunityTags.includes('DeFi'),
+          ...(userOnboardingEnabled
+            ? {
+                // TODO: build and implement api to support other new tags
+                DAO: !!selectedTags.find(({ item }) => item.tag === 'DAO'),
+                DeFi: !!selectedTags.find(({ item }) => item.tag === 'DeFi'),
+              }
+            : {
+                DAO: !!selectedCommunityTags.find(({ tag }) => tag === 'DAO'),
+                DeFi: !!selectedCommunityTags.find(({ tag }) => tag === 'DeFi'),
+              }),
         },
       });
 
@@ -123,7 +140,15 @@ const CommunityProfileForm = () => {
         isDisabled: true,
         canDisable: true,
       });
-      setCurrentCommunityTags([...selectedCommunityTags]);
+      setCurrentCommunityTags(
+        userOnboardingEnabled
+          ? [
+              ...selectedTags
+                .filter(({ isSelected }) => isSelected)
+                .map(({ item }) => ({ ...item })),
+            ]
+          : [...selectedCommunityTags],
+      );
       const updatedLinks = links.map((link) => ({
         value: link.value.trim(),
         canUpdate: true,
@@ -278,34 +303,51 @@ const CommunityProfileForm = () => {
 
           <section className="tags-section">
             <div className="header">
-              <CWText type="h4">Tags</CWText>
+              <CWText type="h4">
+                Tags
+                {userOnboardingEnabled ? (
+                  <>
+                    &nbsp;<CWText type="b1">(select up to 4)</CWText>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </CWText>
               <CWText type="b1">
                 Tags help new members find your community
               </CWText>
             </div>
 
             <div className="controls">
-              {communityTagOptions.map((option) => (
-                <CWButton
-                  key={option}
-                  type="button"
-                  label={option}
-                  buttonWidth="narrow"
-                  buttonType={
-                    selectedCommunityTags.includes(option)
-                      ? 'primary'
-                      : 'secondary'
-                  }
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedCommunityTags((prevTags) =>
-                      prevTags.includes(option)
-                        ? [...prevTags].filter((tag) => tag !== option)
-                        : [...prevTags, option],
-                    );
-                  }}
+              {userOnboardingEnabled ? (
+                <PreferenceTags
+                  selectedTags={selectedTags}
+                  onTagClick={toggleTagFromSelection}
+                  maxSelectableTags={4}
                 />
-              ))}
+              ) : (
+                communityTagOptions.map((option) => (
+                  <CWButton
+                    key={option}
+                    type="button"
+                    label={option}
+                    buttonWidth="narrow"
+                    buttonType={
+                      selectedCommunityTags.find(({ tag }) => tag === option)
+                        ? 'primary'
+                        : 'secondary'
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedCommunityTags((prevTags) =>
+                        prevTags.find(({ tag }) => tag === option)
+                          ? [...prevTags].filter(({ tag }) => tag !== option)
+                          : [...prevTags, { id: 1, tag: option }],
+                      );
+                    }}
+                  />
+                ))
+              )}
             </div>
           </section>
 
@@ -384,7 +426,11 @@ const CommunityProfileForm = () => {
               type="button"
               disabled={
                 !formState.isDirty &&
-                currentCommunityTags.length === selectedCommunityTags.length &&
+                (userOnboardingEnabled
+                  ? currentCommunityTags.length ===
+                    selectedTags.filter(({ isSelected }) => isSelected).length
+                  : currentCommunityTags.length ===
+                    selectedCommunityTags.length) &&
                 links.filter((x) => x.value).length ===
                   (community.socialLinks || []).length &&
                 links.every((x) =>
@@ -398,7 +444,18 @@ const CommunityProfileForm = () => {
                   canDisable: true,
                 });
                 setLinks(initialLinks);
-                setSelectedCommunityTags(currentCommunityTags);
+                if (userOnboardingEnabled) {
+                  setSelectedTags(
+                    [...selectedTags].map(({ item }) => ({
+                      isSelected: !!currentCommunityTags.find(
+                        (t) => t.tag === item.tag,
+                      ),
+                      item: item,
+                    })),
+                  );
+                } else {
+                  setSelectedCommunityTags(currentCommunityTags);
+                }
               }}
             />
             <CWButton

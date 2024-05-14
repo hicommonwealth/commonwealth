@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
@@ -16,6 +17,7 @@ import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
+import { PreferenceTags, usePreferenceTags } from './PreferenceTags';
 import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
@@ -42,6 +44,7 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<EditProfileError>(EditProfileError.None);
@@ -62,6 +65,7 @@ const EditProfileComponent = () => {
       chain: a.community.id,
     })),
   });
+  const { selectedTags, toggleTagFromSelection } = usePreferenceTags({});
 
   const getProfile = async () => {
     try {
@@ -109,6 +113,7 @@ const EditProfileComponent = () => {
   };
 
   const checkForUpdates = () => {
+    // TODO: create/integrate api to store user preference/interests tags when -> `userOnboardingEnabled`
     const profileUpdate: any = {};
 
     if (!_.isEqual(name, profile?.name) && name !== '')
@@ -386,6 +391,23 @@ const EditProfileComponent = () => {
                 Link new addresses via the profile dropdown menu
               </CWText>
             </CWFormSection>
+            {userOnboardingEnabled && (
+              <CWFormSection
+                title="Preferences"
+                description="Set your preferences to enhance your experience"
+              >
+                <div className="preferences-header">
+                  <CWText type="h4" fontWeight="semiBold">
+                    What are you interested in?
+                  </CWText>
+                  <CWText type="h5">(Select all that apply)</CWText>
+                </div>
+                <PreferenceTags
+                  selectedTags={selectedTags}
+                  onTagClick={toggleTagFromSelection}
+                />
+              </CWFormSection>
+            )}
           </CWForm>
         </div>
       </CWPageLayout>

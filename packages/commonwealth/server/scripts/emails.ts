@@ -11,8 +11,8 @@ import {
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import _ from 'lodash';
-import { fileURLToPath } from 'node:url';
 import { Op, WhereOptions } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 import {

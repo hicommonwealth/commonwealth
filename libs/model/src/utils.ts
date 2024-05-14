@@ -3,10 +3,10 @@ import { logger } from '@hicommonwealth/logging';
 import * as schemas from '@hicommonwealth/schemas';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
-import { Model, ModelCtor, Transaction } from 'sequelize';
+import { Model, ModelStatic, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { OutboxAttributes, OutboxModelStatic } from './models';
+import { OutboxAttributes } from './models';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -38,11 +38,15 @@ type EmitEventValues =
   | {
       event_name: EventNames.SnapshotProposalCreated;
       event_payload: z.infer<typeof events.SnapshotProposalCreated>;
+    }
+  | {
+      event_name: EventNames.ThreadUpvoted;
+      event_payload: z.infer<typeof events.ThreadUpvoted>;
     };
 
 // Load with env var?
-const DISALLOWED_EVENTS = process.env.DISALLOWED_EVENTS
-  ? process.env.DISALLOWED_EVENTS.split(',')
+const ALLOWED_EVENTS = process.env.ALLOWED_EVENTS
+  ? process.env.ALLOWED_EVENTS.split(',')
   : [];
 
 /**
@@ -53,19 +57,23 @@ const DISALLOWED_EVENTS = process.env.DISALLOWED_EVENTS
  * a specific event, this function can be updated without having to update the emitter code.
  */
 export async function emitEvent(
-  outbox: ModelCtor<Model<OutboxAttributes>> | OutboxModelStatic,
+  outbox: ModelStatic<Model<OutboxAttributes>>,
   values: Array<EmitEventValues>,
   transaction?: Transaction | null,
 ) {
   const records: Array<EmitEventValues> = [];
   for (const event of values) {
-    if (!DISALLOWED_EVENTS.includes(event.event_name)) {
+    if (ALLOWED_EVENTS.includes(event.event_name)) {
       records.push(event);
     } else {
-      log.warn('Event not inserted into outbox!', {
-        event_name: event.event_name,
-        disallowed_events: DISALLOWED_EVENTS,
-      });
+      log.warn(
+        `Event not inserted into outbox! ` +
+          `Add ${event.event_name} to the ALLOWED_EVENTS env var to enable emitting this event.`,
+        {
+          event_name: event.event_name,
+          allowed_events: ALLOWED_EVENTS,
+        },
+      );
     }
   }
 

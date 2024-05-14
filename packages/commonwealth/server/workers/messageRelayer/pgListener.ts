@@ -1,8 +1,8 @@
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { delay } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { fileURLToPath } from 'url';
 import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 

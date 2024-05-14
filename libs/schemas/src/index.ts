@@ -9,12 +9,16 @@ export type Aggregates = Extract<
   | 'NotificationCategory'
   | 'Subscription'
   | 'Thread'
+  | 'Reaction'
   | 'User'
   | 'StakeTransaction'
   | 'SubscriptionPreference'
   | 'CommunityAlert'
   | 'Address'
   | 'Topic'
+  | 'Profile'
+  | 'CommentSubscription'
+  | 'ThreadSubscription'
 >;
 
 export * from './commands';

@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type TemplateAttributes = {
   id: number;
@@ -16,10 +16,10 @@ export type TemplateAttributes = {
 
 export type TemplateInstance = ModelInstance<TemplateAttributes>;
 
-export type TemplateModelStatic = ModelStatic<TemplateInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <TemplateModelStatic>sequelize.define<TemplateInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<TemplateInstance> =>
+  sequelize.define<TemplateInstance>(
     'Template',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

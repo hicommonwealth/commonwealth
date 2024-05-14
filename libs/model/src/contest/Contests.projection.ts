@@ -1,6 +1,7 @@
-import { Projection, events } from '@hicommonwealth/core';
+import { AppError, Projection, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
+import Web3 from 'web3';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
@@ -37,9 +38,23 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
 ) {
-  const { ticker, decimals } = await contractHelpers.getTokenAttributes(
-    contest_address,
-  );
+  const community = await models.Community.findOne({
+    where: { namespace },
+    include: models.ChainNode.scope('withPrivateData'),
+  });
+
+  if (!community?.ChainNode?.url) {
+    throw new AppError('Chain Node not found');
+  }
+  const { ticker, decimals } =
+    process.env.NODE_ENV === 'test'
+      ? { ticker: 'ETH', decimals: 18 }
+      : await contractHelpers.getTokenAttributes(
+          contest_address,
+          new Web3(
+            community?.ChainNode?.private_url || community?.ChainNode?.url,
+          ),
+        );
   // TODO: evaluate errors from contract helpers and how to drive the event queue
 
   const [updated] = await models.ContestManager.update(
@@ -55,10 +70,6 @@ async function updateOrCreateWithAlert(
     const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
     log.error(msg, new MissingContestManager(msg, namespace, contest_address));
 
-    const community = await models.Community.findOne({
-      where: { namespace },
-      raw: true,
-    });
     if (mustExist(`Community with namespace: ${namespace}`, community))
       await models.ContestManager.create({
         contest_address,
