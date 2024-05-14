@@ -1,3 +1,5 @@
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
@@ -197,6 +199,7 @@ if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       log.info('Success');
+      stats(HotShotsStats()).increment('cw.scheduler.archive-outbox');
       process.exit(0);
     })
     .catch((err) => {

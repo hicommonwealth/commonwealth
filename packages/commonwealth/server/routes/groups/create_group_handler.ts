@@ -30,6 +30,7 @@ export const createGroupHandler = async (
       }),
       requirements: z.array(z.any()), // validated in controller
       topics: z.array(z.number()).optional(),
+      allowList: z.array(z.number()).default([]),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -37,7 +38,7 @@ export const createGroupHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    body: { metadata, requirements, topics },
+    body: { metadata, requirements, topics, allowList },
   } = validationResult.data;
 
   const [group, analyticsOptions] = await controllers.groups.createGroup({
@@ -46,6 +47,7 @@ export const createGroupHandler = async (
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
+    allowList,
   });
 
   // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events
