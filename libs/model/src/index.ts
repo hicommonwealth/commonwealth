@@ -17,6 +17,7 @@ export * as tester from './tester';
 export type { E2E_TestEntities } from './tester';
 
 // Internals - Should not be exported once we finish the migrations to models
+export * from './chainEventSignatures';
 export * from './config';
 export * from './database';
 export * from './globalActivityCache';

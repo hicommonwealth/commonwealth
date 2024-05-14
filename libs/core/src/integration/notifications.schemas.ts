@@ -53,3 +53,29 @@ export const UserMentionedNotification = z.object({
     .describe('A truncated version of the comment body'),
   object_url: z.string().describe('The url of the comment'),
 });
+
+export const CommunityStakeNotification = z.object({
+  transaction_type: z
+    .union([z.literal('minted'), z.literal('burned')])
+    .describe('The type of stake transaction'),
+  community_name: z
+    .string()
+    .max(255)
+    .describe('The user-friendly name of the community'),
+});
+
+export const ChainProposalsNotification = z.object({
+  proposal_kind: z.union([
+    z.literal('proposal-created'),
+    z.literal('proposal-queued'),
+    z.literal('proposal-executed'),
+    z.literal('proposal-canceled'),
+  ]),
+  community_name: z
+    .string()
+    .max(255)
+    .describe('The user-friendly name of the community'),
+  proposal_url: z
+    .string()
+    .describe('The url to the snapshot proposal on Common'),
+});
