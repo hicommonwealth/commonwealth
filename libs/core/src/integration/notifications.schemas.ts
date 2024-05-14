@@ -62,6 +62,7 @@ export const CommunityStakeNotification = z.object({
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
+  community_stakes_url: z.string().describe('The url to the community stakes'),
 });
 
 export const ChainProposalsNotification = z.object({

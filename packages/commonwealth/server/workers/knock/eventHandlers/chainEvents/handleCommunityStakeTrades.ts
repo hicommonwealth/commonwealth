@@ -8,6 +8,7 @@ import { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
+import { getCommunityUrl } from '../../../../../shared/utils';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -34,11 +35,11 @@ export async function handleCommunityStakeTrades(
 
   const users = await models.sequelize.query<{ id: string }>(
     `
-      SELECT DISTINCT(user_id)::TEXT as id
-      FROM "Addresses"
-      WHERE community_id = :communityId
-        AND role = 'admin';
-  `,
+        SELECT DISTINCT(user_id)::TEXT as id
+        FROM "Addresses"
+        WHERE community_id = :communityId
+          AND role = 'admin';
+    `,
     {
       type: QueryTypes.SELECT,
       replacements: {
@@ -54,6 +55,7 @@ export async function handleCommunityStakeTrades(
     data: {
       transaction_type: isBuy ? 'minted' : 'burned',
       community_name: community.name,
+      community_stakes_url: getCommunityUrl(community.id),
     },
   });
 }
