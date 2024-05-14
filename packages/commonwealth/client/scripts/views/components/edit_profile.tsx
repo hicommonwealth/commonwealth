@@ -3,7 +3,7 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
@@ -44,6 +44,7 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
+  const isFetchedOnMount = useRef(false);
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -69,7 +70,7 @@ const EditProfileComponent = () => {
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags({});
 
-  const getProfile = async () => {
+  const getProfile = useCallback(async () => {
     try {
       const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
         params: {
@@ -119,7 +120,7 @@ const EditProfileComponent = () => {
       }
     }
     setLoading(false);
-  };
+  }, [setPreferenceTags]);
 
   const checkForUpdates = () => {
     // TODO: create/integrate api to store user preference/interests tags when -> `userOnboardingEnabled`
@@ -181,8 +182,11 @@ const EditProfileComponent = () => {
   };
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    if (!isFetchedOnMount.current) {
+      getProfile();
+      isFetchedOnMount.current = true;
+    }
+  }, [getProfile]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload

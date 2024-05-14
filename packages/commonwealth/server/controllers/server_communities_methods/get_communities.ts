@@ -1,4 +1,8 @@
-import { CommunityInstance } from '@hicommonwealth/model';
+import {
+  CommunityInstance,
+  CommunityTagsAttributes,
+  TagsAttributes,
+} from '@hicommonwealth/model';
 import { Includeable } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -6,8 +10,15 @@ export type GetCommunitiesOptions = {
   hasGroups?: boolean; // only return communities with associated groups
   includeStakes?: boolean; // include community stakes
 };
+
+type CommunityWithTags = CommunityTagsAttributes & { Tag: TagsAttributes };
+
+type CommunityInstanceWithTags = CommunityInstance & {
+  CommunityTags: CommunityWithTags;
+};
+
 export type GetCommunitiesResult = {
-  community: CommunityInstance;
+  community: CommunityInstanceWithTags;
 }[];
 
 export async function __getCommunities(
@@ -40,13 +51,12 @@ export async function __getCommunities(
     include: communitiesInclude,
   });
 
-  // TODO: fix type
   return communities.map((c) => ({
     community: {
       ...c.toJSON(),
       CommunityTags: (c.toJSON().CommunityTags || []).map(
-        (ct) => (ct as any).Tag,
+        (ct) => (ct as CommunityWithTags).Tag,
       ),
     },
-  })) as any;
+  })) as GetCommunitiesResult;
 }

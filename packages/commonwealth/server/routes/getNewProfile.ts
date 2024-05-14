@@ -3,6 +3,8 @@ import type {
   CommentAttributes,
   DB,
   ProfileInstance,
+  ProfileTagsAttributes,
+  TagsAttributes,
   ThreadAttributes,
 } from '@hicommonwealth/model';
 import { Tag } from '@hicommonwealth/schemas';
@@ -29,6 +31,8 @@ type GetNewProfileResp = {
   isOwner: boolean;
   tags: z.infer<typeof Tag>[];
 };
+
+type ProfileWithTags = ProfileTagsAttributes & { Tag: TagsAttributes };
 
 const getNewProfile = async (
   models: DB,
@@ -129,7 +133,9 @@ const getNewProfile = async (
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
     isOwner: req.user?.id === profile.user_id,
-    tags: profileTags.map((t) => t.toJSON()).map((t) => (t as any).Tag),
+    tags: profileTags
+      .map((t) => t.toJSON())
+      .map((t) => (t as ProfileWithTags).Tag),
   });
 };
 

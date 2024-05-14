@@ -9,6 +9,6 @@ export class ServerTagsController {
   constructor(public models: DB, public banCache: BanCache) {}
 
   async getTags(): Promise<GetTagsResult> {
-    return __getTags.call(this);
+    return await __getTags.call(this);
   }
 }

@@ -59,18 +59,18 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
     }
   }, [profile, isLoading, setPreferenceTags]);
 
-  const handleSavePreferences = async () => {
+  const handleSavePreferences = () => {
     if (isUpdatingProfile) return;
 
-    await updateProfile({
+    updateProfile({
       address: app.user.activeAccount?.profile?.address,
       chain: app.user.activeAccount?.profile?.chain,
       tagIds: preferenceTags
         .filter((tag) => tag.isSelected)
         .map((tag) => tag.item.id),
-    });
-
-    onComplete();
+    })
+      .then(() => onComplete())
+      .catch(console.error);
   };
 
   return (
