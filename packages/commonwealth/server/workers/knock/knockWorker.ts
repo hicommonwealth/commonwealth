@@ -1,15 +1,17 @@
 import {
-  getRabbitMQConfig,
   HotShotsStats,
+  KnockProvider,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
+  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
-  broker,
   Broker,
   BrokerSubscriptions,
+  broker,
+  notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
@@ -51,6 +53,9 @@ async function startKnockWorker() {
     );
     throw e;
   }
+
+  // init Knock as notifications provider - this is necessary since the policies do not define the provider
+  notificationsProvider(KnockProvider());
 
   const sub = await brokerInstance.subscribe(
     BrokerSubscriptions.NotificationsProvider,
