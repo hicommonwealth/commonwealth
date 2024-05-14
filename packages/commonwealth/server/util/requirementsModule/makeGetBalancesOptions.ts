@@ -163,7 +163,8 @@ export function makeGetBalancesOptions(
             });
             if (!existingOptions) {
               allOptions.push({
-                balanceSourceType: castedSource.source_type as any,
+                balanceSourceType:
+                  castedSource.source_type as BalanceSourceType.SPL,
                 mintAddress: castedSource.contract_address,
                 addresses,
               });
