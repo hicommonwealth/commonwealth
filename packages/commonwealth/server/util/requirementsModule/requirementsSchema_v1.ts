@@ -13,6 +13,7 @@ export default {
         },
         contract_address: {
           type: 'string',
+          pattern: '^[a-zA-Z0-9]{32,44}$',
         },
         token_id: {
           type: 'string',

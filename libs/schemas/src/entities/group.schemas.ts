@@ -10,7 +10,7 @@ const ContractSource = z.object({
     BalanceSourceType.SPL,
   ]),
   evm_chain_id: PG_INT,
-  contract_address: z.string(),
+  contract_address: z.string().regex(/^[a-zA-Z0-9]{32,44}$/),
   token_id: z
     .string()
     .regex(/^[0-9]+$/)

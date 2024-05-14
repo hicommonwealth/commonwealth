@@ -41,7 +41,6 @@ export async function getBalances(
       balances = await getEvmBalances(options, ttl);
     }
   } catch (e) {
-    console.log(e);
     const chainId =
       options.balanceSourceType == BalanceSourceType.SPL
         ? 'solana'
