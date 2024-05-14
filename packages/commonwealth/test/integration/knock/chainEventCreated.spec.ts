@@ -31,7 +31,7 @@ const proposalId = '0x1';
 const proposalCreatedEventSignature =
   '0xd272d67d2c8c66de43c1d2515abb064978a5020c173e15903b6a2ab3bf7440ec';
 
-describe.only('chainEventCreated Event Handler', () => {
+describe('chainEventCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let chainNode: z.infer<typeof schemas.ChainNode> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
