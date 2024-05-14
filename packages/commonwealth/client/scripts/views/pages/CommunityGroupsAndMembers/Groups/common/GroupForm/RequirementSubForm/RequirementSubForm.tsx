@@ -31,6 +31,7 @@ const RequirementSubForm = ({
     requirementType === TOKENS.COSMOS_TOKEN ||
     requirementType === CW_SPECIFICATIONS.CW_721 ||
     requirementType === CW_SPECIFICATIONS.CW_20;
+  const isSPLRequirement = requirementType === SPL_SPECIFICATION;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
@@ -126,7 +127,7 @@ const RequirementSubForm = ({
                   x.chainBase ===
                   (isCosmosRequirement
                     ? 'cosmos'
-                    : SPL_SPECIFICATION
+                    : isSPLRequirement
                     ? 'solana'
                     : 'ethereum'),
               )
