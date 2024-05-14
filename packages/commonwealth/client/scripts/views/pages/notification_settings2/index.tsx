@@ -60,8 +60,6 @@ const NotificationSettingsPage2 = () => {
     return <PageLoading />;
   }
 
-  console.log('FIXME: ', JSON.stringify(bundledSubs, null, '  '));
-
   // const threads = useMemo(() => {
   //   bundledSubs
   // })
@@ -70,6 +68,11 @@ const NotificationSettingsPage2 = () => {
 
   const discussionSubscriptions =
     app?.user.notifications.discussionSubscriptions || [];
+
+  console.log(
+    'FIXME: discussionSubscriptions: ',
+    JSON.stringify(discussionSubscriptions, null, '  '),
+  );
 
   return (
     <CWPageLayout>
@@ -83,8 +86,13 @@ const NotificationSettingsPage2 = () => {
 
         {discussionSubscriptions
           .filter((current) => current.Thread)
+          .filter((current) => current.Community)
           .map((current) => (
-            <div>{current.Thread.title}</div>
+            <div key={current.id}>
+              <div>{current.Community.name}</div>
+              <div>{current.Thread.title}</div>
+              <div>{current.Thread.title}</div>
+            </div>
           ))}
 
         <CWText
