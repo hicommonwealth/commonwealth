@@ -124,8 +124,10 @@ export const getContestStatus = async (
  * @param rpc the rpc of the network to use helper with
  * @returns
  */
-export const createWeb3Provider = async (rpc: string): Promise<Web3> => {
-  const privateKey = process.env.PRIVATE_KEY;
+export const createWeb3Provider = async (
+  rpc: string,
+  privateKey: string,
+): Promise<Web3> => {
   if (!privateKey) {
     throw new AppError('Private Key not set for relayer');
   }

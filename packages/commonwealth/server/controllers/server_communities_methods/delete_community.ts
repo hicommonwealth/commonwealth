@@ -1,11 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
-import {
-  ModelInstance,
-  ModelStatic,
-  UserInstance,
-  sequelize,
-} from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { ModelInstance, UserInstance, sequelize } from '@hicommonwealth/model';
+import { Op, type ModelStatic } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -89,7 +84,7 @@ export async function __deleteCommunity(
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
-                SELECT id 
+                SELECT id
                 FROM "Addresses"
                 WHERE community_id = :community_id
             ) DELETE FROM "Memberships" M
@@ -107,7 +102,7 @@ export async function __deleteCommunity(
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
-                SELECT id 
+                SELECT id
                 FROM "Addresses"
                 WHERE community_id = :community_id
             ) DELETE FROM "Collaborations" C
@@ -122,9 +117,9 @@ export async function __deleteCommunity(
             },
           );
 
-          const models: Array<
-            ModelStatic<ModelInstance<{ community_id?: string }>>
-          > = [
+          const models: ModelStatic<
+            ModelInstance<{ community_id?: string }>
+          >[] = [
             this.models.CommunityStake,
             this.models.DiscordBotConfig,
             this.models.Ban,

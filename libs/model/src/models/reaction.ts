@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -34,10 +34,10 @@ export type ReactionAttributes = {
 
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
-export type ReactionModelStatic = ModelStatic<ReactionInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <ReactionModelStatic>sequelize.define<ReactionInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ReactionInstance> =>
+  sequelize.define<ReactionInstance>(
     'Reaction',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

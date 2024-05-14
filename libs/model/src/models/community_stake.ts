@@ -2,7 +2,7 @@ import { CommunityStake } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CommunityStakeAttributes = z.infer<typeof CommunityStake> & {
   // associations
@@ -11,10 +11,10 @@ export type CommunityStakeAttributes = z.infer<typeof CommunityStake> & {
 
 export type CommunityStakeInstance = ModelInstance<CommunityStakeAttributes>;
 
-export type CommunityStakeModelStatic = ModelStatic<CommunityStakeInstance>;
-
-export default (sequelize: Sequelize.Sequelize): CommunityStakeModelStatic =>
-  <CommunityStakeModelStatic>sequelize.define<CommunityStakeInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityStakeInstance> =>
+  sequelize.define<CommunityStakeInstance>(
     'CommunityStakes',
     {
       community_id: {
