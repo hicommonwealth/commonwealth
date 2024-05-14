@@ -243,7 +243,7 @@ jobs:
       - name: Assert pnpm-lock.yaml is correct
         run: |
           if ! git diff --quiet; then
-            echo 'You need to update the pnpm-lock.yaml file (potentially after running: pnpm add -g node-gyp)'
+            echo 'You need to update the pnpm-lock.yaml file (potentially after installing node-gyp)'
             exit 1
           fi
 
