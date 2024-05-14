@@ -3,7 +3,7 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import _ from 'lodash';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
@@ -25,7 +25,6 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
-  const [allowListIds, setAllowListIds] = useState<number[]>([]);
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -39,6 +38,24 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const foundGroup: Group = groups.find(
     (group) => group.id === parseInt(`${groupId}`),
   );
+
+  const initialAllowList = useMemo(() => {
+    return foundGroup?.requirements
+      .filter((r) => r?.rule === 'allow') // Filter only the allowlist rules
+      .flatMap((r) => r?.data?.allow || []); // Flatten and aggregate all addresses
+  }, [foundGroup]);
+
+  const [allowedAddresses, setAllowedAddresses] = useState<string[]>(
+    initialAllowList ?? [],
+  );
+
+  useEffect(() => {
+    if (initialAllowList) {
+      setAllowedAddresses(initialAllowList);
+    }
+  }, [initialAllowList]);
+
+  console.log(initialAllowList, allowedAddresses);
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
@@ -62,39 +79,42 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
-          requirements: foundGroup.requirements.map((requirement) => ({
-            requirementType: {
-              value: requirement.data.source.source_type,
-              label: requirementTypes.find(
-                (requirementType) =>
-                  requirementType.value === requirement.data.source.source_type,
-              )?.label,
-            },
-            requirementTokenId: requirement.data.source.token_id,
-            requirementAmount: convertRequirementAmountFromWeiToTokens(
-              requirement.data.source.source_type,
-              requirement.data.threshold.trim(),
-            ),
-            requirementChain: {
-              value: `${
-                requirement.data.source.cosmos_chain_id ||
-                requirement.data.source.evm_chain_id ||
-                0
-              }`,
-              label: chainTypes.find(
-                (chain) =>
-                  chain.value ==
-                  (requirement.data.source.cosmos_chain_id ||
-                    requirement.data.source.evm_chain_id),
-              )?.label,
-            },
-            requirementContractAddress:
-              requirement.data.source.contract_address || '',
-            // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
-            requirementCondition: conditionTypes.find(
-              (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
-            ),
-          })),
+          requirements: foundGroup.requirements
+            .filter((r) => r?.data?.source) // filter erc groups
+            .map((requirement) => ({
+              requirementType: {
+                value: requirement.data.source.source_type,
+                label: requirementTypes.find(
+                  (requirementType) =>
+                    requirementType.value ===
+                    requirement.data.source.source_type,
+                )?.label,
+              },
+              requirementTokenId: requirement.data.source.token_id,
+              requirementAmount: convertRequirementAmountFromWeiToTokens(
+                requirement.data.source.source_type,
+                requirement.data.threshold.trim(),
+              ),
+              requirementChain: {
+                value: `${
+                  requirement.data.source.cosmos_chain_id ||
+                  requirement.data.source.evm_chain_id ||
+                  0
+                }`,
+                label: chainTypes.find(
+                  (chain) =>
+                    chain.value ==
+                    (requirement.data.source.cosmos_chain_id ||
+                      requirement.data.source.evm_chain_id),
+                )?.label,
+              },
+              requirementContractAddress:
+                requirement.data.source.contract_address || '',
+              // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
+              requirementCondition: conditionTypes.find(
+                (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
+              ),
+            })),
           requirementsToFulfill:
             foundGroup.requirementsToFulfill === foundGroup.requirements.length
               ? 'ALL'
@@ -136,8 +156,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             });
         }}
         onDelete={() => setIsDeleteModalOpen(true)}
-        allowListIds={allowListIds}
-        setAllowedAddresses={setAllowListIds}
+        allowedAddresses={allowedAddresses}
+        setAllowedAddresses={setAllowedAddresses}
       />
       <DeleteGroupModal
         isOpen={isDeleteModalOpen}

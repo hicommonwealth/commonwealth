@@ -99,13 +99,12 @@ const GroupsSection = ({
                   requirementCondition: 'More than', // hardcoded in api
                 }))}
               requirementsToFulfill={
-                !group.requirementsToFulfill ||
                 group.requirementsToFulfill === group.requirements.length
                   ? 'ALL'
                   : group.requirementsToFulfill
               }
               allowLists={
-                group.requirements.find((r) => r.rule === 'allow').data.allow
+                group.requirements?.find((r) => r.rule === 'allow')?.data?.allow
               }
               profiles={profileMap}
               isJoined={group.isJoined}
