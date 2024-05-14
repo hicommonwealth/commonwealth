@@ -1,7 +1,7 @@
 import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
-import type { TypedRequestBody, TypedResponse } from '../types';
-import { success } from '../types';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
 
 type GetDiscordChannelsReq = {
   community_id: string;

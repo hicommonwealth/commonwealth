@@ -9,12 +9,8 @@ export type SelectedTag = {
 };
 
 export type PreferenceTagsProps = {
-  selectedTags: SelectedTag[];
+  preferenceTags: SelectedTag[];
   onTagClick: (tag: Tag, isSelected: boolean) => void;
   containerClassName?: string;
   maxSelectableTags?: number;
-};
-
-export type PreferenceTagsHookProps = {
-  initialSelectedTag?: Tag[];
 };

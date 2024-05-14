@@ -7,8 +7,8 @@ import {
   SnapshotEventType,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { ZodUndefined } from 'zod';
 import emitNotifications from '../../../util/emitNotifications';
 

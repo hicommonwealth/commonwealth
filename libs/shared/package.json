@@ -19,5 +19,10 @@
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/shared"
   },
-  "dependencies": {}
+  "dependencies": {
+    "moment": "^2.23.0"
+  },
+  "devDependencies": {
+    "@types/moment": "^2.13.0"
+  }
 }

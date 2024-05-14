@@ -1,6 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { ChainTesting, ERC1155, ERC721 } from '@hicommonwealth/evm-testing';
+import {
+  ChainTesting,
+  ERC1155,
+  ERC721,
+  getAnvil,
+} from '@hicommonwealth/evm-testing';
 import {
   tester,
   tokenBalanceCache,
@@ -8,6 +13,7 @@ import {
   type DB,
 } from '@hicommonwealth/model';
 import { BalanceSourceType, BalanceType, delay } from '@hicommonwealth/shared';
+import { Anvil } from '@viem/anvil';
 import BN from 'bn.js';
 import { expect } from 'chai';
 import Web3 from 'web3';
@@ -37,8 +43,9 @@ describe('Token Balance Cache EVM Tests', function () {
   this.timeout(160000);
 
   let models: DB;
+  let anvil: Anvil;
 
-  const sdk = new ChainTesting('http://127.0.0.1:3000');
+  const sdk = new ChainTesting();
 
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
   const addressTwo = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
@@ -83,12 +90,14 @@ describe('Token Balance Cache EVM Tests', function () {
   }
 
   before(async () => {
+    anvil = await getAnvil();
     models = await tester.seedDb();
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
   });
 
   after(async () => {
+    await anvil.stop();
     await dispose()();
   });
 
@@ -99,17 +108,12 @@ describe('Token Balance Cache EVM Tests', function () {
     const transferAmount = '76';
 
     before('Transfer balances to addresses', async () => {
+      const erc20 = sdk.getErc20Contract(chainLinkAddress);
       await resetChainNode(ethChainId);
-      originalAddressOneBalance = await sdk.getBalance(
-        chainLinkAddress,
-        addressOne,
-      );
-      originalAddressTwoBalance = await sdk.getBalance(
-        chainLinkAddress,
-        addressTwo,
-      );
-      await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
-      await sdk.getErc20(chainLinkAddress, addressTwo, transferAmount);
+      originalAddressOneBalance = await erc20.getBalance(addressOne);
+      originalAddressTwoBalance = await erc20.getBalance(addressTwo);
+      await erc20.transfer(addressOne, transferAmount);
+      await erc20.transfer(addressTwo, transferAmount);
       const transferAmountBN = new BN(toWei(transferAmount, 'ether'));
       finalAddressOneBalance = new BN(originalAddressOneBalance)
         .add(transferAmountBN)
@@ -724,10 +728,8 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     it('should cache for TTL but not longer', async () => {
-      const originalAddressOneBalance = await sdk.getBalance(
-        chainLinkAddress,
-        addressOne,
-      );
+      const erc20 = sdk.getErc20Contract(chainLinkAddress);
+      const originalAddressOneBalance = await erc20.getBalance(addressOne);
 
       const balance = await tokenBalanceCache.getBalances(
         {
@@ -745,7 +747,7 @@ describe('Token Balance Cache EVM Tests', function () {
       expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
       // this must complete in under balanceTTL time or the test fails
-      await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
+      await erc20.transfer(addressOne, transferAmount);
 
       const balanceTwo = await tokenBalanceCache.getBalances(
         {

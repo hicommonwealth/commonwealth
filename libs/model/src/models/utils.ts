@@ -1,9 +1,14 @@
-import { Model, Sequelize, SyncOptions } from 'sequelize';
+import {
+  Model,
+  Sequelize,
+  type ModelStatic,
+  type SyncOptions,
+} from 'sequelize';
 import type {
+  Associable,
   CompositeKey,
   FkMap,
   ManyToManyOptions,
-  ModelStatic,
   OneToManyOptions,
   OneToOneOptions,
   RuleOptions,
@@ -17,11 +22,11 @@ import type {
  * @param keys one-to-one keys [source fk to target, target fk to source]
  */
 export function oneToOne<Source extends State, Target extends State>(
-  this: ModelStatic<Model<Source>>,
-  target: ModelStatic<Model<Target>>,
+  this: ModelStatic<Model<Source>> & Associable<Source>,
+  target: ModelStatic<Model<Target>> & Associable<Target>,
   keys: [keyof Source & string, keyof Target & string],
   options?: OneToOneOptions<Source>,
-) {
+): ModelStatic<Model<Source>> & Associable<Source> {
   this.belongsTo(target, {
     foreignKey: keys[0],
     as: options?.as,
@@ -36,14 +41,10 @@ export function oneToOne<Source extends State, Target extends State>(
 
   // map fk when source pk === keys[0]
   if (this.primaryKeyAttribute === keys[0])
-    mapFk.apply(target as any, [
-      this as any,
-      [[keys[1], keys[0]]],
-      {
-        onUpdate: options?.onUpdate ?? 'NO ACTION',
-        onDelete: options?.onDelete ?? 'NO ACTION',
-      },
-    ]);
+    mapFk(target, this, [[keys[1], keys[0]]], {
+      onUpdate: options?.onUpdate ?? 'NO ACTION',
+      onDelete: options?.onDelete ?? 'NO ACTION',
+    });
 
   // don't forget to return this (fluent)
   return this;
@@ -57,11 +58,11 @@ export function oneToOne<Source extends State, Target extends State>(
  * @param options one-to-many options
  */
 export function oneToMany<Parent extends State, Child extends State>(
-  this: ModelStatic<Model<Parent>>,
-  child: ModelStatic<Model<Child>>,
+  this: ModelStatic<Model<Parent>> & Associable<Parent>,
+  child: ModelStatic<Model<Child>> & Associable<Child>,
   foreignKey: (keyof Child & string) | Array<keyof Child & string>,
   options?: OneToManyOptions<Parent, Child>,
-) {
+): ModelStatic<Model<Parent>> & Associable<Parent> {
   const fk = Array.isArray(foreignKey) ? foreignKey[0] : foreignKey;
   this.hasMany(child, {
     foreignKey: { name: fk, allowNull: options?.optional },
@@ -73,28 +74,20 @@ export function oneToMany<Parent extends State, Child extends State>(
 
   // map fk when parent has composite pk
   if (Array.isArray(foreignKey)) {
-    mapFk.apply(child as any, [
-      this as any,
-      foreignKey,
-      {
-        onUpdate: options?.onUpdate ?? 'NO ACTION',
-        onDelete: options?.onDelete ?? 'NO ACTION',
-      },
-    ]);
+    mapFk(child, this as any, foreignKey, {
+      onUpdate: options?.onUpdate ?? 'NO ACTION',
+      onDelete: options?.onDelete ?? 'NO ACTION',
+    });
   }
   // map fk when child has composite pk
   else if (
     child.primaryKeyAttributes.length > 1 &&
     this.primaryKeyAttributes.length === 1
   ) {
-    mapFk.apply(child as any, [
-      this as any,
-      [[foreignKey, this.primaryKeyAttribute]],
-      {
-        onUpdate: options?.onUpdate ?? 'NO ACTION',
-        onDelete: options?.onDelete ?? 'NO ACTION',
-      },
-    ]);
+    mapFk(child, this, [[foreignKey, this.primaryKeyAttribute]], {
+      onUpdate: options?.onUpdate ?? 'NO ACTION',
+      onDelete: options?.onDelete ?? 'NO ACTION',
+    });
   }
 
   // don't forget to return this (fluent)
@@ -108,10 +101,10 @@ export function oneToMany<Parent extends State, Child extends State>(
  * @param b [B model with PK, X->B fk field, aliases, fk rules]
  */
 export function manyToMany<X extends State, A extends State, B extends State>(
-  this: ModelStatic<Model<X>>,
-  a: ManyToManyOptions<X, A>,
-  b: ManyToManyOptions<X, B>,
-) {
+  this: ModelStatic<Model<X>> & Associable<X>,
+  a: ManyToManyOptions<X, A> & Associable<A>,
+  b: ManyToManyOptions<X, B> & Associable<B>,
+): ModelStatic<Model<X>> & Associable<X> {
   this.belongsTo(a.model, {
     foreignKey: { name: a.key, allowNull: false },
     as: a.asOne,
@@ -147,22 +140,14 @@ export function manyToMany<X extends State, A extends State, B extends State>(
 
   // map fk when x-ref has composite pk
   if (this.primaryKeyAttributes.length > 1) {
-    mapFk.apply(this as any, [
-      a.model as any,
-      [[a.key, a.model.primaryKeyAttribute]],
-      {
-        onUpdate: a.onUpdate ?? 'NO ACTION',
-        onDelete: a.onDelete ?? 'NO ACTION',
-      },
-    ]);
-    mapFk.apply(this as any, [
-      b.model as any,
-      [[b.key, b.model.primaryKeyAttribute]],
-      {
-        onUpdate: b.onUpdate ?? 'NO ACTION',
-        onDelete: b.onDelete ?? 'NO ACTION',
-      },
-    ]);
+    mapFk(this, a.model, [[a.key, a.model.primaryKeyAttribute]], {
+      onUpdate: a.onUpdate ?? 'NO ACTION',
+      onDelete: a.onDelete ?? 'NO ACTION',
+    });
+    mapFk(this, b.model, [[b.key, b.model.primaryKeyAttribute]], {
+      onUpdate: b.onUpdate ?? 'NO ACTION',
+      onDelete: b.onDelete ?? 'NO ACTION',
+    });
   }
 
   // don't forget to return this (fluent)
@@ -171,13 +156,13 @@ export function manyToMany<X extends State, A extends State, B extends State>(
 
 /**
  * Maps composite FK constraints not supported by sequelize, with type safety
- * @param this model with FK
+ * @param source model with FK
  * @param target model with PK
  * @param keys foreign key fields
  * @param rules optional fk rules
  */
 export function mapFk<Source extends State, Target extends State>(
-  this: ModelStatic<Model<Source>>,
+  source: ModelStatic<Model<Source>> & Associable<Source>,
   target: ModelStatic<Model<Target>>,
   keys: CompositeKey<Source, Target>,
   rules?: RuleOptions,
@@ -185,29 +170,26 @@ export function mapFk<Source extends State, Target extends State>(
   const key = keys.map((k) =>
     Array.isArray(k)
       ? ([
-          this.getAttributes()[k[0]].field!,
+          source.getAttributes()[k[0]].field!,
           target.getAttributes()[k[1]].field!,
         ] as [string, string])
-      : this.getAttributes()[k].field!,
+      : source.getAttributes()[k].field!,
   );
-  const name = `${this.tableName}_${target.tableName.toLowerCase()}_fkey`;
+  const name = `${source.tableName}_${target.tableName.toLowerCase()}_fkey`;
   const fk = key.map((k) => (Array.isArray(k) ? k[0] : k));
   const pk = key.map((k) => (Array.isArray(k) ? k[1] : k));
   // console.log(
   //   'mapFk:',
   //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
   // );
-  this._fks.push({
+  source._fks.push({
     name,
-    source: this.tableName,
+    source: source.tableName,
     fk,
     target: target.tableName,
     pk,
     rules,
   });
-
-  // don't forget to return this (fluent)
-  return this;
 }
 
 /**

@@ -5,7 +5,6 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import * as dotenv from 'dotenv';
 import express, { RequestHandler, json } from 'express';
-import { Response } from 'superagent';
 import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
   CACHE_ENDPOINTS,
@@ -25,7 +24,7 @@ const content_type = {
 };
 
 function verifyNoCacheResponse(
-  res: Response,
+  res: ChaiHttp.Response,
   status = 200,
   cacheHeader = XCACHE_VALUES.MISS,
 ) {

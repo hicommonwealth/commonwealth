@@ -9,7 +9,7 @@ import type { CommunityAlertAttributes } from './community_alerts';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
@@ -46,18 +46,15 @@ export type UserInstance = ModelInstance<UserAttributes> & {
   getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
 };
 
-export type UserCreationAttributes = UserAttributes & {
+export type UserModelStatic = Sequelize.ModelStatic<UserInstance> & {
   createWithProfile?: (
     attrs: UserAttributes,
     options?: CreateOptions,
   ) => Promise<UserInstance>;
 };
 
-export type UserModelStatic = ModelStatic<UserInstance> &
-  UserCreationAttributes;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <UserModelStatic>sequelize.define<UserInstance>(
+export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
+  const User = <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -102,3 +99,21 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
     },
   );
+
+  User.createWithProfile = async (attrs, options) => {
+    const user = await User.create(attrs, options);
+    if (user) {
+      user.Profiles = user.Profiles || [];
+      const profile = await sequelize.models.Profile.create(
+        {
+          user_id: user.id,
+        },
+        options,
+      );
+      if (profile) user.Profiles.push(profile.toJSON());
+    }
+    return user;
+  };
+
+  return User;
+};
