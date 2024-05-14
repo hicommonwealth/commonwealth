@@ -20,4 +20,6 @@ runs:
         cache: 'pnpm'
     - name: Install
       shell: bash
-      run: pnpm i --ignore-scripts
+      run: |
+        pnpm add -g node-gyp && 
+        pnpm i --ignore-scripts
