@@ -6,13 +6,16 @@ module.exports = {
       await queryInterface.createTable(
         'ProfileTags',
         {
-          id: {
+          profile_id: {
             type: Sequelize.INTEGER,
-            autoIncrement: true,
             primaryKey: true,
+            allowNull: false,
           },
-          profile_id: { type: Sequelize.INTEGER, allowNull: false },
-          tag_id: { type: Sequelize.INTEGER, allowNull: false },
+          tag_id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+          },
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },

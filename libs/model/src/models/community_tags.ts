@@ -18,13 +18,12 @@ export default (sequelize: Sequelize.Sequelize) =>
   <CommunityTagsModelStatic>sequelize.define<CommunityTagsInstance>(
     'CommunityTags',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
+      community_id: {
+        type: Sequelize.STRING,
         primaryKey: true,
+        allowNull: false,
       },
-      community_id: { type: Sequelize.STRING, allowNull: false },
-      tag_id: { type: Sequelize.INTEGER, allowNull: false },
+      tag_id: { type: Sequelize.INTEGER, primaryKey: true, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
