@@ -36,7 +36,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
-  const userOnboardingEnabled = true; //useFlag('userOnboardingEnabled');
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityStakeEnabled = useFlag('communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
