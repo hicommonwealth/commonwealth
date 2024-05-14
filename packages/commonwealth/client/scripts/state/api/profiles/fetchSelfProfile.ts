@@ -38,13 +38,40 @@ const fetchSelfProfile = async () => {
 
 interface UseFetchSelfProfileQuery {
   apiCallEnabled?: boolean;
+  updateAddressesOnSuccess?: boolean;
 }
 const useFetchSelfProfileQuery = ({
   apiCallEnabled = true,
+  updateAddressesOnSuccess = false,
 }: UseFetchSelfProfileQuery) => {
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_PROFILES],
     queryFn: fetchSelfProfile,
+    onSuccess: (profile) => {
+      if (
+        updateAddressesOnSuccess &&
+        profile?.addresses &&
+        profile?.addresses?.length > 0
+      ) {
+        console.log('profile => ', profile);
+        app.user.setAddresses(
+          profile.addresses.map(
+            (a) =>
+              new AddressInfo({
+                id: a?.id,
+                walletId: a?.wallet_id,
+                profileId: a?.profile_id,
+                communityId: a?.community_id,
+                keytype: a?.keytype,
+                address: a?.address,
+                ghostAddress: a?.ghost_address,
+                lastActive: a?.last_active,
+                walletSsoSource: a?.wallet_sso_source,
+              }),
+          ),
+        );
+      }
+    },
     staleTime: PROFILE_STALE_TIME,
     enabled: apiCallEnabled,
   });
