@@ -107,7 +107,7 @@ const AllowList = ({
     { type: 'header', label: 'Filters' },
     { label: 'All community', value: 'All groups' },
     { label: 'Allowlisted', value: 'allowlisted' },
-    { label: 'Not allowlisted', value: 'notAllowlisted' },
+    { label: 'Not allowlisted', value: 'not-allowlisted' },
     { type: 'header-divider', label: 'Groups' },
     { label: 'All groups', value: 'All groups' },
     { label: 'Ungrouped', value: 'Ungrouped' },
