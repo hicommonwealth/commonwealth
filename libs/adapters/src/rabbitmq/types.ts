@@ -36,7 +36,6 @@ export enum RascalBindings {
   NotificationsProviderChainEventCreated = 'NotificationsProviderChainEventCreatedBinding',
   NotificationsProviderSnapshotProposalCreated = 'NotificationsProviderSnapshotProposalCreatedBinding',
   NotificationsProviderUserMentioned = 'NotificationsProviderUserMentionedBinding',
-  SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
