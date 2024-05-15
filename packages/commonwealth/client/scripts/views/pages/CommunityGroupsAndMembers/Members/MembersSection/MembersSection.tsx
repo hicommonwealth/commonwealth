@@ -21,7 +21,7 @@ export type Member = {
 
 type MembersSectionProps = {
   filteredMembers: Member[];
-  onLoadMoreMembers?: () => any;
+  onLoadMoreMembers?: () => unknown;
   isLoadingMoreMembers?: boolean;
   tableState: CWTableState;
   selectedAccounts?: string[];

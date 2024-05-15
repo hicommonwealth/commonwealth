@@ -161,8 +161,8 @@ const AllowList = ({
 
   useEffect(() => {
     // Invalidate group memberships cache
-    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+    void queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
+    void queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
   }, []);
 
   const handleCheckboxChange = (address: string) => {
@@ -213,7 +213,11 @@ const AllowList = ({
           onSelect={(option) => {
             setSearchFilters((g) => ({
               ...g,
-              groupFilter: (option as any).value,
+              groupFilter: (
+                option as {
+                  value: number | BaseGroupFilter;
+                }
+              ).value,
             }));
           }}
           selected={searchFilters.groupFilter.toString()}
