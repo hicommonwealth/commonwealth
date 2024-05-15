@@ -306,7 +306,8 @@ async function getAllowListedAddresses(
     .filter((r: any) => r.rule === 'allow')
     .flatMap((r: any) => r.data.allow);
 
-  if (allowListedAddresses.length === 0) return '';
+  // if we have no addresses allowlisted, then don't select any. Otherwise select all
+  if (allowListedAddresses.length === 0) return isAllowList ? 'WHERE 0' : '';
 
   const sqlInArray = allowListedAddresses.map((s) => `'${s}'`).join(', ');
 
