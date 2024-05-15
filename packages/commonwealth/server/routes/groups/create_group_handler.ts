@@ -37,7 +37,7 @@ export const createGroupHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    body: { metadata, requirements, topics, allowList },
+    body: { metadata, requirements, topics },
   } = validationResult.data;
 
   const [group, analyticsOptions] = await controllers.groups.createGroup({
@@ -46,7 +46,6 @@ export const createGroupHandler = async (
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
-    allowList,
   });
 
   // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events

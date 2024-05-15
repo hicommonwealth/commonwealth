@@ -1,4 +1,4 @@
-import { RowData } from '@tanstack/table-core/src/types';
+import { RowData } from '@tanstack/react-table';
 import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import React from 'react';
 import { Link } from 'react-router-dom';

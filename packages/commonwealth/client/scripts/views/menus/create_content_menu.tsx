@@ -5,7 +5,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-
+import { isMobile } from 'react-device-detect';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';

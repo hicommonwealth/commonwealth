@@ -105,7 +105,7 @@ const AllowList = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const totalPages = members?.pages?.[0].totalPages ?? 0;
 
-  const filterOptions = [
+  const filterOptions: { type?: string; label: string; value?: string }[] = [
     { type: 'header', label: 'Filters' },
     { label: 'All community', value: 'All groups' },
     { label: 'Allowlisted', value: 'allowlisted' },
@@ -215,10 +215,10 @@ const AllowList = ({
           onSelect={(option) => {
             setSearchFilters((g) => ({
               ...g,
-              groupFilter: option.value,
+              groupFilter: (option as any).value,
             }));
           }}
-          selected={searchFilters.groupFilter}
+          selected={searchFilters.groupFilter.toString()}
         />
         <div className="member-search">
           <CWTextInput
