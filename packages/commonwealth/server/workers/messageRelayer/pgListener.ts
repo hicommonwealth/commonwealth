@@ -52,9 +52,9 @@ async function reconnect(client: pg.Client) {
 
 export async function setupListener(): Promise<pg.Client> {
   log.info('Setting up listener...');
-  const { DATABASE_URI } = await import('@hicommonwealth/model');
+  const { config } = await import('@hicommonwealth/model');
   const client = new pg.Client({
-    connectionString: DATABASE_URI,
+    connectionString: config.db.uri,
     ssl: ['test', 'development'].includes(NODE_ENV)
       ? false
       : { rejectUnauthorized: false },

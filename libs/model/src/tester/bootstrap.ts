@@ -2,7 +2,7 @@ import { dispose } from '@hicommonwealth/core';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
-import { TESTING, TEST_DB_NAME } from '../config';
+import { config } from '../config';
 import { buildDb, syncDb, type DB } from '../models';
 
 /**
@@ -214,14 +214,14 @@ export const bootstrap_testing = async (
   truncate = false,
   log = false,
 ): Promise<DB> => {
-  if (!TESTING) throw new Error('Seeds only work when testing!');
+  if (config.env !== 'test') throw new Error('Seeds only work when testing!');
   if (!db) {
-    await verify_db(TEST_DB_NAME);
+    await verify_db(config.db.name);
     try {
       db = buildDb(
         new Sequelize({
           dialect: 'postgres',
-          database: TEST_DB_NAME,
+          database: config.db.name,
           username: 'commonwealth',
           password: 'edgeware',
           logging: false,
@@ -236,4 +236,4 @@ export const bootstrap_testing = async (
   return db;
 };
 
-TESTING && dispose(async () => truncate_db(db));
+config.env === 'test' && dispose(async () => truncate_db(db));

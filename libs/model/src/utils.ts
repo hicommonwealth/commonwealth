@@ -6,6 +6,7 @@ import { hasher } from 'node-object-hash';
 import { Model, ModelStatic, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
+import { config } from './config';
 import { OutboxAttributes } from './models';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -44,11 +45,6 @@ type EmitEventValues =
       event_payload: z.infer<typeof events.ThreadUpvoted>;
     };
 
-// Load with env var?
-const ALLOWED_EVENTS = process.env.ALLOWED_EVENTS
-  ? process.env.ALLOWED_EVENTS.split(',')
-  : [];
-
 /**
  * This functions takes either a new domain record or a pre-formatted event and inserts it into the Outbox. For core
  * domain events (e.g. new thread, new comment, etc.), the event_payload should be the complete domain record. The point
@@ -63,7 +59,7 @@ export async function emitEvent(
 ) {
   const records: Array<EmitEventValues> = [];
   for (const event of values) {
-    if (ALLOWED_EVENTS.includes(event.event_name)) {
+    if (config.outbox.allowedEvents.includes(event.event_name)) {
       records.push(event);
     } else {
       log.warn(
@@ -71,7 +67,7 @@ export async function emitEvent(
           `Add ${event.event_name} to the ALLOWED_EVENTS env var to enable emitting this event.`,
         {
           event_name: event.event_name,
-          allowed_events: ALLOWED_EVENTS,
+          allowed_events: config.outbox.allowedEvents,
         },
       );
     }
