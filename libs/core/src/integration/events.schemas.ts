@@ -351,17 +351,17 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   }),
 };
 
-const ContestStartedMapper: EvmMapper<
-  any,
-  typeof ContestStarted
-> = {
-  signature: '',
-  condition: () => true,
-  mapToSchema: (input) => ({
-    // created_at: new Date(),
-    // // contest_address: input.
-  })
-}
+// const ContestStartedMapper: EvmMapper<
+//   any,
+//   typeof ContestStarted
+// > = {
+//   signature: '',
+//   condition: () => true,
+//   mapToSchema: (input) => ({
+//     // created_at: new Date(),
+//     // // contest_address: input.
+//   })
+// }
 
 const EvmMappers: Record<ChainEventName, EvmMapper<any, any>[]> = {
   NewContest: [
