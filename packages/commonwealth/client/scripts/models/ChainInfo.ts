@@ -7,12 +7,14 @@ import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
+import Tag from './Tag';
 
 class ChainInfo {
   public readonly id: string;
   public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
   public readonly CommunityStakes: StakeInfo[];
+  public CommunityTags: Tag[];
   public readonly tokenName: string;
   public readonly threadCount: number;
   public readonly addressCount: number;
@@ -81,6 +83,7 @@ class ChainInfo {
     chain_node_id,
     ChainNode,
     CommunityStakes,
+    CommunityTags,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
@@ -119,6 +122,7 @@ class ChainInfo {
     this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
     this.CommunityStakes = CommunityStakes;
+    this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
@@ -170,6 +174,7 @@ class ChainInfo {
     thread_count,
     address_count,
     CommunityStakes,
+    CommunityTags,
     snapshot_spaces,
   }) {
     let blockExplorerIdsParsed;
@@ -217,6 +222,7 @@ class ChainInfo {
       chain_node_id,
       ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
       CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
+      CommunityTags: CommunityTags?.map((t) => new Tag(t)) ?? [],
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
@@ -365,6 +371,10 @@ class ChainInfo {
       });
 
     return categorizedLinks;
+  }
+
+  public updateTags(tags: Tag[]) {
+    this.CommunityTags = tags;
   }
 }
 
