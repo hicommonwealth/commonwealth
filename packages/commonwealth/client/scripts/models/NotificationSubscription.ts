@@ -85,6 +85,7 @@ export const modelFromServer = (
   subscription: z.infer<typeof Subscription> & {
     Thread?: any;
     Comment?: any;
+    Community?: any;
   },
 ) => {
   const {
@@ -96,6 +97,7 @@ export const modelFromServer = (
     community_id,
     Comment,
     Thread,
+    Community,
     snapshot_id,
   } = subscription;
 

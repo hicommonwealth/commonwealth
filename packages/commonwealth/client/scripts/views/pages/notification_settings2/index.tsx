@@ -86,12 +86,11 @@ const NotificationSettingsPage2 = () => {
 
         {discussionSubscriptions
           .filter((current) => current.Thread)
-          .filter((current) => current.Community)
+          .filter((current) => current.categoryId == 'new-comment-creation')
           .map((current) => (
             <div key={current.id}>
-              <div>{current.Community.name}</div>
               <div>{current.Thread.title}</div>
-              <div>{current.Thread.title}</div>
+              <pre>{JSON.stringify(current, null, '  ')}</pre>
             </div>
           ))}
 
