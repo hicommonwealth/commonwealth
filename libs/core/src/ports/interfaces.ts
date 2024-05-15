@@ -6,7 +6,10 @@ import {
   EventsHandlerMetadata,
 } from '../framework';
 import { Events } from '../integration/events';
-import { CommentCreatedNotification } from '../integration/notifications.schemas';
+import {
+  CommentCreatedNotification,
+  SnapshotProposalCreatedNotification,
+} from '../integration/notifications.schemas';
 
 /**
  * Resource disposer function
@@ -154,7 +157,6 @@ export enum BrokerPublications {
 }
 
 export enum BrokerSubscriptions {
-  SnapshotListener = 'SnapshotListener',
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
@@ -178,6 +180,7 @@ export interface Broker extends Disposable {
 
 export enum WorkflowKeys {
   CommentCreation = 'comment-creation',
+  SnapshotProposals = 'snapshot-proposals',
 }
 
 type BaseNotifProviderOptions = {
@@ -185,10 +188,17 @@ type BaseNotifProviderOptions = {
   actor?: { id: string; email?: string };
 };
 
-export type NotificationsProviderOptions = BaseNotifProviderOptions & {
-  data: z.infer<typeof CommentCreatedNotification>;
-  key: WorkflowKeys.CommentCreation;
-};
+export type NotificationsProviderOptions = BaseNotifProviderOptions &
+  (
+    | {
+        data: z.infer<typeof CommentCreatedNotification>;
+        key: WorkflowKeys.CommentCreation;
+      }
+    | {
+        data: z.infer<typeof SnapshotProposalCreatedNotification>;
+        key: WorkflowKeys.SnapshotProposals;
+      }
+  );
 
 /**
  * Notifications Provider Port
