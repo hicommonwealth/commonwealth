@@ -358,8 +358,8 @@ const ContestStartedMapper: EvmMapper<
   signature: '',
   condition: () => true,
   mapToSchema: (input) => ({
-    created_at: new Date(),
-    // contest_address: input.
+    // created_at: new Date(),
+    // // contest_address: input.
   })
 }
 
