@@ -401,7 +401,7 @@ const CommunityMembersPage = () => {
             }}
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
-            extraRows={extraRows}
+            extraColumns={extraRows}
           />
         )}
       </section>

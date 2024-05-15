@@ -105,7 +105,7 @@ const AllowList = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const totalPages = members?.pages?.[0].totalPages ?? 0;
 
-  const filterOptions: { type?: string; label: string; value?: string }[] = [
+  const filterOptions = [
     { type: 'header', label: 'Filters' },
     { label: 'All community', value: 'All groups' },
     { label: 'Allowlisted', value: 'allowlisted' },
@@ -175,7 +175,7 @@ const AllowList = ({
     }
   };
 
-  const extraRows = (member: Member) => {
+  const extraColumns = (member: Member) => {
     return {
       address: {
         sortValue: member.address,
@@ -208,8 +208,6 @@ const AllowList = ({
           Filter & Search
         </CWText>
         <Select
-          isSearchable={false}
-          isClearable={false}
           options={filterOptions}
           placeholder={filterOptions[1].label}
           onSelect={(option) => {
@@ -237,7 +235,7 @@ const AllowList = ({
         filteredMembers={formattedMembers}
         isLoadingMoreMembers={isLoadingMembers}
         tableState={tableState}
-        extraRows={extraRows}
+        extraColumns={extraColumns}
         selectedAccounts={allowedAddresses}
         handleCheckboxChange={handleCheckboxChange}
       />

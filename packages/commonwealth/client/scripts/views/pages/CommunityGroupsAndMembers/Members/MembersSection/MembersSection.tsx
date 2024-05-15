@@ -1,4 +1,3 @@
-import { RowData } from '@tanstack/react-table';
 import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -27,7 +26,7 @@ type MembersSectionProps = {
   tableState: CWTableState;
   selectedAccounts?: string[];
   handleCheckboxChange?: (address: string) => void;
-  extraRows?: (member: Member) => RowData;
+  extraColumns?: (member: Member) => object;
 };
 
 const MembersSection = ({
@@ -37,7 +36,7 @@ const MembersSection = ({
   tableState,
   selectedAccounts,
   handleCheckboxChange,
-  extraRows,
+  extraColumns,
 }: MembersSectionProps) => {
   return (
     <div className="MembersSection">
@@ -92,7 +91,7 @@ const MembersSection = ({
               <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
-          ...extraRows(member),
+          ...extraColumns(member),
         }))}
         onScrollEnd={onLoadMoreMembers}
         isLoadingMoreRows={isLoadingMoreMembers}
