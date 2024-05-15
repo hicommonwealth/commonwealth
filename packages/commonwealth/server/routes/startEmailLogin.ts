@@ -1,21 +1,15 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type { DB } from '@hicommonwealth/model';
+import { config, type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { fileURLToPath } from 'url';
-import {
-  LOGIN_RATE_LIMIT_MINS,
-  LOGIN_RATE_LIMIT_TRIES,
-  MAGIC_DEFAULT_CHAIN,
-  MAGIC_SUPPORTED_BASES,
-  SENDGRID_API_KEY,
-} from '../config';
+import { MAGIC_DEFAULT_CHAIN, MAGIC_SUPPORTED_BASES } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
@@ -96,16 +90,18 @@ const startEmailLogin = async (
     where: {
       email,
       created_at: {
-        $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate(),
+        $gte: moment()
+          .subtract(config.LOGIN_RATE_LIMIT_MINS, 'minutes')
+          .toDate(),
       },
     },
   });
-  if (recentTokens.count >= LOGIN_RATE_LIMIT_TRIES) {
+  if (recentTokens.count >= config.LOGIN_RATE_LIMIT_TRIES) {
     return res.json({
       status: 'Error',
       message:
         "You've tried to sign in several times already. " +
-        `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
+        `Check your spam folder, or wait ${config.LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
     });
   }
 

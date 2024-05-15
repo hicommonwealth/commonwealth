@@ -50,7 +50,7 @@ const disposers: Disposer[] = [];
  */
 const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   // don't kill process when errors are caught in production
-  if (code === 'ERROR' && config.env === 'production') return;
+  if (code === 'ERROR' && config.NODE_ENV === 'production') return;
 
   // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));
@@ -63,7 +63,7 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   adapters.clear();
 
   // exit when not unit testing
-  config.env !== 'test' &&
+  config.NODE_ENV !== 'test' &&
     code !== 'UNIT_TEST' &&
     process.exit(code === 'ERROR' ? 1 : 0);
 };

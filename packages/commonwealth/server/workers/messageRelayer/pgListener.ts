@@ -3,7 +3,6 @@ import { logger } from '@hicommonwealth/logging';
 import { delay } from '@hicommonwealth/shared';
 import pg from 'pg';
 import { fileURLToPath } from 'url';
-import { NODE_ENV } from '../../config';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -54,8 +53,8 @@ export async function setupListener(): Promise<pg.Client> {
   log.info('Setting up listener...');
   const { config } = await import('@hicommonwealth/model');
   const client = new pg.Client({
-    connectionString: config.db.uri,
-    ssl: ['test', 'development'].includes(NODE_ENV)
+    connectionString: config.DB.URI,
+    ssl: ['test', 'development'].includes(config.NODE_ENV)
       ? false
       : { rejectUnauthorized: false },
   });

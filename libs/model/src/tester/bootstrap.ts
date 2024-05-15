@@ -214,14 +214,15 @@ export const bootstrap_testing = async (
   truncate = false,
   log = false,
 ): Promise<DB> => {
-  if (config.env !== 'test') throw new Error('Seeds only work when testing!');
+  if (config.NODE_ENV !== 'test')
+    throw new Error('Seeds only work when testing!');
   if (!db) {
-    await verify_db(config.db.name);
+    await verify_db(config.DB.NAME);
     try {
       db = buildDb(
         new Sequelize({
           dialect: 'postgres',
-          database: config.db.name,
+          database: config.DB.NAME,
           username: 'commonwealth',
           password: 'edgeware',
           logging: false,
@@ -236,4 +237,4 @@ export const bootstrap_testing = async (
   return db;
 };
 
-config.env === 'test' && dispose(async () => truncate_db(db));
+config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));

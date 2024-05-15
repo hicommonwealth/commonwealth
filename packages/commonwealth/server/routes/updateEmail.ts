@@ -1,18 +1,17 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type { DB } from '@hicommonwealth/model';
+import { config, type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
-import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -67,20 +66,22 @@ const updateEmail = async (
     where: {
       email,
       created_at: {
-        $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate(),
+        $gte: moment()
+          .subtract(config.LOGIN_RATE_LIMIT_MINS, 'minutes')
+          .toDate(),
       },
     },
   });
-  if (recentTokens.count >= LOGIN_RATE_LIMIT_MINS) {
+  if (recentTokens.count >= config.LOGIN_RATE_LIMIT_MINS) {
     return res.json({
       status: 'Error',
-      message: `You've tried to update your email several times! Try again in ${LOGIN_RATE_LIMIT_MINS} minutes`,
+      message: `You've tried to update your email several times! Try again in ${config.LOGIN_RATE_LIMIT_MINS} minutes`,
     });
   }
 
   // create and email the token
   const tokenObj = await models.LoginToken.createForEmail(email);
-  const loginLink = `${SERVER_URL}/api/finishLogin?token=${
+  const loginLink = `${config.SERVER_URL}/api/finishLogin?token=${
     tokenObj.token
   }&email=${encodeURIComponent(email)}&confirmation=success`;
   const msg = {

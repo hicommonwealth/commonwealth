@@ -3,24 +3,12 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export const NODE_ENV = process.env.NODE_ENV || 'development';
-
-export const PORT = process.env.PORT || '8080';
-
-export const SERVER_URL =
-  process.env.SERVER_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : 'http://localhost:8080');
-
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
-
-export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 
@@ -33,11 +21,6 @@ export const REDIS_URL = (() => {
   if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
   return undefined;
 })();
-
-// limit logins in the last 5 minutes
-// increased because of chain waitlist registrations
-export const LOGIN_RATE_LIMIT_TRIES = 15;
-export const LOGIN_RATE_LIMIT_MINS = 5;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
@@ -63,13 +46,6 @@ export const COSMOS_REGISTRY_API =
   process.env.COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro';
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
-// Don't set default value so if env var is not set the database cleaner will not run
-export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;
-
-export const TELEGRAM_BOT_TOKEN =
-  process.env.NODE_ENV === 'production'
-    ? process.env.TELEGRAM_BOT_TOKEN
-    : process.env.TELEGRAM_BOT_TOKEN_DEV;
 
 // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
 // Risks sending webhooks/emails to real users if incorrectly set to true

@@ -33,7 +33,7 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const web3Client = await ContestHelper.createWeb3Provider(
           chainNodeUrl,
-          config.web3.privateKey,
+          config.WEB3.PRIVATE_KEY,
         );
 
         const fullContentUrl = getThreadUrl({
@@ -75,7 +75,7 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const web3Client = await ContestHelper.createWeb3Provider(
           chainNodeUrl!,
-          config.web3.privateKey,
+          config.WEB3.PRIVATE_KEY,
         );
 
         const contestAddress = community!.contest_managers![0].contest_address;

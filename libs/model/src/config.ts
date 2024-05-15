@@ -4,52 +4,75 @@ import { z } from 'zod';
 const {
   TEST_DB_NAME,
   DATABASE_URL,
+  DATABASE_CLEAN_HOUR,
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
+  SENDGRID_API_KEY,
+  TELEGRAM_BOT_TOKEN,
+  TELEGRAM_BOT_TOKEN_DEV,
 } = process.env;
 
-const name =
-  target.env === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
+const NAME =
+  target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
 
 export const config = configure(
   target,
   {
-    db: {
-      uri:
-        target.env === 'production'
+    DB: {
+      URI:
+        target.NODE_ENV === 'production'
           ? DATABASE_URL!
-          : `postgresql://commonwealth:edgeware@localhost/${name}`,
-      name,
-      noSsl: NO_SSL === 'true',
+          : `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+      NAME,
+      NO_SSL: NO_SSL === 'true',
+      CLEAN_HOUR: DATABASE_CLEAN_HOUR
+        ? parseInt(DATABASE_CLEAN_HOUR, 10)
+        : undefined,
     },
-    web3: {
-      privateKey: PRIVATE_KEY!,
+    WEB3: {
+      PRIVATE_KEY: PRIVATE_KEY!,
     },
-    tbc: {
-      ttlSecs: TBC_BALANCE_TTL_SECONDS
+    TBC: {
+      TTL_SECS: TBC_BALANCE_TTL_SECONDS
         ? parseInt(TBC_BALANCE_TTL_SECONDS, 10)
         : 300,
     },
-    outbox: {
-      allowedEvents: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+    SENDGRID: {
+      API_KEY: SENDGRID_API_KEY,
+    },
+    OUTBOX: {
+      ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+    },
+    TELEGRAM: {
+      BOT_TOKEN:
+        target.NODE_ENV === 'production'
+          ? TELEGRAM_BOT_TOKEN
+          : TELEGRAM_BOT_TOKEN_DEV,
     },
   },
   z.object({
-    db: z.object({
-      uri: z.string(),
-      name: z.string(),
-      noSsl: z.boolean(),
+    DB: z.object({
+      URI: z.string(),
+      NAME: z.string(),
+      NO_SSL: z.boolean(),
+      CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
     }),
-    web3: z.object({
-      privateKey: z.string(),
+    WEB3: z.object({
+      PRIVATE_KEY: z.string(),
     }),
-    tbc: z.object({
-      ttlSecs: z.number().int(),
+    TBC: z.object({
+      TTL_SECS: z.number().int(),
     }),
-    outbox: z.object({
-      allowedEvents: z.array(z.string()),
+    SENDGRID: z.object({
+      API_KEY: z.string().optional(),
+    }),
+    OUTBOX: z.object({
+      ALLOWED_EVENTS: z.array(z.string()),
+    }),
+    TELEGRAM: z.object({
+      BOT_TOKEN: z.string().optional(),
     }),
   }),
 );

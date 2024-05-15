@@ -44,7 +44,7 @@ export async function cacheBalances(
         result[transformedKey] = balances[address];
         return result;
       }, {} as Balances),
-      ttl ?? config.tbc.ttlSecs,
+      ttl ?? config.TBC.TTL_SECS,
       false,
     );
   }

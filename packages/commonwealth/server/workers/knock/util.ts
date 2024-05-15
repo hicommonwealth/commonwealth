@@ -1,4 +1,4 @@
-import { SERVER_URL } from '../../config';
+import { config } from '@hicommonwealth/model';
 
 export const getCommentUrl = (
   communityId: string,
@@ -12,5 +12,5 @@ export const getSnapshotUrl = (
   space: string,
   proposalId: string,
 ): string => {
-  return SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
+  return config.SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
 };

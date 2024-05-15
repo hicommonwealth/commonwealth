@@ -1,6 +1,10 @@
 import { logger } from '@hicommonwealth/logging';
-import type { UserAttributes } from '@hicommonwealth/model';
-import { AddressAttributes, DB } from '@hicommonwealth/model';
+import type {
+  AddressAttributes,
+  DB,
+  UserAttributes,
+} from '@hicommonwealth/model';
+import { config } from '@hicommonwealth/model';
 import {
   DynamicTemplate,
   IChainEventNotificationData,
@@ -20,12 +24,11 @@ import {
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 const getForumNotificationCopy = async (
   models: DB,

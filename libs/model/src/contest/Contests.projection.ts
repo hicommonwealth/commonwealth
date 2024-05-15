@@ -48,7 +48,7 @@ async function updateOrCreateWithAlert(
     throw new AppError('Chain Node not found');
   }
   const { ticker, decimals } =
-    config.env === 'test'
+    config.NODE_ENV === 'test'
       ? { ticker: 'ETH', decimals: 18 }
       : await contractHelpers.getTokenAttributes(
           contest_address,

@@ -1,7 +1,11 @@
 /* eslint-disable max-len */
 import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import type { DB, NotificationInstance } from '@hicommonwealth/model';
+import {
+  config,
+  type DB,
+  type NotificationInstance,
+} from '@hicommonwealth/model';
 import {
   IChainEventNotificationData,
   IForumNotificationData,
@@ -10,7 +14,7 @@ import {
 } from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
+import { SEND_WEBHOOKS_EMAILS } from '../config';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
@@ -187,7 +191,7 @@ export default async function emitNotifications(
     // emails
     for (const subscription of subscriptions) {
       if (msg && isChainEventData && chainEvent.community_id) {
-        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
+        msg.dynamic_template_data.notification.path = `${config.SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
       }
       if (msg && subscription?.immediate_email && subscription?.User) {
         // kick off async call and immediately return

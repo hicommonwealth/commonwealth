@@ -59,7 +59,7 @@ export async function emitEvent(
 ) {
   const records: Array<EmitEventValues> = [];
   for (const event of values) {
-    if (config.outbox.allowedEvents.includes(event.event_name)) {
+    if (config.OUTBOX.ALLOWED_EVENTS.includes(event.event_name)) {
       records.push(event);
     } else {
       log.warn(
@@ -67,7 +67,7 @@ export async function emitEvent(
           `Add ${event.event_name} to the ALLOWED_EVENTS env var to enable emitting this event.`,
         {
           event_name: event.event_name,
-          allowed_events: config.outbox.allowedEvents,
+          allowed_events: config.OUTBOX.ALLOWED_EVENTS,
         },
       );
     }
