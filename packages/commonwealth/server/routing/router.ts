@@ -134,6 +134,7 @@ import { ServerThreadsController } from '../controllers/server_threads_controlle
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
+import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
@@ -165,6 +166,7 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
@@ -195,6 +197,7 @@ export type ServerControllers = {
   groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
+  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -224,6 +227,7 @@ function setupRouter(
     groups: new ServerGroupsController(models, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
+    tags: new ServerTagsController(models, banCache), // TOOD: maybe remove banCache?
   };
 
   // ---
@@ -798,6 +802,14 @@ function setupRouter(
     'post',
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models),
+  );
+
+  // tags
+  registerRoute(
+    router,
+    'get',
+    '/tags',
+    getTagsHandler.bind(this, serverControllers),
   );
 
   // roles
