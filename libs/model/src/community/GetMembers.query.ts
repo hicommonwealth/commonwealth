@@ -61,6 +61,18 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           case 'not-in-group':
             membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
             break;
+          case 'in-group:allowlisted':
+            membershipsWhere = await getAllowListedAddresses(
+              community.id!,
+              true,
+            );
+            break;
+          case 'in-group:not-allowlisted':
+            membershipsWhere = await getAllowListedAddresses(
+              community.id!,
+              false,
+            );
+            break;
           default:
             throw new InvalidState(
               `unsupported memberships param: ${payload.memberships}`,
@@ -279,4 +291,27 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       );
     },
   };
+}
+
+async function getAllowListedAddresses(
+  communityId: string,
+  isAllowList: boolean,
+): Promise<string> {
+  const requirements = await models.sequelize.query(`
+      SELECT requirements FROM "Groups" WHERE community_id = '${communityId}';
+  `);
+
+  const allowListedAddresses: string[] = requirements[0]
+    .flatMap((r: any) => r.requirements)
+    .filter((r: any) => r.rule === 'allow')
+    .flatMap((r: any) => r.data.allow);
+
+  if (allowListedAddresses.length === 0) return '';
+
+  const sqlInArray = allowListedAddresses.map((s) => `'${s}'`).join(', ');
+
+  // produces some sql like "AND "Addresses".address IN ('0x0123456...')"
+  return `AND "Addresses".address ${
+    isAllowList ? 'IN' : 'NOT IN'
+  } (${sqlInArray})`;
 }

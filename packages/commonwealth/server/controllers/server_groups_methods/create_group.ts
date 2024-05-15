@@ -34,7 +34,6 @@ export type CreateGroupOptions = {
   metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
-  allowList?: number[];
   systemManaged?: boolean;
   transaction?: Transaction;
 };
