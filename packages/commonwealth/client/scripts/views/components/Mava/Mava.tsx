@@ -1,9 +1,12 @@
 import { memo, useCallback, useEffect, useRef } from 'react';
 import app from 'state';
+import { isWindowSmall } from 'views/components/component_kit/helpers';
 import './Mava.scss';
 
 // eslint-disable-next-line no-var
 declare var window: any;
+
+const mobile = isWindowSmall(window.innerWidth);
 
 export default memo(function Mava() {
   const initializedRef = useRef(false);
@@ -31,7 +34,9 @@ export default memo(function Mava() {
           'User Id': userId,
         });
 
-        activateMava();
+        if (!mobile) {
+          activateMava();
+        }
 
         console.log('Identified with mava.');
       }
