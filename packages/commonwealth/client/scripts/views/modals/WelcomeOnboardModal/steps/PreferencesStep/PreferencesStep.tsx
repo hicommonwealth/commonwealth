@@ -1,3 +1,8 @@
+import app from 'client/scripts/state';
+import {
+  useFetchSelfProfileQuery,
+  useUpdateProfileByAddressMutation,
+} from 'client/scripts/state/api/profiles';
 import {
   PreferenceTags,
   usePreferenceTags,
@@ -12,13 +17,28 @@ type PreferencesStepProps = {
 };
 
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
-  const { selectedTags, toggleTagFromSelection } = usePreferenceTags({});
+  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
+
+  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
+    useUpdateProfileByAddressMutation();
+
+  useFetchSelfProfileQuery({
+    apiCallEnabled: true,
+    updateAddressesOnSuccess: true,
+  });
 
   const handleSavePreferences = () => {
-    // TODO: save tags to api here
-    // const finalTags = selectedTags.filter(tag => tag.isSelected)
+    if (isUpdatingProfile) return;
 
-    onComplete();
+    updateProfile({
+      address: app.user.activeAccount?.profile?.address,
+      chain: app.user.activeAccount?.profile?.chain,
+      tagIds: preferenceTags
+        .filter((tag) => tag.isSelected)
+        .map((tag) => tag.item.id),
+    })
+      .then(() => onComplete())
+      .catch(console.error);
   };
 
   return (
@@ -31,7 +51,7 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
       </div>
 
       <PreferenceTags
-        selectedTags={selectedTags}
+        preferenceTags={preferenceTags}
         onTagClick={toggleTagFromSelection}
       />
 
