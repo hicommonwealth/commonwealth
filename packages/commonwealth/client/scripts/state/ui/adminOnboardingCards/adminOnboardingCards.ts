@@ -3,6 +3,8 @@ import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
 interface AdminActionCardsStore {
+  isVisible: boolean;
+  setIsVisible: (visibility: boolean) => void;
   shouldHideAdminCardsTemporary: string[];
   shouldHideAdminCardsPermanently: string[];
   setShouldHideAdminOnboardingCardsForCommunity: (
@@ -16,6 +18,15 @@ export const AdminActionCardsStore = createStore<AdminActionCardsStore>()(
   devtools(
     persist(
       (set) => ({
+        isVisible: false,
+        setIsVisible: (visibility) => {
+          set((state) => {
+            return {
+              ...state,
+              isVisible: visibility,
+            };
+          });
+        },
         shouldHideAdminCardsTemporary: [],
         shouldHideAdminCardsPermanently: [],
         setShouldHideAdminOnboardingCardsForCommunity: (

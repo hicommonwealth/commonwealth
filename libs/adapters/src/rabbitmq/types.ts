@@ -11,7 +11,6 @@ export enum RascalPublications {
 
 // SnapshotListener and ChainEvent subscriptions will eventually be replaced by NotificationsProvider
 export enum RascalSubscriptions {
-  SnapshotListener = BrokerSubscriptions.SnapshotListener,
   DiscordListener = BrokerSubscriptions.DiscordListener,
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
@@ -26,7 +25,6 @@ export enum RascalExchanges {
 
 export enum RascalQueues {
   DeadLetter = 'DeadLetterQueue',
-  SnapshotListener = 'SnapshotListenerQueueV2',
   DiscordListener = 'DiscordMessageQueueV2',
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',

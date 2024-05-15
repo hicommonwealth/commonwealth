@@ -102,12 +102,6 @@ export function getAllRascalConfigs(
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
-    [RascalQueues.SnapshotListener]: {
-      ...queueConfig,
-      options: {
-        arguments: queueOptions,
-      },
-    },
     [RascalQueues.DiscordListener]: {
       ...queueConfig,
       options: {
@@ -135,12 +129,6 @@ export function getAllRascalConfigs(
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
-    [RascalBindings.SnapshotListener]: {
-      source: RascalExchanges.MessageRelayer,
-      destination: RascalQueues.SnapshotListener,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.SnapshotListener,
-    },
     [RascalBindings.ChainEvent]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ChainEvent,
@@ -205,10 +193,6 @@ export function getAllRascalConfigs(
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
-    [RascalSubscriptions.SnapshotListener]: {
-      queue: RascalQueues.SnapshotListener,
-      ...subscriptionConfig,
-    },
     [RascalSubscriptions.DiscordListener]: {
       queue: RascalQueues.DiscordListener,
       ...subscriptionConfig,
