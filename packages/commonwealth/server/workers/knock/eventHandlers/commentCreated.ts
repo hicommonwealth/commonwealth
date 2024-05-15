@@ -5,8 +5,8 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 import z from 'zod';
 import { getCommentUrl } from '../util';
 
@@ -37,7 +37,7 @@ export const processCommentCreated: EventHandler<
     log.error('Full comment author with profile not found!', undefined, {
       payload,
     });
-    return;
+    return false;
   }
 
   const community = await models.Community.findOne({
@@ -50,7 +50,7 @@ export const processCommentCreated: EventHandler<
     log.error('Comment community not found!', undefined, {
       payload,
     });
-    return;
+    return false;
   }
 
   let users: { user_id: number }[] = [];
@@ -98,5 +98,5 @@ export const processCommentCreated: EventHandler<
     });
   }
 
-  return false;
+  return true;
 };

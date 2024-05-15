@@ -1,10 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
 
@@ -70,6 +73,10 @@ const createThread = async ({
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
+
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
@@ -84,6 +91,15 @@ const useCreateThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
+      }
+
       return newThread;
     },
   });
