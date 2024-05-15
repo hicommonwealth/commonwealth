@@ -7,8 +7,8 @@ import { ApiEndpoints, queryClient } from '../../../../../../state/api/config';
 import { useRefreshMembershipQuery } from '../../../../../../state/api/groups/index';
 import { SearchProfilesResponse } from '../../../../../../state/api/profiles/searchProfiles';
 import app from '../../../../../../state/index';
+import { Select } from '../../../../../components/Select/index';
 import { CWText } from '../../../../../components/component_kit/cw_text';
-import { CWSelectList } from '../../../../../components/component_kit/new_designs/CWSelectList/index';
 import { CWTableColumnInfo } from '../../../../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../../../../components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from '../../../../../components/component_kit/new_designs/CWTextInput/index';
@@ -202,24 +202,23 @@ const AllowList = ({
       </div>
 
       <div className="header-row">
-        <CWText type="h4" fontWeight="semiBold" className="header-text">
+        <CWText type="h5" fontWeight="semiBold" className="header-text">
           Filter & Search
         </CWText>
-        <div className="filter-section-right">
-          <CWSelectList
-            isSearchable={false}
-            isClearable={false}
-            options={filterOptions}
-            placeholder={filterOptions[0].label}
-            onChange={(option) => {
-              setSearchFilters((g) => ({
-                ...g,
-                groupFilter: option.value,
-              }));
-            }}
-          />
-        </div>
-        <div className="community-search">
+        <Select
+          isSearchable={false}
+          isClearable={false}
+          options={filterOptions}
+          placeholder={filterOptions[1].label}
+          onSelect={(option) => {
+            setSearchFilters((g) => ({
+              ...g,
+              groupFilter: option.value,
+            }));
+          }}
+          selected={searchFilters.groupFilter}
+        />
+        <div className="member-search">
           <CWTextInput
             placeholder="Search members"
             iconLeft={<MagnifyingGlass size={24} weight="regular" />}

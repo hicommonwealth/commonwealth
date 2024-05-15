@@ -3,21 +3,14 @@
 .GroupForm {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
   padding: 40px;
 
   .header-row {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
-
-    .filter-section-right {
-      flex: 1;
-      //justify-content: space-between;
-      //align-items: center;
-      //display: flex;
-      //gap: 16px;
-    }
   }
 
   .form-section {
