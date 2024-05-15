@@ -34,7 +34,6 @@ export type CreateGroupOptions = {
   metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
-  allowList?: number[];
   systemManaged?: boolean;
   transaction?: Transaction;
 };
@@ -50,7 +49,6 @@ export async function __createGroup(
     metadata,
     requirements,
     topics,
-    allowList,
     systemManaged,
     transaction,
   }: CreateGroupOptions,

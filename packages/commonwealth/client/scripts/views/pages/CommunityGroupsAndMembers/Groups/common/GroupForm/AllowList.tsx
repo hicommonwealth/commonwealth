@@ -92,6 +92,7 @@ const AllowList = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { fetchNextMembersPage, groups, isLoadingMembers, members } =
     useMemberData({
       tableState,
@@ -101,6 +102,7 @@ const AllowList = ({
     });
 
   // TODO: Hook this up to the pagination buttons
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const totalPages = members?.pages?.[0].totalPages ?? 0;
 
   const filterOptions = [

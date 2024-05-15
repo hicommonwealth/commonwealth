@@ -6,7 +6,7 @@ import { trpc } from '../../../../utils/trpcClient';
 import { CWTableState } from '../../../components/component_kit/new_designs/CWTable/useCWTableState';
 import { SearchFilters } from '../Members/index.types';
 
-interface useMemberDataProps {
+interface UseMemberDataProps {
   memberships?: Memberships[];
   tableState?: CWTableState;
   searchFilters?: SearchFilters;
@@ -18,7 +18,7 @@ export const useMemberData = ({
   tableState,
   searchFilters,
   membersPerPage,
-}) => {
+}: UseMemberDataProps) => {
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
     500,
