@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import _ from 'underscore';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -18,6 +19,7 @@ import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
 import { PreferenceTags, usePreferenceTags } from './PreferenceTags';
+import { UserTrainingCardTypes } from './UserTrainingSlider/types';
 import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
@@ -69,6 +71,9 @@ const EditProfileComponent = () => {
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   const getProfile = useCallback(async () => {
     try {
@@ -156,6 +161,13 @@ const EditProfileComponent = () => {
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
+
+          if (userOnboardingEnabled && socials.length > 0) {
+            markTrainingActionAsComplete(
+              UserTrainingCardTypes.FinishProfile,
+              profile.id,
+            );
+          }
         })
         .catch((err) => {
           notifyError(err?.response?.data?.error || 'Something went wrong.');

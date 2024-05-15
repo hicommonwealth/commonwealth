@@ -1,0 +1,50 @@
+@import '../../../../styles/shared';
+
+.UserTrainingSliderPageLayout {
+  padding-top: 52px;
+
+  @include extraSmall {
+    padding-top: 0;
+  }
+
+  .UserTrainingSlider {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+
+    @include extraSmall {
+      padding-top: 16px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
+      width: 100%;
+
+      .left-section {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .dismissBtn {
+        margin-top: to-upper-case($string: '');
+        &:focus-within {
+          border-color: transparent !important;
+        }
+      }
+    }
+
+    .cards {
+      display: flex;
+      overflow: scroll;
+      margin: 0 auto;
+      gap: 16px;
+      width: 100%;
+      padding-bottom: 8px;
+    }
+  }
+}
