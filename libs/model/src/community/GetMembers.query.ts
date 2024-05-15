@@ -63,13 +63,13 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
             break;
           case 'in-group:allowlisted':
             membershipsWhere = await getAllowListedAddresses(
-              community.id,
+              community.id!,
               true,
             );
             break;
           case 'in-group:not-allowlisted':
             membershipsWhere = await getAllowListedAddresses(
-              community.id,
+              community.id!,
               false,
             );
             break;
@@ -302,9 +302,9 @@ async function getAllowListedAddresses(
   `);
 
   const allowListedAddresses: string[] = requirements[0]
-    .flatMap((r) => r.requirements)
-    .filter((r) => r.rule === 'allow')
-    .flatMap((r) => r.data.allow);
+    .flatMap((r: any) => r.requirements)
+    .filter((r: any) => r.rule === 'allow')
+    .flatMap((r: any) => r.data.allow);
 
   if (allowListedAddresses.length === 0) return '';
 
