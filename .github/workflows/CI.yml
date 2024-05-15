@@ -5,6 +5,7 @@ env:
   NODE_ENV: 'test'
   TEST_WITHOUT_LOGS: 'true'
   ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadUpvoted'
+  PRIVATE_KEY: 'web3-pk'
 
 on:
   pull_request:
