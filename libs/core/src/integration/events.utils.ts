@@ -34,6 +34,7 @@ type ParseSignature<S extends string> =
 // EvmMapper maps chain event args as input to a zod event schema type as output
 type EvmMapper<Input extends string, Output extends ZodSchema> = {
   signature: Input;
+  output: Output;
   condition?: (evmInput: ParseSignature<Input>) => boolean;
   mapEvmToSchema: (evmInput: ParseSignature<Input>) => z.infer<Output>;
 };
@@ -55,6 +56,7 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
   typeof RecurringContestManagerDeployed
 > = {
   signature: ChainEventSigs.NewContest,
+  output: RecurringContestManagerDeployed,
   condition: (evmInput) => !evmInput.oneOff,
   mapEvmToSchema: ({ contest, namespace, interval, oneOff: _ }) => ({
     created_at: new Date(),
@@ -69,6 +71,7 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   typeof OneOffContestManagerDeployed
 > = {
   signature: ChainEventSigs.NewContest,
+  output: OneOffContestManagerDeployed,
   condition: (evmInput) => evmInput.oneOff,
   mapEvmToSchema: ({ contest, namespace, interval, oneOff: _ }) => ({
     created_at: new Date(),
@@ -78,15 +81,12 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   }),
 };
 
-// TODO: when ContestStarted happens, emit ContestStarted + ContestEnded events
-// ContestEnded contest ID = latest contest ID - 1
-// TODO: change projection to update winners on every event: AddContent/Voting/ContestStarted
-
 const NewRecurringContestStartedMapper: EvmMapper<
   typeof ChainEventSigs.NewRecurringContestStarted,
   typeof ContestStarted
 > = {
   signature: ChainEventSigs.NewRecurringContestStarted,
+  output: ContestStarted,
   mapEvmToSchema: ({ contestId, startTime, endTime }) => ({
     created_at: new Date(),
     contest_address: '', // TODO
@@ -101,6 +101,7 @@ const NewSingleContestStartedMapper: EvmMapper<
   typeof ContestStarted
 > = {
   signature: ChainEventSigs.NewSingleContestStarted,
+  output: ContestStarted,
   mapEvmToSchema: ({ startTime, endTime }) => ({
     created_at: new Date(),
     contest_address: '', // TODO
@@ -115,6 +116,7 @@ const NewContestContentAddedMapper: EvmMapper<
   typeof ContestContentAdded
 > = {
   signature: ChainEventSigs.ContentAdded,
+  output: ContestContentAdded,
   mapEvmToSchema: (evmInput) => ({
     created_at: new Date(),
     contest_address: '', // TODO
@@ -129,6 +131,7 @@ const ContestContentUpvotedMapper: EvmMapper<
   typeof ContestContentUpvoted
 > = {
   signature: ChainEventSigs.VoterVoted,
+  output: ContestContentUpvoted,
   mapEvmToSchema: (evmInput) => ({
     created_at: new Date(),
     contest_address: '', // TODO
@@ -139,32 +142,20 @@ const ContestContentUpvotedMapper: EvmMapper<
   }),
 };
 
-type EvmMappersRecord = {
-  [K in keyof typeof ChainEventSigs]:
-    | EvmMapper<any, any>
-    | EvmMapper<any, any>[];
-};
-
 // EvmMappers maps each chain event to one or more zod event schema types
-const EvmMappers: EvmMappersRecord = {
+const EvmMappers = {
   NewContest: [
     RecurringContestManagerDeployedMapper,
     OneOffContestManagerDeployedMapper,
   ],
-  NewRecurringContestStarted: [
-    NewRecurringContestStartedMapper,
-    // TODO add: RecurringContestEnded
-  ],
-  NewSingleContestStarted: [
-    NewSingleContestStartedMapper,
-    // TODO add: SingleContestEnded
-  ],
+  NewRecurringContestStarted: NewRecurringContestStartedMapper,
+  NewSingleContestStarted: NewSingleContestStartedMapper,
   ContentAdded: NewContestContentAddedMapper,
   VoterVoted: ContestContentUpvotedMapper,
 };
 
-// parseEthersResult converts the raw EVM result into key-value pairs based on signature.
-// The raw EVM result values should already be typed (string, boolean, BigNumber)
+// parseEthersResult converts the raw EVM result into key-value pairs
+// based on solidity event signature.
 const parseEthersResult = (
   signature: string,
   params: ethers.utils.Result,
@@ -179,13 +170,24 @@ const parseEthersResult = (
   return result;
 };
 
+// ParserReturnType gets the inferred type for the `output` schema of
+// the event. If output is an array, returns a union of all schemas in the array.
+type ParserReturnType<Event extends keyof typeof ChainEventSigs> =
+  typeof EvmMappers[Event] extends EvmMapper<any, any>
+    ? z.infer<typeof EvmMappers[Event]['output']>
+    : typeof EvmMappers[Event] extends (infer U)[]
+    ? U extends EvmMapper<any, any>
+      ? z.infer<U['output']>
+      : never
+    : never;
+
 // parseEvmEventToContestEvent maps chain event values to zod schema types
 export const parseEvmEventToContestEvent = <
   Event extends keyof typeof ChainEventSigs,
 >(
   chainEventName: Event,
   evmParsedArgs: ethers.utils.Result,
-): any => {
+): ParserReturnType<Event> => {
   const m = EvmMappers[chainEventName];
   if (!m) {
     throw new Error(`failed to map EVM event to schema: ${chainEventName}`);

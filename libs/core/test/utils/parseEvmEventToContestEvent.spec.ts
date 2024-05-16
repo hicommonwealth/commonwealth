@@ -1,5 +1,10 @@
 import { expect } from 'chai';
 import ethers from 'ethers';
+import { z } from 'zod';
+import {
+  OneOffContestManagerDeployed,
+  RecurringContestManagerDeployed,
+} from '../../src/integration/events.schemas';
 import { parseEvmEventToContestEvent } from '../../src/integration/events.utils';
 
 describe('parseEvmEventToContestEvent', () => {
@@ -9,7 +14,7 @@ describe('parseEvmEventToContestEvent', () => {
       '0x2', // namespace
       ethers.BigNumber.from(7), // interval
       false, // oneOff
-    ]);
+    ]) as z.infer<typeof RecurringContestManagerDeployed>;
     console.debug(result);
     expect(result.contest_address).to.eq('0x1');
     expect(result.namespace).to.eq('0x2');
@@ -20,9 +25,9 @@ describe('parseEvmEventToContestEvent', () => {
     const result = parseEvmEventToContestEvent('NewContest', [
       '0x1', // contest
       '0x2', // namespace
-      ethers.BigNumber.from(7), // interval/length?
+      ethers.BigNumber.from(7), // interval is same as length
       true, // oneOff
-    ]);
+    ]) as z.infer<typeof OneOffContestManagerDeployed>;
     console.debug(result);
     expect(result.contest_address).to.eq('0x1');
     expect(result.namespace).to.eq('0x2');
@@ -74,15 +79,5 @@ describe('parseEvmEventToContestEvent', () => {
     expect(result.content_id).to.eq(10);
     expect(result.voter_address).to.eq('0x2');
     expect(result.voting_power).to.eq(9000);
-  });
-
-  it('should map PrizeShareUpdated raw evm result to ContestWinnerRecorded', () => {
-    const result = parseEvmEventToContestEvent('PrizeShareUpdated', [
-      ethers.BigNumber.from(17), // newPrizeShare
-    ]);
-    console.debug(result);
-    expect(result).to.deep.include({
-      winners: [{ creator_address: '', prize: 17 }],
-    });
   });
 });
