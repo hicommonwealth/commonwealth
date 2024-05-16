@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { AuthSSOs, AuthWallets } from '../../components/AuthButton/types';
 
 export enum AuthModalType {
+  AccountTypeGuidance = 'auth-type-guidance',
   CreateAccount = 'create-account',
   SignIn = 'sign-in',
 }

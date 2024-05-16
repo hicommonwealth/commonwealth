@@ -27,14 +27,22 @@ import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubM
 import './ModalBase.scss';
 
 const MODAL_COPY = {
+  [AuthModalType.AccountTypeGuidance]: {
+    title: '',
+    description: `We don't recognize the address you're trying to sign in with. \nWould you like to:`,
+    showFooter: false,
+    showExistingAccountSignInFooter: false,
+  },
   [AuthModalType.CreateAccount]: {
     title: 'Create account',
     description: `Common is built on web3 technology that utilizes wallets. \nHow would you like to sign up?`,
+    showFooter: true,
     showExistingAccountSignInFooter: true,
   },
   [AuthModalType.SignIn]: {
     title: 'Sign into Common',
     description: '',
+    showFooter: true,
     showExistingAccountSignInFooter: false,
   },
 };
@@ -273,19 +281,23 @@ const ModalBase = ({
         </CWModalBody>
 
         <CWModalFooter className="footer">
-          <CWText isCentered>
-            By connecting to Common you agree to our&nbsp;
-            <br />
-            <Link to="/terms">Terms of Service</Link>
-            &nbsp;and&nbsp;
-            <Link to="/privacy">Privacy Policy</Link>
-          </CWText>
+          {copy.showFooter && (
+            <>
+              <CWText isCentered>
+                By connecting to Common you agree to our&nbsp;
+                <br />
+                <Link to="/terms">Terms of Service</Link>
+                &nbsp;and&nbsp;
+                <Link to="/privacy">Privacy Policy</Link>
+              </CWText>
 
-          {copy.showExistingAccountSignInFooter && (
-            <CWText isCentered>
-              Already have an account?&nbsp;
-              <button onClick={() => onSignInClick?.()}>Sign in</button>
-            </CWText>
+              {copy.showExistingAccountSignInFooter && (
+                <CWText isCentered>
+                  Already have an account?&nbsp;
+                  <button onClick={() => onSignInClick?.()}>Sign in</button>
+                </CWText>
+              )}
+            </>
           )}
         </CWModalFooter>
       </section>

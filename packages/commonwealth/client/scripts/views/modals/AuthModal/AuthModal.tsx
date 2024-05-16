@@ -3,6 +3,7 @@ import { useWelcomeOnboardModal } from 'client/scripts/state/ui/modals';
 import React, { useEffect, useState } from 'react';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
+import { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
 import { CreateAccountModal } from './CreateAccountModal';
 import { SignInModal } from './SignInModal';
 import { AuthModalProps, AuthModalType } from './types';
@@ -45,6 +46,15 @@ const AuthModal = ({
 
   const getActiveModalComponent = () => {
     switch (modalType) {
+      case AuthModalType.AccountTypeGuidance: {
+        return (
+          <AuthTypeGuidanceModal
+            onClose={onClose}
+            onSuccess={handleSuccess}
+            onSignInClick={handleOnSignInClick}
+          />
+        );
+      }
       case AuthModalType.CreateAccount: {
         return (
           <CreateAccountModal
