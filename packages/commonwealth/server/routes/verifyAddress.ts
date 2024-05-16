@@ -1,5 +1,5 @@
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';

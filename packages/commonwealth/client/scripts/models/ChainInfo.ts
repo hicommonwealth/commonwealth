@@ -7,12 +7,14 @@ import { getCosmosChains } from '../controllers/app/webWallets/utils';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
+import Tag from './Tag';
 
 class ChainInfo {
   public readonly id: string;
   public readonly chainNodeId: string;
   public readonly ChainNode: NodeInfo;
   public readonly CommunityStakes: StakeInfo[];
+  public CommunityTags: Tag[];
   public readonly tokenName: string;
   public readonly threadCount: number;
   public readonly addressCount: number;
@@ -65,7 +67,6 @@ class ChainInfo {
     stagesEnabled,
     customStages,
     customDomain,
-    snapshot,
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
@@ -82,6 +83,7 @@ class ChainInfo {
     chain_node_id,
     ChainNode,
     CommunityStakes,
+    CommunityTags,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
@@ -92,6 +94,7 @@ class ChainInfo {
     redirect,
     thread_count,
     address_count,
+    snapshot_spaces,
   }) {
     this.id = id;
     this.network = network;
@@ -105,7 +108,6 @@ class ChainInfo {
     this.customStages = customStages;
     this.customDomain = customDomain;
     this.terms = terms;
-    this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
@@ -120,6 +122,7 @@ class ChainInfo {
     this.chainNodeId = chain_node_id;
     this.ChainNode = ChainNode;
     this.CommunityStakes = CommunityStakes;
+    this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
@@ -131,6 +134,7 @@ class ChainInfo {
     this.redirect = redirect;
     this.threadCount = thread_count;
     this.addressCount = address_count;
+    this.snapshot = snapshot_spaces || [];
   }
 
   public static fromJSON({
@@ -144,7 +148,6 @@ class ChainInfo {
     stages_enabled,
     custom_stages,
     custom_domain,
-    snapshot,
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
@@ -171,6 +174,8 @@ class ChainInfo {
     thread_count,
     address_count,
     CommunityStakes,
+    CommunityTags,
+    snapshot_spaces,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -200,7 +205,6 @@ class ChainInfo {
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
-      snapshot,
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
@@ -218,6 +222,7 @@ class ChainInfo {
       chain_node_id,
       ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
       CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
+      CommunityTags: CommunityTags?.map((t) => new Tag(t)) ?? [],
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
@@ -227,6 +232,7 @@ class ChainInfo {
       redirect,
       thread_count,
       address_count,
+      snapshot_spaces,
     });
   }
 
@@ -365,6 +371,10 @@ class ChainInfo {
       });
 
     return categorizedLinks;
+  }
+
+  public updateTags(tags: Tag[]) {
+    this.CommunityTags = tags;
   }
 }
 

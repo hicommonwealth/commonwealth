@@ -1,5 +1,5 @@
-import { delay } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
+import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { Client } from 'pg';
 import { setupListener } from '../../../server/workers/messageRelayer/pgListener';

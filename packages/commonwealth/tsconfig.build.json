@@ -14,6 +14,8 @@
     { "path": "../../libs/core/tsconfig.build.json" },
     { "path": "../../libs/model/tsconfig.build.json" },
     { "path": "../../libs/logging/tsconfig.build.json" },
-    { "path": "../../libs/shared/tsconfig.build.json" }
+    { "path": "../../libs/schemas/tsconfig.build.json" },
+    { "path": "../../libs/shared/tsconfig.build.json" },
+    { "path": "../../libs/evm-testing/tsconfig.build.json" }
   ]
 }

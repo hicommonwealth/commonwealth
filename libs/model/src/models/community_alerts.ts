@@ -1,32 +1,25 @@
-import { schemas } from '@hicommonwealth/core';
+import { CommunityAlert } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-export type CommunityAlertAttributes = z.infer<
-  typeof schemas.entities.CommunityAlert
->;
+export type CommunityAlertAttributes = z.infer<typeof CommunityAlert>;
 
 export type CommunityAlertInstance = ModelInstance<CommunityAlertAttributes>;
 
-export type CommunityAlertModelStatic = ModelStatic<CommunityAlertInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommunityAlertModelStatic>sequelize.define<CommunityAlertInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommunityAlertInstance> =>
+  sequelize.define<CommunityAlertInstance>(
     'CommunityAlerts',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       user_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
       },
       community_id: {
         type: Sequelize.STRING,
-        allowNull: false,
+        primaryKey: true,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -47,8 +40,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       underscored: false,
       indexes: [
         {
-          fields: ['user_id', 'community_id'],
-          unique: true,
+          fields: ['community_id'],
         },
       ],
     },

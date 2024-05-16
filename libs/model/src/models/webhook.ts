@@ -1,7 +1,7 @@
 import { WebhookCategory } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type WebhookAttributes = {
   url: string;
@@ -10,15 +10,15 @@ export type WebhookAttributes = {
   community_id: string;
   created_at?: Date;
   updated_at?: Date;
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
 };
 
 export type WebhookInstance = ModelInstance<WebhookAttributes>;
 
-export type WebhookModelStatic = ModelStatic<WebhookInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <WebhookModelStatic>sequelize.define<WebhookInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<WebhookInstance> =>
+  sequelize.define<WebhookInstance>(
     'Webhook',
     {
       id: {

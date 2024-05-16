@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Role } from '@hicommonwealth/model';
+import type { Role } from '@hicommonwealth/shared';
 import type { Request, Response } from 'express';
 import { findAllRoles } from '../util/roles';
 

@@ -235,7 +235,7 @@ export const DiscussionSection = ({
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
-      const topicInvolvedInActiveContest = true;
+      const topicInvolvedInActiveContest = false;
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,

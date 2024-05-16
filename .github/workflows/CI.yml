@@ -4,6 +4,7 @@ env:
   ROLLBAR_ENV: 'GitHubCI'
   NODE_ENV: 'test'
   TEST_WITHOUT_LOGS: 'true'
+  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadUpvoted'
 
 on:
   pull_request:
@@ -209,7 +210,7 @@ jobs:
         image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
+          POSTGRES_DB: commonwealth
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -256,7 +257,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
+        run: (cd packages/commonwealth && NODE_ENV=production TEST_DB_NAME=commonwealth NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) & (yarn --cwd packages/commonwealth wait-server && TEST_DB_NAME=commonwealth yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
@@ -407,7 +408,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
+      - name: Cache d ependencies
         id: cache
         uses: actions/cache@v3
         with:
@@ -430,9 +431,63 @@ jobs:
         env:
           NO_CLIENT: true
 
+  commonwealth-evm-tests:
+    name: EVM Devnet Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Build CI
+        run: yarn global add node-gyp && yarn --ignore-engines
+
+      - name: Run EVM Devnet tests
+        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
+        env:
+          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+
   # These tests run slowly, so run them in a separate job
-  commonwealth-devnet-tests:
-    name: Devnet Tests
+  commonwealth-cosmos-tests:
+    name: Cosmos Devnet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -454,10 +509,6 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
-      evm_test_app:
-        image: irowan/common_chain_tests_new
-        ports:
-         - 3000:3000
       cosmos_test_app:
         image: mhagel1/csdk-v1
         ports:
@@ -493,20 +544,6 @@ jobs:
 
       - name: Build CI
         run: NO_WEBPACK=true yarn build-ci
-
-      ## EVM Section:
-      - name: Start EVM Testnet
-        run: |
-          /usr/bin/docker pull trufflesuite/ganache;
-          network_name=$(docker inspect -f '{{.HostConfig.NetworkMode}}' ${{ job.services.evm_test_app.id }})
-          echo "Network name: $network_name"
-          /usr/bin/docker run -d --name chain --network $network_name --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
-
-      - name: Run EVM Devnet tests
-        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
-
-      - name: Stop EVM Chain
-        run: docker stop chain
 
       ## Cosmos Section:
       # We only run Cosmos devnet tests if any files in the following folders changes

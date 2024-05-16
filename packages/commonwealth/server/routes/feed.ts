@@ -80,6 +80,8 @@ export const getFeedHandler = async (
       from_date,
       to_date,
       archived,
+      contestAddress,
+      status,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -93,6 +95,8 @@ export const getFeedHandler = async (
       fromDate: from_date,
       toDate: to_date,
       archived: archived,
+      contestAddress,
+      status,
     });
 
     const community = await models.Community.findOne({

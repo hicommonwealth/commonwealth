@@ -1,45 +1,34 @@
-import { schemas } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/core';
+import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
+import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { TopicAttributes } from './topic';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-export enum LinkSource {
-  Snapshot = 'snapshot',
-  Proposal = 'proposal',
-  Thread = 'thread',
-  Web = 'web',
-  Template = 'template',
-}
-
-export type Link = {
-  source: LinkSource;
-  identifier: string;
-  title?: string;
-};
-
-export type ThreadAttributes = z.infer<typeof schemas.entities.Thread> & {
+export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
-  Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
   reactions?: ReactionAttributes[];
+  subscriptions?: ThreadSubscriptionAttributes[];
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
   // no mixins used
 };
 
-export type ThreadModelStatic = ModelStatic<ThreadInstance>;
-
-export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
-  const Thread = <ThreadModelStatic>sequelize.define(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ThreadInstance> =>
+  sequelize.define<ThreadInstance>(
     'Thread',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
@@ -144,62 +133,36 @@ export default (sequelize: Sequelize.Sequelize): ThreadModelStatic => {
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          // when thread created, increment Community.thread_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET thread_count = thread_count + 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: thread.community_id,
+          const { Community, Outbox } = sequelize.models;
+
+          await Community.increment('thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
+
+          await emitEvent(
+            Outbox,
+            [
+              {
+                event_name: EventNames.ThreadCreated,
+                event_payload: thread.get({ plain: true }),
               },
-              transaction: options.transaction,
-            },
+            ],
+            options.transaction,
           );
         },
         afterDestroy: async (
           thread: ThreadInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          // when thread deleted, decrement Community.thread_count
-          await sequelize.query(
-            `
-            UPDATE "Communities"
-            SET thread_count = thread_count - 1
-            WHERE id = :communityId
-          `,
-            {
-              replacements: {
-                communityId: thread.community_id,
-              },
-              transaction: options.transaction,
-            },
-          );
+          const { Community } = sequelize.models;
+          await Community.increment('thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
         },
       },
     },
   );
-
-  Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Address, {
-      as: 'Address',
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Thread.hasMany(models.Comment, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
-    models.Thread.belongsTo(models.Topic, {
-      as: 'topic',
-      foreignKey: 'topic_id',
-    });
-    models.Thread.hasMany(models.Notification, {
-      foreignKey: 'thread_id',
-    });
-  };
-
-  return Thread;
-};

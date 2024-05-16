@@ -1,5 +1,6 @@
-import { delay, schemas } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
+import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { numUnrelayedEvents } from '../../../server/workers/messageRelayer/relayForever';
@@ -21,25 +22,25 @@ describe('messageRelayer', () => {
   it('should correctly increment number of unrelayed events on startup', async () => {
     await models.Outbox.bulkCreate([
       {
-        event_name: schemas.EventNames.ChainEventCreated,
+        event_name: EventNames.ChainEventCreated,
         event_payload: {
-          event_name: schemas.EventNames.ChainEventCreated,
+          event_name: EventNames.ChainEventCreated,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         relayed: true,
       },
       {
-        event_name: schemas.EventNames.ChainEventCreated,
+        event_name: EventNames.ChainEventCreated,
         event_payload: {
-          event_name: schemas.EventNames.ChainEventCreated,
+          event_name: EventNames.ChainEventCreated,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         relayed: false,
       },
       {
-        event_name: schemas.EventNames.ChainEventCreated,
+        event_name: EventNames.ChainEventCreated,
         event_payload: {
-          event_name: schemas.EventNames.ChainEventCreated,
+          event_name: EventNames.ChainEventCreated,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         relayed: false,

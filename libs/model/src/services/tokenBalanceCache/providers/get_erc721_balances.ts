@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
-import AbiCoder from 'web3-eth-abi';
+import * as AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmOffChainRpcBatching, evmRpcRequest } from '../util';
@@ -105,10 +105,7 @@ async function getErc721Balance(
     return {};
   } else {
     return {
-      [address]: AbiCoder.decodeParameter(
-        'uint256',
-        data.result,
-      ) as unknown as string,
+      [address]: String(AbiCoder.decodeParameter('uint256', data.result)),
     };
   }
 }

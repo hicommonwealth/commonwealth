@@ -6,12 +6,16 @@ import {
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { Broker, BrokerTopics, broker, stats } from '@hicommonwealth/core';
+import {
+  Broker,
+  BrokerSubscriptions,
+  broker,
+  stats,
+} from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
-import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -54,13 +58,8 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  const snapshotSubRes = await brokerInstance.subscribe(
-    BrokerTopics.SnapshotListener,
-    SnapshotPolicy(),
-  );
-
   const chainEventSubRes = await brokerInstance.subscribe(
-    BrokerTopics.ChainEvent,
+    BrokerSubscriptions.ChainEvent,
     ChainEventPolicy(),
   );
 
@@ -69,24 +68,9 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       'Failed to subscribe to chain-events. Requires restart!',
       undefined,
       {
-        topic: BrokerTopics.ChainEvent,
+        topic: BrokerSubscriptions.ChainEvent,
       },
     );
-  }
-
-  if (!snapshotSubRes) {
-    log.fatal(
-      'Failed to subscribe to snapshot events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerTopics.SnapshotListener,
-      },
-    );
-  }
-
-  if (!snapshotSubRes && !chainEventSubRes) {
-    log.fatal('All subscriptions failed. Restarting...');
-    process.exit(1);
   }
 }
 
@@ -100,6 +84,6 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main();
 }

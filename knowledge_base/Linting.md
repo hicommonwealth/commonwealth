@@ -197,6 +197,6 @@ Regardless of error code, the entire next line should never be disabled with `//
 
 ## Change Log
 
-- 240425: Linting cheatsheet added by Kevin Burton and Graham Johnson.
+- 240425: Linting cheatsheet added by Kevin Burton and Graham Johnson (#7571).
 - 231012: Flagged by Graham Johnson for review. Recommendations out of date; greater clarity and context desirable.
 - 230830: Split off by Graham Johnson from [Code-Style](./Code-Style.md) entry.

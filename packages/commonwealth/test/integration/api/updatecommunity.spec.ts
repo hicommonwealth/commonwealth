@@ -13,6 +13,7 @@ const { expect } = chai;
 
 describe('Update Community/Chain Tests', () => {
   let jwtToken;
+  let siteAdminJwt;
   let loggedInAddr;
   const chain = 'ethereum';
 
@@ -37,6 +38,20 @@ describe('Update Community/Chain Tests', () => {
       role: 'admin',
     });
     expect(isAdmin).to.not.be.null;
+
+    // get site admin JWT
+    const siteAdminResult = await server.seeder.createAndVerifyAddress(
+      { chain },
+      'Bob',
+    );
+    const siteAdminSetSuccessfully = await server.seeder.setSiteAdmin({
+      user_id: +siteAdminResult.user_id,
+    });
+    expect(siteAdminSetSuccessfully).to.be.true;
+    siteAdminJwt = jwt.sign(
+      { id: siteAdminResult.user_id, email: siteAdminResult.email },
+      JWT_SECRET,
+    );
 
     // create community for test
     const communityArgs: CommunityArgs = {
@@ -188,6 +203,28 @@ describe('Update Community/Chain Tests', () => {
         .send({ jwt: jwtToken, id: chain, network });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(ChainError.CantChangeNetwork);
+    });
+
+    it('should fail to update custom domain if not site admin', async () => {
+      const custom_domain = 'test.com';
+      const res = await chai
+        .request(server.app)
+        .patch(`/api/communities/${chain}`)
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, custom_domain });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(ChainError.CantChangeCustomDomain);
+    });
+
+    it('should update custom domain if site admin', async () => {
+      const custom_domain = 'test.com';
+      const res = await chai
+        .request(server.app)
+        .patch(`/api/communities/${chain}`)
+        .set('Accept', 'application/json')
+        .send({ jwt: siteAdminJwt, id: chain, custom_domain });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.custom_domain).to.be.equal(custom_domain);
     });
 
     it('should fail if no chain id', async () => {

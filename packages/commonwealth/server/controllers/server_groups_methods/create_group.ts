@@ -1,10 +1,12 @@
-import { AppError, Requirement, schemas } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   CommunityAttributes,
   GroupAttributes,
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
+import { GroupMetadata } from '@hicommonwealth/schemas';
+import { Requirement } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import z from 'zod';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -16,7 +18,7 @@ import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_COMMUNITY = 20;
 
-// FIXME: validation errors
+// Warning: validation errors
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
   InvalidRequirements: 'Invalid requirements',
@@ -25,18 +27,19 @@ const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-// FIXME: the schema
+// Warning: the schema
 export type CreateGroupOptions = {
   user: UserInstance;
   community: CommunityAttributes;
-  metadata: z.infer<typeof schemas.entities.GroupMetadata>;
+  metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
+  allowList?: number[];
   systemManaged?: boolean;
   transaction?: Transaction;
 };
 
-// FIXME: should be partial of the aggregate
+// Warning: should be partial of the aggregate
 export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
@@ -51,7 +54,7 @@ export async function __createGroup(
     transaction,
   }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
-  // FIXME: authorization
+  // Warning: authorization
   const isAdmin = await validateOwner({
     models: this.models,
     user,
@@ -64,13 +67,13 @@ export async function __createGroup(
     throw new AppError(Errors.Unauthorized);
   }
 
-  // FIXME: validation
+  // Warning: validation
   const metadataValidationErr = validateMetadata(metadata);
   if (metadataValidationErr) {
     throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
   }
 
-  // FIXME: validation
+  // Warning: validation
   const requirementsValidationErr = validateRequirements(requirements);
   if (requirementsValidationErr) {
     throw new AppError(
@@ -78,7 +81,7 @@ export async function __createGroup(
     );
   }
 
-  // FIXME: invariant
+  // Warning: invariant
   const numCommunityGroups = await this.models.Group.count({
     where: {
       community_id: community.id,
@@ -145,7 +148,7 @@ export async function __createGroup(
     });
   }
 
-  // FIXME: move to middleware
+  // Warning: move to middleware
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
     community: community.id,

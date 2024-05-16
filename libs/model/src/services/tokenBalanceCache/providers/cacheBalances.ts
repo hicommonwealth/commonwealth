@@ -1,8 +1,5 @@
-import {
-  BalanceSourceType,
-  CacheNamespaces,
-  cache,
-} from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { Balances, GetBalancesOptions } from '../types';
 
 const balanceTTL = process.env.TBC_BALANCE_TTL_SECONDS

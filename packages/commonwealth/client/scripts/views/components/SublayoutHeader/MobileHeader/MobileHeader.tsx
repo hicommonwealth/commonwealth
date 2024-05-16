@@ -18,12 +18,14 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
   onMobile: boolean;
   isInsideCommunity: boolean;
-  onAuthModalOpen: (open: boolean) => void;
+  onAuthModalOpen: (modalType?: AuthModalType) => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -41,6 +43,7 @@ const MobileHeader = ({
   onRevalidationModalData,
   onFeedbackModalOpen,
 }: MobileHeaderProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
@@ -107,12 +110,14 @@ const MobileHeader = ({
                 userCommunityId={user?.community?.id}
               />
             </div>
+          ) : userOnboardingEnabled ? (
+            <></>
           ) : (
             <CWButton
               label="Sign in"
               buttonHeight="sm"
               disabled={location.pathname.includes('/finishsociallogin')}
-              onClick={() => onAuthModalOpen(true)}
+              onClick={() => onAuthModalOpen()}
             />
           )}
         </div>

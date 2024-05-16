@@ -51,7 +51,6 @@
     color: $neutral-800 !important;
     font-size: 14px !important;
     line-height: 20px;
-    letter-spacing: 1%;
     font-weight: 400;
     margin-top: 3px;
   }
@@ -70,7 +69,6 @@
   padding: 8px 1px !important;
   background-color: $white;
   border-radius: $border-radius-md !important;
-  overflow-y: auto;
   max-height: 336px;
   margin-top: 4px;
   font-size: 14px !important;
@@ -89,5 +87,15 @@
 
   .IconButton.archiveTrayIcon {
     fill: none;
+  }
+
+  .select-header {
+    text-transform: uppercase;
+    color: $neutral-400;
+    padding: 10px 12px;
+
+    &.divider {
+      border-top: 1px solid $neutral-200;
+    }
   }
 }

@@ -1,6 +1,6 @@
-import { NodeHealth } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
+import { NodeHealth } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Request, Response } from 'express';
 import _ from 'lodash';

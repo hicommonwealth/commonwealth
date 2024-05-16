@@ -189,7 +189,7 @@ export async function updateActiveAddresses({
     // Find all addresses in the current community for this account, sorted by last used date/time
     const communityAddressesSortedByLastUsed = [
       ...(app.user.addresses.filter((a) => a.community.id === chain.id) || []),
-    ].sort((a, b) => b.lastActive.diff(a.lastActive));
+    ].sort((a, b) => b.lastActive?.diff(a.lastActive));
 
     // From the sorted adddress in the current community, find an address which has an active session key
     const chainBase = app.chain?.base;
@@ -229,9 +229,12 @@ export async function updateActiveAddresses({
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
+    app.user.setId(0);
     app.user.setEmail(null);
     app.user.setEmailInterval(null);
     app.user.setEmailVerified(null);
+    app.user.setPromotionalEmailsEnabled(null);
+    app.user.setKnockJWT(null);
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
@@ -242,9 +245,12 @@ export function updateActiveUser(data) {
     app.user.setActiveAccounts([]);
     app.user.ephemerallySetActiveAccount(null);
   } else {
+    app.user.setId(data.id);
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
+    app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
+    app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 
     app.user.setAddresses(

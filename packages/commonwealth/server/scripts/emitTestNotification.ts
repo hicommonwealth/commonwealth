@@ -5,8 +5,8 @@ import {
   models,
 } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import Sequelize, { Transaction } from 'sequelize';
+import { fileURLToPath } from 'url';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import emitNotifications from '../util/emitNotifications';

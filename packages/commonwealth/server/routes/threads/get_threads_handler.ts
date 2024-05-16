@@ -102,6 +102,8 @@ export const getThreadsHandler = async (
       from_date,
       to_date,
       archived,
+      contestAddress,
+      status,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -115,6 +117,8 @@ export const getThreadsHandler = async (
       fromDate: from_date,
       toDate: to_date,
       archived: archived,
+      contestAddress,
+      status,
     });
     return success(res, bulkThreads);
   }

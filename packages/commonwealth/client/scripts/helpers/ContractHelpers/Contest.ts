@@ -1,4 +1,3 @@
-import { AppError } from '@hicommonwealth/core';
 import { TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
@@ -144,7 +143,7 @@ class Contest extends ContractBase {
           maxFeePerGas: null,
         });
       } catch {
-        throw new AppError('ETH transfer failed');
+        throw new Error('ETH transfer failed');
       }
     } else {
       const encodedParameters = this.web3.eth.abi.encodeParameters(

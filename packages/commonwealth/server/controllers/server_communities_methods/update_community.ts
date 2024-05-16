@@ -1,10 +1,11 @@
 /* eslint-disable no-continue */
 import { AppError } from '@hicommonwealth/core';
-import type {
+import {
+  checkSnapshotObjectExists,
+  commonProtocol,
   CommunityAttributes,
-  CommunitySnapshotSpaceWithSpaceAttached,
+  UserInstance,
 } from '@hicommonwealth/model';
-import { UserInstance, commonProtocol } from '@hicommonwealth/model';
 import { ChainBase } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -18,6 +19,7 @@ export const Errors = {
   NotLoggedIn: 'Not signed in',
   NoCommunityId: 'Must provide community ID',
   ReservedId: 'The id is reserved and cannot be used',
+  CantChangeCustomDomain: 'Custom domain change not permitted',
   CantChangeNetwork: 'Cannot change community network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
@@ -139,50 +141,16 @@ export async function __updateCommunity(
     throw new AppError(Errors.InvalidTerms);
   }
 
-  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-    await this.models.CommunitySnapshotSpaces.findAll({
-      where: { community_id: community.id },
-      include: {
-        model: this.models.SnapshotSpace,
-        as: 'snapshot_space',
-      },
-    });
-
-  // Check if any snapshot spaces are being removed
-  const removedSpaces = snapshotSpaces.filter((space) => {
-    return !snapshot.includes(space.snapshot_space.snapshot_space);
+  const newSpaces = snapshot.filter((space) => {
+    return !community.snapshot_spaces.includes(space);
   });
-  const existingSpaces = snapshotSpaces.filter((space) => {
-    return snapshot.includes(space.snapshot_space.snapshot_space);
-  });
-  const existingSpaceNames = existingSpaces.map((space) => {
-    return space.snapshot_space.snapshot_space;
-  });
-
-  for (const spaceName of snapshot) {
-    // check if its in the mapping
-    if (!existingSpaceNames.includes(spaceName)) {
-      const spaceModelInstance = await this.models.SnapshotSpace.findOrCreate({
-        where: { snapshot_space: spaceName },
-      });
-
-      // if it isnt, create it
-      await this.models.CommunitySnapshotSpaces.create({
-        snapshot_space_id: spaceModelInstance[0].snapshot_space,
-        community_id: community.id,
-      });
+  for (const space of newSpaces) {
+    if (!(await checkSnapshotObjectExists('space', space))) {
+      throw new AppError(Errors.InvalidSnapshot);
     }
   }
 
-  // delete unwanted associations
-  for (const removedSpace of removedSpaces) {
-    await this.models.CommunitySnapshotSpaces.destroy({
-      where: {
-        snapshot_space_id: removedSpace.snapshot_space_id,
-        community_id: community.id,
-      },
-    });
-  }
+  community.snapshot_spaces = snapshot;
 
   if (name) community.name = name;
   if (description) community.description = description;
@@ -260,11 +228,14 @@ export async function __updateCommunity(
   // is left un-updated? Is there a better approach?
   community.default_summary_view = default_summary_view || false;
 
-  // Under our current security policy, custom domains must be set by trusted
-  // administrators only. Otherwise an attacker could configure a custom domain and
-  // use the code they run to steal login tokens for arbitrary users.
-  //
-  // chain.custom_domain = custom_domain;
+  // Only permit site admins to update custom domain field on communities, as it requires
+  // external configuration (via heroku + whitelists).
+  // Currently does not permit unsetting the custom domain; must be done manually.
+  if (user.isAdmin && custom_domain) {
+    community.custom_domain = custom_domain;
+  } else if (custom_domain && custom_domain !== community.custom_domain) {
+    throw new AppError(Errors.CantChangeCustomDomain);
+  }
 
   await community.save();
 

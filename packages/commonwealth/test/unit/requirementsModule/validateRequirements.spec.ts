@@ -1,4 +1,4 @@
-import { BalanceSourceType, Requirement } from '@hicommonwealth/core';
+import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 

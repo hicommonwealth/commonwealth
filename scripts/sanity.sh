@@ -15,7 +15,7 @@ yarn workspaces run clean
 
 step 'Building'
 yarn workspace commonwealth build
-yarn workspace scripts build
+yarn workspace @hicommonwealth/sitemaps build
 
 step 'Type checking'
 yarn workspaces run check-types

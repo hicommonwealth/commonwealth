@@ -1,0 +1,80 @@
+@import '../../../../../../../styles/shared.scss';
+
+.JoinCommunityCard {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 16px;
+  gap: 16px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  width: 100%;
+
+  @include extraSmall {
+    padding: 8px 16px;
+    gap: 8px;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .h4 {
+      color: black;
+    }
+
+    .counts {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+
+      @include extraSmall {
+        gap: 4px;
+      }
+
+      .b2 {
+        color: $neutral-500;
+      }
+
+      .dot {
+        height: fit-content;
+        line-height: 5px;
+        color: $neutral-500;
+      }
+    }
+  }
+
+  .join-btn {
+    margin-left: auto;
+
+    @include extraSmall {
+      margin-top: -8px;
+      margin-left: 32px;
+      margin-right: auto;
+    }
+
+    &.isJoined {
+      button {
+        cursor: default !important;
+      }
+
+      svg {
+        height: 1.25rem !important;
+        width: 1.25rem !important;
+        margin-right: -4px;
+      }
+    }
+
+    button {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    &:focus,
+    &:focus-within {
+      border-color: transparent !important;
+    }
+  }
+}

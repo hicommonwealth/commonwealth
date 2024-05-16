@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 type StickyHeaderProps = {
   elementId: string;
   zIndex?: number;
+  top?: number;
   stickyBehaviourEnabled?: boolean;
 };
 
@@ -11,6 +12,7 @@ type StickyHeaderProps = {
 const useStickyHeader = ({
   elementId,
   zIndex = 999,
+  top = 0,
   stickyBehaviourEnabled = true,
 }: StickyHeaderProps) => {
   useEffect(() => {
@@ -19,7 +21,7 @@ const useStickyHeader = ({
     const updateStickyBehaviour = (isSticky = false) => {
       if (stickyElement?.style) {
         stickyElement.style.position = isSticky ? 'sticky' : 'initial';
-        stickyElement.style.top = isSticky ? '0' : 'initial';
+        stickyElement.style.top = isSticky ? `${top}px` : 'initial';
         stickyElement.style.zIndex = isSticky ? `${zIndex}` : 'initial';
       }
     };
@@ -32,7 +34,7 @@ const useStickyHeader = ({
         const stickyElementPos = stickyElement.getBoundingClientRect();
         // checks if user scroll past this element
         const hasTabsSectionReachedTop =
-          stickyElementPos.top - stickyElementPos.height <= 0;
+          stickyElementPos.top - top - stickyElementPos.height <= 0;
         updateStickyBehaviour(hasTabsSectionReachedTop);
       }
     };
@@ -44,7 +46,7 @@ const useStickyHeader = ({
     return () => {
       window.removeEventListener('wheel', listener);
     };
-  }, [stickyBehaviourEnabled, elementId, zIndex]);
+  }, [stickyBehaviourEnabled, elementId, zIndex, top]);
 };
 
 export default useStickyHeader;

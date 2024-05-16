@@ -1,10 +1,15 @@
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { DynamicTemplate } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
+import * as dotenv from 'dotenv';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { formatAddressShort } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
+
+dotenv.config();
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export type ThreadData = {
@@ -321,6 +326,7 @@ export const emailDigestBuilder = async (
 
 emailDigestBuilder(3, 'alex@common.xyz')
   .then(() => {
+    stats(HotShotsStats()).increment('cw.scheduler.email-digest');
     process.exit(0);
   })
   .catch((e) => {

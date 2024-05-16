@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 import type { VoteAttributes } from './vote';
 
 export type PollAttributes = {
@@ -18,15 +18,16 @@ export type PollAttributes = {
 
   // associations
   Thread?: ThreadAttributes;
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   votes?: VoteAttributes[];
 };
 
 export type PollInstance = ModelInstance<PollAttributes>;
-export type PollModelStatic = ModelStatic<PollInstance>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <PollModelStatic>sequelize.define<PollInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<PollInstance> =>
+  sequelize.define<PollInstance>(
     'Poll',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

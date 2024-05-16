@@ -10,12 +10,15 @@ import type {
 import type {
   CommunityAttributes,
   DB,
-  Link,
-  LinkSource,
-  Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  type Link,
+  type LinkSource,
+  type Role,
+} from '@hicommonwealth/shared';
 import {
   SignTypedDataVersion,
   personalSign,
@@ -157,6 +160,10 @@ export interface JoinCommunityArgs {
   originChain: string;
 }
 
+export interface SetSiteAdminArgs {
+  user_id: number;
+}
+
 const sortedStringify = configureStableStringify({
   bigint: false,
   circularValue: Error,
@@ -216,6 +223,7 @@ export type ModelSeeder = {
   ) => Promise<NotificationSubscription>;
   createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
+  setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
 
 export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
@@ -788,6 +796,24 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       return false;
     }
 
+    return true;
+  },
+
+  setSiteAdmin: async (args: SetSiteAdminArgs) => {
+    const { user_id } = args;
+    const user = await models.User.findOne({ where: { id: user_id } });
+    if (!user) {
+      console.error('User not found');
+      return false;
+    }
+    user.isAdmin = true;
+    try {
+      await user.save();
+    } catch (e) {
+      console.error('Failed to set user as site admin');
+      console.error(e);
+      return false;
+    }
     return true;
   },
 });

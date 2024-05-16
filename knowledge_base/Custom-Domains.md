@@ -5,7 +5,6 @@
 - [Local Testing](#local-testing)
 - [Staging Testing](#staging-testing)
 - [Heroku](#heroku)
-- [Airplane (default method for prod)](#airplane-default-method-for-prod)
 - [Workflow](#workflow)
 - [External Dependencies](#external-dependencies)
 - [Change Log](#change-log)
@@ -40,31 +39,17 @@ Go to <https://whateveryouwant.com> and verify that it loads as expected (you mi
 ## Heroku
 
 1. Go to Heroku > settings > custom domain section
-1. get [whatever].herokudns.com ⇒ then "use wherever"
-1. (must) wait for ACM status to be “ready or green check”
-1. if that’s taking a while, just delete the record, and re add it (the use Let’s Encrypt)
-1. it may take some time
-
-## Airplane (default method for prod)
-
-Airplane has a [task](https://app.airplane.dev/runbooks/rbk20220809zm9b1vxoi7e) set up to automate the process of adding a custom domain in 3 stages.
-
-1. Updates the Chain entry to reflect the new custom domain.
-2. Hit heroku /domains endpoint, which spins up a DNS target and is returned to the airplane user. At this step, the DNS target must be shared with the customer and a confirmation that they have added a CNAME record must be obtained.
-3. Refreshes the Heroku ACM via the heroku CLI. This is manually performed after step 2 is complete.
-
-## Workflow
-
-1. A DNS target is made for the custom domain in heroku.
-2. The domain is put in the "Chains" table under the custom_domain column
-3. When a client makes a request to the custom domain, our customDomainRoutes.tsx routes paths to not need the scope, passes scope into the component
+1. Get [whatever].herokudns.com ⇒ then "use wherever". Communicate this with the external client, who must configure it on their side.
+1. Wait for ACM status to be “ready or green check”, once configured on external client's DNS provider.
+1. If that’s taking a while, just delete the record, and re add it (the use Let’s Encrypt).
+1. Once completed, use the admin panel to add the custom domain to the community.
 
 ## External Dependencies
 
 When adding a new custom domain, ensure you update the following external whitelists:
 
 - For Login: magic.link
-- For Chain Data: alchemy.com (ETH mainnet) or quicknode.com (BSC, Fantom)
+- For Chain Data: alchemy.com (ETH mainnet only)
 
 ## Change Log
 

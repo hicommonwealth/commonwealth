@@ -1,11 +1,12 @@
 import {
   Actor,
+  EventNames,
   InvalidState,
   dispose,
   handleEvent,
   query,
-  schemas,
 } from '@hicommonwealth/core';
+import { ContestResults } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -21,7 +22,7 @@ chai.use(chaiAsPromised);
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
   const namespace = 'test-namespace';
-  const recurring = 'test-recurring-contest';
+  const recurring = '0x0000000000000000000000000000000000000000';
   const oneoff = 'test-oneoff-contest';
   const contest_id = 1;
   const content_id = 1;
@@ -60,7 +61,10 @@ describe('Contests projection lifecycle', () => {
 
   before(async () => {
     await bootstrap_testing();
-    const [chain] = await seed('ChainNode', { contracts: [] });
+    const [chain] = await seed('ChainNode', {
+      contracts: [],
+      url: 'https://test',
+    });
     const [user] = await seed(
       'User',
       {
@@ -146,7 +150,7 @@ describe('Contests projection lifecycle', () => {
 
   it('should project events on multiple contests', async () => {
     await handleEvent(Contests(), {
-      name: schemas.EventNames.RecurringContestManagerDeployed,
+      name: EventNames.RecurringContestManagerDeployed,
       payload: {
         namespace,
         contest_address: recurring,
@@ -156,7 +160,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestStarted,
+      name: EventNames.ContestStarted,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -167,7 +171,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.OneOffContestManagerDeployed,
+      name: EventNames.OneOffContestManagerDeployed,
       payload: {
         namespace,
         contest_address: oneoff,
@@ -177,7 +181,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestStarted,
+      name: EventNames.ContestStarted,
       payload: {
         contest_address: oneoff,
         start_time,
@@ -187,7 +191,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentAdded,
+      name: EventNames.ContestContentAdded,
       payload: {
         contest_address: oneoff,
         content_id,
@@ -198,7 +202,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentAdded,
+      name: EventNames.ContestContentAdded,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -210,7 +214,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentUpvoted,
+      name: EventNames.ContestContentUpvoted,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -222,7 +226,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentUpvoted,
+      name: EventNames.ContestContentUpvoted,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -234,7 +238,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestContentUpvoted,
+      name: EventNames.ContestContentUpvoted,
       payload: {
         contest_address: oneoff,
         content_id,
@@ -245,7 +249,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
-      name: schemas.EventNames.ContestWinnersRecorded,
+      name: EventNames.ContestWinnersRecorded,
       payload: {
         contest_address: recurring,
         contest_id,
@@ -323,13 +327,13 @@ describe('Contests projection lifecycle', () => {
           },
         ],
       },
-    ] as Array<z.infer<typeof schemas.queries.ContestResults>>);
+    ] as Array<z.infer<typeof ContestResults>>);
   });
 
   it('should raise invalid state when community with namespace not found', async () => {
     expect(
       handleEvent(Contests(), {
-        name: schemas.EventNames.RecurringContestManagerDeployed,
+        name: EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
           contest_address: 'new-address',
@@ -345,7 +349,7 @@ describe('Contests projection lifecycle', () => {
     getTokenAttributes.rejects(new Error());
     expect(
       handleEvent(Contests(), {
-        name: schemas.EventNames.RecurringContestManagerDeployed,
+        name: EventNames.RecurringContestManagerDeployed,
         payload: {
           namespace: 'not-found',
           contest_address: 'new-address',

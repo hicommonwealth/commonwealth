@@ -1,5 +1,6 @@
-import { Cache, delay, type CacheNamespaces } from '@hicommonwealth/core';
+import { Cache, type CacheNamespaces } from '@hicommonwealth/core';
 import { ILogger, logger } from '@hicommonwealth/logging';
+import { delay } from '@hicommonwealth/shared';
 import { RedisClientOptions, createClient, type RedisClientType } from 'redis';
 import { fileURLToPath } from 'url';
 

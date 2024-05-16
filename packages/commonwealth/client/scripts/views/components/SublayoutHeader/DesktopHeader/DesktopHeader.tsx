@@ -3,9 +3,11 @@ import React from 'react';
 import app from 'state';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
+import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
@@ -18,11 +20,13 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
+import AuthButtons from 'client/scripts/views/components/SublayoutHeader/AuthButtons';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
   onMobile: boolean;
-  onAuthModalOpen: () => void;
+  onAuthModalOpen: (modalType?: AuthModalType) => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -39,6 +43,7 @@ const DesktopHeader = ({
   onRevalidationModalData,
   onFeedbackModalOpen,
 }: DesktopHeaderProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
@@ -51,6 +56,8 @@ const DesktopHeader = ({
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
+
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   return (
     <div className="DesktopHeader">
@@ -85,46 +92,67 @@ const DesktopHeader = ({
       </div>
       <div className="header-right">
         <div
-          className={clsx('DesktopMenuContainer', {
+          className={clsx('DesktopMenuContainerParent', {
             isLoggedIn,
           })}
         >
-          <CreateContentPopover />
-          <CWTooltip
-            content="Explore communities"
-            placement="bottom"
-            renderTrigger={(handleInteraction) => (
-              <CWIconButton
-                iconButtonTheme="black"
-                iconName="compassPhosphor"
-                onClick={() => navigate('/communities', {}, null)}
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
+          <div
+            className={clsx('DesktopMenuContainer', {
+              isLoggedIn,
+            })}
+          >
+            <CreateContentPopover />
+            <CWTooltip
+              content="Explore communities"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="compassPhosphor"
+                  onClick={() => navigate('/communities', {}, null)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
+            />
+
+            <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
+
+            {isLoggedIn && !enableKnockInAppNotifications && (
+              <NotificationsMenuPopover />
             )}
-          />
+          </div>
 
-          <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
-
-          {isLoggedIn && <NotificationsMenuPopover />}
+          {isLoggedIn && enableKnockInAppNotifications && (
+            <KnockNotifications />
+          )}
         </div>
 
         {isLoggedIn && (
           <UserDropdown
-            onAuthModalOpen={onAuthModalOpen}
+            onAuthModalOpen={() => onAuthModalOpen()}
             onRevalidationModalData={onRevalidationModalData}
           />
         )}
 
         {!isLoggedIn && (
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Sign in"
-            buttonWidth="wide"
-            disabled={location.pathname.includes('/finishsociallogin')}
-            onClick={onAuthModalOpen}
-          />
+          <>
+            {userOnboardingEnabled ? (
+              <AuthButtons
+                smallHeightButtons
+                onButtonClick={(selectedType) => onAuthModalOpen(selectedType)}
+              />
+            ) : (
+              <CWButton
+                buttonType="primary"
+                buttonHeight="sm"
+                label="Sign in"
+                buttonWidth="wide"
+                disabled={location.pathname.includes('/finishsociallogin')}
+                onClick={() => onAuthModalOpen()}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

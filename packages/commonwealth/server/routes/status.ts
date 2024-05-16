@@ -1,4 +1,5 @@
 import { ServerError } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/logging';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -10,13 +11,19 @@ import type {
 } from '@hicommonwealth/model';
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
+import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
+import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
-import { ETH_RPC, JWT_SECRET } from '../config';
+import { SESSION_EXPIRY_MILLIS } from '../../session';
+import { ETH_RPC, JWT_SECRET, KNOCK_SIGNING_KEY } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 type ThreadCountQueryData = {
   communityId: string;
@@ -29,10 +36,12 @@ type StatusResp = {
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
   user?: {
+    id: number;
     email: string;
     emailVerified: boolean;
     emailInterval: EmailNotificationInterval;
     jwt: string;
+    knockJwtToken: string;
     addresses: AddressInstance[];
     selectedCommunity: CommunityInstance;
     isAdmin: boolean;
@@ -272,10 +281,13 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   return {
     roles,
     user: {
+      id: user.id,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
+      promotional_emails_enabled: user.promotional_emails_enabled,
       jwt: '',
+      knockJwtToken: '',
       addresses,
       selectedCommunity,
       isAdmin,
@@ -329,8 +341,15 @@ export const status = async (
         threadCountQueryData,
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
+
+      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
+        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+      });
+
+      const knockJwtToken = await computeKnockJwtToken(user.id);
+
       user.jwt = jwtToken as string;
+      user.knockJwtToken = knockJwtToken;
 
       return success(res, {
         notificationCategories,
@@ -348,6 +367,21 @@ export const status = async (
     throw new ServerError('something broke', error);
   }
 };
+
+/**
+ * We have to generate a JWT token for use by the frontend Knock SDK.
+ */
+async function computeKnockJwtToken(userId: number) {
+  if (KNOCK_SIGNING_KEY) {
+    return await Knock.signUserToken(`${userId}`, {
+      signingKey: KNOCK_SIGNING_KEY,
+      expiresInSeconds: SESSION_EXPIRY_MILLIS / 1000,
+    });
+  } else {
+    log.warn('No process.env.KNOCK_SIGNING_KEY defined ');
+    return '';
+  }
+}
 
 type CommunityActivity = [communityId: string, timestamp: string | null][];
 

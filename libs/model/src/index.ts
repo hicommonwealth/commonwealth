@@ -10,6 +10,7 @@ export * as User from './user';
 
 // Core Services
 export * from './services';
+export * from './types';
 
 // Test Service
 export * as tester from './tester';

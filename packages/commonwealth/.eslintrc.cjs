@@ -103,22 +103,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-unused-vars': 1,
     'react/jsx-key': 1,
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: [
-              '@hicommonwealth/core/**',
-              '@hicommonwealth/adapters/**',
-              '@hicommonwealth/model/**',
-            ],
-            message:
-              "Avoid importing from 'lib' directories. Import from the main entry point instead.",
-          },
-        ],
-      },
-    ],
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [

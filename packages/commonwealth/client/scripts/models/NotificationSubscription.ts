@@ -1,5 +1,6 @@
-import type { SubscriptionAttributes } from '@hicommonwealth/model';
+import { Subscription } from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { z } from 'zod';
 import { Comment as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
@@ -76,7 +77,7 @@ class NotificationSubscription {
 }
 
 export const modelFromServer = (
-  subscription: SubscriptionAttributes & {
+  subscription: z.infer<typeof Subscription> & {
     Thread?: any;
     Comment?: any;
   },

@@ -1,3 +1,6 @@
+import Sequelize from 'sequelize';
+import type { Associable } from './types';
+
 import Address from './address';
 import Ban from './ban';
 import ChainNode from './chain_node';
@@ -10,8 +13,8 @@ import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityContractTemplate from './community_contract_template';
 import CommunityContractTemplateMetadata from './community_contract_template_metadata';
-import CommunitySnapshotSpaces from './community_snapshot_spaces';
 import CommunityStake from './community_stake';
+import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
@@ -30,14 +33,14 @@ import NotificationsRead from './notifications_read';
 import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
+import ProfileTags from './profile_tags';
 import Reaction from './reaction';
-import SnapshotProposal from './snapshot_proposal';
-import SnapshotSpace from './snapshot_spaces';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
 import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
+import Tags from './tags';
 import Template from './template';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
@@ -59,8 +62,8 @@ export const Factories = {
   CommunityContract,
   CommunityContractTemplate,
   CommunityContractTemplateMetadata,
-  CommunitySnapshotSpaces,
   CommunityStake,
+  CommunityTags,
   Contest,
   ContestAction,
   ContestManager,
@@ -79,13 +82,13 @@ export const Factories = {
   Outbox,
   Poll,
   Profile,
+  ProfileTags,
   Reaction,
-  SnapshotProposal,
-  SnapshotSpace,
   SsoToken,
   StakeTransaction,
   StarredCommunity,
   Subscription,
+  Tags,
   SubscriptionPreference,
   Template,
   Thread,
@@ -94,4 +97,12 @@ export const Factories = {
   User,
   Vote,
   Webhook,
+};
+
+export type DB = {
+  [K in keyof typeof Factories]: ReturnType<typeof Factories[K]> &
+    Associable<ReturnType<typeof Factories[K]>>;
+} & {
+  sequelize: Sequelize.Sequelize;
+  Sequelize: typeof Sequelize.Sequelize;
 };
