@@ -163,6 +163,7 @@ describe('chainEventCreated Event Handler', () => {
         key: WorkflowKeys.CommunityStake,
         users: [{ id: String(user!.id) }],
         data: {
+          community_id: community!.id,
           transaction_type: 'minted',
           community_name: community!.name,
           community_stakes_url: getCommunityUrl(community!.id),
@@ -269,6 +270,7 @@ describe('chainEventCreated Event Handler', () => {
         key: WorkflowKeys.ChainProposals,
         users: [{ id: String(user!.id) }],
         data: {
+          community_id: community!.id,
           community_name: community!.name,
           proposal_kind: 'proposal-created',
           proposal_url: getChainProposalUrl(community!.id, proposalId),

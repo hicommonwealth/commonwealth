@@ -3,6 +3,7 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  SnapshotProposalCreatedNotification,
   UserMentionedNotification,
 } from './notifications.schemas';
 
@@ -21,15 +22,20 @@ export const GetRecapEmailData = {
         }),
       ]),
     ),
-    stake: z.array(
+    protocol: z.array(
       CommunityStakeNotification.extend({
-        community_logo_url: z.string(),
+        community_icon_url: z.string(),
       }),
     ),
     governance: z.array(
-      ChainProposalsNotification.extend({
-        community_logo_url: z.string(),
-      }),
+      z.union([
+        ChainProposalsNotification.extend({
+          community_icon_url: z.string(),
+        }),
+        SnapshotProposalCreatedNotification.extend({
+          community_icon_url: z.string(),
+        }),
+      ]),
     ),
   }),
 };

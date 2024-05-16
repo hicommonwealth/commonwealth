@@ -134,7 +134,8 @@ describe('snapshotProposalCreated Event Handler', () => {
       key: WorkflowKeys.SnapshotProposals,
       users: [{ id: String(user!.id) }],
       data: {
-        community_name: community.name,
+        community_id: community!.id,
+        community_name: community!.name,
         space_name: space,
         snapshot_proposal_url: getSnapshotUrl(community!.id, space, proposalId),
       },

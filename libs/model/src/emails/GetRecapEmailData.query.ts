@@ -93,54 +93,87 @@ async function enrichNotifications({
   governance: GovernanceNotifications;
   protocol: ProtocolNotifications;
 }): Promise<z.infer<typeof GetRecapEmailData['output']>> {
-  const enrichedDiscussion = [];
-  const enrichedGovernance = [];
-  const enrichedProtocol = [];
+  const enrichedDiscussion: z.infer<
+    typeof GetRecapEmailData['output']
+  >['discussion'] = [];
+  const enrichedGovernance: z.infer<
+    typeof GetRecapEmailData['output']
+  >['governance'] = [];
+  const enrichedProtocol: z.infer<
+    typeof GetRecapEmailData['output']
+  >['protocol'] = [];
 
   const discussionAvatars = await models.sequelize.query<{
     user_avatars: { [user_id: string]: string };
   }>(
     `
-      SELECT JSONB_OBJECT_AGG(A.id, P.avatar_url) as user_avatars
-      FROM "Addresses" A
-               JOIN "Profiles" P ON A.profile_id = P.id
-      WHERE A.id IN (:addressIds);
-  `,
+        SELECT JSONB_OBJECT_AGG(A.id, P.avatar_url) as user_avatars
+        FROM "Addresses" A
+                 JOIN "Profiles" P ON A.profile_id = P.id
+        WHERE A.id IN (:addressIds);
+    `,
     {
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
-        addressIds: discussion.map((n) => {
-          if ('comment_created_event' in n) {
-            return n.comment_created_event.address_id;
-          } else {
-            return n.address_id;
-          }
-        }),
+        addressIds: Array.from(
+          new Set(
+            discussion.map((n) => {
+              if ('comment_created_event' in n) {
+                return n.comment_created_event.address_id;
+              } else {
+                return n.author_address_id;
+              }
+            }),
+          ),
+        ),
+      },
+    },
+  );
+
+  const communityIcons = await models.sequelize.query<{
+    icon_urls: { [community_id: string]: string };
+  }>(
+    `
+        SELECT JSONB_OBJECT_AGG(C.id, C.icon_url) as icon_urls
+        FROM "Communities" C
+        WHERE id IN (:communityIds);
+    `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: {
+        communityIds: Array.from(
+          new Set([...governance, ...protocol].map((i) => i.community_id)),
+        ),
       },
     },
   );
 
   for (const notif of discussion) {
-    if ('comment_created_event' in notif) {
-      enrichedDiscussion.push({
-        ...notif,
-        author_avatar_url:
-          discussionAvatars[0]?.user_avatars[
-            notif.comment_created_event.address_id
-          ],
-      });
-    } else {
-      // TODO: add author or address id to user mentioned notifications
-    }
+    enrichedDiscussion.push({
+      ...notif,
+      author_avatar_url:
+        'comment_created_event' in notif
+          ? discussionAvatars[0]?.user_avatars[
+              notif.comment_created_event.address_id
+            ]
+          : discussionAvatars[0]?.user_avatars[notif.author_address_id],
+    });
   }
 
   for (const notif of governance) {
-    // TODO: add community_id to chain/snapshot proposal notifications
+    enrichedGovernance.push({
+      ...notif,
+      community_icon_url: communityIcons[0]?.icon_urls[notif.community_id],
+    });
   }
 
   for (const notif of protocol) {
-    // TODO: add community_id to community stake notifications
+    enrichedProtocol.push({
+      ...notif,
+      community_icon_url: communityIcons[0]?.icon_urls[notif.community_id],
+    });
   }
 
   return {
