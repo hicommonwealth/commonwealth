@@ -78,7 +78,7 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
     contest_address: evmInput.contest,
     content_id: 0, // TODO optional
     namespace: evmInput.namespace,
-    length: 0, // TODO: NewContest event does not have length (has interval)
+    length: ethers.BigNumber.from(evmInput.interval).toNumber(), // TODO: NewContest event does not have length (has interval)
   }),
 };
 
@@ -90,9 +90,9 @@ const NewRecurringContestStartedMapper: EvmMapper<
   mapEvmToSchema: (evmInput) => ({
     created_at: new Date(),
     contest_address: '', // TODO
-    contest_id: 0, // TODO optional
+    contest_id: ethers.BigNumber.from(evmInput.contestId).toNumber(),
     start_time: new Date(ethers.BigNumber.from(evmInput.startTime).toNumber()),
-    end_time: new Date(ethers.BigNumber.from(evmInput.startTime).toNumber()),
+    end_time: new Date(ethers.BigNumber.from(evmInput.endTime).toNumber()),
   }),
 };
 
@@ -106,7 +106,7 @@ const NewSingleContestStartedMapper: EvmMapper<
     contest_address: '', // TODO
     contest_id: 0, // TODO optional
     start_time: new Date(ethers.BigNumber.from(evmInput.startTime).toNumber()),
-    end_time: new Date(ethers.BigNumber.from(evmInput.startTime).toNumber()),
+    end_time: new Date(ethers.BigNumber.from(evmInput.endTime).toNumber()),
   }),
 };
 
@@ -158,7 +158,9 @@ const ContestWinnersRecordedMapper: EvmMapper<
 };
 
 type EvmMappersRecord = {
-  [K in keyof typeof ChainEventSigs]: EvmMapper<any, any>[];
+  [K in keyof typeof ChainEventSigs]:
+    | EvmMapper<any, any>
+    | EvmMapper<any, any>[];
 };
 
 // EvmMappers maps each chain event to one or more zod event schema types
@@ -167,11 +169,11 @@ const EvmMappers: EvmMappersRecord = {
     RecurringContestManagerDeployedMapper,
     OneOffContestManagerDeployedMapper,
   ],
-  NewRecurringContestStarted: [NewRecurringContestStartedMapper],
-  NewSingleContestStarted: [NewSingleContestStartedMapper],
-  ContentAdded: [NewContestContentAddedMapper],
-  VoterVoted: [ContestContentUpvotedMapper],
-  PrizeShareUpdated: [ContestWinnersRecordedMapper],
+  NewRecurringContestStarted: NewRecurringContestStartedMapper,
+  NewSingleContestStarted: NewSingleContestStartedMapper,
+  ContentAdded: NewContestContentAddedMapper,
+  VoterVoted: ContestContentUpvotedMapper,
+  PrizeShareUpdated: ContestWinnersRecordedMapper,
 };
 
 // parseEthersResult converts the raw EVM result into key-value pairs based on signature.
@@ -184,25 +186,29 @@ const parseEthersResult = (
   const result: Record<string, any> = {};
   for (let i = 0; i < sigParts.length; i++) {
     const value = params[i];
-    const [, sigArgName] = sigParts[i].split(' ');
+    const [, sigArgName] = sigParts[i].replace(' indexed ', ' ').split(' ');
     result[sigArgName] = value;
   }
   return result;
 };
 
-// mapEvmToSchema maps chain event values to
-const mapEvmToSchema = (
-  chainEventName: keyof typeof ChainEventSigs,
-  evmValues: ethers.utils.Result,
+// parseEvmEventToContestEvent maps chain event values to zod schema types
+export const parseEvmEventToContestEvent = <
+  Event extends keyof typeof ChainEventSigs,
+>(
+  chainEventName: Event,
+  evmParsedArgs: ethers.utils.Result,
 ): any => {
-  const mappers = EvmMappers[chainEventName];
-  if (!mappers) {
+  const m = EvmMappers[chainEventName];
+  if (!m) {
     throw new Error(`failed to map EVM event to schema: ${chainEventName}`);
   }
+  const mappers: EvmMapper<any, any>[] = Array.isArray(m) ? m : [m];
   for (const mapper of mappers) {
-    const evmInput = parseEthersResult(mapper.signature, evmValues);
+    const evmInput = parseEthersResult(mapper.signature, evmParsedArgs);
     if (!mapper.condition || mapper.condition(evmInput)) {
       return mapper.mapEvmToSchema(evmInput);
     }
   }
+  throw new Error(`No valid mapper found for event: ${chainEventName}`);
 };
