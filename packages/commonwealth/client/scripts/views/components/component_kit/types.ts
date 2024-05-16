@@ -34,6 +34,7 @@ export enum ComponentType {
   Modal = 'CWModal',
   OldTextInput = 'OldTextInput',
   PageLayout = 'PageLayout',
+  Pagination = 'Pagination',
   PopoverMenu = 'PopoverMenu',
   Popover = 'Popover',
   ProgressBar = 'ProgressBar',

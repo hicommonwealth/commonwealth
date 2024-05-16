@@ -38,7 +38,9 @@ const updateProfileByAddress = async ({
     backgroundImage,
     avatarUrl,
     socials,
-    tag_ids: tagIds,
+    ...(tagIds && {
+      tag_ids: tagIds,
+    }),
     jwt: app.user.jwt,
   });
 
