@@ -49,7 +49,7 @@ Similarly, whenever a PR introduces new codebase functionality where either...
 
 Significant updates to knowledge base entries should be manually listed in a given entry's change log; see the [Change Log](#change-log) sub-entry for guidelines and context. All entries should follow the [Documentation Language](#documentation-language) guidelines.
 
-At least for the duration of 2023, as we implement this new system, any PR that updates or contributes to our knowledge base should tag @gdjohnson (the documentarian) on GitHub.
+As we implement this new system in 2024, any PR that updates or contributes to our knowledge base should tag @gdjohnson (the documentarian) on GitHub.
 
 ### Tickets and PRs
 
