@@ -194,7 +194,7 @@ export const emitMentions = async (
     const values: {
       event_name: EventNames.UserMentioned;
       event_payload: z.infer<typeof events.UserMentioned>;
-    }[] = data.mentions.map(({ user_id, address, profile_name }) => ({
+    }[] = data.mentions.map(({ user_id }) => ({
       event_name: EventNames.UserMentioned,
       event_payload: {
         authorAddressId: data.authorAddressId,
