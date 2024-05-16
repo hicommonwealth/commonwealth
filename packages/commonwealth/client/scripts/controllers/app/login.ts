@@ -10,6 +10,7 @@ import { initAppState } from 'state';
 
 import { OpenFeature } from '@openfeature/web-sdk';
 import axios from 'axios';
+import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
 import moment from 'moment';
 import app from 'state';
@@ -356,13 +357,17 @@ export async function startLoginWithMagicLink({
   const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
+    const authModalState = authModal.getState();
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const { address } = await handleSocialLoginCallback({
+    const { address, isAddressNew } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
+      returnEarlyIfNewAddress:
+        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
     });
-    return { bearer, address };
+
+    return { bearer, address, isAddressNew };
   } else {
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
@@ -466,6 +471,7 @@ export async function handleSocialLoginCallback({
     communities: [],
   });
 
+  console.log('magicAddress => ', { magicAddress, res });
   const isAddressNew = res?.data?.result?.length === 0;
   if (isAddressNew && returnEarlyIfNewAddress) {
     return { address: magicAddress, isAddressNew };

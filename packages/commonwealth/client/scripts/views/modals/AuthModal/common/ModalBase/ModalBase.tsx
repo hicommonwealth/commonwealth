@@ -196,6 +196,10 @@ const ModalBase = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
+      if (layoutType === AuthModalType.SignIn) {
+        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
+      }
+
       setIsAuthenticatingWithEmail(true);
       return;
     }

@@ -33,6 +33,7 @@ import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
+import { authModal } from '../state/ui/modals/authModal';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
@@ -208,13 +209,25 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
-      const { address: magicAddress } = await startLoginWithMagicLink({
-        email: tempEmailToUse,
-        isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
-        chain: app.chain?.id,
-      });
+      const { address: magicAddress, isAddressNew } =
+        await startLoginWithMagicLink({
+          email: tempEmailToUse,
+          isCosmos,
+          redirectTo: document.location.pathname + document.location.search,
+          chain: app.chain?.id,
+        });
       setIsMagicLoading(false);
+
+      // if SSO account address is not already present in db,
+      // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
+      // then open the user auth type guidance modal
+      // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
+      if (isAddressNew) {
+        authModal
+          .getState()
+          .validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
+        return;
+      }
 
       if (walletProps.onSuccess) {
         walletProps.onSuccess(magicAddress, isNewlyCreated);
