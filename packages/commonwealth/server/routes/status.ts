@@ -290,6 +290,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
+      promotional_emails_enabled: user.promotional_emails_enabled,
       jwt: '',
       knockJwtToken: '',
       addresses,

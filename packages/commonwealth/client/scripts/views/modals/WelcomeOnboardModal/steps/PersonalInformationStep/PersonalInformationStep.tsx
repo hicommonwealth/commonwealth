@@ -115,7 +115,6 @@ const PersonalInformationStep = ({
       ...(values.email && {
         email: values.email,
       }),
-      promotionalEmailsEnabled: values.enableProductUpdates,
     });
 
     // set email for notifications
@@ -125,6 +124,8 @@ const PersonalInformationStep = ({
 
     // enable/disable all in-app notifications for user
     await toggleAllInAppNotifications(values.enableAccountNotifications);
+    // enable/disable promotional emails flag for user
+    await app.user.writeEmailSettings('', values.enableProductUpdates);
 
     onComplete();
   };

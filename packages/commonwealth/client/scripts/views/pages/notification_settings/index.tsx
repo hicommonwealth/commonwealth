@@ -99,7 +99,7 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Once a week',
                   onClick: () => {
-                    app.user.updateEmailInterval('weekly');
+                    app.user.writeEmailSettings('weekly');
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -107,7 +107,7 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Never',
                   onClick: () => {
-                    app.user.updateEmailInterval('never');
+                    app.user.writeEmailSettings('never');
                     setCurrentFrequency('never');
                     forceRerender();
                   },

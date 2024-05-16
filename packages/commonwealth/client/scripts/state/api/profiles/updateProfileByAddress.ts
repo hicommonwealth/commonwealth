@@ -14,7 +14,6 @@ interface UpdateProfileByAddressProps {
   avatarUrl?: string;
   socials?: string;
   backgroundImage?: string;
-  promotionalEmailsEnabled?: boolean;
   tagIds?: number[];
 }
 
@@ -28,7 +27,6 @@ const updateProfileByAddress = async ({
   backgroundImage,
   avatarUrl,
   socials,
-  promotionalEmailsEnabled,
   tagIds,
 }: UpdateProfileByAddressProps) => {
   // TODO: ideally this should return a response
@@ -40,9 +38,6 @@ const updateProfileByAddress = async ({
     backgroundImage,
     avatarUrl,
     socials,
-    ...(typeof promotionalEmailsEnabled === 'boolean' && {
-      promotionalEmailsEnabled,
-    }),
     ...(tagIds && {
       tag_ids: tagIds,
     }),

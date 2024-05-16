@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
-        'Profiles',
+        'Users',
         'promotional_emails_enabled',
         {
           type: Sequelize.BOOLEAN,
@@ -15,13 +15,9 @@ module.exports = {
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn(
-        'Profiles',
-        'promotional_emails_enabled',
-        {
-          transaction: t,
-        },
-      );
+      await queryInterface.removeColumn('Users', 'promotional_emails_enabled', {
+        transaction: t,
+      });
     });
   },
 };
