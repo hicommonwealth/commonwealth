@@ -21,7 +21,7 @@ export async function getSolanaBalances(
     },
   });
   if (!chainNode) {
-    const msg = `ChainNode with for Solana does not exist`;
+    const msg = `ChainNode for Solana does not exist`;
     log.error(msg, undefined);
     return {};
   }
