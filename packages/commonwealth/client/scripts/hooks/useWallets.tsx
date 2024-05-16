@@ -73,6 +73,7 @@ type IuseWalletProps = {
   initialWallets?: IWebWallet<any>[];
   onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
+  onUnrecognizedAddressReceived?: () => boolean;
   useSessionKeyLoginFlow?: boolean;
 };
 
@@ -569,6 +570,29 @@ const useWallets = (walletProps: IuseWalletProps) => {
     await wallet.reset();
   };
 
+  const doesAddressExist = async (
+    wallet: IWebWallet<any>,
+    selectedAddress: string,
+  ) => {
+    const res = await axios.post(`${app.serverUrl()}/getAddressProfile`, {
+      addresses: [
+        wallet.chain === ChainBase.Substrate
+          ? addressSwapper({
+              address: selectedAddress,
+              currentPrefix: parseInt(
+                (app.chain as Substrate)?.meta.ss58Prefix,
+                10,
+              ),
+            })
+          : selectedAddress,
+      ],
+      communities: [app.activeChainId() ?? wallet.chain],
+    });
+
+    // if there are any results, then address exists
+    return res?.data?.result?.length > 0;
+  };
+
   const onWalletSelect = async (wallet: IWebWallet<any>) => {
     await wallet.enable();
 
@@ -582,6 +606,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
       await loginToNear(app.chain as Near, app.isCustomDomain());
     } else {
       const selectedAddress = getAddressFromWallet(wallet);
+
+      // check if address exists
+      const addressExists = await doesAddressExist(wallet, selectedAddress);
+      if (!addressExists && walletProps.onUnrecognizedAddressReceived) {
+        const shouldContinue = walletProps.onUnrecognizedAddressReceived();
+        if (!shouldContinue) return;
+      }
 
       if (walletProps.useSessionKeyLoginFlow) {
         await onSessionKeyRevalidation(wallet, selectedAddress);

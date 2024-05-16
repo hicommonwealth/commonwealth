@@ -57,6 +57,7 @@ const ModalBase = ({
   showWalletsFor,
   bodyClassName,
   onSignInClick,
+  onChangeModalType,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
@@ -93,6 +94,17 @@ const ModalBase = ({
     await handleClose();
   };
 
+  const handleUnrecognizedAddressReceived = () => {
+    // if this is the `layoutType == SignIn` modal, and we get an unrecognized
+    // address, then change modal type to `AccountTypeGuidance`
+    if (layoutType === AuthModalType.SignIn) {
+      onChangeModalType(AuthModalType.AccountTypeGuidance);
+      return false;
+    }
+
+    return true;
+  };
+
   const {
     wallets = [],
     isMagicLoading,
@@ -108,6 +120,7 @@ const ModalBase = ({
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
+    onUnrecognizedAddressReceived: handleUnrecognizedAddressReceived,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
