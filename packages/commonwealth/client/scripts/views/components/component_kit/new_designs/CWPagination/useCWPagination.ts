@@ -15,8 +15,8 @@ export interface UseCWPaginationProps {
 const useCWPagination = ({
   totalCount,
   boundaryCount = 1,
-  onChange: handleChange,
   siblingCount = 1,
+  onChange: handleChange,
 }: UseCWPaginationProps) => {
   const [selectedPage, setSelectedPage] = useState(1);
 

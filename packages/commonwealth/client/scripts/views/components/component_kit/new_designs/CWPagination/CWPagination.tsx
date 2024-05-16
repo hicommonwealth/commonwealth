@@ -15,11 +15,19 @@ interface CWPaginationProps extends UseCWPaginationProps {
   className?: string;
 }
 
+/**
+ * @param totalCount total count of pages for pagination
+ * @param boundaryCount number of buttons to show between (previous button and start ellipsis)
+ * or (end ellipsis and next button)
+ * @param siblingCount number of buttons to show before and after the current page
+ * @param onChange onClick handler for pagination
+ * @param className className for pagination container
+ */
 const CWPagination = ({
   totalCount,
   boundaryCount,
-  onChange,
   siblingCount,
+  onChange,
   className,
 }: CWPaginationProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
