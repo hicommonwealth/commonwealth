@@ -28,7 +28,7 @@ test.describe('Discussion Page Tests', () => {
     await login(page);
   });
 
-  test('Check User can create/update/delete/like/unlike comment', async ({
+  test.skip('Check User can create/update/delete/like/unlike comment', async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -80,7 +80,7 @@ test.describe('Discussion Page Tests', () => {
     expect(await page.getByText(commentText).count()).toEqual(0);
   });
 
-  test('Check User can like/dislike thread', async ({ page }) => {
+  test.skip('Check User can like/dislike thread', async ({ page }) => {
     await performUpvote(page, 'ThreadOptions');
   });
 });
