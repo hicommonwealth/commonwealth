@@ -5,8 +5,10 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { useFlag } from '../../../../../hooks/useFlag';
 import MinimumProfile from '../../../../../models/MinimumProfile';
 import { useFetchProfilesByAddressesQuery } from '../../../../../state/api/profiles/index';
+import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
 import { chainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
@@ -23,6 +25,7 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
+  const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 
   const profileAddresses = filteredGroups
@@ -43,7 +46,8 @@ const GroupsSection = ({
 
   return (
     <section className="GroupsSection">
-      {hasNoGroups && (
+      {hasNoGroups && allowlistEnabled && <TopicGatingHelpMessage />}
+      {hasNoGroups && !allowlistEnabled && (
         <div className="empty-groups-container">
           <CWIcon iconName="members" iconSize="xxl" className="members-icon" />
           <CWText type="h4" className="header">

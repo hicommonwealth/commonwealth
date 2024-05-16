@@ -453,6 +453,7 @@ const GroupForm = ({
                   defaultValues={subForm.defaultValues}
                   errors={subForm.errors}
                   onChange={(val) => validateChangedValue(val, index)}
+                  isRemoveable={!allowlistEnabled && index > 0}
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
@@ -556,9 +557,8 @@ const GroupForm = ({
               setAllowedAddresses={setAllowedAddresses}
             />
           )}
-          {(formType === 'create' || formType === 'edit') && (
-            <TopicGatingHelpMessage />
-          )}
+          {(formType === 'create' || formType === 'edit') &&
+            !allowlistEnabled && <TopicGatingHelpMessage />}
 
           {/* Form action buttons */}
           <div className="action-buttons">

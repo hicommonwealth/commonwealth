@@ -30,6 +30,7 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewEventPayload,
 } from '../../../../../../shared/analytics/types';
+import { useFlag } from '../../../../hooks/useFlag';
 import { useMemberData } from '../common/memberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
@@ -45,6 +46,7 @@ const TABS = [
 const GROUP_AND_MEMBER_FILTERS: BaseGroupFilter[] = ['All groups', 'Ungrouped'];
 
 const CommunityMembersPage = () => {
+  const allowlistEnabled = useFlag('allowlist');
   useUserActiveAccount();
   const location = useLocation();
   const navigate = useCommonNavigate();
@@ -318,7 +320,9 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TABS[1].value && groups?.length === 0 ? (
+        {selectedTab === TABS[1].value &&
+        groups?.length === 0 &&
+        !allowlistEnabled ? (
           <></>
         ) : (
           <section

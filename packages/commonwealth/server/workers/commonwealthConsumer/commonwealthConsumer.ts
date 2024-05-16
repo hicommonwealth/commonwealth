@@ -13,6 +13,7 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { ContestWorker } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
@@ -63,12 +64,27 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     ChainEventPolicy(),
   );
 
+  const contestWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestWorkerPolicy,
+    ContestWorker(),
+  );
+
   if (!chainEventSubRes) {
     log.fatal(
       'Failed to subscribe to chain-events. Requires restart!',
       undefined,
       {
         topic: BrokerSubscriptions.ChainEvent,
+      },
+    );
+  }
+
+  if (!contestWorkerSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest worker events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestWorkerPolicy,
       },
     );
   }
