@@ -5,6 +5,7 @@ import {
   ContestContentAdded,
   ContestContentUpvoted,
   ContestStarted,
+  ContestWinnersRecorded,
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
 } from './events.schemas';
@@ -138,6 +139,24 @@ const ContestContentUpvotedMapper: EvmMapper<
   }),
 };
 
+const ContestWinnersRecordedMapper: EvmMapper<
+  typeof ChainEventSigs.PrizeShareUpdated,
+  typeof ContestWinnersRecorded
+> = {
+  signature: ChainEventSigs.PrizeShareUpdated,
+  mapEvmToSchema: (evmInput) => ({
+    created_at: new Date(),
+    contest_address: '', // TODO
+    contest_id: 0, // TODO,
+    winners: [
+      {
+        creator_address: '',
+        prize: ethers.BigNumber.from(evmInput.newPrizeShare).toNumber(),
+      },
+    ],
+  }),
+};
+
 type EvmMappersRecord = {
   [K in keyof typeof ChainEventSigs]: EvmMapper<any, any>[];
 };
@@ -152,7 +171,7 @@ const EvmMappers: EvmMappersRecord = {
   NewSingleContestStarted: [NewSingleContestStartedMapper],
   ContentAdded: [NewContestContentAddedMapper],
   VoterVoted: [ContestContentUpvotedMapper],
-  PrizeShareUpdated: [],
+  PrizeShareUpdated: [ContestWinnersRecordedMapper],
 };
 
 // parseEthersResult converts the raw EVM result into key-value pairs based on signature.
