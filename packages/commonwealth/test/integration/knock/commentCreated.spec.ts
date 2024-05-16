@@ -97,7 +97,7 @@ describe('CommentCreated Event Handler', () => {
     await models.CommentSubscription.truncate();
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
 

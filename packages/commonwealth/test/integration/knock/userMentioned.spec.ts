@@ -66,6 +66,9 @@ describe('userMentioned Event Handler', () => {
       address_id: community.Addresses[1].id,
       topic_id: null,
       deleted_at: null,
+      pinned: false,
+      read_only: false,
+      version_history: [],
     });
   });
 
@@ -99,9 +102,10 @@ describe('userMentioned Event Handler', () => {
     const res = await processUserMentioned({
       name: EventNames.UserMentioned,
       payload: {
+        authorAddressId: community!.Addresses[0].id,
         authorUserId: author!.id,
         authorAddress: community!.Addresses[0].address,
-        authorProfileName: authorProfile!.profile_name,
+        authorProfileId: authorProfile!.id,
         mentionedUserId: user!.id,
         communityId: community!.id,
         thread,
@@ -137,9 +141,10 @@ describe('userMentioned Event Handler', () => {
       processUserMentioned({
         name: EventNames.UserMentioned,
         payload: {
+          authorAddressId: community!.Addresses[0].id,
           authorUserId: author!.id,
           authorAddress: community!.Addresses[0].address,
-          authorProfileName: authorProfile!.profile_name,
+          authorProfileId: authorProfile!.id,
           mentionedUserId: user!.id,
           communityId: community!.id,
           thread,

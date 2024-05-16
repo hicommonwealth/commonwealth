@@ -179,7 +179,10 @@ export async function __createThread(
       await address.save({ transaction });
 
       await emitMentions(this.models, transaction, {
+        authorAddressId: address.id,
         authorUserId: user.id,
+        authorAddress: address.address,
+        authorProfileId: address.profile_id,
         mentions: mentionedAddresses,
         thread,
       });

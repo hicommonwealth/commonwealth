@@ -255,7 +255,10 @@ export async function __updateThread(
     );
 
     await emitMentions(this.models, transaction, {
+      authorAddressId: address.id,
       authorUserId: user.id,
+      authorAddress: address.address,
+      authorProfileId: address.profile_id,
       mentions: mentionedAddresses,
       thread,
     });

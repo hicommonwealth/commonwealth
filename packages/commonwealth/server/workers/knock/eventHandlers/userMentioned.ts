@@ -33,12 +33,28 @@ export const processUserMentioned: EventHandler<
     return false;
   }
 
+  const profile = await models.Profile.findOne({
+    where: {
+      id: payload.authorProfileId,
+    },
+  });
+
+  if (!profile) {
+    log.error('Author profile not found', undefined, payload);
+    return false;
+  }
+
   return await provider.triggerWorkflow({
     key: WorkflowKeys.UserMentioned,
     users: [{ id: String(payload.mentionedUserId) }],
     data: {
+      authorAddressId: payload.authorAddressId,
+      authorUserId: payload.authorUserId,
+      authorAddress: payload.authorAddress,
+      authorProfileId: payload.authorProfileId,
+      community_id: payload.communityId,
       community_name: community.name,
-      author: payload.authorProfileName || payload.authorAddress.substring(255),
+      author: profile.profile_name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
           ? payload.thread.body.substring(255)
