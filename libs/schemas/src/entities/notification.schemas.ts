@@ -1,7 +1,6 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
-import { Thread } from './thread.schemas';
 
 export const NotificationCategory = z.object({
   name: z.string().max(255),
@@ -40,15 +39,15 @@ export const SubscriptionPreference = z.object({
 export const ThreadSubscription = z.object({
   id: PG_INT.optional(),
   user_id: PG_INT,
-  thread_id: PG_INT,
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  Thread: Thread.pick({
-    id: true,
-    address_id: true,
-    community_id: true,
-    title: true,
-  }),
+  // thread_id: PG_INT,
+  // created_at: z.date().optional(),
+  // updated_at: z.date().optional(),
+  // Thread: Thread.pick({
+  //   id: true,
+  //   address_id: true,
+  //   community_id: true,
+  //   title: true,
+  // }).optional(),
 });
 
 export const CommentSubscription = z.object({

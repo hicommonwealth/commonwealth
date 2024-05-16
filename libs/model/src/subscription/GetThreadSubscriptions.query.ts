@@ -10,7 +10,7 @@ const associationParams = [
     //   {
     //     model: models.Address,
     //     as: 'Address',
-    //   },
+    //   }
     //   {
     //     model: models.Community,
     //     required: false,
@@ -33,7 +33,7 @@ export function GetThreadSubscriptions(): Query<
           where: {
             user_id: actor.user.id,
           },
-          include: [...associationParams],
+          // include: [...associationParams],
           logging: console.log,
         })
       ).map((subscription) => subscription.get({ plain: true }));

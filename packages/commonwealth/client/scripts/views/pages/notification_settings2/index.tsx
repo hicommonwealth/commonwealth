@@ -67,9 +67,8 @@ const NotificationSettingsPage2 = () => {
   //
   // app.
 
-  const threadSubscriptions = trpc.subscription.getThreadSubscriptions.useQuery(
-    {},
-  );
+  const threadSubscriptions =
+    trpc.subscription.getThreadSubscriptions.useQuery();
 
   console.log(
     'FIXME: threadSubscriptions: ',
