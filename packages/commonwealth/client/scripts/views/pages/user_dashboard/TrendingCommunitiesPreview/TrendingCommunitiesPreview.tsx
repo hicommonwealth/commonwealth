@@ -15,7 +15,8 @@ export const TrendingCommunitiesPreview = () => {
       //this filter is meant to not include any de facto communities that are actually xss attempts.
       //It's a way of keeping the front facing parts of the app clean looking for users
       return (
-        !['"', '>', '<'].includes(name[0]) && !['"', '>', '<'].includes(name[1])
+        !['"', '>', '<', "'", '/', '`'].includes(name[0]) &&
+        !['"', '>', '<', "'", '/', '`'].includes(name[1])
       );
     })
     .sort((a, b) => {
