@@ -20,6 +20,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
@@ -50,19 +51,35 @@ const Sublayout = ({
     resizeListenerUpdateDeps: [resizing],
   });
 
-  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
-    useWelcomeOnboardModal();
+  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+
+  const {
+    onboardedProfiles,
+    setProfileAsOnboarded,
+    isWelcomeOnboardModalOpen,
+    setIsWelcomeOnboardModalOpen,
+  } = useWelcomeOnboardModal();
 
   useNecessaryEffect(() => {
-    if (isLoggedIn && userOnboardingEnabled && !isWelcomeOnboardModalOpen) {
+    if (
+      isLoggedIn &&
+      userOnboardingEnabled &&
+      !isWelcomeOnboardModalOpen &&
+      profileId
+    ) {
       // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
       const hasUsername = app?.user?.addresses?.find(
         (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
       );
 
       // open welcome modal if user is not onboarded
-      if (!hasUsername) {
+      if (!hasUsername && !onboardedProfiles[profileId]) {
         setIsWelcomeOnboardModalOpen(true);
+      }
+
+      // if the user has a set username, mark as onboarded
+      if (hasUsername && !onboardedProfiles[profileId]) {
+        setProfileAsOnboarded(profileId);
       }
     }
 
@@ -70,6 +87,8 @@ const Sublayout = ({
       setIsWelcomeOnboardModalOpen(false);
     }
   }, [
+    profileId,
+    onboardedProfiles,
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
@@ -173,6 +192,7 @@ const Sublayout = ({
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
+            {userOnboardingEnabled && <UserTrainingSlider />}
             {isInsideCommunity && <AdminOnboardingSlider />}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
@@ -181,9 +201,7 @@ const Sublayout = ({
         {userOnboardingEnabled && (
           <WelcomeOnboardModal
             isOpen={isWelcomeOnboardModalOpen}
-            onClose={() =>
-              setIsWelcomeOnboardModalOpen(!isWelcomeOnboardModalOpen)
-            }
+            onClose={() => setIsWelcomeOnboardModalOpen(false)}
           />
         )}
       </div>
