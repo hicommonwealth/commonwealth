@@ -10,3 +10,5 @@ export const DATABASE_URI =
     : process.env.DATABASE_URL;
 
 export const TESTING = DATABASE_URI.endsWith(TEST_DB_NAME);
+
+export const KNOCK_SECRET_KEY = process.env.KNOCK_SECRET_KEY || '';

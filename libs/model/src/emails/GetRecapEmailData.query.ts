@@ -13,6 +13,7 @@ import { models } from '@hicommonwealth/model';
 import { Knock } from '@knocklabs/node';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
+import { isKnockService } from '../middleware';
 
 type DiscussionNotifications = Array<
   | z.infer<typeof CommentCreatedNotification>
@@ -186,9 +187,9 @@ async function enrichNotifications({
 export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
   return {
     ...GetRecapEmailData,
-    auth: [],
+    auth: [isKnockService],
     secure: true,
-    body: async ({ actor, payload }) => {
+    body: async ({ payload }) => {
       const notifications = await getMessages(payload.user_id);
       return await enrichNotifications(notifications);
     },

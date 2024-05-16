@@ -181,7 +181,8 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
     .input(md.input)
     .output(md.output)
     .query(async ({ ctx, input }) => {
-      if (md.secure) await authenticate(ctx.req);
+      // enable secure by default
+      if (md.secure !== false) await authenticate(ctx.req);
       try {
         return await core.query(
           md,

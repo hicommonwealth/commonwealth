@@ -7,6 +7,7 @@ import { Events, events } from '../integration/events';
 export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
+export const UNAUTHORIZED_ERROR = 'Unauthorized Error';
 
 /**
  * Deep partial utility
@@ -61,6 +62,13 @@ export class InvalidActor extends Error {
   constructor(public actor: Actor, message: string) {
     super(message);
     this.name = INVALID_ACTOR_ERROR;
+  }
+}
+
+export class UnAuthorized extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = UNAUTHORIZED_ERROR;
   }
 }
 
@@ -136,7 +144,7 @@ export type CommandHandler<
  */
 export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
   context: QueryContext<Input>,
-) => Promise<Partial<z.infer<Output>> | undefined>;
+) => Promise<Partial<z.infer<Output>> | void>;
 
 /**
  * Event handler
