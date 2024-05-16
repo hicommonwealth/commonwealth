@@ -49,6 +49,9 @@ describe('Reactions lifecycle', () => {
         address_id: community?.Addresses?.at(0)?.id,
         topic_id: undefined,
         deleted_at: undefined, // so we can find it!
+        pinned: false,
+        read_only: false,
+        version_history: [],
       },
       //{ mock: true, log: true },
     );

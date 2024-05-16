@@ -38,7 +38,7 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const fullContentUrl = getThreadUrl({
           chain: community!.id!,
-          id: payload.id,
+          id: payload.id!,
           title: payload.title,
         });
 

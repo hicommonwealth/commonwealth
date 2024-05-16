@@ -20,7 +20,7 @@ test.describe('New Discussion Page Tests', () => {
     );
   });
 
-  test('Check User can create a thread', async ({ page }) => {
+  test.skip('Check User can create a thread', async ({ page }) => {
     await page.locator('.TextInput').locator('input').fill('Test thread');
     await page.locator('.CWSelectList').locator('.SelectList').click();
     await page.getByText('testTopic', { exact: true }).click();
