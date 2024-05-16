@@ -1,7 +1,34 @@
+import { configure, config as target } from '@hicommonwealth/core';
 import { ChainBase } from '@hicommonwealth/shared';
-import * as dotenv from 'dotenv';
+import { z } from 'zod';
 
-dotenv.config();
+const { SENDGRID_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_TOKEN_DEV } =
+  process.env;
+
+export const config = configure(
+  target,
+  {
+    SENDGRID: {
+      API_KEY: SENDGRID_API_KEY,
+    },
+    TELEGRAM: {
+      BOT_TOKEN:
+        target.NODE_ENV === 'production'
+          ? TELEGRAM_BOT_TOKEN
+          : TELEGRAM_BOT_TOKEN_DEV,
+    },
+  },
+  z.object({
+    SENDGRID: z.object({
+      API_KEY: z.string().optional(),
+    }),
+    TELEGRAM: z.object({
+      BOT_TOKEN: z.string().optional(),
+    }),
+  }),
+);
+
+// TODO: move all vars below to config tree above
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';

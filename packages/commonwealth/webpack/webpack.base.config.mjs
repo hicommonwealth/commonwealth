@@ -6,9 +6,6 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

@@ -4,7 +4,6 @@
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import dotenv from 'dotenv';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
@@ -15,7 +14,6 @@ import { markdownThread } from '../../util/fixtures/markdownThread';
 import { richTextComment } from '../../util/fixtures/richTextComment';
 import { richTextThread } from '../../util/fixtures/richTextThread';
 
-dotenv.config();
 chai.use(chaiHttp);
 const { expect } = chai;
 

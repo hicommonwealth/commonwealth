@@ -6,9 +6,7 @@ import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
-import * as dotenv from 'dotenv';
 
-dotenv.config();
 const log = logger(__filename);
 
 async function doExec() {

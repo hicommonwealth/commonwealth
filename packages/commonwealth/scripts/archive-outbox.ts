@@ -3,14 +3,12 @@ import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { S3 } from 'aws-sdk';
 import { execSync } from 'child_process';
-import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
 // REQUIRED for S3 env var
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);

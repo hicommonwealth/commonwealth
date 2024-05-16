@@ -1,5 +1,6 @@
-import { config, type DB } from '@hicommonwealth/model';
+import { type DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
+import { config } from '../config';
 
 import {
   __emit,

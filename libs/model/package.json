@@ -31,7 +31,6 @@
     "@hicommonwealth/logging": "*",
     "@hicommonwealth/schemas": "*",
     "@hicommonwealth/shared": "*",
-    "dotenv": "^16.0.3",
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",

@@ -28,7 +28,6 @@
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
     "express": "^4.18.2",
-    "dotenv": "^16.0.3",
     "hot-shots": "^9",
     "mixpanel": "^0.14.0",
     "moment": "^2.23.0",

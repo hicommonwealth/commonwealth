@@ -1,5 +1,7 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { configure, config as target } from '@hicommonwealth/core';
+import { z } from 'zod';
+
+export const config = configure(target, {}, z.object({}));
 
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {

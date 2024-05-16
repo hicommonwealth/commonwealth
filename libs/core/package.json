@@ -23,6 +23,7 @@
     "@hicommonwealth/logging": "*",
     "@hicommonwealth/schemas": "*",
     "@hicommonwealth/shared": "*",
+    "dotenv": "^16.0.3",
     "moment": "^2.23.0",
     "zod": "^3.22.4"
   },

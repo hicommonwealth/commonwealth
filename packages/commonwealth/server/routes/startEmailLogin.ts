@@ -1,12 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { config, type DB } from '@hicommonwealth/model';
+import { type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { fileURLToPath } from 'url';
-import { MAGIC_DEFAULT_CHAIN, MAGIC_SUPPORTED_BASES } from '../config';
+import { MAGIC_DEFAULT_CHAIN, MAGIC_SUPPORTED_BASES, config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 
 sgMail.setApiKey(config.SENDGRID.API_KEY);

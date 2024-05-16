@@ -9,9 +9,6 @@ const {
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
-  SENDGRID_API_KEY,
-  TELEGRAM_BOT_TOKEN,
-  TELEGRAM_BOT_TOKEN_DEV,
 } = process.env;
 
 const NAME =
@@ -39,17 +36,8 @@ export const config = configure(
         ? parseInt(TBC_BALANCE_TTL_SECONDS, 10)
         : 300,
     },
-    SENDGRID: {
-      API_KEY: SENDGRID_API_KEY,
-    },
     OUTBOX: {
       ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
-    },
-    TELEGRAM: {
-      BOT_TOKEN:
-        target.NODE_ENV === 'production'
-          ? TELEGRAM_BOT_TOKEN
-          : TELEGRAM_BOT_TOKEN_DEV,
     },
   },
   z.object({
@@ -65,14 +53,8 @@ export const config = configure(
     TBC: z.object({
       TTL_SECS: z.number().int(),
     }),
-    SENDGRID: z.object({
-      API_KEY: z.string().optional(),
-    }),
     OUTBOX: z.object({
       ALLOWED_EVENTS: z.array(z.string()),
-    }),
-    TELEGRAM: z.object({
-      BOT_TOKEN: z.string().optional(),
     }),
   }),
 );

@@ -1,6 +1,6 @@
-import { config } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import request from 'superagent';
+import { config } from '../../../config';
 import {
   ChainEventWebhookData,
   ForumWebhookData,

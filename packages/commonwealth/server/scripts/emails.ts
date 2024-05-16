@@ -4,7 +4,6 @@ import type {
   DB,
   UserAttributes,
 } from '@hicommonwealth/model';
-import { config } from '@hicommonwealth/model';
 import {
   DynamicTemplate,
   IChainEventNotificationData,
@@ -24,6 +23,7 @@ import {
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
+import { config } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);

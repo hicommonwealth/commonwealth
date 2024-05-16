@@ -20,7 +20,6 @@
     "test": "echo No tests to run"
   },
   "dependencies": {
-    "dotenv": "^16.0.3",
     "moment": "^2.23.0",
     "pino": "^8.19.0",
     "pino-http": "^9.0.0",

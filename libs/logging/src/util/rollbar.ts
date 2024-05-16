@@ -1,7 +1,6 @@
-import * as dotenv from 'dotenv';
 import Rollbar from 'rollbar';
 
-dotenv.config();
+//TODO: move this to libs/core
 
 const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN || '';
 const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';

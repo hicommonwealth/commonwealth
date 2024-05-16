@@ -1,12 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import { config, type DB } from '@hicommonwealth/model';
+import { type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
+import { config } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
