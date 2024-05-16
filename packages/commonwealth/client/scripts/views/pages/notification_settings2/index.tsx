@@ -4,6 +4,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -66,13 +67,17 @@ const NotificationSettingsPage2 = () => {
   //
   // app.
 
-  const discussionSubscriptions =
-    app?.user.notifications.discussionSubscriptions || [];
+  const threadSubscriptions = trpc.subscription.getThreadSubscriptions.useQuery(
+    {},
+  );
 
   console.log(
-    'FIXME: discussionSubscriptions: ',
-    JSON.stringify(discussionSubscriptions, null, '  '),
+    'FIXME: threadSubscriptions: ',
+    JSON.stringify(threadSubscriptions, null, '  '),
   );
+
+  const discussionSubscriptions =
+    app?.user.notifications.discussionSubscriptions || [];
 
   return (
     <CWPageLayout>
