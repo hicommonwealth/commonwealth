@@ -49,10 +49,12 @@ export const ThreadSubscription = z.object({
     community_id: true,
     title: true,
     comment_count: true,
+    created_at: true,
   }).merge(
     z.object({
       Community: Community.pick({
         id: true,
+        name: true,
       }),
     }),
   ),
