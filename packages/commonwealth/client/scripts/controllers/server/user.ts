@@ -62,6 +62,15 @@ export class UserController {
     this._emailVerified = emailVerified;
   }
 
+  private _promotionalEmailsEnabled: boolean;
+  public get promotionalEmailsEnabled(): boolean {
+    return this._promotionalEmailsEnabled;
+  }
+
+  private _setPromotionalEmailsEnabled(enabled: boolean): void {
+    this._promotionalEmailsEnabled = enabled;
+  }
+
   private _knockJWT: string;
   public get knockJWT(): string {
     return this._knockJWT;
@@ -162,6 +171,10 @@ export class UserController {
     this._setEmail(email);
   }
 
+  public setPromotionalEmailsEnabled(enabled: boolean): void {
+    this._setPromotionalEmailsEnabled(enabled);
+  }
+
   public async updateEmail(
     email: string,
     shouldNotifyFailure = true,
@@ -185,12 +198,20 @@ export class UserController {
     this._setEmailInterval(emailInterval);
   }
 
-  public async updateEmailInterval(emailInterval: string): Promise<void> {
+  public async writeEmailSettings(
+    emailInterval: string,
+    promotionalEmailsEnabled?: boolean,
+  ): Promise<void> {
+    const key = emailInterval
+      ? 'updateEmailInterval'
+      : 'promotional_emails_enabled';
+    const value = emailInterval ? emailInterval : `${promotionalEmailsEnabled}`;
+
     try {
       await axios.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
-        key: 'updateEmailInterval',
-        value: emailInterval,
+        key,
+        value,
       });
       this._setEmailInterval(emailInterval);
     } catch (e) {
