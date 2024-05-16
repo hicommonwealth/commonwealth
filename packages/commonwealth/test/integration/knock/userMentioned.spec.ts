@@ -125,6 +125,10 @@ describe('userMentioned Event Handler', () => {
       key: WorkflowKeys.UserMentioned,
       users: [{ id: String(user!.id) }],
       data: {
+        author_address_id: community!.Addresses[0].id,
+        author_user_id: author!.id,
+        author_address: community!.Addresses[0].address,
+        author_profile_id: authorProfile!.id,
         community_name: community!.name,
         author: authorProfile!.profile_name,
         object_body: thread!.body.substring(255),
