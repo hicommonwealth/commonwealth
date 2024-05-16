@@ -1,6 +1,7 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
 
 export const NotificationCategory = z.object({
@@ -47,7 +48,14 @@ export const ThreadSubscription = z.object({
     id: true,
     community_id: true,
     title: true,
-  }).optional(),
+    comment_count: true,
+  }).merge(
+    z.object({
+      Community: Community.pick({
+        id: true,
+      }),
+    }),
+  ),
 });
 
 export const CommentSubscription = z.object({

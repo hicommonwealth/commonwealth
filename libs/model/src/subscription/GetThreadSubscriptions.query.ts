@@ -6,17 +6,18 @@ const associationParams = [
   {
     model: models.Thread,
     as: 'Thread',
-    // include: [
-    //   {
-    //     model: models.Address,
-    //     as: 'Address',
-    //   }
-    //   {
-    //     model: models.Community,
-    //     required: false,
-    //     where: { active: true },
-    //   },
-    // ],
+    include: [
+      //   {
+      //     model: models.Address,
+      //     as: 'Address',
+      //   }
+      {
+        model: models.Community,
+        as: 'Community',
+        required: true,
+        where: { active: true },
+      },
+    ],
   },
 ];
 
