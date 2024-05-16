@@ -7,24 +7,26 @@ import {
 } from '../../src/integration/events.schemas';
 import { parseEvmEventToContestEvent } from '../../src/integration/events.utils';
 
+const timestamp = new Date();
 const contestAddress = '0x888';
 
 describe('parseEvmEventToContestEvent', () => {
   it('should map NewContest chain event to RecurringContestManagerDeployed', () => {
-    const result = parseEvmEventToContestEvent('NewContest', null, [
+    const result = parseEvmEventToContestEvent('NewContest', null, timestamp, [
       '0x1', // contest
       '0x2', // namespace
       ethers.BigNumber.from(7), // interval
       false, // oneOff
     ]) as z.infer<typeof RecurringContestManagerDeployed>;
     console.debug(result);
+    // expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq('0x1');
     expect(result.namespace).to.eq('0x2');
     expect(result.interval).to.eq(7);
   });
 
   it('should map NewContest chain event to OneOffContestManagerDeployed', () => {
-    const result = parseEvmEventToContestEvent('NewContest', null, [
+    const result = parseEvmEventToContestEvent('NewContest', null, timestamp, [
       '0x1', // contest
       '0x2', // namespace
       ethers.BigNumber.from(7), // interval is same as length
@@ -40,6 +42,7 @@ describe('parseEvmEventToContestEvent', () => {
     const result = parseEvmEventToContestEvent(
       'NewRecurringContestStarted',
       contestAddress,
+      timestamp,
       [
         ethers.BigNumber.from(8), // contestId
         ethers.BigNumber.from(1000), // startTime
@@ -57,6 +60,7 @@ describe('parseEvmEventToContestEvent', () => {
     const result = parseEvmEventToContestEvent(
       'NewSingleContestStarted',
       contestAddress,
+      timestamp,
       [
         ethers.BigNumber.from(2000), // startTime
         ethers.BigNumber.from(2001), // endTime
@@ -70,11 +74,16 @@ describe('parseEvmEventToContestEvent', () => {
   });
 
   it('should map ContentAdded raw evm result to ContestContentAdded', () => {
-    const result = parseEvmEventToContestEvent('ContentAdded', contestAddress, [
-      ethers.BigNumber.from(9), // contentId
-      '0x1', // creator
-      '/threads/1', // url
-    ]);
+    const result = parseEvmEventToContestEvent(
+      'ContentAdded',
+      contestAddress,
+      timestamp,
+      [
+        ethers.BigNumber.from(9), // contentId
+        '0x1', // creator
+        '/threads/1', // url
+      ],
+    );
     console.debug(result);
     expect(result.contest_address).to.eq(contestAddress);
     expect(result.content_id).to.eq(9);
@@ -83,11 +92,16 @@ describe('parseEvmEventToContestEvent', () => {
   });
 
   it('should map VoterVoted raw evm result to ContestContentUpvoted', () => {
-    const result = parseEvmEventToContestEvent('VoterVoted', contestAddress, [
-      '0x2', // voterAddress
-      ethers.BigNumber.from(10), // contentId
-      ethers.BigNumber.from(9000), // votingPower
-    ]);
+    const result = parseEvmEventToContestEvent(
+      'VoterVoted',
+      contestAddress,
+      timestamp,
+      [
+        '0x2', // voterAddress
+        ethers.BigNumber.from(10), // contentId
+        ethers.BigNumber.from(9000), // votingPower
+      ],
+    );
     console.debug(result);
     expect(result.contest_address).to.eq(contestAddress);
     expect(result.content_id).to.eq(10);
