@@ -5,7 +5,6 @@ import {
   ContestContentAdded,
   ContestContentUpvoted,
   ContestStarted,
-  ContestWinnersRecorded,
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
 } from './events.schemas';
@@ -49,7 +48,6 @@ const ChainEventSigs = {
     'uint256 indexed contentId, address indexed creator, string url' as const,
   VoterVoted:
     'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
-  PrizeShareUpdated: 'uint256 newPrizeShare' as const,
 };
 
 const RecurringContestManagerDeployedMapper: EvmMapper<
@@ -58,12 +56,11 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.NewContest,
   condition: (evmInput) => !evmInput.oneOff,
-  mapEvmToSchema: (evmInput) => ({
+  mapEvmToSchema: ({ contest, namespace, interval, oneOff: _ }) => ({
     created_at: new Date(),
-    contest_address: evmInput.contest,
-    content_id: 0, // TODO optional
-    namespace: evmInput.namespace,
-    interval: ethers.BigNumber.from(evmInput.interval).toNumber(),
+    contest_address: contest,
+    namespace: namespace,
+    interval: ethers.BigNumber.from(interval).toNumber(),
   }),
 };
 
@@ -73,26 +70,29 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.NewContest,
   condition: (evmInput) => evmInput.oneOff,
-  mapEvmToSchema: (evmInput) => ({
+  mapEvmToSchema: ({ contest, namespace, interval, oneOff: _ }) => ({
     created_at: new Date(),
-    contest_address: evmInput.contest,
-    content_id: 0, // TODO optional
-    namespace: evmInput.namespace,
-    length: ethers.BigNumber.from(evmInput.interval).toNumber(), // TODO: NewContest event does not have length (has interval)
+    contest_address: contest,
+    namespace: namespace,
+    length: ethers.BigNumber.from(interval).toNumber(),
   }),
 };
+
+// TODO: when ContestStarted happens, emit ContestStarted + ContestEnded events
+// ContestEnded contest ID = latest contest ID - 1
+// TODO: change projection to update winners on every event: AddContent/Voting/ContestStarted
 
 const NewRecurringContestStartedMapper: EvmMapper<
   typeof ChainEventSigs.NewRecurringContestStarted,
   typeof ContestStarted
 > = {
   signature: ChainEventSigs.NewRecurringContestStarted,
-  mapEvmToSchema: (evmInput) => ({
+  mapEvmToSchema: ({ contestId, startTime, endTime }) => ({
     created_at: new Date(),
     contest_address: '', // TODO
-    contest_id: ethers.BigNumber.from(evmInput.contestId).toNumber(),
-    start_time: new Date(ethers.BigNumber.from(evmInput.startTime).toNumber()),
-    end_time: new Date(ethers.BigNumber.from(evmInput.endTime).toNumber()),
+    contest_id: ethers.BigNumber.from(contestId).toNumber(),
+    start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
+    end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
   }),
 };
 
@@ -101,12 +101,12 @@ const NewSingleContestStartedMapper: EvmMapper<
   typeof ContestStarted
 > = {
   signature: ChainEventSigs.NewSingleContestStarted,
-  mapEvmToSchema: (evmInput) => ({
+  mapEvmToSchema: ({ startTime, endTime }) => ({
     created_at: new Date(),
     contest_address: '', // TODO
-    contest_id: 0, // TODO optional
-    start_time: new Date(ethers.BigNumber.from(evmInput.startTime).toNumber()),
-    end_time: new Date(ethers.BigNumber.from(evmInput.endTime).toNumber()),
+    contest_id: 0,
+    start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
+    end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
   }),
 };
 
@@ -132,28 +132,10 @@ const ContestContentUpvotedMapper: EvmMapper<
   mapEvmToSchema: (evmInput) => ({
     created_at: new Date(),
     contest_address: '', // TODO
-    contest_id: 0, // TODO
+    contest_id: 0, // TODO: oneOff == 0, recurring == ID – Contract must be updated
     content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
     voter_address: evmInput.voter,
     voting_power: ethers.BigNumber.from(evmInput.votingPower).toNumber(),
-  }),
-};
-
-const ContestWinnersRecordedMapper: EvmMapper<
-  typeof ChainEventSigs.PrizeShareUpdated,
-  typeof ContestWinnersRecorded
-> = {
-  signature: ChainEventSigs.PrizeShareUpdated,
-  mapEvmToSchema: (evmInput) => ({
-    created_at: new Date(),
-    contest_address: '', // TODO
-    contest_id: 0, // TODO,
-    winners: [
-      {
-        creator_address: '',
-        prize: ethers.BigNumber.from(evmInput.newPrizeShare).toNumber(),
-      },
-    ],
   }),
 };
 
@@ -169,11 +151,16 @@ const EvmMappers: EvmMappersRecord = {
     RecurringContestManagerDeployedMapper,
     OneOffContestManagerDeployedMapper,
   ],
-  NewRecurringContestStarted: NewRecurringContestStartedMapper,
-  NewSingleContestStarted: NewSingleContestStartedMapper,
+  NewRecurringContestStarted: [
+    NewRecurringContestStartedMapper,
+    // TODO add: RecurringContestEnded
+  ],
+  NewSingleContestStarted: [
+    NewSingleContestStartedMapper,
+    // TODO add: SingleContestEnded
+  ],
   ContentAdded: NewContestContentAddedMapper,
   VoterVoted: ContestContentUpvotedMapper,
-  PrizeShareUpdated: ContestWinnersRecordedMapper,
 };
 
 // parseEthersResult converts the raw EVM result into key-value pairs based on signature.
