@@ -23,6 +23,7 @@ export type ModalVariantProps = {
     | ChainBase.Solana
     | ChainBase.Substrate;
   onSignInClick?: () => void;
+  onChangeModalType?: (type: AuthModalType) => void;
 };
 
 export type ModalBaseProps = {

@@ -9,6 +9,7 @@ const CreateAccountModal = ({
   onSuccess,
   showWalletsFor,
   onSignInClick,
+  onChangeModalType,
 }: ModalVariantProps) => {
   const [authMethod, setAuthMethod] = useState<'wallets' | 'sso' | undefined>();
 
@@ -35,6 +36,7 @@ const CreateAccountModal = ({
       }
       bodyClassName="CreateAccountModal"
       onSignInClick={onSignInClick}
+      onChangeModalType={onChangeModalType}
     />
   );
 };

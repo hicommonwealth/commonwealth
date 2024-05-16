@@ -52,6 +52,7 @@ const AuthModal = ({
             onClose={onClose}
             onSuccess={handleSuccess}
             onSignInClick={handleOnSignInClick}
+            onChangeModalType={(selectedType) => setModalType(selectedType)}
           />
         );
       }
@@ -61,6 +62,7 @@ const AuthModal = ({
             onClose={onClose}
             onSuccess={handleSuccess}
             onSignInClick={handleOnSignInClick}
+            onChangeModalType={(selectedType) => setModalType(selectedType)}
           />
         );
       }
@@ -71,6 +73,7 @@ const AuthModal = ({
             onSuccess={handleSuccess}
             showWalletsFor={showWalletsFor}
             onSignInClick={handleOnSignInClick}
+            onChangeModalType={(selectedType) => setModalType(selectedType)}
           />
         );
       }

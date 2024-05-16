@@ -8,6 +8,7 @@ const SignInModal = ({
   onSuccess,
   showWalletsFor,
   onSignInClick,
+  onChangeModalType,
 }: ModalVariantProps) => {
   return (
     <ModalBase
@@ -18,6 +19,7 @@ const SignInModal = ({
       showWalletsFor={showWalletsFor}
       bodyClassName="SignInModal"
       onSignInClick={onSignInClick}
+      onChangeModalType={onChangeModalType}
     />
   );
 };
