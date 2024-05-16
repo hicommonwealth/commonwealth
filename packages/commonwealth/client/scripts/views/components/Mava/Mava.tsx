@@ -3,12 +3,12 @@ import app from 'state';
 import { isWindowSmall } from 'views/components/component_kit/helpers';
 import './Mava.scss';
 
-// eslint-disable-next-line no-var
+// eslint-disable-next-line no-var, @typescript-eslint/no-explicit-any
 declare var window: any;
 
 const mobile = isWindowSmall(window.innerWidth);
 
-export default memo(function Mava() {
+export const Mava = memo(function Mava() {
   const initializedRef = useRef(false);
 
   const userId = app.user.id;
