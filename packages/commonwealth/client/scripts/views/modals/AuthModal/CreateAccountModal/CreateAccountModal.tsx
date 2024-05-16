@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ModalBase } from '../common/ModalBase';
-import { ModalVariantProps } from '../types';
+import { AuthModalType, ModalVariantProps } from '../types';
 import './CreateAccountModal.scss';
 import { Option } from './Option';
 
@@ -15,9 +15,8 @@ const CreateAccountModal = ({
   return (
     <ModalBase
       onClose={onClose}
-      // TODO: handle post-account creation flow on new acc creation
       onSuccess={onSuccess}
-      layoutType="create-account"
+      layoutType={AuthModalType.CreateAccount}
       hideDescription={!!authMethod}
       {...(authMethod && {
         showAuthenticationOptionsFor: [authMethod],

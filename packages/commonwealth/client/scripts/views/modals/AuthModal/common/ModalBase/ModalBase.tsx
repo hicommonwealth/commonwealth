@@ -20,19 +20,19 @@ import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
-import { ModalBaseProps, ModalBaseTabs } from '../../types';
+import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
 
 const MODAL_COPY = {
-  'create-account': {
+  [AuthModalType.CreateAccount]: {
     title: 'Create account',
     description: `Common is built on web3 technology that utilizes wallets. \nHow would you like to sign up?`,
     showExistingAccountSignInFooter: true,
   },
-  'sign-in': {
+  [AuthModalType.SignIn]: {
     title: 'Sign into Common',
     description: '',
     showExistingAccountSignInFooter: false,

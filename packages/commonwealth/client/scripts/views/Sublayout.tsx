@@ -149,7 +149,7 @@ const Sublayout = ({
         onMobile={isWindowExtraSmall}
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
-          setAuthModalType(modalType || 'sign-in')
+          setAuthModalType(modalType || AuthModalType.SignIn)
         }
       />
       <AuthModal
