@@ -138,6 +138,9 @@ describe('Contests projection lifecycle', () => {
         max_notif_id: 1,
         discord_meta: undefined,
         deleted_at: undefined, // so we can find it!
+        pinned: false,
+        read_only: false,
+        version_history: [],
       },
       //{ mock: true, log: true },
     );
