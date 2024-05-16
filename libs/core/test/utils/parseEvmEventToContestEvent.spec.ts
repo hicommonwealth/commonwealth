@@ -19,7 +19,7 @@ describe('parseEvmEventToContestEvent', () => {
       false, // oneOff
     ]) as z.infer<typeof RecurringContestManagerDeployed>;
     console.debug(result);
-    // expect(result.created_at).to.eq(timestamp);
+    expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq('0x1');
     expect(result.namespace).to.eq('0x2');
     expect(result.interval).to.eq(7);
@@ -33,6 +33,7 @@ describe('parseEvmEventToContestEvent', () => {
       true, // oneOff
     ]) as z.infer<typeof OneOffContestManagerDeployed>;
     console.debug(result);
+    expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq('0x1');
     expect(result.namespace).to.eq('0x2');
     expect(result.length).to.eq(7);
@@ -50,6 +51,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
     );
     console.debug(result);
+    expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq(contestAddress);
     expect(result.contest_id).to.eq(8);
     expect(result.start_time.getTime()).to.eq(new Date(1000 * 1000).getTime());
@@ -67,6 +69,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
     );
     console.debug(result);
+    expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq(contestAddress);
     expect(result.contest_id).to.eq(0); // single == 0
     expect(result.start_time.getTime()).to.eq(new Date(2000 * 1000).getTime());
@@ -85,6 +88,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
     );
     console.debug(result);
+    expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq(contestAddress);
     expect(result.content_id).to.eq(9);
     expect(result.creator_address).to.eq('0x1');
@@ -103,6 +107,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
     );
     console.debug(result);
+    expect(result.created_at).to.eq(timestamp);
     expect(result.contest_address).to.eq(contestAddress);
     expect(result.content_id).to.eq(10);
     expect(result.voter_address).to.eq('0x2');
