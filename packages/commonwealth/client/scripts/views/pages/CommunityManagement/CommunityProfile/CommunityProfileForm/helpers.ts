@@ -1,17 +1,20 @@
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import app from 'state';
 
-export const getCommunityTags = (community: string) => {
+type CommunityTags = {
+  [tag in CommunityCategoryType]: boolean;
+};
+
+// TODO: this method should be deprecated after https://github.com/hicommonwealth/commonwealth/issues/7835
+export const getCommunityTags = (community: string): CommunityTags => {
   const chainToCategoriesMap: {
     [community: string]: CommunityCategoryType[];
   } = app.config.chainCategoryMap;
 
-  const types = Object.keys(CommunityCategoryType);
-  const selectedTags = {};
-
-  for (const type of types) {
-    selectedTags[type] = false;
-  }
+  const selectedTags = {
+    [CommunityCategoryType.DeFi]: false,
+    [CommunityCategoryType.DAO]: false,
+  };
 
   if (chainToCategoriesMap[community]) {
     for (const tag of chainToCategoriesMap[community]) {
