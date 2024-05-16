@@ -358,7 +358,7 @@ export async function startLoginWithMagicLink({
   if (email) {
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({
+    const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
     });
@@ -416,11 +416,13 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
+  returnEarlyIfNewAddress = false,
 }: {
   bearer?: string;
   chain?: string;
   walletSsoSource?: string;
-}): Promise<string> {
+  returnEarlyIfNewAddress?: boolean;
+}): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
@@ -456,6 +458,17 @@ export async function handleSocialLoginCallback({
       const { utils } = await import('ethers');
       magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
     }
+  }
+
+  // check if this address exists in db
+  const res = await axios.post(`${app.serverUrl()}/getAddressProfile`, {
+    addresses: [magicAddress],
+    communities: [],
+  });
+
+  const isAddressNew = res?.data?.result?.length === 0;
+  if (isAddressNew && returnEarlyIfNewAddress) {
+    return { address: magicAddress, isAddressNew };
   }
 
   let authedSessionPayload, authedSignature;
@@ -587,7 +600,7 @@ export async function handleSocialLoginCallback({
       }
     }
 
-    return magicAddress;
+    return { address: magicAddress, isAddressNew };
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

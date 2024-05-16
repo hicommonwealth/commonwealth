@@ -13,7 +13,7 @@ import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
-import { useWelcomeOnboardModal } from '../state/ui/modals';
+import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
@@ -50,6 +50,14 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const profileId = app?.user?.addresses?.[0]?.profile?.id;
 

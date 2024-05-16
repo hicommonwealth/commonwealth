@@ -1,6 +1,7 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import useWallets from 'client/scripts/hooks/useWallets';
 import app from 'client/scripts/state';
+import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
 import AuthButton from 'client/scripts/views/components/AuthButton';
 import {
   AuthTypes,
@@ -104,6 +105,9 @@ const ModalBase = ({
 
     return true;
   };
+
+  const { setShouldOpenGuidanceModalAfterMagicSSORedirect } =
+    useAuthModalStore();
 
   const {
     wallets = [],
@@ -209,6 +213,10 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
+      if (layoutType === AuthModalType.SignIn) {
+        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
+      }
+
       // TODO: decide if twitter references are to be updated to 'x'
       await onSocialLogin(
         option === 'x' ? WalletSsoSource.Twitter : (option as WalletSsoSource),
