@@ -12,20 +12,15 @@ import type {
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
 import { SESSION_EXPIRY_MILLIS } from '../../session';
-import { ETH_RPC, JWT_SECRET } from '../config';
+import { ETH_RPC, JWT_SECRET, KNOCK_SIGNING_KEY } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-
-dotenv.config();
-
-const KNOCK_SIGNING_KEY = process.env.KNOCK_SIGNING_KEY;
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
