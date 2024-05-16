@@ -50,6 +50,9 @@ describe('Contest Worker Policy', () => {
       address_id: addressId,
       topic_id: undefined,
       deleted_at: undefined,
+      pinned: false,
+      read_only: false,
+      version_history: [],
     });
   });
   after(async () => {
@@ -92,6 +95,9 @@ describe('Contest Worker Policy', () => {
             comment_count: 0,
             max_notif_id: 0,
             deleted_at: undefined,
+            pinned: false,
+            read_only: false,
+            version_history: [],
           },
         },
         true,
