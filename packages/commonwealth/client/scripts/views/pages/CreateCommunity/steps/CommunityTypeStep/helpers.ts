@@ -52,7 +52,7 @@ export const communityTypeOptions = [
     chainBase: ChainBase.Solana,
     title: 'Solana',
     isRecommended: false,
-    isHidden: true,
+    isHidden: false,
     description:
       'Solana is a rapidly growing technology due to its speed and scale. ' +
       'Our integration with Solana allows you to create a community for your project with just a click!',
