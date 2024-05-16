@@ -13,7 +13,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
@@ -69,12 +69,13 @@ const ModalBase = ({
       : 0,
   );
   useEffect(() => {
-    setActiveTabIndex(
-      showAuthenticationOptionsFor?.includes('sso') &&
-        showAuthenticationOptionsFor.length === 1
+    setActiveTabIndex((prevActiveTab) => {
+      return (showAuthenticationOptionsFor?.includes('sso') &&
+        showAuthenticationOptionsFor.length === 1) ||
+        prevActiveTab === 1
         ? 1
-        : 0,
-    );
+        : 0;
+    });
   }, [showAuthenticationOptionsFor]);
 
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
@@ -241,11 +242,11 @@ const ModalBase = ({
 
         {copy.description && !hideDescription && (
           <CWText type="b1" className="description" isCentered>
-            {...copy.description.split('\n').map((line) => (
-              <>
+            {...copy.description.split('\n').map((line, index) => (
+              <Fragment key={index}>
                 {line}
                 <br />
-              </>
+              </Fragment>
             ))}
           </CWText>
         )}
