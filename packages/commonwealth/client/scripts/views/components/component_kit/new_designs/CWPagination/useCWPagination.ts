@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { ButtonType } from './types';
 
-interface UseCWPaginationProps {
+export interface UseCWPaginationProps {
   totalCount: number;
   boundaryCount?: number;
   siblingCount?: number;

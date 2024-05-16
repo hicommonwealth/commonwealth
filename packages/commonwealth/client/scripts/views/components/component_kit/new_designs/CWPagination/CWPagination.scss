@@ -1,5 +1,52 @@
+@import '../../../../../../styles/shared.scss';
+
 .Pagination {
-  .active {
-    background-color: lightblue;
+  display: flex;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    min-width: 40px;
+    gap: 8px;
+    border: 1px solid $neutral-200;
+    outline: none;
+    cursor: pointer;
+
+    &:not(.Previous) {
+      border-left: none;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+
+      .Text {
+        color: $neutral-300;
+      }
+    }
+
+    &.selected {
+      background-color: $neutral-100;
+    }
+
+    &.Previous {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+
+    &.Next {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    @include extraSmall {
+      &.Previous,
+      &.Next {
+        .Text {
+          display: none;
+        }
+      }
+    }
   }
 }
