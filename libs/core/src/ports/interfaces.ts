@@ -189,6 +189,12 @@ export enum WorkflowKeys {
   ChainProposals = 'chain-event-proposals',
 }
 
+export enum KnockChannelIds {
+  InApp = 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
+  SendGrid = 'a7e200fa-7d18-444c-8e42-ba7c28bb8891',
+  FCM = 'c9e1b544-2130-4814-833a-a79bc527051c',
+}
+
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
   actor?: { id: string; email?: string };
