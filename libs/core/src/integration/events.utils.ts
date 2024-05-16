@@ -36,7 +36,10 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
   signature: Input;
   output: Output;
   condition?: (evmInput: ParseSignature<Input>) => boolean;
-  mapEvmToSchema: (evmInput: ParseSignature<Input>) => z.infer<Output>;
+  mapEvmToSchema: (
+    contestAddress: string | null,
+    evmInput: ParseSignature<Input>,
+  ) => z.infer<Output>;
 };
 
 const ChainEventSigs = {
@@ -58,7 +61,10 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
   signature: ChainEventSigs.NewContest,
   output: RecurringContestManagerDeployed,
   condition: (evmInput) => !evmInput.oneOff,
-  mapEvmToSchema: ({ contest, namespace, interval, oneOff: _ }) => ({
+  mapEvmToSchema: (
+    contestAddress,
+    { contest, namespace, interval, oneOff: _ },
+  ) => ({
     created_at: new Date(),
     contest_address: contest,
     namespace: namespace,
@@ -73,7 +79,10 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   signature: ChainEventSigs.NewContest,
   output: OneOffContestManagerDeployed,
   condition: (evmInput) => evmInput.oneOff,
-  mapEvmToSchema: ({ contest, namespace, interval, oneOff: _ }) => ({
+  mapEvmToSchema: (
+    contestAddress,
+    { contest, namespace, interval, oneOff: _ },
+  ) => ({
     created_at: new Date(),
     contest_address: contest,
     namespace: namespace,
@@ -87,9 +96,9 @@ const NewRecurringContestStartedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.NewRecurringContestStarted,
   output: ContestStarted,
-  mapEvmToSchema: ({ contestId, startTime, endTime }) => ({
+  mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
     created_at: new Date(),
-    contest_address: '', // TODO
+    contest_address: contestAddress!,
     contest_id: ethers.BigNumber.from(contestId).toNumber(),
     start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
     end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
@@ -102,9 +111,9 @@ const NewSingleContestStartedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.NewSingleContestStarted,
   output: ContestStarted,
-  mapEvmToSchema: ({ startTime, endTime }) => ({
+  mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
     created_at: new Date(),
-    contest_address: '', // TODO
+    contest_address: contestAddress!,
     contest_id: 0,
     start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
     end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
@@ -117,9 +126,9 @@ const NewContestContentAddedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.ContentAdded,
   output: ContestContentAdded,
-  mapEvmToSchema: (evmInput) => ({
+  mapEvmToSchema: (contestAddress, evmInput) => ({
     created_at: new Date(),
-    contest_address: '', // TODO
+    contest_address: contestAddress!,
     content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
     creator_address: evmInput.creator,
     content_url: evmInput.url,
@@ -132,9 +141,9 @@ const ContestContentUpvotedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.VoterVoted,
   output: ContestContentUpvoted,
-  mapEvmToSchema: (evmInput) => ({
+  mapEvmToSchema: (contestAddress, evmInput) => ({
     created_at: new Date(),
-    contest_address: '', // TODO
+    contest_address: contestAddress!,
     contest_id: 0, // TODO: oneOff == 0, recurring == ID – Contract must be updated
     content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
     voter_address: evmInput.voter,
@@ -158,12 +167,19 @@ const EvmMappers = {
 // based on solidity event signature.
 const parseEthersResult = (
   signature: string,
-  params: ethers.utils.Result,
+  evmParsedArgs: ethers.utils.Result,
 ): Record<string, any> => {
   const sigParts = signature.split(',').map((str: string) => str.trim());
+  if (!evmParsedArgs || evmParsedArgs.length !== sigParts.length) {
+    throw new Error(
+      `evm parsed args does not match signature: (${JSON.stringify(
+        evmParsedArgs,
+      )}) !== (${signature})`,
+    );
+  }
   const result: Record<string, any> = {};
   for (let i = 0; i < sigParts.length; i++) {
-    const value = params[i];
+    const value = evmParsedArgs[i];
     const [, sigArgName] = sigParts[i].replace(' indexed ', ' ').split(' ');
     result[sigArgName] = value;
   }
@@ -186,6 +202,7 @@ export const parseEvmEventToContestEvent = <
   Event extends keyof typeof ChainEventSigs,
 >(
   chainEventName: Event,
+  contestAddress: string | null,
   evmParsedArgs: ethers.utils.Result,
 ): ParserReturnType<Event> => {
   const m = EvmMappers[chainEventName];
@@ -196,7 +213,7 @@ export const parseEvmEventToContestEvent = <
   for (const mapper of mappers) {
     const evmInput = parseEthersResult(mapper.signature, evmParsedArgs);
     if (!mapper.condition || mapper.condition(evmInput)) {
-      return mapper.mapEvmToSchema(evmInput);
+      return mapper.mapEvmToSchema(contestAddress, evmInput);
     }
   }
   throw new Error(`No valid mapper found for event: ${chainEventName}`);
