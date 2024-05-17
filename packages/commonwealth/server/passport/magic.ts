@@ -26,7 +26,7 @@ import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
@@ -584,6 +584,14 @@ async function magicLoginRoute(
       include: [
         {
           model: models.Profile,
+        },
+        {
+          // guarantee that we only access ghost addresses as part of this query
+          model: models.Address,
+          where: {
+            ghost_address: true,
+          } as WhereOptions<AddressAttributes>,
+          required: true,
         },
       ],
     });

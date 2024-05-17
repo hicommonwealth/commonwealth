@@ -34,11 +34,6 @@ export const REDIS_URL = (() => {
   return undefined;
 })();
 
-// limit logins in the last 5 minutes
-// increased because of chain waitlist registrations
-export const LOGIN_RATE_LIMIT_TRIES = 15;
-export const LOGIN_RATE_LIMIT_MINS = 5;
-
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
   ',',

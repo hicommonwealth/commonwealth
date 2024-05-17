@@ -22,10 +22,10 @@ import ContestTopic from './contest_topic';
 import Contract from './contract';
 import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
+import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
-import LoginToken from './login_token';
 import Membership from './membership';
 import Notification from './notification';
 import NotificationCategory from './notification_category';
@@ -71,10 +71,10 @@ export const Factories = {
   Contract,
   ContractAbi,
   DiscordBotConfig,
+  EmailUpdateToken,
   EvmEventSource,
   Group,
   LastProcessedEvmBlock,
-  LoginToken,
   Membership,
   Notification,
   NotificationCategory,

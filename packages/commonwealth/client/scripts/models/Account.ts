@@ -199,6 +199,8 @@ class Account {
 
     if (res.data.result.status === 'Success') {
       // update ghost address for discourse users
+      // XXX Jake 5/17/24: this code needs to apply for social logins too?
+      //  Actually, when does this get run at all?
       const hasGhostAddress = app.user.addresses.some(
         ({ address, ghostAddress, community }) =>
           ghostAddress &&
