@@ -477,7 +477,13 @@ export async function handleSocialLoginCallback({
   });
 
   const isAddressNew = profileAddresses?.length === 0;
-  if (isAddressNew && returnEarlyIfNewAddress) {
+  const isAttemptingToConnectAddressToCommunity =
+    app.isLoggedIn() && app.activeChainId();
+  if (
+    isAddressNew &&
+    !isAttemptingToConnectAddressToCommunity &&
+    returnEarlyIfNewAddress
+  ) {
     return { address: magicAddress, isAddressNew };
   }
 

@@ -16,6 +16,8 @@ const validate = async (setRoute: (route: string) => void) => {
   const authModalState = authModal.getState();
 
   try {
+    const isAttemptingToConnectAddressToCommunity =
+      app.isLoggedIn() && app.activeChainId();
     const { isAddressNew } = await handleSocialLoginCallback({
       chain,
       walletSsoSource,
@@ -34,9 +36,10 @@ const validate = async (setRoute: (route: string) => void) => {
 
     // if SSO account address is not already present in db,
     // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
+    // and the user isn't trying to link address to community,
     // then open the user auth type guidance modal
     // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-    if (isAddressNew) {
+    if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
       authModalState.validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
     }
   } catch (error) {

@@ -212,6 +212,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
       const { address: magicAddress, isAddressNew } =
         await startLoginWithMagicLink({
           email: tempEmailToUse,
@@ -223,9 +225,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
       // if SSO account address is not already present in db,
       // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
+      // and the user isn't trying to link address to community,
       // then open the user auth type guidance modal
       // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-      if (isAddressNew) {
+      if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
         authModal
           .getState()
           .validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
@@ -618,7 +621,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
         initiateProfilesAfterFetch: false,
       });
       const addressExists = profileAddresses?.length > 0;
-      if (!addressExists && walletProps.onUnrecognizedAddressReceived) {
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      if (
+        !addressExists &&
+        !isAttemptingToConnectAddressToCommunity &&
+        walletProps.onUnrecognizedAddressReceived
+      ) {
         const shouldContinue = walletProps.onUnrecognizedAddressReceived();
         if (!shouldContinue) return;
       }
