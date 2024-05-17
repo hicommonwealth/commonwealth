@@ -5,6 +5,7 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import { useDebounce } from 'usehooks-ts';
 import { Select } from 'views/components/Select';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPagination from 'views/components/component_kit/new_designs/CWPagination';
@@ -111,10 +112,16 @@ const Allowlist = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  const debouncedSearchTerm = useDebounce<string>(
+    searchFilters.searchText,
+    500,
+  );
+
   const { fetchNextMembersPage, groups, isLoadingMembers, members } =
     useMemberData({
       tableState,
-      searchFilters,
+      groupFilter: searchFilters.groupFilter,
+      debouncedSearchTerm,
       memberships,
       membersPerPage: MEMBERS_PER_PAGE,
     });
@@ -244,12 +251,13 @@ const Allowlist = ({
           fullWidth={true}
           placeholder="Search members"
           iconLeft={<MagnifyingGlass size={24} weight="regular" />}
-          onInput={(e) =>
+          onInput={async (e) => {
+            await handlePageChange(null, 1);
             setSearchFilters((g) => ({
               ...g,
               searchText: e.target.value?.trim(),
-            }))
-          }
+            }));
+          }}
         />
       </div>
       {searchFilters.searchText !== '' && formattedMembers.length === 0 ? (

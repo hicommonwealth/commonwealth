@@ -16,6 +16,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
+import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -115,18 +116,19 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const {
-    fetchNextMembersPage,
-    groups,
-    isLoadingMembers,
-    members,
-    debouncedSearchTerm,
-  } = useMemberData({
-    tableState,
-    searchFilters,
-    memberships,
-    membersPerPage: 30,
-  });
+  const debouncedSearchTerm = useDebounce<string>(
+    searchFilters.searchText,
+    500,
+  );
+
+  const { fetchNextMembersPage, groups, isLoadingMembers, members } =
+    useMemberData({
+      tableState,
+      groupFilter: searchFilters.groupFilter,
+      memberships,
+      debouncedSearchTerm,
+      membersPerPage: 30,
+    });
 
   const filterOptions = useMemo(
     () => [

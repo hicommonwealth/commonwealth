@@ -1,37 +1,33 @@
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups/index';
 import { Memberships } from 'state/api/groups/refreshMembership';
-import { useDebounce } from 'usehooks-ts';
 import { trpc } from 'utils/trpcClient';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 
 interface UseMemberDataProps {
   memberships?: Memberships[];
   tableState?: CWTableState;
-  searchFilters?: { groupFilter: string | number; searchText: string };
+  groupFilter?: string;
+  debouncedSearchTerm?: string;
   membersPerPage: number;
 }
 
 export const useMemberData = ({
   memberships,
   tableState,
-  searchFilters,
+  groupFilter,
+  debouncedSearchTerm,
   membersPerPage,
 }: UseMemberDataProps) => {
-  const debouncedSearchTerm = useDebounce<string>(
-    searchFilters.searchText,
-    500,
-  );
-
-  const parseMembership = !isNaN(<number>searchFilters.groupFilter)
-    ? `in-group:${searchFilters.groupFilter}`
-    : searchFilters.groupFilter;
+  const parseMembership = !isNaN(<number>groupFilter)
+    ? `in-group:${groupFilter}`
+    : groupFilter;
 
   const membershipsFilter = [
     'all-community',
     'allowlisted',
     'not-allowlisted',
-  ].includes(searchFilters.groupFilter.toString())
+  ].includes(groupFilter.toString())
     ? undefined
     : parseMembership;
 
