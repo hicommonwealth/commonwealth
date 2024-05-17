@@ -137,6 +137,7 @@ describe('parseEvmEventToContestEvent', () => {
         ethers.BigNumber.from(9000), // votingPower
       ],
     );
+    expect(event_name).to.eq(EventNames.ContestContentUpvoted);
     const parsedEvent = ContestContentUpvoted.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
