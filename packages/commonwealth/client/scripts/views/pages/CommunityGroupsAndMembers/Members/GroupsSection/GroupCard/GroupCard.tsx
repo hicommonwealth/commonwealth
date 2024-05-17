@@ -1,6 +1,6 @@
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import MinimumProfile from 'models/MinimumProfile';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from 'views/components/Avatar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -8,6 +8,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { formatAddressShort } from '../../../../../../helpers';
+import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 
@@ -33,6 +34,7 @@ type GroupCardProps = {
   profiles?: Map<string, MinimumProfile>;
 };
 
+const ALLOWLIST_MEMBERS_PER_PAGE = 7;
 const GroupCard = ({
   isJoined,
   groupName,
@@ -46,7 +48,13 @@ const GroupCard = ({
   profiles,
 }: GroupCardProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [currentAllowListPage, setCurrentAllowListPage] = useState(1);
 
+  console.log(currentAllowListPage, 'curr');
+  const paginatedAllowList = allowLists?.slice(
+    ALLOWLIST_MEMBERS_PER_PAGE * (currentAllowListPage - 1),
+    ALLOWLIST_MEMBERS_PER_PAGE * currentAllowListPage,
+  );
   return (
     <section className="GroupCard">
       {/* Join status */}
@@ -82,7 +90,7 @@ const GroupCard = ({
         <RequirementCard key={index} {...r} />
       ))}
 
-      {allowLists && (
+      {paginatedAllowList && (
         <>
           <CWText type="h5">Allow List</CWText>
           <CWText type="b2">
@@ -102,7 +110,7 @@ const GroupCard = ({
                 </tr>
               </thead>
               <tbody>
-                {allowLists.map((address, index) => (
+                {paginatedAllowList.map((address, index) => (
                   <tr key={index}>
                     <div className="table-spacing">
                       <Link
@@ -129,6 +137,16 @@ const GroupCard = ({
                   </tr>
                 ))}
               </tbody>
+              <div className="pagination-buttons">
+                {allowLists.length > ALLOWLIST_MEMBERS_PER_PAGE && (
+                  <CWPagination
+                    totalCount={Math.ceil(
+                      allowLists.length / ALLOWLIST_MEMBERS_PER_PAGE,
+                    )}
+                    onChange={(_, n) => setCurrentAllowListPage(n)}
+                  />
+                )}
+              </div>
             </table>
           </div>
         </>
