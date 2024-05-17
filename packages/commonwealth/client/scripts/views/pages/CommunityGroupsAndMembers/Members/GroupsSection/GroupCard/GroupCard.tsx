@@ -1,13 +1,13 @@
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import MinimumProfile from 'models/MinimumProfile';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar } from 'views/components/Avatar/index';
+import { Avatar } from 'views/components/Avatar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { formatAddressShort } from '../../../../../../helpers/index';
-import useBrowserWindow from '../../../../../../hooks/useBrowserWindow';
-import MinimumProfile from '../../../../../../models/MinimumProfile';
+import { formatAddressShort } from '../../../../../../helpers';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 

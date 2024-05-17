@@ -1,5 +1,5 @@
 import app from 'state';
-import { useFetchGroupsQuery } from 'state/api/groups/index';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { Memberships } from 'state/api/groups/refreshMembership';
 import { trpc } from 'utils/trpcClient';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';

@@ -28,7 +28,7 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList/index';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
