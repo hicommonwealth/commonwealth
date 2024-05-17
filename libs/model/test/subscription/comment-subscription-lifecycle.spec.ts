@@ -40,17 +40,20 @@ describe('Comment subscription lifecycle', () => {
       address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
       topic_id: community?.topics?.at(0)?.id,
+      pinned: false,
+      read_only: false,
+      version_history: [],
     });
 
     [commentOne] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      thread_id: thread?.id,
+      thread_id: thread!.id!,
     });
     [commentTwo] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
       community_id: community?.id,
-      thread_id: thread?.id,
+      thread_id: thread!.id!,
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },

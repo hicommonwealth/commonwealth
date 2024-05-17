@@ -1,6 +1,8 @@
 import { Policy, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
+import { processCommentCreated } from './eventHandlers/commentCreated';
+import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -18,8 +20,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
     inputs: notificationInputs,
     body: {
       // eslint-disable-next-line @typescript-eslint/require-await
-      SnapshotProposalCreated: async () => {
-        log.info('Method not implemented');
+      SnapshotProposalCreated: async (event) => {
+        await processSnapshotProposalCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       ChainEventCreated: async () => {
@@ -30,8 +32,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         log.info('Method not implemented');
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      CommentCreated: async () => {
-        log.info('Method not implemented');
+      CommentCreated: async (event) => {
+        await processCommentCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       UserMentioned: async () => {

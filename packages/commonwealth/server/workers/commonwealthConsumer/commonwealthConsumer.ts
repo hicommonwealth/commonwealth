@@ -13,10 +13,10 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
+import { ContestWorker } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
-import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -59,14 +59,14 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  const snapshotSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.SnapshotListener,
-    SnapshotPolicy(),
-  );
-
   const chainEventSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ChainEvent,
     ChainEventPolicy(),
+  );
+
+  const contestWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestWorkerPolicy,
+    ContestWorker(),
   );
 
   if (!chainEventSubRes) {
@@ -79,19 +79,14 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     );
   }
 
-  if (!snapshotSubRes) {
+  if (!contestWorkerSubRes) {
     log.fatal(
-      'Failed to subscribe to snapshot events. Requires restart!',
+      'Failed to subscribe to contest worker events. Requires restart!',
       undefined,
       {
-        topic: BrokerSubscriptions.SnapshotListener,
+        topic: BrokerSubscriptions.ContestWorkerPolicy,
       },
     );
-  }
-
-  if (!snapshotSubRes && !chainEventSubRes) {
-    log.fatal('All subscriptions failed. Restarting...');
-    process.exit(1);
   }
 }
 

@@ -3,10 +3,11 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import _ from 'underscore';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -18,6 +19,7 @@ import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
 import { PreferenceTags, usePreferenceTags } from './PreferenceTags';
+import { UserTrainingCardTypes } from './UserTrainingSlider/types';
 import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
@@ -44,6 +46,7 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
+  const isFetchedOnMount = useRef(false);
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -65,9 +68,14 @@ const EditProfileComponent = () => {
       chain: a.community.id,
     })),
   });
-  const { selectedTags, toggleTagFromSelection } = usePreferenceTags({});
 
-  const getProfile = async () => {
+  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
+    usePreferenceTags();
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
+
+  const getProfile = useCallback(async () => {
     try {
       const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
         params: {
@@ -80,6 +88,13 @@ const EditProfileComponent = () => {
       setEmail(response.data.result.profile.email || '');
       setSocials(response.data.result.profile.socials);
       setAvatarUrl(response.data.result.profile.avatar_url);
+      const profileTags = response.data.result.tags;
+      setPreferenceTags((tags) =>
+        [...(tags || [])].map((t) => ({
+          ...t,
+          isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
+        })),
+      );
       setBio(deserializeDelta(response.data.result.profile.bio));
       backgroundImageRef.current =
         response.data.result.profile.background_image;
@@ -110,7 +125,7 @@ const EditProfileComponent = () => {
       }
     }
     setLoading(false);
-  };
+  }, [setPreferenceTags]);
 
   const checkForUpdates = () => {
     // TODO: create/integrate api to store user preference/interests tags when -> `userOnboardingEnabled`
@@ -140,9 +155,19 @@ const EditProfileComponent = () => {
         profileId: profile.id,
         address: app.user.activeAccount?.address,
         chain: app.user.activeAccount?.community,
+        tagIds: preferenceTags
+          .filter((tag) => tag.isSelected)
+          .map((tag) => tag.item.id),
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
+
+          if (userOnboardingEnabled && socials.length > 0) {
+            markTrainingActionAsComplete(
+              UserTrainingCardTypes.FinishProfile,
+              profile.id,
+            );
+          }
         })
         .catch((err) => {
           notifyError(err?.response?.data?.error || 'Something went wrong.');
@@ -169,8 +194,11 @@ const EditProfileComponent = () => {
   };
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    if (!isFetchedOnMount.current) {
+      getProfile().catch(console.error);
+      isFetchedOnMount.current = true;
+    }
+  }, [getProfile]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
@@ -403,7 +431,7 @@ const EditProfileComponent = () => {
                   <CWText type="h5">(Select all that apply)</CWText>
                 </div>
                 <PreferenceTags
-                  selectedTags={selectedTags}
+                  preferenceTags={preferenceTags}
                   onTagClick={toggleTagFromSelection}
                 />
               </CWFormSection>
