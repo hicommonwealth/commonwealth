@@ -45,6 +45,7 @@ const CWPagination = ({
         if (item.type === ButtonType.Previous) {
           return (
             <button
+              type="button"
               onClick={item.onClick}
               disabled={item.disabled}
               key={index}
@@ -59,6 +60,7 @@ const CWPagination = ({
         if (item.type === ButtonType.Next) {
           return (
             <button
+              type="button"
               onClick={item.onClick}
               disabled={item.disabled}
               key={index}
@@ -73,6 +75,7 @@ const CWPagination = ({
         if (item.type === ButtonType.Page) {
           return (
             <button
+              type="button"
               onClick={item.onClick}
               className={clsx({ selected: item.selected })}
               key={index}
@@ -86,7 +89,12 @@ const CWPagination = ({
           item.type === ButtonType.StartEllipsis ||
           item.type === ButtonType.EndEllipsis
         ) {
-          return <button key={index}> ... </button>;
+          return (
+            <button type="button" key={index}>
+              {' '}
+              ...{' '}
+            </button>
+          );
         }
       })}
     </div>

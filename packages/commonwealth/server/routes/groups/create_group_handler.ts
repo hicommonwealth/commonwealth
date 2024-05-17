@@ -28,7 +28,7 @@ export const createGroupHandler = async (
         description: z.string(),
         required_requirements: z.number().optional(),
       }),
-      requirements: z.array(z.any()), // validated in controller
+      requirements: z.array(z.any()).min(1), // validated in controller
       topics: z.array(z.number()).optional(),
     }),
   });

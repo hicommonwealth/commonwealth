@@ -4,12 +4,11 @@ import { Memberships } from '../../../../state/api/groups/refreshMembership';
 import app from '../../../../state/index';
 import { trpc } from '../../../../utils/trpcClient';
 import { CWTableState } from '../../../components/component_kit/new_designs/CWTable/useCWTableState';
-import { SearchFilters } from '../Members/index.types';
 
 interface UseMemberDataProps {
   memberships?: Memberships[];
   tableState?: CWTableState;
-  searchFilters?: SearchFilters;
+  searchFilters?: { groupFilter: string | number; searchText: string };
   membersPerPage: number;
 }
 
@@ -24,6 +23,9 @@ export const useMemberData = ({
     500,
   );
 
+  const membership = !isNaN(<number>searchFilters.groupFilter)
+    ? `in-group:${searchFilters.groupFilter}`
+    : searchFilters.groupFilter;
   const {
     data: members,
     fetchNextPage: fetchNextMembersPage,
@@ -36,15 +38,10 @@ export const useMemberData = ({
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
       include_roles: true,
-      ...(!['All groups', 'Ungrouped'].includes(
-        `${searchFilters.groupFilter}`,
-      ) &&
-        searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
-      ...(searchFilters.groupFilter === 'Ungrouped' && {
-        memberships: 'not-in-group',
-      }),
+      memberships:
+        membership === 'allowlisted' || membership === 'not-allowlisted'
+          ? 'all-community'
+          : membership,
       include_group_ids: true,
       // only include stake balances if community has staking enabled
       include_stake_balances: !!app.config.chains.getById(app.activeChainId())
@@ -63,5 +60,11 @@ export const useMemberData = ({
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
-  return { groups, members, fetchNextMembersPage, isLoadingMembers };
+  return {
+    groups,
+    members,
+    fetchNextMembersPage,
+    isLoadingMembers,
+    debouncedSearchTerm,
+  };
 };

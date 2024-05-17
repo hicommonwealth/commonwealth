@@ -25,11 +25,12 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
+  console.log(filteredGroups);
   const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 
   const profileAddresses = filteredGroups
-    .map((g) => g.requirements) // Extract requirements from each group
+    ?.map((g) => g.requirements) // Extract requirements from each group
     .filter((r) => r[0]?.rule === 'allow') // Filter only the allowlist rules
     .flatMap((r) => r[0]?.data?.allow || []); // Flatten and aggregate all addresses
 
@@ -37,7 +38,7 @@ const GroupsSection = ({
     currentChainId: app.activeChainId(),
     profileAddresses,
     profileChainIds: [app.activeChainId()],
-    apiCallEnabled: profileAddresses.length > 0,
+    apiCallEnabled: profileAddresses?.length > 0,
   });
 
   const profileMap = new Map<string, MinimumProfile>(
@@ -68,9 +69,9 @@ const GroupsSection = ({
           )}
         </div>
       )}
-      {filteredGroups.length > 0 && (
+      {filteredGroups?.length > 0 && (
         <section className="list-container">
-          {filteredGroups.map((group, index) => (
+          {filteredGroups?.map((group, index) => (
             <GroupCard
               key={index}
               groupName={group.name}

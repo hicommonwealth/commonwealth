@@ -4,7 +4,9 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import useBrowserWindow from '../../../../../../hooks/useBrowserWindow';
 import MinimumProfile from '../../../../../../models/MinimumProfile';
+import { formatAddressCompact } from '../../../../../../utils/addressFormat';
 import { Avatar } from '../../../../../components/Avatar/index';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
@@ -43,7 +45,8 @@ const GroupCard = ({
   onEditClick = () => {},
   profiles,
 }: GroupCardProps) => {
-  console.log(profiles);
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+
   return (
     <section className="GroupCard">
       {/* Join status */}
@@ -87,7 +90,7 @@ const GroupCard = ({
             additional requirements
           </CWText>
           <div className="allowlist-table">
-            <table className="table-spacing">
+            <table>
               <thead>
                 <tr className="column-header">
                   <th>
@@ -101,22 +104,26 @@ const GroupCard = ({
               <tbody>
                 {allowLists.map((address, index) => (
                   <tr key={index}>
-                    <Link
-                      to={`/profile/id/${profiles.get(address)?.id}`}
-                      className="user-info"
-                    >
-                      <Avatar
-                        url={profiles.get(address)?.avatarUrl}
-                        size={24}
-                        address={profiles.get(address)?.id}
-                      />
-                      <CWText type="b2">
-                        {profiles.get(address)?.name ?? 'undefined'}
-                      </CWText>
-                    </Link>
+                    <div className="table-spacing">
+                      <Link
+                        to={`/profile/id/${profiles.get(address)?.id}`}
+                        className="user-info"
+                      >
+                        <Avatar
+                          url={profiles.get(address)?.avatarUrl}
+                          size={24}
+                          address={profiles.get(address)?.id}
+                        />
+                        <CWText type="b2">
+                          {profiles.get(address)?.name ?? 'undefined'}
+                        </CWText>
+                      </Link>
+                    </div>
                     <td>
                       <CWText type="b2">
-                        {profiles.get(address)?.address ?? 'error'}
+                        {(!isWindowSmallInclusive
+                          ? profiles.get(address)?.address
+                          : formatAddressCompact(address)) ?? 'error'}
                       </CWText>
                     </td>
                   </tr>

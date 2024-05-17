@@ -501,7 +501,7 @@ const GroupForm = ({
                 />
 
                 <CWRequirementsRadioButton
-                  maxRequirements={requirementSubForms.length}
+                  maxRequirements={requirementSubForms.length + 1} // + 1 for allowlists
                   inputValue={cwRequiremenetsLabelInputValue}
                   isSelected={isSelectedCustomRequirementsToFulfillOption}
                   onSelect={() =>
@@ -594,7 +594,11 @@ const GroupForm = ({
             <CWButton
               type="submit"
               buttonWidth="wide"
-              disabled={isNameTaken}
+              disabled={
+                isNameTaken ||
+                (requirementSubForms.length === 0 &&
+                  allowedAddresses.length === 0)
+              }
               label={formType === 'create' ? 'Create group' : 'Save changes'}
             />
           </div>

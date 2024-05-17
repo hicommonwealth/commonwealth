@@ -1,12 +1,10 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import _ from 'lodash';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
-import useGroupMutationBannerStore from 'state/ui/group';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import { PageNotFound } from '../../../404';
@@ -25,8 +23,6 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
-  const { setShouldShowGroupMutationBannerForCommunity } =
-    useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
     communityId: app.activeChainId(),
@@ -38,6 +34,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const foundGroup: Group = groups.find(
     (group) => group.id === parseInt(`${groupId}`),
   );
+  console.log(foundGroup);
 
   const initialAllowList = useMemo(() => {
     return foundGroup?.requirements
@@ -54,8 +51,6 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
       setAllowedAddresses(initialAllowList);
     }
   }, [initialAllowList]);
-
-  console.log(initialAllowList, allowedAddresses);
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
@@ -125,30 +120,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(values);
+          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
           const finalPayload = {
             ...payload,
             groupId: groupId,
           };
 
-          // if requirements are equal, then don't send them to api
-          const isRequirementsEqual = _.isEqual(
-            foundGroup.requirements,
-            payload.requirements,
-          );
-          if (isRequirementsEqual) {
-            delete finalPayload.requirements;
-          }
-
           editGroup(finalPayload)
             .then(() => {
               notifySuccess('Group Updated');
-              if (!isRequirementsEqual) {
-                setShouldShowGroupMutationBannerForCommunity(
-                  app.activeChainId(),
-                  true,
-                );
-              }
               navigate(`/members?tab=groups`);
             })
             .catch(() => {

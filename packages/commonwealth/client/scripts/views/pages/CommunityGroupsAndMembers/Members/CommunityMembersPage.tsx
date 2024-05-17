@@ -12,7 +12,6 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
-import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -20,7 +19,6 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
@@ -31,19 +29,23 @@ import {
   MixpanelPageViewEventPayload,
 } from '../../../../../../shared/analytics/types';
 import { useFlag } from '../../../../hooks/useFlag';
+import { CWSelectList } from '../../../components/component_kit/new_designs/CWSelectList/index';
 import { useMemberData } from '../common/memberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
-import { BaseGroupFilter, SearchFilters } from './index.types';
+import { SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
   { value: 'groups', label: 'Groups' },
 ];
 
-const GROUP_AND_MEMBER_FILTERS: BaseGroupFilter[] = ['All groups', 'Ungrouped'];
+const GROUP_AND_MEMBER_FILTERS = [
+  { label: 'All groups', value: 'all-community' },
+  { label: 'Ungrouped', value: 'not-in-group' },
+];
 
 const CommunityMembersPage = () => {
   const allowlistEnabled = useFlag('allowlist');
@@ -54,7 +56,7 @@ const CommunityMembersPage = () => {
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
-    groupFilter: GROUP_AND_MEMBER_FILTERS[0],
+    groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
 
   const {
@@ -72,11 +74,6 @@ const CommunityMembersPage = () => {
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
-
-  const debouncedSearchTerm = useDebounce<string>(
-    searchFilters.searchText,
-    500,
-  );
 
   const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
     .namespace;
@@ -119,24 +116,25 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const { fetchNextMembersPage, groups, isLoadingMembers, members } =
-    useMemberData({
-      tableState,
-      searchFilters,
-      memberships,
-      membersPerPage: 30,
-    });
+  const {
+    fetchNextMembersPage,
+    groups,
+    isLoadingMembers,
+    members,
+    debouncedSearchTerm,
+  } = useMemberData({
+    tableState,
+    searchFilters,
+    memberships,
+    membersPerPage: 30,
+  });
 
   const filterOptions = useMemo(
     () => [
       {
         // base filters
         label: 'Filters',
-        options: GROUP_AND_MEMBER_FILTERS.map((x) => ({
-          id: x,
-          label: x,
-          value: x,
-        })),
+        options: GROUP_AND_MEMBER_FILTERS,
       },
       {
         // filters by group name
@@ -207,8 +205,9 @@ const CommunityMembersPage = () => {
           : true,
       )
       .filter((group) => {
-        if (searchFilters.groupFilter === 'All groups') return true;
-        if (searchFilters.groupFilter === 'Ungrouped') return !group.isJoined;
+        if (searchFilters.groupFilter === 'all-community') return true;
+        if (searchFilters.groupFilter === 'not-in-group')
+          return !group.isJoined;
         return group.id === parseInt(`${searchFilters.groupFilter}`);
       });
 
@@ -265,7 +264,7 @@ const CommunityMembersPage = () => {
 
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
-  const extraRows = (member: Member) => {
+  const extraColumns = (member: Member) => {
     return {
       lastActive: {
         sortValue: moment(member.lastActive).unix(),
@@ -405,7 +404,7 @@ const CommunityMembersPage = () => {
             }}
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
-            extraColumns={extraRows}
+            extraColumns={extraColumns}
           />
         )}
       </section>
