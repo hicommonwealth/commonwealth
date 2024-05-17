@@ -35,7 +35,6 @@ import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
-import { SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
@@ -54,7 +53,7 @@ const CommunityMembersPage = () => {
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+  const [searchFilters, setSearchFilters] = useState({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
@@ -370,7 +369,7 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
-                      groupFilter: option.value,
+                      groupFilter: option.value as string,
                     }));
                   }}
                 />

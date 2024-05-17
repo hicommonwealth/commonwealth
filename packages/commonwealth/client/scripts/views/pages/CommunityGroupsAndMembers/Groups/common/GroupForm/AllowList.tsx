@@ -16,7 +16,7 @@ import MembersSection, {
   Member,
 } from '../../../Members/MembersSection/MembersSection';
 import '../../../Members/MembersSection/MembersSection.scss';
-import { BaseGroupFilter, SearchFilters } from '../../../Members/index.types';
+import { BaseGroupFilter } from '../../../Members/index.types';
 import { useMemberData } from '../../../common/memberData';
 
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
@@ -76,7 +76,7 @@ const AllowList = ({
 }: AllowListProps) => {
   useUserActiveAccount();
 
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+  const [searchFilters, setSearchFilters] = useState({
     searchText: '',
     groupFilter: 'all-community',
   });
@@ -119,7 +119,7 @@ const AllowList = ({
       totalPages - Math.ceil(allowedAddresses.length / membersPerPage);
   }
 
-  const formattedMembers = useMemo(() => {
+  const formattedMembers: Member[] = useMemo(() => {
     if (!members?.pages?.length) {
       return [];
     }
@@ -167,7 +167,7 @@ const AllowList = ({
         .sort((a, b) => a.localeCompare(b)),
       stakeBalance: p.addresses[0].stake_balance,
       address: p.addresses[0].address,
-    }));
+    })) as Member[];
     // we disable the exhaustive-deps because we don't want to refresh on changed allowedAddresses because it will
     // update the displayed list while the boxes are being checked which is a bit jarring from a UI perspective
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -237,7 +237,7 @@ const AllowList = ({
                 option as {
                   value: number | BaseGroupFilter;
                 }
-              ).value,
+              ).value as string,
             }));
           }}
           selected={searchFilters.groupFilter.toString()}
