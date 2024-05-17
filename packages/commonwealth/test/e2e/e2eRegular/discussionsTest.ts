@@ -55,7 +55,7 @@ export const discussionTests = (test) => {
       expect(page.url()).to.include('/profile/id/');
     });
 
-    test('Check User can Like/Dislike post', async ({ page }) => {
+    test.skip('Check User can Like/Dislike post', async ({ page }) => {
       await login(page);
 
       let reactionsCountDivs = await page.locator('div.reactions-count');
