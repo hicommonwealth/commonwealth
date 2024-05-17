@@ -2,7 +2,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useDebounce } from 'usehooks-ts';
@@ -12,6 +12,10 @@ import CWPagination from 'views/components/component_kit/new_designs/CWPaginatio
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import {
+  ApiEndpoints,
+  queryClient,
+} from '../../../../../../../state/api/config';
 import MembersSection, {
   Member,
 } from '../../../../Members/MembersSection/MembersSection';
@@ -97,6 +101,12 @@ const Allowlist = ({
   });
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+
+  useEffect(() => {
+    // Invalidate group memberships cache
+    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
+    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+  }, []);
 
   const { data: memberships } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),

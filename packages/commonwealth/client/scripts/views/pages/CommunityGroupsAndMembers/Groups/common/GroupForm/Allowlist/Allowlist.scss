@@ -1,3 +1,5 @@
+@import '../../../../../../../../styles/shared';
+
 .AllowList {
   display: flex;
   flex-direction: column;
@@ -17,6 +19,14 @@
     width: 100%;
     white-space: nowrap;
     margin-top: -20px;
+  }
+
+  @media screen and (max-width: $breakpoint-small-max-px) {
+    .header-column {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 0;
+    }
   }
 
   .pagination-buttons {
