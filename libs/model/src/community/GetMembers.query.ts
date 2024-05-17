@@ -67,13 +67,13 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
             break;
           case 'allowlisted':
             membershipsWhere =
-              addressBinding?.length > 0
+              addressBinding && addressBinding.length > 0
                 ? `AND "Addresses".address IN(:addressBinding)`
                 : '';
             break;
           case 'not-allowlisted':
             membershipsWhere =
-              addressBinding?.length > 0
+              addressBinding && addressBinding.length > 0
                 ? `AND "Addresses".address NOT IN(:addressBinding)`
                 : '';
             break;
