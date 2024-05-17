@@ -252,24 +252,36 @@ const Allowlist = ({
           }
         />
       </div>
-      <MembersSection
-        filteredMembers={formattedMembers}
-        isLoadingMoreMembers={isLoadingMembers}
-        tableState={tableState}
-        extraColumns={extraColumns}
-        selectedAccounts={allowedAddresses}
-        handleCheckboxChange={handleCheckboxChange}
-      />
-      <div className="pagination-buttons">
-        <CWPagination
-          totalCount={getTotalPages(
-            members,
-            allowedAddresses,
-            searchFilters.groupFilter,
-          )}
-          onChange={handlePageChange}
-        />
-      </div>
+      {searchFilters.searchText !== '' && formattedMembers.length === 0 ? (
+        <div className="inline">
+          <CWText type="b2">No search results found matching</CWText>
+          &nbsp;
+          <CWText type="b2" fontWeight="bold">
+            {searchFilters.searchText}
+          </CWText>
+        </div>
+      ) : (
+        <>
+          <MembersSection
+            filteredMembers={formattedMembers}
+            isLoadingMoreMembers={isLoadingMembers}
+            tableState={tableState}
+            extraColumns={extraColumns}
+            selectedAccounts={allowedAddresses}
+            handleCheckboxChange={handleCheckboxChange}
+          />
+          <div className="pagination-buttons">
+            <CWPagination
+              totalCount={getTotalPages(
+                members,
+                allowedAddresses,
+                searchFilters.groupFilter,
+              )}
+              onChange={handlePageChange}
+            />
+          </div>
+        </>
+      )}
     </section>
   );
 };

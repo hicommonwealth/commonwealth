@@ -18,9 +18,14 @@
     white-space: nowrap;
     margin-top: -20px;
   }
+
+  .pagination-buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
-.pagination-buttons {
+.inline {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: row;
 }
