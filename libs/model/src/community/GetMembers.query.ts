@@ -25,7 +25,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         throw new InvalidState(Errors.CommunityNotFound);
       }
 
-      const addressBinding: string[] = payload?.allowedAddresses
+      const addressBinding: string[] | undefined = payload?.allowedAddresses
         ?.split(',')
         .map((a) => a.trim());
       const replacements: any = {
