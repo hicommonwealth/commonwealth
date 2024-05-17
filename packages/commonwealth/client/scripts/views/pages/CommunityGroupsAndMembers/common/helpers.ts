@@ -29,7 +29,7 @@ export const convertRequirementAmountFromWeiToTokens = (
   requirementType: 'erc20' | 'erc721' | 'eth_native' | 'cosmos_native' | 'spl',
   amount: string,
 ) => {
-  return converter(requirementType, amount.trim(), weiToTokens);
+  return converter(requirementType, amount?.trim(), weiToTokens);
 };
 
 export const convertRequirementAmountFromTokensToWei = (
