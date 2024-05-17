@@ -7,6 +7,7 @@ const PaginationsShowcase = () => {
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     newSelectedPage: number,
   ) => {
+    await Promise.resolve(true);
     console.log('Selected page: ', newSelectedPage);
   };
 
