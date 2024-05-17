@@ -91,8 +91,7 @@ const CWPagination = ({
         ) {
           return (
             <button type="button" key={index}>
-              {' '}
-              ...{' '}
+              ...
             </button>
           );
         }

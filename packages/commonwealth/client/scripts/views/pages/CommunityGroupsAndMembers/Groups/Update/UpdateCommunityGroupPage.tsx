@@ -34,7 +34,6 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const foundGroup: Group = groups.find(
     (group) => group.id === parseInt(`${groupId}`),
   );
-  console.log(foundGroup);
 
   const initialAllowList = useMemo(() => {
     return foundGroup?.requirements

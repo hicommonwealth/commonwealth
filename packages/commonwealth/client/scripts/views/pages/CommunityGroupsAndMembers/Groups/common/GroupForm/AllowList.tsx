@@ -1,23 +1,22 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { APIOrderDirection } from '../../../../../../helpers/constants';
-import useUserActiveAccount from '../../../../../../hooks/useUserActiveAccount';
-import { ApiEndpoints, queryClient } from '../../../../../../state/api/config';
-import { useRefreshMembershipQuery } from '../../../../../../state/api/groups/index';
-import app from '../../../../../../state/index';
-import { formatAddressCompact } from '../../../../../../utils/addressFormat';
-import { Select } from '../../../../../components/Select/index';
-import { CWText } from '../../../../../components/component_kit/cw_text';
-import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
-import { CWTableColumnInfo } from '../../../../../components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from '../../../../../components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTextInput } from '../../../../../components/component_kit/new_designs/CWTextInput/index';
+import { formatAddressShort } from 'helpers';
+import { APIOrderDirection } from 'helpers/constants';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import React, { useMemo, useState } from 'react';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
+import { Select } from 'views/components/Select';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWPagination from 'views/components/component_kit/new_designs/CWPagination';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import MembersSection, {
   Member,
 } from '../../../Members/MembersSection/MembersSection';
 import '../../../Members/MembersSection/MembersSection.scss';
 import { BaseGroupFilter } from '../../../Members/index.types';
-import { useMemberData } from '../../../common/memberData';
+import { useMemberData } from '../../../common/useMemberData';
 
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
@@ -53,6 +52,19 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   },
 ];
 
+const getTotalPages = (members, allowedAddresses: string[], filter: string) => {
+  let totalPages = members?.pages?.[0].totalPages ?? 0;
+
+  if (filter === 'allowlisted') {
+    totalPages = Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
+  } else if (filter === 'not-allowlisted') {
+    totalPages =
+      totalPages - Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
+  }
+
+  return totalPages;
+};
+
 type AllowListProps = {
   allowedAddresses: string[];
   setAllowedAddresses: (
@@ -70,6 +82,8 @@ const baseFilterOptions = [
   { label: 'Ungrouped', value: 'not-in-group' },
 ];
 
+const MEMBERS_PER_PAGE = 10;
+
 const AllowList = ({
   allowedAddresses,
   setAllowedAddresses,
@@ -83,7 +97,7 @@ const AllowList = ({
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const { data: memberships = null } = useRefreshMembershipQuery({
+  const { data: memberships } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
@@ -97,28 +111,18 @@ const AllowList = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const membersPerPage = 10;
   const { fetchNextMembersPage, groups, isLoadingMembers, members } =
     useMemberData({
       tableState,
       searchFilters,
       memberships,
-      membersPerPage,
+      membersPerPage: MEMBERS_PER_PAGE,
     });
 
-  const handleChange = async (_e, page: number) => {
+  const handlePageChange = async (_e, page: number) => {
     setCurrentPage(page);
     await fetchNextMembersPage({ pageParam: page });
   };
-  let totalPages = members?.pages?.[0].totalPages ?? 0;
-
-  if (searchFilters.groupFilter === 'allowlisted') {
-    totalPages = Math.ceil(allowedAddresses.length / membersPerPage);
-  } else if (searchFilters.groupFilter === 'not-allowlisted') {
-    totalPages =
-      totalPages - Math.ceil(allowedAddresses.length / membersPerPage);
-  }
-
   const formattedMembers: Member[] = useMemo(() => {
     if (!members?.pages?.length) {
       return [];
@@ -148,8 +152,8 @@ const AllowList = ({
       memberResults = Array.from(uniqueMembers.values());
 
       memberResults = memberResults.slice(
-        (currentPage - 1) * membersPerPage,
-        currentPage * membersPerPage,
+        (currentPage - 1) * MEMBERS_PER_PAGE,
+        currentPage * MEMBERS_PER_PAGE,
       );
     }
 
@@ -173,12 +177,6 @@ const AllowList = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchFilters.groupFilter, members?.pages, currentPage, groups]);
 
-  useEffect(() => {
-    // Invalidate group memberships cache
-    void queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    void queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
-
   const handleCheckboxChange = (address: string) => {
     if (allowedAddresses.includes(address)) {
       setAllowedAddresses((prevItems) =>
@@ -195,7 +193,7 @@ const AllowList = ({
         sortValue: member.address,
         customElement: (
           <div className="table-cell">
-            {formatAddressCompact(member.address)}
+            {formatAddressShort(member.address, 5, 6)}
           </div>
         ),
       },
@@ -230,7 +228,7 @@ const AllowList = ({
           ]}
           placeholder={baseFilterOptions[1].label}
           onSelect={async (option) => {
-            await handleChange(null, 1);
+            await handlePageChange(null, 1);
             setSearchFilters((g) => ({
               ...g,
               groupFilter: (
@@ -263,7 +261,14 @@ const AllowList = ({
         handleCheckboxChange={handleCheckboxChange}
       />
       <div className="pagination-buttons">
-        <CWPagination totalCount={totalPages} onChange={handleChange} />
+        <CWPagination
+          totalCount={getTotalPages(
+            members,
+            allowedAddresses,
+            searchFilters.groupFilter,
+          )}
+          onChange={handlePageChange}
+        />
       </div>
     </section>
   );

@@ -4,9 +4,9 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { formatAddressShort } from '../../../../../../helpers/index';
 import useBrowserWindow from '../../../../../../hooks/useBrowserWindow';
 import MinimumProfile from '../../../../../../models/MinimumProfile';
-import { formatAddressCompact } from '../../../../../../utils/addressFormat';
 import { Avatar } from '../../../../../components/Avatar/index';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
@@ -123,7 +123,7 @@ const GroupCard = ({
                       <CWText type="b2">
                         {(!isWindowSmallInclusive
                           ? profiles.get(address)?.address
-                          : formatAddressCompact(address)) ?? 'error'}
+                          : formatAddressShort(address, 5, 6)) ?? 'error'}
                       </CWText>
                     </td>
                   </tr>

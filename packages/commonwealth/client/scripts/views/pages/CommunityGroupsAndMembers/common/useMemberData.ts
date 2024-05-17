@@ -1,7 +1,7 @@
+import app from 'state';
+import { useFetchGroupsQuery } from 'state/api/groups/index';
+import { Memberships } from 'state/api/groups/refreshMembership';
 import { useDebounce } from 'usehooks-ts';
-import { useFetchGroupsQuery } from '../../../../state/api/groups/index';
-import { Memberships } from '../../../../state/api/groups/refreshMembership';
-import app from '../../../../state/index';
 import { trpc } from '../../../../utils/trpcClient';
 import { CWTableState } from '../../../components/component_kit/new_designs/CWTable/useCWTableState';
 

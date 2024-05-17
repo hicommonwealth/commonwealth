@@ -30,7 +30,7 @@ import {
 } from '../../../../../../shared/analytics/types';
 import { useFlag } from '../../../../hooks/useFlag';
 import { CWSelectList } from '../../../components/component_kit/new_designs/CWSelectList/index';
-import { useMemberData } from '../common/memberData';
+import { useMemberData } from '../common/useMemberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
