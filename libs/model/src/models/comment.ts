@@ -1,5 +1,4 @@
-import { EventNames, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
 import { IDiscordMeta } from '../types';

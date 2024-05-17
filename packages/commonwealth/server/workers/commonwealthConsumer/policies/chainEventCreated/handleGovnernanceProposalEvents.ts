@@ -1,5 +1,4 @@
-import { events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { events, logger } from '@hicommonwealth/core';
 import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import {
   NotificationCategories,

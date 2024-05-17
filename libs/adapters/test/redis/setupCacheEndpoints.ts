@@ -1,5 +1,4 @@
-import { ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { ServerError, logger } from '@hicommonwealth/core';
 import { Express } from 'express';
 import { fileURLToPath } from 'url';
 import { CustomRequest, lookupKeyDurationInReq } from '../../src';

@@ -5,8 +5,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { analytics, cache, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { analytics, cache, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { REDIS_URL } from './server/config';

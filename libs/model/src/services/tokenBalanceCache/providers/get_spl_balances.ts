@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { ChainNodeInstance } from 'model/src/models/chain_node';

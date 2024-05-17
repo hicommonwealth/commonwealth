@@ -1,5 +1,4 @@
-import { Stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { Stats, logger } from '@hicommonwealth/core';
 import { StatsD } from 'hot-shots';
 import { fileURLToPath } from 'url';
 

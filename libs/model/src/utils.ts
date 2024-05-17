@@ -1,5 +1,4 @@
-import { EventNames, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventNames, events, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';

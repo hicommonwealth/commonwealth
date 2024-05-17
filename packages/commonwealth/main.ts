@@ -1,5 +1,5 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { GlobalActivityCache } from '@hicommonwealth/model';
 import compression from 'compression';

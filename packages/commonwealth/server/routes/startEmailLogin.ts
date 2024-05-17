@@ -1,5 +1,4 @@
-import { AppError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { AppError, logger } from '@hicommonwealth/core';
 import { type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';

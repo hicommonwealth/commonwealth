@@ -6,8 +6,7 @@ import {
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { Broker, broker, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { Broker, broker, logger, stats } from '@hicommonwealth/core';
 import {
   Client,
   IntentsBitField,

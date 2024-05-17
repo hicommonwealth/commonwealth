@@ -6,7 +6,7 @@ import bs58 from 'bs58';
 import { verifyMessage } from 'ethers/lib/utils';
 import { fileURLToPath } from 'url';
 
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import {
   ChainBase,
   NotificationCategories,

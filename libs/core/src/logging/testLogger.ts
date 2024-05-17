@@ -1,4 +1,4 @@
-import { ILogger } from '../interfaces';
+import { ILogger } from './interfaces';
 
 export const testLogger: ILogger = {
   trace() {},

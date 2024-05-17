@@ -1,5 +1,4 @@
-import { events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { events, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import { fileURLToPath } from 'url';

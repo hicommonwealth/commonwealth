@@ -10,9 +10,9 @@ import {
   Broker,
   BrokerSubscriptions,
   broker,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { ContestWorker } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';

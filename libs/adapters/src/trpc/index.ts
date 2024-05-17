@@ -3,12 +3,12 @@ import {
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  logger,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
   type QueryMetadata,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request } from 'express';

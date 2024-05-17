@@ -11,10 +11,10 @@ import {
   Broker,
   BrokerSubscriptions,
   broker,
+  logger,
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { NotificationsPolicy } from './notificationsPolicy';

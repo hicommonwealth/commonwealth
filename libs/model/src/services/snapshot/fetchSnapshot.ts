@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 

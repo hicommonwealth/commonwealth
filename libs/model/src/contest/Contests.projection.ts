@@ -1,5 +1,4 @@
-import { AppError, Projection, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { AppError, Projection, events, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';
 import { config } from '../config';

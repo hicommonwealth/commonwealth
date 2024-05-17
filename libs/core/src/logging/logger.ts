@@ -1,5 +1,13 @@
+import { config } from '../config';
 import { GetLogger, ILogger, LoggerIds } from './interfaces';
-import { getDefaultLogger } from './util/getDefaultLogger';
+import { getPinoLogger } from './pinoLogger';
+import { testLogger } from './testLogger';
+
+const getDefaultLogger = (ids: LoggerIds): ILogger => {
+  if (config.NODE_ENV === 'test' && config.LOGGING.TEST_WITHOUT_LOGS)
+    return testLogger;
+  else return getPinoLogger(ids);
+};
 
 // Unified function implementation
 export function logger(

@@ -1,6 +1,5 @@
 import { HotShotsStats } from '@hicommonwealth/adapters';
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import {

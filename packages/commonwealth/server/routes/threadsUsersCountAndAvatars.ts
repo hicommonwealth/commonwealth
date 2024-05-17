@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import _ from 'lodash';

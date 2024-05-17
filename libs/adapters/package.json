@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@hicommonwealth/core": "workspace:*",
-    "@hicommonwealth/logging": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "@knocklabs/node": "^0.6.10",
     "@trpc/server": "^10.45.1",

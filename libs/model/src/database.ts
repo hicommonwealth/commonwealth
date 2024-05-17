@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { Sequelize } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { config } from './config';

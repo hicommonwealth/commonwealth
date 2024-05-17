@@ -1,5 +1,4 @@
-import { EventHandler, Policy, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventHandler, Policy, events, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';

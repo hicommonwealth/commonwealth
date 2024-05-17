@@ -13,9 +13,9 @@ import {
   Policy,
   broker,
   events,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import {
   CommentDiscordActions,
   IDiscordMessage,

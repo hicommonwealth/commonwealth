@@ -1,4 +1,3 @@
-import { ILogger } from '@hicommonwealth/logging';
 import { z } from 'zod';
 import {
   EventContext,
@@ -10,6 +9,7 @@ import {
   CommentCreatedNotification,
   SnapshotProposalCreatedNotification,
 } from '../integration/notifications.schemas';
+import { ILogger } from '../logging/interfaces';
 
 /**
  * Resource disposer function

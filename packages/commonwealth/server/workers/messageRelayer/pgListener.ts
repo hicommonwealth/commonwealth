@@ -1,5 +1,4 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
 import pg from 'pg';
 import { fileURLToPath } from 'url';

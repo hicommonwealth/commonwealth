@@ -6,7 +6,7 @@ import {
   setupBankExtension,
   setupStakingExtension,
 } from '@cosmjs/stargate';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';

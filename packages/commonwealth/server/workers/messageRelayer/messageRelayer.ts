@@ -5,8 +5,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { broker } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { broker, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { RABBITMQ_URI } from '../../config';
 import { setupListener } from './pgListener';

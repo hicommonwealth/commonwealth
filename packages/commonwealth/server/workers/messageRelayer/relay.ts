@@ -2,9 +2,9 @@ import {
   Broker,
   BrokerPublications,
   Outbox,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';

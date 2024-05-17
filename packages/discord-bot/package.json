@@ -21,7 +21,6 @@
     "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
-    "@hicommonwealth/logging": "workspace:*",
     "axios": "^1.3.4",
     "discord.js": "^14.11.0",
     "moment": "^2.23.0",

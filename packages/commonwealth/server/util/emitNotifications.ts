@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   config,
   type DB,

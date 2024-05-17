@@ -1,5 +1,9 @@
-import { EventNames, events as coreEvents, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import {
+  EventNames,
+  events as coreEvents,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';

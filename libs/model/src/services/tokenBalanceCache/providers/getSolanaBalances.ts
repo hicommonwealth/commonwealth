@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { Balances, GetSPLBalancesOptions } from '../types';

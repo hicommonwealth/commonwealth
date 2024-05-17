@@ -3,8 +3,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { EventNames, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import {
   emitEvent,
   fetchNewSnapshotProposal,

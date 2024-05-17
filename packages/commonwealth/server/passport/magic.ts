@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type {
   DB,
   ProfileAttributes,
