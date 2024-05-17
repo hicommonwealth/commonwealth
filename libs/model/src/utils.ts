@@ -42,6 +42,30 @@ type EmitEventValues =
   | {
       event_name: EventNames.SnapshotProposalCreated;
       event_payload: z.infer<typeof events.SnapshotProposalCreated>;
+    }
+  | {
+      event_name: EventNames.RecurringContestManagerDeployed;
+      event_payload: z.infer<typeof events.RecurringContestManagerDeployed>;
+    }
+  | {
+      event_name: EventNames.OneOffContestManagerDeployed;
+      event_payload: z.infer<typeof events.OneOffContestManagerDeployed>;
+    }
+  | {
+      event_name: EventNames.ContestStarted;
+      event_payload: z.infer<typeof events.ContestStarted>;
+    }
+  | {
+      event_name: EventNames.ContestContentAdded;
+      event_payload: z.infer<typeof events.ContestContentAdded>;
+    }
+  | {
+      event_name: EventNames.ContestContentUpvoted;
+      event_payload: z.infer<typeof events.ContestContentUpvoted>;
+    }
+  | {
+      event_name: EventNames.ContestWinnersRecorded;
+      event_payload: z.infer<typeof events.ContestWinnersRecorded>;
     };
 
 // Load with env var?

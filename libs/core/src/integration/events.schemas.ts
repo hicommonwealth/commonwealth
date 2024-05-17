@@ -254,7 +254,7 @@ const ContestManagerEvent = EventMetadata.extend({
   contest_id: z
     .number()
     .int()
-    .positive()
+    .gte(0)
     .optional()
     .describe('Recurring contest id'),
 });
