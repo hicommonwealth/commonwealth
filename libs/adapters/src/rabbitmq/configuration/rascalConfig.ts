@@ -184,43 +184,43 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadUpvoted,
     },
-    [RascalBindings.ContestWorkerPolicyRecurringContestManagerDeployed]: {
+    [RascalBindings.ContestProjectionRecurringContestManagerDeployed]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestProjection,
       destinationType: 'queue',
       bindingKey:
-        RascalRoutingKeys.ContestWorkerPolicyRecurringContestManagerDeployed,
+        RascalRoutingKeys.ContestProjectionRecurringContestManagerDeployed,
     },
-    [RascalBindings.ContestWorkerPolicyOneOffContestManagerDeployed]: {
+    [RascalBindings.ContestProjectionOneOffContestManagerDeployed]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestProjection,
       destinationType: 'queue',
       bindingKey:
-        RascalRoutingKeys.ContestWorkerPolicyOneOffContestManagerDeployed,
+        RascalRoutingKeys.ContestProjectionOneOffContestManagerDeployed,
     },
-    [RascalBindings.ContestWorkerPolicyContestStarted]: {
+    [RascalBindings.ContestProjectionContestStarted]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestProjection,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicyContestStarted,
+      bindingKey: RascalRoutingKeys.ContestProjectionContestStarted,
     },
-    [RascalBindings.ContestWorkerPolicyContestContentAdded]: {
+    [RascalBindings.ContestProjectionContestContentAdded]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestProjection,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicyContestContentAdded,
+      bindingKey: RascalRoutingKeys.ContestProjectionContestContentAdded,
     },
-    [RascalBindings.ContestWorkerPolicyContestContentUpvoted]: {
+    [RascalBindings.ContestProjectionContestContentUpvoted]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestProjection,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicyContestContentUpvoted,
+      bindingKey: RascalRoutingKeys.ContestProjectionContestContentUpvoted,
     },
-    [RascalBindings.ContestWorkerPolicyContestWinnersRecorded]: {
+    [RascalBindings.ContestProjectionContestWinnersRecorded]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestProjection,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicyContestWinnersRecorded,
+      bindingKey: RascalRoutingKeys.ContestProjectionContestWinnersRecorded,
     },
   };
 

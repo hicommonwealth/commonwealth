@@ -44,12 +44,12 @@ export enum RascalBindings {
 
   ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
   ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
-  ContestWorkerPolicyRecurringContestManagerDeployed = 'ContestWorkerPolicyRecurringContestManagerDeployed',
-  ContestWorkerPolicyOneOffContestManagerDeployed = 'ContestWorkerPolicyOneOffContestManagerDeployed',
-  ContestWorkerPolicyContestStarted = 'ContestWorkerPolicyContestStarted',
-  ContestWorkerPolicyContestContentAdded = 'ContestWorkerPolicyContestContentAdded',
-  ContestWorkerPolicyContestContentUpvoted = 'ContestWorkerPolicyContestContentUpvoted',
-  ContestWorkerPolicyContestWinnersRecorded = 'ContestWorkerPolicyContestWinnersRecorded',
+  ContestProjectionRecurringContestManagerDeployed = 'ContestProjectionRecurringContestManagerDeployed',
+  ContestProjectionOneOffContestManagerDeployed = 'ContestProjectionOneOffContestManagerDeployed',
+  ContestProjectionContestStarted = 'ContestProjectionContestStarted',
+  ContestProjectionContestContentAdded = 'ContestProjectionContestContentAdded',
+  ContestProjectionContestContentUpvoted = 'ContestProjectionContestContentUpvoted',
+  ContestProjectionContestWinnersRecorded = 'ContestProjectionContestWinnersRecorded',
 }
 
 export enum RascalRoutingKeys {
@@ -64,10 +64,10 @@ export enum RascalRoutingKeys {
 
   ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
   ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
-  ContestWorkerPolicyRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
-  ContestWorkerPolicyOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
-  ContestWorkerPolicyContestStarted = EventNames.ContestStarted,
-  ContestWorkerPolicyContestContentAdded = EventNames.ContestContentAdded,
-  ContestWorkerPolicyContestContentUpvoted = EventNames.ContestContentUpvoted,
-  ContestWorkerPolicyContestWinnersRecorded = EventNames.ContestWinnersRecorded,
+  ContestProjectionRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
+  ContestProjectionOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
+  ContestProjectionContestStarted = EventNames.ContestStarted,
+  ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
+  ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
+  ContestProjectionContestWinnersRecorded = EventNames.ContestWinnersRecorded,
 }
