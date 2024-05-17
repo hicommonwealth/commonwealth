@@ -10,21 +10,25 @@ interface FetchProfilesByAddressProps {
   currentChainId: string;
   profileChainIds: string[];
   profileAddresses: string[];
+  initiateProfilesAfterFetch?: boolean;
 }
 
-const fetchProfilesByAddress = async ({
+export const fetchProfilesByAddress = async ({
   currentChainId,
   profileAddresses,
   profileChainIds,
+  initiateProfilesAfterFetch = true,
 }: FetchProfilesByAddressProps) => {
   const response = await axios.post(
     `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES}`,
     {
       addresses: profileAddresses,
       communities: profileChainIds,
-      jwt: app.user.jwt,
+      ...(app?.user?.jwt && { jwt: app.user.jwt }),
     },
   );
+
+  if (!initiateProfilesAfterFetch) return response.data.result;
 
   return response.data.result.map((t) => {
     const profile = new MinimumProfile(t.address, currentChainId);
@@ -48,6 +52,7 @@ const useFetchProfilesByAddressesQuery = ({
   profileChainIds,
   profileAddresses = [],
   apiCallEnabled = true,
+  initiateProfilesAfterFetch = true,
 }: UseFetchProfilesByAddressesQuery) => {
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -64,6 +69,7 @@ const useFetchProfilesByAddressesQuery = ({
         currentChainId,
         profileAddresses,
         profileChainIds,
+        initiateProfilesAfterFetch,
       }),
     staleTime: PROFILES_STALE_TIME,
     enabled: apiCallEnabled,
