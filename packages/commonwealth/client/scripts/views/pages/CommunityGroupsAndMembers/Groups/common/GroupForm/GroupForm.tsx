@@ -168,7 +168,28 @@ const GroupForm = ({
     useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
-  >([]);
+  >(
+    !allowlistEnabled
+      ? [
+          {
+            defaultValues: {
+              requirementCondition: conditionTypes.find(
+                (x) => x.value === AMOUNT_CONDITIONS.MORE,
+              ),
+            },
+            values: {
+              requirementAmount: '',
+              requirementChain: '',
+              requirementCondition: AMOUNT_CONDITIONS.MORE,
+              requirementContractAddress: '',
+              requirementType: '',
+              requirementTokenId: '',
+            },
+            errors: {},
+          },
+        ]
+      : [],
+  );
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -453,7 +474,7 @@ const GroupForm = ({
                   defaultValues={subForm.defaultValues}
                   errors={subForm.errors}
                   onChange={(val) => validateChangedValue(val, index)}
-                  isRemoveable={!allowlistEnabled && index > 0}
+                  isRemoveable={allowlistEnabled || index > 0}
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
