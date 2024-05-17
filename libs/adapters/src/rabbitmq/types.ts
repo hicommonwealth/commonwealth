@@ -15,6 +15,7 @@ export enum RascalSubscriptions {
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
+  ContestProjection = BrokerSubscriptions.ContestProjection,
 }
 
 export enum RascalExchanges {
@@ -29,6 +30,7 @@ export enum RascalQueues {
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
+  ContestProjection = 'ContestProjection',
 }
 
 export enum RascalBindings {
@@ -39,8 +41,15 @@ export enum RascalBindings {
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
+
   ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
   ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
+  ContestWorkerPolicyRecurringContestManagerDeployed = 'ContestWorkerPolicyRecurringContestManagerDeployed',
+  ContestWorkerPolicyOneOffContestManagerDeployed = 'ContestWorkerPolicyOneOffContestManagerDeployed',
+  ContestWorkerPolicyContestStarted = 'ContestWorkerPolicyContestStarted',
+  ContestWorkerPolicyContestContentAdded = 'ContestWorkerPolicyContestContentAdded',
+  ContestWorkerPolicyContestContentUpvoted = 'ContestWorkerPolicyContestContentUpvoted',
+  ContestWorkerPolicyContestWinnersRecorded = 'ContestWorkerPolicyContestWinnersRecorded',
 }
 
 export enum RascalRoutingKeys {
@@ -52,6 +61,13 @@ export enum RascalRoutingKeys {
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
+
   ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
   ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
+  ContestWorkerPolicyRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
+  ContestWorkerPolicyOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
+  ContestWorkerPolicyContestStarted = EventNames.ContestStarted,
+  ContestWorkerPolicyContestContentAdded = EventNames.ContestContentAdded,
+  ContestWorkerPolicyContestContentUpvoted = EventNames.ContestContentUpvoted,
+  ContestWorkerPolicyContestWinnersRecorded = EventNames.ContestWinnersRecorded,
 }

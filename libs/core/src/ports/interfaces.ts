@@ -161,6 +161,7 @@ export enum BrokerSubscriptions {
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
+  ContestProjection = 'ContestProjection',
 }
 
 /**

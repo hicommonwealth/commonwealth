@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { DB, emitEvent } from '@hicommonwealth/model';
+import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { getEventSources } from './getEventSources';
@@ -98,9 +99,8 @@ export async function processChainNode(
 
       const contestEvents = events
         .map((event) => {
-          // get contract address for event
           const timestamp = new Date(); // TODO: get block timestamp
-          const contractAddress = '0x1'; // TODO: get contract address
+          const contractAddress = ethers.utils.getAddress(event.rawLog.address);
 
           const parseEvent = (e: keyof typeof ChainEventSigs) =>
             parseEvmEventToContestEvent(

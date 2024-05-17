@@ -142,6 +142,7 @@ describe('parseEvmEventToContestEvent', () => {
     console.debug(parsedEvent);
     expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.contest_id).to.eq(0); // TODO: this should come from contract
     expect(parsedEvent.content_id).to.eq(10);
     expect(parsedEvent.voter_address).to.eq('0x2');
     expect(parsedEvent.voting_power).to.eq(9000);
