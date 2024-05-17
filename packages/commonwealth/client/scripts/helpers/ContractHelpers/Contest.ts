@@ -3,6 +3,8 @@ import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
+const TOPIC_LOG =
+  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 class Contest extends ContractBase {
   namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
@@ -62,11 +64,7 @@ class Contest extends ContractBase {
         feeShare,
         prizeShare,
       );
-      const eventLog = txReceipt.logs.find(
-        (log) =>
-          log.topics[0] ==
-          '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
-      );
+      const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
       const newContestAddress = this.web3.eth.abi.decodeParameters(
         ['address', 'address', 'uint256', 'bool'],
         eventLog.data.toString(),
@@ -114,11 +112,7 @@ class Contest extends ContractBase {
         walletAddress,
         exchangeToken,
       );
-      const eventLog = txReceipt.logs.find(
-        (log) =>
-          log.topics[0] ==
-          '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
-      );
+      const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
       const newContestAddress = this.web3.eth.abi.decodeParameters(
         ['address', 'address', 'uint256', 'bool'],
         eventLog.data.toString(),
