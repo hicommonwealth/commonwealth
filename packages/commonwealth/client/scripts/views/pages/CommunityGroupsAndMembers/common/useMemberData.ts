@@ -31,13 +31,6 @@ export const useMemberData = ({
     ? undefined
     : parseMembership;
 
-  const allowedAddressesMemo = [
-    'allow-specified-addresses',
-    'not-allow-specified-addresses',
-  ].includes(membershipsFilter)
-    ? allowedAddresses.join(', ')
-    : undefined;
-
   const { data: members, isLoading: isLoadingMembers } =
     trpc.community.getMembers.useQuery(
       {
@@ -50,7 +43,7 @@ export const useMemberData = ({
         memberships: membershipsFilter,
         include_group_ids: true,
         cursor: page,
-        allowedAddresses: allowedAddressesMemo,
+        allowedAddresses: allowedAddresses.join(', '),
         // only include stake balances if community has staking enabled
         include_stake_balances: !!app.config.chains.getById(app.activeChainId())
           .namespace,

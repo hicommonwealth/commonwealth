@@ -117,6 +117,13 @@ const Allowlist = ({
     500,
   );
 
+  const memoizedAddresses = useMemo(() => {
+    return allowedAddresses;
+    // we disable the exhaustive-deps because we don't want to refresh on changed allowedAddresses because it will
+    // update the displayed list while the boxes are being checked which is a bit jarring from a UI perspective
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchFilters]);
+
   const { groups, isLoadingMembers, members } = useMemberData({
     tableState,
     groupFilter: searchFilters.groupFilter,
@@ -124,7 +131,7 @@ const Allowlist = ({
     memberships,
     membersPerPage: MEMBERS_PER_PAGE,
     page: currentPage,
-    allowedAddresses,
+    allowedAddresses: memoizedAddresses,
   });
 
   const handlePageChange = (_e, page: number) => {
