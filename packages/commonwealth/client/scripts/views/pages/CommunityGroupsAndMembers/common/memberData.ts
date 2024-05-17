@@ -23,9 +23,18 @@ export const useMemberData = ({
     500,
   );
 
-  const membership = !isNaN(<number>searchFilters.groupFilter)
+  const parseMembership = !isNaN(<number>searchFilters.groupFilter)
     ? `in-group:${searchFilters.groupFilter}`
     : searchFilters.groupFilter;
+
+  const membershipsFilter = [
+    'all-community',
+    'allowlisted',
+    'not-allowlisted',
+  ].includes(searchFilters.groupFilter.toString())
+    ? undefined
+    : parseMembership;
+
   const {
     data: members,
     fetchNextPage: fetchNextMembersPage,
@@ -38,10 +47,7 @@ export const useMemberData = ({
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
       include_roles: true,
-      memberships:
-        membership === 'allowlisted' || membership === 'not-allowlisted'
-          ? 'all-community'
-          : membership,
+      memberships: membershipsFilter,
       include_group_ids: true,
       // only include stake balances if community has staking enabled
       include_stake_balances: !!app.config.chains.getById(app.activeChainId())
