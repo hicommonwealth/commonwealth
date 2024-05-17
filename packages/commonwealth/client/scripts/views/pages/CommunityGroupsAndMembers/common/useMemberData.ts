@@ -10,6 +10,8 @@ interface UseMemberDataProps {
   groupFilter?: string;
   debouncedSearchTerm?: string;
   membersPerPage: number;
+  page: number;
+  allowedAddresses: string[];
 }
 
 export const useMemberData = ({
@@ -18,43 +20,38 @@ export const useMemberData = ({
   groupFilter,
   debouncedSearchTerm,
   membersPerPage,
+  page,
+  allowedAddresses,
 }: UseMemberDataProps) => {
   const parseMembership = !isNaN(<number>groupFilter)
     ? `in-group:${groupFilter}`
     : groupFilter;
 
-  const membershipsFilter = [
-    'all-community',
-    'allowlisted',
-    'not-allowlisted',
-  ].includes(groupFilter.toString())
+  const membershipsFilter = ['all-community'].includes(groupFilter.toString())
     ? undefined
     : parseMembership;
 
-  const {
-    data: members,
-    fetchNextPage: fetchNextMembersPage,
-    isLoading: isLoadingMembers,
-  } = trpc.community.getMembers.useInfiniteQuery(
-    {
-      limit: membersPerPage,
-      order_by: tableState.orderBy,
-      order_direction: tableState.orderDirection,
-      search: debouncedSearchTerm,
-      community_id: app.activeChainId(),
-      include_roles: true,
-      memberships: membershipsFilter,
-      include_group_ids: true,
-      // only include stake balances if community has staking enabled
-      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-        .namespace,
-    },
-    {
-      initialCursor: 1,
-      getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-    },
-  );
+  const { data: members, isLoading: isLoadingMembers } =
+    trpc.community.getMembers.useQuery(
+      {
+        limit: membersPerPage,
+        order_by: tableState.orderBy,
+        order_direction: tableState.orderDirection,
+        search: debouncedSearchTerm,
+        community_id: app.activeChainId(),
+        include_roles: true,
+        memberships: membershipsFilter,
+        include_group_ids: true,
+        cursor: page,
+        allowedAddresses: allowedAddresses.join(', '),
+        // only include stake balances if community has staking enabled
+        include_stake_balances: !!app.config.chains.getById(app.activeChainId())
+          .namespace,
+      },
+      {
+        enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+      },
+    );
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -65,7 +62,6 @@ export const useMemberData = ({
   return {
     groups,
     members,
-    fetchNextMembersPage,
     isLoadingMembers,
     debouncedSearchTerm,
   };

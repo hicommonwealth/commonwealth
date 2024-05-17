@@ -2,7 +2,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useDebounce } from 'usehooks-ts';
@@ -58,7 +58,7 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
 ];
 
 const getTotalPages = (members, allowedAddresses: string[], filter: string) => {
-  let totalPages = members?.pages?.[0].totalPages ?? 0;
+  let totalPages = members?.totalPages ?? 0;
 
   if (filter === 'allowlisted') {
     totalPages = Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
@@ -127,54 +127,21 @@ const Allowlist = ({
     500,
   );
 
-  const { fetchNextMembersPage, groups, isLoadingMembers, members } =
-    useMemberData({
-      tableState,
-      groupFilter: searchFilters.groupFilter,
-      debouncedSearchTerm,
-      memberships,
-      membersPerPage: MEMBERS_PER_PAGE,
-    });
+  const { groups, isLoadingMembers, members } = useMemberData({
+    tableState,
+    groupFilter: searchFilters.groupFilter,
+    debouncedSearchTerm,
+    memberships,
+    membersPerPage: MEMBERS_PER_PAGE,
+    page: currentPage,
+    allowedAddresses,
+  });
 
   const handlePageChange = async (_e, page: number) => {
     setCurrentPage(page);
-    await fetchNextMembersPage({ pageParam: page });
   };
-  const formattedMembers: Member[] = useMemo(() => {
-    if (!members?.pages?.length) {
-      return [];
-    }
-
-    let memberResults =
-      members?.pages?.find((p) => p.page === currentPage)?.results ?? [];
-
-    if (
-      searchFilters.groupFilter === 'allowlisted' ||
-      searchFilters.groupFilter === 'not-allowlisted'
-    ) {
-      memberResults = members.pages
-        .flatMap((p) => p.results)
-        .filter((r) => {
-          if (allowedAddresses.includes(r.addresses[0].address)) {
-            return searchFilters.groupFilter === 'allowlisted';
-          }
-          return searchFilters.groupFilter === 'not-allowlisted';
-        });
-
-      const uniqueMembers = new Map();
-      memberResults.forEach((m) => {
-        uniqueMembers.set(m.id, m);
-      });
-
-      memberResults = Array.from(uniqueMembers.values());
-
-      memberResults = memberResults.slice(
-        (currentPage - 1) * MEMBERS_PER_PAGE,
-        currentPage * MEMBERS_PER_PAGE,
-      );
-    }
-
-    return memberResults.map((p) => ({
+  const formattedMembers: Member[] =
+    (members?.results?.map((p) => ({
       id: p.id,
       avatarUrl: p.avatar_url,
       name: p.profile_name || 'Anonymous',
@@ -188,11 +155,7 @@ const Allowlist = ({
         .sort((a, b) => a.localeCompare(b)),
       stakeBalance: p.addresses[0].stake_balance,
       address: p.addresses[0].address,
-    })) as Member[];
-    // we disable the exhaustive-deps because we don't want to refresh on changed allowedAddresses because it will
-    // update the displayed list while the boxes are being checked which is a bit jarring from a UI perspective
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchFilters.groupFilter, members?.pages, currentPage, groups]);
+    })) as Member[]) || [];
 
   const handleCheckboxChange = (address: string) => {
     if (allowedAddresses.includes(address)) {
@@ -228,7 +191,6 @@ const Allowlist = ({
           using the table below
         </CWText>
       </div>
-
       <div className="header-column">
         <CWText type="h5" fontWeight="semiBold">
           Filter & Search
@@ -270,36 +232,35 @@ const Allowlist = ({
           }}
         />
       </div>
-      {searchFilters.searchText !== '' && formattedMembers.length === 0 ? (
-        <div className="inline">
-          <CWText type="b2">No search results found matching</CWText>
-          &nbsp;
-          <CWText type="b2" fontWeight="bold">
-            {searchFilters.searchText}
-          </CWText>
-        </div>
-      ) : (
-        <>
-          <MembersSection
-            filteredMembers={formattedMembers}
-            isLoadingMoreMembers={isLoadingMembers}
-            tableState={tableState}
-            extraColumns={extraColumns}
-            selectedAccounts={allowedAddresses}
-            handleCheckboxChange={handleCheckboxChange}
+      {/*{searchFilters.searchText !== '' && formattedMembers.length === 0 ? (*/}
+      {/*  <div className="inline">*/}
+      {/*    <CWText type="b2">No search results found matching</CWText>*/}
+      {/*    &nbsp;*/}
+      {/*    <CWText type="b2" fontWeight="bold">*/}
+      {/*      {searchFilters.searchText}*/}
+      {/*    </CWText>*/}
+      {/*  </div>*/}
+      {/*) : (*/}
+      <>
+        <MembersSection
+          filteredMembers={formattedMembers}
+          isLoadingMoreMembers={isLoadingMembers}
+          tableState={tableState}
+          extraColumns={extraColumns}
+          selectedAccounts={allowedAddresses}
+          handleCheckboxChange={handleCheckboxChange}
+        />
+        <div className="pagination-buttons">
+          <CWPagination
+            totalCount={getTotalPages(
+              members,
+              allowedAddresses,
+              searchFilters.groupFilter,
+            )}
+            onChange={handlePageChange}
           />
-          <div className="pagination-buttons">
-            <CWPagination
-              totalCount={getTotalPages(
-                members,
-                allowedAddresses,
-                searchFilters.groupFilter,
-              )}
-              onChange={handlePageChange}
-            />
-          </div>
-        </>
-      )}
+        </div>
+      </>
     </section>
   );
 };

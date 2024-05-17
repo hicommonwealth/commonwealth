@@ -28,10 +28,13 @@ export const GetCommunityMembers = {
         z.literal('in-group'),
         z.string().regex(/^in-group:\d+$/, 'in-group with a number'),
         z.literal('not-in-group'),
+        z.literal('allowlisted'),
+        z.literal('not-allowlisted'),
       ])
       .optional(),
     include_group_ids: z.coerce.boolean().optional(),
     include_stake_balances: z.coerce.boolean().optional(),
+    allowedAddresses: z.string().optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
