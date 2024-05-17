@@ -60,16 +60,16 @@ from
     from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
 		group by a.contest_id
   ) as ca on c.contest_id = ca.contest_id
+  ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	group by c.contest_address
 ) as c on cm.contest_address = c.contest_address
 where
   cm.community_id = :community_id
   ${
     payload.contest_address
-      ? `and cm.contest_address = ${payload.contest_address}`
+      ? `and cm.contest_address = '${payload.contest_address}'`
       : ''
   }
-  ${payload.contest_id ? `and c.contest_id = ${payload.contest_id}` : ''}
 group by
   cm.community_id,
   cm.contest_address,
