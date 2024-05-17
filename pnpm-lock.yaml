@@ -404,9 +404,6 @@ importers:
       async-rwlock:
         specifier: ^1.1.1
         version: 1.1.1
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -589,6 +586,9 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
+      dotenv:
+        specifier: ^16.0.3
+        version: 16.4.5
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -611,6 +611,9 @@ importers:
 
   libs/evm-testing:
     dependencies:
+      '@hicommonwealth/core':
+        specifier: workspace:*
+        version: link:../core
       '@hicommonwealth/logging':
         specifier: workspace:*
         version: link:../logging
@@ -623,9 +626,6 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -664,12 +664,12 @@ importers:
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
+      zod:
+        specifier: ^3.22.4
+        version: 3.23.6
 
   libs/logging:
     dependencies:
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1121,9 +1121,6 @@ importers:
       dompurify:
         specifier: ^2.2.6
         version: 2.5.2
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       esm-loader-css:
         specifier: ^1.0.6
         version: 1.0.6
@@ -1464,9 +1461,6 @@ importers:
       discord.js:
         specifier: ^14.11.0
         version: 14.15.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1530,9 +1524,6 @@ importers:
       body-parser:
         specifier: ^1.20.1
         version: 1.20.2
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -1548,6 +1539,9 @@ importers:
       tslog:
         specifier: ^3.3.4
         version: 3.3.4
+      zod:
+        specifier: ^3.22.4
+        version: 3.23.6
     devDependencies:
       tsx:
         specifier: ^4.7.2
