@@ -36,10 +36,14 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         ? `"Addresses".community_id = $community_id AND`
         : '';
 
+      const memberships =
+        payload.memberships !== 'all-community'
+          ? payload.memberships
+          : undefined;
       const groupIdFromMemberships = parseInt(
-        ((payload.memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
+        ((memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
       );
-      let membershipsWhere = payload.memberships
+      let membershipsWhere = memberships
         ? `SELECT 1 FROM "Memberships"
     JOIN "Groups" ON "Groups".id = "Memberships".group_id
     WHERE "Memberships".address_id = "Addresses".id
@@ -52,8 +56,8 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
     `
         : '';
 
-      if (payload.memberships) {
-        switch (payload.memberships) {
+      if (memberships) {
+        switch (memberships) {
           case 'in-group':
           case `in-group:${groupIdFromMemberships}`:
             membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
@@ -61,13 +65,13 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           case 'not-in-group':
             membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
             break;
-          case 'in-group:allowlisted':
+          case 'allowlisted':
             membershipsWhere = await getAllowListedAddresses(
               community.id!,
               true,
             );
             break;
-          case 'in-group:not-allowlisted':
+          case 'not-allowlisted':
             membershipsWhere = await getAllowListedAddresses(
               community.id!,
               false,
@@ -75,7 +79,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
             break;
           default:
             throw new InvalidState(
-              `unsupported memberships param: ${payload.memberships}`,
+              `unsupported memberships param: ${memberships}`,
             );
         }
       }
@@ -99,8 +103,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       ${communityWhere}
       (
         "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
-        OR
-        "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
       ${membershipsWhere}
     GROUP BY

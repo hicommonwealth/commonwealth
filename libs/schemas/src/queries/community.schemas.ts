@@ -28,8 +28,9 @@ export const GetCommunityMembers = {
         z.literal('in-group'),
         z.string().regex(/^in-group:\d+$/, 'in-group with a number'),
         z.literal('not-in-group'),
-        z.literal('in-group:allowlisted'),
-        z.literal('in-group:not-allowlisted'),
+        z.literal('allowlisted'),
+        z.literal('not-allowlisted'),
+        z.literal('all-community'),
       ])
       .optional(),
     include_group_ids: z.coerce.boolean().optional(),
