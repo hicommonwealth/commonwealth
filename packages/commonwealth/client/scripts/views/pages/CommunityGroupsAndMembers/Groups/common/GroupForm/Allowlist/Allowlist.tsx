@@ -173,6 +173,8 @@ const Allowlist = ({
     };
   };
 
+  console.log(currentPage);
+
   return (
     <section className="AllowList">
       <div className="header-row">
@@ -245,12 +247,13 @@ const Allowlist = ({
           />
           <div className="pagination-buttons">
             <CWPagination
+              selectedPageProp={currentPage}
               totalCount={getTotalPages(
                 members,
                 allowedAddresses,
                 searchFilters.groupFilter,
               )}
-              onChange={void handlePageChange}
+              onChange={handlePageChange}
             />
           </div>
         </>
