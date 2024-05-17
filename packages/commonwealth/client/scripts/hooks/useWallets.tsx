@@ -32,7 +32,10 @@ import { setDarkMode } from '../helpers/darkMode';
 import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
+import {
+  DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
+  fetchProfilesByAddress,
+} from '../state/api/profiles/fetchProfilesByAddress';
 import { authModal } from '../state/ui/modals/authModal';
 import {
   breakpointFnValidator,
@@ -583,29 +586,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
     await wallet.reset();
   };
 
-  const doesAddressExist = async (
-    wallet: IWebWallet<any>,
-    selectedAddress: string,
-  ) => {
-    const res = await axios.post(`${app.serverUrl()}/getAddressProfile`, {
-      addresses: [
-        wallet.chain === ChainBase.Substrate
-          ? addressSwapper({
-              address: selectedAddress,
-              currentPrefix: parseInt(
-                (app.chain as Substrate)?.meta.ss58Prefix,
-                10,
-              ),
-            })
-          : selectedAddress,
-      ],
-      communities: [app.activeChainId() ?? wallet.chain],
-    });
-
-    // if there are any results, then address exists
-    return res?.data?.result?.length > 0;
-  };
-
   const onWalletSelect = async (wallet: IWebWallet<any>) => {
     await wallet.enable();
 
@@ -621,7 +601,23 @@ const useWallets = (walletProps: IuseWalletProps) => {
       const selectedAddress = getAddressFromWallet(wallet);
 
       // check if address exists
-      const addressExists = await doesAddressExist(wallet, selectedAddress);
+      const profileAddresses = await fetchProfilesByAddress({
+        currentChainId: '',
+        profileAddresses: [
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address: selectedAddress,
+                currentPrefix: parseInt(
+                  (app.chain as Substrate)?.meta.ss58Prefix,
+                  10,
+                ),
+              })
+            : selectedAddress,
+        ],
+        profileChainIds: [app.activeChainId() ?? wallet.chain],
+        initiateProfilesAfterFetch: false,
+      });
+      const addressExists = profileAddresses?.length > 0;
       if (!addressExists && walletProps.onUnrecognizedAddressReceived) {
         const shouldContinue = walletProps.onUnrecognizedAddressReceived();
         if (!shouldContinue) return;

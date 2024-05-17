@@ -10,6 +10,7 @@ import { initAppState } from 'state';
 
 import { OpenFeature } from '@openfeature/web-sdk';
 import axios from 'axios';
+import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
 import moment from 'moment';
@@ -468,13 +469,14 @@ export async function handleSocialLoginCallback({
   }
 
   // check if this address exists in db
-  const res = await axios.post(`${app.serverUrl()}/getAddressProfile`, {
-    addresses: [magicAddress],
-    communities: [],
+  const profileAddresses = await fetchProfilesByAddress({
+    currentChainId: '',
+    profileAddresses: [magicAddress],
+    profileChainIds: [],
+    initiateProfilesAfterFetch: false,
   });
 
-  console.log('magicAddress => ', { magicAddress, res });
-  const isAddressNew = res?.data?.result?.length === 0;
+  const isAddressNew = profileAddresses?.length === 0;
   if (isAddressNew && returnEarlyIfNewAddress) {
     return { address: magicAddress, isAddressNew };
   }
