@@ -15,10 +15,11 @@
     "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
-    "@hicommonwealth/core": "*",
-    "@hicommonwealth/logging": "*",
-    "@hicommonwealth/model": "*",
-    "@hicommonwealth/sitemaps": "*",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/logging": "workspace:*",
+    "@hicommonwealth/model": "workspace:*",
+    "@hicommonwealth/sitemaps": "workspace:*",
+    "dotenv": "^16.0.3",
     "sequelize": "^6.32.1",
     "mocha": "^10.4.0",
     "moment": "^2.23.0",

@@ -45,11 +45,11 @@ Note: If you get error "No images to push," make sure Dockerfile is capitalized
 If you ever need to run devnets locally on your machine, there are three helper scripts
 
 ```bash
-yarn cosmos:build # build & start first time only - this takes several minutes
+pnpm cosmos:build # build & start first time only - this takes several minutes
 
-yarn cosmos:start # start container - if you have pre-built images
+pnpm cosmos:start # start container - if you have pre-built images
 
-yarn cosmos:stop  # stop container
+pnpm cosmos:stop  # stop container
 ```
 
 Browse to these to confirm node is running locally:

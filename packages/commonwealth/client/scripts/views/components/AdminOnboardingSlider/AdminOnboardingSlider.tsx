@@ -168,7 +168,7 @@ export const AdminOnboardingSlider = () => {
                 description={CARD_TYPES['launch-contest'].description}
                 iconURL={CARD_TYPES['launch-contest'].iconURL}
                 iconAlt="launch-contest-icon"
-                isActionCompleted={contestsData.length > 0}
+                isActionCompleted={contestsData?.length > 0}
                 onCTAClick={() => redirectToPage('launch-contest')}
               />
             )}

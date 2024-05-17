@@ -20,9 +20,9 @@
     "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
-    "@hicommonwealth/core": "*",
-    "@hicommonwealth/logging": "*",
-    "@hicommonwealth/shared": "*",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/logging": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*",
     "@knocklabs/node": "^0.6.10",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",
