@@ -2,9 +2,8 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useDebounce } from 'usehooks-ts';
 import { Select } from 'views/components/Select';
@@ -99,12 +98,6 @@ const Allowlist = ({
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  useEffect(() => {
-    // Invalidate group memberships cache
-    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
-
   const { data: memberships } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
@@ -134,7 +127,7 @@ const Allowlist = ({
     allowedAddresses,
   });
 
-  const handlePageChange = async (_e, page: number) => {
+  const handlePageChange = (_e, page: number) => {
     setCurrentPage(page);
   };
   const formattedMembers: Member[] = useMemo(() => {
@@ -207,7 +200,7 @@ const Allowlist = ({
           ]}
           placeholder={baseFilterOptions[1].label}
           onSelect={async (option) => {
-            await handlePageChange(null, 1);
+            handlePageChange(null, 1);
             setSearchFilters((g) => ({
               ...g,
               groupFilter: (
@@ -223,8 +216,8 @@ const Allowlist = ({
           fullWidth={true}
           placeholder="Search members"
           iconLeft={<MagnifyingGlass size={24} weight="regular" />}
-          onInput={async (e) => {
-            await handlePageChange(null, 1);
+          onInput={(e) => {
+            handlePageChange(null, 1);
             setSearchFilters((g) => ({
               ...g,
               searchText: e.target.value?.trim(),
@@ -257,7 +250,7 @@ const Allowlist = ({
                 allowedAddresses,
                 searchFilters.groupFilter,
               )}
-              onChange={handlePageChange}
+              onChange={void handlePageChange}
             />
           </div>
         </>
