@@ -13,11 +13,15 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
-import { useRefreshMembershipQuery } from 'state/api/groups';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery,
+} from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
+import { trpc } from 'utils/trpcClient';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -31,7 +35,6 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { useFlag } from '../../../../hooks/useFlag';
-import { useMemberData } from '../common/useMemberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -75,6 +78,11 @@ const CommunityMembersPage = () => {
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
+  const debouncedSearchTerm = useDebounce<string>(
+    searchFilters.searchText,
+    500,
+  );
+
   const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())
     .namespace;
 
@@ -116,19 +124,44 @@ const CommunityMembersPage = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const debouncedSearchTerm = useDebounce<string>(
-    searchFilters.searchText,
-    500,
+  const {
+    data: members,
+    fetchNextPage,
+    isLoading: isLoadingMembers,
+  } = trpc.community.getMembers.useInfiniteQuery(
+    {
+      limit: 30,
+      order_by: tableState.orderBy,
+      order_direction: tableState.orderDirection,
+      search: debouncedSearchTerm,
+      community_id: app.activeChainId(),
+      include_roles: true,
+      ...(!['all-community', 'not-in-group'].includes(
+        `${searchFilters.groupFilter}`,
+      ) &&
+        searchFilters.groupFilter && {
+          memberships: `in-group:${searchFilters.groupFilter}`,
+        }),
+      ...(searchFilters.groupFilter === 'Ungrouped' && {
+        memberships: 'not-in-group',
+      }),
+      include_group_ids: true,
+      // only include stake balances if community has staking enabled
+      include_stake_balances: !!app.config.chains.getById(app.activeChainId())
+        .namespace,
+    },
+    {
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => lastPage.page + 1,
+      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    },
   );
 
-  const { fetchNextMembersPage, groups, isLoadingMembers, members } =
-    useMemberData({
-      tableState,
-      groupFilter: searchFilters.groupFilter,
-      memberships,
-      debouncedSearchTerm,
-      membersPerPage: 30,
-    });
+  const { data: groups } = useFetchGroupsQuery({
+    communityId: app.activeChainId(),
+    includeTopics: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+  });
 
   const filterOptions = useMemo(
     () => [
@@ -400,7 +433,7 @@ const CommunityMembersPage = () => {
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-                fetchNextMembersPage?.().catch(console.error);
+                fetchNextPage?.().catch(console.error);
               }
             }}
             isLoadingMoreMembers={isLoadingMembers}

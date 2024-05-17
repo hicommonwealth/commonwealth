@@ -4,6 +4,7 @@ import { APIOrderDirection } from 'helpers/constants';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useDebounce } from 'usehooks-ts';
 import { Select } from 'views/components/Select';
@@ -12,10 +13,6 @@ import CWPagination from 'views/components/component_kit/new_designs/CWPaginatio
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import {
-  ApiEndpoints,
-  queryClient,
-} from '../../../../../../../state/api/config';
 import MembersSection, {
   Member,
 } from '../../../../Members/MembersSection/MembersSection';
