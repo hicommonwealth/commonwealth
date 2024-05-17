@@ -140,17 +140,17 @@ const AllowList = ({
           return searchFilters.groupFilter === 'not-allowlisted';
         });
 
-      memberResults = memberResults.slice(
-        (currentPage - 1) * membersPerPage,
-        currentPage * membersPerPage,
-      );
-
       const uniqueMembers = new Map();
       memberResults.forEach((m) => {
         uniqueMembers.set(m.id, m);
       });
 
       memberResults = Array.from(uniqueMembers.values());
+
+      memberResults = memberResults.slice(
+        (currentPage - 1) * membersPerPage,
+        currentPage * membersPerPage,
+      );
     }
 
     return memberResults.map((p) => ({
