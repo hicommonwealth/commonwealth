@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
+
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';

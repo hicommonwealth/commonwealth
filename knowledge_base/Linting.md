@@ -29,9 +29,9 @@ We use ESLint and the eslint-diff plugin for linting.
 
 All linting commands should be run from root.
 
-- `yarn lint-all`
+- `pnpm lint-all`
   - Lints all code (regardless of changes)
-- `yarn lint-branch`
+- `pnpm lint-branch`
   - Lints all changes made in a branch (used in CI)
 
 ### Configuration
@@ -53,15 +53,15 @@ We use Prettier for formatting our codebase. There is only 1 Prettier config and
 
 *Never run Prettier from anywhere other than root to avoid conflicting Prettier configs!*
 
-Prettier is not enforced by our CI, but runs during precommit via a Husky hook, which formats all files diverging from master. `yarn install` must have been run on your machine for the precommit hook to work.
+Prettier is not enforced by our CI, but runs during precommit via a Husky hook, which formats all files diverging from master. `pnpm install` must have been run on your machine for the precommit hook to work.
 
 ### Formatting Commands
 
 Formatting commands should *always* be executed from root.
 
-- `yarn format`
+- `pnpm format`
   - Execute Prettier and format the entire repo
-- `yarn format-check`
+- `pnpm format-check`
   - Execute Prettier in `check` mode, so that it lists all files requiring formatting, but doesn't automatically format them
 
 ## Handling Linting Issues: Cheatsheet
@@ -182,7 +182,7 @@ You can just look for the following code
 ```yml
 # To disable eslint-diff just comment the following two lines
 - name: Run eslint-diff
-  run: yarn workspace commonwealth run lint-diff
+  run: pnpm workspace commonwealth run lint-diff
 ```
 
 ### Things Not To Do

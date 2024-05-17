@@ -2,7 +2,7 @@
 
 The goal of this document is to describe the current state of the app initialization flow in as much detail as possible, so that we are better informed when engineering improvements.
 
-1. On `yarn start`, bundling begins with the `webpack.base.config.js`-defined entry point, currently set to the `client/scripts` file `index.tsx`.
+1. On `pnpm start`, bundling begins with the `webpack.base.config.js`-defined entry point, currently set to the `client/scripts` file `index.tsx`.
 2. `index.tsx` uses the browser's `root` element as a container to render the `App` view component (imported from `app.tsx`) within.
 3. The `App` component fires the `useInitApp()` hook (`hooks/useInitApp.tsx`), which:
     1. Sets the `isLoading` and `customDomain` state variables, as well as initializing their respective setter functions.
