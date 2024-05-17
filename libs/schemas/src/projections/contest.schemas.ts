@@ -11,8 +11,8 @@ export const ContestAction = z
     actor_address: z.string(),
     action: z.enum(CONTEST_ACTIONS).describe('Type of content action'),
     content_url: z.string().url().describe('Content url').optional(),
-    thread_id: PG_INT.optional().describe('Thread id mapped from content url'),
-    thread_title: z.string().optional(),
+    thread_id: PG_INT.nullish().describe('Thread id mapped from content url'),
+    thread_title: z.string().nullish(),
     voting_power: PG_INT.positive().describe(
       'Voting power of address when action was recorded',
     ),

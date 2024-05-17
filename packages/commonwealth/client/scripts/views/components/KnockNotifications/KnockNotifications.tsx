@@ -4,13 +4,9 @@ import {
   NotificationFeedPopover,
   NotificationIconButton,
 } from '@knocklabs/react';
+import '@knocklabs/react-notification-feed/dist/index.css';
 import React, { useRef, useState } from 'react';
 import app from 'state';
-
-dotenv.config();
-
-import '@knocklabs/react-notification-feed/dist/index.css';
-import dotenv from 'dotenv';
 import './KnockNotifications.scss';
 
 const KNOCK_PUBLIC_API_KEY =

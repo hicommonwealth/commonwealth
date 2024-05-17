@@ -43,6 +43,12 @@ const writeUserSetting = async (
   ) {
     req.user.emailNotificationInterval = value;
     await req.user.save();
+  } else if (
+    key === 'promotional_emails_enabled' &&
+    ['true', 'false'].includes(value)
+  ) {
+    req.user.promotional_emails_enabled = value === 'true' ? true : false;
+    await req.user.save();
   } else {
     return next(new AppError(Errors.InvalidSetting));
   }

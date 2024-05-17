@@ -192,7 +192,9 @@ export const CWContentPage = ({
         authorAddress={author?.address}
         authorCommunityId={authorCommunityId}
         collaboratorsInfo={collaborators}
-        publishDate={moment(createdOrEditedDate)}
+        publishDate={moment(createdOrEditedDate, 'X')}
+        //second parameter in moment() is case sensitive.
+        //If 'x' is passed instead of 'X' it will show "Published 54 years ago" again.
         viewsCount={viewCount}
         showPublishLabelWithDate={!lastEdited}
         showEditedLabelWithDate={!!lastEdited}

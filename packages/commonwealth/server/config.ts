@@ -123,3 +123,5 @@ export const EVM_CE_POLL_INTERVAL_MS =
 
 export const NEW_SUBSCRIPTION_API_FLAG =
   process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;
+
+export const KNOCK_SIGNING_KEY = process.env.KNOCK_SIGNING_KEY;

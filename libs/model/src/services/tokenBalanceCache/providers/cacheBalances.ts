@@ -82,6 +82,8 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
         `${options.sourceOptions.cosmosChainId}_` +
         `${options.sourceOptions.contractAddress}_${address}`
       );
+    case BalanceSourceType.SPL:
+      return `sol_${options.mintAddress}_${address}`;
   }
 }
 

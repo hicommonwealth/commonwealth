@@ -23,6 +23,7 @@ type UpdateNewProfileReq = {
   avatarUrl: string;
   socials: string;
   backgroundImage: string;
+  promotionalEmailsEnabled?: boolean;
   tag_ids?: number[];
 };
 type UpdateNewProfileResp = {
@@ -52,6 +53,7 @@ const updateNewProfile = async (
     avatarUrl,
     socials,
     backgroundImage,
+    promotionalEmailsEnabled,
     tag_ids,
   } = req.body;
 
@@ -72,6 +74,9 @@ const updateNewProfile = async (
       ...(avatarUrl && { avatar_url: avatarUrl }),
       ...(socials && { socials: JSON.parse(socials) }),
       ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
+      ...(typeof promotionalEmailsEnabled === 'boolean' && {
+        promotional_emails_enabled: promotionalEmailsEnabled,
+      }),
     },
     {
       where: {
