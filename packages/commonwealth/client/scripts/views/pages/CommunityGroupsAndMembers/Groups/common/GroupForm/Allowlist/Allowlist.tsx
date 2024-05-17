@@ -2,7 +2,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useDebounce } from 'usehooks-ts';
@@ -140,22 +140,25 @@ const Allowlist = ({
   const handlePageChange = async (_e, page: number) => {
     setCurrentPage(page);
   };
-  const formattedMembers: Member[] =
-    (members?.results?.map((p) => ({
-      id: p.id,
-      avatarUrl: p.avatar_url,
-      name: p.profile_name || 'Anonymous',
-      role: p.roles[0],
-      groups: (p.group_ids || [])
-        .map(
-          (groupId) =>
-            (groups || []).find((group) => group.id === groupId)?.name,
-        )
-        .filter(Boolean)
-        .sort((a, b) => a.localeCompare(b)),
-      stakeBalance: p.addresses[0].stake_balance,
-      address: p.addresses[0].address,
-    })) as Member[]) || [];
+  const formattedMembers: Member[] = useMemo(() => {
+    return (
+      (members?.results?.map((p) => ({
+        id: p.id,
+        avatarUrl: p.avatar_url,
+        name: p.profile_name || 'Anonymous',
+        role: p.roles[0],
+        groups: (p.group_ids || [])
+          .map(
+            (groupId) =>
+              (groups || []).find((group) => group.id === groupId)?.name,
+          )
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b)),
+        stakeBalance: p.addresses[0].stake_balance,
+        address: p.addresses[0].address,
+      })) as Member[]) || []
+    );
+  }, [groups, members?.results]);
 
   const handleCheckboxChange = (address: string) => {
     if (allowedAddresses.includes(address)) {

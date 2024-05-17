@@ -26,7 +26,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       }
 
       const addressBinding = payload?.allowedAddresses
-        .split(',')
+        ?.split(',')
         .map((a) => a.trim());
       const replacements: any = {
         searchTerm: `%${payload.search || ''}%`,
@@ -125,7 +125,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       }>(`${sqlWithoutPagination}`, {
         replacements,
         type: QueryTypes.SELECT,
-        logging: true,
       });
       const totalResults = allCommunityProfiles.length;
 
