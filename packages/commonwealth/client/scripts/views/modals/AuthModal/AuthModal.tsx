@@ -1,3 +1,4 @@
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useWelcomeOnboardModal } from 'client/scripts/state/ui/modals';
 import React, { useEffect, useState } from 'react';
@@ -35,7 +36,14 @@ const AuthModal = ({
   };
 
   const handleSuccess = (isNewlyCreated) => {
-    if (userOnboardingEnabled && isNewlyCreated) {
+    const userUniqueAddresses = getUniqueUserAddresses({});
+
+    // open welcome modal only if there is a single connected address
+    if (
+      userOnboardingEnabled &&
+      isNewlyCreated &&
+      userUniqueAddresses.length === 1
+    ) {
       // using timeout to make the modal transition smooth
       setTimeout(() => {
         setIsWelcomeOnboardModalOpen(true);

@@ -10,6 +10,7 @@ import { initAppState } from 'state';
 
 import { OpenFeature } from '@openfeature/web-sdk';
 import axios from 'axios';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
@@ -604,12 +605,18 @@ export async function handleSocialLoginCallback({
         await app.user.updateEmail(ssoEmail, false);
       }
 
+      const userUniqueAddresses = getUniqueUserAddresses({});
+
       // if account is created in last few minutes and has a single
-      // profile (no account linking) then open the welcome modal.
+      // profile and address (no account linking) then open the welcome modal.
       const isCreatedInLast5Minutes =
         accountCreatedTime &&
         moment().diff(moment(accountCreatedTime), 'minutes') < 5;
-      if (isCreatedInLast5Minutes && profiles?.length === 1) {
+      if (
+        isCreatedInLast5Minutes &&
+        profiles?.length === 1 &&
+        userUniqueAddresses.length === 1
+      ) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
         }, 1000);

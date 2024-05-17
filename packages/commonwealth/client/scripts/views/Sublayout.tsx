@@ -9,6 +9,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { getUniqueUserAddresses } from '../helpers/user';
 import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -80,8 +81,14 @@ const Sublayout = ({
         (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
       );
 
-      // open welcome modal if user is not onboarded
-      if (!hasUsername && !onboardedProfiles[profileId]) {
+      const userUniqueAddresses = getUniqueUserAddresses({});
+
+      // open welcome modal if user is not onboarded and there is a single connected address
+      if (
+        !hasUsername &&
+        !onboardedProfiles[profileId] &&
+        userUniqueAddresses.length === 1
+      ) {
         setIsWelcomeOnboardModalOpen(true);
       }
 
