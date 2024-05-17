@@ -102,8 +102,10 @@ const useCWPagination = ({
   const items = itemList.map((item) => {
     if (typeof item === 'number') {
       return {
-        onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-          handleClick(event, item);
+        onClick: async (
+          event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        ) => {
+          await handleClick(event, item);
         },
         type: ButtonType.Page,
         pageNumber: item,
@@ -119,8 +121,10 @@ const useCWPagination = ({
       item === ButtonType.Next && selectedPage >= totalCount;
 
     return {
-      onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        handleClick(event, buttonTypeToPageNumber(item));
+      onClick: async (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      ) => {
+        await handleClick(event, buttonTypeToPageNumber(item));
       },
       type: item,
       pageNumber: buttonTypeToPageNumber(item),
