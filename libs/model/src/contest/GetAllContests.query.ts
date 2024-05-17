@@ -95,7 +95,9 @@ order by
       );
       results.forEach((r) =>
         r.contests.forEach((c) => {
-          c.winners?.forEach((w) => (w.prize = w.prize / 10 ** r.decimals));
+          c.winners?.forEach(
+            (w) => (w.prize = Math.floor(w.prize / 10 ** r.decimals)),
+          );
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);
           c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
