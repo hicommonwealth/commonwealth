@@ -3,7 +3,7 @@ import React from 'react';
 import CWPagination from 'views/components/component_kit/new_designs/CWPagination';
 
 const PaginationsShowcase = () => {
-  const handleChange = (
+  const handleChange = async (
     _e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     newSelectedPage: number,
   ) => {

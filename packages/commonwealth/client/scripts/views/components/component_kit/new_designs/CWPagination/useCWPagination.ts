@@ -9,7 +9,7 @@ export interface UseCWPaginationProps {
   onChange?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     newSelectedPage: number,
-  ) => void;
+  ) => Promise<void>;
 }
 
 const useCWPagination = ({
@@ -20,14 +20,14 @@ const useCWPagination = ({
 }: UseCWPaginationProps) => {
   const [selectedPage, setSelectedPage] = useState(1);
 
-  const handleClick = (
+  const handleClick = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     newSelectedPage: number,
   ) => {
     setSelectedPage(newSelectedPage);
 
     if (handleChange) {
-      handleChange(event, newSelectedPage);
+      await handleChange(event, newSelectedPage);
     }
   };
 
