@@ -181,6 +181,7 @@ export const notificationsProvider = port(function notificationsProvider(
       name: 'in-memory-notifications-provider',
       dispose: () => Promise.resolve(),
       triggerWorkflow: () => Promise.resolve(true),
+      getMessages: () => Promise.resolve([]),
     }
   );
 });

@@ -4,6 +4,7 @@ import {
   CommunityStakeNotification,
   GetRecapEmailData,
   KnockChannelIds,
+  notificationsProvider,
   Query,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
@@ -42,26 +43,26 @@ async function getMessages(userId: string): Promise<{
   let oldestFetched = new Date();
   let cursor: string | undefined;
 
+  const provider = notificationsProvider();
   while (
     oldestFetched > sevenDaysAgo &&
     (discussion.length < 10 || governance.length < 10 || protocol.length < 10)
   ) {
-    const messages = await knock.users.getMessages(userId, {
-      page_size: 2,
+    const messages = await provider.getMessages({
+      user_id: userId,
+      page_size: 50,
       channel_id: KnockChannelIds.InApp,
-      after: cursor,
+      cursor,
     });
 
-    if (!messages.items.length) {
+    if (!messages.length) {
       break;
     }
 
-    cursor = messages.items[messages.items.length - 1].__cursor;
-    oldestFetched = new Date(
-      messages.items[messages.items.length - 1].inserted_at,
-    );
+    cursor = messages[messages.length - 1].__cursor;
+    oldestFetched = new Date(messages[messages.length - 1].inserted_at);
 
-    for (const message of messages.items) {
+    for (const message of messages) {
       if (new Date(message.inserted_at) < sevenDaysAgo) {
         break;
       }

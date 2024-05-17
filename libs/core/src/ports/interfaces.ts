@@ -200,7 +200,7 @@ type BaseNotifProviderOptions = {
   actor?: { id: string; email?: string };
 };
 
-export type NotificationsProviderOptions = BaseNotifProviderOptions &
+export type NotificationsProviderTriggerOptions = BaseNotifProviderOptions &
   (
     | {
         data: z.infer<typeof CommentCreatedNotification>;
@@ -224,9 +224,46 @@ export type NotificationsProviderOptions = BaseNotifProviderOptions &
       }
   );
 
+export type NotificationsProviderGetMessagesOptions = {
+  user_id: string;
+  page_size: number;
+  channel_id: string;
+  cursor: string | undefined;
+};
+
+export type NotificationsProviderGetMessagesReturn = Array<{
+  id: string;
+  channel_id: string;
+  recipient:
+    | string
+    | {
+        collection: string;
+        id: string;
+      };
+  tenant: string | null;
+  status: 'queued' | 'sent' | 'delivered' | 'undelivered' | 'not_sent';
+  read_at: string | null;
+  seen_at: string | null;
+  archived_at: string | null;
+  inserted_at: string;
+  updated_at: string;
+  source: {
+    version_id: string;
+    key: string;
+  };
+  data: any;
+  __cursor?: string;
+}>;
+
 /**
  * Notifications Provider Port
  */
 export interface NotificationsProvider extends Disposable {
-  triggerWorkflow(options: NotificationsProviderOptions): Promise<boolean>;
+  triggerWorkflow(
+    options: NotificationsProviderTriggerOptions,
+  ): Promise<boolean>;
+
+  getMessages(
+    options: NotificationsProviderGetMessagesOptions,
+  ): Promise<NotificationsProviderGetMessagesReturn>;
 }

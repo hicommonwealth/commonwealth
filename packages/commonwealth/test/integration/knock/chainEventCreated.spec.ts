@@ -1,6 +1,9 @@
 import {
   ChainEventCreated,
   EventNames,
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -19,11 +22,6 @@ import z from 'zod';
 import { processChainEventCreated } from '../../../server/workers/knock/eventHandlers/chainEventCreated';
 import { getChainProposalUrl } from '../../../server/workers/knock/util';
 import { getCommunityUrl } from '../../../shared/utils';
-import {
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-} from './util';
 
 const namespaceAddress = '0x123';
 const communityStakesAddress = '0x0000000000000000000000000000000000000001';
