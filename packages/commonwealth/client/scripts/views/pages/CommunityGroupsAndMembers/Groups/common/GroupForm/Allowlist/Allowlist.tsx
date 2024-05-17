@@ -199,7 +199,7 @@ const Allowlist = ({
             }),
           ]}
           placeholder={baseFilterOptions[1].label}
-          onSelect={async (option) => {
+          onSelect={(option) => {
             handlePageChange(null, 1);
             setSearchFilters((g) => ({
               ...g,
