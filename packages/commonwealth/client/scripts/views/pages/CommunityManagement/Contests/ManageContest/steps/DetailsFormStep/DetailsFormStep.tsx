@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
+import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import useUpdateContestMutation from 'state/api/contests/updateContest';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -72,6 +75,8 @@ const DetailsFormStep = ({
     initialToggledTopicList: contestFormData?.toggledTopicList,
   });
 
+  const { mutateAsync: updateContest } = useUpdateContestMutation();
+
   const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
   const totalPayoutPercentage = payoutStructure.reduce(
@@ -124,7 +129,7 @@ const DetailsFormStep = ({
     });
   };
 
-  const handleSubmit = (values: ContestFormValidationSubmitValues) => {
+  const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
     if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
       return;
     }
@@ -141,8 +146,20 @@ const DetailsFormStep = ({
     };
 
     if (editMode) {
-      // TODO save edit API call
-      goBack();
+      try {
+        await updateContest({
+          id: app.activeChainId(),
+          contest_address: contestAddress,
+          name: values.contestName,
+          image_url: values.contestImage,
+          topic_ids: toggledTopicList.filter((t) => t.checked).map((t) => t.id),
+        });
+
+        goBack();
+      } catch (error) {
+        console.log(error);
+        notifyError('Failed to edit contest');
+      }
     } else {
       onSetContestFormData(formData);
       onSetLaunchContestStep('SignTransactions');
