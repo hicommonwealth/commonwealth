@@ -41,6 +41,14 @@
     }
   }
 
+  .gating-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+
   .allowlist-table {
     display: flex;
     align-items: center;
@@ -65,13 +73,5 @@
         text-decoration: underline;
       }
     }
-  }
-
-  .gating-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
   }
 }

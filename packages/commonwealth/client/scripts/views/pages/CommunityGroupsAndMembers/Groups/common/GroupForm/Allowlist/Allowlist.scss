@@ -1,0 +1,26 @@
+.AllowList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .header-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-column {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    white-space: nowrap;
+    margin-top: -20px;
+  }
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: flex-end;
+}

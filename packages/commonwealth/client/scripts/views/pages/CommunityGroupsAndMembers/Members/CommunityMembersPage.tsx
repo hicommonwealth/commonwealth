@@ -7,6 +7,10 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPageViewEventPayload,
+} from 'shared/analytics/types';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useRefreshMembershipQuery } from 'state/api/groups';
@@ -19,17 +23,13 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList/index';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import {
-  MixpanelPageViewEvent,
-  MixpanelPageViewEventPayload,
-} from '../../../../../../shared/analytics/types';
 import { useFlag } from '../../../../hooks/useFlag';
-import { CWSelectList } from '../../../components/component_kit/new_designs/CWSelectList/index';
 import { useMemberData } from '../common/useMemberData';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';

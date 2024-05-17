@@ -1,13 +1,13 @@
 import Group from 'models/Group';
+import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { useFlag } from '../../../../../hooks/useFlag';
-import MinimumProfile from '../../../../../models/MinimumProfile';
-import { useFetchProfilesByAddressesQuery } from '../../../../../state/api/profiles/index';
 import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
 import { chainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';

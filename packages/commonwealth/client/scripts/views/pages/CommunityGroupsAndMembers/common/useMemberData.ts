@@ -2,8 +2,8 @@ import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups/index';
 import { Memberships } from 'state/api/groups/refreshMembership';
 import { useDebounce } from 'usehooks-ts';
-import { trpc } from '../../../../utils/trpcClient';
-import { CWTableState } from '../../../components/component_kit/new_designs/CWTable/useCWTableState';
+import { trpc } from 'utils/trpcClient';
+import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 
 interface UseMemberDataProps {
   memberships?: Memberships[];

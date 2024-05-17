@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Avatar } from 'views/components/Avatar/index';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,7 +8,6 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { formatAddressShort } from '../../../../../../helpers/index';
 import useBrowserWindow from '../../../../../../hooks/useBrowserWindow';
 import MinimumProfile from '../../../../../../models/MinimumProfile';
-import { Avatar } from '../../../../../components/Avatar/index';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 
@@ -92,7 +92,7 @@ const GroupCard = ({
           <div className="allowlist-table">
             <table>
               <thead>
-                <tr className="column-header">
+                <tr>
                   <th>
                     <CWText type="b2">Username</CWText>
                   </th>

@@ -3,9 +3,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWCheckbox } from '../../../../components/component_kit/cw_checkbox';
 import './MembersSection.scss';
 
 export type Member = {

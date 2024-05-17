@@ -13,10 +13,10 @@ import { useCWTableState } from 'views/components/component_kit/new_designs/CWTa
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import MembersSection, {
   Member,
-} from '../../../Members/MembersSection/MembersSection';
-import '../../../Members/MembersSection/MembersSection.scss';
-import { BaseGroupFilter } from '../../../Members/index.types';
-import { useMemberData } from '../../../common/useMemberData';
+} from '../../../../Members/MembersSection/MembersSection';
+import { BaseGroupFilter } from '../../../../Members/index.types';
+import { useMemberData } from '../../../../common/useMemberData';
+import '/views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/Allowlist/Allowlist.scss';
 
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
@@ -84,7 +84,7 @@ const baseFilterOptions = [
 
 const MEMBERS_PER_PAGE = 10;
 
-const AllowList = ({
+const Allowlist = ({
   allowedAddresses,
   setAllowedAddresses,
 }: AllowListProps) => {
@@ -201,7 +201,7 @@ const AllowList = ({
   };
 
   return (
-    <section className="form-section">
+    <section className="AllowList">
       <div className="header-row">
         <CWText type="h4" fontWeight="semiBold">
           Allow List
@@ -274,4 +274,4 @@ const AllowList = ({
   );
 };
 
-export default AllowList;
+export default Allowlist;
