@@ -71,6 +71,12 @@ export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
   };
 };
 
+export type GetSPLBalancesOptions = {
+  balanceSourceType: BalanceSourceType.SPL;
+  addresses: string[];
+  mintAddress: string;
+} & TbcConfigOptions;
+
 export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
@@ -91,7 +97,8 @@ export type GetCwBalancesOptions =
 
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
-  | GetCosmosBalancesOptions;
+  | GetCosmosBalancesOptions
+  | GetSPLBalancesOptions;
 
 export type GetTendermintClientOptions = {
   chainNode: ChainNodeInstance;
