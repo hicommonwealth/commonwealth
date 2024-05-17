@@ -1,0 +1,28 @@
+name: E2E Setup
+description: Bundle & install playwright browser drivers & proxy
+runs:
+  using: composite
+  steps:
+    - name: Bundle
+      shell: bash
+      run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
+
+    - name: Cache browsers
+      id: playwright-cache
+      uses: actions/cache@v3
+      with:
+        path: '~/.cache/ms-playwright/chromium-1045'
+        key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
+
+    - name: Install playwright browser drivers
+      shell: bash
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      run: npx playwright install chromium
+
+    - name: Install proxy
+      shell: bash
+      run: pnpm add -g local-ssl-proxy
+
+    - name: Add custom domain to /etc/hosts
+      shell: bash
+      run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
