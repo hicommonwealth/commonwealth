@@ -23,7 +23,7 @@ import {
   conditionTypes,
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
-import AllowList from './AllowList';
+import AllowList from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {

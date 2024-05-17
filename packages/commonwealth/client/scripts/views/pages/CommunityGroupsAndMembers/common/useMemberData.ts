@@ -23,7 +23,7 @@ export const useMemberData = ({
   page,
   allowedAddresses,
 }: UseMemberDataProps) => {
-  const parseMembership = !isNaN(<number>groupFilter)
+  const parseMembership = !isNaN(groupFilter as unknown as number)
     ? `in-group:${groupFilter}`
     : groupFilter;
 
@@ -42,7 +42,7 @@ export const useMemberData = ({
       {
         limit: membersPerPage,
         order_by: tableState.orderBy,
-        order_direction: tableState.orderDirection,
+        order_direction: tableState.orderDirection as 'ASC' | 'DESC',
         search: debouncedSearchTerm,
         community_id: app.activeChainId(),
         include_roles: true,
