@@ -65,13 +65,13 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           case 'not-in-group':
             membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
             break;
-          case 'allowlisted':
+          case 'allow-specified-addresses':
             membershipsWhere =
               addressBinding && addressBinding.length > 0
                 ? `AND "Addresses".address IN(:addressBinding)`
                 : '';
             break;
-          case 'not-allowlisted':
+          case 'not-allow-specified-addresses':
             membershipsWhere =
               addressBinding && addressBinding.length > 0
                 ? `AND "Addresses".address NOT IN(:addressBinding)`

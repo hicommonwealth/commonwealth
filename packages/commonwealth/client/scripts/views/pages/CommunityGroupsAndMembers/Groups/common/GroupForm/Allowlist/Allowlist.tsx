@@ -56,9 +56,9 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
 const getTotalPages = (members, allowedAddresses: string[], filter: string) => {
   let totalPages = members?.totalPages ?? 0;
 
-  if (filter === 'allowlisted') {
+  if (filter === 'allow-specified-addresses') {
     totalPages = Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
-  } else if (filter === 'not-allowlisted') {
+  } else if (filter === 'not-allow-specified-addresses') {
     totalPages =
       totalPages - Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
   }
@@ -76,8 +76,8 @@ type AllowListProps = {
 const baseFilterOptions = [
   { type: 'header', label: 'Filters' },
   { label: 'All community', value: 'all-community' },
-  { label: 'Allowlisted', value: 'allowlisted' },
-  { label: 'Not allowlisted', value: 'not-allowlisted' },
+  { label: 'Allowlisted', value: 'allow-specified-addresses' },
+  { label: 'Not allowlisted', value: 'not-allow-specified-addresses' },
   { type: 'header-divider', label: 'Groups' },
   { label: 'All groups', value: 'in-group' },
   { label: 'Ungrouped', value: 'not-in-group' },

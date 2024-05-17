@@ -31,9 +31,10 @@ export const useMemberData = ({
     ? undefined
     : parseMembership;
 
-  const allowedAddressesMemo = ['allowlisted', 'not-allowlisted'].includes(
-    membershipsFilter,
-  )
+  const allowedAddressesMemo = [
+    'allow-specified-addresses',
+    'not-allow-specified-addresses',
+  ].includes(membershipsFilter)
     ? allowedAddresses.join(', ')
     : undefined;
 
