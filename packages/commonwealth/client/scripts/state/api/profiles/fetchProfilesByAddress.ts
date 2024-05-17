@@ -24,7 +24,7 @@ export const fetchProfilesByAddress = async ({
     {
       addresses: profileAddresses,
       communities: profileChainIds,
-      jwt: app.user.jwt,
+      ...(app?.user?.jwt && { jwt: app.user.jwt }),
     },
   );
 

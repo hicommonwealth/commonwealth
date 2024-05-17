@@ -473,7 +473,7 @@ export async function handleSocialLoginCallback({
   const profileAddresses = await fetchProfilesByAddress({
     currentChainId: '',
     profileAddresses: [magicAddress],
-    profileChainIds: [],
+    profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
     initiateProfilesAfterFetch: false,
   });
 
