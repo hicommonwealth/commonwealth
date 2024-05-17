@@ -228,7 +228,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // and the user isn't trying to link address to community,
       // then open the user auth type guidance modal
       // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-      if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
+      if (
+        isAddressNew &&
+        !isAttemptingToConnectAddressToCommunity &&
+        !app.isLoggedIn()
+      ) {
         authModal
           .getState()
           .validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
