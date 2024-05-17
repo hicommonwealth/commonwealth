@@ -45,7 +45,7 @@ const useFetchSelfProfileQuery = ({
   updateAddressesOnSuccess = false,
 }: UseFetchSelfProfileQuery) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_PROFILES],
+    queryKey: [ApiEndpoints.FETCH_SELF_PROFILE],
     queryFn: fetchSelfProfile,
     onSuccess: (profile) => {
       if (
