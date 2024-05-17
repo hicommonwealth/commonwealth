@@ -52,7 +52,7 @@ export const AndroidPrompt = ({
       if (manualStepsInstructionsEle) {
         setTimeout(() => {
           manualStepsInstructionsEle.style.display = 'flex';
-        }, 1000);
+        }, 500);
       }
     }
   };
