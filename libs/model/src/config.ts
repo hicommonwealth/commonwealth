@@ -29,7 +29,7 @@ export const config = configure(
         : undefined,
     },
     WEB3: {
-      PRIVATE_KEY: PRIVATE_KEY!,
+      PRIVATE_KEY: PRIVATE_KEY || '',
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
