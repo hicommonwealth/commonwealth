@@ -894,6 +894,9 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core
+      '@hicommonwealth/evm-testing':
+        specifier: workspace:*
+        version: link:../../libs/evm-testing
       '@hicommonwealth/model':
         specifier: workspace:*
         version: link:../../libs/model

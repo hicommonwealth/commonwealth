@@ -98,6 +98,7 @@
     "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/chains": "workspace:*",
     "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/evm-testing": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
