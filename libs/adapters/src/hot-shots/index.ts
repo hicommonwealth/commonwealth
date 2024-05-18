@@ -1,4 +1,4 @@
-import { Stats, logger } from '@hicommonwealth/core';
+import { Stats, config, logger } from '@hicommonwealth/core';
 import { StatsD } from 'hot-shots';
 import { fileURLToPath } from 'url';
 
@@ -6,7 +6,7 @@ export const HotShotsStats = (): Stats => {
   const __filename = fileURLToPath(import.meta.url);
   const log = logger(__filename);
   let client: StatsD | undefined = new StatsD({
-    globalTags: { env: process.env.NODE_ENV || 'development' },
+    globalTags: { env: config.NODE_ENV || 'development' },
     errorHandler: (error) => {
       log.error('Caught statsd socket error', error);
     },

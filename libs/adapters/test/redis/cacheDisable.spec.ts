@@ -4,6 +4,7 @@ import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express, { RequestHandler, json } from 'express';
+import { config } from '../../src/config';
 import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
   CACHE_ENDPOINTS,
@@ -51,18 +52,18 @@ async function makePostRequest(
 
 describe('Cache Disable Tests', () => {
   console.log(
-    `Cache Disable Tests: DISABLE_CACHE ${process.env.DISABLE_CACHE}`,
+    `Cache Disable Tests: DISABLE_CACHE ${config.CACHE.DISABLE_CACHE}`,
   );
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
   let cacheDecorator;
 
   before(async () => {
-    process.env.DISABLE_CACHE = 'true';
+    config.CACHE.DISABLE_CACHE = true;
     cache(new RedisCache('redis://localhost:6379'));
     cacheDecorator = new CacheDecorator();
     await cache().ready();
     setupCacheTestEndpoints(app, cacheDecorator);
-    process.env.DISABLE_CACHE = 'false';
+    config.CACHE.DISABLE_CACHE = false;
   });
 
   after(async () => {

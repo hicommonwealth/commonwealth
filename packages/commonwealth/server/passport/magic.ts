@@ -29,7 +29,7 @@ import { Op, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
-import { JWT_SECRET, MAGIC_API_KEY } from '../config';
+import { MAGIC_API_KEY, config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -447,7 +447,10 @@ async function magicLoginRoute(
   // check if the user is logged in already (provided valid JWT)
   if (req.body.jwt) {
     try {
-      const { id } = jsonwebtoken.verify(req.body.jwt, JWT_SECRET) as {
+      const { id } = jsonwebtoken.verify(
+        req.body.jwt,
+        config.AUTH.JWT_SECRET,
+      ) as {
         id: number;
         email: string | null;
       };

@@ -22,7 +22,7 @@ import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
-import { PRERENDER_TOKEN, SESSION_SECRET } from './server/config';
+import { PRERENDER_TOKEN, config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
@@ -31,7 +31,6 @@ import BanCache from './server/util/banCheckCache';
 import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
-import { SESSION_EXPIRY_MILLIS } from './session';
 
 const DEV = process.env.NODE_ENV !== 'production';
 
@@ -76,18 +75,18 @@ export async function main(
     db: db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: SESSION_EXPIRY_MILLIS,
+    expiration: config.AUTH.SESSION_EXPIRY_MILLIS,
   });
 
   sessionStore.sync();
 
   const sessionParser = session({
-    secret: SESSION_SECRET,
+    secret: config.AUTH.SESSION_SECRET,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: SESSION_EXPIRY_MILLIS,
+      maxAge: config.AUTH.SESSION_EXPIRY_MILLIS,
     },
   });
 

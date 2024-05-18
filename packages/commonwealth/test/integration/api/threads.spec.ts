@@ -7,7 +7,6 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from 'server/config';
 import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
@@ -15,6 +14,7 @@ import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
 import { testServer, TestServer } from '../../../server-test';
+import { config } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import type { CommunityArgs } from '../../util/modelUtils';
 
@@ -58,7 +58,10 @@ describe.skip('Thread Tests', () => {
     topicId = await server.seeder.getTopicId({ chain });
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
-    adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    adminJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     const isAdmin = await server.seeder.updateRole({
       address_id: +res.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -71,7 +74,10 @@ describe.skip('Thread Tests', () => {
 
     res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -81,7 +87,10 @@ describe.skip('Thread Tests', () => {
       'Alice',
     );
     userAddress2 = res.address;
-    userJWT2 = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT2 = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession2 = { session: res.session, sign: res.sign };
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
@@ -623,7 +632,7 @@ describe.skip('Thread Tests', () => {
       );
       const newUserJWT = jwt.sign(
         { id: res.user_id, email: res.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       // try to comment and fail
       const cRes = await server.seeder.createComment({

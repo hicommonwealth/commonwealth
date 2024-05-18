@@ -1,13 +1,13 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { REDIS_URL } from '../server/config';
+import { config } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
 
 async function main() {
-  REDIS_URL && cache(new RedisCache(REDIS_URL));
+  config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
   const banCache = new BanCache(models);
 

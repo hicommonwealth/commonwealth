@@ -8,7 +8,7 @@ import {
 import { analytics, cache, logger, stats } from '@hicommonwealth/core';
 import express from 'express';
 import { fileURLToPath } from 'url';
-import { REDIS_URL } from './server/config';
+import { config } from './server/config';
 import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
@@ -19,7 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
-REDIS_URL && cache(new RedisCache(REDIS_URL));
+config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
 let isServiceHealthy = false;
 startHealthCheckLoop({
@@ -39,14 +39,14 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
-  const { models, config } = await import('@hicommonwealth/model');
+  const { models } = await import('@hicommonwealth/model');
   config.NODE_ENV !== 'production' && console.log(config);
 
   const { main } = await import('./main');
 
   main(app, models, {
     port: config.PORT,
-    noGlobalActivityCache: process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true',
+    noGlobalActivityCache: config.NO_GLOBAL_ACTIVITY_CACHE,
     withLoggingMiddleware: true,
     withStatsMiddleware: true,
     withFrontendBuild: !config.NO_CLIENT,

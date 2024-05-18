@@ -7,7 +7,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
-import { RABBITMQ_URI } from '../../config';
+import { config } from '../../config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
@@ -32,7 +32,10 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
 
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
