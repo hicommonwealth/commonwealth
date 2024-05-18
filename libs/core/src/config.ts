@@ -50,7 +50,7 @@ export const config = configure(
   z.object({
     NODE_ENV: z.enum(Environments),
     SERVER_URL: z.string(),
-    PORT: z.number().int().min(1000).max(9999),
+    PORT: z.number().int().min(1000).max(65535),
     LOGGING: z.object({
       ROLLBAR_SERVER_TOKEN: z.string(),
       ROLLBAR_ENV: z.string(),
