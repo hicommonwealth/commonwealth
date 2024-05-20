@@ -15,6 +15,12 @@ export type ContestStatus = {
   lastContentId: string;
 };
 
+export type ContestWinners = {
+  winningContent: string[];
+  winningAddress: string[];
+  voteCount: string[];
+};
+
 /**
  * Adds content to an active contest. Includes validation of contest state
  * @param web3 an instance of web3.js with correct RPC and Private Key
@@ -116,6 +122,44 @@ export const getContestStatus = async (
     endTime: Number(promise[1]),
     contestInterval: Number(promise[2]),
     lastContentId: String(promise[3]),
+  };
+};
+
+/**
+ * Gets vote and more information about winners of a given contest
+ * @param web3 an instance of web3.js with correct RPC and Private Key
+ * @param contest the address of the contest
+ * @param contestId the id of the contest for data within the contest contract
+ * @returns ContestWinners object containing eqaul indexed content ids, addresses, and votes
+ */
+export const getContestWinners = async (
+  web3: Web3,
+  contest: string,
+  contestId?: number,
+): Promise<ContestWinners> => {
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  let winnerIds: string[] = contestId
+    ? await contestInstance.methods.getPastWinners(contestId).call()
+    : await contestInstance.methods.getWinnerIds().call();
+
+  if (winnerIds.length == 0) {
+    throw new AppError('Contest Id not found on Contest address');
+  }
+
+  let votePromises: any[] = [];
+  winnerIds.forEach((w) => {
+    votePromises.push(contestInstance.methods.content(w).call());
+  });
+
+  const contentMeta = await Promise.all(votePromises);
+  return {
+    winningContent: winnerIds,
+    winningAddress: contentMeta.map((c) => c['creator']),
+    voteCount: contentMeta.map((c) => c['cumulativeVotes']),
   };
 };
 
