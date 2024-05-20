@@ -1,16 +1,14 @@
 import {
   InvalidActor,
   InvalidInput,
-  QueryHandler,
-  UnAuthorized,
   type CommandContext,
   type CommandHandler,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { ZodSchema, ZodUndefined } from 'zod';
-import { AddressAttributes, KNOCK_SECRET_KEY, models } from '..';
+import { ZodSchema } from 'zod';
+import { AddressAttributes, models } from '..';
 
 /**
  * TODO: review rules
@@ -132,12 +130,4 @@ export const isCommentAuthor: CommentMiddleware = async ({ actor }, state) => {
   if (!state) throw new InvalidActor(actor, 'Must load comment');
   if (state.Address?.address !== actor.address_id)
     throw new InvalidActor(actor, 'User is not the author of the comment');
-};
-
-export const isKnockService: QueryHandler<ZodSchema, ZodUndefined> = async ({
-  payload,
-}) => {
-  if (payload.knock_secret_key !== KNOCK_SECRET_KEY) {
-    throw new UnAuthorized('Invalid Knock secret');
-  }
 };

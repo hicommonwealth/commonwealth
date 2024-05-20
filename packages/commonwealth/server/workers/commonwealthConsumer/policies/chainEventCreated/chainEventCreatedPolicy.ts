@@ -2,10 +2,7 @@ import { EventHandler, Policy, events, logger } from '@hicommonwealth/core';
 import {
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
-} from '@hicommonwealth/model';
-import {
-  communityStakeTradeEventSignature,
-  deployedNamespaceEventSignature,
+  models,
 } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { ZodUndefined } from 'zod';
@@ -18,8 +15,6 @@ export const processChainEventCreated: EventHandler<
   'ChainEventCreated',
   ZodUndefined
 > = async ({ payload }) => {
-  const { models } = await import('@hicommonwealth/model');
-
   if (
     payload.eventSource.eventSignature === communityStakeTradeEventSignature
   ) {

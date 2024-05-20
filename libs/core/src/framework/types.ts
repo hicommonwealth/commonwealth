@@ -7,7 +7,15 @@ import { Events, events } from '../integration/events';
 export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
-export const UNAUTHORIZED_ERROR = 'Unauthorized Error';
+
+export const ExternalServiceUserIds = {
+  Knock: -1,
+} as const;
+
+export type AuthStrategies = {
+  name: 'jwt' | 'authtoken';
+  userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+};
 
 /**
  * Deep partial utility
@@ -62,13 +70,6 @@ export class InvalidActor extends Error {
   constructor(public actor: Actor, message: string) {
     super(message);
     this.name = INVALID_ACTOR_ERROR;
-  }
-}
-
-export class UnAuthorized extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = UNAUTHORIZED_ERROR;
   }
 }
 
@@ -144,7 +145,7 @@ export type CommandHandler<
  */
 export type QueryHandler<Input extends ZodSchema, Output extends ZodSchema> = (
   context: QueryContext<Input>,
-) => Promise<Partial<z.infer<Output>> | void>;
+) => Promise<Partial<z.infer<Output>> | undefined>;
 
 /**
  * Event handler
@@ -188,6 +189,7 @@ export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
   readonly auth: QueryHandler<Input, Output>[];
   readonly body: QueryHandler<Input, Output>;
   readonly secure?: boolean;
+  readonly authStrategy?: AuthStrategies;
 };
 
 /**

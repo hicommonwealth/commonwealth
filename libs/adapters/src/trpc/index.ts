@@ -1,5 +1,6 @@
 import * as core from '@hicommonwealth/core';
 import {
+  AuthStrategies,
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
@@ -33,10 +34,19 @@ export interface Context {
 
 const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
-const authenticate = async (req: Request) => {
+const authenticate = async (
+  req: Request,
+  authStrategy: AuthStrategies = { name: 'jwt' },
+) => {
   try {
-    await passport.authenticate('jwt', { session: false });
+    await passport.authenticate(authStrategy.name, { session: false });
     if (!req.user) throw new Error('Not authenticated');
+    if (
+      authStrategy.userId &&
+      (req.user as core.User).id !== authStrategy.userId
+    ) {
+      throw new Error('Not authenticated');
+    }
   } catch (error) {
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),
@@ -182,7 +192,7 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
     .output(md.output)
     .query(async ({ ctx, input }) => {
       // enable secure by default
-      if (md.secure !== false) await authenticate(ctx.req);
+      if (md.secure !== false) await authenticate(ctx.req, md.authStrategy);
       try {
         return await core.query(
           md,

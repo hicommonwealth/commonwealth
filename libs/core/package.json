@@ -22,6 +22,7 @@
   "dependencies": {
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@types/sinon": "^17.0.3",
     "dotenv": "^16.0.3",
     "moment": "^2.23.0",
     "pino": "^8.19.0",
@@ -29,6 +30,7 @@
     "pino-http-print": "^3.1.0",
     "pino-pretty": "^10.3.1",
     "rollbar": "^2.6.1",
+    "sinon": "^17.0.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {

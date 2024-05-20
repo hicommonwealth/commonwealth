@@ -8,7 +8,7 @@ import { Knock } from '@knocklabs/node';
 import { config } from '../config';
 
 export function KnockProvider(): NotificationsProvider {
-  const knock = new Knock(config.NOTIFICATIONS.KNOCK_API_KEY);
+  const knock = new Knock(config.NOTIFICATIONS.KNOCK_SECRET_KEY);
 
   return {
     name: 'KnockProvider',

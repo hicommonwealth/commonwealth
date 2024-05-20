@@ -2,6 +2,7 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  ExternalServiceUserIds,
   GetRecapEmailData,
   KnockChannelIds,
   notificationsProvider,
@@ -10,11 +11,9 @@ import {
   UserMentionedNotification,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
-import { Knock } from '@knocklabs/node';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import { isKnockService } from '../middleware';
+import { models } from '..';
 
 type DiscussionNotifications = Array<
   | z.infer<typeof CommentCreatedNotification>
@@ -31,10 +30,6 @@ async function getMessages(userId: string): Promise<{
   governance: GovernanceNotifications;
   protocol: ProtocolNotifications;
 }> {
-  const knock = new Knock(
-    'sk_test_nhLIMpw9kp3tyaFqtJyzH-WYJ8rt85YXUCSm08-5-mo',
-  );
-
   let discussion: DiscussionNotifications = [];
   let governance: GovernanceNotifications = [];
   let protocol: ProtocolNotifications = [];
@@ -188,8 +183,9 @@ async function enrichNotifications({
 export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
   return {
     ...GetRecapEmailData,
-    auth: [isKnockService],
+    auth: [],
     secure: true,
+    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
       const notifications = await getMessages(payload.user_id);
       return await enrichNotifications(notifications);

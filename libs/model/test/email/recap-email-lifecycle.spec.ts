@@ -1,4 +1,5 @@
 import {
+  ExternalServiceUserIds,
   SpyNotificationsProvider,
   dispose,
   disposeAdapter,
@@ -114,6 +115,12 @@ describe('Recap email lifecycle', () => {
     );
 
     const res = await query(GetRecapEmailDataQuery(), {
+      actor: {
+        user: {
+          id: ExternalServiceUserIds.Knock,
+          email: 'hello@knock.app',
+        },
+      },
       payload: {
         user_id: String(recipientUser!.id),
       },

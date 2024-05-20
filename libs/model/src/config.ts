@@ -9,7 +9,6 @@ const {
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
-  KNOCK_SECRET_KEY,
 } = process.env;
 
 const NAME =
@@ -40,9 +39,6 @@ export const config = configure(
     OUTBOX: {
       ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
     },
-    KNOCK: {
-      SECRET_KEY: KNOCK_SECRET_KEY,
-    }
   },
   z.object({
     DB: z.object({
@@ -60,8 +56,5 @@ export const config = configure(
     OUTBOX: z.object({
       ALLOWED_EVENTS: z.array(z.string()),
     }),
-    KNOCK: z.object({
-      SECRET_KEY: z.string(),
-    })
   }),
 );

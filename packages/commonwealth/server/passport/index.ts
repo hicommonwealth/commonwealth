@@ -5,6 +5,7 @@ import passportJWT from 'passport-jwt';
 import { config } from '../config';
 import '../types';
 import { initMagicAuth } from './magic';
+import { initTokenAuth } from './secretKey';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -43,6 +44,7 @@ function initDefaultUserAuth(models: DB) {
 export function setupPassport(models: DB) {
   initDefaultUserAuth(models);
   initMagicAuth(models);
+  initTokenAuth();
 
   passport.serializeUser<any>((user, done) => {
     stats().increment('cw.users.logged_in');
