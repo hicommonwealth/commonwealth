@@ -22,14 +22,14 @@ const useCWPagination = ({
 }: UseCWPaginationProps) => {
   const [selectedPage, setSelectedPage] = useState(selectedPageProp);
 
-  const handleClick = async (
+  const handleClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     newSelectedPage: number,
   ) => {
     setSelectedPage(newSelectedPage);
 
     if (handleChange) {
-      await handleChange(event, newSelectedPage);
+      handleChange(event, newSelectedPage);
     }
   };
 
@@ -104,10 +104,8 @@ const useCWPagination = ({
   const items = itemList.map((item) => {
     if (typeof item === 'number') {
       return {
-        onClick: async (
-          event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        ) => {
-          await handleClick(event, item);
+        onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+          handleClick(event, item);
         },
         type: ButtonType.Page,
         pageNumber: item,
@@ -123,10 +121,8 @@ const useCWPagination = ({
       item === ButtonType.Next && selectedPage >= totalCount;
 
     return {
-      onClick: async (
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      ) => {
-        await handleClick(event, buttonTypeToPageNumber(item));
+      onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        handleClick(event, buttonTypeToPageNumber(item));
       },
       type: item,
       pageNumber: buttonTypeToPageNumber(item),
