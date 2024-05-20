@@ -13,6 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 
+import { Link } from 'react-router-dom';
 import './index.scss';
 
 function useThreadSubscriptions() {
@@ -66,11 +67,11 @@ const NotificationSettingsPage2 = () => {
                   />
                 </div>
                 <div style={{ marginLeft: '8px' }}>
-                  <a href={getCommunityUrl(current.Thread.Community.name)}>
+                  <Link to={getCommunityUrl(current.Thread.Community.name)}>
                     <CWText fontWeight="semiBold">
                       {current.Thread.Community.name}
                     </CWText>
-                  </a>
+                  </Link>
                 </div>
 
                 <div style={{ marginLeft: '8px', marginRight: '8px' }}>•</div>
