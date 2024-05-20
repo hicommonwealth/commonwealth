@@ -74,6 +74,7 @@
     "@apollo/client": "^3.3.18",
     "@aws-sdk/client-s3": "^3.577.0",
     "@aws-sdk/lib-storage": "^3.578.0",
+    "@aws-sdk/s3-request-presigner": "^3.577.0",
     "@brillout/import": "^0.2.2",
     "@canvas-js/interfaces": "0.5.0-alpha4",
     "@cosmjs/amino": "^0.31.3",
