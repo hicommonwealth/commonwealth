@@ -14,3 +14,7 @@ export const getSnapshotUrl = (
 ): string => {
   return config.SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
 };
+
+export const getThreadUrl = (communityId: string, threadId: number): string => {
+  return `/${communityId}/discussion/${threadId}`;
+};
