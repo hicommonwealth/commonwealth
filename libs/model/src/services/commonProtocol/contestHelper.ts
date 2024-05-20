@@ -132,7 +132,7 @@ export const getContestStatus = async (
  * @param contestId the id of the contest for data within the contest contract
  * @returns ContestWinners object containing eqaul indexed content ids, addresses, and votes
  */
-export const getContestWinners = async (
+export const getContestScore = async (
   web3: Web3,
   contest: string,
   contestId?: number,
@@ -142,7 +142,7 @@ export const getContestWinners = async (
     contest,
   );
 
-  let winnerIds: string[] = contestId
+  const winnerIds: string[] = contestId
     ? await contestInstance.methods.getPastWinners(contestId).call()
     : await contestInstance.methods.getWinnerIds().call();
 
@@ -150,7 +150,7 @@ export const getContestWinners = async (
     throw new AppError('Contest Id not found on Contest address');
   }
 
-  let votePromises: any[] = [];
+  const votePromises: any[] = [];
   winnerIds.forEach((w) => {
     votePromises.push(contestInstance.methods.content(w).call());
   });
