@@ -6,6 +6,13 @@ import { GetLogger, LogContext, LoggerIds } from './interfaces';
 let logLevel: 'info' | 'debug';
 let transport: DestinationStream;
 
+const rollbar = new Rollbar({
+  accessToken: config.LOGGING.ROLLBAR_SERVER_TOKEN,
+  environment: config.LOGGING.ROLLBAR_ENV,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
 const formatFilename = (name: string) => {
   const t = name.split('/');
   return t[t.length - 1];
@@ -26,13 +33,6 @@ export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
     });
     logLevel = 'debug';
   } else logLevel = 'info';
-
-  const rollbar = new Rollbar({
-    accessToken: config.LOGGING.ROLLBAR_SERVER_TOKEN,
-    environment: config.LOGGING.ROLLBAR_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
 
   const logger = pino(
     {

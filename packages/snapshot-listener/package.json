@@ -26,7 +26,6 @@
     "moment": "^2.23.0",
     "node-fetch": "2",
     "sequelize": "^6.32.1",
-    "tslog": "^3.3.4",
     "zod": "^3.22.4"
   },
   "devDependencies": {

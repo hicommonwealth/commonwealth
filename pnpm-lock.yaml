@@ -1498,9 +1498,6 @@ importers:
       sequelize:
         specifier: ^6.32.1
         version: 6.37.3(pg@8.11.5)
-      tslog:
-        specifier: ^3.3.4
-        version: 3.3.4
       zod:
         specifier: ^3.22.4
         version: 3.23.6
@@ -20877,13 +20874,6 @@ packages:
     peerDependencies:
       typescript: '>=2.3.0-dev || >=2.4.0-dev || >=2.5.0-dev || >=2.6.0-dev || >=2.7.0-dev || >=2.8.0-dev || >=2.9.0-dev || >=3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev'
 
-  tslog@3.3.4:
-    resolution:
-      {
-        integrity: sha512-N0HHuHE0e/o75ALfkioFObknHR5dVchUad4F0XyFf3gXJYB++DewEzwGI/uIOM216E5a43ovnRNEeQIq9qgm4Q==,
-      }
-    engines: { node: '>=10' }
-
   tsort@0.0.1:
     resolution:
       {
@@ -29090,14 +29080,14 @@ snapshots:
 
   axios@0.27.2:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
 
   axios@1.6.8:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -31645,8 +31635,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  follow-redirects@1.15.6: {}
-
   follow-redirects@1.15.6(debug@4.3.4):
     optionalDependencies:
       debug: 4.3.4(supports-color@8.1.1)
@@ -32229,7 +32217,7 @@ snapshots:
   http-proxy@1.18.1:
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -37097,10 +37085,6 @@ snapshots:
       tslib: 1.14.1
       tsutils: 2.29.0(typescript@5.4.5)
       typescript: 5.4.5
-
-  tslog@3.3.4:
-    dependencies:
-      source-map-support: 0.5.21
 
   tsort@0.0.1: {}
 
