@@ -293,7 +293,7 @@ describe('Contests projection lifecycle', () => {
             end_time,
             winners: winners.map((w) => ({
               ...w,
-              prize: w.prize / 10 ** decimals,
+              prize: Math.floor(w.prize / 10 ** decimals),
             })),
             actions: [
               {
