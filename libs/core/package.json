@@ -24,7 +24,8 @@
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "moment": "^2.23.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "ethers": "5.7.2"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0",

@@ -1,6 +1,5 @@
 import { EventNames, events } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
-import * as schemas from '@hicommonwealth/schemas';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { Model, ModelStatic, Transaction } from 'sequelize';
@@ -25,11 +24,11 @@ export function hashAbi(abi: AbiType): string {
 type EmitEventValues =
   | {
       event_name: EventNames.CommentCreated;
-      event_payload: z.infer<typeof schemas.Comment>;
+      event_payload: z.infer<typeof events.CommentCreated>;
     }
   | {
       event_name: EventNames.ThreadCreated;
-      event_payload: z.infer<typeof schemas.Thread>;
+      event_payload: z.infer<typeof events.ThreadCreated>;
     }
   | {
       event_name: EventNames.ThreadUpvoted;
@@ -70,10 +69,6 @@ type EmitEventValues =
   | {
       event_name: EventNames.ContestWinnersRecorded;
       event_payload: z.infer<typeof events.ContestWinnersRecorded>;
-    }
-  | {
-      event_name: EventNames.ThreadUpvoted;
-      event_payload: z.infer<typeof events.ThreadUpvoted>;
     };
 
 // Load with env var?
