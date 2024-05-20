@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
+import { models } from '../../../database';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
 import { __get_spl_balances } from './get_spl_balances';

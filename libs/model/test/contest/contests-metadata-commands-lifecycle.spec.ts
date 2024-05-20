@@ -1,9 +1,9 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { Contest, TopicAttributes } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import z from 'zod';
+import { Contest, TopicAttributes } from '../../src/index';
 import { bootstrap_testing, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
