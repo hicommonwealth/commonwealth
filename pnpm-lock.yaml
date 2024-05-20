@@ -824,6 +824,12 @@ importers:
 
   libs/sitemaps:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.577.0
+        version: 3.577.0
+      '@aws-sdk/lib-storage':
+        specifier: ^3.578.0
+        version: 3.578.0(@aws-sdk/client-s3@3.577.0)
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../core
@@ -833,9 +839,6 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
-      aws-sdk:
-        specifier: ^2.814.0
-        version: 2.1614.0
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1076,12 +1079,6 @@ importers:
       assert:
         specifier: ^2.0.0
         version: 2.1.0
-      aws-sdk:
-        specifier: ^2.814.0
-        version: 2.1614.0
-      aws-sdk-js-codemod:
-        specifier: ^1.4.0
-        version: 1.4.0(@babel/preset-env@7.24.5(@babel/core@7.24.5))
       axios:
         specifier: ^1.3.4
         version: 1.6.8
@@ -2300,15 +2297,6 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/plugin-syntax-flow@7.24.1':
-    resolution:
-      {
-        integrity: sha512-sxi2kLTI5DeW5vDtMUsk4mTPwvlUDbjOnoWayhynCwrw4QXRld4QEYwqzY8JmQXaJUtgUuCIurtSRH5sn4c7mA==,
-      }
-    engines: { node: '>=6.9.0' }
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-
   '@babel/plugin-syntax-import-assertions@7.24.1':
     resolution:
       {
@@ -2566,15 +2554,6 @@ packages:
     resolution:
       {
         integrity: sha512-Ft38m/KFOyzKw2UaJFkWG9QnHPG/Q/2SkOrRk4pNBPg5IPZ+dOxcmkK5IyuBcxiNPyyYowPGUReyBvrvZs7IlQ==,
-      }
-    engines: { node: '>=6.9.0' }
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-
-  '@babel/plugin-transform-flow-strip-types@7.24.1':
-    resolution:
-      {
-        integrity: sha512-iIYPIWt3dUmUKKE10s3W+jsQ3icFkw0JyRVyY1B7G4yK/nngAOHLVx8xlhA6b/Jzl/Y0nis8gjqhqKtRDQqHWQ==,
       }
     engines: { node: '>=6.9.0' }
     peerDependencies:
@@ -2933,15 +2912,6 @@ packages:
     resolution:
       {
         integrity: sha512-UGK2ifKtcC8i5AI4cH+sbLLuLc2ktYSFJgBAXorKAsHUZmrQ1q6aQ6i3BvU24wWs2AAKqQB6kq3N9V9Gw1HiMQ==,
-      }
-    engines: { node: '>=6.9.0' }
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-
-  '@babel/preset-flow@7.24.1':
-    resolution:
-      {
-        integrity: sha512-sWCV2G9pcqZf+JHyv/RyqEIpFypxdCSxWIxQjpdaQxenNog7cN1pr76hg8u0Fz8Qgg0H4ETkGcJnXL8d4j0PPA==,
       }
     engines: { node: '>=6.9.0' }
     peerDependencies:
@@ -9117,13 +9087,6 @@ packages:
         integrity: sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==,
       }
 
-  ast-types@0.16.1:
-    resolution:
-      {
-        integrity: sha512-6t10qk83GOG8p0vKmaCr8eiilZwO171AvbROMtvvNiwrTly62t+7XkA8RdIIVbpMhCASAsxgAzdRSwh6nw/5Dg==,
-      }
-    engines: { node: '>=4' }
-
   astral-regex@2.0.0:
     resolution:
       {
@@ -9190,21 +9153,6 @@ packages:
       }
     engines: { node: '>= 0.4' }
 
-  aws-sdk-js-codemod@1.4.0:
-    resolution:
-      {
-        integrity: sha512-SCFBF91dEaH1DKllxD/1yGFK1MAC08MUcz6XLXZSH9QV2LiIeSN9XrJ+f+4aZrdGno86t96r+ZXHKH8Yp9PqQA==,
-      }
-    engines: { node: '>=14.0.0' }
-    hasBin: true
-
-  aws-sdk@2.1614.0:
-    resolution:
-      {
-        integrity: sha512-dsfoOk/1UBGfELJ9skBma1RzfYXalK+0QdStuwKCqrYHgpF/mlf7BqYOB0acNQHzxgVxEP0LOGjWZOzWWwdGhw==,
-      }
-    engines: { node: '>= 10.0.0' }
-
   aws-sign2@0.7.0:
     resolution:
       {
@@ -9240,14 +9188,6 @@ packages:
       {
         integrity: sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==,
       }
-
-  babel-core@7.0.0-bridge.0:
-    resolution:
-      {
-        integrity: sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==,
-      }
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
 
   babel-eslint@10.1.0:
     resolution:
@@ -12282,13 +12222,6 @@ packages:
         integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==,
       }
 
-  events@1.1.1:
-    resolution:
-      {
-        integrity: sha512-kEcvvCBByWXGnZy6JUlgAp2gBIUjfCAV6P6TgT1/aaQKcmuAEC4OZTV1I4EWQLz2gxZw76atuVyvHhTxvi0Flw==,
-      }
-    engines: { node: '>=0.4.x' }
-
   events@3.3.0:
     resolution:
       {
@@ -12688,13 +12621,6 @@ packages:
       {
         integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==,
       }
-
-  flow-parser@0.236.0:
-    resolution:
-      {
-        integrity: sha512-0OEk9Gr+Yj7wjDW2KgaNYUypKau71jAfFyeLQF5iVtxqc6uJHag/MT7pmaEApf4qM7u86DkBcd4ualddYMfbLw==,
-      }
-    engines: { node: '>=0.4.0' }
 
   flux@4.0.4:
     resolution:
@@ -13742,12 +13668,6 @@ packages:
     resolution:
       {
         integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==,
-      }
-
-  ieee754@1.1.13:
-    resolution:
-      {
-        integrity: sha512-4vf7I2LYV/HaWerSo3XmlMkp5eZ83i+/CDluXi/IGTs/O1sejBNhTtnxzmRZfvOUqj7lZjqHkeTvpgSFDlWZTg==,
       }
 
   ieee754@1.2.1:
@@ -14885,13 +14805,6 @@ packages:
         integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==,
       }
 
-  jmespath@0.16.0:
-    resolution:
-      {
-        integrity: sha512-9FzQjJ7MATs1tSpnco1K6ayiYE3figslrXA72G2HQ/n76RzvYlofyi5QM+iX4YRs/pu3yzxlVQSST23+dMDknw==,
-      }
-    engines: { node: '>= 0.6.0' }
-
   jose@5.3.0:
     resolution:
       {
@@ -14963,18 +14876,6 @@ packages:
       {
         integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==,
       }
-
-  jscodeshift@0.15.2:
-    resolution:
-      {
-        integrity: sha512-FquR7Okgmc4Sd0aEDwqho3rEiKR3BdvuG9jfdHjLJ6JQoWSMpavug3AoIfnfWhxFlf+5pzQh8qjqz0DWFrNQzA==,
-      }
-    hasBin: true
-    peerDependencies:
-      '@babel/preset-env': ^7.1.6
-    peerDependenciesMeta:
-      '@babel/preset-env':
-        optional: true
 
   jscrypto@1.0.3:
     resolution:
@@ -16458,13 +16359,6 @@ packages:
         integrity: sha512-mNcltoe1R8o7STTegSOHdnJNN7s5EUvhoS7ShnTHDyOSd+8H+UdWODq6qSv67PjC8Zc5JRT8+oLAMCr0SIXw7g==,
       }
     engines: { node: ^16 || ^18 || >= 20 }
-
-  node-dir@0.1.17:
-    resolution:
-      {
-        integrity: sha512-tmPX422rYgofd4epzrNoOXiE8XFZYOcCq1vD7MAXCDO+O+zndlA2ztdKKMa+EeuBG5tHETpr4ml4RGgpqDCCAg==,
-      }
-    engines: { node: '>= 0.10.5' }
 
   node-domexception@1.0.0:
     resolution:
@@ -18451,12 +18345,6 @@ packages:
         integrity: sha512-LwZy+p3SFs1Pytd/jYct4wpv49HiYCqd9Rlc5ZVdk0V+8Yzv6jR5Blk3TRmPL1ft69TxP0IMZGJ+WPFU2BFhww==,
       }
 
-  punycode@1.3.2:
-    resolution:
-      {
-        integrity: sha512-RofWgt/7fL5wP1Y7fxE7/EmTLzQVnB0ycyibJ0OOHIlJqTNzglYFxVwETOcIoJqJmpDXJ9xImDv+Fq34F/d4Dw==,
-      }
-
   punycode@1.4.1:
     resolution:
       {
@@ -18539,14 +18427,6 @@ packages:
         integrity: sha512-773xhDQnZBMFobEiztv8LIl70ch5MSF/jUQVlhwFyBILqq96anmoctVIYz+ZRp0qbCKATTn6ev02M3r7Ga5vqA==,
       }
     engines: { node: '>=0.4.x' }
-
-  querystring@0.2.0:
-    resolution:
-      {
-        integrity: sha512-X/xY82scca2tau62i9mDyU9K+I+djTMUsvwf7xnUX5GLvVzgJybOJf4Y6o9Zx3oJK/LSXg5tTZBjwzqVPaPO2g==,
-      }
-    engines: { node: '>=0.4.x' }
-    deprecated: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
 
   querystringify@2.2.0:
     resolution:
@@ -19104,13 +18984,6 @@ packages:
       }
     engines: { node: '>= 12.13.0' }
 
-  recast@0.23.7:
-    resolution:
-      {
-        integrity: sha512-MpQlLZVpqbbxYcqEjwpRWo88sGvjOYoXptySz710RuddNMHx+wPkoNX6YyLZJlXAh5VZr1qmPrTwcTuFMh0Lag==,
-      }
-    engines: { node: '>= 4' }
-
   rechoir@0.6.2:
     resolution:
       {
@@ -19402,13 +19275,6 @@ packages:
       {
         integrity: sha512-zgn5OjNQXLUTdq8m17KdaicF6w89TZs8ZU8y0AYENIU6wG8GG6LLm0yLSiPY8DmaYmHdgRW8rnApjoT0fQRfMg==,
       }
-
-  rimraf@2.6.3:
-    resolution:
-      {
-        integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==,
-      }
-    hasBin: true
 
   rimraf@2.7.1:
     resolution:
@@ -20767,13 +20633,6 @@ packages:
       }
     engines: { node: '>=14.16' }
 
-  temp@0.8.4:
-    resolution:
-      {
-        integrity: sha512-s0ZZzd0BzYv5tLSptZooSjK8oj6C+c19p7Vqta9+6NPOf7r+fxq0cJe6/oN4LTC79sy5NY8ucOJNgwsKCSbfqg==,
-      }
-    engines: { node: '>=6.0.0' }
-
   tempy@3.1.0:
     resolution:
       {
@@ -21716,12 +21575,6 @@ packages:
         integrity: sha512-3AChu4NiXquPfeckE5R5cGdiHCMWJx1dwCWOmWIL4KHAziJNOFIYJlpGFeKDvwLPHovZRCxK3cYlwzqI9Vp+Gg==,
       }
 
-  url@0.10.3:
-    resolution:
-      {
-        integrity: sha512-hzSUW2q06EqL1gKM/a+obYHLIO6ct2hwPuviqTTOcfFVc61UbfJ2Q32+uGL/HCPxKqrdGB5QUwIe7UqlDgwsOQ==,
-      }
-
   url@0.11.3:
     resolution:
       {
@@ -21908,13 +21761,6 @@ packages:
         integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==,
       }
     deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
-    hasBin: true
-
-  uuid@8.0.0:
-    resolution:
-      {
-        integrity: sha512-jOXGuXZAWdsTH7eZLtyXMqUb9EcWMGZNbL9YcGBJl4MH4nrxHmZJhEHvyLFrkxo+28uLb/NYRcStH48fnD0Vzw==,
-      }
     hasBin: true
 
   uuid@8.3.2:
@@ -22536,12 +22382,6 @@ packages:
     resolution:
       {
         integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==,
-      }
-
-  write-file-atomic@2.4.3:
-    resolution:
-      {
-        integrity: sha512-GaETH5wwsX+GcnzhPgKcKjJ6M2Cq3/iZp1WyY/X1CSqrW+jVNM9Y7D8EC2sM4ZG/V8wZlSniJnCKWPmBYAucRQ==,
       }
 
   write-file-atomic@3.0.3:
@@ -23759,11 +23599,6 @@ snapshots:
       '@babel/core': 7.24.5
       '@babel/helper-plugin-utils': 7.24.5
 
-  '@babel/plugin-syntax-flow@7.24.1(@babel/core@7.24.5)':
-    dependencies:
-      '@babel/core': 7.24.5
-      '@babel/helper-plugin-utils': 7.24.5
-
   '@babel/plugin-syntax-import-assertions@7.24.1(@babel/core@7.24.5)':
     dependencies:
       '@babel/core': 7.24.5
@@ -23934,12 +23769,6 @@ snapshots:
       '@babel/core': 7.24.5
       '@babel/helper-plugin-utils': 7.24.5
       '@babel/plugin-syntax-export-namespace-from': 7.8.3(@babel/core@7.24.5)
-
-  '@babel/plugin-transform-flow-strip-types@7.24.1(@babel/core@7.24.5)':
-    dependencies:
-      '@babel/core': 7.24.5
-      '@babel/helper-plugin-utils': 7.24.5
-      '@babel/plugin-syntax-flow': 7.24.1(@babel/core@7.24.5)
 
   '@babel/plugin-transform-for-of@7.24.1(@babel/core@7.24.5)':
     dependencies:
@@ -24261,13 +24090,6 @@ snapshots:
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
-
-  '@babel/preset-flow@7.24.1(@babel/core@7.24.5)':
-    dependencies:
-      '@babel/core': 7.24.5
-      '@babel/helper-plugin-utils': 7.24.5
-      '@babel/helper-validator-option': 7.23.5
-      '@babel/plugin-transform-flow-strip-types': 7.24.1(@babel/core@7.24.5)
 
   '@babel/preset-modules@0.1.6-no-external-plugins(@babel/core@7.24.5)':
     dependencies:
@@ -29427,10 +29249,6 @@ snapshots:
 
   assertion-error@1.1.0: {}
 
-  ast-types@0.16.1:
-    dependencies:
-      tslib: 2.6.2
-
   astral-regex@2.0.0: {}
 
   async-eventemitter@0.2.4:
@@ -29457,26 +29275,6 @@ snapshots:
   available-typed-arrays@1.0.7:
     dependencies:
       possible-typed-array-names: 1.0.0
-
-  aws-sdk-js-codemod@1.4.0(@babel/preset-env@7.24.5(@babel/core@7.24.5)):
-    dependencies:
-      jscodeshift: 0.15.2(@babel/preset-env@7.24.5(@babel/core@7.24.5))
-    transitivePeerDependencies:
-      - '@babel/preset-env'
-      - supports-color
-
-  aws-sdk@2.1614.0:
-    dependencies:
-      buffer: 4.9.2
-      events: 1.1.1
-      ieee754: 1.1.13
-      jmespath: 0.16.0
-      querystring: 0.2.0
-      sax: 1.2.1
-      url: 0.10.3
-      util: 0.12.5
-      uuid: 8.0.0
-      xml2js: 0.6.2
 
   aws-sign2@0.7.0: {}
 
@@ -29507,10 +29305,6 @@ snapshots:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-
-  babel-core@7.0.0-bridge.0(@babel/core@7.24.5):
-    dependencies:
-      '@babel/core': 7.24.5
 
   babel-eslint@10.1.0(eslint@8.57.0):
     dependencies:
@@ -29809,7 +29603,7 @@ snapshots:
   buffer@4.9.2:
     dependencies:
       base64-js: 1.5.1
-      ieee754: 1.1.13
+      ieee754: 1.2.1
       isarray: 1.0.0
 
   buffer@5.6.0:
@@ -31767,8 +31561,6 @@ snapshots:
 
   eventemitter3@5.0.1: {}
 
-  events@1.1.1: {}
-
   events@3.3.0: {}
 
   evp_bytestokey@1.0.3:
@@ -32060,8 +31852,6 @@ snapshots:
   flat@5.0.2: {}
 
   flatted@3.3.1: {}
-
-  flow-parser@0.236.0: {}
 
   flux@4.0.4(react@18.3.1):
     dependencies:
@@ -32740,8 +32530,6 @@ snapshots:
 
   idb@7.1.1: {}
 
-  ieee754@1.1.13: {}
-
   ieee754@1.2.1: {}
 
   ignore-loader@0.1.2: {}
@@ -33400,8 +33188,6 @@ snapshots:
 
   jju@1.4.0: {}
 
-  jmespath@0.16.0: {}
-
   jose@5.3.0: {}
 
   joycon@3.1.1: {}
@@ -33434,33 +33220,6 @@ snapshots:
   jsbn@0.1.1: {}
 
   jsbn@1.1.0: {}
-
-  jscodeshift@0.15.2(@babel/preset-env@7.24.5(@babel/core@7.24.5)):
-    dependencies:
-      '@babel/core': 7.24.5
-      '@babel/parser': 7.24.5
-      '@babel/plugin-transform-class-properties': 7.24.1(@babel/core@7.24.5)
-      '@babel/plugin-transform-modules-commonjs': 7.24.1(@babel/core@7.24.5)
-      '@babel/plugin-transform-nullish-coalescing-operator': 7.24.1(@babel/core@7.24.5)
-      '@babel/plugin-transform-optional-chaining': 7.24.5(@babel/core@7.24.5)
-      '@babel/plugin-transform-private-methods': 7.24.1(@babel/core@7.24.5)
-      '@babel/preset-flow': 7.24.1(@babel/core@7.24.5)
-      '@babel/preset-typescript': 7.24.1(@babel/core@7.24.5)
-      '@babel/register': 7.23.7(@babel/core@7.24.5)
-      babel-core: 7.0.0-bridge.0(@babel/core@7.24.5)
-      chalk: 4.1.2
-      flow-parser: 0.236.0
-      graceful-fs: 4.2.11
-      micromatch: 4.0.5
-      neo-async: 2.6.2
-      node-dir: 0.1.17
-      recast: 0.23.7
-      temp: 0.8.4
-      write-file-atomic: 2.4.3
-    optionalDependencies:
-      '@babel/preset-env': 7.24.5(@babel/core@7.24.5)
-    transitivePeerDependencies:
-      - supports-color
 
   jscrypto@1.0.3: {}
 
@@ -34362,10 +34121,6 @@ snapshots:
   node-addon-api@5.1.0: {}
 
   node-addon-api@7.1.0: {}
-
-  node-dir@0.1.17:
-    dependencies:
-      minimatch: 3.1.2
 
   node-domexception@1.0.0: {}
 
@@ -35725,8 +35480,6 @@ snapshots:
       end-of-stream: 1.4.4
       once: 1.4.0
 
-  punycode@1.3.2: {}
-
   punycode@1.4.1: {}
 
   punycode@2.3.1: {}
@@ -35772,8 +35525,6 @@ snapshots:
       strict-uri-encode: 2.0.0
 
   querystring-es3@0.2.1: {}
-
-  querystring@0.2.0: {}
 
   querystringify@2.2.0: {}
 
@@ -36186,14 +35937,6 @@ snapshots:
 
   real-require@0.2.0: {}
 
-  recast@0.23.7:
-    dependencies:
-      ast-types: 0.16.1
-      esprima: 4.0.1
-      source-map: 0.6.1
-      tiny-invariant: 1.3.3
-      tslib: 2.6.2
-
   rechoir@0.6.2:
     dependencies:
       resolve: 1.22.8
@@ -36364,10 +36107,6 @@ snapshots:
   rgb-regex@1.0.1: {}
 
   rgba-regex@1.0.0: {}
-
-  rimraf@2.6.3:
-    dependencies:
-      glob: 7.2.3
 
   rimraf@2.7.1:
     dependencies:
@@ -37338,10 +37077,6 @@ snapshots:
 
   temp-dir@3.0.0: {}
 
-  temp@0.8.4:
-    dependencies:
-      rimraf: 2.6.3
-
   tempy@3.1.0:
     dependencies:
       is-stream: 3.0.0
@@ -37897,11 +37632,6 @@ snapshots:
 
   url-set-query@1.0.0: {}
 
-  url@0.10.3:
-    dependencies:
-      punycode: 1.3.2
-      querystring: 0.2.0
-
   url@0.11.3:
     dependencies:
       punycode: 1.4.1
@@ -38006,8 +37736,6 @@ snapshots:
   utils-merge@1.0.1: {}
 
   uuid@3.4.0: {}
-
-  uuid@8.0.0: {}
 
   uuid@8.3.2: {}
 
@@ -38745,12 +38473,6 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
-
-  write-file-atomic@2.4.3:
-    dependencies:
-      graceful-fs: 4.2.11
-      imurmurhash: 0.1.4
-      signal-exit: 3.0.7
 
   write-file-atomic@3.0.3:
     dependencies:
