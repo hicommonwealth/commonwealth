@@ -45,7 +45,6 @@ export const useMemberData = ({
     // only include stake balances if community has staking enabled
     include_stake_balances: !!app.config.chains.getById(app.activeChainId())
       ?.namespace,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
   const { data: groups } = useFetchGroupsQuery({

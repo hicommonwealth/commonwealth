@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { GetCommunityMembers } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
+import app from '../../index';
 
 type UseGetMembersQueryProps = z.infer<typeof GetCommunityMembers.input>;
 
@@ -17,7 +18,6 @@ const useGetMembersQuery = ({
   cursor,
   allowedAddresses,
   include_stake_balances,
-  enabled,
 }: UseGetMembersQueryProps) => {
   return trpc.community.getMembers.useQuery(
     {
@@ -35,7 +35,7 @@ const useGetMembersQuery = ({
       include_stake_balances,
     },
     {
-      enabled,
+      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
     },
   );
 };
