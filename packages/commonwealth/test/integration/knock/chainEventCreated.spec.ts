@@ -64,7 +64,7 @@ describe('chainEventCreated Event Handler', () => {
       chain_node_id: chainNode!.id,
       abi_id: null,
     });
-    const [communityContract] = await tester.seed('CommunityContract', {
+    await tester.seed('CommunityContract', {
       community_id: community!.id,
       contract_id: contract!.id,
     });
@@ -172,9 +172,7 @@ describe('chainEventCreated Event Handler', () => {
 
     it('should throw if triggerWorkflow fails', async () => {
       sandbox = sinon.createSandbox();
-      const provider = notificationsProvider(
-        ThrowingSpyNotificationsProvider(sandbox),
-      );
+      notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
       await tester.seed('Address', {
         community_id: community!.id,
@@ -278,9 +276,7 @@ describe('chainEventCreated Event Handler', () => {
 
     it('should throw if triggerWorkflow fails', async () => {
       sandbox = sinon.createSandbox();
-      const provider = notificationsProvider(
-        ThrowingSpyNotificationsProvider(sandbox),
-      );
+      notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
       await tester.seed('CommunityAlert', {
         community_id: community!.id,
