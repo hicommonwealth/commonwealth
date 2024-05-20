@@ -157,7 +157,7 @@ const NotificationSettingsPage2 = () => {
                 </CWText>
               </div>
 
-              <div style={{ marginTop: '16px' }}>
+              <div className="SubFooter">
                 <div>{current.Thread.comment_count} Comments</div>
               </div>
             </div>

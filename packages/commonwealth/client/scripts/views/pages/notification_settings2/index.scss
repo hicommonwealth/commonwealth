@@ -3,11 +3,18 @@
 .NotificationSettingsPage2 .SubEntry {
   border-bottom: 1px solid $neutral-300;
   margin-bottom: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .NotificationSettingsPage2 .SubHeader {
   display: flex;
   align-items: center;
   margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.NotificationSettingsPage2 .SubFooter {
+  margin-top: 16px;
   margin-bottom: 16px;
 }
