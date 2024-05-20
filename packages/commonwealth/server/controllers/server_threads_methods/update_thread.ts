@@ -14,6 +14,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
   createThreadMentionNotifications,
+  emitMentions,
   findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
@@ -174,6 +175,12 @@ export async function __updateThread(
 
   const community = await this.models.Community.findByPk(thread.community_id);
 
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
 
@@ -246,6 +253,15 @@ export async function __updateThread(
       this.models,
       transaction,
     );
+
+    await emitMentions(this.models, transaction, {
+      authorAddressId: address.id,
+      authorUserId: user.id,
+      authorAddress: address.address,
+      authorProfileId: address.profile_id,
+      mentions: mentionedAddresses,
+      thread,
+    });
 
     await transaction.commit();
   } catch (err) {
@@ -331,12 +347,6 @@ export async function __updateThread(
     },
     excludeAddresses: [address.address],
   });
-
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
     ...createThreadMentionNotifications(mentionedAddresses, finalThread),

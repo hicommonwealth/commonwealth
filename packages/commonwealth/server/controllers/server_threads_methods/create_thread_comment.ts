@@ -13,6 +13,7 @@ import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import {
   createCommentMentionNotifications,
+  emitMentions,
   parseUserMentions,
   queryMentionedUsers,
   uniqueMentions,
@@ -183,12 +184,27 @@ export async function __createThreadComment(
     Object.assign(commentContent, { parent_id: parentId });
   }
 
+  // grab mentions to notify tagged users
+  const bodyText = decodeURIComponent(text);
+  const mentions = uniqueMentions(parseUserMentions(bodyText));
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
   let comment: CommentInstance;
   try {
     await this.models.sequelize.transaction(async (transaction) => {
       comment = await this.models.Comment.create(commentContent, {
         transaction,
       });
+
+      await emitMentions(this.models, transaction, {
+        authorAddressId: address.id,
+        authorUserId: user.id,
+        authorAddress: address.address,
+        authorProfileId: address.profile_id,
+        mentions: mentionedAddresses,
+        comment,
+      });
+
       await this.models.Subscription.bulkCreate(
         [
           {
@@ -212,11 +228,6 @@ export async function __createThreadComment(
   } catch (e) {
     throw new ServerError('Failed to create comment', e);
   }
-
-  // grab mentions to notify tagged users
-  const bodyText = decodeURIComponent(text);
-  const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   const allNotificationOptions: EmitOptions[] = [];
 

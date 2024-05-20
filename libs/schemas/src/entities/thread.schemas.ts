@@ -41,7 +41,6 @@ export const Thread = z.object({
   reaction_count: PG_INT,
   reaction_weights_sum: PG_INT,
   comment_count: PG_INT,
-
   //notifications
   max_notif_id: PG_INT,
 
