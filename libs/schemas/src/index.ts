@@ -19,6 +19,8 @@ export type Aggregates = Extract<
   | 'Profile'
   | 'CommentSubscription'
   | 'ThreadSubscription'
+  | 'Contract'
+  | 'CommunityContract'
 >;
 
 export * from './commands';
