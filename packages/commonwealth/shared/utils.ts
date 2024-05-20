@@ -6,7 +6,6 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { config } from '../server/config';
 
 export const slugifyPreserveDashes = (str: string): string => {
   // Remove any character that isn't a alphanumeric character, a
@@ -33,13 +32,14 @@ export const getThreadUrlWithoutObject = (
   const tId = proposalId;
   const cId = comment ? `?comment=${comment.id}` : '';
 
-  return config.NODE_ENV === 'production'
+  return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
     : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
+// WARN: Using process.env to avoid webpack failures
 export const getCommunityUrl = (community: string): string => {
-  return config.NODE_ENV === 'production'
+  return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${community}`
     : `http://localhost:8080/${community}`;
 };
