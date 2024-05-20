@@ -20,6 +20,7 @@ export const AndroidPrompt = ({
   const { animationStyles } = useAnimation({ transitionDuration: '.5s' });
   let installPromptEvent = null;
   const [checkboxChecked, setCheckboxChecked] = useState(false);
+  const [showInstallButton, setShowInstallButton] = useState(true);
 
   window.addEventListener('beforeinstallprompt', (event) => {
     // Prevent Chrome 67 and earlier from automatically showing the prompt
@@ -29,24 +30,27 @@ export const AndroidPrompt = ({
   });
 
   const handleInstallClick = () => {
-    try {
-      installPromptEvent.prompt();
+    if (installPromptEvent) {
+      try {
+        installPromptEvent.prompt();
 
-      // Wait for the user to respond to the prompt
-      installPromptEvent.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          // Hide after install prompt is accepted
-          console.log('User accepted the install prompt');
-          sessionStorage.setItem(HIDE_PROMPT, 'true');
-          setShowPrompt(false);
-        } else {
-          // Hide after install prompt is dismissed
-          sessionStorage.setItem(HIDE_PROMPT, 'true');
-          setShowPrompt(false);
-        }
-      });
-    } catch (e) {
-      console.error(e);
+        // Wait for the user to respond to the prompt
+        installPromptEvent.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            // Hide after install prompt is accepted
+            console.log('User accepted the install prompt');
+            sessionStorage.setItem(HIDE_PROMPT, 'true');
+            setShowPrompt(false);
+          } else {
+            // Hide after install prompt is dismissed
+            sessionStorage.setItem(HIDE_PROMPT, 'true');
+            setShowPrompt(false);
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
       const manualStepsInstructionsEle =
         document.getElementById('manual-install');
       if (manualStepsInstructionsEle) {
@@ -54,6 +58,7 @@ export const AndroidPrompt = ({
           manualStepsInstructionsEle.style.display = 'flex';
         }, 500);
       }
+      setShowInstallButton(false);
     }
   };
 
@@ -116,12 +121,14 @@ export const AndroidPrompt = ({
             label="Cancel"
             onClick={handleCancelClick}
           />
-          <CWButton
-            buttonType="tertiary"
-            className="prompt-button"
-            label="Install"
-            onClick={handleInstallClick}
-          />
+          {showInstallButton && (
+            <CWButton
+              buttonType="tertiary"
+              className="prompt-button"
+              label="Install"
+              onClick={handleInstallClick}
+            />
+          )}
         </div>
       </div>
     </div>
