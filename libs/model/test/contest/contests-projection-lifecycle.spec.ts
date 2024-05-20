@@ -269,7 +269,7 @@ describe('Contests projection lifecycle', () => {
 
     const result = await query(GetAllContests(), {
       actor,
-      payload: { community_id, contest_id },
+      payload: { community_id, contest_address: recurring, contest_id },
     });
     expect(result).to.deep.eq([
       {
@@ -293,7 +293,7 @@ describe('Contests projection lifecycle', () => {
             end_time,
             winners: winners.map((w) => ({
               ...w,
-              prize: w.prize / 10 ** decimals,
+              prize: Math.floor(w.prize / 10 ** decimals),
             })),
             actions: [
               {
