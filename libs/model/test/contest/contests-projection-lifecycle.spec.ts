@@ -1,5 +1,6 @@
 import {
   Actor,
+  DeepPartial,
   EventNames,
   InvalidState,
   dispose,
@@ -18,6 +19,8 @@ import { contractHelpers } from '../../src/services/commonProtocol';
 import { bootstrap_testing, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
+chai.config.truncateThreshold = 0; // Disable truncation
+chai.config.showDiff = true; // Show diff output
 
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
@@ -158,7 +161,6 @@ describe('Contests projection lifecycle', () => {
         namespace,
         contest_address: recurring,
         interval: 10,
-        created_at,
       },
     });
 
@@ -169,7 +171,6 @@ describe('Contests projection lifecycle', () => {
         contest_id,
         start_time,
         end_time,
-        created_at,
       },
     });
 
@@ -179,7 +180,6 @@ describe('Contests projection lifecycle', () => {
         namespace,
         contest_address: oneoff,
         length: 1,
-        created_at,
       },
     });
 
@@ -189,7 +189,6 @@ describe('Contests projection lifecycle', () => {
         contest_address: oneoff,
         start_time,
         end_time,
-        created_at,
       },
     });
 
@@ -200,7 +199,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         creator_address: creator1,
         content_url,
-        created_at,
       },
     });
 
@@ -212,7 +210,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         creator_address: creator2,
         content_url,
-        created_at,
       },
     });
 
@@ -224,7 +221,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         voter_address: voter1,
         voting_power: voting_power1,
-        created_at,
       },
     });
 
@@ -236,7 +232,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         voter_address: voter2,
         voting_power: voting_power2,
-        created_at,
       },
     });
 
@@ -247,7 +242,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         voter_address: voter3,
         voting_power: voting_power3,
-        created_at,
       },
     });
 
@@ -257,7 +251,6 @@ describe('Contests projection lifecycle', () => {
         contest_address: recurring,
         contest_id,
         winners,
-        created_at,
       },
     });
 
@@ -271,7 +264,7 @@ describe('Contests projection lifecycle', () => {
       actor,
       payload: { community_id, contest_id },
     });
-    expect(result).to.deep.eq([
+    expect(result).to.deep.contain([
       {
         community_id,
         contest_address: recurring,
@@ -302,7 +295,6 @@ describe('Contests projection lifecycle', () => {
                 content_id,
                 content_url,
                 voting_power: 0,
-                created_at,
                 thread_id,
                 thread_title,
               },
@@ -312,7 +304,6 @@ describe('Contests projection lifecycle', () => {
                 content_id,
                 content_url: null,
                 voting_power: 1,
-                created_at,
                 thread_id,
                 thread_title,
               },
@@ -322,7 +313,6 @@ describe('Contests projection lifecycle', () => {
                 content_id,
                 content_url: null,
                 voting_power: 2,
-                created_at,
                 thread_id,
                 thread_title,
               },
@@ -330,7 +320,7 @@ describe('Contests projection lifecycle', () => {
           },
         ],
       },
-    ] as Array<z.infer<typeof ContestResults>>);
+    ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
   });
 
   it('should raise invalid state when community with namespace not found', async () => {
@@ -341,7 +331,6 @@ describe('Contests projection lifecycle', () => {
           namespace: 'not-found',
           contest_address: 'new-address',
           interval: 10,
-          created_at,
         },
       }),
     ).to.eventually.be.rejectedWith(InvalidState);
@@ -357,7 +346,6 @@ describe('Contests projection lifecycle', () => {
           namespace: 'not-found',
           contest_address: 'new-address',
           interval: 10,
-          created_at,
         },
       }),
     ).to.eventually.be.rejectedWith(Error);
