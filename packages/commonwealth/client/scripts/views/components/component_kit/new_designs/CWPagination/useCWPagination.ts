@@ -9,7 +9,7 @@ export interface UseCWPaginationProps {
   onChange?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     newSelectedPage: number,
-  ) => Promise<void> | void;
+  ) => void;
   selectedPageProp?: number;
 }
 
