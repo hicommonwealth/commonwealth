@@ -129,6 +129,7 @@ export function Contests(): Projection<typeof inputs> {
           content_url: payload.content_url,
           thread_id: thread?.id,
           voting_power: 0,
+          created_at: new Date(), // TODO: use protocol util to get creation date
         });
       },
 
@@ -150,6 +151,7 @@ export function Contests(): Projection<typeof inputs> {
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action?.thread_id,
+          created_at: new Date(), // TODO: use protocol util to get creation date
         });
       },
 

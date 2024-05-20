@@ -10,7 +10,6 @@ import {
 } from '../../src/integration/events.schemas';
 import { parseEvmEventToContestEvent } from '../../src/integration/events.utils';
 
-const timestamp = new Date();
 const contestAddress = '0x888';
 
 describe('parseEvmEventToContestEvent', () => {
