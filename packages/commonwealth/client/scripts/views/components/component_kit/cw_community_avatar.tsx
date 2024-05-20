@@ -8,7 +8,7 @@ import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
 type CommunityAvatarProps = {
-  community: ChainInfo;
+  community: Pick<ChainInfo, 'iconUrl' | 'name'>;
   onClick?: () => void;
   size?: IconSize;
   showSkeleton?: boolean;
