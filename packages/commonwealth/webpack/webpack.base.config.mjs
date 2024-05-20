@@ -6,9 +6,6 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -219,6 +216,7 @@ const baseConfig = {
       fs: false,
       net: false,
       buffer: false,
+      events: require.resolve('events/'),
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),

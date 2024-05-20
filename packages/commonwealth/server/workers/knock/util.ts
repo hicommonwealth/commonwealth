@@ -1,4 +1,4 @@
-import { SERVER_URL } from '../../config';
+import { config } from '@hicommonwealth/model';
 
 export const getCommentUrl = (
   communityId: string,
@@ -6,7 +6,8 @@ export const getCommentUrl = (
   commentId: number,
 ): string => {
   return (
-    SERVER_URL + `/${communityId}/discussion/${threadId}?comment=${commentId}`
+    config.SERVER_URL +
+    `/${communityId}/discussion/${threadId}?comment=${commentId}`
   );
 };
 export const getSnapshotUrl = (
@@ -14,16 +15,16 @@ export const getSnapshotUrl = (
   space: string,
   proposalId: string,
 ): string => {
-  return SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
+  return config.SERVER_URL + `/${communityId}/snapshot/${space}/${proposalId}`;
 };
 
 export const getThreadUrl = (communityId: string, threadId: number): string => {
-  return SERVER_URL + `/${communityId}/discussion/${threadId}`;
+  return config.SERVER_URL + `/${communityId}/discussion/${threadId}`;
 };
 
 export const getChainProposalUrl = (
   communityId: string,
   proposalId: string,
 ) => {
-  return SERVER_URL + `/${communityId}/proposal/${proposalId}`;
+  return config.SERVER_URL + `/${communityId}/proposal/${proposalId}`;
 };

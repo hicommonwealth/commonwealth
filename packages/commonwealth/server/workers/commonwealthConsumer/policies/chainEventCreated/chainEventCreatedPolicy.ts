@@ -1,5 +1,4 @@
-import { EventHandler, Policy, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventHandler, Policy, events, logger } from '@hicommonwealth/core';
 import {
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,

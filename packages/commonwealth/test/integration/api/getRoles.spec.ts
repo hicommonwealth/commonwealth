@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { testServer, TestServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors } from '../../../server/controller/index';
 import { get } from './external/appHook.spec';
 
@@ -27,7 +27,7 @@ describe('get roles Integration Tests', () => {
         id: server.e2eTestEntities.testUsers[0].id,
         email: server.e2eTestEntities.testUsers[0].email,
       },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 

@@ -1,6 +1,7 @@
 import { events, Policy } from '@hicommonwealth/core';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { URL } from 'url';
+import { config } from '../config';
 import { models } from '../database';
 import { ContestHelper } from '../services/commonProtocol';
 
@@ -32,7 +33,7 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const web3Client = await ContestHelper.createWeb3Provider(
           chainNodeUrl,
-          process.env.PRIVATE_KEY!,
+          config.WEB3.PRIVATE_KEY,
         );
 
         const fullContentUrl = getThreadUrl({
@@ -74,7 +75,7 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const web3Client = await ContestHelper.createWeb3Provider(
           chainNodeUrl!,
-          process.env.PRIVATE_KEY!,
+          config.WEB3.PRIVATE_KEY,
         );
 
         const contestAddress = community!.contest_managers![0].contest_address;

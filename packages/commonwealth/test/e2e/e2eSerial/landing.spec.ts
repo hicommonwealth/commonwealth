@@ -1,5 +1,5 @@
+import { config } from '@hicommonwealth/core';
 import { expect, test } from '@playwright/test';
-import { PORT } from '../../../server/config';
 import { E2E_Seeder, e2eSeeder } from '../utils/e2eUtils';
 
 let seeder: E2E_Seeder;
@@ -16,7 +16,7 @@ test.describe('Test landing login', () => {
       }
     });
 
-    await page.goto(`http://localhost:${PORT}/`);
+    await page.goto(`${config.SERVER_URL}/`);
 
     // await login(page);
 

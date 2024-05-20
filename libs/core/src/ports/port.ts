@@ -1,5 +1,6 @@
-import { logger } from '@hicommonwealth/logging';
 import { fileURLToPath } from 'url';
+import { config } from '../config';
+import { logger } from '../logging';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
@@ -49,7 +50,7 @@ const disposers: Disposer[] = [];
  */
 const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   // don't kill process when errors are caught in production
-  if (code === 'ERROR' && process.env.NODE_ENV === 'production') return;
+  if (code === 'ERROR' && config.NODE_ENV === 'production') return;
 
   // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));
@@ -62,7 +63,7 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   adapters.clear();
 
   // exit when not unit testing
-  process.env.NODE_ENV !== 'test' &&
+  config.NODE_ENV !== 'test' &&
     code !== 'UNIT_TEST' &&
     process.exit(code === 'ERROR' ? 1 : 0);
 };

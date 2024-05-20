@@ -1,6 +1,7 @@
-import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 import mixpanel from 'mixpanel-browser';
+import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 
+// WARN: Using process.env to avoid webpack failures
 try {
   if (process.env.NODE_ENV === 'production') {
     mixpanel.init(process.env.MIXPANEL_PROD_TOKEN, { debug: true });

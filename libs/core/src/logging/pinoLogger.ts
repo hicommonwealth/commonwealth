@@ -1,26 +1,17 @@
 import pino, { DestinationStream } from 'pino';
-import { GetLogger, LogContext, LoggerIds } from '../interfaces';
-import { rollbar } from '../util/rollbar';
+import Rollbar from 'rollbar';
+import { config } from '../config';
+import { GetLogger, LogContext, LoggerIds } from './interfaces';
 
 let logLevel: 'info' | 'debug';
 let transport: DestinationStream;
 
-const node_env = process.env.NODE_ENV;
-
-if (node_env !== 'production') {
-  transport = pino.transport({
-    target: 'pino-pretty',
-    options: {
-      destination: 1, // STDOUT
-      ignore: 'pid,hostname',
-      errorLikeObjectKeys: ['e', 'err', 'error'],
-      sync: node_env === 'test',
-      colorizeObjects: false,
-      singleLine: true,
-    },
-  });
-  logLevel = 'debug';
-} else logLevel = 'info';
+const rollbar = new Rollbar({
+  accessToken: config.LOGGING.ROLLBAR_SERVER_TOKEN,
+  environment: config.LOGGING.ROLLBAR_ENV,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
 const formatFilename = (name: string) => {
   const t = name.split('/');
@@ -28,6 +19,21 @@ const formatFilename = (name: string) => {
 };
 
 export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
+  if (config.NODE_ENV !== 'production') {
+    transport = pino.transport({
+      target: 'pino-pretty',
+      options: {
+        destination: 1, // STDOUT
+        ignore: 'pid,hostname',
+        errorLikeObjectKeys: ['e', 'err', 'error'],
+        sync: config.NODE_ENV === 'test',
+        colorizeObjects: false,
+        singleLine: true,
+      },
+    });
+    logLevel = 'debug';
+  } else logLevel = 'info';
+
   const logger = pino(
     {
       level: logLevel,
@@ -41,8 +47,9 @@ export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
             time: bindings.time,
             hostname: bindings.hostname,
             pid: bindings.pid,
-            filename: node_env === 'production' ? bindings.name : undefined,
-            name: node_env !== 'production' ? bindings.name : undefined,
+            filename:
+              config.NODE_ENV === 'production' ? bindings.name : undefined,
+            name: config.NODE_ENV !== 'production' ? bindings.name : undefined,
             ids: ids.length > 1 ? ids.slice(1) : undefined,
           };
         },

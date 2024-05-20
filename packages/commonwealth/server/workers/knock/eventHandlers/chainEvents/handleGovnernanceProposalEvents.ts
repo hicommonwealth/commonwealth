@@ -1,9 +1,9 @@
 import {
   events,
+  logger,
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { CommunityAttributes, DB } from '@hicommonwealth/model';
 import { ETHERS_BIG_NUMBER } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';

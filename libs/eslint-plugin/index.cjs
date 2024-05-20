@@ -19,7 +19,6 @@ module.exports = {
                 '@hicommonwealth/core',
                 '@hicommonwealth/eslint-plugin',
                 '@hicommonwealth/evm-testing',
-                '@hicommonwealth/logging',
                 '@hicommonwealth/model',
                 '@hicommonwealth/sitemaps',
               ].includes(node.source.value)

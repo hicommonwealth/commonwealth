@@ -1,5 +1,4 @@
-import { command } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { command, logger } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
