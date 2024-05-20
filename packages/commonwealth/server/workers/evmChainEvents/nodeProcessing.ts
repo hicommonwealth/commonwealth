@@ -97,8 +97,8 @@ export async function processChainNode(
         await lastProcessedBlock.save({ transaction });
       }
 
-      const contestEvents = events
-        .map((event) => {
+      if (allEvents.length > 0) {
+        const contestEvents = allEvents.map((event) => {
           const contractAddress = ethers.utils.getAddress(event.rawLog.address);
 
           const parseEvent = (e: keyof typeof ChainEventSigs) =>
@@ -140,25 +140,32 @@ export async function processChainNode(
           }
 
           return null;
-        })
-        .filter(Boolean);
+        });
 
-      await emitEvent(models.Outbox, contestEvents, transaction);
+        // filter out the rest of the events from contest events,
+        // temp solution until chain events are broken down
+        const contestEventSignatures = Object.values(EvmContestEventSignatures);
+        const restEvents = allEvents
+          .filter((event) => {
+            return !contestEventSignatures.includes(
+              event.eventSource.eventSignature,
+            );
+          })
+          .map(
+            (
+              event,
+            ): {
+              event_name: EventNames.ChainEventCreated;
+              event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
+            } => ({
+              event_name: EventNames.ChainEventCreated,
+              event_payload: event as z.infer<
+                typeof coreEvents.ChainEventCreated
+              >,
+            }),
+          );
 
-      if (allEvents.length > 0) {
-        const records = allEvents.map(
-          (
-            event,
-          ): {
-            event_name: EventNames.ChainEventCreated;
-            event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
-          } => ({
-            event_name: EventNames.ChainEventCreated,
-            event_payload: event as z.infer<
-              typeof coreEvents.ChainEventCreated
-            >,
-          }),
-        );
+        const records = [...contestEvents, ...restEvents];
         await emitEvent(models.Outbox, records, transaction);
       }
     });
