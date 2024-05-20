@@ -89,6 +89,8 @@ const NotificationSettingsPage2 = () => {
     JSON.stringify(threadSubscriptions, null, '  '),
   );
 
+  console.log('FIXME: bundledSubs: ', JSON.stringify(bundledSubs, null, '  '));
+
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage">
@@ -106,6 +108,12 @@ const NotificationSettingsPage2 = () => {
               <div>Thread title: {current.Thread.title}</div>
               <div>
                 Thread created at: {current.Thread.created_at.toISOString()}
+              </div>
+              <div>
+                <User
+                  userAddress={current.Thread.Address.address}
+                  userCommunityId={current.Thread.Community.id}
+                />
               </div>
               <div>Thread comment count at: {current.Thread.comment_count}</div>
               <pre>{JSON.stringify(current, null, '  ')}</pre>

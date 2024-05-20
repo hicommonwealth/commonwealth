@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
+import { Address } from './user.schemas';
 
 export const NotificationCategory = z.object({
   name: z.string().max(255),
@@ -47,14 +48,23 @@ export const ThreadSubscription = z.object({
   Thread: Thread.pick({
     id: true,
     community_id: true,
+    address_id: true,
     title: true,
     comment_count: true,
     created_at: true,
+    url: true,
   }).merge(
     z.object({
       Community: Community.pick({
         id: true,
         name: true,
+        icon_url: true,
+      }),
+      Address: Address.pick({
+        id: true,
+        profile_id: true,
+        user_id: true,
+        address: true,
       }),
     }),
   ),
