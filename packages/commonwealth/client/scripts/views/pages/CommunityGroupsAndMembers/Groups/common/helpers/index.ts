@@ -13,7 +13,7 @@ export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
   allowedAddresses?: string[],
 ) => {
-  const extraRequrirements = allowedAddresses.length > 0 ? 1 : 0;
+  const extraRequrirements = allowedAddresses?.length > 0 ? 1 : 0;
   const payload = {
     communityId: app.activeChainId(),
     address: app.user.activeAccount.address,

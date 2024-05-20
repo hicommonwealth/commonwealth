@@ -392,6 +392,11 @@ const GroupForm = ({
     await onSubmit(formValues);
   };
 
+  // + 1 for allowlists
+  const maxRequirements = allowlistEnabled
+    ? requirementSubForms.length + 1
+    : requirementSubForms.length;
+
   return (
     <CWForm
       className="GroupForm"
@@ -522,7 +527,7 @@ const GroupForm = ({
                 />
 
                 <CWRequirementsRadioButton
-                  maxRequirements={requirementSubForms.length + 1} // + 1 for allowlists
+                  maxRequirements={maxRequirements}
                   inputValue={cwRequiremenetsLabelInputValue}
                   isSelected={isSelectedCustomRequirementsToFulfillOption}
                   onSelect={() =>

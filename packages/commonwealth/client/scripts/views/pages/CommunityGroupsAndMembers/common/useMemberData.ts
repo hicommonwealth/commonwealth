@@ -27,7 +27,7 @@ export const useMemberData = ({
     ? `in-group:${groupFilter}`
     : groupFilter;
 
-  const membershipsFilter = ['all-community'].includes(groupFilter.toString())
+  const membershipsFilter = ['all-community'].includes(groupFilter?.toString())
     ? undefined
     : parseMembership;
 
@@ -44,7 +44,7 @@ export const useMemberData = ({
     allowedAddresses: allowedAddresses.join(', '),
     // only include stake balances if community has staking enabled
     include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-      .namespace,
+      ?.namespace,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 

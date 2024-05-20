@@ -23,7 +23,7 @@ const useGetMembersQuery = ({
     {
       limit,
       order_by,
-      order_direction,
+      order_direction: order_direction as 'ASC' | 'DESC',
       search,
       community_id,
       include_roles,
