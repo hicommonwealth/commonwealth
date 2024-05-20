@@ -1,5 +1,4 @@
-import { ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -12,20 +11,14 @@ import type {
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
-import { SESSION_EXPIRY_MILLIS } from '../../session';
-import { ETH_RPC, JWT_SECRET } from '../config';
+import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-
-dotenv.config();
-
-const KNOCK_SIGNING_KEY = process.env.KNOCK_SIGNING_KEY;
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -290,6 +283,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
+      promotional_emails_enabled: user.promotional_emails_enabled,
       jwt: '',
       knockJwtToken: '',
       addresses,
@@ -322,7 +316,7 @@ export const status = async (
       return success(res, {
         notificationCategories,
         recentThreads: threadCountQueryData,
-        evmTestEnv: ETH_RPC,
+        evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         communityCategoryMap: communityCategories,
       });
@@ -346,8 +340,8 @@ export const status = async (
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
 
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
-        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+      const jwtToken = jwt.sign({ id, email }, config.AUTH.JWT_SECRET, {
+        expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
 
       const knockJwtToken = await computeKnockJwtToken(user.id);
@@ -361,7 +355,7 @@ export const status = async (
         roles,
         loggedIn: true,
         user: { ...user, profileId: profileInstance.id },
-        evmTestEnv: ETH_RPC,
+        evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         communityCategoryMap: communityCategories,
       });
@@ -376,10 +370,10 @@ export const status = async (
  * We have to generate a JWT token for use by the frontend Knock SDK.
  */
 async function computeKnockJwtToken(userId: number) {
-  if (KNOCK_SIGNING_KEY) {
+  if (config.NOTIFICATIONS.KNOCK_SIGNING_KEY) {
     return await Knock.signUserToken(`${userId}`, {
-      signingKey: KNOCK_SIGNING_KEY,
-      expiresInSeconds: SESSION_EXPIRY_MILLIS / 1000,
+      signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
+      expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
     });
   } else {
     log.warn('No process.env.KNOCK_SIGNING_KEY defined ');

@@ -1,5 +1,5 @@
+import { config } from '@hicommonwealth/core';
 import { test } from '@playwright/test';
-import { PORT } from '../../../server/config';
 import { e2eSeeder, type E2E_Seeder } from '../utils/e2eUtils';
 import { discussionTests } from './discussionsTest';
 
@@ -11,7 +11,7 @@ test.beforeAll(async () => {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(
-    `http://localhost:${PORT}/${seeder.testChains[0].id}/discussions`,
+    `${config.SERVER_URL}/${seeder.testChains[0].id}/discussions`,
   );
 });
 

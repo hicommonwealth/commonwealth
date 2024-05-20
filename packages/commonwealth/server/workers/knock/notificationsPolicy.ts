@@ -1,5 +1,4 @@
-import { Policy, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { Policy, events, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';

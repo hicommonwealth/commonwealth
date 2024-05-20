@@ -1,5 +1,4 @@
-import { CacheNamespaces } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { CacheNamespaces, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { CacheDecorator, KeyFunction } from './redis';
 

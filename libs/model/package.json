@@ -17,7 +17,7 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "yarn build && NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha 'test/**/*.spec.ts'"
+    "test": "NODE_ENV=test NODE_OPTIONS='--import tsx/esm --conditions=devmode' mocha 'test/**/*.spec.ts'"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",
@@ -26,12 +26,12 @@
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
     "@faker-js/faker": "^8.4.1",
-    "@hicommonwealth/chains": "*",
-    "@hicommonwealth/core": "*",
-    "@hicommonwealth/logging": "*",
-    "@hicommonwealth/schemas": "*",
-    "@hicommonwealth/shared": "*",
-    "dotenv": "^16.0.3",
+    "@hicommonwealth/chains": "workspace:*",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/schemas": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*",
+    "@solana/web3.js": "^1.91.6",
+    "@solana/spl-token": "^0.4.6",
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",

@@ -1,7 +1,7 @@
-import type { S3 } from 'aws-sdk';
-import AWS from 'aws-sdk';
+import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 
-const s3 = new AWS.S3();
+const s3 = new S3();
 
 export interface Resource {
   readonly location: string;
@@ -26,14 +26,21 @@ export function createAsyncWriterMock() {
 
 export function createAsyncWriterS3(): AsyncWriter {
   async function write(filename: string, content: string): Promise<Resource> {
-    const params: S3.Types.PutObjectRequest = {
+    const params: PutObjectCommandInput = {
       Bucket: 'common-sitemap',
       Key: `${filename}`,
       Body: content,
       ContentType: 'text/xml; charset=utf-8',
     };
 
-    const upload = await s3.upload(params).promise();
+    const upload = await new Upload({
+      client: s3,
+      params,
+    }).done();
+
+    if (!upload.Location) {
+      throw new Error('Failed to return upload location');
+    }
 
     return { location: upload.Location };
   }

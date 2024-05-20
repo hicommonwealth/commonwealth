@@ -1,5 +1,5 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import { models } from '../../../database';

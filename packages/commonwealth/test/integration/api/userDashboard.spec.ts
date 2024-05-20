@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
 
@@ -63,7 +63,10 @@ describe('User Dashboard API', () => {
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
-    userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: userId, email: firstUser.email },
+      config.AUTH.JWT_SECRET,
+    );
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -76,7 +79,10 @@ describe('User Dashboard API', () => {
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
-    userJWT2 = jwt.sign({ id: userId2, email: secondUser.email }, JWT_SECRET);
+    userJWT2 = jwt.sign(
+      { id: userId2, email: secondUser.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession2 = { session: secondUser.session, sign: secondUser.sign };
     expect(userId2).to.not.be.null;
     expect(userAddress2).to.not.be.null;

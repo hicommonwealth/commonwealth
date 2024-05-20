@@ -2,10 +2,7 @@ import { models, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
-import * as dotenv from 'dotenv';
 import { app } from '../src';
-
-dotenv.config();
 
 chai.use(chaiHttp);
 

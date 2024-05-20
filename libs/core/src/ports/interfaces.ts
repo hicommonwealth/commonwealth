@@ -1,4 +1,3 @@
-import { ILogger } from '@hicommonwealth/logging';
 import { z } from 'zod';
 import {
   EventContext,
@@ -13,6 +12,7 @@ import {
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
 } from '../integration/notifications.schemas';
+import { ILogger } from '../logging/interfaces';
 
 /**
  * Resource disposer function
@@ -163,6 +163,7 @@ export enum BrokerSubscriptions {
   DiscordListener = 'DiscordMessage',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
+  ContestWorkerPolicy = 'ContestWorkerPolicy',
 }
 
 /**

@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
 import { CosmosGovernanceVersion, NodeHealth } from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';

@@ -4,13 +4,24 @@ import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
-import mockedContests from '../mockedContests';
 import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
+type Contest = {
+  contest_address?: string;
+  name?: string;
+  image_url?: string;
+  topics?: { id?: number; name?: string }[];
+  cancelled?: boolean;
+  contests?: {
+    end_time?: string;
+    winners?: { prize?: number; creator_address?: string }[];
+  }[];
+};
+
 interface ContestsListProps {
-  contests: typeof mockedContests;
+  contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
   stakeEnabled: boolean;
@@ -47,7 +58,7 @@ const ContestsList = ({
           contests.map((contest) => {
             // only last contest is relevant
             const { end_time, winners } =
-              contest.contests[contest.contests.length - 1];
+              contest.contests[contest.contests.length - 1] || {};
 
             return (
               <ContestCard
@@ -58,13 +69,13 @@ const ContestsList = ({
                 imageUrl={contest.image_url}
                 topics={contest.topics}
                 winners={winners}
-                finishDate={end_time.toISOString()}
-                isActive={!contest.cancelled}
-                onFund={() =>
-                  setFundDrawerAddress(
-                    contest.funding_token_address || 'stake address',
-                  )
+                finishDate={
+                  end_time
+                    ? new Date(end_time)?.toISOString()
+                    : new Date().toISOString()
                 }
+                isActive={!contest.cancelled}
+                onFund={() => setFundDrawerAddress(contest.contest_address)}
               />
             );
           })
