@@ -9,11 +9,12 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { getUniqueUserAddresses } from '../helpers/user';
 import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
-import { useWelcomeOnboardModal } from '../state/ui/modals';
+import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
@@ -50,6 +51,14 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const profileId = app?.user?.addresses?.[0]?.profile?.id;
 
@@ -72,8 +81,14 @@ const Sublayout = ({
         (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
       );
 
-      // open welcome modal if user is not onboarded
-      if (!hasUsername && !onboardedProfiles[profileId]) {
+      const userUniqueAddresses = getUniqueUserAddresses({});
+
+      // open welcome modal if user is not onboarded and there is a single connected address
+      if (
+        !hasUsername &&
+        !onboardedProfiles[profileId] &&
+        userUniqueAddresses.length === 1
+      ) {
         setIsWelcomeOnboardModalOpen(true);
       }
 
@@ -149,7 +164,7 @@ const Sublayout = ({
         onMobile={isWindowExtraSmall}
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
-          setAuthModalType(modalType || 'sign-in')
+          setAuthModalType(modalType || AuthModalType.SignIn)
         }
       />
       <AuthModal

@@ -67,9 +67,9 @@ The release phase allows processes (e.g. database migrations) to run prior to th
 To download and restore the production database, run the following package scripts:
 
 ```bash
-yarn dump-db
+pnpm dump-db
 
-yarn load-db
+pnpm load-db
 ```
 
 To access the production DB, run:

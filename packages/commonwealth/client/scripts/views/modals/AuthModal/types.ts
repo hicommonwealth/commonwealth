@@ -2,6 +2,12 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { ReactNode } from 'react';
 import { AuthSSOs, AuthWallets } from '../../components/AuthButton/types';
 
+export enum AuthModalType {
+  AccountTypeGuidance = 'auth-type-guidance',
+  CreateAccount = 'create-account',
+  SignIn = 'sign-in',
+}
+
 export type ModalBaseTabs = {
   name: string;
   options: AuthWallets[] | AuthSSOs[];
@@ -17,9 +23,8 @@ export type ModalVariantProps = {
     | ChainBase.Solana
     | ChainBase.Substrate;
   onSignInClick?: () => void;
+  onChangeModalType?: (type: AuthModalType) => void;
 };
-
-export type AuthModalType = 'create-account' | 'sign-in';
 
 export type ModalBaseProps = {
   layoutType: AuthModalType;

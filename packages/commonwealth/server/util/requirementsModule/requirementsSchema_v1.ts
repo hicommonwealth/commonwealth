@@ -6,14 +6,13 @@ export default {
       properties: {
         source_type: {
           type: 'string',
-          enum: ['erc20', 'erc721', 'erc1155'],
+          enum: ['erc20', 'erc721', 'erc1155', 'spl'],
         },
         evm_chain_id: {
           type: 'number',
         },
         contract_address: {
           type: 'string',
-          pattern: '^0x[a-fA-F0-9]{40}$',
         },
         token_id: {
           type: 'string',
@@ -21,6 +20,27 @@ export default {
         },
       },
       required: ['source_type', 'evm_chain_id', 'contract_address'],
+      if: {
+        properties: {
+          source_type: {
+            const: 'spl',
+          },
+        },
+      },
+      then: {
+        properties: {
+          contract_address: {
+            pattern: '^[a-zA-Z0-9]{32,44}$',
+          },
+        },
+      },
+      else: {
+        properties: {
+          contract_address: {
+            pattern: '^0x[a-fA-F0-9]{40}$',
+          },
+        },
+      },
     },
     NativeSource: {
       type: 'object',

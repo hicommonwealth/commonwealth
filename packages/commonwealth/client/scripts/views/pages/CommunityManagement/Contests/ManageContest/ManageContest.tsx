@@ -23,6 +23,8 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
 
+  const [createdContestAddress, setCreatedContestAddress] = useState('');
+
   const {
     setContestFormData,
     contestFormData,
@@ -58,12 +60,15 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
         return (
           <SignTransactionsStep
             onSetLaunchContestStep={setLaunchContestStep}
-            isDirectDepositSelected={false}
+            contestFormData={contestFormData}
+            onSetCreatedContestAddress={setCreatedContestAddress}
           />
         );
 
       case 'ContestLive':
-        return <ContestLiveStep />;
+        return (
+          <ContestLiveStep createdContestAddress={createdContestAddress} />
+        );
     }
   };
 

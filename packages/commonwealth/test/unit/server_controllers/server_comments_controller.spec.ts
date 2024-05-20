@@ -552,6 +552,16 @@ describe('ServerCommentsController', () => {
           findOne: async () => data,
           update: () => (data.text = 'Hello'),
         },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+        },
       };
       const banCache = {
         checkBan: async () => [true, null],
@@ -629,6 +639,16 @@ describe('ServerCommentsController', () => {
           findOne: async () => data,
           update: () => null,
         },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
+        },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverCommentsController = new ServerCommentsController(
@@ -678,6 +698,16 @@ describe('ServerCommentsController', () => {
         },
         Thread: {
           findOne: async () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
         },
       };
       const banCache = {

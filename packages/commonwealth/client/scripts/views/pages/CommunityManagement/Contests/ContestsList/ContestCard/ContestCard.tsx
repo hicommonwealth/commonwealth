@@ -1,10 +1,11 @@
 import moment from 'moment';
 import React from 'react';
 
-import { CWCard } from 'views/components/component_kit/cw_card';
-
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import useCancelContestMutation from 'state/api/contests/cancelContest';
+import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -42,6 +43,17 @@ const ContestCard = ({
   const navigate = useCommonNavigate();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const { mutateAsync: cancelContest } = useCancelContestMutation();
+
+  const handleCancel = () => {
+    cancelContest({
+      contest_address: address,
+      id: app.activeChainId(),
+    }).catch((error) => {
+      console.error('Failed to cancel contest: ', error);
+    });
+  };
+
   const handleCancelContest = () => {
     openConfirmation({
       title: 'You are about to end your contest',
@@ -57,7 +69,7 @@ const ContestCard = ({
           label: 'Cancel contest',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: () => console.log('cancel contest'),
+          onClick: handleCancel,
         },
       ],
     });
@@ -96,7 +108,7 @@ const ContestCard = ({
           Current Prizes
         </CWText>
         <div className="prizes">
-          {winners.map((winner, index) => (
+          {winners?.map((winner, index) => (
             <div className="prize-row" key={winner.creator_address}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize

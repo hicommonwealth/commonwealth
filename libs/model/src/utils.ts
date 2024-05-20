@@ -40,6 +40,10 @@ type EmitEventValues =
       event_payload: z.infer<typeof events.SnapshotProposalCreated>;
     }
   | {
+      event_name: EventNames.UserMentioned;
+      event_payload: z.infer<typeof events.UserMentioned>;
+    }
+  | {
       event_name: EventNames.ThreadUpvoted;
       event_payload: z.infer<typeof events.ThreadUpvoted>;
     };

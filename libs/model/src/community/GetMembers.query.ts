@@ -25,15 +25,19 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         throw new InvalidState(Errors.CommunityNotFound);
       }
 
-      const bind: any = {
+      const addressBinding: string[] | undefined = payload?.allowedAddresses
+        ?.split(',')
+        .map((a) => a.trim());
+      const replacements: any = {
         searchTerm: `%${payload.search || ''}%`,
+        addressBinding,
       };
       if (community) {
-        bind.community_id = community.id;
+        replacements.community_id = community.id;
       }
 
-      const communityWhere = bind.community_id
-        ? `"Addresses".community_id = $community_id AND`
+      const communityWhere = replacements.community_id
+        ? `"Addresses".community_id = :community_id AND`
         : '';
 
       const groupIdFromMemberships = parseInt(
@@ -43,7 +47,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         ? `SELECT 1 FROM "Memberships"
     JOIN "Groups" ON "Groups".id = "Memberships".group_id
     WHERE "Memberships".address_id = "Addresses".id
-    AND "Groups".community_id = $community_id
+    AND "Groups".community_id = :community_id
     ${
       groupIdFromMemberships
         ? `AND "Groups".id = ${groupIdFromMemberships}`
@@ -60,6 +64,18 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
             break;
           case 'not-in-group':
             membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
+            break;
+          case 'allow-specified-addresses':
+            membershipsWhere =
+              addressBinding && addressBinding.length > 0
+                ? `AND "Addresses".address IN(:addressBinding)`
+                : '';
+            break;
+          case 'not-allow-specified-addresses':
+            membershipsWhere =
+              addressBinding && addressBinding.length > 0
+                ? `AND "Addresses".address NOT IN(:addressBinding)`
+                : '';
             break;
           default:
             throw new InvalidState(
@@ -86,9 +102,9 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
     WHERE
       ${communityWhere}
       (
-        "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
+        "Profiles".profile_name ILIKE '%' || :searchTerm || '%'
         OR
-        "Addresses".address ILIKE '%' || $searchTerm || '%'
+        "Addresses".address ILIKE '%' || :searchTerm || '%'
       )
       ${membershipsWhere}
     GROUP BY
@@ -107,7 +123,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         stake_balances: string[];
         last_active: string;
       }>(`${sqlWithoutPagination}`, {
-        bind,
+        replacements,
         type: QueryTypes.SELECT,
       });
       const totalResults = allCommunityProfiles.length;
