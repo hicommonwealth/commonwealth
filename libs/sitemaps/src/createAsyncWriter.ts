@@ -38,6 +38,10 @@ export function createAsyncWriterS3(): AsyncWriter {
       params,
     }).done();
 
+    if (!upload.Location) {
+      throw new Error('Failed to return upload location');
+    }
+
     return { location: upload.Location };
   }
 
