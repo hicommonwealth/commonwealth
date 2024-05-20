@@ -7,10 +7,10 @@ const associationParams = [
     model: models.Thread,
     as: 'Thread',
     include: [
-      //   {
-      //     model: models.Address,
-      //     as: 'Address',
-      //   }
+      {
+        model: models.Address,
+        as: 'Address',
+      },
       {
         model: models.Community,
         as: 'Community',
