@@ -24,6 +24,8 @@ import {
 } from './helper_components';
 import useNotificationSettings from './useNotificationSettings';
 
+import './index.scss';
+
 const emailIntervalFrequencyMap = {
   never: 'Never',
   weekly: 'Once a week',
@@ -94,7 +96,7 @@ const NotificationSettingsPage2 = () => {
 
   return (
     <CWPageLayout>
-      <div className="NotificationSettingsPage">
+      <div className="NotificationSettingsPage NotificationSettingsPage2">
         <CWText type="h3" fontWeight="semiBold" className="page-header-text">
           Notification settings
         </CWText>
@@ -105,15 +107,8 @@ const NotificationSettingsPage2 = () => {
         {(threadSubscriptions.data || [])
           .filter((current) => current.Thread)
           .map((current) => (
-            <div key={current.id}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '8px',
-                  marginTop: '8px',
-                }}
-              >
+            <div key={current.id} className="SubEntry">
+              <div className="SubHeader">
                 <div>
                   <CWCommunityAvatar
                     community={{
@@ -155,37 +150,16 @@ const NotificationSettingsPage2 = () => {
                       title: current.Thread.title,
                     })}
                   >
-                    <CWText type="h5">
+                    <CWText type="h4">
                       {decodeURIComponent(current.Thread.title)}
                     </CWText>
                   </a>
                 </CWText>
               </div>
 
-              <div style={{ marginTop: '8px' }}>
+              <div style={{ marginTop: '16px' }}>
                 <div>{current.Thread.comment_count} Comments</div>
               </div>
-            </div>
-          ))}
-
-        <h2>Debug</h2>
-
-        {(threadSubscriptions.data || [])
-          .filter((current) => current.Thread)
-          .map((current) => (
-            <div key={current.id}>
-              <div>Thread title: {current.Thread.title}</div>
-              <div>
-                Thread created at: {current.Thread.created_at.toISOString()}
-              </div>
-              <div>
-                <User
-                  userAddress={current.Thread.Address.address}
-                  userCommunityId={current.Thread.Community.id}
-                />
-              </div>
-              <div>Thread comment count at: {current.Thread.comment_count}</div>
-              <pre>{JSON.stringify(current, null, '  ')}</pre>
             </div>
           ))}
 

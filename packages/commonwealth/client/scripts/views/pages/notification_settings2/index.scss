@@ -1,0 +1,13 @@
+@import '../../../../styles/shared';
+
+.NotificationSettingsPage2 .SubEntry {
+  border-bottom: 1px solid $neutral-300;
+  margin-bottom: 16px;
+}
+
+.NotificationSettingsPage2 .SubHeader {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
