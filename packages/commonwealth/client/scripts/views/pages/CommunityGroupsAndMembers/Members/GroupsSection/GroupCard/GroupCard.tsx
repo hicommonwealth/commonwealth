@@ -48,12 +48,11 @@ const GroupCard = ({
   profiles,
 }: GroupCardProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const [currentAllowListPage, setCurrentAllowListPage] = useState(1);
+  const [currentAllowlistPage, setCurrentAllowlistPage] = useState(1);
 
-  console.log(currentAllowListPage, 'curr');
-  const paginatedAllowList = allowLists?.slice(
-    ALLOWLIST_MEMBERS_PER_PAGE * (currentAllowListPage - 1),
-    ALLOWLIST_MEMBERS_PER_PAGE * currentAllowListPage,
+  const paginatedAllowlist = allowLists?.slice(
+    ALLOWLIST_MEMBERS_PER_PAGE * (currentAllowlistPage - 1),
+    ALLOWLIST_MEMBERS_PER_PAGE * currentAllowlistPage,
   );
   return (
     <section className="GroupCard">
@@ -90,7 +89,7 @@ const GroupCard = ({
         <RequirementCard key={index} {...r} />
       ))}
 
-      {paginatedAllowList && (
+      {paginatedAllowlist && (
         <>
           <CWText type="h5">Allow List</CWText>
           <CWText type="b2">
@@ -110,7 +109,7 @@ const GroupCard = ({
                 </tr>
               </thead>
               <tbody>
-                {paginatedAllowList.map((address, index) => (
+                {paginatedAllowlist.map((address, index) => (
                   <tr key={index}>
                     <div className="table-spacing">
                       <Link
@@ -143,7 +142,7 @@ const GroupCard = ({
                     totalCount={Math.ceil(
                       allowLists.length / ALLOWLIST_MEMBERS_PER_PAGE,
                     )}
-                    onChange={(_, n) => setCurrentAllowListPage(n)}
+                    onChange={(_, n) => setCurrentAllowlistPage(n)}
                   />
                 )}
               </div>

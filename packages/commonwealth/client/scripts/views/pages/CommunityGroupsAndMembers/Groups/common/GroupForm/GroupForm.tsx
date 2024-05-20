@@ -23,7 +23,7 @@ import {
   conditionTypes,
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
-import AllowList from './Allowlist';
+import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
@@ -573,7 +573,7 @@ const GroupForm = ({
           </section>
 
           {allowlistEnabled && (
-            <AllowList
+            <Allowlist
               allowedAddresses={allowedAddresses}
               setAllowedAddresses={setAllowedAddresses}
             />

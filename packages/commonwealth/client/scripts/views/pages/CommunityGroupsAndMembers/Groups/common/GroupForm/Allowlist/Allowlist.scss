@@ -1,6 +1,6 @@
 @import '../../../../../../../../styles/shared';
 
-.AllowList {
+.Allowlist {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -21,7 +21,7 @@
     margin-top: -20px;
   }
 
-  @media screen and (max-width: $breakpoint-small-max-px) {
+  @media screen and (max-width: $breakpoint-extra-small-max-px) {
     .header-column {
       flex-direction: column;
       align-items: flex-start;

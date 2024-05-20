@@ -1,8 +1,8 @@
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { Memberships } from 'state/api/groups/refreshMembership';
-import { trpc } from 'utils/trpcClient';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import useGetMembersQuery from '../../../../state/api/members/getMembers';
 
 interface UseMemberDataProps {
   memberships?: Memberships[];
@@ -31,27 +31,22 @@ export const useMemberData = ({
     ? undefined
     : parseMembership;
 
-  const { data: members, isLoading: isLoadingMembers } =
-    trpc.community.getMembers.useQuery(
-      {
-        limit: membersPerPage,
-        order_by: tableState.orderBy,
-        order_direction: tableState.orderDirection as 'ASC' | 'DESC',
-        search: debouncedSearchTerm,
-        community_id: app.activeChainId(),
-        include_roles: true,
-        memberships: membershipsFilter,
-        include_group_ids: true,
-        cursor: page,
-        allowedAddresses: allowedAddresses.join(', '),
-        // only include stake balances if community has staking enabled
-        include_stake_balances: !!app.config.chains.getById(app.activeChainId())
-          .namespace,
-      },
-      {
-        enabled: app?.user?.activeAccount?.address ? !!memberships : true,
-      },
-    );
+  const { data: members, isLoading: isLoadingMembers } = useGetMembersQuery({
+    limit: membersPerPage,
+    order_by: tableState.orderBy,
+    order_direction: tableState.orderDirection as 'ASC' | 'DESC',
+    search: debouncedSearchTerm,
+    community_id: app.activeChainId(),
+    include_roles: true,
+    memberships: membershipsFilter,
+    include_group_ids: true,
+    cursor: page,
+    allowedAddresses: allowedAddresses.join(', '),
+    // only include stake balances if community has staking enabled
+    include_stake_balances: !!app.config.chains.getById(app.activeChainId())
+      .namespace,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+  });
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),

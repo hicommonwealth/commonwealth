@@ -17,7 +17,8 @@ import MembersSection, {
 } from '../../../../Members/MembersSection/MembersSection';
 import { BaseGroupFilter } from '../../../../Members/index.types';
 import { useMemberData } from '../../../../common/useMemberData';
-import '/views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/Allowlist/Allowlist.scss';
+import { getTotalPages } from '../../helpers/index';
+import './Allowlist.scss';
 
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
@@ -53,20 +54,7 @@ const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   },
 ];
 
-const getTotalPages = (members, allowedAddresses: string[], filter: string) => {
-  let totalPages = members?.totalPages ?? 0;
-
-  if (filter === 'allow-specified-addresses') {
-    totalPages = Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
-  } else if (filter === 'not-allow-specified-addresses') {
-    totalPages =
-      totalPages - Math.ceil(allowedAddresses.length / MEMBERS_PER_PAGE);
-  }
-
-  return totalPages;
-};
-
-type AllowListProps = {
+type AllowlistProps = {
   allowedAddresses: string[];
   setAllowedAddresses: (
     value: ((prevState: string[]) => string[]) | string[],
@@ -88,7 +76,7 @@ const MEMBERS_PER_PAGE = 10;
 const Allowlist = ({
   allowedAddresses,
   setAllowedAddresses,
-}: AllowListProps) => {
+}: AllowlistProps) => {
   useUserActiveAccount();
 
   const [searchFilters, setSearchFilters] = useState({
@@ -180,10 +168,8 @@ const Allowlist = ({
     };
   };
 
-  console.log(currentPage);
-
   return (
-    <section className="AllowList">
+    <section className="Allowlist">
       <div className="header-row">
         <CWText type="h4" fontWeight="semiBold">
           Allow List
@@ -259,6 +245,7 @@ const Allowlist = ({
                 members,
                 allowedAddresses,
                 searchFilters.groupFilter,
+                MEMBERS_PER_PAGE,
               )}
               onChange={handlePageChange}
             />

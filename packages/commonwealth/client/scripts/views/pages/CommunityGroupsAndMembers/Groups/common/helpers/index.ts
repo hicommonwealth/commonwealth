@@ -97,3 +97,21 @@ export const makeGroupDataBaseAPIPayload = (
 
   return payload;
 };
+
+export const getTotalPages = (
+  members,
+  allowedAddresses: string[],
+  filter: string,
+  membersPerPage: number,
+) => {
+  let totalPages = members?.totalPages ?? 0;
+
+  if (filter === 'allow-specified-addresses') {
+    totalPages = Math.ceil(allowedAddresses.length / membersPerPage);
+  } else if (filter === 'not-allow-specified-addresses') {
+    totalPages =
+      totalPages - Math.ceil(allowedAddresses.length / membersPerPage);
+  }
+
+  return totalPages;
+};

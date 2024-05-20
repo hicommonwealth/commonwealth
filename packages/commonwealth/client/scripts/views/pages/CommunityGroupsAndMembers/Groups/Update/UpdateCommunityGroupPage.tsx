@@ -35,21 +35,21 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     (group) => group.id === parseInt(`${groupId}`),
   );
 
-  const initialAllowList = useMemo(() => {
+  const initialAllowlist = useMemo(() => {
     return foundGroup?.requirements
       .filter((r) => r?.rule === 'allow') // Filter only the allowlist rules
       .flatMap((r) => r?.data?.allow || []); // Flatten and aggregate all addresses
   }, [foundGroup]);
 
   const [allowedAddresses, setAllowedAddresses] = useState<string[]>(
-    initialAllowList ?? [],
+    initialAllowlist ?? [],
   );
 
   useEffect(() => {
-    if (initialAllowList) {
-      setAllowedAddresses(initialAllowList);
+    if (initialAllowlist) {
+      setAllowedAddresses(initialAllowlist);
     }
-  }, [initialAllowList]);
+  }, [initialAllowlist]);
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
