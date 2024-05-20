@@ -27,8 +27,8 @@ export const Thread = z.object({
   canvas_session: z.string(),
   canvas_hash: z.string(),
 
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
   last_edited: z.date().optional(),
   deleted_at: z.date().optional(),
   last_commented_on: z.date().optional(),

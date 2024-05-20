@@ -42,8 +42,8 @@ export const ThreadSubscription = z.object({
   id: PG_INT.optional(),
   user_id: PG_INT,
   thread_id: PG_INT,
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
   Thread: Thread.pick({
     id: true,
     community_id: true,

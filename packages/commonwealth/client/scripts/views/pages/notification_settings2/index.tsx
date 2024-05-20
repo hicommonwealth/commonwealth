@@ -1,8 +1,9 @@
+import { GetThreadSubscriptions } from '@hicommonwealth/schemas';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -28,9 +29,25 @@ const emailIntervalFrequencyMap = {
   monthly: 'Once a month',
 };
 
+function useThreadSubscriptions() {
+  const threadSubscriptions = trpc.subscription.getThreadSubscriptions.useQuery(
+    {},
+  );
+
+  return useMemo(() => {
+    return {
+      ...threadSubscriptions,
+      data: threadSubscriptions.data
+        ? GetThreadSubscriptions.output.parse(threadSubscriptions.data)
+        : threadSubscriptions.data,
+    };
+  }, [threadSubscriptions]);
+}
+
 const NotificationSettingsPage2 = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const threadSubscriptions = useThreadSubscriptions();
 
   const {
     email,
@@ -67,17 +84,10 @@ const NotificationSettingsPage2 = () => {
   //
   // app.
 
-  const threadSubscriptions = trpc.subscription.getThreadSubscriptions.useQuery(
-    {},
-  );
-
   console.log(
     'FIXME: threadSubscriptions: ',
     JSON.stringify(threadSubscriptions, null, '  '),
   );
-
-  const discussionSubscriptions =
-    app?.user.notifications.discussionSubscriptions || [];
 
   return (
     <CWPageLayout>
@@ -89,12 +99,15 @@ const NotificationSettingsPage2 = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {discussionSubscriptions
+        {(threadSubscriptions.data || [])
           .filter((current) => current.Thread)
-          .filter((current) => current.categoryId == 'new-comment-creation')
           .map((current) => (
             <div key={current.id}>
-              <div>{current.Thread.title}</div>
+              <div>Thread title: {current.Thread.title}</div>
+              <div>
+                Thread created at: {current.Thread.created_at.toISOString()}
+              </div>
+              <div>Thread comment count at: {current.Thread.comment_count}</div>
               <pre>{JSON.stringify(current, null, '  ')}</pre>
             </div>
           ))}
