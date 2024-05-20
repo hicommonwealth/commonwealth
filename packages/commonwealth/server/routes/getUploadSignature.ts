@@ -1,13 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
-import AWS from 'aws-sdk';
+
+import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-
-AWS.config.update({
-  signatureVersion: 'v4',
-});
 
 export const Errors = {
   NotLoggedIn: 'Must be signed in',
@@ -38,21 +36,21 @@ const getUploadSignature = async (
     return next(new AppError(Errors.ImageType));
   }
 
-  const s3 = new AWS.S3();
+  const s3 = new S3();
   const params = {
     Bucket: 'assets.commonwealth.im',
     Key: `${filename}`,
-    Expires: 3600,
     ContentType: contentType,
   };
 
-  s3.getSignedUrl('putObject', params, (err, url) => {
-    if (err) {
-      res.json({ status: 'Failure', result: err });
-    } else {
-      res.json({ status: 'Success', result: url });
-    }
-  });
+  try {
+    const url = await getSignedUrl(s3, new PutObjectCommand(params), {
+      expiresIn: 3600,
+    });
+    res.json({ status: 'Success', result: url });
+  } catch (err) {
+    res.json({ status: 'Failure', result: err });
+  }
 };
 
 export default getUploadSignature;
