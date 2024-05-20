@@ -59,4 +59,10 @@ export const Outbox = z.union([
       event_payload: events.ChainEventCreated,
     })
     .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.UserMentioned),
+      event_payload: events.UserMentioned,
+    })
+    .merge(BaseOutboxProperties),
 ]);

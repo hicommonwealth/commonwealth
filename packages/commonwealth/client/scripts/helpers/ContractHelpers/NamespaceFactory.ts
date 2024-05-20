@@ -189,7 +189,7 @@ class NamespaceFactory extends ContractBase {
             maxFeePerGas: null,
           });
       } else {
-        txReceipt = await this.contract
+        txReceipt = await this.contract.methods
           .newSingleContest(
             namespaceName,
             contestInterval,

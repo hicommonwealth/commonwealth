@@ -91,6 +91,12 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 
 Points may always be increased mid-implementation, but a justification must be provided. Moreover, the original point estimation _must_ be left as a tag, rather than deleted.
 
+#### Tags
+
+The tag syntax `Sn` (e.g. `S1`, `S2`) refers to the sprint cycle `n` the work is scoped to. If a ticket rolls over to the next sprint cycle, we add that next cycle's tag without removing the prior cycle tag. (Similar to our handling of point estimations.)
+
+Documentation work (both tickets and pull requests) must receive a `documentation` tag.
+
 ### Branches
 
 Branches should be prefixed with an issue number, then the contributor's name, followed by a short descriptive tag e.g. `5007.john-doe.update-sidebar-layout`.

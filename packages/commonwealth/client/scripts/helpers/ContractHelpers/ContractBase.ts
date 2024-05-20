@@ -24,7 +24,7 @@ abstract class ContractBase {
     withWallet: boolean = false,
     chainId?: string,
   ): Promise<void> {
-    if (!this.initialized) {
+    if (!this.initialized || withWallet) {
       try {
         let provider = this.rpc;
         if (withWallet) {
