@@ -5,6 +5,8 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { useFlag } from '../../../../../hooks/useFlag';
+import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
 import { chainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
@@ -21,11 +23,13 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
+  const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 
   return (
     <section className="GroupsSection">
-      {hasNoGroups && (
+      {hasNoGroups && allowlistEnabled && <TopicGatingHelpMessage />}
+      {hasNoGroups && !allowlistEnabled && (
         <div className="empty-groups-container">
           <CWIcon iconName="members" iconSize="xxl" className="members-icon" />
           <CWText type="h4" className="header">
@@ -70,8 +74,8 @@ const GroupsSection = ({
                     )
                     ?.label?.split('-')
                     ?.join(' ') || '',
-                requirementContractAddress: r.data.source.contract_address,
-                requirementTokenId: r.data.source.token_id,
+                requirementContractAddress: r?.data?.source?.contract_address,
+                requirementTokenId: r?.data?.source?.token_id,
                 requirementAmount: `${convertRequirementAmountFromWeiToTokens(
                   r?.data?.source?.source_type,
                   r.data.threshold,

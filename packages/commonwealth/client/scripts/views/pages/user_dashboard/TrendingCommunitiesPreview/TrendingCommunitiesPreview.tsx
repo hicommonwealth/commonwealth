@@ -10,6 +10,15 @@ export const TrendingCommunitiesPreview = () => {
 
   const sortedCommunities = app.config.chains
     .getAll()
+    .filter((community) => {
+      const name = community.name.toLowerCase();
+      //this filter is meant to not include any de facto communities that are actually xss attempts.
+      //It's a way of keeping the front facing parts of the app clean looking for users
+      return (
+        !['"', '>', '<', "'", '/', '`'].includes(name[0]) &&
+        !['"', '>', '<', "'", '/', '`'].includes(name[1])
+      );
+    })
     .sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
       const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);

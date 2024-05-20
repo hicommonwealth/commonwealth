@@ -1,23 +1,18 @@
-import { useQuery } from '@tanstack/react-query';
 import { useCommunityStake } from 'views/components/CommunityStake';
 
-import mockedContests from './mockedContests';
+import app from 'state';
+import { trpc } from 'utils/trpcClient';
 
 const useCommunityContests = () => {
   const { stakeEnabled } = useCommunityStake();
 
-  const { data: contestsData, isLoading: isContestDataLoading } = useQuery<
-    typeof mockedContests
-  >({
-    queryKey: ['contests'],
-    queryFn: () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(mockedContests);
-        }, 2000);
-      });
-    },
-  });
+  const { data: contestsData, isLoading: isContestDataLoading } =
+    trpc.contest.getAllContests.useQuery(
+      {
+        community_id: app.activeChainId(),
+      },
+      { enabled: !!app.activeChainId() },
+    );
 
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;
 

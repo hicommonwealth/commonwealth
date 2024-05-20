@@ -10,6 +10,9 @@ import { initAppState } from 'state';
 
 import { OpenFeature } from '@openfeature/web-sdk';
 import axios from 'axios';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
+import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
+import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
 import moment from 'moment';
 import app from 'state';
@@ -233,6 +236,7 @@ export function updateActiveUser(data) {
     app.user.setEmail(null);
     app.user.setEmailInterval(null);
     app.user.setEmailVerified(null);
+    app.user.setPromotionalEmailsEnabled(null);
     app.user.setKnockJWT(null);
     app.user.setJWT(null);
 
@@ -248,6 +252,7 @@ export function updateActiveUser(data) {
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
+    app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
     app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 
@@ -356,13 +361,17 @@ export async function startLoginWithMagicLink({
   const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
+    const authModalState = authModal.getState();
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({
+    const { address, isAddressNew } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
+      returnEarlyIfNewAddress:
+        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
     });
-    return { bearer, address };
+
+    return { bearer, address, isAddressNew };
   } else {
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
@@ -416,11 +425,13 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
+  returnEarlyIfNewAddress = false,
 }: {
   bearer?: string;
   chain?: string;
   walletSsoSource?: string;
-}): Promise<string> {
+  returnEarlyIfNewAddress?: boolean;
+}): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
@@ -456,6 +467,25 @@ export async function handleSocialLoginCallback({
       const { utils } = await import('ethers');
       magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
     }
+  }
+
+  // check if this address exists in db
+  const profileAddresses = await fetchProfilesByAddress({
+    currentChainId: '',
+    profileAddresses: [magicAddress],
+    profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
+    initiateProfilesAfterFetch: false,
+  });
+
+  const isAddressNew = profileAddresses?.length === 0;
+  const isAttemptingToConnectAddressToCommunity =
+    app.isLoggedIn() && app.activeChainId();
+  if (
+    isAddressNew &&
+    !isAttemptingToConnectAddressToCommunity &&
+    returnEarlyIfNewAddress
+  ) {
+    return { address: magicAddress, isAddressNew };
   }
 
   let authedSessionPayload, authedSignature;
@@ -575,19 +605,25 @@ export async function handleSocialLoginCallback({
         await app.user.updateEmail(ssoEmail, false);
       }
 
+      const userUniqueAddresses = getUniqueUserAddresses({});
+
       // if account is created in last few minutes and has a single
-      // profile (no account linking) then open the welcome modal.
+      // profile and address (no account linking) then open the welcome modal.
       const isCreatedInLast5Minutes =
         accountCreatedTime &&
         moment().diff(moment(accountCreatedTime), 'minutes') < 5;
-      if (isCreatedInLast5Minutes && profiles?.length === 1) {
+      if (
+        isCreatedInLast5Minutes &&
+        profiles?.length === 1 &&
+        userUniqueAddresses.length === 1
+      ) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
         }, 1000);
       }
     }
 
-    return magicAddress;
+    return { address: magicAddress, isAddressNew };
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

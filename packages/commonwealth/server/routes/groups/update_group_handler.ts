@@ -33,7 +33,7 @@ export const updateGroupHandler = async (
           required_requirements: z.number().optional(),
         })
         .optional(),
-      requirements: z.array(z.any()).optional(), // validated in controller
+      requirements: z.array(z.any()).min(1), // validated in controller
       topics: z.array(z.number()).optional(),
       allowList: z.array(z.number()).default([]),
     }),

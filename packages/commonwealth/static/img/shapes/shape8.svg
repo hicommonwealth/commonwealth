@@ -1,0 +1,8 @@
+<svg width="33" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g style="mix-blend-mode:multiply">
+<rect x="0.75" y="12" width="32" height="8" fill="#F2D430"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<rect x="12.75" y="32" width="32" height="8" transform="rotate(-90 12.75 32)" fill="#0079CC"/>
+</g>
+</svg>
