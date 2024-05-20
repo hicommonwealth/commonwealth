@@ -99,16 +99,10 @@ export async function processChainNode(
 
       const contestEvents = events
         .map((event) => {
-          const timestamp = new Date(); // TODO: get block timestamp
           const contractAddress = ethers.utils.getAddress(event.rawLog.address);
 
           const parseEvent = (e: keyof typeof ChainEventSigs) =>
-            parseEvmEventToContestEvent(
-              e,
-              contractAddress,
-              timestamp,
-              event.parsedArgs,
-            );
+            parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
 
           switch (event.eventSource.eventSignature) {
             case EvmContestEventSignatures.NewContest:

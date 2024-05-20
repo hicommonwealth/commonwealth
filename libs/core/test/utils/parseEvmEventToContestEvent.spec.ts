@@ -18,7 +18,6 @@ describe('parseEvmEventToContestEvent', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewContest',
       null,
-      timestamp,
       [
         '0x1', // contest
         '0x2', // namespace
@@ -29,7 +28,6 @@ describe('parseEvmEventToContestEvent', () => {
     expect(event_name).to.eq(EventNames.RecurringContestManagerDeployed);
     const parsedEvent = RecurringContestManagerDeployed.parse(event_payload);
     console.debug(parsedEvent);
-    expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq('0x1');
     expect(parsedEvent.namespace).to.eq('0x2');
     expect(parsedEvent.interval).to.eq(7); // prop of RecurringContestManagerDeployed
@@ -39,7 +37,6 @@ describe('parseEvmEventToContestEvent', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewContest',
       null,
-      timestamp,
       [
         '0x1', // contest
         '0x2', // namespace
@@ -50,7 +47,6 @@ describe('parseEvmEventToContestEvent', () => {
     expect(event_name).to.eq(EventNames.OneOffContestManagerDeployed);
     const parsedEvent = OneOffContestManagerDeployed.parse(event_payload);
     console.debug(parsedEvent);
-    expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq('0x1');
     expect(parsedEvent.namespace).to.eq('0x2');
     expect(parsedEvent.length).to.eq(7);
@@ -60,7 +56,6 @@ describe('parseEvmEventToContestEvent', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewRecurringContestStarted',
       contestAddress,
-      timestamp,
       [
         ethers.BigNumber.from(8), // contestId
         ethers.BigNumber.from(1000), // startTime
@@ -70,7 +65,6 @@ describe('parseEvmEventToContestEvent', () => {
     expect(event_name).to.eq(EventNames.ContestStarted);
     const parsedEvent = ContestStarted.parse(event_payload);
     console.debug(parsedEvent);
-    expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq(contestAddress);
     expect(parsedEvent.contest_id).to.eq(8);
     expect(parsedEvent.start_time.getTime()).to.eq(
@@ -85,7 +79,6 @@ describe('parseEvmEventToContestEvent', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewSingleContestStarted',
       contestAddress,
-      timestamp,
       [
         ethers.BigNumber.from(2000), // startTime
         ethers.BigNumber.from(2001), // endTime
@@ -94,7 +87,6 @@ describe('parseEvmEventToContestEvent', () => {
     expect(event_name).to.eq(EventNames.ContestStarted);
     const parsedEvent = ContestStarted.parse(event_payload);
     console.debug(parsedEvent);
-    expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq(contestAddress);
     expect(parsedEvent.contest_id).to.eq(0); // single == 0
     expect(parsedEvent.start_time.getTime()).to.eq(
@@ -109,7 +101,6 @@ describe('parseEvmEventToContestEvent', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'ContentAdded',
       contestAddress,
-      timestamp,
       [
         ethers.BigNumber.from(9), // contentId
         '0x1', // creator
@@ -119,7 +110,6 @@ describe('parseEvmEventToContestEvent', () => {
     expect(event_name).to.eq(EventNames.ContestContentAdded);
     const parsedEvent = ContestContentAdded.parse(event_payload);
     console.debug(parsedEvent);
-    expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq(contestAddress);
     expect(parsedEvent.content_id).to.eq(9);
     expect(parsedEvent.creator_address).to.eq('0x1');
@@ -130,7 +120,6 @@ describe('parseEvmEventToContestEvent', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'VoterVoted',
       contestAddress,
-      timestamp,
       [
         '0x2', // voterAddress
         ethers.BigNumber.from(10), // contentId
@@ -140,7 +129,6 @@ describe('parseEvmEventToContestEvent', () => {
     expect(event_name).to.eq(EventNames.ContestContentUpvoted);
     const parsedEvent = ContestContentUpvoted.parse(event_payload);
     console.debug(parsedEvent);
-    expect(parsedEvent.created_at.getTime()).to.eq(timestamp.getTime());
     expect(parsedEvent.contest_address).to.eq(contestAddress);
     expect(parsedEvent.contest_id).to.eq(0); // TODO: this should come from contract
     expect(parsedEvent.content_id).to.eq(10);
@@ -151,7 +139,7 @@ describe('parseEvmEventToContestEvent', () => {
   it('should throw if the wrong number of args are used outbox shape', () => {
     expect(() => {
       // VoterVoted event requires 3 args
-      parseEvmEventToContestEvent('VoterVoted', contestAddress, timestamp, [
+      parseEvmEventToContestEvent('VoterVoted', contestAddress, [
         '0x2', // voterAddress
       ]);
     }).to.throw('evm parsed args does not match signature');

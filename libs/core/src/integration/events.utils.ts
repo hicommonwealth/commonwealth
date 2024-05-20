@@ -39,7 +39,6 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
   condition?: (evmInput: ParseSignature<Input>) => boolean;
   mapEvmToSchema: (
     contestAddress: string | null,
-    timestamp: Date,
     evmInput: ParseSignature<Input>,
   ) => {
     event_name: EventNames;
@@ -68,12 +67,10 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
   condition: (evmInput) => !evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
-    timestamp,
     { contest, namespace, interval, oneOff: _ },
   ) => ({
     event_name: EventNames.RecurringContestManagerDeployed,
     event_payload: {
-      created_at: timestamp,
       contest_address: contest,
       namespace: namespace,
       interval: ethers.BigNumber.from(interval).toNumber(),
@@ -90,12 +87,10 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   condition: (evmInput) => evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
-    timestamp,
     { contest, namespace, interval, oneOff: _ },
   ) => ({
     event_name: EventNames.OneOffContestManagerDeployed,
     event_payload: {
-      created_at: timestamp,
       contest_address: contest,
       namespace: namespace,
       length: ethers.BigNumber.from(interval).toNumber(),
@@ -109,14 +104,9 @@ const NewRecurringContestStartedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.NewRecurringContestStarted,
   output: ContestStarted,
-  mapEvmToSchema: (
-    contestAddress,
-    timestamp,
-    { contestId, startTime, endTime },
-  ) => ({
+  mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
-      created_at: timestamp,
       contest_address: contestAddress!,
       contest_id: ethers.BigNumber.from(contestId).toNumber(),
       start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
@@ -131,10 +121,9 @@ const NewSingleContestStartedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.NewSingleContestStarted,
   output: ContestStarted,
-  mapEvmToSchema: (contestAddress, timestamp, { startTime, endTime }) => ({
+  mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
-      created_at: timestamp,
       contest_address: contestAddress!,
       contest_id: 0,
       start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
@@ -149,10 +138,9 @@ const NewContestContentAddedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.ContentAdded,
   output: ContestContentAdded,
-  mapEvmToSchema: (contestAddress, timestamp, evmInput) => ({
+  mapEvmToSchema: (contestAddress, evmInput) => ({
     event_name: EventNames.ContestContentAdded,
     event_payload: {
-      created_at: timestamp,
       contest_address: contestAddress!,
       content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
       creator_address: evmInput.creator,
@@ -167,10 +155,9 @@ const ContestContentUpvotedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.VoterVoted,
   output: ContestContentUpvoted,
-  mapEvmToSchema: (contestAddress, timestamp, evmInput) => ({
+  mapEvmToSchema: (contestAddress, evmInput) => ({
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
-      created_at: timestamp,
       contest_address: contestAddress!,
       contest_id: 0, // TODO: oneOff == 0, recurring == ID – Contract must be updated
       content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
@@ -238,7 +225,6 @@ export const parseEvmEventToContestEvent = <
 >(
   chainEventName: Event,
   contestAddress: string | null,
-  timestamp: Date,
   evmParsedArgs: ethers.utils.Result,
 ): ContestOutboxEvent<Event> => {
   const m = EvmMappers[chainEventName];
@@ -249,7 +235,7 @@ export const parseEvmEventToContestEvent = <
   for (const mapper of mappers) {
     const evmInput = parseEthersResult(mapper.signature, evmParsedArgs);
     if (!mapper.condition || mapper.condition(evmInput)) {
-      return mapper.mapEvmToSchema(contestAddress, timestamp, evmInput);
+      return mapper.mapEvmToSchema(contestAddress, evmInput);
     }
   }
   throw new Error(`No valid mapper found for event: ${chainEventName}`);
