@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 
+import { commonProtocol } from '@hicommonwealth/shared';
+import app from 'state';
+import {
+  useCreateContestMutation,
+  useDeployRecurringContestOnchainMutation,
+  useDeploySingleContestOnchainMutation,
+} from 'state/api/contests';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -10,60 +17,127 @@ import {
   ActionStepsProps,
 } from 'views/pages/CreateCommunity/components/ActionSteps/types';
 
-import { LaunchContestStep } from '../../types';
+import {
+  ContestFeeType,
+  ContestFormData,
+  ContestRecurringType,
+  LaunchContestStep,
+} from '../../types';
 
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
-  isDirectDepositSelected: boolean;
+  contestFormData: ContestFormData;
+  onSetCreatedContestAddress: (address: string) => void;
 }
+
+const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
-  isDirectDepositSelected,
+  contestFormData,
+  onSetCreatedContestAddress,
 }: SignTransactionsStepProps) => {
-  // TODO all the logic here is temporary, it will be moved to react-query
-  // when hooking up with the backend/protocol layer
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
     errorText: '',
   });
 
-  const [launchContestAndRerouteFeesData, setLaunchContestAndRerouteFeesData] =
-    useState({
-      state: 'not-started' as ActionStepProps['state'],
-      errorText: '',
-    });
+  const { mutateAsync: deploySingleContestOnchainMutation } =
+    useDeploySingleContestOnchainMutation();
+  const { mutateAsync: deployRecurringContestOnchainMutation } =
+    useDeployRecurringContestOnchainMutation();
+  const { mutateAsync: createContestMutation } = useCreateContestMutation();
 
-  const handleLaunchContest = () => {
-    setLaunchContestData((prevState) => ({
-      ...prevState,
-      state: 'loading',
-    }));
+  const isContestRecurring =
+    contestFormData.contestRecurring === ContestRecurringType.Yes;
+  const isDirectDepositSelected =
+    contestFormData.feeType === ContestFeeType.DirectDeposit;
 
-    setTimeout(() => {
+  const signTransaction = async () => {
+    const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+    const chainRpc = app?.chain?.meta?.ChainNode?.url;
+    const namespaceName = app?.chain?.meta?.namespace;
+    const contestLength = SEVEN_DAYS_IN_SECONDS;
+    const stakeId = app?.chain?.meta?.CommunityStakes?.[0]?.stakeId;
+    const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
+    const feeShare = commonProtocol.CONTEST_FEE_SHARE;
+    const weight = Number(app?.chain?.meta?.CommunityStakes?.[0]?.voteWeight);
+    const contestInterval = SEVEN_DAYS_IN_SECONDS;
+    const prizeShare = contestFormData?.prizePercentage;
+    const walletAddress = app.user.activeAccount?.address;
+    const exchangeToken = isDirectDepositSelected
+      ? contestFormData?.fundingTokenAddress
+      : app?.chain?.meta?.CommunityStakes?.[0]?.stakeToken;
+    const winnerShares = contestFormData?.payoutStructure;
+
+    const single = {
+      ethChainId,
+      chainRpc,
+      namespaceName,
+      contestLength,
+      winnerShares,
+      stakeId,
+      voterShare,
+      weight,
+      walletAddress,
+      exchangeToken,
+    };
+
+    const recurring = {
+      ethChainId,
+      chainRpc,
+      namespaceName,
+      contestInterval,
+      winnerShares,
+      stakeId,
+      prizeShare,
+      voterShare,
+      feeShare,
+      weight,
+      walletAddress,
+    };
+
+    let contestAddress: string;
+
+    try {
       setLaunchContestData((prevState) => ({
         ...prevState,
-        state: 'completed',
+        state: 'loading',
       }));
+
+      isContestRecurring
+        ? (contestAddress = await deployRecurringContestOnchainMutation(
+            recurring,
+          ))
+        : (contestAddress = await deploySingleContestOnchainMutation(single));
+
+      await createContestMutation({
+        contest_address: contestAddress,
+        name: contestFormData?.contestName,
+        id: app.activeChainId(),
+        image_url: contestFormData?.contestImage,
+        funding_token_address: exchangeToken,
+        prize_percentage: isContestRecurring
+          ? contestFormData?.prizePercentage
+          : 0,
+        payout_structure: contestFormData?.payoutStructure,
+        interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
+        topic_ids: contestFormData?.toggledTopicList.map((topic) => topic.id),
+      });
+
       onSetLaunchContestStep('ContestLive');
-    }, 2000);
-  };
-
-  const handleLaunchContestAndRerouteFees = () => {
-    setLaunchContestAndRerouteFeesData((prevState) => ({
-      ...prevState,
-      state: 'loading',
-    }));
-
-    setTimeout(() => {
-      setLaunchContestAndRerouteFeesData((prevState) => ({
+      onSetCreatedContestAddress(contestAddress);
+    } catch (error) {
+      console.log('error', error);
+      setLaunchContestData((prevState) => ({
         ...prevState,
-        state: 'completed',
+        state: 'not-started',
+        errorText:
+          'There was an issue launching the contest. Please try again.',
       }));
-      onSetLaunchContestStep('ContestLive');
-    }, 2000);
+    }
   };
 
   const handleBack = () => {
@@ -71,44 +145,26 @@ const SignTransactionsStep = ({
   };
 
   const getActionSteps = (): ActionStepsProps['steps'] => {
-    return isDirectDepositSelected
-      ? [
-          {
-            label: 'Launch contest',
-            state: launchContestData.state,
-            errorText: launchContestData.errorText,
-            actionButton: {
-              label:
-                launchContestData.state === 'completed' ? 'Signed' : 'Sign',
-              disabled:
-                launchContestData.state === 'loading' ||
-                launchContestData.state === 'completed',
-              onClick: handleLaunchContest,
-            },
-          },
-        ]
-      : [
-          {
-            label: 'Launch contest & re-route fees',
-            state: launchContestAndRerouteFeesData.state,
-            errorText: launchContestAndRerouteFeesData.errorText,
-            actionButton: {
-              label:
-                launchContestAndRerouteFeesData.state === 'completed'
-                  ? 'Signed'
-                  : 'Sign',
-              disabled:
-                launchContestAndRerouteFeesData.state === 'loading' ||
-                launchContestAndRerouteFeesData.state === 'completed',
-              onClick: handleLaunchContestAndRerouteFees,
-            },
-          },
-        ];
+    return [
+      {
+        label: isDirectDepositSelected
+          ? 'Launch contest'
+          : 'Launch contest & re-route fees',
+        state: launchContestData.state,
+        errorText: launchContestData.errorText,
+        actionButton: {
+          label: launchContestData.state === 'completed' ? 'Signed' : 'Sign',
+          disabled:
+            launchContestData.state === 'loading' ||
+            launchContestData.state === 'completed',
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onClick: signTransaction,
+        },
+      },
+    ];
   };
 
-  const cancelDisabled =
-    launchContestData.state === 'loading' ||
-    launchContestAndRerouteFeesData.state === 'loading';
+  const cancelDisabled = launchContestData.state === 'loading';
 
   return (
     <CWPageLayout>

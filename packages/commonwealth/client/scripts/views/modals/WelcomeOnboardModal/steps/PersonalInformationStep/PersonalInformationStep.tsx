@@ -8,6 +8,7 @@ import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import {
+  useFetchSelfProfileQuery,
   useSearchProfilesQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
@@ -40,6 +41,11 @@ const PersonalInformationStep = ({
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
+
+  const { refetch: refetchProfileData } = useFetchSelfProfileQuery({
+    apiCallEnabled: true,
+    updateAddressesOnSuccess: true,
+  });
 
   useNecessaryEffect(() => {
     // if user authenticated with SSO, by default we show username granted by the SSO service
@@ -126,6 +132,9 @@ const PersonalInformationStep = ({
     await toggleAllInAppNotifications(values.enableAccountNotifications);
     // enable/disable promotional emails flag for user
     await app.user.writeEmailSettings('', values.enableProductUpdates);
+
+    // refetch profile data
+    await refetchProfileData().catch(console.error);
 
     onComplete();
   };

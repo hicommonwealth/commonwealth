@@ -44,6 +44,10 @@ type EmitEventValues =
       event_payload: z.infer<typeof events.SnapshotProposalCreated>;
     }
   | {
+      event_name: EventNames.UserMentioned;
+      event_payload: z.infer<typeof events.UserMentioned>;
+    }
+  | {
       event_name: EventNames.RecurringContestManagerDeployed;
       event_payload: z.infer<typeof events.RecurringContestManagerDeployed>;
     }
@@ -66,6 +70,10 @@ type EmitEventValues =
   | {
       event_name: EventNames.ContestWinnersRecorded;
       event_payload: z.infer<typeof events.ContestWinnersRecorded>;
+    }
+  | {
+      event_name: EventNames.ThreadUpvoted;
+      event_payload: z.infer<typeof events.ThreadUpvoted>;
     };
 
 // Load with env var?

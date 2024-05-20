@@ -74,8 +74,8 @@ const GroupsSection = ({
                     )
                     ?.label?.split('-')
                     ?.join(' ') || '',
-                requirementContractAddress: r.data.source.contract_address,
-                requirementTokenId: r.data.source.token_id,
+                requirementContractAddress: r?.data?.source?.contract_address,
+                requirementTokenId: r?.data?.source?.token_id,
                 requirementAmount: `${convertRequirementAmountFromWeiToTokens(
                   r?.data?.source?.source_type,
                   r.data.threshold,

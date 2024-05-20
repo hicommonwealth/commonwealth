@@ -1,19 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { useCommonNavigate } from 'navigation/helpers';
-import { PageLoading } from 'views/pages/loading';
-import ErrorPage from 'views/pages/error';
 import { handleSocialLoginCallback } from 'controllers/app/login';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { authModal } from 'state/ui/modals/authModal';
+import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
 
-const validate = async (setRoute) => {
+const validate = async (setRoute: (route: string) => void) => {
   const params = new URLSearchParams(window.location.search);
   const chain = params.get('chain');
   const walletSsoSource = params.get('sso');
   let redirectTo = params.get('redirectTo');
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
+  const authModalState = authModal.getState();
+
   try {
-    await handleSocialLoginCallback({ chain, walletSsoSource });
+    const isAttemptingToConnectAddressToCommunity =
+      app.isLoggedIn() && app.activeChainId();
+    const { isAddressNew } = await handleSocialLoginCallback({
+      chain,
+      walletSsoSource,
+      returnEarlyIfNewAddress:
+        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
+    });
     await initAppState();
 
     if (redirectTo) {
@@ -22,6 +32,15 @@ const validate = async (setRoute) => {
       setRoute(`/${chain}`);
     } else {
       setRoute('/');
+    }
+
+    // if SSO account address is not already present in db,
+    // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
+    // and the user isn't trying to link address to community,
+    // then open the user auth type guidance modal
+    // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
+    if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
+      authModalState.validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
     }
   } catch (error) {
     return `Error: ${error.message}`;
