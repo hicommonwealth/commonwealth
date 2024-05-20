@@ -210,13 +210,9 @@ export const createFk = (
  * Drops composite FK constraints (not supported by sequelize)
  */
 export const dropFk = (sequelize: Sequelize, { source, name }: FkMap) =>
-  sequelize?.query(`
-      DO $$
-      BEGIN
-        IF EXISTS(SELECT 1 FROM pg_constraint WHERE conname = '${name}') THEN
-          ALTER TABLE "${source}" DROP CONSTRAINT "${name}";
-        END IF;
-      END $$;`);
+  sequelize?.query(
+    `ALTER TABLE "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
+  );
 
 /**
  * Model sync hooks that can be used to inspect sequelize generated scripts
