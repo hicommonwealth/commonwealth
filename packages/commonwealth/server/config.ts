@@ -17,6 +17,7 @@ const {
   NO_GLOBAL_ACTIVITY_CACHE,
   LOGIN_RATE_LIMIT_TRIES,
   LOGIN_RATE_LIMIT_MINS,
+  SLACK_FEEDBACK_WEBHOOK,
 } = process.env;
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
@@ -34,6 +35,7 @@ export const config = configure(
     // increased because of chain waitlist registrations
     LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
     LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
+    SLACK_FEEDBACK_WEBHOOK,
     AUTH: {
       SESSION_SECRET: SESSION_SECRET || 'my secret',
       JWT_SECRET: JWT_SECRET || 'my secret',
@@ -56,6 +58,7 @@ export const config = configure(
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     LOGIN_RATE_LIMIT_TRIES: z.number().int(),
     LOGIN_RATE_LIMIT_MINS: z.number().int(),
+    SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
     AUTH: z.object({
       SESSION_SECRET: z.string(),
       JWT_SECRET: z.string(),
@@ -71,8 +74,6 @@ export const config = configure(
 );
 
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
-
-export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 

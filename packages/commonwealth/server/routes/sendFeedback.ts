@@ -3,7 +3,7 @@ import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';
 import { fileURLToPath } from 'url';
-import { SLACK_FEEDBACK_WEBHOOK } from '../config';
+import { config } from '../config';
 
 export const Errors = {
   NotSent: 'Please enter the feedback message.',
@@ -23,7 +23,7 @@ const sendFeedback = async (
     return next(new AppError(Errors.NotSent));
   }
 
-  if (!SLACK_FEEDBACK_WEBHOOK) {
+  if (!config.SLACK_FEEDBACK_WEBHOOK) {
     log.error('No slack webhook found');
     return next(new ServerError(Errors.SlackWebhookError));
   }
@@ -40,7 +40,7 @@ const sendFeedback = async (
     text: `${userText} @ ${urlText}:\n${req.body.text}`,
   });
   request
-    .post(SLACK_FEEDBACK_WEBHOOK)
+    .post(config.SLACK_FEEDBACK_WEBHOOK)
     .send(data)
     .end((err) => {
       if (err) {

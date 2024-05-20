@@ -23,6 +23,7 @@ export const configure = <T, E extends Record<string, unknown>>(
 
 const {
   NODE_ENV,
+  IS_CI,
   SERVER_URL,
   PORT: _PORT,
   ROLLBAR_SERVER_TOKEN: _ROLLBAR_SERVER_TOKEN,
@@ -36,6 +37,7 @@ export const config = configure(
   {},
   {
     NODE_ENV: (NODE_ENV || 'development') as Environment,
+    IS_CI: IS_CI === 'true',
     SERVER_URL:
       SERVER_URL ?? NODE_ENV === 'production'
         ? 'https://commonwealth.im'
@@ -49,6 +51,7 @@ export const config = configure(
   },
   z.object({
     NODE_ENV: z.enum(Environments),
+    IS_CI: z.boolean(),
     SERVER_URL: z.string(),
     PORT: z.number().int().min(1000).max(65535),
     LOGGING: z.object({

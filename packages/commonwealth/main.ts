@@ -32,8 +32,6 @@ import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
-const DEV = process.env.NODE_ENV !== 'production';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -202,7 +200,7 @@ export async function main(
   setupIpfsProxy(app, cacheDecorator);
 
   if (withFrontendBuild) {
-    if (DEV) {
+    if (config.NODE_ENV !== 'production') {
       // lazy import because we want to keep all of webpacks dependencies in devDependencies
       const setupWebpackDevServer = (
         await import('./server/scripts/setupWebpackDevServer')

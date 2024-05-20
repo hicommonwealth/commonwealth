@@ -247,7 +247,7 @@ describe('Webhook Tests', () => {
   describe('Integration Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {
-      const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
+      const webhookUrl = config.SLACK_FEEDBACK_WEBHOOK;
       await server.seeder.createWebhook({
         chain,
         webhookUrl,

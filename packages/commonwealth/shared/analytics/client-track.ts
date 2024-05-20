@@ -1,13 +1,14 @@
-import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 import mixpanel from 'mixpanel-browser';
+import { config } from '../../server/config';
+import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 
 try {
-  if (process.env.NODE_ENV === 'production') {
-    mixpanel.init(process.env.MIXPANEL_PROD_TOKEN, { debug: true });
-  } else if (process.env.NODE_ENV === 'development') {
+  if (config.NODE_ENV === 'production') {
+    mixpanel.init(config.ANALYTICS.MIXPANEL_PROD_TOKEN, { debug: true });
+  } else if (config.NODE_ENV === 'development') {
     // NOTE: Only works if NODE_ENV defined in .env
     // Make sure that is set to development if you want to use backend Mixpanel locally.
-    mixpanel.init(process.env.MIXPANEL_DEV_TOKEN, { debug: true });
+    mixpanel.init(config.ANALYTICS.MIXPANEL_DEV_TOKEN, { debug: true });
   }
 } catch (e) {
   console.log('Unable to initialized the backend mixpanel client: ', e);

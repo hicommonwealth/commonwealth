@@ -269,9 +269,6 @@ importers:
       file-loader:
         specifier: ^6.2.0
         version: 6.2.0(webpack@5.91.0(webpack-cli@4.10.0))
-      ganache-cli:
-        specifier: ^6.9.1
-        version: 6.12.2
       html-webpack-inject-attributes-plugin:
         specifier: ^1.0.6
         version: 1.0.6
@@ -12088,18 +12085,6 @@ packages:
       {
         integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==,
       }
-
-  ganache-cli@6.12.2:
-    resolution:
-      {
-        integrity: sha512-bnmwnJDBDsOWBUP8E/BExWf85TsdDEFelQSzihSJm9VChVO1SHp94YXLP5BlA4j/OTxp0wR4R1Tje9OHOuAJVw==,
-      }
-    deprecated: ganache-cli is now ganache; visit https://trfl.io/g7 for details
-    hasBin: true
-    bundledDependencies:
-      - source-map-support
-      - yargs
-      - ethereumjs-util
 
   generate-function@2.3.1:
     resolution:
@@ -30315,8 +30300,6 @@ snapshots:
   functional-red-black-tree@1.0.1: {}
 
   functions-have-names@1.2.3: {}
-
-  ganache-cli@6.12.2: {}
 
   generate-function@2.3.1:
     dependencies:
