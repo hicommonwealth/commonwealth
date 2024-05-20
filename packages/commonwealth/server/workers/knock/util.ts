@@ -5,7 +5,9 @@ export const getCommentUrl = (
   threadId: number,
   commentId: number,
 ): string => {
-  return `/${communityId}/discussion/${threadId}?comment=${commentId}`;
+  return (
+    SERVER_URL + `/${communityId}/discussion/${threadId}?comment=${commentId}`
+  );
 };
 export const getSnapshotUrl = (
   communityId: string,
@@ -16,5 +18,12 @@ export const getSnapshotUrl = (
 };
 
 export const getThreadUrl = (communityId: string, threadId: number): string => {
-  return `/${communityId}/discussion/${threadId}`;
+  return SERVER_URL + `/${communityId}/discussion/${threadId}`;
+};
+
+export const getChainProposalUrl = (
+  communityId: string,
+  proposalId: string,
+) => {
+  return SERVER_URL + `/${communityId}/proposal/${proposalId}`;
 };
