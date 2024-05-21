@@ -39,11 +39,6 @@ export default async (
     },
   ];
 
-  // FIXME ...
-
-  // ThreadSubscriptions, CommentSubscriptions, community alerts, SubscriptionPReferences
-  // https://explain.dalibo.com/
-
   const subscriptions = await models.Subscription.findAll({
     where: {
       subscriber_id: req.user.id,
