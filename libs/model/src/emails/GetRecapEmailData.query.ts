@@ -2,7 +2,6 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
-  ExternalServiceUserIds,
   GetRecapEmailData,
   KnockChannelIds,
   logger,
@@ -95,19 +94,16 @@ async function enrichDiscussionNotifications(
     typeof GetRecapEmailData['output']
   >['discussion'] = [];
 
-  const addressIds = Array.from(
-    new Set(
-      discussion.map((n) => {
-        if ('comment_created_event' in n) {
-          return n.comment_created_event.address_id;
-        } else {
-          return n.author_address_id;
-        }
-      }),
-    ),
-  );
+  const unfilteredIds: number[] = [];
+  for (const n of discussion) {
+    if ('comment_created_event' in n && n.comment_created_event.address_id) {
+      unfilteredIds.push(n.comment_created_event.address_id);
+    } else if ('author_address_id' in n && n.author_address_id) {
+      unfilteredIds.push(n.author_address_id);
+    }
+  }
 
-  if (!addressIds.length && discussion.length) {
+  if (!unfilteredIds.length) {
     log.error('Address ids not found!', undefined, {
       discussion,
     });
@@ -124,10 +120,11 @@ async function enrichDiscussionNotifications(
         WHERE A.id IN (:addressIds);
     `,
     {
+      logging: console.log,
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
-        addressIds,
+        addressIds: Array.from(new Set(unfilteredIds)),
       },
     },
   );
@@ -157,17 +154,23 @@ async function enrichGovAndProtocolNotif({
   governance: z.infer<typeof GetRecapEmailData['output']>['governance'];
   protocol: z.infer<typeof GetRecapEmailData['output']>['protocol'];
 }> {
+  if (!governance.length && !protocol.length)
+    return { governance: [], protocol: [] };
+
   const enrichedGovernance: z.infer<
     typeof GetRecapEmailData['output']
   >['governance'] = [];
   const enrichedProtocol: z.infer<
     typeof GetRecapEmailData['output']
   >['protocol'] = [];
-  const communityIds = Array.from(
-    new Set([...governance, ...protocol].map((i) => i.community_id)),
-  );
 
-  if (!communityIds.length) {
+  const unfilteredCommunityIds: string[] = [];
+
+  for (const n of [...governance, ...protocol]) {
+    unfilteredCommunityIds.push(n.community_id);
+  }
+
+  if (!unfilteredCommunityIds.length) {
     log.error('Community ids not found!', undefined, {
       governance,
       protocol,
@@ -190,7 +193,7 @@ async function enrichGovAndProtocolNotif({
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
-        communityIds,
+        communityIds: Array.from(new Set(unfilteredCommunityIds)),
       },
     },
   );
@@ -219,9 +222,10 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
   return {
     ...GetRecapEmailData,
     auth: [],
-    secure: true,
-    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
+    secure: false,
+    // authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
+      console.log('HELLO THERE');
       const notifications = await getMessages(payload.user_id);
       const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({
         governance: notifications.governance,
