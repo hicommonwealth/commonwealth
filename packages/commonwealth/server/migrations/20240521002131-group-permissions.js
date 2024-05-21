@@ -15,12 +15,14 @@ module.exports = {
           },
           primaryKey: true,
         },
-        type: {
-          type: Sequelize.ENUM(
-            'CREATE_THREAD',
-            'CREATE_COMMENT',
-            'CREATE_REACTION',
-            'UPDATE_POLL',
+        allowed_permissions: {
+          type: Sequelize.ARRAY(
+            Sequelize.ENUM(
+              'CREATE_THREAD',
+              'CREATE_COMMENT',
+              'CREATE_REACTION',
+              'UPDATE_POLL',
+            ),
           ),
           allowNull: false,
           primaryKey: true,

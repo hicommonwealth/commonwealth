@@ -1,4 +1,4 @@
-import { GroupPermission, permissionEnum } from '@hicommonwealth/schemas';
+import { GroupPermission, PermissionEnum } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { GroupAttributes } from './group';
@@ -22,8 +22,8 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
-      type: {
-        type: Sequelize.ENUM(...permissionEnum),
+      allowed_permissions: {
+        type: Sequelize.ARRAY(Sequelize.ENUM(...Object.values(PermissionEnum))),
         allowNull: false,
         primaryKey: true,
       },
