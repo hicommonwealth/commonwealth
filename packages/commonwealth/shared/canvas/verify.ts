@@ -6,7 +6,7 @@ import type {
   Session,
   Signature,
 } from '@canvas-js/interfaces';
-import { ed25519 } from '@canvas-js/signatures';
+import { Ed25519DelegateSigner } from '@canvas-js/signatures';
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
 import { CANVAS_TOPIC } from './constants';
@@ -74,8 +74,8 @@ export const verify = async ({
   );
 
   // verify the action message and session message
-  ed25519.verify(actionMessageSignature, actionMessage);
-  ed25519.verify(sessionMessageSignature, sessionMessage);
+  Ed25519DelegateSigner.verify(actionMessageSignature, actionMessage);
+  Ed25519DelegateSigner.verify(sessionMessageSignature, sessionMessage);
 
   if (sessionMessage.payload.duration !== null) {
     // if the session has an expiry, assert that the session is not expired

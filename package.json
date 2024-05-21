@@ -6,7 +6,7 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "type": "module",
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.1.1+sha256.9551e803dcb7a1839fdf5416153a844060c7bce013218ce823410532504ac10b",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "chromatic": "chromatic --exit-zero-on-changes",
