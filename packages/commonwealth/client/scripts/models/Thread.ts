@@ -124,6 +124,14 @@ export type AssociatedReaction = {
   last_active?: string;
 };
 
+type AssociatedContest = {
+  id: number;
+  thread_id: number;
+  content_id: number;
+  start_time: string;
+  end_time: string;
+};
+
 export enum LinkSource {
   Snapshot = 'snapshot',
   Proposal = 'proposal',
@@ -182,7 +190,7 @@ export class Thread implements IUniqueId {
   public readonly hasPoll: boolean;
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
-  public associatedContests: any[];
+  public associatedContests: AssociatedContest[];
   public reactionWeightsSum: number;
   public links: Link[];
   public readonly discord_meta: any;
@@ -283,7 +291,7 @@ export class Thread implements IUniqueId {
     avatar_url: string;
     address_last_active: string;
     associatedReactions?: AssociatedReaction[];
-    associatedContests?: any[];
+    associatedContests?: AssociatedContest[];
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
