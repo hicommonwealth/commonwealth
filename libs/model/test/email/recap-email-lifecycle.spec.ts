@@ -214,16 +214,6 @@ describe.only('Recap email lifecycle', () => {
   });
 
   it.skip('should throw if the notifications provider fails', async () => {
-    const discussionData = generateDiscussionData(
-      authorUser!,
-      authorProfile!,
-      community!.Addresses![0]!,
-      recipientUser!,
-      community!,
-      thread!,
-      comment!,
-    );
-
     sandbox = sinon.createSandbox();
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
