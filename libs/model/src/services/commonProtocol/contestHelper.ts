@@ -16,10 +16,13 @@ export type ContestStatus = {
   lastContentId: string;
 };
 
-export type ContestWinners = {
-  winningContent: string[];
-  winningAddress: string[];
-  voteCount: string[];
+export type ContestScores = {
+  scores: {
+    winningContent: string;
+    winningAddress: string;
+    voteCount: string;
+  }[];
+  contestBalance: number;
 };
 
 /**
@@ -131,21 +134,26 @@ export const getContestStatus = async (
  * @param web3 an instance of web3.js with correct RPC and Private Key
  * @param contest the address of the contest
  * @param contestId the id of the contest for data within the contest contract
- * @returns ContestWinners object containing eqaul indexed content ids, addresses, and votes
+ * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   web3: Web3,
   contest: string,
   contestId?: number,
-): Promise<ContestWinners> => {
+): Promise<ContestScores> => {
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
 
-  const winnerIds: string[] = contestId
-    ? await contestInstance.methods.getPastWinners(contestId).call()
-    : await contestInstance.methods.getWinnerIds().call();
+  const contestData = await Promise.all([
+    contestId
+      ? contestInstance.methods.getPastWinners(contestId).call()
+      : contestInstance.methods.getWinnerIds().call(),
+    getContestBalance(web3, contest),
+  ]);
+
+  const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
     throw new AppError('Contest Id not found on Contest address');
@@ -157,10 +165,16 @@ export const getContestScore = async (
   });
 
   const contentMeta = await Promise.all(votePromises);
+
   return {
-    winningContent: winnerIds,
-    winningAddress: contentMeta.map((c) => c['creator']),
-    voteCount: contentMeta.map((c) => c['cumulativeVotes']),
+    scores: winnerIds.map((v, i) => {
+      return {
+        winningContent: v,
+        winningAddress: contentMeta[i]['creator'],
+        voteCount: contentMeta[i]['cumulativeVotes'],
+      };
+    }),
+    contestBalance: contestData[1],
   };
 };
 
