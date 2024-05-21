@@ -46,8 +46,10 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 
 export const DiscussionSection = ({
   isContestAvailable,
+  topicIdsIncludedInContest,
 }: {
   isContestAvailable: boolean;
+  topicIdsIncludedInContest: number[];
 }) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -235,7 +237,8 @@ export const DiscussionSection = ({
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
-      const topicInvolvedInActiveContest = false;
+      const topicInvolvedInActiveContest =
+        contestsEnabled && topicIdsIncludedInContest.includes(topic.id);
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,

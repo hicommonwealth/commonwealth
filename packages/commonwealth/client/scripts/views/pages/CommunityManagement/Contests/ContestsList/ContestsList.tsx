@@ -60,6 +60,8 @@ const ContestsList = ({
             const { end_time, winners } =
               contest.contests[contest.contests.length - 1] || {};
 
+            const hasEnded = new Date(end_time) < new Date();
+
             return (
               <ContestCard
                 key={contest.contest_address}
@@ -74,7 +76,7 @@ const ContestsList = ({
                     ? new Date(end_time)?.toISOString()
                     : new Date().toISOString()
                 }
-                isActive={!contest.cancelled}
+                isActive={!contest.cancelled && !hasEnded}
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
               />
             );
