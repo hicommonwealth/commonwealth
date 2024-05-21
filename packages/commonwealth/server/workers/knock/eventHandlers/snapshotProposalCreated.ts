@@ -71,6 +71,7 @@ export const processSnapshotProposalCreated: EventHandler<
         key: WorkflowKeys.SnapshotProposals,
         users,
         data: {
+          community_id,
           community_name,
           space_name: space,
           snapshot_proposal_url: getSnapshotUrl(community_id, space, id),

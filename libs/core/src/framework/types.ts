@@ -8,6 +8,15 @@ export const INVALID_INPUT_ERROR = 'Invalid Input Error';
 export const INVALID_ACTOR_ERROR = 'Invalid Actor Error';
 export const INVALID_STATE_ERROR = 'Invalid State Error';
 
+export const ExternalServiceUserIds = {
+  Knock: -1,
+} as const;
+
+export type AuthStrategies = {
+  name: 'jwt' | 'authtoken';
+  userId?: typeof ExternalServiceUserIds[keyof typeof ExternalServiceUserIds];
+};
+
 /**
  * Deep partial utility
  */
@@ -47,6 +56,7 @@ export type Actor = {
  */
 export class InvalidInput extends Error {
   public readonly details?: string[];
+
   constructor(message: string, details?: string[]) {
     super(details ? `${message}:\n${details.join('\n')}` : message);
     this.name = INVALID_INPUT_ERROR;
@@ -180,6 +190,7 @@ export type QueryMetadata<Input extends ZodSchema, Output extends ZodSchema> = {
   readonly auth: QueryHandler<Input, Output>[];
   readonly body: QueryHandler<Input, Output>;
   readonly secure?: boolean;
+  readonly authStrategy?: AuthStrategies;
 };
 
 /**

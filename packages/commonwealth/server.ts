@@ -1,11 +1,18 @@
 import {
   HotShotsStats,
+  KnockProvider,
   MixpanelAnalytics,
   RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { analytics, cache, logger, stats } from '@hicommonwealth/core';
+import {
+  analytics,
+  cache,
+  logger,
+  notificationsProvider,
+  stats,
+} from '@hicommonwealth/core';
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { config } from './server/config';
@@ -20,6 +27,7 @@ const log = logger(__filename);
 stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
+notificationsProvider(KnockProvider());
 
 let isServiceHealthy = false;
 startHealthCheckLoop({

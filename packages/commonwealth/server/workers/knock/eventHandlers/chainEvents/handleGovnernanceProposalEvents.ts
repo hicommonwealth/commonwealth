@@ -76,6 +76,7 @@ export async function handleGovernanceProposalEvents(
       key: WorkflowKeys.ChainProposals,
       users,
       data: {
+        community_id: community[0].id,
         community_name: community[0].name,
         proposal_kind: event.eventSource.kind as
           | 'proposal-created'

@@ -1,6 +1,9 @@
 import {
   EventNames,
+  ProviderError,
   SnapshotProposalCreated,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -15,11 +18,6 @@ import sinon from 'sinon';
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
 import { getSnapshotUrl } from '../../../server/workers/knock/util';
-import {
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-} from './util';
 
 chai.use(chaiAsPromised);
 
@@ -134,7 +132,8 @@ describe('snapshotProposalCreated Event Handler', () => {
       key: WorkflowKeys.SnapshotProposals,
       users: [{ id: String(user!.id) }],
       data: {
-        community_name: community.name,
+        community_id: community!.id,
+        community_name: community!.name,
         space_name: space,
         snapshot_proposal_url: getSnapshotUrl(community!.id, space, proposalId),
       },
