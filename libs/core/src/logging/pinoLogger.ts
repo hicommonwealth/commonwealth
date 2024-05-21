@@ -18,22 +18,22 @@ const formatFilename = (name: string) => {
   return t[t.length - 1];
 };
 
-export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
-  if (config.NODE_ENV !== 'production') {
-    transport = pino.transport({
-      target: 'pino-pretty',
-      options: {
-        destination: 1, // STDOUT
-        ignore: 'pid,hostname',
-        errorLikeObjectKeys: ['e', 'err', 'error'],
-        sync: config.NODE_ENV === 'test',
-        colorizeObjects: false,
-        singleLine: true,
-      },
-    });
-    logLevel = 'debug';
-  } else logLevel = 'info';
+if (config.NODE_ENV !== 'production') {
+  transport = pino.transport({
+    target: 'pino-pretty',
+    options: {
+      destination: 1, // STDOUT
+      ignore: 'pid,hostname',
+      errorLikeObjectKeys: ['e', 'err', 'error'],
+      sync: config.NODE_ENV === 'test',
+      colorizeObjects: false,
+      singleLine: true,
+    },
+  });
+  logLevel = 'debug';
+} else logLevel = 'info';
 
+export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
   const logger = pino(
     {
       level: logLevel,
