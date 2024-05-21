@@ -577,9 +577,6 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       dotenv:
         specifier: ^16.0.3
         version: 16.4.5
@@ -601,9 +598,6 @@ importers:
       rollbar:
         specifier: ^2.6.1
         version: 2.26.4
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
       zod:
         specifier: ^3.22.4
         version: 3.23.6
@@ -611,6 +605,12 @@ importers:
       '@types/moment':
         specifier: ^2.13.0
         version: 2.13.0
+      '@types/sinon':
+        specifier: ^17.0.3
+        version: 17.0.3
+      sinon:
+        specifier: ^17.0.2
+        version: 17.0.2
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
@@ -28788,7 +28788,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -29095,20 +29095,20 @@ snapshots:
 
   axios@0.21.4:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
     transitivePeerDependencies:
       - debug
 
   axios@0.27.2:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
 
   axios@1.6.8:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -29829,7 +29829,7 @@ snapshots:
 
   connect-session-sequelize@7.1.7(sequelize@6.37.3(pg@8.11.5)):
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       sequelize: 6.37.3(pg@8.11.5)
     transitivePeerDependencies:
       - supports-color
@@ -30286,10 +30286,6 @@ snapshots:
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
-
-  debug@4.3.4:
-    dependencies:
-      ms: 2.1.2
 
   debug@4.3.4(supports-color@8.1.1):
     dependencies:
@@ -31660,8 +31656,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  follow-redirects@1.15.6: {}
-
   follow-redirects@1.15.6(debug@4.3.4):
     optionalDependencies:
       debug: 4.3.4(supports-color@8.1.1)
@@ -32237,14 +32231,14 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
   http-proxy@1.18.1:
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -32282,7 +32276,7 @@ snapshots:
   https-proxy-agent@7.0.4:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -33882,7 +33876,7 @@ snapshots:
 
   nock@13.5.4:
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       json-stringify-safe: 5.0.1
       propagate: 2.0.1
     transitivePeerDependencies:
@@ -36108,7 +36102,7 @@ snapshots:
     dependencies:
       '@types/debug': 4.1.12
       '@types/validator': 13.11.9
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       dottie: 2.0.6
       inflection: 1.13.4
       lodash: 4.17.21
@@ -36664,7 +36658,7 @@ snapshots:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       fast-safe-stringify: 2.1.1
       form-data: 3.0.1
       formidable: 1.2.6
