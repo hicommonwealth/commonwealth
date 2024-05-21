@@ -12,9 +12,15 @@
   align-items: center;
   margin-top: 8px;
   margin-bottom: 16px;
+  font-size: 14px;
 }
 
 .NotificationSettingsPage2 .SubFooter {
   margin-top: 16px;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  row-gap: 8px;
+  column-gap: 8px;
+  font-size: 14px;
 }
