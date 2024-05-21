@@ -5,6 +5,7 @@ import {
   ExternalServiceUserIds,
   GetRecapEmailData,
   KnockChannelIds,
+  logger,
   notificationsProvider,
   Query,
   SnapshotProposalCreatedNotification,
@@ -12,8 +13,12 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import z from 'zod';
 import { models } from '..';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 type DiscussionNotifications = Array<
   | z.infer<typeof CommentCreatedNotification>
@@ -81,24 +86,33 @@ async function getMessages(userId: string): Promise<{
   return { discussion, governance, protocol };
 }
 
-async function enrichNotifications({
-  discussion,
-  governance,
-  protocol,
-}: {
-  discussion: DiscussionNotifications;
-  governance: GovernanceNotifications;
-  protocol: ProtocolNotifications;
-}): Promise<z.infer<typeof GetRecapEmailData['output']>> {
+async function enrichDiscussionNotifications(
+  discussion: DiscussionNotifications,
+): Promise<z.infer<typeof GetRecapEmailData['output']>['discussion']> {
+  if (!discussion.length) return [];
+
   const enrichedDiscussion: z.infer<
     typeof GetRecapEmailData['output']
   >['discussion'] = [];
-  const enrichedGovernance: z.infer<
-    typeof GetRecapEmailData['output']
-  >['governance'] = [];
-  const enrichedProtocol: z.infer<
-    typeof GetRecapEmailData['output']
-  >['protocol'] = [];
+
+  const addressIds = Array.from(
+    new Set(
+      discussion.map((n) => {
+        if ('comment_created_event' in n) {
+          return n.comment_created_event.address_id;
+        } else {
+          return n.author_address_id;
+        }
+      }),
+    ),
+  );
+
+  if (!addressIds.length && discussion.length) {
+    log.error('Address ids not found!', undefined, {
+      discussion,
+    });
+    return [];
+  }
 
   const discussionAvatars = await models.sequelize.query<{
     user_avatars: { [user_id: string]: string };
@@ -113,36 +127,7 @@ async function enrichNotifications({
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
-        addressIds: Array.from(
-          new Set(
-            discussion.map((n) => {
-              if ('comment_created_event' in n) {
-                return n.comment_created_event.address_id;
-              } else {
-                return n.author_address_id;
-              }
-            }),
-          ),
-        ),
-      },
-    },
-  );
-
-  const communityIcons = await models.sequelize.query<{
-    icon_urls: { [community_id: string]: string };
-  }>(
-    `
-        SELECT JSONB_OBJECT_AGG(C.id, C.icon_url) as icon_urls
-        FROM "Communities" C
-        WHERE id IN (:communityIds);
-    `,
-    {
-      type: QueryTypes.SELECT,
-      raw: true,
-      replacements: {
-        communityIds: Array.from(
-          new Set([...governance, ...protocol].map((i) => i.community_id)),
-        ),
+        addressIds,
       },
     },
   );
@@ -159,6 +144,57 @@ async function enrichNotifications({
     });
   }
 
+  return enrichedDiscussion;
+}
+
+async function enrichGovAndProtocolNotif({
+  governance,
+  protocol,
+}: {
+  governance: GovernanceNotifications;
+  protocol: ProtocolNotifications;
+}): Promise<{
+  governance: z.infer<typeof GetRecapEmailData['output']>['governance'];
+  protocol: z.infer<typeof GetRecapEmailData['output']>['protocol'];
+}> {
+  const enrichedGovernance: z.infer<
+    typeof GetRecapEmailData['output']
+  >['governance'] = [];
+  const enrichedProtocol: z.infer<
+    typeof GetRecapEmailData['output']
+  >['protocol'] = [];
+  const communityIds = Array.from(
+    new Set([...governance, ...protocol].map((i) => i.community_id)),
+  );
+
+  if (!communityIds.length) {
+    log.error('Community ids not found!', undefined, {
+      governance,
+      protocol,
+    });
+    return {
+      governance: [],
+      protocol: [],
+    };
+  }
+
+  const communityIcons = await models.sequelize.query<{
+    icon_urls: { [community_id: string]: string };
+  }>(
+    `
+        SELECT JSONB_OBJECT_AGG(C.id, C.icon_url) as icon_urls
+        FROM "Communities" C
+        WHERE id IN (:communityIds);
+    `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: {
+        communityIds,
+      },
+    },
+  );
+
   for (const notif of governance) {
     enrichedGovernance.push({
       ...notif,
@@ -174,7 +210,6 @@ async function enrichNotifications({
   }
 
   return {
-    discussion: enrichedDiscussion,
     governance: enrichedGovernance,
     protocol: enrichedProtocol,
   };
@@ -188,7 +223,17 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
     authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
       const notifications = await getMessages(payload.user_id);
-      return await enrichNotifications(notifications);
+      const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({
+        governance: notifications.governance,
+        protocol: notifications.protocol,
+      });
+      const enrichedDiscussion = await enrichDiscussionNotifications(
+        notifications.discussion,
+      );
+      return {
+        discussion: enrichedDiscussion,
+        ...enrichedGovernanceAndProtocol,
+      };
     },
   };
 }
