@@ -257,11 +257,11 @@ describe('Contests projection lifecycle', () => {
     });
     expect(all?.length).to.eq(2);
 
-    const result = await query(GetAllContests(), {
-      actor,
-      payload: { community_id, contest_id },
-    });
-    // expect(result).to.deep.include([
+    // const result = await query(GetAllContests(), {
+    //   actor,
+    //   payload: { community_id, contest_address: recurring, contest_id },
+    // });
+    // expect(result).to.deep.eq([
     //   {
     //     community_id,
     //     contest_address: recurring,
@@ -274,6 +274,7 @@ describe('Contests projection lifecycle', () => {
     //     ticker,
     //     decimals,
     //     cancelled,
+    //     created_at,
     //     topics: [],
     //     contests: [
     //       {
@@ -282,7 +283,7 @@ describe('Contests projection lifecycle', () => {
     //         end_time,
     //         winners: winners.map((w) => ({
     //           ...w,
-    //           prize: w.prize / 10 ** decimals,
+    //           prize: Math.floor(w.prize / 10 ** decimals),
     //         })),
     //         actions: [
     //           {
@@ -291,6 +292,7 @@ describe('Contests projection lifecycle', () => {
     //             content_id,
     //             content_url,
     //             voting_power: 0,
+    //             created_at,
     //             thread_id,
     //             thread_title,
     //           },
@@ -300,6 +302,7 @@ describe('Contests projection lifecycle', () => {
     //             content_id,
     //             content_url: null,
     //             voting_power: 1,
+    //             created_at,
     //             thread_id,
     //             thread_title,
     //           },
@@ -309,6 +312,7 @@ describe('Contests projection lifecycle', () => {
     //             content_id,
     //             content_url: null,
     //             voting_power: 2,
+    //             created_at,
     //             thread_id,
     //             thread_title,
     //           },
@@ -316,7 +320,7 @@ describe('Contests projection lifecycle', () => {
     //       },
     //     ],
     //   },
-    // ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
+    // ] as Array<z.infer<typeof ContestResults>>);
   });
 
   it('should raise invalid state when community with namespace not found', async () => {

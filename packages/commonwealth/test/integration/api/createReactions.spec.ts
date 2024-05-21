@@ -6,9 +6,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import Sinon from 'sinon';
 import { TestServer, testServer } from '../../../server-test';
-import * as Config from '../../../server/config';
-
-const { JWT_SECRET } = Config;
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 
@@ -59,7 +57,10 @@ describe('createReaction Integration Tests', () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
       () => ({ [userAddress]: 300 }),
     );
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession = { session: res.session, sign: res.sign };
 
     const topic = await server.models.Topic.findOne({

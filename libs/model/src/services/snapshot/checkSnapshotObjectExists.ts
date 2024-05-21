@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

@@ -24,7 +24,7 @@ import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
-import { COSMOS_REGISTRY_API } from '../../config';
+import { config } from '../../config';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -217,7 +217,7 @@ export async function __createCommunity(
     }
 
     const { data: chains } = await axios.get(
-      `${COSMOS_REGISTRY_API}/api/v1/mainnet`,
+      `${config.COSMOS.COSMOS_REGISTRY_API}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
       (chain) => chain === cosmos_chain_id,

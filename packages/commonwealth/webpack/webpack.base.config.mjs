@@ -6,9 +6,6 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -88,6 +85,9 @@ const baseConfig = {
       'process.env.FLAG_COMMUNITY_STAKE': JSON.stringify(
         process.env.FLAG_COMMUNITY_STAKE,
       ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED':
@@ -216,6 +216,7 @@ const baseConfig = {
       fs: false,
       net: false,
       buffer: false,
+      events: require.resolve('events/'),
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),

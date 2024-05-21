@@ -1,4 +1,3 @@
-import { ILogger } from '@hicommonwealth/logging';
 import { z } from 'zod';
 import {
   EventContext,
@@ -7,10 +6,13 @@ import {
 } from '../framework';
 import { Events } from '../integration/events';
 import {
+  ChainProposalsNotification,
   CommentCreatedNotification,
+  CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
   UserMentionedNotification,
 } from '../integration/notifications.schemas';
+import { ILogger } from '../logging/interfaces';
 
 /**
  * Resource disposer function
@@ -185,6 +187,8 @@ export enum WorkflowKeys {
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',
   UserMentioned = 'user-mentioned',
+  CommunityStake = 'community-stake',
+  ChainProposals = 'chain-event-proposals',
 }
 
 type BaseNotifProviderOptions = {
@@ -205,6 +209,14 @@ export type NotificationsProviderOptions = BaseNotifProviderOptions &
     | {
         data: z.infer<typeof UserMentionedNotification>;
         key: WorkflowKeys.UserMentioned;
+      }
+    | {
+        data: z.infer<typeof CommunityStakeNotification>;
+        key: WorkflowKeys.CommunityStake;
+      }
+    | {
+        data: z.infer<typeof ChainProposalsNotification>;
+        key: WorkflowKeys.ChainProposals;
       }
   );
 

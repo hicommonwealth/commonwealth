@@ -1,7 +1,7 @@
-import { AppError, Projection, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { AppError, Projection, events, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';
+import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
@@ -47,7 +47,7 @@ async function updateOrCreateWithAlert(
     throw new AppError('Chain Node not found');
   }
   const { ticker, decimals } =
-    process.env.NODE_ENV === 'test'
+    config.NODE_ENV === 'test'
       ? { ticker: 'ETH', decimals: 18 }
       : await contractHelpers.getTokenAttributes(
           contest_address,

@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
 import { ChainNodeInstance } from '../../../models/chain_node';

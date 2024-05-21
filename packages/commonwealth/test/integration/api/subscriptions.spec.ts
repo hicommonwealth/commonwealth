@@ -8,7 +8,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import Errors from '../../../server/routes/subscription/errors';
 
 chai.use(chaiHttp);
@@ -30,7 +30,7 @@ describe('Subscriptions Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     userId = +result.user_id;
 
@@ -726,7 +726,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
 
       await server.seeder.createSubscription({
@@ -857,7 +857,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       let res = await chai
         .request(server.app)
@@ -977,7 +977,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       expect(subscription).to.not.be.null;
       let res = await chai

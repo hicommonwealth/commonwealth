@@ -1,5 +1,4 @@
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';

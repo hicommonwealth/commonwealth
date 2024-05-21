@@ -1,23 +1,22 @@
+import { S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { HotShotsStats } from '@hicommonwealth/adapters';
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import { S3 } from 'aws-sdk';
+import { logger, stats } from '@hicommonwealth/core';
+import { config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
-import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
 // REQUIRED for S3 env var
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = config.DB.URI;
 
   if (!databaseUrl) {
     log.error('DATABASE_URL environment variable is not set.');
@@ -65,7 +64,10 @@ async function uploadToS3(filePath: string): Promise<boolean> {
       Body: fileStream,
     };
 
-    const data = await s3.upload(params).promise();
+    const data = await new Upload({
+      client: s3,
+      params,
+    }).done();
     log.info(`File uploaded successfully at ${data.Location}`);
     return true;
   } catch (error) {
@@ -114,12 +116,10 @@ async function getTablesToBackup(): Promise<string[]> {
         log.info(
           `Searching for ${objectKey} in S3 bucket ${S3_BUCKET_NAME}...`,
         );
-        await s3
-          .headObject({
-            Bucket: S3_BUCKET_NAME,
-            Key: objectKey,
-          })
-          .promise();
+        await s3.headObject({
+          Bucket: S3_BUCKET_NAME,
+          Key: objectKey,
+        });
         return true;
       } catch (e) {
         if (e.statusCode === 404) return false;

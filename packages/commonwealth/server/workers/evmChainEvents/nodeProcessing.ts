@@ -7,10 +7,10 @@ import {
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
   events as coreEvents,
+  logger,
   parseEvmEventToContestEvent,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
