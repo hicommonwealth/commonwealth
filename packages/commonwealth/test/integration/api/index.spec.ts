@@ -34,7 +34,7 @@ describe('API Tests', () => {
 
     it('should create an ETH address', async () => {
       const wallet = new SIWESigner({ chainId: 1 });
-      const session = await wallet.getSession(CANVAS_TOPIC);
+      const { payload: session } = await wallet.newSession(CANVAS_TOPIC);
       const address = session.address.split(':')[2];
 
       const chain = 'ethereum';
@@ -85,10 +85,7 @@ describe('API Tests', () => {
       const chainId = '1'; // use ETH mainnet for testing
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
-      const timestamp = 1665083987891;
-      const session = await sessionSigner.getSession(CANVAS_TOPIC, {
-        timestamp,
-      });
+      const { payload: session } = await sessionSigner.newSession(CANVAS_TOPIC);
       const address = session.address.split(':')[2];
 
       const community_id = 'ethereum';
