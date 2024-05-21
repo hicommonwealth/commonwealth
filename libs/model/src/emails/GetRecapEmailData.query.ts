@@ -35,11 +35,11 @@ async function getMessages(userId: string): Promise<{
   governance: GovernanceNotifications;
   protocol: ProtocolNotifications;
 }> {
-  let discussion: DiscussionNotifications = [];
-  let governance: GovernanceNotifications = [];
-  let protocol: ProtocolNotifications = [];
+  const discussion: DiscussionNotifications = [];
+  const governance: GovernanceNotifications = [];
+  const protocol: ProtocolNotifications = [];
 
-  let sevenDaysAgo = new Date(new Date().getTime() - 604_800_000);
+  const sevenDaysAgo = new Date(new Date().getTime() - 604_800_000);
   let oldestFetched = new Date();
   let cursor: string | undefined;
 
