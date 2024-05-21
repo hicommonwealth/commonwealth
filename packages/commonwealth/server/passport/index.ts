@@ -5,7 +5,7 @@ import passportJWT from 'passport-jwt';
 import { config } from '../config';
 import '../types';
 import { initMagicAuth } from './magic';
-import { initTokenAuth } from './secretKey';
+import { initTokenAuth } from './tokenAuth';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
