@@ -282,14 +282,3 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
     .int()
     .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
-
-export const ContestWinnersRecorded = ContestManagerEvent.extend({
-  winners: z
-    .array(
-      z.object({
-        creator_address: z.string(),
-        prize: z.number().int().positive(),
-      }),
-    )
-    .describe('Contest winners from first to last'),
-}).describe('When contest winners are recorded and contest ends');

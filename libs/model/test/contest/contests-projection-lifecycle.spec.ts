@@ -7,14 +7,17 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { ContestResults } from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
-import { contractHelpers } from '../../src/services/commonProtocol';
+import {
+  contestHelper,
+  contractHelpers,
+} from '../../src/services/commonProtocol';
 import { bootstrap_testing, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -40,26 +43,27 @@ describe('Contests projection lifecycle', () => {
   const end_time = new Date(start_time.getTime() + 1000);
   const cancelled = false;
   const payout_structure = [90, 10];
-  const prize_percentage = 1;
+  const prize_percentage = 12;
   const funding_token_address = 'funding-address';
   const image_url = 'url';
   const interval = 10;
-  const winners = [
-    { creator_address: creator1, prize: 1 },
-    { creator_address: creator2, prize: 2 },
+  const score = [
+    { creator_address: creator1, content_id, votes: 1, prize: 100000000 },
+    { creator_address: creator2, content_id, votes: 2, prize: 200000000 },
   ];
   const community_id = 'community-with-contests';
   const thread_id = 1;
   const thread_title = 'thread-in-contest';
   const ticker = commonProtocol.Denominations.ETH;
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
-  const getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
-  getTokenAttributes.resolves({
-    ticker,
-    decimals,
-  });
+
+  let getTokenAttributes: Sinon.SinonStub;
+  let getContestScore: Sinon.SinonStub;
 
   before(async () => {
+    getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
+    getContestScore = Sinon.stub(contestHelper, 'getContestScore');
+
     await bootstrap_testing();
     const [chain] = await seed('ChainNode', {
       contracts: [],
@@ -147,11 +151,31 @@ describe('Contests projection lifecycle', () => {
   });
 
   after(async () => {
-    Sinon.restore();
     await dispose()();
   });
 
+  afterEach(async () => {
+    Sinon.restore();
+  });
+
   it('should project events on multiple contests', async () => {
+    getTokenAttributes.resolves({ ticker, decimals });
+    getContestScore.resolves({
+      contestBalance: 10000000000,
+      scores: [
+        {
+          winningAddress: creator1,
+          winningContent: content_id.toString(),
+          voteCount: '1',
+        },
+        {
+          winningAddress: creator2,
+          winningContent: content_id.toString(),
+          voteCount: '2',
+        },
+      ],
+    });
+
     await handleEvent(Contests(), {
       name: EventNames.RecurringContestManagerDeployed,
       payload: {
@@ -251,15 +275,8 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
-      name: EventNames.ContestWinnersRecorded,
-      payload: {
-        contest_address: recurring,
-        contest_id,
-        winners,
-        created_at,
-      },
-    });
+    // wait for projection
+    await delay(100);
 
     const all = await query(GetAllContests(), {
       actor,
@@ -271,6 +288,7 @@ describe('Contests projection lifecycle', () => {
       actor,
       payload: { community_id, contest_address: recurring, contest_id },
     });
+
     expect(result).to.deep.eq([
       {
         community_id,
@@ -291,9 +309,10 @@ describe('Contests projection lifecycle', () => {
             contest_id,
             start_time,
             end_time,
-            winners: winners.map((w) => ({
-              ...w,
-              prize: Math.floor(w.prize / 10 ** decimals),
+            score_updated_at: result?.at(0)?.contests.at(0)?.score_updated_at,
+            score: score.map((s) => ({
+              ...s,
+              prize: Math.floor(s.prize / 10 ** decimals),
             })),
             actions: [
               {
