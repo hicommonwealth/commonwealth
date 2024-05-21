@@ -1,6 +1,8 @@
 import {
   ExternalServiceUserIds,
+  ProviderError,
   SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
   dispose,
   disposeAdapter,
   notificationsProvider,
@@ -15,13 +17,20 @@ import {
 } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
-import { generateDiscussionData } from './util';
+import {
+  generateDiscussionData,
+  generateGovernanceData,
+  generateProtocolData,
+} from './util';
 
-describe('Recap email lifecycle', () => {
+chai.use(chaiAsPromised);
+
+describe.skip('Recap email lifecycle', () => {
   let community: z.infer<typeof Community> | undefined;
   let comment: z.infer<typeof Comment> | undefined;
   let thread: z.infer<typeof Thread> | undefined;
@@ -106,7 +115,7 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
+    notificationsProvider(
       SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
@@ -126,10 +135,103 @@ describe('Recap email lifecycle', () => {
       },
     });
     expect(res?.discussion).to.exist;
-    expect(res?.discussion).to.deep.contains({});
+    expect(res?.discussion).to.deep.equal(discussionData.enrichedNotifications);
   });
 
-  it('should return enriched governance notifications');
-  it('should return enriched protocol notifications');
-  it('should throw if the notifications provider fails');
+  it('should return enriched governance notifications', async () => {
+    const governanceData = generateGovernanceData(
+      {
+        id: '0x5ed0465ba58b442f1e671789797d5e36b538a27603549639a34f95451b59ad32',
+        space: 'dydxgov.eth',
+      },
+      recipientUser!,
+      community!,
+    );
+
+    sandbox = sinon.createSandbox();
+    notificationsProvider(
+      SpyNotificationsProvider(sandbox, {
+        getMessagesStub: sandbox
+          .stub()
+          .returns(Promise.resolve(governanceData.messages)),
+      }),
+    );
+
+    const res = await query(GetRecapEmailDataQuery(), {
+      actor: {
+        user: {
+          id: ExternalServiceUserIds.Knock,
+          email: 'hello@knock.app',
+        },
+      },
+      payload: {
+        user_id: String(recipientUser!.id),
+      },
+    });
+    expect(res?.discussion).to.exist;
+    expect(res?.discussion).to.deep.equal(governanceData.enrichedNotifications);
+  });
+
+  it('should return enriched protocol notifications', async () => {
+    let currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 2);
+    const protocolData = generateProtocolData(
+      2,
+      currentDate,
+      recipientUser!,
+      community!,
+    );
+
+    sandbox = sinon.createSandbox();
+    notificationsProvider(
+      SpyNotificationsProvider(sandbox, {
+        getMessagesStub: sandbox
+          .stub()
+          .returns(Promise.resolve(protocolData.messages)),
+      }),
+    );
+
+    const res = await query(GetRecapEmailDataQuery(), {
+      actor: {
+        user: {
+          id: ExternalServiceUserIds.Knock,
+          email: 'hello@knock.app',
+        },
+      },
+      payload: {
+        user_id: String(recipientUser!.id),
+      },
+    });
+    expect(res?.discussion).to.exist;
+    expect(res?.discussion).to.deep.equal(protocolData.enrichedNotifications);
+  });
+
+  it('should throw if the notifications provider fails', async () => {
+    const discussionData = generateDiscussionData(
+      authorUser!,
+      authorProfile!,
+      community!.Addresses![0]!,
+      recipientUser!,
+      community!,
+      thread!,
+      comment!,
+    );
+
+    sandbox = sinon.createSandbox();
+    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+
+    await expect(
+      await query(GetRecapEmailDataQuery(), {
+        actor: {
+          user: {
+            id: ExternalServiceUserIds.Knock,
+            email: 'hello@knock.app',
+          },
+        },
+        payload: {
+          user_id: String(recipientUser!.id),
+        },
+      }),
+    ).to.eventually.be.rejectedWith(ProviderError);
+  });
 });

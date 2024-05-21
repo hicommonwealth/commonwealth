@@ -17,11 +17,14 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import z from 'zod';
 import { processChainEventCreated } from '../../../server/workers/knock/eventHandlers/chainEventCreated';
 import { getChainProposalUrl } from '../../../server/workers/knock/util';
 import { getCommunityUrl } from '../../../shared/utils';
+
+chai.use(chaiAsPromised);
 
 const namespaceAddress = '0x123';
 const communityStakesAddress = '0x0000000000000000000000000000000000000001';
