@@ -1,12 +1,11 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -28,10 +27,10 @@ export type NotificationInstance = ModelInstance<NotificationAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 };
 
-export type NotificationModelStatic = ModelStatic<NotificationInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <NotificationModelStatic>sequelize.define<NotificationInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<NotificationInstance> =>
+  sequelize.define<NotificationInstance>(
     'Notification',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },

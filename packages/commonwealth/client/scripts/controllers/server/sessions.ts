@@ -12,7 +12,7 @@ import {
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+import { addressSwapper } from '../../../../shared/utils';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 

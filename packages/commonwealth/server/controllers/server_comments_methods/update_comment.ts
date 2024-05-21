@@ -5,16 +5,17 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
-import moment from 'moment';
 import { WhereOptions } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createCommentMentionNotifications,
+  emitMentions,
   findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
 } from '../../util/parseUserMentions';
+import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
@@ -90,24 +91,14 @@ export async function __updateComment(
     throw new AppError(Errors.NotAuthor);
   }
 
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(comment.version_history[0]).body;
-  } catch (e) {
-    console.log(e);
-  }
-  // If new comment body text has been submitted, create another version history entry
-  if (decodeURIComponent(commentBody) !== latestVersion) {
-    const recentEdit = {
-      timestamp: moment(),
-      body: decodeURIComponent(commentBody),
-    };
-    const arr = comment.version_history;
-    arr.unshift(JSON.stringify(recentEdit));
-    comment.version_history = arr;
-  }
-  comment.text = commentBody;
-  comment.plaintext = (() => {
+  const { latestVersion, versionHistory } = addVersionHistory(
+    comment.version_history,
+    commentBody,
+    address,
+  );
+
+  const text = commentBody;
+  const plaintext = (() => {
     try {
       return renderQuillDeltaToText(
         JSON.parse(decodeURIComponent(commentBody)),
@@ -116,7 +107,38 @@ export async function __updateComment(
       return decodeURIComponent(commentBody);
     }
   })();
-  await comment.save();
+
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(
+    decodeURIComponent(commentBody),
+  );
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
+  await this.models.sequelize.transaction(async (transaction) => {
+    await this.models.Comment.update(
+      {
+        text,
+        plaintext,
+        version_history: versionHistory ?? undefined,
+      },
+      {
+        where: { id: comment.id },
+        transaction,
+      },
+    );
+
+    await emitMentions(this.models, transaction, {
+      authorAddressId: address.id,
+      authorUserId: user.id,
+      authorAddress: address.address,
+      authorProfileId: address.profile_id,
+      mentions: mentionedAddresses,
+      comment,
+    });
+  });
+
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
     include: [this.models.Address],
@@ -143,14 +165,6 @@ export async function __updateComment(
     },
     excludeAddresses: [finalComment.Address.address],
   });
-
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(
-    decodeURIComponent(commentBody),
-  );
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
     ...createCommentMentionNotifications(

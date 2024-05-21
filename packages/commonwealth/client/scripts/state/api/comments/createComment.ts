@@ -1,10 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signComment } from 'client/scripts/controllers/server/sessions';
+import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -56,11 +59,15 @@ const useCreateCommentMutation = ({
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     communityId,
     threadId,
   });
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   return useMutation({
     mutationFn: createComment,
@@ -74,6 +81,15 @@ const useCreateCommentMutation = ({
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
+      }
+
       return newComment;
     },
   });

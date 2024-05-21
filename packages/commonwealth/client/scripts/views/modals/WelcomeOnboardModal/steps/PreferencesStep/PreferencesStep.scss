@@ -22,34 +22,6 @@
     }
   }
 
-  .tags-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    .tag {
-      &.isSelected {
-        background-color: $primary-100;
-
-        .Text,
-        button {
-          background-color: $primary-100;
-        }
-      }
-
-      .Text {
-        font-weight: 500 !important;
-        color: black !important;
-      }
-
-      &:focus,
-      &:focus-within {
-        border-width: 1px;
-      }
-    }
-  }
-
   .action-btns {
     margin-top: 12px;
     display: grid;

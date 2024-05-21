@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type {
   DB,
   ProfileAttributes,
@@ -23,16 +22,16 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
-import { verify } from 'jsonwebtoken';
-import { fileURLToPath } from 'node:url';
+import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
 import { CANVAS_TOPIC } from 'shared/canvas';
 import { deserializeCanvas } from 'shared/canvas/types';
+import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getSessionSignerForAddress } from '../../shared/canvas/verify';
-import { JWT_SECRET, MAGIC_API_KEY } from '../config';
+import { MAGIC_API_KEY, config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -450,7 +449,10 @@ async function magicLoginRoute(
   // check if the user is logged in already (provided valid JWT)
   if (req.body.jwt) {
     try {
-      const { id } = verify(req.body.jwt, JWT_SECRET) as {
+      const { id } = jsonwebtoken.verify(
+        req.body.jwt,
+        config.AUTH.JWT_SECRET,
+      ) as {
         id: number;
         email: string | null;
       };

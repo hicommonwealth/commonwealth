@@ -1,4 +1,5 @@
-import { logger } from '@hicommonwealth/logging';
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   createAsyncWriterS3,
   createDatabasePaginatorDefault,
@@ -19,6 +20,8 @@ async function doExec() {
     // URLs and that might be very destructive to our SEO
     throw new Error('Must run with NODE_ENV=production');
   }
+
+  stats(HotShotsStats()).increment('cw.scheduler.email-digest');
 
   log.info('Creating writer... ');
   const writer = createAsyncWriterS3();

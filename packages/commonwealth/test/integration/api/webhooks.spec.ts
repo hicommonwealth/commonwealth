@@ -4,18 +4,16 @@
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import dotenv from 'dotenv';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import Errors from '../../../server/routes/webhooks/errors';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import { markdownThread } from '../../util/fixtures/markdownThread';
 import { richTextComment } from '../../util/fixtures/richTextComment';
 import { richTextThread } from '../../util/fixtures/richTextThread';
 
-dotenv.config();
 chai.use(chaiHttp);
 const { expect } = chai;
 
@@ -54,7 +52,7 @@ describe('Webhook Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     await server.seeder.updateRole({
       address_id: +result.address_id,
@@ -69,7 +67,7 @@ describe('Webhook Tests', () => {
     loggedInNotAdminAddr = result.address;
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 
@@ -123,7 +121,7 @@ describe('Webhook Tests', () => {
           address: notLoggedInAddr,
           chain,
           webhookUrl,
-          jwt: jwt.sign({ id: -999999, email: null }, JWT_SECRET),
+          jwt: jwt.sign({ id: -999999, email: null }, config.AUTH.JWT_SECRET),
         });
       expectErrorOnResponse(401, undefined, errorRes);
       const webhookUrls = await server.models.Webhook.findAll({
@@ -249,7 +247,7 @@ describe('Webhook Tests', () => {
   describe('Integration Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {
-      const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
+      const webhookUrl = config.SLACK_FEEDBACK_WEBHOOK;
       await server.seeder.createWebhook({
         chain,
         webhookUrl,

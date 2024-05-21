@@ -20,9 +20,12 @@
     "test": "echo No tests for @hicommonwealth/sitemaps"
   },
   "dependencies": {
-    "@hicommonwealth/core": "*",
-    "@hicommonwealth/model": "*",
-    "@hicommonwealth/shared": "*",
-    "aws-sdk": "^2.814.0"
+    "@aws-sdk/client-s3": "^3.577.0",
+    "@aws-sdk/lib-storage": "^3.578.0",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/model": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*",
+    "moment": "^2.23.0",
+    "sequelize": "^6.32.1"
   }
 }

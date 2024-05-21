@@ -1,13 +1,10 @@
 import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { createRequire } from 'node:module';
+import { createRequire } from 'module';
 import path from 'path';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
-
-import dotenv from 'dotenv';
-dotenv.config();
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,8 +27,13 @@ const baseConfig = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
+      'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
+        process.env.KNOCK_PUBLIC_API_KEY,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
+        process.env.KNOCK_IN_APP_FEED_ID,
       ),
     }),
     new webpack.DefinePlugin({
@@ -85,6 +87,9 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
+    }),
+    new webpack.DefinePlugin({
       'process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED':
         JSON.stringify(
           process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
@@ -94,6 +99,9 @@ const baseConfig = {
       'process.env.FLAG_USER_ONBOARDING_ENABLED': JSON.stringify(
         process.env.FLAG_USER_ONBOARDING_ENABLED,
       ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
     }),
     new webpack.DefinePlugin({
       'process.env.IS_PRODUCTION': JSON.stringify(process.env.IS_PRODUCTION),
@@ -111,6 +119,11 @@ const baseConfig = {
     new webpack.DefinePlugin({
       'process.env.HEROKU_APP_NAME': JSON.stringify(
         process.env.HEROKU_APP_NAME,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS': JSON.stringify(
+        process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
       ),
     }),
     new HtmlWebpackPlugin({
@@ -133,7 +146,8 @@ const baseConfig = {
   optimization: {
     splitChunks: {
       chunks: 'all',
-      // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
+      // TODO: Commented out packages need to be code split.
+      // Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
         ethersAsync: {
           test: /[\\/]node_modules[\\/](ethers)[\\/]/,
@@ -201,6 +215,8 @@ const baseConfig = {
     fallback: {
       fs: false,
       net: false,
+      buffer: false,
+      events: require.resolve('events/'),
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),

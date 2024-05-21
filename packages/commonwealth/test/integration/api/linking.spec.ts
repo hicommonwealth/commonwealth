@@ -11,7 +11,7 @@ import { LinkSource } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from 'server/config';
+import { config } from 'server/config';
 import { Errors } from 'server/util/linkingValidationHelper';
 import { TestServer, testServer } from '../../../server-test';
 
@@ -66,7 +66,10 @@ describe('Linking Tests', () => {
 
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
-    adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    adminJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     const isAdmin = await server.seeder.updateRole({
       address_id: +res.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -79,7 +82,10 @@ describe('Linking Tests', () => {
 
     res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;

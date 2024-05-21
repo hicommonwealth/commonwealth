@@ -1,6 +1,6 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { AllCosmosProposals } from './types';
 import {
   filterV1GovCommunities,

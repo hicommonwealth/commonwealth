@@ -1,11 +1,3 @@
-export const Environments = [
-  'development',
-  'test',
-  'staging',
-  'production',
-] as const;
-export type Environment = typeof Environments[number];
-
 export const LogLevels = [
   'trace',
   'debug',

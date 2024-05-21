@@ -1,10 +1,14 @@
-import { ServerError } from '@hicommonwealth/core';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
+import { fileURLToPath } from 'url';
 
 export const Errors = {
   FailedToToggle: 'Failed to toggle community star',
 };
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const starCommunity = async (
   models: DB,
@@ -29,6 +33,7 @@ const starCommunity = async (
 
     return res.json({ status: 'Success', result: star.toJSON() });
   } catch (err) {
+    log.error('Failed to toggle community star', err);
     return next(new ServerError(Errors.FailedToToggle));
   }
 };

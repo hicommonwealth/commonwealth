@@ -2,7 +2,7 @@ import { stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
-import { JWT_SECRET } from '../config';
+import { config } from '../config';
 import '../types';
 import { initMagicAuth } from './magic';
 
@@ -18,7 +18,7 @@ function initDefaultUserAuth(models: DB) {
           ExtractJWT.fromUrlQueryParameter('jwt'),
           ExtractJWT.fromAuthHeaderAsBearerToken(),
         ]),
-        secretOrKey: JWT_SECRET,
+        secretOrKey: config.AUTH.JWT_SECRET,
       },
       async (jwtPayload, done) => {
         try {

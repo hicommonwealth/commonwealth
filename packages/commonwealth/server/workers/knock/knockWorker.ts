@@ -1,20 +1,22 @@
 import {
-  getRabbitMQConfig,
   HotShotsStats,
+  KnockProvider,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
+  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
-  broker,
   Broker,
   BrokerSubscriptions,
+  broker,
+  logger,
+  notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
-import { RABBITMQ_URI } from '../../config';
+import { fileURLToPath } from 'url';
+import { config } from '../../config';
 import { NotificationsPolicy } from './notificationsPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,7 +42,10 @@ async function startKnockWorker() {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -51,6 +56,9 @@ async function startKnockWorker() {
     );
     throw e;
   }
+
+  // init Knock as notifications provider - this is necessary since the policies do not define the provider
+  notificationsProvider(KnockProvider());
 
   const sub = await brokerInstance.subscribe(
     BrokerSubscriptions.NotificationsProvider,

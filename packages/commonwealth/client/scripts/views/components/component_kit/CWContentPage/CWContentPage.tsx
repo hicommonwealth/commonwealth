@@ -1,6 +1,5 @@
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
-import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
@@ -79,6 +78,7 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
+  setThreadBody?: (body: string) => void;
 };
 
 export const CWContentPage = ({
@@ -115,12 +115,12 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
+  setThreadBody,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const contestsEnabled = useFlag('contest');
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
@@ -190,7 +190,9 @@ export const CWContentPage = ({
         authorAddress={author?.address}
         authorCommunityId={authorCommunityId}
         collaboratorsInfo={collaborators}
-        publishDate={moment(createdOrEditedDate)}
+        publishDate={moment(createdOrEditedDate, 'X')}
+        //second parameter in moment() is case sensitive.
+        //If 'x' is passed instead of 'X' it will show "Published 54 years ago" again.
         viewsCount={viewCount}
         showPublishLabelWithDate={!lastEdited}
         showEditedLabelWithDate={!!lastEdited}
@@ -199,6 +201,8 @@ export const CWContentPage = ({
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
         profile={thread?.profile}
+        versionHistory={thread?.versionHistory}
+        changeContentText={setThreadBody}
       />
     </div>
   );
@@ -219,7 +223,8 @@ export const CWContentPage = ({
       isRecurring: true,
     },
   ];
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const showContestWinnerTag = false;
+  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   const mainBody = (
     <div className="main-body-container">

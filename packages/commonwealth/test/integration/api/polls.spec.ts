@@ -10,7 +10,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -52,7 +52,7 @@ describe('Polls', () => {
     userAddress = canvasAddress.split(':')[2];
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     userSession = {
       session: userRes.session,

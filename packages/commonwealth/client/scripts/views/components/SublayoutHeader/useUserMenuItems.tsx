@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -22,7 +23,6 @@ import {
   chainBaseToCanvasChainId,
 } from 'shared/canvas/chainMappings';
 
-import { getUniqueUserAddressesForChainBase } from '../../modals/ManageCommunityStakeModal/utils';
 import { useCommunityStake } from '../CommunityStake';
 
 import UserMenuItem from './UserMenuItem';
@@ -89,9 +89,9 @@ const useUserMenuItems = ({
   const user = app.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
 
-  const uniqueChainAddresses = getUniqueUserAddressesForChainBase(
-    app?.chain?.base,
-  );
+  const uniqueChainAddresses = getUniqueUserAddresses({
+    forChain: app?.chain?.base,
+  });
   const shouldShowAddressesSwitcherForNonMember =
     stakeEnabled &&
     app.activeChainId() &&

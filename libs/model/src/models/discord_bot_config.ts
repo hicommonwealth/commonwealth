@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type DiscordBotConfigAttributes = {
   id: number;
@@ -17,10 +17,10 @@ export type DiscordBotConfigAttributes = {
 export type DiscordBotConfigInstance =
   ModelInstance<DiscordBotConfigAttributes>;
 
-export type DiscordBotConfigModelStatic = ModelStatic<DiscordBotConfigInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <DiscordBotConfigModelStatic>sequelize.define<DiscordBotConfigInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<DiscordBotConfigInstance> =>
+  sequelize.define<DiscordBotConfigInstance>(
     'DiscordBotConfig',
     {
       id: {

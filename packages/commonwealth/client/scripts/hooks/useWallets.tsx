@@ -36,7 +36,11 @@ import { setDarkMode } from '../helpers/darkMode';
 import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
+import {
+  DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
+  fetchProfilesByAddress,
+} from '../state/api/profiles/fetchProfilesByAddress';
+import { authModal } from '../state/ui/modals/authModal';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
@@ -77,6 +81,7 @@ type IuseWalletProps = {
   initialWallets?: IWebWallet<any>[];
   onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
+  onUnrecognizedAddressReceived?: () => boolean;
   useSessionKeyLoginFlow?: boolean;
 };
 
@@ -207,13 +212,32 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
-      const { address: magicAddress } = await startLoginWithMagicLink({
-        email: tempEmailToUse,
-        isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
-        chain: app.chain?.id,
-      });
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      const { address: magicAddress, isAddressNew } =
+        await startLoginWithMagicLink({
+          email: tempEmailToUse,
+          isCosmos,
+          redirectTo: document.location.pathname + document.location.search,
+          chain: app.chain?.id,
+        });
       setIsMagicLoading(false);
+
+      // if SSO account address is not already present in db,
+      // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
+      // and the user isn't trying to link address to community,
+      // then open the user auth type guidance modal
+      // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
+      if (
+        isAddressNew &&
+        !isAttemptingToConnectAddressToCommunity &&
+        !app.isLoggedIn()
+      ) {
+        authModal
+          .getState()
+          .validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
+        return;
+      }
 
       if (walletProps.onSuccess) {
         walletProps.onSuccess(magicAddress, isNewlyCreated);
@@ -525,6 +549,35 @@ const useWallets = (walletProps: IuseWalletProps) => {
       await loginToNear(app.chain as Near, app.isCustomDomain());
     } else {
       const selectedAddress = getAddressFromWallet(wallet);
+
+      // check if address exists
+      const profileAddresses = await fetchProfilesByAddress({
+        currentChainId: '',
+        profileAddresses: [
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address: selectedAddress,
+                currentPrefix: parseInt(
+                  (app.chain as Substrate)?.meta.ss58Prefix,
+                  10,
+                ),
+              })
+            : selectedAddress,
+        ],
+        profileChainIds: [app.activeChainId() ?? wallet.chain],
+        initiateProfilesAfterFetch: false,
+      });
+      const addressExists = profileAddresses?.length > 0;
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      if (
+        !addressExists &&
+        !isAttemptingToConnectAddressToCommunity &&
+        walletProps.onUnrecognizedAddressReceived
+      ) {
+        const shouldContinue = walletProps.onUnrecognizedAddressReceived();
+        if (!shouldContinue) return;
+      }
 
       if (walletProps.useSessionKeyLoginFlow) {
         await onSessionKeyRevalidation(wallet, selectedAddress);

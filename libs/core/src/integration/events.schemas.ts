@@ -2,21 +2,27 @@ import {
   Comment,
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
+  Reaction,
   Thread,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
 export const ThreadCreated = Thread;
+export const ThreadUpvoted = Reaction;
 export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
 });
 export const UserMentioned = z.object({
-  authorId: z.number(),
-  userMentionedId: z.number(),
-  threadId: z.string().optional(),
-  commentId: z.string().optional(),
+  authorAddressId: z.number(),
+  authorUserId: z.number(),
+  authorAddress: z.string(),
+  authorProfileId: z.number(),
+  mentionedUserId: z.number(),
+  communityId: z.string(),
+  thread: Thread.optional(),
+  comment: Comment.optional(),
 });
 export const CommunityCreated = z.object({
   communityId: z.string(),

@@ -1,4 +1,4 @@
-import { ServerError } from '@hicommonwealth/core';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -10,14 +10,18 @@ import type {
 } from '@hicommonwealth/model';
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
+import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
+import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
-import { SESSION_EXPIRY_MILLIS } from '../../session';
-import { ETH_RPC, JWT_SECRET } from '../config';
+import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 type ThreadCountQueryData = {
   communityId: string;
@@ -30,10 +34,12 @@ type StatusResp = {
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
   user?: {
+    id: number;
     email: string;
     emailVerified: boolean;
     emailInterval: EmailNotificationInterval;
     jwt: string;
+    knockJwtToken: string;
     addresses: AddressInstance[];
     selectedCommunity: CommunityInstance;
     isAdmin: boolean;
@@ -273,10 +279,13 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   return {
     roles,
     user: {
+      id: user.id,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
+      promotional_emails_enabled: user.promotional_emails_enabled,
       jwt: '',
+      knockJwtToken: '',
       addresses,
       selectedCommunity,
       isAdmin,
@@ -307,7 +316,7 @@ export const status = async (
       return success(res, {
         notificationCategories,
         recentThreads: threadCountQueryData,
-        evmTestEnv: ETH_RPC,
+        evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         communityCategoryMap: communityCategories,
       });
@@ -330,10 +339,15 @@ export const status = async (
         threadCountQueryData,
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
-        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+
+      const jwtToken = jwt.sign({ id, email }, config.AUTH.JWT_SECRET, {
+        expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
+
+      const knockJwtToken = await computeKnockJwtToken(user.id);
+
       user.jwt = jwtToken as string;
+      user.knockJwtToken = knockJwtToken;
 
       return success(res, {
         notificationCategories,
@@ -341,7 +355,7 @@ export const status = async (
         roles,
         loggedIn: true,
         user: { ...user, profileId: profileInstance.id },
-        evmTestEnv: ETH_RPC,
+        evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         communityCategoryMap: communityCategories,
       });
@@ -351,6 +365,21 @@ export const status = async (
     throw new ServerError('something broke', error);
   }
 };
+
+/**
+ * We have to generate a JWT token for use by the frontend Knock SDK.
+ */
+async function computeKnockJwtToken(userId: number) {
+  if (config.NOTIFICATIONS.KNOCK_SIGNING_KEY) {
+    return await Knock.signUserToken(`${userId}`, {
+      signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
+      expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
+    });
+  } else {
+    log.warn('No process.env.KNOCK_SIGNING_KEY defined ');
+    return '';
+  }
+}
 
 type CommunityActivity = [communityId: string, timestamp: string | null][];
 

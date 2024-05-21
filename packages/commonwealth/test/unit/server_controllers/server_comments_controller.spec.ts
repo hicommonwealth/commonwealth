@@ -53,6 +53,7 @@ describe('ServerCommentsController', () => {
           ]),
         },
         Comment: {
+          update: sandbox.stub().resolves(null),
           findOne: sandbox.stub().resolves({
             id: 3,
             text: 'my comment body',
@@ -182,6 +183,7 @@ describe('ServerCommentsController', () => {
         },
         Comment: {
           findOne: sandbox.stub().resolves(null),
+          update: sandbox.stub().resolves(null),
         },
         Thread: {
           findOne: sandbox.stub().resolves({
@@ -249,6 +251,7 @@ describe('ServerCommentsController', () => {
             id: 3,
             text: 'my comment body',
           }),
+          update: sandbox.stub().resolves(null),
         },
         Thread: {
           findOne: sandbox.stub().resolves(null),
@@ -317,6 +320,7 @@ describe('ServerCommentsController', () => {
               community_id: 'ethereum',
             },
           }),
+          update: sandbox.stub().resolves(null),
         },
       };
       const banCache = {
@@ -384,6 +388,7 @@ describe('ServerCommentsController', () => {
               topic_id: 77,
             },
           }),
+          update: sandbox.stub().resolves(null),
         },
         // for validateTopicThreshold
         Topic: {
@@ -545,6 +550,17 @@ describe('ServerCommentsController', () => {
         },
         Comment: {
           findOne: async () => data,
+          update: () => (data.text = 'Hello'),
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
         },
       };
       const banCache = {
@@ -621,6 +637,17 @@ describe('ServerCommentsController', () => {
       const db = {
         Comment: {
           findOne: async () => data,
+          update: () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -667,9 +694,20 @@ describe('ServerCommentsController', () => {
       const db = {
         Comment: {
           findOne: async () => data,
+          update: () => null,
         },
         Thread: {
           findOne: async () => null,
+        },
+        sequelize: {
+          transaction: (callback?: () => Promise<void>) => {
+            if (callback) return callback();
+            else
+              return {
+                rollback: () => Promise.resolve({}),
+                commit: () => Promise.resolve({}),
+              };
+          },
         },
       };
       const banCache = {
@@ -715,6 +753,7 @@ describe('ServerCommentsController', () => {
               didDestroy = true;
             },
           }),
+          update: () => ({}),
         },
         Subscription: {
           destroy: async () => ({}),

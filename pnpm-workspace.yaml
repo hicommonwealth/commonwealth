@@ -1,0 +1,6 @@
+packages:
+  - 'libs/**'
+  - 'packages/commonwealth'
+  - 'packages/discord-bot'
+  - 'packages/snapshot-listener'
+  - 'packages/scripts'

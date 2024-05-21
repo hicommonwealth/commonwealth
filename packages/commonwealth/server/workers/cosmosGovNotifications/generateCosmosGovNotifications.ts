@@ -1,6 +1,7 @@
-import { logger } from '@hicommonwealth/logging';
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -67,7 +68,10 @@ export async function generateCosmosGovNotifications() {
 
 if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
-    .then(() => process.exit(0))
+    .then(() => {
+      stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');
+      process.exit(0);
+    })
     .catch((err) => {
       log.error(err);
       process.exit(1);

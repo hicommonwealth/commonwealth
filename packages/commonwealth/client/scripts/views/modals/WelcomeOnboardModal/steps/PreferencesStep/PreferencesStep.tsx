@@ -1,31 +1,36 @@
+import app from 'client/scripts/state';
+import { useUpdateProfileByAddressMutation } from 'client/scripts/state/api/profiles';
+import {
+  PreferenceTags,
+  usePreferenceTags,
+} from 'client/scripts/views/components/PreferenceTags';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import clsx from 'clsx';
-import React, { useState } from 'react';
+import React from 'react';
 import './PreferencesStep.scss';
-import { interestTags } from './constants';
 
 type PreferencesStepProps = {
   onComplete: () => void;
 };
 
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
-  const [selectedTags, setSelectedTags] = useState(
-    [...interestTags].map((tag) => ({ isSelected: false, tag })),
-  );
+  const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
 
-  const toggleTagFromSelection = (tag: string, isSelected: boolean) => {
-    const updatedTags = [...selectedTags];
-    const foundTag = updatedTags.find((t) => t.tag === tag);
-    foundTag.isSelected = isSelected;
-    setSelectedTags([...updatedTags]);
-  };
+  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
+    useUpdateProfileByAddressMutation();
 
   const handleSavePreferences = () => {
-    // TODO: save tags to api here
-    // const finalTags = selectedTags.filter(tag => tag.isSelected)
+    if (isUpdatingProfile) return;
 
-    onComplete();
+    updateProfile({
+      address: app.user.activeAccount?.profile?.address,
+      chain: app.user.activeAccount?.profile?.chain,
+      tagIds: preferenceTags
+        .filter((tag) => tag.isSelected)
+        .map((tag) => tag.item.id),
+    })
+      .then(() => onComplete())
+      .catch(console.error);
   };
 
   return (
@@ -37,19 +42,10 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
         <CWText type="h5">Select all that apply</CWText>
       </div>
 
-      <div className="tags-container">
-        {selectedTags.map(({ tag, isSelected }) => (
-          <CWButton
-            key={tag}
-            label={tag}
-            buttonType="secondary"
-            buttonHeight="sm"
-            buttonWidth="narrow"
-            containerClassName={clsx('tag', { isSelected })}
-            onClick={() => toggleTagFromSelection(tag, !isSelected)}
-          />
-        ))}
-      </div>
+      <PreferenceTags
+        preferenceTags={preferenceTags}
+        onTagClick={toggleTagFromSelection}
+      />
 
       <div className="action-btns">
         <CWButton

@@ -44,10 +44,10 @@ To run each service locally the follow this process from the chain-testing dir:
 
 1. run `npm install`
 2. Add the host `127.0.0.1       chain` to `/etc/hosts`
-3. run `yarn run ganache`
+3. run `pnpm run ganache`
 4. Specify Host port for API ie `export CHAIN_PORT=3000`
 5. Specify that ganache should be used `export RPC_HOST=ganache`
-6. run `yarn start` in a separate terminal.
+6. run `pnpm start` in a separate terminal.
 
 ## API
 

@@ -1,5 +1,4 @@
-import { EventNames, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
 import { IDiscordMeta } from '../types';
@@ -9,7 +8,7 @@ import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes } from './community';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -49,10 +48,10 @@ export type CommentAttributes = {
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
 
-export type CommentModelStatic = ModelStatic<CommentInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommentModelStatic>sequelize.define<CommentInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommentInstance> =>
+  sequelize.define<CommentInstance>(
     'Comment',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

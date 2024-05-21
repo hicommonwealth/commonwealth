@@ -9,8 +9,8 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from 'server/config';
 import { TestServer, testServer } from '../../../server-test';
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -47,7 +47,7 @@ describe('Thread Patch Update', () => {
       adminAddress = adminCanvasAddress.split(':')[2];
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       const isAdmin = await server.seeder.updateRole({
         address_id: +adminRes.address_id,
@@ -68,7 +68,7 @@ describe('Thread Patch Update', () => {
       userAddress = canvasAddress.split(':')[2];
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       userSession = { session: userRes.session, sign: userRes.sign };
       expect(userAddress).to.not.be.null;

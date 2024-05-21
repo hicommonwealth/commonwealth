@@ -1,4 +1,9 @@
 import useFetchDiscordChannelsQuery from './fetchDiscordChannels';
 import useRemoveDiscordBotConfigMutation from './removeDiscordBotConfig';
+import useSetDiscordBotConfigMutation from './setDiscordBotConfig';
 
-export { useFetchDiscordChannelsQuery, useRemoveDiscordBotConfigMutation };
+export {
+  useFetchDiscordChannelsQuery,
+  useRemoveDiscordBotConfigMutation,
+  useSetDiscordBotConfigMutation,
+};

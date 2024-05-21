@@ -1,8 +1,8 @@
 import { ProposalStatus } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { getCosmosClient } from './getCosmosClient';
 import { GovV1Beta1ClientType } from './types';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';

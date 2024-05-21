@@ -5,7 +5,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 
 chai.use(chaiHttp);
@@ -33,7 +33,7 @@ describe('Notification Routes Tests', () => {
     userId = result.user_id;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
 
     newThreadSub = await server.seeder.createSubscription({

@@ -1,8 +1,9 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   ProfileAttributes,
   WebhookInstance,
+  config,
   models,
 } from '@hicommonwealth/model';
 import {
@@ -10,9 +11,9 @@ import {
   NotificationDataAndCategory,
   slugify,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
-import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import { fileURLToPath } from 'url';
+import { DEFAULT_COMMONWEALTH_LOGO } from '../../config';
 import { WebhookDestinations } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -132,7 +133,7 @@ export function getThreadUrlFromNotification(
   }
 
   const data = notification.data;
-  return `${SERVER_URL}/${data.community_id}/discussion/${
+  return `${config.SERVER_URL}/${data.community_id}/discussion/${
     data.thread_id
   }-${slugify(data.root_title)}${commentId}`;
 }

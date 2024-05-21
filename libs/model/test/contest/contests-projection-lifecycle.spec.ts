@@ -22,7 +22,7 @@ chai.use(chaiAsPromised);
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
   const namespace = 'test-namespace';
-  const recurring = 'test-recurring-contest';
+  const recurring = '0x0000000000000000000000000000000000000000';
   const oneoff = 'test-oneoff-contest';
   const contest_id = 1;
   const content_id = 1;
@@ -61,7 +61,10 @@ describe('Contests projection lifecycle', () => {
 
   before(async () => {
     await bootstrap_testing();
-    const [chain] = await seed('ChainNode', { contracts: [] });
+    const [chain] = await seed('ChainNode', {
+      contracts: [],
+      url: 'https://test',
+    });
     const [user] = await seed(
       'User',
       {
@@ -135,6 +138,9 @@ describe('Contests projection lifecycle', () => {
         max_notif_id: 1,
         discord_meta: undefined,
         deleted_at: undefined, // so we can find it!
+        pinned: false,
+        read_only: false,
+        version_history: [],
       },
       //{ mock: true, log: true },
     );
@@ -263,7 +269,7 @@ describe('Contests projection lifecycle', () => {
 
     const result = await query(GetAllContests(), {
       actor,
-      payload: { community_id, contest_id },
+      payload: { community_id, contest_address: recurring, contest_id },
     });
     expect(result).to.deep.eq([
       {
@@ -287,7 +293,7 @@ describe('Contests projection lifecycle', () => {
             end_time,
             winners: winners.map((w) => ({
               ...w,
-              prize: w.prize / 10 ** decimals,
+              prize: Math.floor(w.prize / 10 ** decimals),
             })),
             actions: [
               {

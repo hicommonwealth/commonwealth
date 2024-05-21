@@ -1,5 +1,7 @@
+export * from './config';
 export * as express from './express';
 export * from './hot-shots';
+export * from './knock';
 export * from './mixpanel';
 export * from './rabbitmq';
 export * from './redis';

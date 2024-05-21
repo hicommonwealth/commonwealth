@@ -1,5 +1,4 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   WebhookInstance,
@@ -9,7 +8,7 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';

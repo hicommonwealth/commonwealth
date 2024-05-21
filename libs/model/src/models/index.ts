@@ -1,14 +1,9 @@
 import { Sequelize } from 'sequelize';
 import { buildAssociations } from './associations';
-import { Factories } from './factories';
-import type { Models } from './types';
+import { Factories, type DB } from './factories';
 import { createFk, dropFk, manyToMany, oneToMany, oneToOne } from './utils';
 
-export type DB = Models<typeof Factories> & {
-  sequelize: Sequelize;
-  Sequelize: typeof Sequelize;
-};
-
+export type { DB };
 /**
  * Wraps sequelize sync with the process of building composite foreign key constraints
  * - This is not yet supported by sequelize
@@ -31,21 +26,17 @@ export const syncDb = async (db: DB, log = false) => {
  * @returns built db model
  */
 export const buildDb = (sequelize: Sequelize): DB => {
-  const models = Object.fromEntries(
-    Object.entries(Factories).map(([key, factory]) => {
-      const model = factory(sequelize);
-      model._fks = [];
-      // TODO: can we make this work without any?
-      model.withOne = oneToOne as any;
-      model.withMany = oneToMany as any;
-      model.withManyToMany = manyToMany as any;
-      return [key, model];
+  const models = Object.entries(Factories).map(([key, factory]) => [
+    key,
+    Object.assign(factory(sequelize), {
+      _fks: [],
+      withOne: oneToOne,
+      withMany: oneToMany,
+      withManyToMany: manyToMany,
     }),
-  );
-
-  const db = { sequelize, Sequelize, ...models } as DB;
+  ]);
+  const db = { sequelize, Sequelize, ...Object.fromEntries(models) } as DB;
   buildAssociations(db);
-
   return db;
 };
 
@@ -62,6 +53,7 @@ export * from './community_contract_template';
 export * from './community_contract_template_metadata';
 export * from './community_role';
 export * from './community_stake';
+export * from './community_tags';
 export * from './contract';
 export * from './contract_abi';
 export * from './discord_bot_config';
@@ -76,6 +68,7 @@ export * from './notifications_read';
 export * from './outbox';
 export * from './poll';
 export * from './profile';
+export * from './profile_tags';
 export * from './reaction';
 export * from './role';
 export * from './role_assignment';
@@ -83,6 +76,7 @@ export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';
 export * from './subscription';
+export * from './tags';
 export * from './template';
 export * from './thread';
 export * from './topic';

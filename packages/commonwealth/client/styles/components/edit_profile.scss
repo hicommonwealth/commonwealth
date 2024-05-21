@@ -138,6 +138,24 @@
       }
     }
 
+    .preferences-header {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      padding-bottom: 16px;
+
+      .h4 {
+        color: $neutral-600;
+      }
+
+      .h5 {
+        color: $neutral-500;
+      }
+    }
+
     .Divider {
       margin-bottom: 16px;
     }

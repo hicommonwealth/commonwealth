@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import { recomputeCounts } from '../../../scripts/recompute-count-job';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 
@@ -311,7 +311,7 @@ describe('recomputeCounts', () => {
         id: testVerifiedChainAddress.user_id,
         email: null,
       },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 

@@ -1,9 +1,9 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
 } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
