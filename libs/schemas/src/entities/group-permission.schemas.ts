@@ -12,5 +12,5 @@ export type GroupPermissionType = keyof typeof PermissionEnum;
 
 export const GroupPermission = z.object({
   group_id: PG_INT.optional(),
-  type: z.nativeEnum(PermissionEnum),
+  allowed_permissions: z.array(z.nativeEnum(PermissionEnum)),
 });

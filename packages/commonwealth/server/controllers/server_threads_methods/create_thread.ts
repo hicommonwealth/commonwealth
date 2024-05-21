@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas/src/index';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/core';

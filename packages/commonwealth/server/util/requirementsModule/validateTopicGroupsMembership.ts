@@ -4,7 +4,7 @@ import {
   GroupInstance,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { GroupPermissionType } from '@hicommonwealth/schemas/src/index';
+import { GroupPermissionType } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 

@@ -5,7 +5,7 @@ import {
   CommentInstance,
   UserInstance,
 } from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas/src/index';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
