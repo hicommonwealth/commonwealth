@@ -70,10 +70,6 @@
     "unit-test:watch": "NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
-  "resolutions": {
-    "@canvas-js/chain-cosmos/ethers": "^6.9.0",
-    "@canvas-js/chain-ethereum/ethers": "^6.9.0"
-  },
   "dependencies": {
     "@apollo/client": "^3.3.18",
     "@aws-sdk/client-s3": "^3.577.0",
