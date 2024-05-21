@@ -15,7 +15,7 @@ export const query = async <Input extends ZodSchema, Output extends ZodSchema>(
   { input, auth, body }: QueryMetadata<Input, Output>,
   { actor, payload }: QueryContext<Input>,
   validate = true,
-): Promise<Partial<z.infer<Output>> | undefined | void> => {
+): Promise<Partial<z.infer<Output>> | undefined> => {
   try {
     const context: QueryContext<Input> = {
       actor,
@@ -41,6 +41,8 @@ export const query = async <Input extends ZodSchema, Output extends ZodSchema>(
       }
       throw error;
     }
-    throw new InvalidInput('Invalid query', [error as string]);
+    throw new InvalidInput('Invalid query', [
+      typeof error !== 'string' ? JSON.stringify(error) : error,
+    ]);
   }
 };
