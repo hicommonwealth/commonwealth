@@ -178,7 +178,7 @@ describe.only('Recap email lifecycle', () => {
     expect(res?.governance).to.deep.equal(governanceData.enrichedNotifications);
   });
 
-  it.only('should return enriched protocol notifications', async () => {
+  it('should return enriched protocol notifications', async () => {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(new Date().getDate() - 2);
     const protocolData = generateProtocolData(
