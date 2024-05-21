@@ -4,7 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { testServer, TestServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
 import type { CommunityArgs } from '../../util/modelUtils';
 
@@ -30,7 +30,7 @@ describe('Update Community/Chain Tests', () => {
     loggedInAddr = result.address;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     const isAdmin = await server.seeder.updateRole({
       address_id: +result.address_id,
@@ -50,7 +50,7 @@ describe('Update Community/Chain Tests', () => {
     expect(siteAdminSetSuccessfully).to.be.true;
     siteAdminJwt = jwt.sign(
       { id: siteAdminResult.user_id, email: siteAdminResult.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
 
     // create community for test
@@ -257,7 +257,7 @@ describe('Update Community/Chain Tests', () => {
       );
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       const res = await chai
         .request(server.app)

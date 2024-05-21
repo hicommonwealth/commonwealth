@@ -1,9 +1,9 @@
 import {
   EventHandler,
+  logger,
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
@@ -71,6 +71,7 @@ export const processSnapshotProposalCreated: EventHandler<
         key: WorkflowKeys.SnapshotProposals,
         users,
         data: {
+          community_id,
           community_name,
           space_name: space,
           snapshot_proposal_url: getSnapshotUrl(community_id, space, id),

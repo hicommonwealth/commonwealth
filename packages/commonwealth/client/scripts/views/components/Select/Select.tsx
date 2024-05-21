@@ -80,6 +80,7 @@ export const Select = ({
       <div className={containerClassname}>
         {label && <MessageRow label={label} />}
         <CWButton
+          type="button"
           className={`Select ${
             popoverProps.anchorEl ? 'active' : ''
           } ${`size-${size}`}`}

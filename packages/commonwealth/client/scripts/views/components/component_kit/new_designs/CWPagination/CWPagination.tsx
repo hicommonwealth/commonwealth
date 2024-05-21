@@ -21,6 +21,7 @@ interface CWPaginationProps extends UseCWPaginationProps {
  * or (end ellipsis and next button)
  * @param siblingCount number of buttons to show before and after the current page
  * @param onChange onClick handler for pagination
+ * @param selectedPageProp externally modify which page is selected
  * @param className className for pagination container
  */
 const CWPagination = ({
@@ -28,6 +29,7 @@ const CWPagination = ({
   boundaryCount,
   siblingCount,
   onChange,
+  selectedPageProp,
   className,
 }: CWPaginationProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
@@ -37,6 +39,7 @@ const CWPagination = ({
     boundaryCount,
     onChange,
     siblingCount: siblingCount || isWindowExtraSmall ? 0 : 1,
+    selectedPageProp,
   });
 
   return (
@@ -47,6 +50,7 @@ const CWPagination = ({
           children: React.ReactNode,
         ) => (
           <button
+            type="button"
             onClick={item.onClick}
             disabled={item.disabled}
             key={index}

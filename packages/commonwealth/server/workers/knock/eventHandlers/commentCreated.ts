@@ -1,9 +1,9 @@
 import {
   EventHandler,
+  logger,
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';

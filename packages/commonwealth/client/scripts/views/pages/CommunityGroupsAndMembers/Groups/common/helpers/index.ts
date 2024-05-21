@@ -11,7 +11,9 @@ import { GroupResponseValuesType } from '../GroupForm/index.types';
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
+  allowedAddresses?: string[],
 ) => {
+  const extraRequrirements = allowedAddresses?.length > 0 ? 1 : 0;
   const payload = {
     communityId: app.activeChainId(),
     address: app.user.activeAccount.address,
@@ -20,10 +22,17 @@ export const makeGroupDataBaseAPIPayload = (
     topicIds: formSubmitValues.topics.map((x) => parseInt(x.value)),
     requirementsToFulfill:
       formSubmitValues.requirementsToFulfill === 'ALL'
-        ? formSubmitValues.requirements.length
+        ? formSubmitValues.requirements.length + extraRequrirements
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
   };
+
+  if (allowedAddresses?.length > 0) {
+    payload.requirements.push({
+      rule: 'allow',
+      data: { allow: allowedAddresses },
+    });
+  }
 
   // map requirements and add to payload
   formSubmitValues.requirements.map((x) => {
@@ -87,4 +96,22 @@ export const makeGroupDataBaseAPIPayload = (
   });
 
   return payload;
+};
+
+export const getTotalPages = (
+  members,
+  allowedAddresses: string[],
+  filter: string,
+  membersPerPage: number,
+) => {
+  let totalPages = members?.totalPages ?? 0;
+
+  if (filter === 'allow-specified-addresses') {
+    totalPages = Math.ceil(allowedAddresses.length / membersPerPage);
+  } else if (filter === 'not-allow-specified-addresses') {
+    totalPages =
+      totalPages - Math.ceil(allowedAddresses.length / membersPerPage);
+  }
+
+  return totalPages;
 };

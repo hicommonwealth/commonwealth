@@ -1,4 +1,5 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useWallets from 'client/scripts/hooks/useWallets';
 import app from 'client/scripts/state';
 import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
@@ -60,6 +61,7 @@ const ModalBase = ({
   onSignInClick,
   onChangeModalType,
 }: ModalBaseProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const copy = MODAL_COPY[layoutType];
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -197,7 +199,7 @@ const ModalBase = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      if (layoutType === AuthModalType.SignIn) {
+      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
         setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
       }
 
@@ -218,7 +220,7 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
-      if (layoutType === AuthModalType.SignIn) {
+      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
         setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
       }
 

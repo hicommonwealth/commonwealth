@@ -1,8 +1,5 @@
 import { models, UserAttributes } from '@hicommonwealth/model';
-import * as dotenv from 'dotenv';
 import { WhereOptions } from 'sequelize';
-
-dotenv.config();
 
 async function main() {
   if (

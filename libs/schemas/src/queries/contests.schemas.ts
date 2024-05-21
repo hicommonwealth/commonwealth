@@ -16,6 +16,7 @@ export const ContestResults = ContestManager.extend({
 export const GetAllContests = {
   input: z.object({
     community_id: z.string(),
+    contest_address: z.string().optional(),
     contest_id: z.number().int().optional(),
     running: z.boolean().optional().describe('Only active contests'),
   }),

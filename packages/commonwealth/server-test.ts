@@ -3,12 +3,9 @@ import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
 import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
+import 'express-async-errors'; // handle exceptions thrown in express routes
+import { config } from './server/config';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
-
-// handle exceptions thrown in express routes
-import 'express-async-errors';
-
-const TEST_WITHOUT_LOGS = process.env.TEST_WITHOUT_LOGS === 'true';
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -45,7 +42,7 @@ export const testServer = async (): Promise<TestServer> => {
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
     port: 8081,
-    withLoggingMiddleware: !TEST_WITHOUT_LOGS,
+    withLoggingMiddleware: !config.LOGGING.TEST_WITHOUT_LOGS,
   });
   const seeder = modelSeeder(app, db);
   const e2eTestEntities = await tester.e2eTestEntities(db);

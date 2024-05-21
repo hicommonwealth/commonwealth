@@ -7,7 +7,7 @@ import type {
 import { hashAbi } from '@hicommonwealth/model';
 import axios from 'axios';
 import { NextFunction } from 'express';
-import { ETHERSCAN_JS_API_KEY } from '../config';
+import { config } from '../config';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import validateAbi from '../util/abiValidation';
@@ -44,7 +44,7 @@ export const fetchEtherscanContract = async (
   req: TypedRequestBody<FetchEtherscanContractReq>,
   res: TypedResponse<FetchEtherscanContractResp>,
 ) => {
-  if (!ETHERSCAN_JS_API_KEY) {
+  if (!config.EVM.ETHERSCAN_JS_API_KEY) {
     throw new AppError(Errors.NoEtherscanApiKey);
   }
 
@@ -76,7 +76,7 @@ export const fetchEtherscanContract = async (
   const fqdn = network === 'Mainnet' ? 'api' : `api-${network.toLowerCase()}`;
 
   // eslint-disable-next-line max-len
-  const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`;
+  const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${config.EVM.ETHERSCAN_JS_API_KEY}`;
 
   const response = await axios.get(url, { timeout: 3000 });
   if (response.status === 200) {
@@ -136,7 +136,7 @@ export const fetchEtherscanContractAbi = async (
   res: TypedResponse<FetchEtherscanContractAbiResp>,
   next: NextFunction,
 ) => {
-  if (!ETHERSCAN_JS_API_KEY) {
+  if (!config.EVM.ETHERSCAN_JS_API_KEY) {
     throw new AppError(Errors.NoEtherscanApiKey);
   }
 
@@ -162,7 +162,7 @@ export const fetchEtherscanContractAbi = async (
   const fqdn = network === 'Mainnet' ? 'api' : `api-${network.toLowerCase()}`;
 
   // eslint-disable-next-line max-len
-  const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`;
+  const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${config.EVM.ETHERSCAN_JS_API_KEY}`;
 
   const response = await axios.get(url, { timeout: 3000 });
   if (response.status === 200) {

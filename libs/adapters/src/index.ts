@@ -1,3 +1,4 @@
+export * from './config';
 export * as express from './express';
 export * from './hot-shots';
 export * from './knock';
