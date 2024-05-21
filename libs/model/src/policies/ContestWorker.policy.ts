@@ -1,7 +1,6 @@
 import { events, Policy } from '@hicommonwealth/core';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { URL } from 'url';
-import { config } from '../config';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
 
@@ -31,26 +30,19 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
         const chainNodeUrl = community!.ChainNode!.private_url!;
 
-        const web3Client = await contestHelper.createWeb3Provider(
-          chainNodeUrl,
-          config.WEB3.PRIVATE_KEY,
-        );
-
         const fullContentUrl = getThreadUrl({
           chain: community!.id!,
           id: payload.id!,
           title: payload.title,
         });
-
         // content url only contains path
         const contentUrl = new URL(fullContentUrl).pathname;
-
         const contestAddress = community!.contest_managers![0].contest_address;
         const { address: userAddress } = (await models.Address.findByPk(
           payload!.address_id,
         ))!;
         await contestHelper.addContent(
-          web3Client,
+          chainNodeUrl,
           contestAddress!,
           userAddress,
           contentUrl,
@@ -71,25 +63,20 @@ export function ContestWorker(): Policy<typeof inputs> {
             ],
           },
         );
+
         const chainNodeUrl = community!.ChainNode!.private_url!;
-
-        const web3Client = await contestHelper.createWeb3Provider(
-          chainNodeUrl!,
-          config.WEB3.PRIVATE_KEY,
-        );
-
         const contestAddress = community!.contest_managers![0].contest_address;
-
         const addAction = await models.ContestAction.findOne({
           where: {
             contest_address: contestAddress,
             action: 'added',
           },
         });
+
         const userAddress = addAction!.actor_address!;
         const contentId = addAction!.content_id!;
         await contestHelper.voteContent(
-          web3Client,
+          chainNodeUrl,
           contestAddress!,
           userAddress,
           contentId.toString(),

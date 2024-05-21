@@ -2,7 +2,6 @@ import { AppError, Projection, events, logger } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { config } from '../config';
 import { models, sequelize } from '../database';
@@ -52,10 +51,7 @@ async function updateOrCreateWithAlert(
   const { ticker, decimals } =
     config.NODE_ENV === 'test'
       ? { ticker: 'ETH', decimals: 18 }
-      : await protocol.contractHelpers.getTokenAttributes(
-          contest_address,
-          new Web3(url),
-        );
+      : await protocol.contractHelpers.getTokenAttributes(url, contest_address);
 
   const [updated] = await models.ContestManager.update(
     {

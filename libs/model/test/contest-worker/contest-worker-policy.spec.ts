@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
-import Web3 from 'web3';
 
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import { commonProtocol, models } from '../../src';
@@ -61,10 +60,6 @@ describe('Contest Worker Policy', () => {
   });
 
   it('Policy should handle ThreadCreated and ThreadUpvoted events', async () => {
-    Sinon.stub(commonProtocol.contestHelper, 'createWeb3Provider').resolves(
-      new Web3(),
-    );
-
     {
       const addContentStub = Sinon.stub(
         commonProtocol.contestHelper,

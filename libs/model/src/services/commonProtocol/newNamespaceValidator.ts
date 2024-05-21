@@ -58,7 +58,7 @@ export const validateNamespace = async (
 
   //validate contract data
   const activeNamespace = await getNamespace(
-    web3,
+    community.ChainNode.url,
     namespace,
     factoryData.factory,
   );
