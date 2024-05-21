@@ -51,7 +51,6 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
     // though
 
     await deleteThreadSubscriptionMutation.mutateAsync({
-      id: 'FIXME: not_needed',
       thread_ids: [thread_id],
     });
   }, [deleteThreadSubscriptionMutation, thread_id]);
