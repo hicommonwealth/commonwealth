@@ -27,13 +27,16 @@ export default (
         type: Sequelize.DATE,
         allowNull: false,
       },
-      winners: {
-        type: Sequelize.ARRAY(Sequelize.JSONB),
+      score_updated_at: {
+        type: Sequelize.DATE,
+      },
+      score: {
+        type: Sequelize.JSONB,
       },
     },
     {
       tableName: 'Contests',
       timestamps: false,
-      indexes: [{ fields: ['start_time'] }], // TODO: can we enforce typings in indexes?
+      indexes: [{ fields: ['start_time'] }],
     },
   );

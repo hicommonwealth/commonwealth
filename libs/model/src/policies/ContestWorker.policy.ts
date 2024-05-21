@@ -3,7 +3,7 @@ import { getThreadUrl } from '@hicommonwealth/shared';
 import { URL } from 'url';
 import { config } from '../config';
 import { models } from '../database';
-import { ContestHelper } from '../services/commonProtocol';
+import { contestHelper } from '../services/commonProtocol';
 
 const inputs = {
   ThreadCreated: events.ThreadCreated,
@@ -31,7 +31,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
         const chainNodeUrl = community!.ChainNode!.private_url!;
 
-        const web3Client = await ContestHelper.createWeb3Provider(
+        const web3Client = await contestHelper.createWeb3Provider(
           chainNodeUrl,
           config.WEB3.PRIVATE_KEY,
         );
@@ -49,7 +49,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         const { address: userAddress } = (await models.Address.findByPk(
           payload!.address_id,
         ))!;
-        await ContestHelper.addContent(
+        await contestHelper.addContent(
           web3Client,
           contestAddress!,
           userAddress,
@@ -73,7 +73,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
         const chainNodeUrl = community!.ChainNode!.private_url!;
 
-        const web3Client = await ContestHelper.createWeb3Provider(
+        const web3Client = await contestHelper.createWeb3Provider(
           chainNodeUrl!,
           config.WEB3.PRIVATE_KEY,
         );
@@ -88,7 +88,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         });
         const userAddress = addAction!.actor_address!;
         const contentId = addAction!.content_id!;
-        await ContestHelper.voteContent(
+        await contestHelper.voteContent(
           web3Client,
           contestAddress!,
           userAddress,

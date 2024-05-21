@@ -137,3 +137,49 @@ export const createWeb3Provider = async (
   web3.eth.defaultAccount = account.address;
   return web3;
 };
+
+export type ContestWinners = {
+  winningContent: string[];
+  winningAddress: string[];
+  voteCount: string[];
+};
+
+/**
+ * Gets vote and more information about winners of a given contest
+ * @param url node url
+ * @param contest the address of the contest
+ * @param contestId the id of the contest for data within the contest contract
+ * @returns ContestWinners object containing eqaul indexed content ids, addresses, and votes
+ */
+export const getContestScore = async (
+  url: string,
+  contest: string,
+  contestId?: number,
+): Promise<ContestWinners> => {
+  const web3 = new Web3(url);
+
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  const winnerIds: string[] = contestId
+    ? await contestInstance.methods.getPastWinners(contestId).call()
+    : await contestInstance.methods.getWinnerIds().call();
+
+  if (winnerIds.length == 0) {
+    throw new AppError('Contest Id not found on Contest address');
+  }
+
+  const votePromises: any[] = [];
+  winnerIds.forEach((w) => {
+    votePromises.push(contestInstance.methods.content(w).call());
+  });
+
+  const contentMeta = await Promise.all(votePromises);
+  return {
+    winningContent: winnerIds,
+    winningAddress: contentMeta.map((c) => c['creator']),
+    voteCount: contentMeta.map((c) => c['cumulativeVotes']),
+  };
+};

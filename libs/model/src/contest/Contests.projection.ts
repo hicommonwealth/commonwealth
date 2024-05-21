@@ -1,10 +1,14 @@
 import { AppError, Projection, events, logger } from '@hicommonwealth/core';
+import { ContestScore } from '@hicommonwealth/schemas';
+import { Op, QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';
+import { z } from 'zod';
 import { config } from '../config';
-import { models } from '../database';
+import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
-import { contractHelpers } from '../services/commonProtocol';
+import * as protocol from '../services/commonProtocol';
+import type { ContestWinners } from '../services/commonProtocol/contestHelper';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -26,7 +30,6 @@ const inputs = {
   ContestStarted: events.ContestStarted,
   ContestContentAdded: events.ContestContentAdded,
   ContestContentUpvoted: events.ContestContentUpvoted,
-  ContestWinnersRecorded: events.ContestWinnersRecorded,
 };
 
 /**
@@ -42,20 +45,17 @@ async function updateOrCreateWithAlert(
     where: { namespace },
     include: models.ChainNode.scope('withPrivateData'),
   });
+  const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
+  if (!url)
+    throw new AppError(`Chain node url not found on namespace ${namespace}`);
 
-  if (!community?.ChainNode?.url) {
-    throw new AppError('Chain Node not found');
-  }
   const { ticker, decimals } =
     config.NODE_ENV === 'test'
       ? { ticker: 'ETH', decimals: 18 }
-      : await contractHelpers.getTokenAttributes(
+      : await protocol.contractHelpers.getTokenAttributes(
           contest_address,
-          new Web3(
-            community?.ChainNode?.private_url || community?.ChainNode?.url,
-          ),
+          new Web3(url),
         );
-  // TODO: evaluate errors from contract helpers and how to drive the event queue
 
   const [updated] = await models.ContestManager.update(
     {
@@ -85,6 +85,100 @@ async function updateOrCreateWithAlert(
   }
 }
 
+/**
+ * Gets chain node url from contest address
+ */
+async function getChainUrl(
+  contest_address: string,
+): Promise<string | undefined> {
+  const [{ url }] = await models.sequelize.query<{ url: string }>(
+    `
+  select
+    coalesce(cn.private_url, cn.url) as url
+  from
+    "ContestManagers" cm 
+    join "Communities" c on cm.community_id = c.id
+    join "ChainNodes" cn on c.chain_node_id = cn.id
+  where
+    cm.contest_address = :contest_address;
+  `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { contest_address },
+    },
+  );
+  return url;
+}
+
+/**
+ * Updates contest score (eventually winners)
+ */
+async function updateScore(contest_address: string, contest_id: number) {
+  try {
+    const url = await getChainUrl(contest_address);
+    if (!url)
+      throw new AppError(
+        `Chain node url not found on contest ${contest_address}`,
+      );
+
+    const result: ContestWinners = await protocol.contestHelper.getContestScore(
+      url,
+      contest_address,
+      contest_id,
+    );
+    const score: z.infer<typeof ContestScore> = result.winningContent.map(
+      (_, i) => ({
+        content_id: +result.winningContent[i],
+        creator_address: result.winningAddress[i],
+        votes: +result.voteCount[i],
+        prize: 0, // TODO: +result.prize[i],
+      }),
+    );
+    await models.Contest.update(
+      {
+        score,
+        score_updated_at: new Date(),
+      },
+      {
+        where: {
+          contest_address: contest_address,
+          contest_id,
+        },
+      },
+    );
+  } catch (err) {
+    err instanceof Error
+      ? log.error(err.message, err)
+      : log.error(err as string);
+  }
+}
+
+/**
+ * Makes sure all previous contests have an updated score
+ */
+async function updateEndedContests(
+  contest_address: string,
+  contest_id: number,
+) {
+  try {
+    const outdated = await models.Contest.findAll({
+      where: {
+        contest_address: contest_address,
+        contest_id: { [Op.lt]: contest_id },
+        score_updated_at: { [Op.lte]: sequelize.col('end_time') },
+      },
+    });
+    for (const contest of outdated) {
+      await updateScore(contest_address, contest.contest_id);
+    }
+  } catch (err) {
+    err instanceof Error
+      ? log.error(err.message, err)
+      : log.error(err as string);
+  }
+}
+
 export function Contests(): Projection<typeof inputs> {
   return {
     inputs,
@@ -108,10 +202,15 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestStarted: async ({ payload }) => {
+        const contest_id = payload.contest_id || 0;
         await models.Contest.create({
           ...payload,
-          contest_id: payload.contest_id || 0,
+          contest_id,
         });
+        contest_id > 0 &&
+          setImmediate(() =>
+            updateEndedContests(payload.contest_address, contest_id),
+          );
       },
 
       ContestContentAdded: async ({ payload }) => {
@@ -133,11 +232,12 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentUpvoted: async ({ payload }) => {
+        const contest_id = payload.contest_id || 0;
         // TODO: can we make this just one sql statement using subqueries?
         const add_action = await models.ContestAction.findOne({
           where: {
             contest_address: payload.contest_address,
-            contest_id: payload.contest_id || 0,
+            contest_id,
             content_id: payload.content_id,
             action: 'added',
           },
@@ -146,25 +246,14 @@ export function Contests(): Projection<typeof inputs> {
         });
         await models.ContestAction.create({
           ...payload,
-          contest_id: payload.contest_id || 0,
+          contest_id,
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action?.thread_id,
         });
-      },
-
-      ContestWinnersRecorded: async ({ payload }) => {
-        await models.Contest.update(
-          {
-            winners: payload.winners,
-          },
-          {
-            where: {
-              contest_address: payload.contest_address,
-              contest_id: payload.contest_id || 0,
-            },
-          },
-        );
+        // update score if event is less than 24h old
+        Date.now() - payload.created_at.getTime() < 24 * 60 * 60 * 1000 &&
+          setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },
   };
