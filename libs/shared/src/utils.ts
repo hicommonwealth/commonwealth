@@ -35,8 +35,8 @@ export const getThreadUrl = (
   }
 
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${relativePath}`
-    : `http://localhost:8080/${relativePath}`;
+    ? `https://commonwealth.im${relativePath}`
+    : `http://localhost:8080${relativePath}`;
 };
 
 export function timeoutPromise(timeout: number) {
