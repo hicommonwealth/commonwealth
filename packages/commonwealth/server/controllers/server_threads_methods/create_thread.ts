@@ -11,6 +11,7 @@ import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
+import { assertGroupPermission } from '../../util/groupPermissions';
 import {
   createThreadMentionNotifications,
   emitMentions,
@@ -108,6 +109,14 @@ export async function __createThread(
   if (!canInteract) {
     throw new AppError(`Ban error: ${banError}`);
   }
+
+  // check if sufficient group permissions
+  await assertGroupPermission(
+    'CREATE_THREAD',
+    address.id,
+    community.id,
+    this.models,
+  );
 
   // Render a copy of the thread to plaintext for the search indexer
   const plaintext = (() => {
