@@ -201,4 +201,17 @@ export const contestABI = [
       },
     ],
   },
+  {
+    inputs: [],
+    name: 'FeeMangerAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];

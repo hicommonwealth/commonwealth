@@ -2,6 +2,7 @@ import { AppError } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { contestABI } from './abi/contestAbi';
+import { feeManagerABI } from './abi/feeManagerAbi';
 
 export type AddContentResponse = {
   txReceipt: any;
@@ -161,6 +162,61 @@ export const getContestScore = async (
     winningAddress: contentMeta.map((c) => c['creator']),
     voteCount: contentMeta.map((c) => c['cumulativeVotes']),
   };
+};
+
+/**
+ * Get the total balance of a given contest
+ * @param web3 an instance of web3.js
+ * @param contest the address of contest to get the balance of
+ * @returns a numeric contest balance of the contestToken in wei(ie / 1e18 for decimal value)
+ */
+export const getContestBalance = async (
+  web3: Web3,
+  contest: string,
+): Promise<number> => {
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  const promises = [
+    contestInstance.methods.contestToken().call(),
+    contestInstance.methods.FeeManagerAddress().call(),
+  ];
+
+  const results = await Promise.all(promises);
+  const feeManager = new web3.eth.Contract(
+    feeManagerABI as AbiItem[],
+    String(results[1]),
+  );
+  const balancePromises: Promise<number>[] = [
+    feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
+  ];
+  if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
+    balancePromises.push(
+      web3.eth.getBalance(contest).then((v) => {
+        return Number(v);
+      }),
+    );
+  } else {
+    const calldata =
+      '0x70a08231' +
+      web3.eth.abi.encodeParameters(['address'], [contest]).substring(2);
+    balancePromises.push(
+      web3.eth
+        .call({
+          to: String(results[0]),
+          data: calldata,
+        })
+        .then((v) => {
+          return Number(web3.eth.abi.decodeParameter('uint256', v));
+        }),
+    );
+  }
+
+  const balanceResults = await Promise.all(balancePromises);
+
+  return balanceResults[0] + balanceResults[1];
 };
 
 /**
