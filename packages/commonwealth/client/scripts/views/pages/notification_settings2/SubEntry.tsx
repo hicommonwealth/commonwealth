@@ -2,7 +2,7 @@ import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getRelativeTimestamp } from 'helpers/dates';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getCommunityUrl } from 'utils';
 import { trpc } from 'utils/trpcClient';
@@ -14,10 +14,11 @@ import { z } from 'zod';
 
 interface SubscriptionEntryProps {
   readonly thread: z.infer<typeof ThreadSubscription>['Thread'];
+  readonly onUnsubscribe: (id: string) => void;
 }
 
 export const SubEntry = (props: SubscriptionEntryProps) => {
-  const { thread } = props;
+  const { thread, onUnsubscribe } = props;
   const thread_id = thread.id;
 
   const threadUrl = getThreadUrl(
@@ -36,40 +37,24 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
     navigate(threadUrl);
   }, [navigate, threadUrl]);
 
-  const hasSubscriptionRef = useRef<boolean>(true);
-
-  const createThreadSubscriptionMutation =
-    trpc.subscription.createThreadSubscription.useMutation();
-
   const deleteThreadSubscriptionMutation =
     trpc.subscription.deleteThreadSubscription.useMutation();
 
   const deleteThreadSubscription = useCallback(async () => {
     await deleteThreadSubscriptionMutation.mutateAsync({
-      id: 'FIXME: not needed',
+      id: 'not_needed',
       thread_ids: [thread_id],
     });
   }, [deleteThreadSubscriptionMutation, thread_id]);
 
-  const createThreadSubscription = useCallback(async () => {
-    await createThreadSubscriptionMutation.mutateAsync({
-      thread_id: thread_id,
-    });
-  }, [createThreadSubscriptionMutation, thread_id]);
-
-  const toggleSubscription = useCallback(() => {
-    if (hasSubscriptionRef.current) {
-      deleteThreadSubscription()
-        .then(() => notifySuccess('Unsubscribed!'))
-        .catch(console.error);
-    } else {
-      createThreadSubscription()
-        .then(() => notifySuccess('Subscribed!'))
-        .catch(console.error);
-    }
-
-    hasSubscriptionRef.current = !hasSubscriptionRef.current;
-  }, [createThreadSubscription, deleteThreadSubscription]);
+  const handleDeleteSubscription = useCallback(() => {
+    deleteThreadSubscription()
+      .then(() => {
+        notifySuccess('Unsubscribed!');
+        onUnsubscribe(thread_id);
+      })
+      .catch(console.error);
+  }, [deleteThreadSubscription, onUnsubscribe, thread_id]);
 
   return (
     <div className="SubEntry">
@@ -124,7 +109,7 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
           action="subscribe"
           onClick={(e) => {
             e.preventDefault();
-            toggleSubscription();
+            handleDeleteSubscription();
           }}
         />
       </div>

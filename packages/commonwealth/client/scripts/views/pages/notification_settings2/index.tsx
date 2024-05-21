@@ -1,7 +1,7 @@
 import { GetThreadSubscriptions } from '@hicommonwealth/schemas';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -29,6 +29,15 @@ const Index = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
 
+  const [threadsFilter, setThreadsFilter] = useState<readonly string[]>([]);
+
+  const handleUnsubscribe = useCallback(
+    (id: string) => {
+      setThreadsFilter([...threadsFilter, id]);
+    },
+    [threadsFilter],
+  );
+
   if (!threadSubscriptions.data) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
@@ -48,8 +57,13 @@ const Index = () => {
 
         {(threadSubscriptions.data || [])
           .filter((current) => current.Thread)
+          .filter((current) => !threadsFilter.includes(current.Thread.id))
           .map((current) => (
-            <SubEntry key={current.Thread.id} thread={current.Thread} />
+            <SubEntry
+              key={current.Thread.id}
+              thread={current.Thread}
+              onUnsubscribe={handleUnsubscribe}
+            />
           ))}
       </div>
     </CWPageLayout>
