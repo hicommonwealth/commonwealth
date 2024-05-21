@@ -204,7 +204,6 @@
     "os-browserify": "^0.3.0",
     "parchment": "^1.1.4",
     "passport": "^0.7.0",
-    "passport-auth-token": "^1.0.1",
     "passport-jwt": "^4.0.0",
     "passport-magic": "^1.0.0",
     "path-browserify": "^1.0.1",

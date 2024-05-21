@@ -2,6 +2,7 @@ import * as core from '@hicommonwealth/core';
 import {
   AuthStrategies,
   Events,
+  ExternalServiceUserIds,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   logger,
@@ -24,6 +25,7 @@ import {
 } from 'trpc-openapi';
 import { fileURLToPath } from 'url';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
+import { config } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -39,7 +41,21 @@ const authenticate = async (
   authStrategy: AuthStrategies = { name: 'jwt' },
 ) => {
   try {
-    await passport.authenticate(authStrategy.name, { session: false });
+    if (authStrategy.name === 'authtoken') {
+      switch (req.headers['authorization']) {
+        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
+          req.user = {
+            id: ExternalServiceUserIds.Knock,
+            email: 'hello@knock.app',
+          };
+          break;
+        default:
+          throw new Error('Not authenticated');
+      }
+    } else {
+      await passport.authenticate(authStrategy.name, { session: false });
+    }
+
     if (!req.user) throw new Error('Not authenticated');
     if (
       authStrategy.userId &&

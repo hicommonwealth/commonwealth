@@ -2,6 +2,7 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  ExternalServiceUserIds,
   GetRecapEmailData,
   KnockChannelIds,
   logger,
@@ -221,8 +222,8 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
   return {
     ...GetRecapEmailData,
     auth: [],
-    secure: false,
-    // authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
+    secure: true,
+    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
       const notifications = await getMessages(payload.user_id);
       const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({
