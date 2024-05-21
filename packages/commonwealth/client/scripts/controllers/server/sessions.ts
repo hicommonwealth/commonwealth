@@ -69,13 +69,8 @@ export async function getSessionFromWallet(
   wallet: IWebWallet<any>,
 ) {
   const sessionSigner = await wallet.getSessionSigner();
-  let session = await sessionSigner.getSession(CANVAS_TOPIC);
-
-  if (session == null) {
-    session = await sessionSigner.newSession(CANVAS_TOPIC);
-  }
-
-  return session.payload;
+  const { payload: session } = await sessionSigner.getSession(CANVAS_TOPIC);
+  return session;
 }
 
 function getCaip2Address(address: string) {
