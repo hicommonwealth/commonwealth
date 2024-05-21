@@ -257,7 +257,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       throw new Error(`invalid chain ${chain}`);
     }
 
-    const session = await sessionSigner.getSession(CANVAS_TOPIC, {});
+    const { payload: session, signer } = await sessionSigner.getSession(
+      CANVAS_TOPIC,
+      {},
+    );
     const walletAddress = session.address.split(':')[2];
 
     let res = await chai.request
@@ -292,7 +295,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       user_id,
       email,
       session,
-      sign: sessionSigner.sign.bind(sessionSigner),
+      sign: signer.sign.bind(signer),
     };
   },
 
