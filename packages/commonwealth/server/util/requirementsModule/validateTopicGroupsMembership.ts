@@ -59,8 +59,8 @@ export async function validateTopicGroupsMembership(
       },
     );
 
-  // If groupPermissions exist for the group, then only check for groups with the type. Otherwise, treat it as a regular
-  // logic and block all non-members.
+  // If groupPermissions exist for the group, then only check groups with the permission type.
+  // Otherwise, treat it as a regular logic and block all non-members.
   if (groupPermissions.length > 0) {
     groups = groupPermissions.filter((g) => g.type === type);
   }

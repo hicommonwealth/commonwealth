@@ -153,7 +153,7 @@ export async function __createThread(
     allowAdmin: true,
     allowSuperAdmin: true,
   });
-  if (isAdmin) {
+  if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
       topicId,
@@ -161,14 +161,6 @@ export async function __createThread(
       address,
       PermissionEnum.CREATE_THREAD,
     );
-
-    // check if sufficient group permissions
-    // await assertGroupPermission(
-    //   'CREATE_THREAD',
-    //   address.id,
-    //   community.id,
-    //   this.models,
-    // );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
     }
