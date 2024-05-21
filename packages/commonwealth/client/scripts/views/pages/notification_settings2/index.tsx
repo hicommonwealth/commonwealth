@@ -29,10 +29,10 @@ const Index = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
 
-  const [threadsFilter, setThreadsFilter] = useState<readonly string[]>([]);
+  const [threadsFilter, setThreadsFilter] = useState<readonly number[]>([]);
 
   const handleUnsubscribe = useCallback(
-    (id: string) => {
+    (id: number) => {
       setThreadsFilter([...threadsFilter, id]);
     },
     [threadsFilter],

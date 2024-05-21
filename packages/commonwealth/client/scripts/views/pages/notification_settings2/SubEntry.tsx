@@ -14,7 +14,7 @@ import { z } from 'zod';
 
 interface SubscriptionEntryProps {
   readonly thread: z.infer<typeof ThreadSubscription>['Thread'];
-  readonly onUnsubscribe: (id: string) => void;
+  readonly onUnsubscribe: (id: number) => void;
 }
 
 export const SubEntry = (props: SubscriptionEntryProps) => {
