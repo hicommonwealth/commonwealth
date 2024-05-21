@@ -1,8 +1,8 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { getRelativeTimestamp } from 'helpers/dates';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { getCommunityUrl } from 'utils';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -16,6 +16,22 @@ interface SubscriptionEntryProps {
 
 export const SubEntry = (props: SubscriptionEntryProps) => {
   const { thread } = props;
+
+  const threadUrl = getThreadUrl(
+    {
+      chain: thread.community_id,
+      id: thread.id,
+      title: thread.title,
+    },
+    undefined,
+    true,
+  );
+
+  const navigate = useNavigate();
+
+  const handleComment = useCallback(() => {
+    navigate(threadUrl);
+  }, [navigate, threadUrl]);
 
   return (
     <div className="SubEntry">
@@ -50,13 +66,7 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
-          <Link
-            to={getThreadUrl({
-              chain: thread.community_id,
-              id: thread.id,
-              title: thread.title,
-            })}
-          >
+          <Link to={threadUrl}>
             <CWText type="h4">{decodeURIComponent(thread.title)}</CWText>
           </Link>
         </CWText>
@@ -67,8 +77,8 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
           label={`${thread.comment_count}`}
           action="comment"
           onClick={(e) => {
-            // e.preventDefault();
-            // onCommentBtnClick();
+            e.preventDefault();
+            handleComment();
           }}
         />
       </div>
