@@ -16,6 +16,15 @@ export type ContestStatus = {
   lastContentId: string;
 };
 
+export type ContestScores = {
+  scores: {
+    winningContent: string;
+    winningAddress: string;
+    voteCount: string;
+  }[];
+  contestBalance: number;
+};
+
 /**
  * A helper for creating the web3 provider via an RPC, including private key import
  * @param rpcNodeUrl the rpc of the network to use helper with
@@ -140,34 +149,32 @@ export const getContestStatus = async (
   };
 };
 
-export type ContestWinners = {
-  winningContent: string[];
-  winningAddress: string[];
-  voteCount: string[];
-};
-
 /**
  * Gets vote and more information about winners of a given contest
- * @param rpcNodeUrl node url
+ * @param web3 an instance of web3.js with correct RPC and Private Key
  * @param contest the address of the contest
  * @param contestId the id of the contest for data within the contest contract
- * @returns ContestWinners object containing eqaul indexed content ids, addresses, and votes
+ * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   rpcNodeUrl: string,
   contest: string,
   contestId?: number,
-): Promise<ContestWinners> => {
+): Promise<ContestScores> => {
   const web3 = new Web3(rpcNodeUrl);
-
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
 
-  const winnerIds: string[] = contestId
-    ? await contestInstance.methods.getPastWinners(contestId).call()
-    : await contestInstance.methods.getWinnerIds().call();
+  const contestData = await Promise.all([
+    contestId
+      ? contestInstance.methods.getPastWinners(contestId).call()
+      : contestInstance.methods.getWinnerIds().call(),
+    //getContestBalance(web3, contest),
+  ]);
+
+  const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
     throw new AppError('Contest Id not found on Contest address');
@@ -179,9 +186,15 @@ export const getContestScore = async (
   });
 
   const contentMeta = await Promise.all(votePromises);
+
   return {
-    winningContent: winnerIds,
-    winningAddress: contentMeta.map((c) => c['creator']),
-    voteCount: contentMeta.map((c) => c['cumulativeVotes']),
+    scores: winnerIds.map((v, i) => {
+      return {
+        winningContent: v,
+        winningAddress: contentMeta[i]['creator'],
+        voteCount: contentMeta[i]['cumulativeVotes'],
+      };
+    }),
+    contestBalance: 100, //TODO: fix this
   };
 };

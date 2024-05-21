@@ -7,7 +7,6 @@ import { config } from '../config';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 import * as protocol from '../services/commonProtocol';
-import type { ContestWinners } from '../services/commonProtocol/contestHelper';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -62,7 +61,8 @@ async function updateOrCreateWithAlert(
     { where: { contest_address }, returning: true },
   );
   if (!updated) {
-    // when contest manager metadata is not found, it means it failed creation or was deleted -> alert admins and create default
+    // when contest manager metadata is not found, it means it failed creation or was deleted
+    // here we are alerting admins and creating a default entry
     const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
     log.error(msg, new MissingContestManager(msg, namespace, contest_address));
 
@@ -76,21 +76,28 @@ async function updateOrCreateWithAlert(
         created_at: new Date(),
         name: community.name,
         image_url: 'http://default.image', // TODO: can we have a default image for this?
-        payout_structure: [], // empty payout structure by default
+        payout_structure: [],
       });
   }
 }
 
+type ContestDetails = {
+  url: string;
+  prize_percentage: number;
+  payout_structure: number[];
+};
 /**
  * Gets chain node url from contest address
  */
-async function getChainUrl(
+async function getContestDetails(
   contest_address: string,
-): Promise<string | undefined> {
-  const [{ url }] = await models.sequelize.query<{ url: string }>(
+): Promise<ContestDetails | undefined> {
+  const [result] = await models.sequelize.query<ContestDetails>(
     `
   select
-    coalesce(cn.private_url, cn.url) as url
+    coalesce(cn.private_url, cn.url) as url,
+    cm.prize_percentage,
+    cm.payout_structure
   from
     "ContestManagers" cm 
     join "Communities" c on cm.community_id = c.id
@@ -104,7 +111,7 @@ async function getChainUrl(
       replacements: { contest_address },
     },
   );
-  return url;
+  return result;
 }
 
 /**
@@ -112,25 +119,28 @@ async function getChainUrl(
  */
 async function updateScore(contest_address: string, contest_id: number) {
   try {
-    const url = await getChainUrl(contest_address);
-    if (!url)
+    const details = await getContestDetails(contest_address);
+    if (!details?.url)
       throw new AppError(
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const result: ContestWinners = await protocol.contestHelper.getContestScore(
-      url,
-      contest_address,
-      contest_id,
-    );
-    const score: z.infer<typeof ContestScore> = result.winningContent.map(
-      (_, i) => ({
-        content_id: +result.winningContent[i],
-        creator_address: result.winningAddress[i],
-        votes: +result.voteCount[i],
-        prize: 0, // TODO: +result.prize[i],
-      }),
-    );
+    const { scores, contestBalance } =
+      await protocol.contestHelper.getContestScore(
+        details.url,
+        contest_address,
+        contest_id,
+      );
+    const prizePool = contestBalance * details.prize_percentage;
+    const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
+      content_id: +s.winningContent,
+      creator_address: s.winningAddress,
+      votes: +s.voteCount,
+      prize:
+        i < details.payout_structure.length
+          ? prizePool * details.payout_structure[i]
+          : 0,
+    }));
     await models.Contest.update(
       {
         score,
@@ -203,6 +213,7 @@ export function Contests(): Projection<typeof inputs> {
           ...payload,
           contest_id,
         });
+        // update winners on ended contests
         contest_id > 0 &&
           setImmediate(() =>
             updateEndedContests(payload.contest_address, contest_id),
@@ -210,7 +221,6 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        // TODO: can we make this just one sql statement using subqueries?
         const thread = await models.Thread.findOne({
           where: { url: payload.content_url },
           attributes: ['id'],
@@ -229,7 +239,6 @@ export function Contests(): Projection<typeof inputs> {
 
       ContestContentUpvoted: async ({ payload }) => {
         const contest_id = payload.contest_id || 0;
-        // TODO: can we make this just one sql statement using subqueries?
         const add_action = await models.ContestAction.findOne({
           where: {
             contest_address: payload.contest_address,
@@ -247,8 +256,8 @@ export function Contests(): Projection<typeof inputs> {
           action: 'upvoted',
           thread_id: add_action?.thread_id,
         });
-        // update score if event is less than 24h old
-        Date.now() - payload.created_at.getTime() < 24 * 60 * 60 * 1000 &&
+        // update score if vote is less than 1hr old
+        Date.now() - payload.created_at.getTime() < 1 * 60 * 60 * 1000 &&
           setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },

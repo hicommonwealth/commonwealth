@@ -161,9 +161,19 @@ describe('Contests projection lifecycle', () => {
   it('should project events on multiple contests', async () => {
     getTokenAttributes.resolves({ ticker, decimals });
     getContestScore.resolves({
-      winningAddress: [creator1, creator2],
-      winningContent: [content_id.toString(), content_id.toString()],
-      voteCount: ['1', '2'],
+      contestBalance: 10000000000,
+      scores: [
+        {
+          winningAddress: creator1,
+          winningContent: content_id.toString(),
+          voteCount: '1',
+        },
+        {
+          winningAddress: creator2,
+          winningContent: content_id.toString(),
+          voteCount: '2',
+        },
+      ],
     });
 
     await handleEvent(Contests(), {
