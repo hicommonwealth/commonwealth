@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas/src/index';
 import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/core';
@@ -11,7 +12,6 @@ import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
-import { assertGroupPermission } from '../../util/groupPermissions';
 import {
   createThreadMentionNotifications,
   emitMentions,
@@ -110,14 +110,6 @@ export async function __createThread(
     throw new AppError(`Ban error: ${banError}`);
   }
 
-  // check if sufficient group permissions
-  await assertGroupPermission(
-    'CREATE_THREAD',
-    address.id,
-    community.id,
-    this.models,
-  );
-
   // Render a copy of the thread to plaintext for the search indexer
   const plaintext = (() => {
     try {
@@ -161,13 +153,22 @@ export async function __createThread(
     allowAdmin: true,
     allowSuperAdmin: true,
   });
-  if (!isAdmin) {
+  if (isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
       topicId,
       community.id,
       address,
+      PermissionEnum.CREATE_THREAD,
     );
+
+    // check if sufficient group permissions
+    // await assertGroupPermission(
+    //   'CREATE_THREAD',
+    //   address.id,
+    //   community.id,
+    //   this.models,
+    // );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
     }

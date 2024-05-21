@@ -16,7 +16,12 @@ module.exports = {
           primaryKey: true,
         },
         type: {
-          type: Sequelize.ENUM('CREATE_THREAD', 'CREATE_COMMENT'),
+          type: Sequelize.ENUM(
+            'CREATE_THREAD',
+            'CREATE_COMMENT',
+            'CREATE_REACTION',
+            'UPDATE_POLL',
+          ),
           allowNull: false,
           primaryKey: true,
         },

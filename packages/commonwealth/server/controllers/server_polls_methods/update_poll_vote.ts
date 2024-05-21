@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas/src/index';
 import moment from 'moment';
 
 import { AppError, ServerError } from '@hicommonwealth/core';
@@ -73,6 +74,7 @@ export async function __updatePollVote(
       thread.topic_id,
       poll.community_id,
       address,
+      PermissionEnum.UPDATE_POLL,
     );
     if (!isValid) {
       throw new AppError(Errors.InsufficientTokenBalance);

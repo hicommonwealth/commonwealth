@@ -1,9 +1,11 @@
 import {
   AddressAttributes,
   DB,
+  GroupInstance,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { GroupPermissionType } from '@hicommonwealth/schemas/src/index';
+import { Op, QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 /**
@@ -13,6 +15,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param topicId ID of the topic
  * @param communityId ID of the community of the groups
  * @param address Address to check against requirements
+ * @param type The type of permission it is gating
  * @returns validity with optional error message
  */
 export async function validateTopicGroupsMembership(
@@ -20,6 +23,7 @@ export async function validateTopicGroupsMembership(
   topicId: number,
   communityId: string,
   address: AddressAttributes,
+  type?: GroupPermissionType,
 ): Promise<{ isValid: boolean; message?: string }> {
   // check via new TBC with groups
 
@@ -33,13 +37,32 @@ export async function validateTopicGroupsMembership(
   if (!topic) {
     return { isValid: false, message: 'Topic not found' };
   }
-  const groups = await models.Group.findAll({
+  let groups = await models.Group.findAll({
     where: {
       id: { [Op.in]: topic.group_ids },
     },
   });
   if (groups.length === 0) {
     return { isValid: true };
+  }
+
+  const groupPermissions: (GroupInstance & { type: GroupPermissionType })[] =
+    await models.sequelize.query(
+      `
+        SELECT g.*, gp.type FROM "GroupPermissions" as gp LEFT JOIN "Groups" g ON g.id = gp.group_id
+        WHERE g.community_id = :communityId AND gp.id IN(:groupIds);
+      `,
+      {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements: { communityId, groupIds: groups.map((g) => g.id) },
+      },
+    );
+
+  // If groupPermissions exist for the group, then only check for groups with the type. Otherwise, treat it as a regular
+  // logic and block all non-members.
+  if (groupPermissions.length > 0) {
+    groups = groupPermissions.filter((g) => g.type === type);
   }
 
   // check membership for all groups of topic
