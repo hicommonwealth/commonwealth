@@ -179,11 +179,9 @@ describe.only('Recap email lifecycle', () => {
   });
 
   it('should return enriched protocol notifications', async () => {
-    let currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() - 2);
     const protocolData = generateProtocolData(
       2,
-      currentDate,
+      new Date(new Date().getDate() - 2),
       recipientUser!,
       community!,
     );
