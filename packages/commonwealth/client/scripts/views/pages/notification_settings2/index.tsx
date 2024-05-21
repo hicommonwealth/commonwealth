@@ -49,7 +49,7 @@ const Index = () => {
         {(threadSubscriptions.data || [])
           .filter((current) => current.Thread)
           .map((current) => (
-            <SubEntry key={current.id} thread={current.Thread} />
+            <SubEntry key={current.Thread.id} thread={current.Thread} />
           ))}
       </div>
     </CWPageLayout>

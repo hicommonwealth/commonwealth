@@ -1,5 +1,6 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
+import { notifySuccess } from 'controllers/app/notifications';
 import { getRelativeTimestamp } from 'helpers/dates';
 import React, { useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -43,19 +44,28 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
   const deleteThreadSubscriptionMutation =
     trpc.subscription.deleteThreadSubscription.useMutation();
 
-  const deleteThreadSubscription = useCallback(() => {
-    deleteThreadSubscriptionMutation.mutate({ thread_id });
-  }, [deleteThreadSubscriptionMutation]);
+  const deleteThreadSubscription = useCallback(async () => {
+    await deleteThreadSubscriptionMutation.mutateAsync({
+      id: 'FIXME: not needed',
+      thread_ids: [thread_id],
+    });
+  }, [deleteThreadSubscriptionMutation, thread_id]);
 
-  const createThreadSubscription = useCallback(() => {
-    createThreadSubscriptionMutation.mutate({ thread_id });
-  }, [createThreadSubscriptionMutation]);
+  const createThreadSubscription = useCallback(async () => {
+    await createThreadSubscriptionMutation.mutateAsync({
+      thread_id: thread_id,
+    });
+  }, [createThreadSubscriptionMutation, thread_id]);
 
   const toggleSubscription = useCallback(() => {
     if (hasSubscriptionRef.current) {
-      deleteThreadSubscription();
+      deleteThreadSubscription()
+        .then(() => notifySuccess('Unsubscribed!'))
+        .catch(console.error);
     } else {
-      createThreadSubscription();
+      createThreadSubscription()
+        .then(() => notifySuccess('Subscribed!'))
+        .catch(console.error);
     }
 
     hasSubscriptionRef.current = !hasSubscriptionRef.current;
@@ -107,6 +117,14 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
           onClick={(e) => {
             e.preventDefault();
             handleComment();
+          }}
+        />
+
+        <CWThreadAction
+          action="subscribe"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleSubscription();
           }}
         />
       </div>

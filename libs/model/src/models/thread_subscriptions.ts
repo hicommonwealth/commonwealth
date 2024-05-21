@@ -8,6 +8,8 @@ export type ThreadSubscriptionAttributes = z.infer<typeof ThreadSubscription>;
 export type ThreadSubscriptionInstance =
   ModelInstance<ThreadSubscriptionAttributes>;
 
+const Thread: any = {};
+
 export default (
   sequelize: Sequelize.Sequelize,
 ): Sequelize.ModelStatic<ThreadSubscriptionInstance> =>
@@ -32,6 +34,8 @@ export default (
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
+      // // FIXME: this is wrong!
+      // Thread
     },
     {
       tableName: 'ThreadSubscriptions',
