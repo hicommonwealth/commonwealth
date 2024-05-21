@@ -41,6 +41,15 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
     trpc.subscription.deleteThreadSubscription.useMutation();
 
   const deleteThreadSubscription = useCallback(async () => {
+    // FIXME: There are two problems here:
+    //
+    // - The first is that the 'id' property is not defined anywhere but the
+    // backend keeps complaining that the 'id' property is missing but I can't
+    // figure out where it's failing.
+    //
+    // - The mutateAsync args are not typed.  This might be a larger problem
+    // though
+
     await deleteThreadSubscriptionMutation.mutateAsync({
       id: 'FIXME: not_needed',
       thread_ids: [thread_id],
