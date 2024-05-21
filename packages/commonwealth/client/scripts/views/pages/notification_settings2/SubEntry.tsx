@@ -1,9 +1,10 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { getRelativeTimestamp } from 'helpers/dates';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getCommunityUrl } from 'utils';
+import { trpc } from 'utils/trpcClient';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -16,6 +17,7 @@ interface SubscriptionEntryProps {
 
 export const SubEntry = (props: SubscriptionEntryProps) => {
   const { thread } = props;
+  const thread_id = thread.id;
 
   const threadUrl = getThreadUrl(
     {
@@ -32,6 +34,32 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
   const handleComment = useCallback(() => {
     navigate(threadUrl);
   }, [navigate, threadUrl]);
+
+  const hasSubscriptionRef = useRef<boolean>(true);
+
+  const createThreadSubscriptionMutation =
+    trpc.subscription.createThreadSubscription.useMutation();
+
+  const deleteThreadSubscriptionMutation =
+    trpc.subscription.deleteThreadSubscription.useMutation();
+
+  const deleteThreadSubscription = useCallback(() => {
+    deleteThreadSubscriptionMutation.mutate({ thread_id });
+  }, [deleteThreadSubscriptionMutation]);
+
+  const createThreadSubscription = useCallback(() => {
+    createThreadSubscriptionMutation.mutate({ thread_id });
+  }, [createThreadSubscriptionMutation]);
+
+  const toggleSubscription = useCallback(() => {
+    if (hasSubscriptionRef.current) {
+      deleteThreadSubscription();
+    } else {
+      createThreadSubscription();
+    }
+
+    hasSubscriptionRef.current = !hasSubscriptionRef.current;
+  }, [createThreadSubscription, deleteThreadSubscription]);
 
   return (
     <div className="SubEntry">
