@@ -14,7 +14,7 @@ import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 
 import { Link } from 'react-router-dom';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import './index.scss';
 
 function useThreadSubscriptions() {
@@ -107,16 +107,14 @@ const NotificationSettingsPage2 = () => {
               </div>
 
               <div className="SubFooter">
-                <CWIcon iconName="comment" iconSize="small" />
-                <Link
-                  to={getThreadUrl({
-                    chain: current.Thread.community_id,
-                    id: current.Thread.id,
-                    title: current.Thread.title,
-                  })}
-                >
-                  <div>{current.Thread.comment_count} Comments</div>
-                </Link>
+                <CWThreadAction
+                  label={`${current.Thread.comment_count}`}
+                  action="comment"
+                  onClick={(e) => {
+                    // e.preventDefault();
+                    // onCommentBtnClick();
+                  }}
+                />
               </div>
             </div>
           ))}
