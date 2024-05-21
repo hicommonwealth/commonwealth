@@ -30,7 +30,7 @@ import {
 
 chai.use(chaiAsPromised);
 
-describe.only('Recap email lifecycle', () => {
+describe('Recap email lifecycle', () => {
   let community: z.infer<typeof Community> | undefined;
   let comment: z.infer<typeof Comment> | undefined;
   let thread: z.infer<typeof Thread> | undefined;

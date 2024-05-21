@@ -120,7 +120,6 @@ async function enrichDiscussionNotifications(
         WHERE A.id IN (:addressIds);
     `,
     {
-      logging: console.log,
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
@@ -225,7 +224,6 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
     secure: false,
     // authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
-      console.log('HELLO THERE');
       const notifications = await getMessages(payload.user_id);
       const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({
         governance: notifications.governance,
