@@ -42,7 +42,7 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
 
   const deleteThreadSubscription = useCallback(async () => {
     await deleteThreadSubscriptionMutation.mutateAsync({
-      id: 'not_needed',
+      id: 'FIXME: not_needed',
       thread_ids: [thread_id],
     });
   }, [deleteThreadSubscriptionMutation, thread_id]);

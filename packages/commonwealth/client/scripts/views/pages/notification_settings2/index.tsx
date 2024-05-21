@@ -45,6 +45,8 @@ const Index = () => {
     return <PageLoading />;
   }
 
+  // FIXME: this layout isn't correct yet.
+
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage NotificationSettingsPage2">
