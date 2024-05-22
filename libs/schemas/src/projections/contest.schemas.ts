@@ -27,6 +27,7 @@ export const ContestScore = z
       content_id: PG_INT,
       votes: PG_INT,
       prize: PG_INT,
+      tickerPrize: z.number().optional(),
     }),
   )
   .describe('Contest score, sorted from first to last');

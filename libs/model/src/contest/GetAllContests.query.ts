@@ -96,9 +96,7 @@ order by
       );
       results.forEach((r) =>
         r.contests.forEach((c) => {
-          c.score?.forEach(
-            (w) => (w.prize = Math.floor(w.prize / 10 ** r.decimals)),
-          );
+          c.score?.forEach((w) => (w.tickerPrize = w.prize / 10 ** r.decimals));
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);
           c.score_updated_at =

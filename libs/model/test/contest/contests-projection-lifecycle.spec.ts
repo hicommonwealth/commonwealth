@@ -49,10 +49,6 @@ describe('Contests projection lifecycle', () => {
   const funding_token_address = 'funding-address';
   const image_url = 'url';
   const interval = 10;
-  const score = [
-    { creator_address: creator1, content_id, votes: 1, prize: 100000000 },
-    { creator_address: creator2, content_id, votes: 2, prize: 200000000 },
-  ];
   const community_id = 'community-with-contests';
   const thread_id = 1;
   const thread_title = 'thread-in-contest';
@@ -161,9 +157,28 @@ describe('Contests projection lifecycle', () => {
   });
 
   it('should project events on multiple contests', async () => {
+    const contestBalance = 10000000000;
+    const score = [
+      {
+        creator_address: creator1,
+        content_id,
+        votes: 1,
+        prize:
+          (((contestBalance * prize_percentage) / 100) * payout_structure[0]) /
+          100,
+      },
+      {
+        creator_address: creator2,
+        content_id,
+        votes: 2,
+        prize:
+          (((contestBalance * prize_percentage) / 100) * payout_structure[1]) /
+          100,
+      },
+    ];
     getTokenAttributes.resolves({ ticker, decimals });
     getContestScore.resolves({
-      contestBalance: 10000000000,
+      contestBalance,
       scores: [
         {
           winningAddress: creator1,
@@ -312,7 +327,7 @@ describe('Contests projection lifecycle', () => {
             score_updated_at: result?.at(0)?.contests.at(0)?.score_updated_at,
             score: score.map((s) => ({
               ...s,
-              prize: Math.floor(s.prize / 10 ** decimals),
+              tickerPrize: s.prize / 10 ** decimals,
             })),
             actions: [
               {
@@ -367,7 +382,6 @@ describe('Contests projection lifecycle', () => {
   });
 
   it('should raise retryable error when protocol helper fails', async () => {
-    // TODO: define retryable error @rbennettcw
     getTokenAttributes.rejects(new Error());
     expect(
       handleEvent(Contests(), {
