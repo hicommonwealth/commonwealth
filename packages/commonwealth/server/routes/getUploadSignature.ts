@@ -3,7 +3,7 @@ import { AppError } from '@hicommonwealth/core';
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import type { DB } from '@hicommonwealth/model';
+import { DB, formatS3Url } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -47,7 +47,7 @@ const getUploadSignature = async (
     const url = await getSignedUrl(s3, new PutObjectCommand(params), {
       expiresIn: 3600,
     });
-    res.json({ status: 'Success', result: url });
+    res.json({ status: 'Success', result: formatS3Url(url) });
   } catch (err) {
     res.json({ status: 'Failure', result: err });
   }

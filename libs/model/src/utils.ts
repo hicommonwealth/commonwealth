@@ -99,3 +99,23 @@ export async function emitEvent(
     await outbox.bulkCreate(values, { transaction });
   }
 }
+
+/**
+ * Creates a valid S3 asset url for the client. Only for the public assets.commonwealth.im bucket
+ * @param uploadLocation The url returned by the Upload method of @aws-sdk/lib-storage
+ * @param bucketName The name of the bucket or the domain (alias) of the bucket. Defaults to assets.commonwealth.im
+ */
+export function formatS3Url(
+  uploadLocation: string,
+  bucketName: string = 'assets.commonwealth.im',
+): string {
+  if (uploadLocation.includes('/assets.commonwealth.im/')) {
+    return (
+      `https://assets.commonwealth.im/` +
+      uploadLocation.split('/assets.commonwealth.im/').pop()
+    );
+  }
+  return (
+    `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
+  );
+}
