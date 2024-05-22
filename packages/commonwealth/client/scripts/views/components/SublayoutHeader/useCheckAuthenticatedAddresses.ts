@@ -52,16 +52,10 @@ const useCheckAuthenticatedAddresses = ({
         continue;
       }
       // check if it has an authorised session
-      let hasSession = false;
-      try {
-        matchedSessionSigner.getSession(CANVAS_TOPIC, {
-          address: caip2Address,
-        });
-        hasSession = true;
-      } catch (e) {
-        // do nothing
-      }
-      newAuthenticatedAddresses[caip2Address] = hasSession;
+      newAuthenticatedAddresses[caip2Address] = matchedSessionSigner.hasSession(
+        CANVAS_TOPIC,
+        caip2Address,
+      );
     }
 
     setAuthenticatedAddresses(newAuthenticatedAddresses);
