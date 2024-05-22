@@ -10,14 +10,30 @@ import ContestCard from './ContestCard';
 import './ContestsList.scss';
 
 type Contest = {
+  community_id?: string;
   contest_address?: string;
+  created_at?: Date;
   name?: string;
   image_url?: string;
   topics?: { id?: number; name?: string }[];
   cancelled?: boolean;
+  decimals?: number;
+  funding_token_address?: string;
+  interval?: number;
+  payout_structure?: number[];
+  prize_percentage?: number;
+  ticker?: string;
   contests?: {
-    end_time?: string;
-    winners?: { prize?: number; creator_address?: string }[];
+    contest_id?: number;
+    score?: {
+      creator_address?: string;
+      content_id?: number;
+      votes?: number;
+      prize?: number;
+    }[];
+    score_updated_at?: Date;
+    start_time?: Date;
+    end_time?: Date;
   }[];
 };
 
@@ -58,7 +74,7 @@ const ContestsList = ({
         ) : (
           contests.map((contest) => {
             // only last contest is relevant
-            const { end_time, winners } =
+            const { end_time, score } =
               contest.contests[contest.contests.length - 1] || {};
 
             const hasEnded = moment(end_time) < moment();
@@ -71,7 +87,7 @@ const ContestsList = ({
                 name={contest.name}
                 imageUrl={contest.image_url}
                 topics={contest.topics}
-                winners={winners}
+                score={score}
                 finishDate={
                   end_time
                     ? new Date(end_time)?.toISOString()
