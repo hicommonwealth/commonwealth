@@ -3,14 +3,12 @@ import { stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { DynamicTemplate } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
-import * as dotenv from 'dotenv';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { formatAddressShort } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
+import { config } from '../config';
 
-dotenv.config();
-sgMail.setApiKey(SENDGRID_API_KEY);
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 export type ThreadData = {
   title: string;

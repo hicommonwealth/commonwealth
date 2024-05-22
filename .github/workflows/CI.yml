@@ -4,7 +4,8 @@ env:
   ROLLBAR_ENV: 'GitHubCI'
   NODE_ENV: 'test'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadUpvoted'
+  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted'
+  PRIVATE_KEY: 'web3-pk'
 
 on:
   pull_request:
@@ -187,13 +188,16 @@ jobs:
 
       - name: Run serial e2e tests
         run: |
-          (cd packages/commonwealth && NODE_ENV=production TEST_DB_NAME=commonwealth NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
-          (pnpm -F commonwealth wait-server && TEST_DB_NAME=commonwealth pnpm -F commonwealth test-e2e-serial --forbid-only)
+          (cd packages/commonwealth && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
+
         env:
+          SERVER_URL: http://localhost:8080
           PORT: 8080
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+          DATABASE_URL: postgresql://commonwealth:edgeware@localhost/commonwealth # required in production
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3

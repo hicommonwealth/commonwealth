@@ -1,4 +1,5 @@
-import AWS from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
@@ -55,7 +56,7 @@ const generateImage = async (
     throw new AppError('Problem Generating Image!');
   }
 
-  const s3 = new AWS.S3();
+  const s3 = new S3();
   const resp = await fetch(image);
   const buffer = await resp.buffer();
   const params = {
@@ -67,7 +68,10 @@ const generateImage = async (
 
   let imageUrl = '';
   try {
-    const upload = await s3.upload(params).promise();
+    const upload = await new Upload({
+      client: s3,
+      params,
+    }).done();
     imageUrl = upload.Location;
   } catch (e) {
     console.log(e);

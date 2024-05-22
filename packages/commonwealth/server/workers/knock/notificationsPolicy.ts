@@ -1,6 +1,6 @@
-import { Policy, events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { Policy, events, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
+import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
 import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
 import { processUserMentioned } from './eventHandlers/userMentioned';
@@ -25,8 +25,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         await processSnapshotProposalCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      ChainEventCreated: async () => {
-        log.info('Method not implemented');
+      ChainEventCreated: async (event) => {
+        await processChainEventCreated(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       ThreadCreated: async () => {

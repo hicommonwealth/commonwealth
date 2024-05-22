@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { testServer, TestServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -37,7 +37,7 @@ describe('Polls', () => {
     userAddress = userRes.address;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;

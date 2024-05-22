@@ -1,5 +1,4 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 
 const PING_INTERVAL = 1_000 * 20;

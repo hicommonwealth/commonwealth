@@ -1,5 +1,4 @@
-import { broker, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { broker, logger, stats } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 import { MESSAGE_RELAYER_TIMEOUT_MS } from '../../config';
 import { relay } from './relay';

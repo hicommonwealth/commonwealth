@@ -41,6 +41,8 @@ export const query = async <Input extends ZodSchema, Output extends ZodSchema>(
       }
       throw error;
     }
-    throw new InvalidInput('Invalid query', [error as string]);
+    throw new InvalidInput('Invalid query', [
+      typeof error !== 'string' ? JSON.stringify(error) : error,
+    ]);
   }
 };

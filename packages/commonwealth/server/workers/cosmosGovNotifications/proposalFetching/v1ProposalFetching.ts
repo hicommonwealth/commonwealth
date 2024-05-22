@@ -5,7 +5,7 @@ import {
   ProposalStatus,
   numberToLong,
 } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { getCosmosClient } from './getCosmosClient';

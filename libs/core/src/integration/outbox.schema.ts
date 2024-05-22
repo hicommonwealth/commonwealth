@@ -65,4 +65,34 @@ export const Outbox = z.union([
       event_payload: events.UserMentioned,
     })
     .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.RecurringContestManagerDeployed),
+      event_payload: events.RecurringContestManagerDeployed,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.OneOffContestManagerDeployed),
+      event_payload: events.OneOffContestManagerDeployed,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.ContestStarted),
+      event_payload: events.ContestStarted,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.ContestContentAdded),
+      event_payload: events.ContestContentAdded,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.ContestContentUpvoted),
+      event_payload: events.ContestContentUpvoted,
+    })
+    .merge(BaseOutboxProperties),
 ]);

@@ -6,9 +6,6 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -90,12 +87,6 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED':
-        JSON.stringify(
-          process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
-        ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_USER_ONBOARDING_ENABLED': JSON.stringify(
         process.env.FLAG_USER_ONBOARDING_ENABLED,
       ),
@@ -122,8 +113,8 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS': JSON.stringify(
-        process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+      'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
+        process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
       ),
     }),
     new HtmlWebpackPlugin({
@@ -216,6 +207,7 @@ const baseConfig = {
       fs: false,
       net: false,
       buffer: false,
+      events: require.resolve('events/'),
       zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),

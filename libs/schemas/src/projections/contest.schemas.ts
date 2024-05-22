@@ -20,22 +20,25 @@ export const ContestAction = z
   })
   .describe('On-Chain content related actions on contest instance');
 
+export const ContestScore = z
+  .array(
+    z.object({
+      creator_address: z.string(),
+      content_id: PG_INT,
+      votes: PG_INT,
+      prize: PG_INT,
+    }),
+  )
+  .describe('Contest score, sorted from first to last');
+
 export const Contest = z
   .object({
     contest_address: z.string().describe('On-Chain contest manager address'),
     contest_id: PG_INT.describe('On-Chain contest id, 0 when one-off'),
     start_time: z.date(),
     end_time: z.date(),
-    winners: z
-      .array(
-        z.object({
-          creator_address: z.string(),
-          prize: PG_INT,
-        }),
-      )
-      .describe('Contest winners, sorted from first to last')
-      .optional()
-      .nullish(),
-    actions: z.array(ContestAction).optional(),
+    score_updated_at: z.date().nullish(),
+    score: ContestScore.nullish(),
+    actions: z.array(ContestAction).nullish(),
   })
   .describe('On-Chain contest instance');

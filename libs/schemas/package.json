@@ -26,8 +26,5 @@
   },
   "devDependencies": {
     "@types/moment": "^2.13.0"
-  },
-  "devDependencies": {
-    "@types/moment": "^2.13.0"
   }
 }
