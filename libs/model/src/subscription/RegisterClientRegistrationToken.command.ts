@@ -8,8 +8,9 @@ export function RegisterClientRegistrationToken(): Command<
     ...schemas.RegisterClientRegistrationToken,
     auth: [],
     secure: true,
-    body: async (req) => {
+    body: async ({ payload, actor }) => {
       console.log('Registering client token!');
+      return {};
     },
   };
 }

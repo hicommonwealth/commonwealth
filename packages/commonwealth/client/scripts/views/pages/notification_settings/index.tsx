@@ -5,6 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useCallback, useEffect } from 'react';
 import app from 'state';
+import { trpc } from 'utils/trpcClient';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
@@ -62,6 +63,9 @@ const NotificationSettingsPage = () => {
     relevantSubscribedCommunities,
   } = useNotificationSettings();
 
+  const { mutateAsync: registerClientRegistrationToken } =
+    trpc.subscription.registerClientRegistrationToken.useMutation();
+
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [forceRerender]);
@@ -73,6 +77,7 @@ const NotificationSettingsPage = () => {
         console.log('Notification permission granted.');
         const token = await getFirebaseMessagingToken();
         console.log('FIXME: got the token: ' + token);
+        await registerClientRegistrationToken({ id: 'none', token });
       }
     }
 
