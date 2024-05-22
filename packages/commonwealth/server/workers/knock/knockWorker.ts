@@ -58,7 +58,7 @@ async function startKnockWorker() {
   }
 
   // init Knock as notifications provider - this is necessary since the policies do not define the provider
-  if (config.NOTIFICATIONS.KNOCK_INTEGRATION_ENABLED)
+  if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
     notificationsProvider(KnockProvider());
   else notificationsProvider();
 

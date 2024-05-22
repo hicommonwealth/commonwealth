@@ -21,7 +21,7 @@ const artifacts = {
   contest: contest.trpcRouter,
 };
 
-if (config.NOTIFICATIONS.KNOCK_INTEGRATION_ENABLED) {
+if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   artifacts['subscription'] = subscription.trpcRouter;
   artifacts['email'] = email.trpcRouter;
 }

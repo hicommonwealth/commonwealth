@@ -370,10 +370,7 @@ export const status = async (
  * We have to generate a JWT token for use by the frontend Knock SDK.
  */
 async function computeKnockJwtToken(userId: number) {
-  if (
-    config.NOTIFICATIONS.KNOCK_INTEGRATION_ENABLED &&
-    config.NOTIFICATIONS.KNOCK_SIGNING_KEY
-  ) {
+  if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
     return await Knock.signUserToken(`${userId}`, {
       signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
       expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,

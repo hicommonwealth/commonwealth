@@ -11,7 +11,7 @@ const {
   CLOUDAMQP_URL,
   REDIS_URL, // local + staging
   REDIS_TLS_URL, // staging + production
-  KNOCK_INTEGRATION_ENABLED,
+  FLAG_KNOCK_INTEGRATION_ENABLED,
 } = process.env;
 
 export const config = configure(
@@ -33,7 +33,7 @@ export const config = configure(
       KNOCK_AUTH_TOKEN: KNOCK_AUTH_TOKEN,
       KNOCK_SECRET_KEY: KNOCK_SECRET_KEY,
       KNOCK_SIGNING_KEY: KNOCK_SIGNING_KEY,
-      KNOCK_INTEGRATION_ENABLED: KNOCK_INTEGRATION_ENABLED === 'true',
+      FLAG_KNOCK_INTEGRATION_ENABLED: FLAG_KNOCK_INTEGRATION_ENABLED === 'true',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -78,7 +78,7 @@ export const config = configure(
           .string()
           .optional()
           .describe('The channel ID of the in-app integration on Knock'),
-        KNOCK_INTEGRATION_ENABLED: z
+        FLAG_KNOCK_INTEGRATION_ENABLED: z
           .boolean()
           .optional()
           .default(false)
@@ -88,7 +88,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (data.KNOCK_INTEGRATION_ENABLED) {
+          if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
             return (
               data.KNOCK_AUTH_TOKEN &&
               data.KNOCK_SECRET_KEY &&
@@ -102,7 +102,7 @@ export const config = configure(
         {
           message:
             'KNOCK_AUTH_TOKEN, KNOCK_SECRET_KEY, KNOCK_PUBLIC_API_KEY, KNOCK_IN_APP_FEED_ID, and KNOCK_SIGNING_KEY ' +
-            'are required when KNOCK_INTEGRATION_ENABLED is true',
+            'are required when FLAG_KNOCK_INTEGRATION_ENABLED is true',
           path: [
             'KNOCK_AUTH_TOKEN',
             'KNOCK_SECRET_KEY',

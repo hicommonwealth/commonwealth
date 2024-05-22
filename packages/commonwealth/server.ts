@@ -28,7 +28,7 @@ stats(HotShotsStats());
 analytics(MixpanelAnalytics());
 config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
-if (config.NOTIFICATIONS.KNOCK_INTEGRATION_ENABLED)
+if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
   notificationsProvider(KnockProvider());
 else notificationsProvider();
 

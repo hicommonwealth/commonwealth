@@ -113,8 +113,8 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.KNOCK_INTEGRATION_ENABLED': JSON.stringify(
-        process.env.KNOCK_INTEGRATION_ENABLED,
+      'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
+        process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
       ),
     }),
     new HtmlWebpackPlugin({
