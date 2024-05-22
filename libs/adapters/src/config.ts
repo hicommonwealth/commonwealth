@@ -11,6 +11,7 @@ const {
   CLOUDAMQP_URL,
   REDIS_URL, // local + staging
   REDIS_TLS_URL, // staging + production
+  KNOCK_INTEGRATION_ENABLED,
 } = process.env;
 
 export const config = configure(
@@ -29,9 +30,10 @@ export const config = configure(
           : CLOUDAMQP_URL,
     },
     NOTIFICATIONS: {
-      KNOCK_AUTH_TOKEN: KNOCK_AUTH_TOKEN || 'my secret',
-      KNOCK_SECRET_KEY: KNOCK_SECRET_KEY || 'my secret',
-      KNOCK_SIGNING_KEY: KNOCK_SIGNING_KEY || 'my secret',
+      KNOCK_AUTH_TOKEN: KNOCK_AUTH_TOKEN,
+      KNOCK_SECRET_KEY: KNOCK_SECRET_KEY,
+      KNOCK_SIGNING_KEY: KNOCK_SIGNING_KEY,
+      KNOCK_INTEGRATION_ENABLED: KNOCK_INTEGRATION_ENABLED === 'true',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -47,9 +49,10 @@ export const config = configure(
       RABBITMQ_URI: z.string(),
     }),
     NOTIFICATIONS: z.object({
-      KNOCK_AUTH_TOKEN: z.string(),
+      KNOCK_AUTH_TOKEN: z.string().optional(),
       KNOCK_SECRET_KEY: z.string().optional(),
       KNOCK_SIGNING_KEY: z.string().optional(),
+      KNOCK_INTEGRATION_ENABLED: z.boolean().optional().default(false),
     }),
     ANALYTICS: z.object({
       MIXPANEL_PROD_TOKEN: z.string().optional(),

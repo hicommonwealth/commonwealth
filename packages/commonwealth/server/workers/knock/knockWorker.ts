@@ -58,7 +58,9 @@ async function startKnockWorker() {
   }
 
   // init Knock as notifications provider - this is necessary since the policies do not define the provider
-  notificationsProvider(KnockProvider());
+  if (config.NOTIFICATIONS.KNOCK_INTEGRATION_ENABLED)
+    notificationsProvider(KnockProvider());
+  else notificationsProvider();
 
   const sub = await brokerInstance.subscribe(
     BrokerSubscriptions.NotificationsProvider,
