@@ -52,3 +52,8 @@ export const GetRecapEmailData = {
     ),
   }),
 };
+
+export const GetDigestEmailData = {
+  input: z.object({}),
+  output: z.object({}),
+};
