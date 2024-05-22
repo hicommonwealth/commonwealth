@@ -87,15 +87,6 @@ const baseConfig = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_ALLOWLIST': JSON.stringify(process.env.FLAG_ALLOWLIST),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED':
-        JSON.stringify(
-          process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
-        ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_USER_ONBOARDING_ENABLED': JSON.stringify(
         process.env.FLAG_USER_ONBOARDING_ENABLED,
       ),

@@ -2,7 +2,8 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  KNOCK_API_KEY,
+  KNOCK_AUTH_TOKEN,
+  KNOCK_SECRET_KEY,
   KNOCK_SIGNING_KEY,
   MIXPANEL_PROD_TOKEN,
   MIXPANEL_DEV_TOKEN,
@@ -28,8 +29,9 @@ export const config = configure(
           : CLOUDAMQP_URL,
     },
     NOTIFICATIONS: {
-      KNOCK_API_KEY,
-      KNOCK_SIGNING_KEY,
+      KNOCK_AUTH_TOKEN: KNOCK_AUTH_TOKEN || 'my secret',
+      KNOCK_SECRET_KEY: KNOCK_SECRET_KEY || 'my secret',
+      KNOCK_SIGNING_KEY: KNOCK_SIGNING_KEY || 'my secret',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -45,7 +47,8 @@ export const config = configure(
       RABBITMQ_URI: z.string(),
     }),
     NOTIFICATIONS: z.object({
-      KNOCK_API_KEY: z.string().optional(),
+      KNOCK_AUTH_TOKEN: z.string(),
+      KNOCK_SECRET_KEY: z.string().optional(),
       KNOCK_SIGNING_KEY: z.string().optional(),
     }),
     ANALYTICS: z.object({
