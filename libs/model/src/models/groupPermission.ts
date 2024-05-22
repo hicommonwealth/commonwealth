@@ -25,7 +25,6 @@ export default (
       allowed_permissions: {
         type: Sequelize.ARRAY(Sequelize.ENUM(...Object.values(PermissionEnum))),
         allowNull: false,
-        primaryKey: true,
       },
     },
     {
