@@ -89,7 +89,6 @@ export function getRabbitMQConfig(
       RascalBindings.ContestProjectionContestStarted,
       RascalBindings.ContestProjectionContestContentAdded,
       RascalBindings.ContestProjectionContestContentUpvoted,
-      RascalBindings.ContestProjectionContestWinnersRecorded,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,

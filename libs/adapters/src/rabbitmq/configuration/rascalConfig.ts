@@ -216,12 +216,6 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.ContestProjectionContestContentUpvoted,
     },
-    [RascalBindings.ContestProjectionContestWinnersRecorded]: {
-      source: RascalExchanges.MessageRelayer,
-      destination: RascalQueues.ContestProjection,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestProjectionContestWinnersRecorded,
-    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {

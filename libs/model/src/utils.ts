@@ -65,10 +65,6 @@ type EmitEventValues =
   | {
       event_name: EventNames.ContestContentUpvoted;
       event_payload: z.infer<typeof events.ContestContentUpvoted>;
-    }
-  | {
-      event_name: EventNames.ContestWinnersRecorded;
-      event_payload: z.infer<typeof events.ContestWinnersRecorded>;
     };
 
 /**

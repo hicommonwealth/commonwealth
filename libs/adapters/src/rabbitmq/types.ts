@@ -49,7 +49,6 @@ export enum RascalBindings {
   ContestProjectionContestStarted = 'ContestProjectionContestStarted',
   ContestProjectionContestContentAdded = 'ContestProjectionContestContentAdded',
   ContestProjectionContestContentUpvoted = 'ContestProjectionContestContentUpvoted',
-  ContestProjectionContestWinnersRecorded = 'ContestProjectionContestWinnersRecorded',
 }
 
 export enum RascalRoutingKeys {
@@ -69,5 +68,4 @@ export enum RascalRoutingKeys {
   ContestProjectionContestStarted = EventNames.ContestStarted,
   ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
   ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
-  ContestProjectionContestWinnersRecorded = EventNames.ContestWinnersRecorded,
 }
