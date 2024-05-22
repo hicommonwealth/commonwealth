@@ -28,7 +28,7 @@ const featureFlags = {
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
   knockInAppNotifications: buildFlag(
-    process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+    process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),
 };
 
