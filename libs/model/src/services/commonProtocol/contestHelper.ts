@@ -31,7 +31,7 @@ export type ContestScores = {
  * @param rpc the rpc of the network to use helper with
  * @returns
  */
-export const createWeb3Provider = async (rpc: string): Promise<Web3> => {
+const createWeb3Provider = async (rpc: string): Promise<Web3> => {
   if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
   const web3 = new Web3(rpc);
   const account = web3.eth.accounts.privateKeyToAccount(
@@ -153,7 +153,7 @@ export const getContestStatus = async (
  * Gets vote and more information about winners of a given contest
  * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
- * @param contestId the id of the contest for data within the contest contract
+ * @param contestId the id of the contest for data within the contest contract. No contest id will return current winners
  * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
