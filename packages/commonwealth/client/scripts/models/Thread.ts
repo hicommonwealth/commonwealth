@@ -190,7 +190,7 @@ export class Thread implements IUniqueId {
   public readonly hasPoll: boolean;
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
-  public associatedContests: AssociatedContest[];
+  public associatedContests?: AssociatedContest[];
   public reactionWeightsSum: number;
   public links: Link[];
   public readonly discord_meta: any;
@@ -341,7 +341,7 @@ export class Thread implements IUniqueId {
         reactedProfileAvatarUrl,
         reactedAddressLastActive,
       );
-    this.associatedContests = associatedContests;
+    this.associatedContests = associatedContests || [];
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)
       : moment(created_at);

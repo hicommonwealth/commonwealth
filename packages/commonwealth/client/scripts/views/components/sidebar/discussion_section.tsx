@@ -44,13 +44,15 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
+interface DiscussionSectionProps {
+  isContestAvailable: boolean;
+  topicIdsIncludedInContest: number[];
+}
+
 export const DiscussionSection = ({
   isContestAvailable,
   topicIdsIncludedInContest,
-}: {
-  isContestAvailable: boolean;
-  topicIdsIncludedInContest: number[];
-}) => {
+}: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 

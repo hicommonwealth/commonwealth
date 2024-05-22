@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, { useState } from 'react';
 
 import { Skeleton } from 'views/components/Skeleton';
@@ -60,7 +61,7 @@ const ContestsList = ({
             const { end_time, winners } =
               contest.contests[contest.contests.length - 1] || {};
 
-            const hasEnded = new Date(end_time) < new Date();
+            const hasEnded = moment(end_time) < moment();
 
             return (
               <ContestCard
