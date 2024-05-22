@@ -130,15 +130,19 @@ async function updateScore(contest_address: string, contest_id: number) {
         contest_address,
         contest_id,
       );
-    const prizePool = (contestBalance * details.prize_percentage) / 100;
+    const prizePool =
+      (BigInt(contestBalance) * BigInt(details.prize_percentage)) / 100n;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
-      content_id: +s.winningContent,
+      content_id: s.winningContent,
       creator_address: s.winningAddress,
       votes: +s.voteCount,
       prize:
         i < details.payout_structure.length
-          ? Math.floor((prizePool * details.payout_structure[i]) / 100)
-          : 0,
+          ? (
+              (prizePool * BigInt(details.payout_structure[i])) /
+              100n
+            ).toString()
+          : '0',
     }));
     await models.Contest.update(
       {

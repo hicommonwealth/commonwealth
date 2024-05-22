@@ -158,22 +158,20 @@ describe('Contests projection lifecycle', () => {
 
   it('should project events on multiple contests', async () => {
     const contestBalance = 10000000000;
+    const prizePool =
+      (BigInt(contestBalance) * BigInt(prize_percentage)) / 100n;
     const score = [
       {
         creator_address: creator1,
-        content_id,
+        content_id: content_id.toString(),
         votes: 1,
-        prize:
-          (((contestBalance * prize_percentage) / 100) * payout_structure[0]) /
-          100,
+        prize: ((prizePool * BigInt(payout_structure[0])) / 100n).toString(),
       },
       {
         creator_address: creator2,
-        content_id,
+        content_id: content_id.toString(),
         votes: 2,
-        prize:
-          (((contestBalance * prize_percentage) / 100) * payout_structure[1]) /
-          100,
+        prize: ((prizePool * BigInt(payout_structure[1])) / 100n).toString(),
       },
     ];
     getTokenAttributes.resolves({ ticker, decimals });
@@ -327,7 +325,7 @@ describe('Contests projection lifecycle', () => {
             score_updated_at: result?.at(0)?.contests.at(0)?.score_updated_at,
             score: score.map((s) => ({
               ...s,
-              tickerPrize: s.prize / 10 ** decimals,
+              tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
             })),
             actions: [
               {
