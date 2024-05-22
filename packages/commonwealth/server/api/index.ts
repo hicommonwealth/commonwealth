@@ -1,7 +1,7 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { NEW_SUBSCRIPTION_API_FLAG } from '../config';
+import { config } from '../config';
 import * as community from './community';
 import * as contest from './contest';
 import * as email from './emails';
@@ -21,7 +21,7 @@ const artifacts = {
   contest: contest.trpcRouter,
 };
 
-if (NEW_SUBSCRIPTION_API_FLAG) {
+if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   artifacts['subscription'] = subscription.trpcRouter;
   artifacts['email'] = email.trpcRouter;
 }
