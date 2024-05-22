@@ -36,7 +36,6 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
   const handleComment = useCallback(() => {
     navigate(threadUrl);
   }, [navigate, threadUrl]);
-
   const deleteThreadSubscriptionMutation =
     trpc.subscription.deleteThreadSubscription.useMutation();
 
