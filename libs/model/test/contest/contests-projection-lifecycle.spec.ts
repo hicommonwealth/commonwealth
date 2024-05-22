@@ -1,11 +1,13 @@
 import {
   Actor,
+  DeepPartial,
   EventNames,
   InvalidState,
   dispose,
   handleEvent,
   query,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { commonProtocol, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
@@ -182,7 +184,6 @@ describe('Contests projection lifecycle', () => {
         namespace,
         contest_address: recurring,
         interval: 10,
-        created_at,
       },
     });
 
@@ -193,7 +194,6 @@ describe('Contests projection lifecycle', () => {
         contest_id,
         start_time,
         end_time,
-        created_at,
       },
     });
 
@@ -203,7 +203,6 @@ describe('Contests projection lifecycle', () => {
         namespace,
         contest_address: oneoff,
         length: 1,
-        created_at,
       },
     });
 
@@ -213,7 +212,6 @@ describe('Contests projection lifecycle', () => {
         contest_address: oneoff,
         start_time,
         end_time,
-        created_at,
       },
     });
 
@@ -224,7 +222,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         creator_address: creator1,
         content_url,
-        created_at,
       },
     });
 
@@ -236,7 +233,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         creator_address: creator2,
         content_url,
-        created_at,
       },
     });
 
@@ -248,7 +244,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         voter_address: voter1,
         voting_power: voting_power1,
-        created_at,
       },
     });
 
@@ -260,7 +255,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         voter_address: voter2,
         voting_power: voting_power2,
-        created_at,
       },
     });
 
@@ -271,7 +265,6 @@ describe('Contests projection lifecycle', () => {
         content_id,
         voter_address: voter3,
         voting_power: voting_power3,
-        created_at,
       },
     });
 
@@ -288,6 +281,13 @@ describe('Contests projection lifecycle', () => {
       actor,
       payload: { community_id, contest_address: recurring, contest_id },
     });
+
+    const recurringActions = await models.ContestAction.findAll({
+      where: {
+        contest_address: recurring,
+      },
+    });
+    expect(recurringActions.length).to.eq(3);
 
     expect(result).to.deep.eq([
       {
@@ -321,9 +321,9 @@ describe('Contests projection lifecycle', () => {
                 content_id,
                 content_url,
                 voting_power: 0,
-                created_at,
                 thread_id,
                 thread_title,
+                created_at: recurringActions[0].created_at,
               },
               {
                 action: 'upvoted',
@@ -331,9 +331,9 @@ describe('Contests projection lifecycle', () => {
                 content_id,
                 content_url: null,
                 voting_power: 1,
-                created_at,
                 thread_id,
                 thread_title,
+                created_at: recurringActions[1].created_at,
               },
               {
                 action: 'upvoted',
@@ -341,15 +341,15 @@ describe('Contests projection lifecycle', () => {
                 content_id,
                 content_url: null,
                 voting_power: 2,
-                created_at,
                 thread_id,
                 thread_title,
+                created_at: recurringActions[2].created_at,
               },
             ],
           },
         ],
       },
-    ] as Array<z.infer<typeof ContestResults>>);
+    ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
   });
 
   it('should raise invalid state when community with namespace not found', async () => {
