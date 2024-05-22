@@ -15,6 +15,11 @@ function useThreadSubscriptions() {
     {},
   );
 
+  console.log(
+    'FIXME: raw threadSubscriptions: ' +
+      JSON.stringify(threadSubscriptions, null, '  '),
+  );
+
   return useMemo(() => {
     return {
       ...threadSubscriptions,
