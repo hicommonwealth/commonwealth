@@ -8,11 +8,8 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Profile, 'user_id', { onUpdate: 'CASCADE' })
     .withMany(db.Subscription, 'subscriber_id')
     .withMany(db.NotificationsRead, 'user_id')
-    .withOne(db.Community, ['selected_community_id', 'id'], {
-      as: 'selectedCommunity',
-    })
-    .withOne(db.SubscriptionPreference, ['id', 'user_id'], {
-      as: 'SubscriptionPreferences',
+    .withMany(db.SubscriptionPreference, 'user_id', {
+      asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
     });
 
@@ -32,7 +29,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     })
     .withMany(db.Reaction, 'address_id')
-    .withOne(db.SsoToken, ['id', 'address_id'], {
+    .withMany(db.SsoToken, 'address_id', {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });
@@ -40,7 +37,7 @@ export const buildAssociations = (db: DB) => {
   db.ChainNode.withMany(db.Community, 'chain_node_id')
     .withMany(db.Contract, 'chain_node_id', { asMany: 'contracts' })
     .withMany(db.EvmEventSource, 'chain_node_id')
-    .withOne(db.LastProcessedEvmBlock, ['id', 'chain_node_id']);
+    .withOne(db.LastProcessedEvmBlock, 'chain_node_id');
 
   db.ContractAbi.withMany(db.Contract, 'abi_id')
     .withMany(db.EvmEventSource, 'abi_id')
@@ -71,11 +68,15 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Ban, 'community_id')
     .withMany(db.CommunityBanner, 'community_id')
     .withMany(db.Template, 'created_for_community')
-    .withOne(db.DiscordBotConfig, ['discord_config_id', 'community_id'], {
-      onDelete: 'CASCADE',
-    })
     .withMany(db.CommunityTags, 'community_id', {
       onDelete: 'CASCADE',
+    })
+    .withOne(db.DiscordBotConfig, 'community_id', {
+      targeyKey: 'discord_config_id',
+      onDelete: 'CASCADE',
+    })
+    .withOne(db.User, 'selected_community_id', {
+      as: 'selectedCommunity',
     });
 
   db.Tags.withMany(db.ProfileTags, 'tag_id', {

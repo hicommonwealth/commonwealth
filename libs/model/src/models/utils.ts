@@ -19,29 +19,29 @@ import type {
  * Builds on-to-one association between two models
  * @param this source model with FK to target
  * @param target target model with FK to source
- * @param keys one-to-one keys [source fk to target, target fk to source]
+ * @param foreignKey foreign key field in the target model - sequelize defaults the PK
+ * @param options one-to-one options
  */
 export function oneToOne<Source extends State, Target extends State>(
   this: ModelStatic<Model<Source>> & Associable<Source>,
   target: ModelStatic<Model<Target>> & Associable<Target>,
-  keys: [keyof Source & string, keyof Target & string],
-  options?: OneToOneOptions<Source>,
+  foreignKey: keyof Target & string,
+  options?: OneToOneOptions<Source, Target>,
 ): ModelStatic<Model<Source>> & Associable<Source> {
-  this.belongsTo(target, {
-    foreignKey: keys[0],
-    as: options?.as,
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
   target.belongsTo(this, {
-    foreignKey: keys[1],
+    foreignKey,
+    as: options?.as,
     onUpdate: options?.onUpdate ?? 'NO ACTION',
     onDelete: options?.onDelete ?? 'NO ACTION',
   });
-
-  // map fk when source pk === keys[0]
-  if (this.primaryKeyAttribute === keys[0])
-    mapFk(target, this, [[keys[1], keys[0]]], {
+  if (options?.targeyKey)
+    this.belongsTo(target, {
+      foreignKey: options?.targeyKey,
+      onUpdate: 'NO ACTION',
+      onDelete: 'NO ACTION',
+    });
+  else
+    mapFk(target, this, [[foreignKey, this.primaryKeyAttribute]], {
       onUpdate: options?.onUpdate ?? 'NO ACTION',
       onDelete: options?.onDelete ?? 'NO ACTION',
     });

@@ -25,10 +25,15 @@ export type AliasOptions<One extends State, Many extends State> = {
 
 /**
  * One to one association options
+ * - `targeyKey`: foreign key to target model
  * - `as`: association alias - defaults to model name
  */
-export type OneToOneOptions<Source extends State> = RuleOptions & {
-  as?: keyof Source & string;
+export type OneToOneOptions<
+  Source extends State,
+  Target extends State,
+> = RuleOptions & {
+  targeyKey?: keyof Source & string;
+  as?: keyof Target & string;
 };
 
 /**
@@ -80,13 +85,13 @@ export type Associable<M> = M extends ModelStatic<infer Source>
        * Builds on-to-one association between two models
        * @param this source model with FK to target
        * @param target target model with FK to source
-       * @param keys one-to-one keys [source fk to target, target fk to source]
+       * @param foreignKey foreign key field in the target model - sequelize defaults the PK
        * @param options one-to-one options
        */
       withOne: <Target extends State>(
         target: ModelStatic<Model<Target>>,
-        keys: [keyof Source & string, keyof Target & string],
-        options?: OneToOneOptions<Attributes<Source>>,
+        foreignKey: keyof Target & string,
+        options?: OneToOneOptions<Attributes<Source>, Target>,
       ) => Associable<M>;
 
       /**
