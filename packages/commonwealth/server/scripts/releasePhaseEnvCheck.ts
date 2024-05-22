@@ -15,5 +15,6 @@ async function releasePhaseEnvCheck() {
 if (import.meta.url.endsWith(process.argv[1])) {
   releasePhaseEnvCheck().then(() => {
     log.info('Environment variables are properly configured');
+    process.exit(0);
   });
 }
