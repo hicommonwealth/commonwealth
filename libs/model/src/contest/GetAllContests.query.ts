@@ -41,7 +41,8 @@ from
       'contest_id', c.contest_id,
       'start_time', c.start_time,
       'end_time', c.end_time,
-      'winners', c.winners,
+      'score_updated_at', c.score_updated_at,
+      'score', c.score,
       'actions', coalesce(ca.actions, '[]'::jsonb)
 		)) as contests
 	from "Contests" c left join (
@@ -95,11 +96,13 @@ order by
       );
       results.forEach((r) =>
         r.contests.forEach((c) => {
-          c.winners?.forEach(
+          c.score?.forEach(
             (w) => (w.prize = Math.floor(w.prize / 10 ** r.decimals)),
           );
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);
+          c.score_updated_at =
+            c.score_updated_at && new Date(c.score_updated_at);
           c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
         }),
       );

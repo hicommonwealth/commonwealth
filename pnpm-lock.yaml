@@ -580,6 +580,9 @@ importers:
       dotenv:
         specifier: ^16.0.3
         version: 16.4.5
+      ethers:
+        specifier: 5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -605,6 +608,12 @@ importers:
       '@types/moment':
         specifier: ^2.13.0
         version: 2.13.0
+      '@types/sinon':
+        specifier: ^17.0.3
+        version: 17.0.3
+      sinon:
+        specifier: ^17.0.2
+        version: 17.0.2
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
@@ -1411,6 +1420,9 @@ importers:
       '@types/passport':
         specifier: ^1.0.16
         version: 1.0.16
+      '@types/passport-auth-token':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@types/uuid':
         specifier: ^9.0.7
         version: 9.0.8
@@ -7588,6 +7600,12 @@ packages:
     resolution:
       {
         integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==,
+      }
+
+  '@types/passport-auth-token@1.0.4':
+    resolution:
+      {
+        integrity: sha512-7W0Nl0/IQeAj2Abp5NU8TxN/AdGWGQHgcj745I5glpnIJkL/Iv2qgTA87NS7m8wkrvK7rnXOccPVXBJ3ljtgpw==,
       }
 
   '@types/passport-jwt@3.0.13':
@@ -27827,6 +27845,12 @@ snapshots:
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/parse-json@4.0.2': {}
+
+  '@types/passport-auth-token@1.0.4':
+    dependencies:
+      '@types/express': 4.17.21
+      '@types/passport': 1.0.16
+      '@types/passport-strategy': 0.2.38
 
   '@types/passport-jwt@3.0.13':
     dependencies:

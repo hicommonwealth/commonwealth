@@ -1,6 +1,9 @@
 import {
   ChainEventCreated,
   EventNames,
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -13,17 +16,15 @@ import {
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import z from 'zod';
 import { processChainEventCreated } from '../../../server/workers/knock/eventHandlers/chainEventCreated';
 import { getChainProposalUrl } from '../../../server/workers/knock/util';
 import { getCommunityUrl } from '../../../shared/utils';
-import {
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-} from './util';
+
+chai.use(chaiAsPromised);
 
 const namespaceAddress = '0x123';
 const communityStakesAddress = '0x0000000000000000000000000000000000000001';
@@ -163,6 +164,7 @@ describe('chainEventCreated Event Handler', () => {
         key: WorkflowKeys.CommunityStake,
         users: [{ id: String(user!.id) }],
         data: {
+          community_id: community!.id,
           transaction_type: 'minted',
           community_name: community!.name,
           community_stakes_url: getCommunityUrl(community!.id),
@@ -267,6 +269,7 @@ describe('chainEventCreated Event Handler', () => {
         key: WorkflowKeys.ChainProposals,
         users: [{ id: String(user!.id) }],
         data: {
+          community_id: community!.id,
           community_name: community!.name,
           proposal_kind: 'proposal-created',
           proposal_url: getChainProposalUrl(community!.id, proposalId),

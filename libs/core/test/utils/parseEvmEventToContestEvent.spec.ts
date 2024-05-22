@@ -1,0 +1,146 @@
+import { EventNames } from '@hicommonwealth/core';
+import { expect } from 'chai';
+import ethers from 'ethers';
+import {
+  ContestContentAdded,
+  ContestContentUpvoted,
+  ContestStarted,
+  OneOffContestManagerDeployed,
+  RecurringContestManagerDeployed,
+} from '../../src/integration/events.schemas';
+import { parseEvmEventToContestEvent } from '../../src/integration/events.utils';
+
+const contestAddress = '0x888';
+
+describe('parseEvmEventToContestEvent', () => {
+  it('should map NewContest chain event to RecurringContestManagerDeployed outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'NewContest',
+      null,
+      [
+        '0x1', // contest
+        '0x2', // namespace
+        ethers.BigNumber.from(7), // interval
+        false, // oneOff
+      ],
+    );
+    expect(event_name).to.eq(EventNames.RecurringContestManagerDeployed);
+    const parsedEvent = RecurringContestManagerDeployed.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq('0x1');
+    expect(parsedEvent.namespace).to.eq('0x2');
+    expect(parsedEvent.interval).to.eq(7); // prop of RecurringContestManagerDeployed
+  });
+
+  it('should map NewContest chain event to OneOffContestManagerDeployed outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'NewContest',
+      null,
+      [
+        '0x1', // contest
+        '0x2', // namespace
+        ethers.BigNumber.from(7), // interval is same as length
+        true, // oneOff
+      ],
+    );
+    expect(event_name).to.eq(EventNames.OneOffContestManagerDeployed);
+    const parsedEvent = OneOffContestManagerDeployed.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq('0x1');
+    expect(parsedEvent.namespace).to.eq('0x2');
+    expect(parsedEvent.length).to.eq(7);
+  });
+
+  it('should map NewRecurringContestStarted raw evm result to ContestStarted outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'NewRecurringContestStarted',
+      contestAddress,
+      [
+        ethers.BigNumber.from(8), // contestId
+        ethers.BigNumber.from(1000), // startTime
+        ethers.BigNumber.from(1001), // endTime
+      ],
+    );
+    expect(event_name).to.eq(EventNames.ContestStarted);
+    const parsedEvent = ContestStarted.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.contest_id).to.eq(8);
+    expect(parsedEvent.start_time.getTime()).to.eq(
+      new Date(1000 * 1000).getTime(),
+    );
+    expect(parsedEvent.end_time.getTime()).to.eq(
+      new Date(1001 * 1000).getTime(),
+    );
+  });
+
+  it('should map NewSingleContestStarted raw evm result to ContestStarted outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'NewSingleContestStarted',
+      contestAddress,
+      [
+        ethers.BigNumber.from(2000), // startTime
+        ethers.BigNumber.from(2001), // endTime
+      ],
+    );
+    expect(event_name).to.eq(EventNames.ContestStarted);
+    const parsedEvent = ContestStarted.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.contest_id).to.eq(0); // single == 0
+    expect(parsedEvent.start_time.getTime()).to.eq(
+      new Date(2000 * 1000).getTime(),
+    );
+    expect(parsedEvent.end_time.getTime()).to.eq(
+      new Date(2001 * 1000).getTime(),
+    );
+  });
+
+  it('should map ContentAdded raw evm result to ContestContentAdded outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'ContentAdded',
+      contestAddress,
+      [
+        ethers.BigNumber.from(9), // contentId
+        '0x1', // creator
+        '/threads/1', // url
+      ],
+    );
+    expect(event_name).to.eq(EventNames.ContestContentAdded);
+    const parsedEvent = ContestContentAdded.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.content_id).to.eq(9);
+    expect(parsedEvent.creator_address).to.eq('0x1');
+    expect(parsedEvent.content_url).to.eq('/threads/1');
+  });
+
+  it('should map VoterVoted raw evm result to ContestContentUpvoted outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'VoterVoted',
+      contestAddress,
+      [
+        '0x2', // voterAddress
+        ethers.BigNumber.from(10), // contentId
+        ethers.BigNumber.from(9000), // votingPower
+      ],
+    );
+    expect(event_name).to.eq(EventNames.ContestContentUpvoted);
+    const parsedEvent = ContestContentUpvoted.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.contest_id).to.eq(0); // TODO: this should come from contract
+    expect(parsedEvent.content_id).to.eq(10);
+    expect(parsedEvent.voter_address).to.eq('0x2');
+    expect(parsedEvent.voting_power).to.eq(9000);
+  });
+
+  it('should throw if the wrong number of args are used outbox shape', () => {
+    expect(() => {
+      // VoterVoted event requires 3 args
+      parseEvmEventToContestEvent('VoterVoted', contestAddress, [
+        '0x2', // voterAddress
+      ]);
+    }).to.throw('evm parsed args does not match signature');
+  });
+});

@@ -26,6 +26,7 @@ export const CommentCreatedNotification = z.object({
 });
 
 export const SnapshotProposalCreatedNotification = z.object({
+  community_id: z.string().max(255).describe('The community id'),
   community_name: z
     .string()
     .max(255)
@@ -62,6 +63,7 @@ export const UserMentionedNotification = z.object({
 });
 
 export const CommunityStakeNotification = z.object({
+  community_id: z.string().max(255).describe('The community id'),
   transaction_type: z
     .union([z.literal('minted'), z.literal('burned')])
     .describe('The type of stake transaction'),
@@ -73,6 +75,7 @@ export const CommunityStakeNotification = z.object({
 });
 
 export const ChainProposalsNotification = z.object({
+  community_id: z.string().max(255).describe('The community id'),
   proposal_kind: z.union([
     z.literal('proposal-created'),
     z.literal('proposal-queued'),

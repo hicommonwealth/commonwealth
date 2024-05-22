@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 
 export type AddContentResponse = {
@@ -15,20 +16,47 @@ export type ContestStatus = {
   lastContentId: string;
 };
 
+export type ContestScores = {
+  scores: {
+    winningContent: string;
+    winningAddress: string;
+    voteCount: string;
+  }[];
+  contestBalance: number;
+};
+
+/**
+ * A helper for creating the web3 provider via an RPC, including private key import
+ * @param rpcNodeUrl the rpc of the network to use helper with
+ * @returns
+ */
+const createWeb3Provider = (rpcNodeUrl: string): Web3 => {
+  if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
+
+  const web3 = new Web3(rpcNodeUrl);
+  const account = web3.eth.accounts.privateKeyToAccount(
+    config.WEB3.PRIVATE_KEY,
+  );
+  web3.eth.accounts.wallet.add(account);
+  web3.eth.defaultAccount = account.address;
+  return web3;
+};
+
 /**
  * Adds content to an active contest. Includes validation of contest state
- * @param web3 an instance of web3.js with correct RPC and Private Key
+ * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
  * @param creator the address of the user to create content on behalf of
  * @param url the common/commonwealth url of the content
  * @returns txReceipt and contentId of new content(NOTE: this should be saved for future voting)
  */
 export const addContent = async (
-  web3: Web3,
+  rpcNodeUrl: string,
   contest: string,
   creator: string,
   url: string,
 ): Promise<AddContentResponse> => {
+  const web3 = createWeb3Provider(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -60,18 +88,19 @@ export const addContent = async (
 
 /**
  * Adds a vote to content if voting power is available and user hasnt voted
- * @param web3 an instance of web3.js with correct RPC and Private Key
+ * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
  * @param voter the address of the voter
  * @param contentId The contentId on the contest to vote
  * @returns a tx receipt
  */
 export const voteContent = async (
-  web3: Web3,
+  rpcNodeUrl: string,
   contest: string,
   voter: string,
   contentId: string,
 ): Promise<any> => {
+  const web3 = createWeb3Provider(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -91,14 +120,15 @@ export const voteContent = async (
 
 /**
  * Gets relevant contest state information
- * @param web3 an instance of web3.js with correct RPC and Private Key
+ * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
  * @returns Contest Status object
  */
 export const getContestStatus = async (
-  web3: Web3,
+  rpcNodeUrl: string,
   contest: string,
 ): Promise<ContestStatus> => {
+  const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -120,20 +150,51 @@ export const getContestStatus = async (
 };
 
 /**
- * A helper for creating the web3 provider via an RPC, including private key import
- * @param rpc the rpc of the network to use helper with
- * @returns
+ * Gets vote and more information about winners of a given contest
+ * @param web3 an instance of web3.js with correct RPC and Private Key
+ * @param contest the address of the contest
+ * @param contestId the id of the contest for data within the contest contract
+ * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
-export const createWeb3Provider = async (
-  rpc: string,
-  privateKey: string,
-): Promise<Web3> => {
-  if (!privateKey) {
-    throw new AppError('Private Key not set for relayer');
+export const getContestScore = async (
+  rpcNodeUrl: string,
+  contest: string,
+  contestId?: number,
+): Promise<ContestScores> => {
+  const web3 = new Web3(rpcNodeUrl);
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  const contestData = await Promise.all([
+    contestId
+      ? contestInstance.methods.getPastWinners(contestId).call()
+      : contestInstance.methods.getWinnerIds().call(),
+    //getContestBalance(web3, contest),
+  ]);
+
+  const winnerIds: string[] = contestData[0] as string[];
+
+  if (winnerIds.length == 0) {
+    throw new AppError('Contest Id not found on Contest address');
   }
-  const web3 = new Web3(rpc);
-  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-  web3.eth.accounts.wallet.add(account);
-  web3.eth.defaultAccount = account.address;
-  return web3;
+
+  const votePromises: any[] = [];
+  winnerIds.forEach((w) => {
+    votePromises.push(contestInstance.methods.content(w).call());
+  });
+
+  const contentMeta = await Promise.all(votePromises);
+
+  return {
+    scores: winnerIds.map((v, i) => {
+      return {
+        winningContent: v,
+        winningAddress: contentMeta[i]['creator'],
+        voteCount: contentMeta[i]['cumulativeVotes'],
+      };
+    }),
+    contestBalance: 100, //TODO: fix this
+  };
 };

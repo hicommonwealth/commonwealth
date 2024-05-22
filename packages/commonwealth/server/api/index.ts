@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import { NEW_SUBSCRIPTION_API_FLAG } from '../config';
 import * as community from './community';
 import * as contest from './contest';
+import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
 import * as subscription from './subscription';
@@ -22,6 +23,7 @@ const artifacts = {
 
 if (NEW_SUBSCRIPTION_API_FLAG) {
   artifacts['subscription'] = subscription.trpcRouter;
+  artifacts['email'] = email.trpcRouter;
 }
 
 const apiV1 = trpc.router(artifacts);
