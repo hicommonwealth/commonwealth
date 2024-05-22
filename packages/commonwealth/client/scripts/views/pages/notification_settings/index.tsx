@@ -3,7 +3,7 @@ import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -60,13 +60,21 @@ const NotificationSettingsPage = () => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [forceRerender]);
 
+  const handleSubs = useCallback(() => {
+    console.log(Notification.permission);
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+      }
+    });
+  }, []);
+
   if (!app.loginStatusLoaded()) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
     navigate('/', { replace: true });
     return <PageLoading />;
   }
-
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage">
@@ -78,6 +86,7 @@ const NotificationSettingsPage = () => {
           and chain events in the following communities.
         </CWText>
         <div className="email-management-section">
+          <button onClick={handleSubs}>DO IT</button>
           <div className="text-description">
             <CWText type="h5">Scheduled Email Digest</CWText>
             <CWText type="b2" className="subtitle-text">
