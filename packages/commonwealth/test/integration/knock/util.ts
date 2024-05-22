@@ -13,6 +13,8 @@ export function SpyNotificationsProvider(
   };
 }
 
+export const ProviderError = new Error('some error');
+
 export function ThrowingSpyNotificationsProvider(
   sandbox: sinon.SinonSandbox,
   triggerWorkflowStub?: sinon.SinonStub,
@@ -21,7 +23,6 @@ export function ThrowingSpyNotificationsProvider(
     name: 'ThrowingNotificationsProvider',
     dispose: sandbox.stub().returns(Promise.resolve()),
     triggerWorkflow:
-      triggerWorkflowStub ||
-      sandbox.stub().returns(Promise.reject(new Error('some error'))),
+      triggerWorkflowStub || sandbox.stub().rejects(ProviderError),
   };
 }
