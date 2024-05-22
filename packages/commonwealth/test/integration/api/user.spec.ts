@@ -6,7 +6,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 
 chai.use(chaiHttp);
@@ -36,7 +36,10 @@ describe('User Model Routes', () => {
       );
       userAddress = res.address;
       userEmail = res.email;
-      jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
+      jwtToken = jwt.sign(
+        { id: res.user_id, email: userEmail },
+        config.AUTH.JWT_SECRET,
+      );
       const isAdmin = await server.seeder.updateRole({
         address_id: +res.address_id,
         chainOrCommObj: { chain_id: chain },

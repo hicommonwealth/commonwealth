@@ -1,5 +1,4 @@
-import { InvalidState } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { InvalidState, logger } from '@hicommonwealth/core';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

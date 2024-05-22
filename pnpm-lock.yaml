@@ -383,9 +383,6 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../core
-      '@hicommonwealth/logging':
-        specifier: workspace:*
-        version: link:../logging
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
@@ -401,9 +398,6 @@ importers:
       async-rwlock:
         specifier: ^1.1.1
         version: 1.1.1
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -577,18 +571,36 @@ importers:
 
   libs/core:
     dependencies:
-      '@hicommonwealth/logging':
-        specifier: workspace:*
-        version: link:../logging
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
+      dotenv:
+        specifier: ^16.0.3
+        version: 16.4.5
+      ethers:
+        specifier: 5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       moment:
         specifier: ^2.23.0
         version: 2.30.1
+      pino:
+        specifier: ^8.19.0
+        version: 8.21.0
+      pino-http:
+        specifier: ^9.0.0
+        version: 9.0.0
+      pino-http-print:
+        specifier: ^3.1.0
+        version: 3.1.0
+      pino-pretty:
+        specifier: ^10.3.1
+        version: 10.3.1
+      rollbar:
+        specifier: ^2.6.1
+        version: 2.26.4
       zod:
         specifier: ^3.22.4
         version: 3.23.6
@@ -596,6 +608,12 @@ importers:
       '@types/moment':
         specifier: ^2.13.0
         version: 2.13.0
+      '@types/sinon':
+        specifier: ^17.0.3
+        version: 17.0.3
+      sinon:
+        specifier: ^17.0.2
+        version: 17.0.2
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
@@ -608,9 +626,9 @@ importers:
 
   libs/evm-testing:
     dependencies:
-      '@hicommonwealth/logging':
+      '@hicommonwealth/core':
         specifier: workspace:*
-        version: link:../logging
+        version: link:../core
       '@viem/anvil':
         specifier: ^0.0.10
         version: 0.0.10(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -620,9 +638,6 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -657,34 +672,9 @@ importers:
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
-
-  libs/logging:
-    dependencies:
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
-      moment:
-        specifier: ^2.23.0
-        version: 2.30.1
-      pino:
-        specifier: ^8.19.0
-        version: 8.21.0
-      pino-http:
-        specifier: ^9.0.0
-        version: 9.0.0
-      pino-http-print:
-        specifier: ^3.1.0
-        version: 3.1.0
-      pino-pretty:
-        specifier: ^10.3.1
-        version: 10.3.1
-      rollbar:
-        specifier: ^2.6.1
-        version: 2.26.4
-    devDependencies:
-      '@types/moment':
-        specifier: ^2.13.0
-        version: 2.13.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.23.6
 
   libs/model:
     dependencies:
@@ -712,9 +702,6 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../core
-      '@hicommonwealth/logging':
-        specifier: workspace:*
-        version: link:../logging
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -727,9 +714,6 @@ importers:
       '@solana/web3.js':
         specifier: ^1.91.6
         version: 1.91.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       ethers:
         specifier: 5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -928,9 +912,9 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core
-      '@hicommonwealth/logging':
+      '@hicommonwealth/evm-testing':
         specifier: workspace:*
-        version: link:../../libs/logging
+        version: link:../../libs/evm-testing
       '@hicommonwealth/model':
         specifier: workspace:*
         version: link:../../libs/model
@@ -1123,9 +1107,6 @@ importers:
       dompurify:
         specifier: ^2.2.6
         version: 2.5.2
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       esm-loader-css:
         specifier: ^1.0.6
         version: 1.0.6
@@ -1138,9 +1119,6 @@ importers:
       ethers:
         specifier: 5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -1442,6 +1420,9 @@ importers:
       '@types/passport':
         specifier: ^1.0.16
         version: 1.0.16
+      '@types/passport-auth-token':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@types/uuid':
         specifier: ^9.0.7
         version: 9.0.8
@@ -1454,9 +1435,6 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core
-      '@hicommonwealth/logging':
-        specifier: workspace:*
-        version: link:../../libs/logging
       '@hicommonwealth/model':
         specifier: workspace:*
         version: link:../../libs/model
@@ -1466,9 +1444,6 @@ importers:
       discord.js:
         specifier: ^14.11.0
         version: 14.15.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -1490,18 +1465,12 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core
-      '@hicommonwealth/logging':
-        specifier: workspace:*
-        version: link:../../libs/logging
       '@hicommonwealth/model':
         specifier: workspace:*
         version: link:../../libs/model
       '@hicommonwealth/sitemaps':
         specifier: workspace:*
         version: link:../../libs/sitemaps
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       mocha:
         specifier: ^10.4.0
         version: 10.4.0
@@ -1523,18 +1492,12 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core
-      '@hicommonwealth/logging':
-        specifier: workspace:*
-        version: link:../../libs/logging
       '@hicommonwealth/model':
         specifier: workspace:*
         version: link:../../libs/model
       body-parser:
         specifier: ^1.20.1
         version: 1.20.2
-      dotenv:
-        specifier: ^16.0.3
-        version: 16.4.5
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -1547,9 +1510,9 @@ importers:
       sequelize:
         specifier: ^6.32.1
         version: 6.37.3(pg@8.11.5)
-      tslog:
-        specifier: ^3.3.4
-        version: 3.3.4
+      zod:
+        specifier: ^3.22.4
+        version: 3.23.6
     devDependencies:
       tsx:
         specifier: ^4.7.2
@@ -7637,6 +7600,12 @@ packages:
     resolution:
       {
         integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==,
+      }
+
+  '@types/passport-auth-token@1.0.4':
+    resolution:
+      {
+        integrity: sha512-7W0Nl0/IQeAj2Abp5NU8TxN/AdGWGQHgcj745I5glpnIJkL/Iv2qgTA87NS7m8wkrvK7rnXOccPVXBJ3ljtgpw==,
       }
 
   '@types/passport-jwt@3.0.13':
@@ -20923,13 +20892,6 @@ packages:
     peerDependencies:
       typescript: '>=2.3.0-dev || >=2.4.0-dev || >=2.5.0-dev || >=2.6.0-dev || >=2.7.0-dev || >=2.8.0-dev || >=2.9.0-dev || >=3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev'
 
-  tslog@3.3.4:
-    resolution:
-      {
-        integrity: sha512-N0HHuHE0e/o75ALfkioFObknHR5dVchUad4F0XyFf3gXJYB++DewEzwGI/uIOM216E5a43ovnRNEeQIq9qgm4Q==,
-      }
-    engines: { node: '>=10' }
-
   tsort@0.0.1:
     resolution:
       {
@@ -27884,6 +27846,12 @@ snapshots:
 
   '@types/parse-json@4.0.2': {}
 
+  '@types/passport-auth-token@1.0.4':
+    dependencies:
+      '@types/express': 4.17.21
+      '@types/passport': 1.0.16
+      '@types/passport-strategy': 0.2.38
+
   '@types/passport-jwt@3.0.13':
     dependencies:
       '@types/express': 4.17.21
@@ -29136,14 +29104,14 @@ snapshots:
 
   axios@0.27.2:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
 
   axios@1.6.8:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -31691,8 +31659,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  follow-redirects@1.15.6: {}
-
   follow-redirects@1.15.6(debug@4.3.4):
     optionalDependencies:
       debug: 4.3.4(supports-color@8.1.1)
@@ -32275,7 +32241,7 @@ snapshots:
   http-proxy@1.18.1:
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.4)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -37143,10 +37109,6 @@ snapshots:
       tslib: 1.14.1
       tsutils: 2.29.0(typescript@5.4.5)
       typescript: 5.4.5
-
-  tslog@3.3.4:
-    dependencies:
-      source-map-support: 0.5.21
 
   tsort@0.0.1: {}
 

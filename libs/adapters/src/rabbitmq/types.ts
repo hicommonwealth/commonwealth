@@ -15,6 +15,7 @@ export enum RascalSubscriptions {
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
+  ContestProjection = BrokerSubscriptions.ContestProjection,
 }
 
 export enum RascalExchanges {
@@ -29,6 +30,7 @@ export enum RascalQueues {
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
+  ContestProjection = 'ContestProjection',
 }
 
 export enum RascalBindings {
@@ -39,8 +41,14 @@ export enum RascalBindings {
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
   ChainEvent = 'ChainEventBinding',
+
   ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
   ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
+  ContestProjectionRecurringContestManagerDeployed = 'ContestProjectionRecurringContestManagerDeployed',
+  ContestProjectionOneOffContestManagerDeployed = 'ContestProjectionOneOffContestManagerDeployed',
+  ContestProjectionContestStarted = 'ContestProjectionContestStarted',
+  ContestProjectionContestContentAdded = 'ContestProjectionContestContentAdded',
+  ContestProjectionContestContentUpvoted = 'ContestProjectionContestContentUpvoted',
 }
 
 export enum RascalRoutingKeys {
@@ -52,6 +60,12 @@ export enum RascalRoutingKeys {
   DeadLetter = 'DeadLetter',
   DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
+
   ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
   ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
+  ContestProjectionRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
+  ContestProjectionOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
+  ContestProjectionContestStarted = EventNames.ContestStarted,
+  ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
+  ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
 }

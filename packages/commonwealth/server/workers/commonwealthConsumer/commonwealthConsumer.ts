@@ -10,12 +10,12 @@ import {
   Broker,
   BrokerSubscriptions,
   broker,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import { ContestWorker } from '@hicommonwealth/model';
+import { Contest, ContestWorker } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
-import { RABBITMQ_URI } from '../../config';
+import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,7 +47,10 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -69,6 +72,11 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     ContestWorker(),
   );
 
+  const contestProjectionsSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestProjection,
+    Contest.Contests(),
+  );
+
   if (!chainEventSubRes) {
     log.fatal(
       'Failed to subscribe to chain-events. Requires restart!',
@@ -85,6 +93,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       undefined,
       {
         topic: BrokerSubscriptions.ContestWorkerPolicy,
+      },
+    );
+  }
+
+  if (!contestProjectionsSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest projection events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestProjection,
       },
     );
   }

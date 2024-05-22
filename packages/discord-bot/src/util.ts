@@ -1,6 +1,5 @@
-import { TopicAttributes } from '@hicommonwealth/model';
+import { models, type TopicAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from './database';
 
 /**
  * Searches the Commonwealth database Topics table for any topics that are linked to the given Discord Forum
@@ -8,7 +7,7 @@ import { sequelize } from './database';
 export async function getForumLinkedTopic(
   forumId: string,
 ): Promise<TopicAttributes> {
-  const result = await sequelize.query<TopicAttributes>(
+  const result = await models.sequelize.query<TopicAttributes>(
     `
     SELECT * FROM "Topics" WHERE channel_id = :forumId AND deleted_at IS NULL LIMIT 1;
   `,

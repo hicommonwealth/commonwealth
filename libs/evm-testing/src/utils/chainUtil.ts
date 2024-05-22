@@ -1,10 +1,10 @@
 import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
 import Web3 from 'web3';
-import { ETH_ALCHEMY_API_KEY, PROVIDER_URL } from '../config';
+import { config } from '../config';
 import getProvider from './getProvider';
 
 export async function advanceTime(seconds: number, blocks = 1) {
-  const provider = new Web3.providers.HttpProvider(PROVIDER_URL);
+  const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
 
   const web3 = getProvider();
   let block = await web3.eth.getBlock('latest');
@@ -32,7 +32,7 @@ export async function advanceTime(seconds: number, blocks = 1) {
 }
 
 export async function mineBlocks(blocks: number) {
-  const provider = new Web3.providers.HttpProvider(PROVIDER_URL);
+  const provider = new Web3.providers.HttpProvider(config.EVM.PROVIDER_URL);
 
   // mine blocks
   const res = await provider.request({
@@ -53,7 +53,7 @@ export async function getAnvil(
   options: CreateAnvilOptions = {},
 ): Promise<Anvil> {
   const anvil = createAnvil({
-    forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${ETH_ALCHEMY_API_KEY}`,
+    forkUrl: `https://eth-mainnet.g.alchemy.com/v2/${config.EVM.ETH_ALCHEMY_API_KEY}`,
     silent: false,
     port: 8545,
     autoImpersonate: true,

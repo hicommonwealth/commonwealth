@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import type { Express } from 'express';
 import http from 'http';
 import { fileURLToPath } from 'url';

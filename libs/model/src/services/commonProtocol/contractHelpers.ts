@@ -6,10 +6,11 @@ import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
 
 export const getNamespace = async (
-  web3: Web3,
+  rpcNodeUrl: string,
   namespace: string,
   factoryAddress: string,
 ): Promise<string> => {
+  const web3 = new Web3(rpcNodeUrl);
   const factory = new web3.eth.Contract(
     [
       {
@@ -48,7 +49,7 @@ export const getNamespace = async (
  * @param tokenId ERC1155 id(ie 0 for admin token, default 2 for CommunityStake)
  * @param chain chainNode to use(must be chain with deployed protocol)
  * @param addresses User address to check balance
- * @param nodeUrl The RPC url of the node
+ * @param rpcNodeUrl The RPC url of the node
  * @returns balance in wei
  */
 export const getNamespaceBalance = async (
@@ -56,10 +57,10 @@ export const getNamespaceBalance = async (
   tokenId: number,
   chain: commonProtocol.ValidChains,
   addresses: string[],
-  nodeUrl: string,
+  rpcNodeUrl: string,
 ): Promise<Balances> => {
   const factoryData = commonProtocol.factoryContracts[chain];
-  if (nodeUrl) {
+  if (rpcNodeUrl) {
     if (!namespaceAddress) {
       throw new AppError('No namespace provided!');
     }
@@ -83,8 +84,9 @@ export const getNamespaceBalance = async (
  */
 export const getTokenAttributes = async (
   contestAddress: string,
-  web3: Web3,
+  rpcNodeUrl: string,
 ): Promise<TokenAttributes> => {
+  const web3 = new Web3(rpcNodeUrl);
   const contest = new web3.eth.Contract(
     contestABI as AbiItem[],
     contestAddress,
