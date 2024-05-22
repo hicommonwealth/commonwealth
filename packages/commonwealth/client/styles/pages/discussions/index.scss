@@ -20,6 +20,16 @@ $size: 48px;
     }
   }
 
+  .UserTrainingSliderPageLayout,
+  .AdminOnboardingSliderPageLayout {
+    padding-inline: 0;
+    margin-top: -36px;
+
+    @include smallInclusive {
+      margin-top: -12px;
+    }
+  }
+
   .DiscussionsPage {
     display: flex;
     flex: 1;
