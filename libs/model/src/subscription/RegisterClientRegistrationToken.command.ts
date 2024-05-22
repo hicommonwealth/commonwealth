@@ -10,6 +10,9 @@ export function RegisterClientRegistrationToken(): Command<
     secure: true,
     body: async ({ payload, actor }) => {
       console.log('Registering client token!');
+      // if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
+      //
+
       return {};
     },
   };
