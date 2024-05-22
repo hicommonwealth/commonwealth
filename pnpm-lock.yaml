@@ -580,6 +580,9 @@ importers:
       dotenv:
         specifier: ^16.0.3
         version: 16.4.5
+      ethers:
+        specifier: 5.7.2
+        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       moment:
         specifier: ^2.23.0
         version: 2.30.1

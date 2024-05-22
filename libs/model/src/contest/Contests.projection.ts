@@ -99,7 +99,7 @@ async function getContestDetails(
     cm.prize_percentage,
     cm.payout_structure
   from
-    "ContestManagers" cm 
+    "ContestManagers" cm
     join "Communities" c on cm.community_id = c.id
     join "ChainNodes" cn on c.chain_node_id = cn.id
   where
@@ -234,6 +234,7 @@ export function Contests(): Projection<typeof inputs> {
           content_url: payload.content_url,
           thread_id: thread?.id,
           voting_power: 0,
+          created_at: new Date(),
         });
       },
 
@@ -255,10 +256,10 @@ export function Contests(): Projection<typeof inputs> {
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action?.thread_id,
+          created_at: new Date(),
         });
         // update score if vote is less than 1hr old
-        Date.now() - payload.created_at.getTime() < 1 * 60 * 60 * 1000 &&
-          setImmediate(() => updateScore(payload.contest_address, contest_id));
+        setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },
   };
