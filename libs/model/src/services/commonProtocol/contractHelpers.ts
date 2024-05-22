@@ -83,8 +83,8 @@ export const getNamespaceBalance = async (
  * Gets token ticker and decimal places to wei
  */
 export const getTokenAttributes = async (
-  rpcNodeUrl: string,
   contestAddress: string,
+  rpcNodeUrl: string,
 ): Promise<TokenAttributes> => {
   const web3 = new Web3(rpcNodeUrl);
   const contest = new web3.eth.Contract(

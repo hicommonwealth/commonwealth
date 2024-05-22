@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
+import { feeManagerABI } from './abi/feeManagerAbi';
 
 export type AddContentResponse = {
   txReceipt: any;
@@ -27,13 +28,12 @@ export type ContestScores = {
 
 /**
  * A helper for creating the web3 provider via an RPC, including private key import
- * @param rpcNodeUrl the rpc of the network to use helper with
+ * @param rpc the rpc of the network to use helper with
  * @returns
  */
-const createWeb3Provider = (rpcNodeUrl: string): Web3 => {
+const createWeb3Provider = async (rpc: string): Promise<Web3> => {
   if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
-
-  const web3 = new Web3(rpcNodeUrl);
+  const web3 = new Web3(rpc);
   const account = web3.eth.accounts.privateKeyToAccount(
     config.WEB3.PRIVATE_KEY,
   );
@@ -56,7 +56,7 @@ export const addContent = async (
   creator: string,
   url: string,
 ): Promise<AddContentResponse> => {
-  const web3 = createWeb3Provider(rpcNodeUrl);
+  const web3 = await createWeb3Provider(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -100,7 +100,7 @@ export const voteContent = async (
   voter: string,
   contentId: string,
 ): Promise<any> => {
-  const web3 = createWeb3Provider(rpcNodeUrl);
+  const web3 = await createWeb3Provider(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -151,9 +151,9 @@ export const getContestStatus = async (
 
 /**
  * Gets vote and more information about winners of a given contest
- * @param web3 an instance of web3.js with correct RPC and Private Key
+ * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
- * @param contestId the id of the contest for data within the contest contract
+ * @param contestId the id of the contest for data within the contest contract. No contest id will return current winners
  * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
@@ -171,7 +171,7 @@ export const getContestScore = async (
     contestId
       ? contestInstance.methods.getPastWinners(contestId).call()
       : contestInstance.methods.getWinnerIds().call(),
-    //getContestBalance(web3, contest),
+    getContestBalance(rpcNodeUrl, contest),
   ]);
 
   const winnerIds: string[] = contestData[0] as string[];
@@ -195,6 +195,62 @@ export const getContestScore = async (
         voteCount: contentMeta[i]['cumulativeVotes'],
       };
     }),
-    contestBalance: 100, //TODO: fix this
+    contestBalance: contestData[1],
   };
+};
+
+/**
+ * Get the total balance of a given contest
+ * @param rpcNodeUrl the rpc node url
+ * @param contest the address of contest to get the balance of
+ * @returns a numeric contest balance of the contestToken in wei(ie / 1e18 for decimal value)
+ */
+export const getContestBalance = async (
+  rpcNodeUrl: string,
+  contest: string,
+): Promise<number> => {
+  const web3 = new Web3(rpcNodeUrl);
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  const promises = [
+    contestInstance.methods.contestToken().call(),
+    contestInstance.methods.FeeManagerAddress().call(),
+  ];
+
+  const results = await Promise.all(promises);
+  const feeManager = new web3.eth.Contract(
+    feeManagerABI as AbiItem[],
+    String(results[1]),
+  );
+  const balancePromises: Promise<number>[] = [
+    feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
+  ];
+  if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
+    balancePromises.push(
+      web3.eth.getBalance(contest).then((v) => {
+        return Number(v);
+      }),
+    );
+  } else {
+    const calldata =
+      '0x70a08231' +
+      web3.eth.abi.encodeParameters(['address'], [contest]).substring(2);
+    balancePromises.push(
+      web3.eth
+        .call({
+          to: String(results[0]),
+          data: calldata,
+        })
+        .then((v) => {
+          return Number(web3.eth.abi.decodeParameter('uint256', v));
+        }),
+    );
+  }
+
+  const balanceResults = await Promise.all(balancePromises);
+
+  return balanceResults[0] + balanceResults[1];
 };
