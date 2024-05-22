@@ -48,12 +48,70 @@ export const config = configure(
     BROKER: z.object({
       RABBITMQ_URI: z.string(),
     }),
-    NOTIFICATIONS: z.object({
-      KNOCK_AUTH_TOKEN: z.string().optional(),
-      KNOCK_SECRET_KEY: z.string().optional(),
-      KNOCK_SIGNING_KEY: z.string().optional(),
-      KNOCK_INTEGRATION_ENABLED: z.boolean().optional().default(false),
-    }),
+    NOTIFICATIONS: z
+      .object({
+        KNOCK_AUTH_TOKEN: z
+          .string()
+          .optional()
+          .describe(
+            'A secret token used by the Knock fetch step to interact with private routes on Common',
+          ),
+        KNOCK_SECRET_KEY: z
+          .string()
+          .optional()
+          .describe(
+            'The secret API key used to interact with the Knock API from the platform side',
+          ),
+        KNOCK_SIGNING_KEY: z
+          .string()
+          .optional()
+          .describe(
+            'The key used by the platform to generate Knock JWTs. Required when Knock is in Enhanced Security mode',
+          ),
+        KNOCK_PUBLIC_API_KEY: z
+          .string()
+          .optional()
+          .describe(
+            'The public API key used on the client to interact with public Knock API',
+          ),
+        KNOCK_IN_APP_FEED_ID: z
+          .string()
+          .optional()
+          .describe('The channel ID of the in-app integration on Knock'),
+        KNOCK_INTEGRATION_ENABLED: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe(
+            'A flag indicating whether the Knock integration is enabled or disabled',
+          ),
+      })
+      .refine(
+        (data) => {
+          if (data.KNOCK_INTEGRATION_ENABLED) {
+            return (
+              data.KNOCK_AUTH_TOKEN &&
+              data.KNOCK_SECRET_KEY &&
+              data.KNOCK_SIGNING_KEY &&
+              data.KNOCK_PUBLIC_API_KEY &&
+              data.KNOCK_IN_APP_FEED_ID
+            );
+          }
+          return true;
+        },
+        {
+          message:
+            'KNOCK_AUTH_TOKEN, KNOCK_SECRET_KEY, KNOCK_PUBLIC_API_KEY, KNOCK_IN_APP_FEED_ID, and KNOCK_SIGNING_KEY ' +
+            'are required when KNOCK_INTEGRATION_ENABLED is true',
+          path: [
+            'KNOCK_AUTH_TOKEN',
+            'KNOCK_SECRET_KEY',
+            'KNOCK_SIGNING_KEY',
+            'KNOCK_PUBLIC_API_KEY',
+            'KNOCK_IN_APP_FEED_ID',
+          ],
+        },
+      ),
     ANALYTICS: z.object({
       MIXPANEL_PROD_TOKEN: z.string().optional(),
       MIXPANEL_DEV_TOKEN: z.string().optional(),
