@@ -139,6 +139,11 @@ export async function main(
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
+    app.use(
+      '/firebase-messaging-sw.js',
+      express.static('firebase-messaging-sw.js'),
+    );
+    app.use('/manifest.json', express.static('manifest.json'));
     app.use('/robots.txt', express.static('robots.txt'));
     app.use('/static', express.static('static'));
 

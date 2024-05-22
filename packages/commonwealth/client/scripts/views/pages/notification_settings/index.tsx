@@ -7,6 +7,10 @@ import React, { useCallback, useEffect } from 'react';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import {
+  getFirebaseMessaging,
+  getFirebaseMessagingToken,
+} from 'views/pages/notification_settings/getFirebaseMessaging';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -33,6 +37,8 @@ const emailIntervalFrequencyMap = {
   twoweeks: 'Every two weeks',
   monthly: 'Once a month',
 };
+
+const firebaseMessaging = getFirebaseMessaging();
 
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
@@ -61,12 +67,16 @@ const NotificationSettingsPage = () => {
   }, [forceRerender]);
 
   const handleSubs = useCallback(() => {
-    console.log(Notification.permission);
-    Notification.requestPermission().then((permission) => {
+    async function doAsync() {
+      const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         console.log('Notification permission granted.');
+        const token = await getFirebaseMessagingToken();
+        console.log('FIXME: got the token: ' + token);
       }
-    });
+    }
+
+    doAsync().catch(console.error);
   }, []);
 
   if (!app.loginStatusLoaded()) {

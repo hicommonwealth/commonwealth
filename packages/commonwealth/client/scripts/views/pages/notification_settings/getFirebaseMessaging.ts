@@ -1,8 +1,12 @@
 import { initializeApp } from 'firebase/app';
-import { getMessaging } from 'firebase/messaging';
+import { getMessaging, getToken } from 'firebase/messaging';
+
+// FIXME: move to env...
+const PUBLIC_VAPID_KEY =
+  'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
 
 // FIXME move to env...
-const firebaseConfig = {
+const PUBLIC_FIREBASE_CONFIG = {
   apiKey: 'AIzaSyA93Av0xLkOB_nP9hyzhGYg78n9JEfS1bQ',
   authDomain: 'common-staging-384806.firebaseapp.com',
   projectId: 'common-staging-384806',
@@ -13,11 +17,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(PUBLIC_FIREBASE_CONFIG);
 
 // Initialize Firebase Cloud Messaging and get a reference to the service
 const messaging = getMessaging(app);
 
 export function getFirebaseMessaging() {
   return messaging;
+}
+
+export async function getFirebaseMessagingToken() {
+  return await getToken(messaging, { vapidKey: PUBLIC_VAPID_KEY });
 }
