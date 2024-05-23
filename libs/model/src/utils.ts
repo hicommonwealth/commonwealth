@@ -101,7 +101,7 @@ export async function emitEvent(
 }
 
 /**
- * Creates a valid S3 asset url for the client. Only for the public assets.commonwealth.im bucket
+ * Creates a valid S3 asset url from an upload.Location url
  * @param uploadLocation The url returned by the Upload method of @aws-sdk/lib-storage
  * @param bucketName The name of the bucket or the domain (alias) of the bucket. Defaults to assets.commonwealth.im
  */
