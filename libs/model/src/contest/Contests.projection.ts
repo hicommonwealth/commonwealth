@@ -39,8 +39,11 @@ async function updateOrCreateWithAlert(
   interval: number,
 ) {
   const community = await models.Community.findOne({
-    where: { namespace },
-    include: models.ChainNode.scope('withPrivateData'),
+    where: { namespace_address: namespace },
+    include: {
+      model: models.ChainNode.scope('withPrivateData'),
+      required: false,
+    },
   });
   const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
   if (!url)
@@ -49,7 +52,7 @@ async function updateOrCreateWithAlert(
     );
 
   const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(url, contest_address);
+    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
 
   const [updated] = await models.ContestManager.update(
     {
