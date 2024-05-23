@@ -5,7 +5,7 @@ import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AppError } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { DB, formatS3Url } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -72,7 +72,7 @@ const generateImage = async (
       client: s3,
       params,
     }).done();
-    imageUrl = upload.Location;
+    imageUrl = formatS3Url(upload.Location);
   } catch (e) {
     console.log(e);
     throw new AppError('Problem uploading image!');
