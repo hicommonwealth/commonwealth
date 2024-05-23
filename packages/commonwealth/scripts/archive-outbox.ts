@@ -5,7 +5,7 @@ import { stats } from '@hicommonwealth/core';
 import { logger } from '@hicommonwealth/logging';
 import { formatS3Url } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
