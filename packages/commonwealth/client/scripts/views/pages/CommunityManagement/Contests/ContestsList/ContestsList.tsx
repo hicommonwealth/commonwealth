@@ -27,9 +27,10 @@ type Contest = {
     contest_id?: number;
     score?: {
       creator_address?: string;
-      content_id?: number;
+      content_id?: string;
       votes?: number;
-      prize?: number;
+      prize?: string;
+      tickerPrize?: number;
     }[];
     score_updated_at?: Date;
     start_time?: Date;
@@ -74,8 +75,12 @@ const ContestsList = ({
         ) : (
           contests.map((contest) => {
             // only last contest is relevant
+            const sortedContests = (contest?.contests || []).toSorted((a, b) =>
+              moment(a.end_time).isBefore(b.end_time) ? -1 : 1,
+            );
+
             const { end_time, score } =
-              contest.contests[contest.contests.length - 1] || {};
+              sortedContests[sortedContests.length - 1] || {};
 
             const hasEnded = moment(end_time) < moment();
 
@@ -88,11 +93,7 @@ const ContestsList = ({
                 imageUrl={contest.image_url}
                 topics={contest.topics}
                 score={score}
-                finishDate={
-                  end_time
-                    ? new Date(end_time)?.toISOString()
-                    : new Date().toISOString()
-                }
+                finishDate={moment(end_time).toISOString()}
                 isActive={!contest.cancelled && !hasEnded}
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
               />

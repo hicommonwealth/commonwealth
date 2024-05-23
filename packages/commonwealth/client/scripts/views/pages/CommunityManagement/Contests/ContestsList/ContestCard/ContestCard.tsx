@@ -25,9 +25,10 @@ interface ContestCardProps {
   topics: { id?: number; name?: string }[];
   score: {
     creator_address?: string;
-    content_id?: number;
+    content_id?: string;
     votes?: number;
-    prize?: number;
+    prize?: string;
+    tickerPrize?: number;
   }[];
   isAdmin: boolean;
   isActive: boolean;
@@ -114,11 +115,11 @@ const ContestCard = ({
         </CWText>
         <div className="prizes">
           {score?.map((s, index) => (
-            <div className="prize-row" key={s.creator_address}>
+            <div className="prize-row" key={s.content_id}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{s.prize} ETH</CWText>
+              <CWText fontWeight="bold">{s.tickerPrize} ETH</CWText>
             </div>
           ))}
         </div>
