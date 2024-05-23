@@ -6,7 +6,7 @@
 
 import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import { models, sequelize } from '@hicommonwealth/model';
+import { formatS3Url, models, sequelize } from '@hicommonwealth/model';
 import * as https from 'https';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
@@ -198,10 +198,7 @@ async function uploadToS3AndReplace(
 
     // although it gets added to the assets.commonwealth.im bucket, the location of the newImage object points
     // to the bucket directly. We want to swap this out with the cloudflare url.
-    const newLocation = newImage.Location.replace(
-      's3.amazonaws.com/assets.commonwealth.im',
-      'assets.commonwealth.im',
-    );
+    const newLocation = formatS3Url(newImage.Location);
 
     console.log(
       `Successfully resized ${name} ${datum.id} with new url ${newLocation}`,
