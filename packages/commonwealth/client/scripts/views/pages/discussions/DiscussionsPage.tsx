@@ -23,11 +23,14 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
@@ -36,6 +39,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
@@ -193,6 +197,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => (
             <>
               <Breadcrumbs />
+              {userOnboardingEnabled && <UserTrainingSlider />}
+              <AdminOnboardingSlider />
               <HeaderWithFilters
                 topic={topicName}
                 stage={stageName}
