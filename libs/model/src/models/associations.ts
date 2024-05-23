@@ -133,8 +133,6 @@ export const buildAssociations = (db: DB) => {
     'category_id',
   );
 
-  db.Group.withMany(db.GroupPermission, 'group_id');
-
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
     {
