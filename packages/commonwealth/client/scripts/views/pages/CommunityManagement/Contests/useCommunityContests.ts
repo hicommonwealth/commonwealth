@@ -1,6 +1,7 @@
 import app from 'state';
 import { useGetContestsQuery } from 'state/api/contests';
 import { useCommunityStake } from 'views/components/CommunityStake';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 
 const useCommunityContests = () => {
   const { stakeEnabled } = useCommunityStake();
@@ -19,7 +20,7 @@ const useCommunityContests = () => {
   return {
     stakeEnabled,
     isContestAvailable,
-    contestsData,
+    contestsData: contestsData as unknown as Contest[],
     isContestDataLoading,
     getContestByAddress,
   };

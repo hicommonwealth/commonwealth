@@ -9,7 +9,7 @@ import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
-type Contest = {
+export type Contest = {
   community_id?: string;
   contest_address?: string;
   created_at?: Date;
