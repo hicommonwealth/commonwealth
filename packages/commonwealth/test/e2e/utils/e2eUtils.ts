@@ -226,6 +226,14 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
 let seeder;
 
+/**
+ * Legacy e2e seeder
+ *
+ * @deprecated Use `seed` from `libs/model/src/tester/seed.ts` instead
+ * - Seed data is too coupled with integration seeds
+ *
+ * @returns e2e seeder
+ */
 export const e2eSeeder = async (): Promise<E2E_Seeder> => {
   if (!seeder) {
     try {
