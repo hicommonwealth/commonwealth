@@ -1,5 +1,19 @@
 export function foo() {}
 
+/**
+ * Decamelizes a string
+ * @param value camelized string
+ * @returns decamelized string
+ */
+export const decamelize = (value: string): string =>
+  value
+    .replace(/([\p{Lowercase_Letter}\d])(\p{Uppercase_Letter})/gu, '$1_$2')
+    .replace(
+      /(\p{Uppercase_Letter}+)(\p{Uppercase_Letter}\p{Lowercase_Letter}+)/gu,
+      '$1-$2',
+    )
+    .toLowerCase();
+
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes.

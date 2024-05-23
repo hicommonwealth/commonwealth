@@ -1,3 +1,4 @@
+import { decamelize } from '@hicommonwealth/shared';
 import {
   Model,
   Sequelize,
@@ -16,34 +17,48 @@ import type {
 } from './types';
 
 /**
+ * Enforces fk naming convention
+ */
+function getDefaultFK(source: ModelStatic<Model>, target: ModelStatic<Model>) {
+  const fk = decamelize(`${source.name}_${source.primaryKeyAttribute}`);
+  if (!target.getAttributes()[fk])
+    throw Error(
+      `Table "${target.tableName}" missing foreign key field "${fk}" to "${source.tableName}"`,
+    );
+  return fk;
+}
+
+/**
  * Builds on-to-one association between two models
  * @param this source model with FK to target
  * @param target target model with FK to source
- * @param foreignKey foreign key field in the target model - sequelize defaults the PK
  * @param options one-to-one options
  */
 export function oneToOne<Source extends State, Target extends State>(
   this: ModelStatic<Model<Source>> & Associable<Source>,
   target: ModelStatic<Model<Target>> & Associable<Target>,
-  foreignKey: keyof Target & string,
   options?: OneToOneOptions<Source, Target>,
 ): ModelStatic<Model<Source>> & Associable<Source> {
-  target.belongsTo(this, {
-    foreignKey,
-    as: options?.as,
-    onUpdate: options?.onUpdate ?? 'NO ACTION',
-    onDelete: options?.onDelete ?? 'NO ACTION',
-  });
-  if (options?.targeyKey)
+  const foreignKey = options?.foreignKey ?? getDefaultFK(this, target);
+
+  // sequelize is not creating fk when fk = pk
+  foreignKey === target.primaryKeyAttribute
+    ? mapFk(target, this, [[foreignKey, this.primaryKeyAttribute]], {
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      })
+    : target.belongsTo(this, {
+        foreignKey,
+        as: options?.as,
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      });
+
+  options?.targeyKey &&
     this.belongsTo(target, {
       foreignKey: options?.targeyKey,
       onUpdate: 'NO ACTION',
       onDelete: 'NO ACTION',
-    });
-  else
-    mapFk(target, this, [[foreignKey, this.primaryKeyAttribute]], {
-      onUpdate: options?.onUpdate ?? 'NO ACTION',
-      onDelete: options?.onDelete ?? 'NO ACTION',
     });
 
   // don't forget to return this (fluent)
@@ -54,15 +69,15 @@ export function oneToOne<Source extends State, Target extends State>(
  * Builds on-to-many association between parent/child models
  * @param this parent model with PK
  * @param child child model with FK
- * @param foreignKey foreign key field in the child model - sequelize defaults the PK
  * @param options one-to-many options
  */
 export function oneToMany<Parent extends State, Child extends State>(
   this: ModelStatic<Model<Parent>> & Associable<Parent>,
   child: ModelStatic<Model<Child>> & Associable<Child>,
-  foreignKey: (keyof Child & string) | Array<keyof Child & string>,
   options?: OneToManyOptions<Parent, Child>,
 ): ModelStatic<Model<Parent>> & Associable<Parent> {
+  const foreignKey = options?.foreignKey ?? getDefaultFK(this, child);
+
   const fk = Array.isArray(foreignKey) ? foreignKey[0] : foreignKey;
   this.hasMany(child, {
     foreignKey: { name: fk, allowNull: options?.optional },
