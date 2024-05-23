@@ -44,7 +44,9 @@ const getUploadSignature = async (
   };
 
   try {
-    const url = await getSignedUrl(s3, new PutObjectCommand(params));
+    const url = await getSignedUrl(s3, new PutObjectCommand(params), {
+      expiresIn: 3600,
+    });
     res.json({ status: 'Success', result: url });
   } catch (err) {
     res.json({ status: 'Failure', result: err });
