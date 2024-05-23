@@ -268,4 +268,9 @@ export interface NotificationsProvider extends Disposable {
   getMessages(
     options: NotificationsProviderGetMessagesOptions,
   ): Promise<NotificationsProviderGetMessagesReturn>;
+
+  registerClientRegistrationToken(
+    userId: number,
+    token: string,
+  ): Promise<unknown>;
 }

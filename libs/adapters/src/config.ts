@@ -85,6 +85,13 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
+        KNOCK_FCM_CHANNEL_ID: z
+          .string()
+          .optional()
+          .default('c9e1b544-2130-4814-833a-a79bc527051c')
+          .describe(
+            'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
+          ),
       })
       .refine(
         (data) => {
