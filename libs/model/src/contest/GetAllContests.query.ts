@@ -27,7 +27,7 @@ select
   cm.payout_structure,
   cm.cancelled,
   coalesce((
-    select jsonb_agg(json_build_object('id', t.id, 'name', t.name))
+    select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
     from "ContestTopics" ct 
     left join "Topics" t on ct.topic_id = t.id
     where cm.contest_address = ct.contest_address
@@ -44,7 +44,7 @@ from
       'score_updated_at', c.score_updated_at,
       'score', c.score,
       'actions', coalesce(ca.actions, '[]'::jsonb)
-		)) as contests
+		) order by c.contest_id desc) as contests
 	from "Contests" c left join (
 		select
 			a.contest_id,
@@ -57,7 +57,7 @@ from
         'thread_title', tr.title,
         'voting_power', a.voting_power,
         'created_at', a.created_at
-      )) as actions
+      ) order by a.created_at) as actions
     from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
 		group by a.contest_id
   ) as ca on c.contest_id = ca.contest_id
@@ -96,9 +96,9 @@ order by
       );
       results.forEach((r) =>
         r.contests.forEach((c) => {
-          c.score?.forEach(
-            (w) => (w.prize = Math.floor(w.prize / 10 ** r.decimals)),
-          );
+          c.score?.forEach((w) => {
+            w.tickerPrize = Number(BigInt(w.prize)) / 10 ** r.decimals;
+          });
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);
           c.score_updated_at =

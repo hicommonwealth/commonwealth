@@ -1,9 +1,8 @@
-import { AppError, Projection, events, logger } from '@hicommonwealth/core';
+import { InvalidState, Projection, events, logger } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { config } from '../config';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 import * as protocol from '../services/commonProtocol';
@@ -45,12 +44,12 @@ async function updateOrCreateWithAlert(
   });
   const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
   if (!url)
-    throw new AppError(`Chain node url not found on namespace ${namespace}`);
+    throw new InvalidState(
+      `Chain node url not found on namespace ${namespace}`,
+    );
 
   const { ticker, decimals } =
-    config.NODE_ENV === 'test'
-      ? { ticker: 'ETH', decimals: 18 }
-      : await protocol.contractHelpers.getTokenAttributes(url, contest_address);
+    await protocol.contractHelpers.getTokenAttributes(url, contest_address);
 
   const [updated] = await models.ContestManager.update(
     {
@@ -121,7 +120,7 @@ async function updateScore(contest_address: string, contest_id: number) {
   try {
     const details = await getContestDetails(contest_address);
     if (!details?.url)
-      throw new AppError(
+      throw new InvalidState(
         `Chain node url not found on contest ${contest_address}`,
       );
 
@@ -131,15 +130,19 @@ async function updateScore(contest_address: string, contest_id: number) {
         contest_address,
         contest_id,
       );
-    const prizePool = (contestBalance * details.prize_percentage) / 100;
+    const prizePool =
+      (BigInt(contestBalance) * BigInt(details.prize_percentage)) / 100n;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
-      content_id: +s.winningContent,
+      content_id: s.winningContent,
       creator_address: s.winningAddress,
       votes: +s.voteCount,
       prize:
         i < details.payout_structure.length
-          ? Math.floor((prizePool * details.payout_structure[i]) / 100)
-          : 0,
+          ? (
+              (prizePool * BigInt(details.payout_structure[i])) /
+              100n
+            ).toString()
+          : '0',
     }));
     await models.Contest.update(
       {
