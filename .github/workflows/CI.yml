@@ -197,7 +197,8 @@ jobs:
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-          TEST_DB_NAME: commonwealth
+          TEST_DB_NAME: commonwealth # required by config to bootstrap tests
+          DATABASE_URL: postgresql://commonwealth:edgeware@localhost/commonwealth # required in production
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
