@@ -23,7 +23,13 @@ interface ContestCardProps {
   imageUrl?: string;
   finishDate: string;
   topics: { id?: number; name?: string }[];
-  winners: { prize?: number; creator_address?: string }[];
+  score: {
+    creator_address?: string;
+    content_id?: string;
+    votes?: number;
+    prize?: string;
+    tickerPrize?: number;
+  }[];
   isAdmin: boolean;
   isActive: boolean;
   onFund: () => void;
@@ -35,7 +41,7 @@ const ContestCard = ({
   imageUrl,
   finishDate,
   topics,
-  winners,
+  score,
   isAdmin,
   isActive,
   onFund,
@@ -80,11 +86,11 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    navigate(`/discussions?featured=mostLikes&contest=${name}`);
+    navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
   const handleWinnersClick = () => {
-    navigate(`/discussions?contest=${name}`);
+    navigate(`/discussions?contest=${address}`);
   };
 
   const handleFundClick = () => {
@@ -108,12 +114,12 @@ const ContestCard = ({
           Current Prizes
         </CWText>
         <div className="prizes">
-          {winners?.map((winner, index) => (
-            <div className="prize-row" key={winner.creator_address}>
+          {score?.map((s, index) => (
+            <div className="prize-row" key={s.content_id}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{winner.prize} ETH</CWText>
+              <CWText fontWeight="bold">{s.tickerPrize} ETH</CWText>
             </div>
           ))}
         </div>

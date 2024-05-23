@@ -124,7 +124,9 @@ const SignTransactionsStep = ({
           : 0,
         payout_structure: contestFormData?.payoutStructure,
         interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
-        topic_ids: contestFormData?.toggledTopicList.map((topic) => topic.id),
+        topic_ids: contestFormData?.toggledTopicList
+          .filter((t) => t.checked)
+          .map((t) => t.id),
       });
 
       onSetLaunchContestStep('ContestLive');

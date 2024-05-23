@@ -59,10 +59,9 @@ export async function __getBulkThreads(
   if (stage && status) {
     throw new AppError('Cannot provide both stage and status');
   }
-  if (!((contestAddress && status) || (!contestAddress && !status))) {
-    throw new AppError(
-      'Must provide both contestAddress and status or neither',
-    );
+
+  if (status && !contestAddress) {
+    throw new AppError('Must provide contestAddress if status is provided');
   }
 
   // query params that bind to sql query
@@ -126,7 +125,7 @@ export async function __getBulkThreads(
             ${
               contestAddress ? ' AND CA.contest_address = :contestAddress ' : ''
             }
-            ${contestAddress ? contestStatus[status] : ''}
+            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
         ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'} 
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (
