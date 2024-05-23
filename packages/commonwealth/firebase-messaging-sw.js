@@ -17,19 +17,25 @@ self.addEventListener('push', function (event) {
     return;
   }
 
+  const img = '/static/img/branding/common.png';
+
   const data = event.data.json();
   const options = {
-    body: data.body,
-    icon: 'images/icon.png', // Replace with the path to your notification icon
-    badge: 'images/badge.png', // Replace with the path to your notification badge
-    tag: 'notification-tag', // Optional: A tag for the notification (useful for stacking notifications)
+    body: data.body || data.comment_body || 'No body',
+    image: img,
+    icon: img, // Replace with the path to your notification icon
+    badge: img, // Replace with the path to your notification badge
+    // tag: 'notification-tag', // Optional: A tag for the notification (useful for stacking notifications)
     data: {
-      url: data.url, // Optional: URL to open when the user clicks the notification
+      url: data.url || data.comment_url || 'https://common.xyz',
     },
   };
 
   // Display the notification
-  event.waitUntil(self.registration.showNotification(data.title, options));
+  // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'No title', options),
+  );
 });
 
 // Listen for 'notificationclick' events to handle notification interactions

@@ -8,10 +8,7 @@ import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  getFirebaseMessaging,
-  getFirebaseMessagingToken,
-} from 'views/pages/notification_settings/getFirebaseMessaging';
+import { getFirebaseMessagingToken } from 'views/pages/notification_settings/getFirebaseMessaging';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -38,8 +35,6 @@ const emailIntervalFrequencyMap = {
   twoweeks: 'Every two weeks',
   monthly: 'Once a month',
 };
-
-const firebaseMessaging = getFirebaseMessaging();
 
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
@@ -84,6 +79,25 @@ const NotificationSettingsPage = () => {
     doAsync().catch(console.error);
   }, []);
 
+  const handleFakeNotification = useCallback(() => {
+    const img = '/static/img/branding/common.png';
+
+    function showNotification(title, options) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, options);
+      } else {
+        console.log('Notification permission not granted.');
+      }
+    }
+
+    showNotification('Hello!', {
+      body: 'This is a notification from your PWA.',
+      image: img,
+      icon: img, // Replace with the path to your notification icon
+      badge: img, // Replace with the path to your notification badge
+    });
+  }, []);
+
   if (!app.loginStatusLoaded()) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
@@ -102,6 +116,8 @@ const NotificationSettingsPage = () => {
         </CWText>
         <div className="email-management-section">
           <button onClick={handleSubs}>DO IT</button>
+
+          <button onClick={handleFakeNotification}>FAKE IT</button>
           <div className="text-description">
             <CWText type="h5">Scheduled Email Digest</CWText>
             <CWText type="b2" className="subtitle-text">
