@@ -862,43 +862,74 @@ async function uploadABIs(queryInterface, transaction) {
   return { namespaceFactoryAbiId, contestAbiId };
 }
 
-async function getChainNodeIds(queryInterface, transaction) {
-  const sepoliaBase = await queryInterface.sequelize.query(
+async function getChainNodeId(chainId, queryInterface, transaction) {
+  const chainNode = await queryInterface.sequelize.query(
     `
         SELECT id
         FROM "ChainNodes"
-        WHERE eth_chain_id = 84532;
+        WHERE eth_chain_id = :chain_id;
       `,
-    { transaction, raw: true, type: QueryTypes.SELECT },
+    {
+      transaction,
+      raw: true,
+      type: QueryTypes.SELECT,
+      replacements: {
+        chain_id: chainId,
+      },
+    },
   );
-  return {
-    sepoliaBaseId: sepoliaBase[0]?.id,
-  };
+  return chainNode[0]?.id;
 }
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      // insert namespace factory ABI with NewContest event + Contest ABI
       const { namespaceFactoryAbiId } = await uploadABIs(
         queryInterface,
         transaction,
       );
 
-      const { sepoliaBaseId } = await getChainNodeIds(
-        queryInterface,
-        transaction,
-      );
-
-      const records = [
-        {
-          chain_node_id: sepoliaBaseId,
-          contract_address: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
-          event_signature:
-            '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
-          kind: 'NewContest',
-          abi_id: namespaceFactoryAbiId,
+      const chainInfo = {
+        Sepolia: {
+          factory: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
+          chainId: 11155111,
         },
-      ];
+        SepoliaBase: {
+          factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
+          chainId: 84532,
+        },
+        Blast: {
+          factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+          chainId: 81457,
+        },
+        Base: {
+          factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+          chainId: 8453,
+        },
+      };
+
+      // insert event source for NamespaceFactory->NewContest event
+      const records = [];
+
+      for (const chainName of Object.keys(chainInfo)) {
+        const { factory, chainId } = chainInfo[chainName];
+        const chainNodeId = await getChainNodeId(
+          chainId,
+          queryInterface,
+          transaction,
+        );
+        if (chainNodeId) {
+          records.push({
+            chain_node_id: chainNodeId,
+            contract_address: factory,
+            event_signature:
+              '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
+            kind: 'NewContest',
+            abi_id: namespaceFactoryAbiId,
+          });
+        }
+      }
 
       await queryInterface.bulkInsert('EvmEventSources', records, {
         transaction,
