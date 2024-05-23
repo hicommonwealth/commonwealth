@@ -66,14 +66,8 @@ export type ManyToManyOptions<X extends State, Source extends State> = {
 } & RuleOptions;
 
 /**
- * Composite foreign key mappings
+ * Holds fk mappings not supported by sequelize
  */
-export type KeyMap<Source extends State, Target extends State> =
-  | (keyof Source & keyof Target & string)
-  | [keyof Source & string, keyof Target & string];
-export type CompositeKey<Source extends State, Target extends State> = Array<
-  KeyMap<Source, Target>
->;
 export type FkMap = {
   name: string;
   source: string;
@@ -83,6 +77,9 @@ export type FkMap = {
   rules?: RuleOptions;
 };
 
+/**
+ * Model association methods
+ */
 export type Associable<M> = M extends ModelStatic<infer Source>
   ? {
       /**

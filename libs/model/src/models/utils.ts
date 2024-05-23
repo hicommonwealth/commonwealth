@@ -7,7 +7,6 @@ import {
 } from 'sequelize';
 import type {
   Associable,
-  CompositeKey,
   FkMap,
   ManyToManyOptions,
   OneToManyOptions,
@@ -19,13 +18,16 @@ import type {
 /**
  * Enforces fk naming convention
  */
-function getDefaultFK(source: ModelStatic<Model>, target: ModelStatic<Model>) {
+function getDefaultFK<Source extends State, Target extends State>(
+  source: ModelStatic<Model<Source>>,
+  target: ModelStatic<Model<Target>>,
+) {
   const fk = decamelize(`${source.name}_${source.primaryKeyAttribute}`);
   if (!target.getAttributes()[fk])
     throw Error(
       `Table "${target.tableName}" missing foreign key field "${fk}" to "${source.tableName}"`,
     );
-  return fk;
+  return fk as keyof Target & string;
 }
 
 /**
@@ -43,10 +45,15 @@ export function oneToOne<Source extends State, Target extends State>(
 
   // sequelize is not creating fk when fk = pk
   foreignKey === target.primaryKeyAttribute
-    ? mapFk(target, this, [[foreignKey, this.primaryKeyAttribute]], {
-        onUpdate: options?.onUpdate ?? 'NO ACTION',
-        onDelete: options?.onDelete ?? 'NO ACTION',
-      })
+    ? mapFk(
+        target,
+        this,
+        { primaryKey: [this.primaryKeyAttribute], foreignKey: [foreignKey] },
+        {
+          onUpdate: options?.onUpdate ?? 'NO ACTION',
+          onDelete: options?.onDelete ?? 'NO ACTION',
+        },
+      )
     : target.belongsTo(this, {
         foreignKey,
         as: options?.as,
@@ -88,22 +95,34 @@ export function oneToMany<Parent extends State, Child extends State>(
   child.belongsTo(this, { foreignKey: fk, as: options?.asOne });
 
   // map fk when parent has composite pk
-  if (Array.isArray(foreignKey)) {
-    mapFk(child, this as any, foreignKey, {
-      onUpdate: options?.onUpdate ?? 'NO ACTION',
-      onDelete: options?.onDelete ?? 'NO ACTION',
-    });
-  }
-  // map fk when child has composite pk
+  if (Array.isArray(foreignKey))
+    mapFk(
+      child,
+      this,
+      {
+        primaryKey: this.primaryKeyAttributes as Array<keyof Parent & string>,
+        foreignKey,
+      },
+      {
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      },
+    );
+  // map fk when child has composite pk,
+  // or when fk = pk (sequelize is not creating fk when fk = pk)
   else if (
     child.primaryKeyAttributes.length > 1 &&
     this.primaryKeyAttributes.length === 1
-  ) {
-    mapFk(child, this, [[foreignKey, this.primaryKeyAttribute]], {
-      onUpdate: options?.onUpdate ?? 'NO ACTION',
-      onDelete: options?.onDelete ?? 'NO ACTION',
-    });
-  }
+  )
+    mapFk(
+      child,
+      this,
+      { primaryKey: [this.primaryKeyAttribute], foreignKey: [foreignKey] },
+      {
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      },
+    );
 
   // don't forget to return this (fluent)
   return this;
@@ -158,14 +177,24 @@ export function manyToMany<X extends State, A extends State, B extends State>(
 
   // map fk when x-ref has composite pk
   if (this.primaryKeyAttributes.length > 1) {
-    mapFk(this, a.model, [[foreignKeyA, a.model.primaryKeyAttribute]], {
-      onUpdate: a.onUpdate ?? 'NO ACTION',
-      onDelete: a.onDelete ?? 'NO ACTION',
-    });
-    mapFk(this, b.model, [[foreignKeyB, b.model.primaryKeyAttribute]], {
-      onUpdate: b.onUpdate ?? 'NO ACTION',
-      onDelete: b.onDelete ?? 'NO ACTION',
-    });
+    mapFk(
+      this,
+      a.model,
+      { primaryKey: [a.model.primaryKeyAttribute], foreignKey: [foreignKeyA] },
+      {
+        onUpdate: a.onUpdate ?? 'NO ACTION',
+        onDelete: a.onDelete ?? 'NO ACTION',
+      },
+    );
+    mapFk(
+      this,
+      b.model,
+      { primaryKey: [b.model.primaryKeyAttribute], foreignKey: [foreignKeyB] },
+      {
+        onUpdate: b.onUpdate ?? 'NO ACTION',
+        onDelete: b.onDelete ?? 'NO ACTION',
+      },
+    );
   }
 
   // don't forget to return this (fluent)
@@ -176,26 +205,23 @@ export function manyToMany<X extends State, A extends State, B extends State>(
  * Maps composite FK constraints not supported by sequelize, with type safety
  * @param source model with FK
  * @param target model with PK
- * @param keys foreign key fields
  * @param rules optional fk rules
  */
 export function mapFk<Source extends State, Target extends State>(
   source: ModelStatic<Model<Source>> & Associable<Source>,
   target: ModelStatic<Model<Target>>,
-  keys: CompositeKey<Source, Target>,
+  {
+    primaryKey,
+    foreignKey,
+  }: {
+    primaryKey: Array<keyof Target & string>;
+    foreignKey: Array<keyof Source & string>;
+  },
   rules?: RuleOptions,
 ) {
-  const key = keys.map((k) =>
-    Array.isArray(k)
-      ? ([
-          source.getAttributes()[k[0]].field!,
-          target.getAttributes()[k[1]].field!,
-        ] as [string, string])
-      : source.getAttributes()[k].field!,
-  );
   const name = `${source.tableName}_${target.tableName.toLowerCase()}_fkey`;
-  const fk = key.map((k) => (Array.isArray(k) ? k[0] : k));
-  const pk = key.map((k) => (Array.isArray(k) ? k[1] : k));
+  const pk = primaryKey.map((k) => target.getAttributes()[k].field!);
+  const fk = foreignKey.map((k) => source.getAttributes()[k].field!);
   // console.log(
   //   'mapFk:',
   //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
