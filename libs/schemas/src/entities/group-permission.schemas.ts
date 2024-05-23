@@ -13,4 +13,6 @@ export type GroupPermissionAction = keyof typeof PermissionEnum;
 export const GroupPermission = z.object({
   group_id: PG_INT.optional(),
   allowed_actions: z.array(z.nativeEnum(PermissionEnum)),
+  created_at: z.any().optional(),
+  updated_at: z.any().optional(),
 });
