@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
-import { commonProtocol, delay } from '@hicommonwealth/shared';
+import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
@@ -63,8 +63,17 @@ describe('Contests projection lifecycle', () => {
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
 
     await bootstrap_testing();
+    const abi = await models.ContractAbi.create({
+      id: 700,
+      abi: [] as AbiType,
+      nickname: 'Contest',
+    });
     const [chain] = await seed('ChainNode', {
-      contracts: [],
+      contracts: [
+        {
+          abi_id: abi.id,
+        },
+      ],
       url: 'https://test',
     });
     const [user] = await seed(
