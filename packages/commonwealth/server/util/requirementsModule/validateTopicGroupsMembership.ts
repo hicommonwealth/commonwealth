@@ -15,7 +15,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param topicId ID of the topic
  * @param communityId ID of the community of the groups
  * @param address Address to check against requirements
- * @param allowedAction The type of permission it is gating
+ * @param action The type of permission allowed_action it is checking for
  * @returns validity with optional error message
  */
 export async function validateTopicGroupsMembership(
@@ -23,7 +23,7 @@ export async function validateTopicGroupsMembership(
   topicId: number,
   communityId: string,
   address: AddressAttributes,
-  allowedAction?: GroupPermissionAction,
+  action: GroupPermissionAction,
 ): Promise<{ isValid: boolean; message?: string }> {
   // check via new TBC with groups
 
@@ -60,8 +60,15 @@ export async function validateTopicGroupsMembership(
   // any allowed_actions, or we have the new fine-grained permission system where the action must be in
   // the allowed_actions list.
   const permissionedGroups = groups.filter(
-    (g) => !g.allowed_actions || g.allowed_actions.includes(allowedAction),
+    (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
+
+  if (permissionedGroups.length === 0) {
+    return {
+      isValid: false,
+      message: `User does not have permission to perform action ${action}`,
+    };
+  }
 
   // check membership for all groups of topic
   let numValidGroups = 0;
