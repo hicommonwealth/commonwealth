@@ -40,7 +40,6 @@ export function ContestWorker(): Policy<typeof inputs> {
         // content url only contains path
         const contentUrl = new URL(fullContentUrl).pathname;
 
-        // TODO: refine contest manager selection?
         const contestAddress = community!.contest_managers![0].contest_address;
         const { address: userAddress } = (await models.Address.findByPk(
           payload!.address_id,
@@ -71,7 +70,6 @@ export function ContestWorker(): Policy<typeof inputs> {
         const chainNodeUrl =
           community?.ChainNode?.private_url || community?.ChainNode?.url;
 
-        // TODO: refine contest manager selection?
         const contestAddress = community!.contest_managers![0].contest_address;
         const addAction = await models.ContestAction.findOne({
           where: {
