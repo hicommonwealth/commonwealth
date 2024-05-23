@@ -213,6 +213,8 @@ export const bootstrap_testing = async (
   truncate = false,
   log = false,
 ): Promise<DB> => {
+  if (config.NODE_ENV !== 'test')
+    throw new Error('Seeds only work when testing!');
   if (!db) {
     await verify_db(config.DB.NAME);
     try {
