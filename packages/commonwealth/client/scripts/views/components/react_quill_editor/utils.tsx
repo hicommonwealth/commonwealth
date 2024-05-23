@@ -100,7 +100,6 @@ export const uploadFileToS3 = async (
     await axios.put(signedUploadUrl, compressedFile, {
       headers: {
         'Content-Type': file.type,
-        'Content-Length': file.size,
       },
     });
 
