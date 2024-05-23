@@ -63,6 +63,10 @@ export async function validateTopicGroupsMembership(
     (g) => !g.allowed_actions || g.allowed_actions.includes(allowedAction),
   );
 
+  if (permissionedGroups.length === 0) {
+    return { isValid: true };
+  }
+
   // check membership for all groups of topic
   let numValidGroups = 0;
   const allErrorMessages: MembershipRejectReason[] = [];
