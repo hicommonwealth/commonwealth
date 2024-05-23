@@ -19,4 +19,7 @@ export enum EventNames {
   ContestStarted = 'ContestStarted',
   ContestContentAdded = 'ContestContentAdded',
   ContestContentUpvoted = 'ContestContentUpvoted',
+
+  // Preferences
+  SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
 }

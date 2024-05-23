@@ -65,6 +65,10 @@ type EmitEventValues =
   | {
       event_name: EventNames.ContestContentUpvoted;
       event_payload: z.infer<typeof events.ContestContentUpvoted>;
+    }
+  | {
+      event_name: EventNames.SubscriptionPreferencesUpdated;
+      event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
     };
 
 /**

@@ -3,6 +3,7 @@ import {
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
   Reaction,
+  SubscriptionPreference,
   Thread,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
@@ -282,3 +283,14 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
     .int()
     .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
+
+export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
+  email_notifications_enabled: true,
+  digest_email_enabled: true,
+  recap_email_enabled: true,
+  mobile_push_notifications_enabled: true,
+  mobile_push_discussion_activity_enabled: true,
+  mobile_push_admin_alerts_enabled: true,
+  created_at: true,
+  updated_at: true,
+}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));

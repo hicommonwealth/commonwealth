@@ -95,4 +95,8 @@ export const Outbox = z.union([
       event_payload: events.ContestContentUpvoted,
     })
     .merge(BaseOutboxProperties),
+  z.object({
+    event_name: z.literal(EventNames.SubscriptionPreferencesUpdated),
+    event_payload: events.SubscriptionPreferencesUpdated,
+  }),
 ]);
