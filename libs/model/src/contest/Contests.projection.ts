@@ -1,10 +1,17 @@
-import { InvalidState, Projection, events, logger } from '@hicommonwealth/core';
+import {
+  EvmContestEventSignatures,
+  InvalidState,
+  Projection,
+  events,
+  logger,
+} from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
+import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -54,33 +61,63 @@ async function updateOrCreateWithAlert(
   const { ticker, decimals } =
     await protocol.contractHelpers.getTokenAttributes(contest_address, url);
 
-  const [updated] = await models.ContestManager.update(
-    {
-      interval,
-      ticker,
-      decimals,
-    },
-    { where: { contest_address }, returning: true },
-  );
-  if (!updated) {
-    // when contest manager metadata is not found, it means it failed creation or was deleted
-    // here we are alerting admins and creating a default entry
-    const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
-    log.error(msg, new MissingContestManager(msg, namespace, contest_address));
-
-    if (mustExist(`Community with namespace: ${namespace}`, community))
-      await models.ContestManager.create({
-        contest_address,
-        community_id: community.id!,
+  await models.sequelize.transaction(async (transaction) => {
+    const [updated] = await models.ContestManager.update(
+      {
         interval,
         ticker,
         decimals,
-        created_at: new Date(),
-        name: community.name,
-        image_url: 'http://default.image', // TODO: can we have a default image for this?
-        payout_structure: [],
+      },
+      { where: { contest_address }, returning: true, transaction },
+    );
+    if (!updated) {
+      // when contest manager metadata is not found, it means it failed creation or was deleted
+      // here we are alerting admins and creating a default entry
+      const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
+      log.error(
+        msg,
+        new MissingContestManager(msg, namespace, contest_address),
+      );
+
+      if (mustExist(`Community with namespace: ${namespace}`, community))
+        await models.ContestManager.create(
+          {
+            contest_address,
+            community_id: community.id!,
+            interval,
+            ticker,
+            decimals,
+            created_at: new Date(),
+            name: community.name,
+            image_url: 'http://default.image', // TODO: can we have a default image for this?
+            payout_structure: [],
+          },
+          { transaction },
+        );
+    }
+
+    // create EVM event sources so chain listener will listen to events on new contest contract
+    const contestAbi = await models.ContractAbi.findOne({
+      where: { nickname: 'Contest' },
+    });
+    if (mustExist(`Contest ABI with nickname "Contest"`, contestAbi)) {
+      const sourcesToCreate: EvmEventSourceAttributes[] = Object.keys(
+        EvmContestEventSignatures,
+      ).map((eventName) => {
+        const eventSignature = (
+          EvmContestEventSignatures as Record<string, string>
+        )[eventName];
+        return {
+          chain_node_id: community!.ChainNode!.id!,
+          contract_address: contest_address,
+          event_signature: eventSignature,
+          kind: eventName,
+          abi_id: contestAbi.id,
+        };
       });
-  }
+      await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
+    }
+  });
 }
 
 type ContestDetails = {
