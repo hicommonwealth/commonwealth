@@ -158,11 +158,7 @@ export const NewThreadForm = () => {
         return;
       }
       console.error(err.response.data.error || err?.message);
-      const errorMessage = 'Failed to create thread';
-      const finalErrorMessage = err?.response?.data?.error
-        ? `${errorMessage} ${err?.response?.data?.error}`
-        : errorMessage;
-      notifyError(finalErrorMessage);
+      notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
     }

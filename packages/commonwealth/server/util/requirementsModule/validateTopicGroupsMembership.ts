@@ -4,8 +4,8 @@ import {
   GroupInstance,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { GroupPermissionType } from '@hicommonwealth/schemas';
-import { Op, QueryTypes } from 'sequelize';
+import { GroupPermissionAction } from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 /**
@@ -15,7 +15,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param topicId ID of the topic
  * @param communityId ID of the community of the groups
  * @param address Address to check against requirements
- * @param type The type of permission it is gating
+ * @param allowedAction The type of permission it is gating
  * @returns validity with optional error message
  */
 export async function validateTopicGroupsMembership(
@@ -23,7 +23,7 @@ export async function validateTopicGroupsMembership(
   topicId: number,
   communityId: string,
   address: AddressAttributes,
-  type?: GroupPermissionType,
+  allowedAction?: GroupPermissionAction,
 ): Promise<{ isValid: boolean; message?: string }> {
   // check via new TBC with groups
 
@@ -37,33 +37,31 @@ export async function validateTopicGroupsMembership(
   if (!topic) {
     return { isValid: false, message: 'Topic not found' };
   }
-  let groups = await models.Group.findAll({
-    where: {
-      id: { [Op.in]: topic.group_ids },
-    },
-  });
-  if (groups.length === 0) {
+
+  if (topic.group_ids.length === 0) {
     return { isValid: true };
   }
 
-  const groupPermissions: (GroupInstance & { type: GroupPermissionType })[] =
-    await models.sequelize.query(
-      `
-        SELECT g.*, gp.type FROM "GroupPermissions" as gp LEFT JOIN "Groups" g ON g.id = gp.group_id
-        WHERE g.community_id = :communityId AND gp.id IN(:groupIds);
+  const groups: (GroupInstance & {
+    allowed_actions?: GroupPermissionAction[];
+  })[] = await models.sequelize.query(
+    `
+        SELECT g.*, gp.allowed_actions FROM "Groups" as g LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
+        WHERE g.community_id = :communityId AND g.id IN(:groupIds);
       `,
-      {
-        type: QueryTypes.SELECT,
-        raw: true,
-        replacements: { communityId, groupIds: groups.map((g) => g.id) },
-      },
-    );
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { communityId, groupIds: topic.group_ids },
+    },
+  );
 
-  // If groupPermissions exist for the group, then only check groups with the permission type.
-  // Otherwise, treat it as a regular logic and block all non-members.
-  if (groupPermissions.length > 0) {
-    groups = groupPermissions.filter((g) => g.type === type);
-  }
+  // There are 2 cases here. We either have the old group permission system where the group doesn't have
+  // any allowed_actions, or we have the new fine-grained permission system where the action must be in
+  // the allowed_actions list.
+  const permissionedGroups = groups.filter(
+    (g) => !g.allowed_actions || g.allowed_actions.includes(allowedAction),
+  );
 
   // check membership for all groups of topic
   let numValidGroups = 0;
@@ -72,7 +70,7 @@ export async function validateTopicGroupsMembership(
   const memberships = await refreshMembershipsForAddress(
     models,
     address,
-    groups,
+    permissionedGroups,
     false, // use cached balances
   );
 

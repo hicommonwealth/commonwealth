@@ -15,7 +15,7 @@ module.exports = {
           },
           primaryKey: true,
         },
-        allowed_permissions: {
+        allowed_actions: {
           type: Sequelize.ARRAY(
             Sequelize.ENUM(
               'CREATE_THREAD',

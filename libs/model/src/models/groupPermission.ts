@@ -22,7 +22,7 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
-      allowed_permissions: {
+      allowed_actions: {
         type: Sequelize.ARRAY(Sequelize.ENUM(...Object.values(PermissionEnum))),
         allowNull: false,
       },
