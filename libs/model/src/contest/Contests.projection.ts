@@ -13,6 +13,7 @@ import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
+import { getContestStatus } from '../services/commonProtocol/contestHelper';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -95,6 +96,18 @@ async function updateOrCreateWithAlert(
           { transaction },
         );
     }
+
+    // create contest
+    const { startTime, endTime } = await getContestStatus(url, contest_address);
+    await models.Contest.create(
+      {
+        contest_address,
+        start_time: new Date(startTime * 1000),
+        end_time: new Date(endTime * 1000),
+        contest_id: 0,
+      },
+      { transaction },
+    );
 
     // create EVM event sources so chain listener will listen to events on new contest contract
     const contestAbi = await models.ContractAbi.findOne({
@@ -250,12 +263,9 @@ export function Contests(): Projection<typeof inputs> {
         );
       },
 
+      // This event is NOT emitted at the start of the contest, but at each interval
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id || 0;
-        await models.Contest.create({
-          ...payload,
-          contest_id,
-        });
         // update winners on ended contests
         contest_id > 0 &&
           setImmediate(() =>
