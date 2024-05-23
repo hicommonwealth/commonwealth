@@ -55,7 +55,7 @@ export const ChainEventSigs = {
   ContentAdded:
     'uint256 indexed contentId, address indexed creator, string url' as const,
   VoterVoted:
-    'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
+    'address indexed voter, uint256 indexed contentId, uint256 contestId, uint256 votingPower' as const,
 };
 
 const RecurringContestManagerDeployedMapper: EvmMapper<
@@ -138,13 +138,13 @@ const NewContestContentAddedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.ContentAdded,
   output: ContestContentAdded,
-  mapEvmToSchema: (contestAddress, evmInput) => ({
+  mapEvmToSchema: (contestAddress, { contentId, creator, url }) => ({
     event_name: EventNames.ContestContentAdded,
     event_payload: {
       contest_address: contestAddress!,
-      content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
-      creator_address: evmInput.creator,
-      content_url: evmInput.url,
+      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      creator_address: creator,
+      content_url: url,
     },
   }),
 };
@@ -155,14 +155,17 @@ const ContestContentUpvotedMapper: EvmMapper<
 > = {
   signature: ChainEventSigs.VoterVoted,
   output: ContestContentUpvoted,
-  mapEvmToSchema: (contestAddress, evmInput) => ({
+  mapEvmToSchema: (
+    contestAddress,
+    { contestId, contentId, voter, votingPower },
+  ) => ({
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: 0, // TODO: oneOff == 0, recurring == ID – Contract must be updated
-      content_id: ethers.BigNumber.from(evmInput.contentId).toNumber(),
-      voter_address: evmInput.voter,
-      voting_power: ethers.BigNumber.from(evmInput.votingPower).toNumber(),
+      contest_id: ethers.BigNumber.from(contestId).toNumber(),
+      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      voter_address: voter,
+      voting_power: ethers.BigNumber.from(votingPower).toNumber(),
     },
   }),
 };

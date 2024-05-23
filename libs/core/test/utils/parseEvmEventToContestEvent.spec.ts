@@ -122,6 +122,7 @@ describe('parseEvmEventToContestEvent', () => {
       [
         '0x2', // voterAddress
         ethers.BigNumber.from(10), // contentId
+        ethers.BigNumber.from(888), // contestId
         ethers.BigNumber.from(9000), // votingPower
       ],
     );
@@ -129,8 +130,8 @@ describe('parseEvmEventToContestEvent', () => {
     const parsedEvent = ContestContentUpvoted.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.contest_address).to.eq(contestAddress);
-    expect(parsedEvent.contest_id).to.eq(0); // TODO: this should come from contract
     expect(parsedEvent.content_id).to.eq(10);
+    expect(parsedEvent.contest_id).to.eq(888);
     expect(parsedEvent.voter_address).to.eq('0x2');
     expect(parsedEvent.voting_power).to.eq(9000);
   });
