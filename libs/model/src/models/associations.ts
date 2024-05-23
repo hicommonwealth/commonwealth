@@ -135,7 +135,7 @@ export const buildAssociations = (db: DB) => {
   );
 
   // TODO: Temporary hack, remove.
-  mapFk(db.GroupPermission, db.Group, [['group_id', 'id']]);
+  mapFk(db.GroupPermission as any, db.Group, [['group_id', 'id']]);
 
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
