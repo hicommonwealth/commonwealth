@@ -2,16 +2,12 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  KNOCK_AUTH_TOKEN,
-  KNOCK_SECRET_KEY,
-  KNOCK_SIGNING_KEY,
   MIXPANEL_PROD_TOKEN,
   MIXPANEL_DEV_TOKEN,
   DISABLE_CACHE,
   CLOUDAMQP_URL,
   REDIS_URL, // local + staging
   REDIS_TLS_URL, // staging + production
-  FLAG_KNOCK_INTEGRATION_ENABLED,
 } = process.env;
 
 export const config = configure(
@@ -30,10 +26,13 @@ export const config = configure(
           : CLOUDAMQP_URL,
     },
     NOTIFICATIONS: {
-      KNOCK_AUTH_TOKEN: KNOCK_AUTH_TOKEN,
-      KNOCK_SECRET_KEY: KNOCK_SECRET_KEY,
-      KNOCK_SIGNING_KEY: KNOCK_SIGNING_KEY,
-      FLAG_KNOCK_INTEGRATION_ENABLED: FLAG_KNOCK_INTEGRATION_ENABLED === 'true',
+      FLAG_KNOCK_INTEGRATION_ENABLED:
+        process.env.FLAG_KNOCK_INTEGRATION_ENABLED === 'true',
+      KNOCK_AUTH_TOKEN: process.env.KNOCK_AUTH_TOKEN,
+      KNOCK_SECRET_KEY: process.env.KNOCK_SECRET_KEY,
+      KNOCK_SIGNING_KEY: process.env.KNOCK_SIGNING_KEY,
+      KNOCK_IN_APP_FEED_ID: process.env.KNOCK_IN_APP_FEED_ID,
+      KNOCK_PUBLIC_API_KEY: process.env.KNOCK_PUBLIC_API_KEY,
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -96,12 +95,13 @@ export const config = configure(
       .refine(
         (data) => {
           if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
+            console.log('FIXME: data: ', JSON.stringify(data, null, '  '));
             return (
               data.KNOCK_AUTH_TOKEN &&
               data.KNOCK_SECRET_KEY &&
               data.KNOCK_SIGNING_KEY &&
-              data.KNOCK_PUBLIC_API_KEY &&
-              data.KNOCK_IN_APP_FEED_ID
+              data.KNOCK_IN_APP_FEED_ID &&
+              data.KNOCK_PUBLIC_API_KEY
             );
           }
           return true;
