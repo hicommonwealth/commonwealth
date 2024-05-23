@@ -5,6 +5,7 @@ import {
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -95,6 +96,7 @@ export async function __createCommentReaction(
         thread.topic_id,
         thread.community_id,
         address,
+        PermissionEnum.CREATE_COMMENT_REACTION,
       );
       canReact = isValid;
     } catch (e) {

@@ -20,7 +20,8 @@ module.exports = {
             Sequelize.ENUM(
               'CREATE_THREAD',
               'CREATE_COMMENT',
-              'CREATE_REACTION',
+              'CREATE_THREAD_REACTION',
+              'CREATE_COMMENT_REACTION',
               'UPDATE_POLL',
             ),
           ),

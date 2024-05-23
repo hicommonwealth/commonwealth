@@ -89,7 +89,7 @@ export async function __createThreadReaction(
       thread.topic_id,
       thread.community_id,
       address,
-      PermissionEnum.CREATE_REACTION,
+      PermissionEnum.CREATE_THREAD_REACTION,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
