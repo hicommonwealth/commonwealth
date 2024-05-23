@@ -60,6 +60,8 @@ const EditProfileComponent = () => {
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [displayNameValid, setDisplayNameValid] = useState(true);
   const [account, setAccount] = useState<Account>();
+  const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
+  const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
   const backgroundImageRef = useRef<Image>();
 
   const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation({
@@ -271,6 +273,7 @@ const EditProfileComponent = () => {
                     label="Save"
                     onClick={() => handleSaveProfile()}
                     className="save-button"
+                    disabled={isUploadingProfileImage || isUploadingCoverImage}
                     buttonType="primary"
                   />
                 </div>
@@ -292,7 +295,11 @@ const EditProfileComponent = () => {
                   <AvatarUpload
                     scope="user"
                     account={account}
+                    uploadStartedCallback={() =>
+                      setIsUploadingProfileImage(true)
+                    }
                     uploadCompleteCallback={(files) => {
+                      setIsUploadingProfileImage(false);
                       files.forEach((f) => {
                         if (!f.uploadURL) return;
                         const url = f.uploadURL.replace(/\?.*/, '').trim();
@@ -399,6 +406,7 @@ const EditProfileComponent = () => {
                 enableGenerativeAI
                 defaultImageUrl={backgroundImageRef.current?.url}
                 defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
+                onImageProcessStatusChange={setIsUploadingCoverImage}
               />
             </CWFormSection>
             <CWFormSection
