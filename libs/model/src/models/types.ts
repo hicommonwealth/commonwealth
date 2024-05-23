@@ -51,10 +51,15 @@ export type OneToManyOptions<Parent extends State, Child extends State> = {
 
 /**
  * Many to many association options
+ * @param model one of the two source models
+ * @param foreignKey foreign key to source - defaults to source_pk
+ * @param as association alias - defaults to model name
+ * @param asOne one association alias - defaults to model name
+ * @param asMany many association alias - defaults to model name
  */
 export type ManyToManyOptions<X extends State, Source extends State> = {
   model: ModelStatic<Model<Source>>;
-  key: keyof X & string;
+  foreignKey?: keyof X & string;
   as?: keyof Source & string;
   asOne?: keyof X & string;
   asMany?: keyof Source & string;

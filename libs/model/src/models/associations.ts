@@ -140,39 +140,35 @@ export const buildAssociations = (db: DB) => {
   db.Membership.withManyToMany(
     {
       model: db.Group,
-      key: 'group_id',
       as: 'memberships',
       asOne: 'group',
     },
     {
       model: db.Address,
-      key: 'address_id',
       as: 'Memberships',
       asOne: 'address',
     },
   );
   db.Collaboration.withManyToMany(
-    { model: db.Address, key: 'address_id' },
-    { model: db.Thread, key: 'thread_id', asMany: 'collaborators' },
+    { model: db.Address },
+    { model: db.Thread, asMany: 'collaborators' },
   );
   db.CommunityContract.withManyToMany(
-    { model: db.Community, key: 'community_id' },
-    { model: db.Contract, key: 'contract_id' },
+    { model: db.Community },
+    { model: db.Contract },
   );
   db.StarredCommunity.withManyToMany(
-    { model: db.Community, key: 'community_id', onUpdate: 'CASCADE' },
-    { model: db.User, key: 'user_id', onUpdate: 'CASCADE' },
+    { model: db.Community, onUpdate: 'CASCADE' },
+    { model: db.User, onUpdate: 'CASCADE' },
   );
   db.CommunityAlert.withManyToMany(
     {
       model: db.User,
-      key: 'user_id',
       as: 'communityAlerts',
       onDelete: 'CASCADE',
     },
     {
       model: db.Community,
-      key: 'community_id',
       as: 'communityAlerts',
       onDelete: 'CASCADE',
     },
@@ -181,13 +177,11 @@ export const buildAssociations = (db: DB) => {
   db.ThreadSubscription.withManyToMany(
     {
       model: db.Thread,
-      key: 'thread_id',
       as: 'subscriptions',
       onDelete: 'CASCADE',
     },
     {
       model: db.User,
-      key: 'user_id',
       as: 'threadSubscriptions',
       onDelete: 'CASCADE',
     },
@@ -195,22 +189,19 @@ export const buildAssociations = (db: DB) => {
   db.CommentSubscription.withManyToMany(
     {
       model: db.Comment,
-      key: 'comment_id',
       as: 'subscriptions',
       onDelete: 'CASCADE',
     },
     {
       model: db.User,
-      key: 'user_id',
       as: 'commentSubscriptions',
       onDelete: 'CASCADE',
     },
   );
   db.NotificationsRead.withManyToMany(
-    { model: db.Subscription, key: 'subscription_id', onDelete: 'CASCADE' },
+    { model: db.Subscription, onDelete: 'CASCADE' },
     {
       model: db.Notification,
-      key: 'notification_id',
       onDelete: 'CASCADE',
       hooks: true,
     },

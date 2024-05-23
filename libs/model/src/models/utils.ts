@@ -120,46 +120,49 @@ export function manyToMany<X extends State, A extends State, B extends State>(
   a: ManyToManyOptions<X, A> & Associable<A>,
   b: ManyToManyOptions<X, B> & Associable<B>,
 ): ModelStatic<Model<X>> & Associable<X> {
+  const foreignKeyA = a.foreignKey ?? getDefaultFK(a.model, this);
+  const foreignKeyB = b.foreignKey ?? getDefaultFK(b.model, this);
+
   this.belongsTo(a.model, {
-    foreignKey: { name: a.key, allowNull: false },
+    foreignKey: { name: foreignKeyA, allowNull: false },
     as: a.asOne,
     onUpdate: a.onUpdate ?? 'NO ACTION',
     onDelete: a.onDelete ?? 'NO ACTION',
   });
   this.belongsTo(b.model, {
-    foreignKey: { name: b.key, allowNull: false },
+    foreignKey: { name: foreignKeyB, allowNull: false },
     as: b.asOne,
     onUpdate: b.onUpdate ?? 'NO ACTION',
     onDelete: b.onDelete ?? 'NO ACTION',
   });
   a.model.hasMany(this, {
-    foreignKey: { name: a.key, allowNull: false },
+    foreignKey: { name: foreignKeyA, allowNull: false },
     hooks: a.hooks,
     as: a.as,
   });
   b.model.hasMany(this, {
-    foreignKey: { name: b.key, allowNull: false },
+    foreignKey: { name: foreignKeyB, allowNull: false },
     hooks: b.hooks,
     as: b.as,
   });
   a.model.belongsToMany(b.model, {
     through: this,
-    foreignKey: a.key,
+    foreignKey: foreignKeyA,
     as: a.asMany,
   });
   b.model.belongsToMany(a.model, {
     through: this,
-    foreignKey: b.key,
+    foreignKey: foreignKeyB,
     as: b.asMany,
   });
 
   // map fk when x-ref has composite pk
   if (this.primaryKeyAttributes.length > 1) {
-    mapFk(this, a.model, [[a.key, a.model.primaryKeyAttribute]], {
+    mapFk(this, a.model, [[foreignKeyA, a.model.primaryKeyAttribute]], {
       onUpdate: a.onUpdate ?? 'NO ACTION',
       onDelete: a.onDelete ?? 'NO ACTION',
     });
-    mapFk(this, b.model, [[b.key, b.model.primaryKeyAttribute]], {
+    mapFk(this, b.model, [[foreignKeyB, b.model.primaryKeyAttribute]], {
       onUpdate: b.onUpdate ?? 'NO ACTION',
       onDelete: b.onDelete ?? 'NO ACTION',
     });
