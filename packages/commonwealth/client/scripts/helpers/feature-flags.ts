@@ -30,6 +30,7 @@ const featureFlags = {
   knockInAppNotifications: buildFlag(
     process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),
+  contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
