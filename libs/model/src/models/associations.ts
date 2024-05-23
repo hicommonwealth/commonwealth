@@ -1,4 +1,5 @@
 import type { DB } from './factories';
+import { mapFk } from './utils';
 
 /**
  * Associates models with type safety
@@ -133,7 +134,8 @@ export const buildAssociations = (db: DB) => {
     'category_id',
   );
 
-  db.GroupPermission.withMany(db.Group, 'id');
+  // TODO: Temporary hack, remove.
+  mapFk(db.GroupPermission, db.Group, [['group_id', 'id']]);
 
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
