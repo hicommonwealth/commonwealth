@@ -19,7 +19,8 @@ export function ContestWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
+                required: false,
               },
               {
                 model: models.ContestManager,
@@ -28,7 +29,8 @@ export function ContestWorker(): Policy<typeof inputs> {
             ],
           },
         );
-        const chainNodeUrl = community!.ChainNode!.private_url!;
+        const chainNodeUrl =
+          community?.ChainNode?.private_url || community?.ChainNode?.url;
 
         const fullContentUrl = getThreadUrl({
           chain: community!.id!,
@@ -42,7 +44,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload!.address_id,
         ))!;
         await contestHelper.addContent(
-          chainNodeUrl,
+          chainNodeUrl!,
           contestAddress!,
           userAddress,
           contentUrl,
