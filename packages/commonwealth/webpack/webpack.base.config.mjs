@@ -254,6 +254,17 @@ const baseConfig = {
           fullySpecified: false,
         },
       },
+      {
+        test: /\.(js)$/,
+        include: [
+          path.resolve(__dirname, '../client'),
+          path.resolve(__dirname, '../shared'),
+        ],
+        exclude: /\/node_modules\//,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
     ],
   },
 };
