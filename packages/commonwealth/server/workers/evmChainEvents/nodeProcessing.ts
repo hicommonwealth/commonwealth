@@ -86,83 +86,63 @@ export async function processChainNode(
         await lastProcessedBlock.save({ transaction });
       }
 
-      if (allEvents.length > 0) {
-        const contestEvents = allEvents
-          .map((event) => {
-            const contractAddress = ethers.utils.getAddress(
-              event.rawLog.address,
-            );
-
-            const parseEvent = (e: keyof typeof ChainEventSigs) =>
-              parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
-
-            switch (event.eventSource.eventSignature) {
-              case EvmNamespaceFactoryEventSignatures.NewContest:
-                return parseEvent('NewContest') as
-                  | {
-                      event_name: EventNames.RecurringContestManagerDeployed;
-                      event_payload: z.infer<
-                        typeof RecurringContestManagerDeployed
-                      >;
-                    }
-                  | {
-                      event_name: EventNames.OneOffContestManagerDeployed;
-                      event_payload: z.infer<
-                        typeof OneOffContestManagerDeployed
-                      >;
-                    };
-              case EvmContestEventSignatures.NewRecurringContestStarted:
-                return parseEvent('NewRecurringContestStarted') as {
-                  event_name: EventNames.ContestStarted;
-                  event_payload: z.infer<typeof ContestStarted>;
-                };
-              case EvmContestEventSignatures.NewSingleContestStarted:
-                return parseEvent('NewSingleContestStarted') as {
-                  event_name: EventNames.ContestStarted;
-                  event_payload: z.infer<typeof ContestStarted>;
-                };
-              case EvmContestEventSignatures.ContentAdded:
-                return parseEvent('ContentAdded') as {
-                  event_name: EventNames.ContestContentAdded;
-                  event_payload: z.infer<typeof ContestContentAdded>;
-                };
-              case EvmContestEventSignatures.VoterVoted:
-                return parseEvent('VoterVoted') as {
-                  event_name: EventNames.ContestContentUpvoted;
-                  event_payload: z.infer<typeof ContestContentUpvoted>;
-                };
-            }
-
-            return null;
-          })
-          .filter(Boolean);
-
-        // filter out the rest of the events from contest events,
-        // temp solution until chain events are broken down
-        const contestEventSignatures = Object.values(EvmContestEventSignatures);
-        const restEvents = allEvents
-          .filter((event) => {
-            return !contestEventSignatures.includes(
-              event.eventSource.eventSignature,
-            );
-          })
-          .map(
-            (
-              event,
-            ): {
-              event_name: EventNames.ChainEventCreated;
-              event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
-            } => ({
-              event_name: EventNames.ChainEventCreated,
-              event_payload: event as z.infer<
-                typeof coreEvents.ChainEventCreated
-              >,
-            }),
-          );
-
-        const records = [...contestEvents, ...restEvents];
-        await emitEvent(models.Outbox, records, transaction);
+      if (allEvents.length === 0) {
+        log.info(`Processed 0 events for chainNodeId ${chainNodeId}`);
+        return;
       }
+
+      const records = allEvents.map((event) => {
+        const contractAddress = ethers.utils.getAddress(event.rawLog.address);
+
+        const parseContestEvent = (e: keyof typeof ChainEventSigs) =>
+          parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
+
+        switch (event.eventSource.eventSignature) {
+          case EvmNamespaceFactoryEventSignatures.NewContest:
+            return parseContestEvent('NewContest') as
+              | {
+                  event_name: EventNames.RecurringContestManagerDeployed;
+                  event_payload: z.infer<
+                    typeof RecurringContestManagerDeployed
+                  >;
+                }
+              | {
+                  event_name: EventNames.OneOffContestManagerDeployed;
+                  event_payload: z.infer<typeof OneOffContestManagerDeployed>;
+                };
+          case EvmContestEventSignatures.NewRecurringContestStarted:
+            return parseContestEvent('NewRecurringContestStarted') as {
+              event_name: EventNames.ContestStarted;
+              event_payload: z.infer<typeof ContestStarted>;
+            };
+          case EvmContestEventSignatures.NewSingleContestStarted:
+            return parseContestEvent('NewSingleContestStarted') as {
+              event_name: EventNames.ContestStarted;
+              event_payload: z.infer<typeof ContestStarted>;
+            };
+          case EvmContestEventSignatures.ContentAdded:
+            return parseContestEvent('ContentAdded') as {
+              event_name: EventNames.ContestContentAdded;
+              event_payload: z.infer<typeof ContestContentAdded>;
+            };
+          case EvmContestEventSignatures.VoterVoted:
+            return parseContestEvent('VoterVoted') as {
+              event_name: EventNames.ContestContentUpvoted;
+              event_payload: z.infer<typeof ContestContentUpvoted>;
+            };
+        }
+
+        // fallback to generic chain event
+        return {
+          event_name: EventNames.ChainEventCreated,
+          event_payload: event as z.infer<typeof coreEvents.ChainEventCreated>,
+        } as {
+          event_name: EventNames.ChainEventCreated;
+          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
+        };
+      });
+
+      await emitEvent(models.Outbox, records, transaction);
     });
 
     log.info(
