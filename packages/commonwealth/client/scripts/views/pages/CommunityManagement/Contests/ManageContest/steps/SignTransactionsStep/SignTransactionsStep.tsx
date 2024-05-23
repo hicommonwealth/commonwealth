@@ -70,7 +70,9 @@ const SignTransactionsStep = ({
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = Number(app?.chain?.meta?.CommunityStakes?.[0]?.voteWeight);
-    const contestInterval = SEVEN_DAYS_IN_SECONDS;
+    const contestInterval = devContest
+      ? FIVE_MINS_IN_SECONDS
+      : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
