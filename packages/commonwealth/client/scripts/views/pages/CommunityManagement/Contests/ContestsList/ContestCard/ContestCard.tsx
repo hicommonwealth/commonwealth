@@ -86,11 +86,11 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    navigate(`/discussions?featured=mostLikes&contest=${name}`);
+    navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
   const handleWinnersClick = () => {
-    navigate(`/discussions?contest=${name}`);
+    navigate(`/discussions?contest=${address}`);
   };
 
   const handleFundClick = () => {
