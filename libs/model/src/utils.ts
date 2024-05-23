@@ -109,12 +109,6 @@ export function formatS3Url(
   uploadLocation: string,
   bucketName: string = 'assets.commonwealth.im',
 ): string {
-  if (uploadLocation.includes('/assets.commonwealth.im/')) {
-    return (
-      `https://assets.commonwealth.im/` +
-      uploadLocation.split('/assets.commonwealth.im/').pop()
-    );
-  }
   return (
     `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
   );
