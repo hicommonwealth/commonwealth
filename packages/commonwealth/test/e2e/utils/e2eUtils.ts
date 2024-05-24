@@ -237,7 +237,9 @@ let seeder;
 export const e2eSeeder = async (): Promise<E2E_Seeder> => {
   if (!seeder) {
     try {
+      console.log('Seeding e2e test data...');
       seeder = await buildSeeder();
+      console.log('Seeding e2e test data...DONE');
     } catch (error) {
       console.error('Error seeding E2E:', error);
       throw error;

@@ -20,6 +20,7 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
+import { e2eSeeder } from 'test/e2e/utils/e2eUtils';
 
 // bootstrap production adapters
 const __filename = fileURLToPath(import.meta.url);
@@ -52,6 +53,9 @@ const app = express();
 const start = async () => {
   const { models } = await import('@hicommonwealth/model');
   config.NODE_ENV !== 'production' && console.log(config);
+
+  // seed test data in CI
+  config.NODE_ENV === 'test' && config.IS_CI && (await e2eSeeder());
 
   const { main } = await import('./main');
 
