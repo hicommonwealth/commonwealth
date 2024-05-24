@@ -124,13 +124,13 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
     .meta({
       openapi: {
         method: 'POST',
-        path: `/${tag.toLowerCase()}/${factory.name}`,
+        path: `/${tag.toLowerCase()}/{id}/${factory.name}`,
         tags: [tag],
         headers: [{ name: 'address_id' }],
         protect: md.secure,
       },
     })
-    .input(md.input)
+    .input(md.input.extend({ id: z.string() })) // this might cause client typing issues
     .output(md.output)
     .mutation(async ({ ctx, input }) => {
       // md.secure must explicitly be false if the route requires no authentication
@@ -140,6 +140,7 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
         return await core.command(
           md,
           {
+            id: input?.id,
             actor: {
               user: ctx.req.user as core.User,
               // TODO: get from JWT?
