@@ -5,7 +5,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { SubEntry } from 'views/pages/notification_settings2/SubEntry';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import './index.scss';
@@ -62,16 +61,16 @@ const Index = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {(threadSubscriptions.data || [])
-          .filter((current) => current.Thread)
-          .filter((current) => !threadsFilter.includes(current.Thread.id))
-          .map((current) => (
-            <SubEntry
-              key={current.Thread.id}
-              thread={current.Thread}
-              onUnsubscribe={handleUnsubscribe}
-            />
-          ))}
+        {/*{(threadSubscriptions.data || [])*/}
+        {/*  .filter((current) => current.Thread)*/}
+        {/*  .filter((current) => !threadsFilter.includes(current.Thread.id))*/}
+        {/*  .map((current) => (*/}
+        {/*    <SubEntry*/}
+        {/*      key={current.Thread.id}*/}
+        {/*      thread={current.Thread}*/}
+        {/*      onUnsubscribe={handleUnsubscribe}*/}
+        {/*    />*/}
+        {/*  ))}*/}
       </div>
     </CWPageLayout>
   );
