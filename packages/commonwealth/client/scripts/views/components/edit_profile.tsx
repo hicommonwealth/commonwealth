@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
@@ -46,6 +47,7 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
+  const { isLoggedIn } = useUserLoggedIn();
   const isFetchedOnMount = useRef(false);
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
@@ -194,11 +196,17 @@ const EditProfileComponent = () => {
   };
 
   useEffect(() => {
-    if (!isFetchedOnMount.current) {
-      getProfile().catch(console.error);
-      isFetchedOnMount.current = true;
-    }
-  }, [getProfile]);
+    const id = setTimeout(() => {
+      if (!isFetchedOnMount.current && isLoggedIn && app?.user?.jwt) {
+        getProfile().catch(console.error);
+        isFetchedOnMount.current = true;
+      }
+    }, 300); // The app.user updates with a delay, this timeout ensure we wait for it to update
+
+    return () => {
+      clearTimeout(id);
+    };
+  }, [getProfile, isLoggedIn]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
