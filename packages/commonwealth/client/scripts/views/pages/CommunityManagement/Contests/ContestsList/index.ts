@@ -1,4 +1,4 @@
 import ContestsList, { Contest } from './ContestsList';
 
 export default ContestsList;
-export { Contest };
+export type { Contest };
