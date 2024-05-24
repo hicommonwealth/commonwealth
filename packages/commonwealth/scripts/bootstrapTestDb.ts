@@ -2,8 +2,13 @@ import { tester } from '@hicommonwealth/model';
 
 async function main() {
   console.log('Bootstrapping test db...');
-  await tester.bootstrap_testing();
-  console.log('Bootstrapping test db...DONE!');
+  try {
+    await tester.bootstrap_testing();
+    console.log('Bootstrapping test db...DONE!');
+  } catch (e) {
+    console.log('Bootstrapping test db...FAIL!');
+    console.error(e);
+  }
   process.exit(0);
 }
 void main();
