@@ -39,6 +39,8 @@ interface FetchBulkThreadsProps extends CommonProps {
   stage?: string;
   includePinnedThreads?: boolean;
   isOnArchivePage?: boolean;
+  contestAddress?: string;
+  contestStatus?: string;
   orderBy?:
     | 'newest'
     | 'oldest'
@@ -107,6 +109,8 @@ const getFetchThreadsQueryKey = (props) => {
       props.fromDate,
       props.limit,
       props.orderBy,
+      props.contestAddress,
+      props.contestStatus,
     ];
 
     // remove milliseconds from cache key
@@ -159,6 +163,12 @@ const fetchBulkThreads = (props) => {
           to_date: props.toDate,
           orderBy: props.orderBy || 'newest',
           ...(props.isOnArchivePage && { archived: true }),
+          ...(props.contestAddress && {
+            contestAddress: props.contestAddress,
+          }),
+          ...(props.contestStatus && {
+            status: props.contestStatus,
+          }),
         },
       },
     );

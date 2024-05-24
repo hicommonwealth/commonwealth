@@ -57,6 +57,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId,
   });
+  const contestAddress = searchParams.get('contest');
+  const contestStatus = searchParams.get('status');
 
   const containerRef = useRef();
 
@@ -97,6 +99,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
+      contestAddress,
+      contestStatus,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
