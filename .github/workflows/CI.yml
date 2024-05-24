@@ -183,9 +183,10 @@ jobs:
 
       - name: Run serial e2e tests
         run: |
-          (NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' mocha ./test/unit/seed_hack.spec.ts") &
-          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
+          sudo local-ssl-proxy --source 443 --target 8080 &
+          pnpm -F commonwealth e2e-start-server --forbid-only &
+          pnpm -F commonwealth wait-server &&
+          pnpm -F commonwealth test-e2e-serial --forbid-only
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
