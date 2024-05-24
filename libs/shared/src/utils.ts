@@ -10,7 +10,7 @@ export const decamelize = (value: string): string =>
     .replace(/([\p{Lowercase_Letter}\d])(\p{Uppercase_Letter})/gu, '$1_$2')
     .replace(
       /(\p{Uppercase_Letter}+)(\p{Uppercase_Letter}\p{Lowercase_Letter}+)/gu,
-      '$1-$2',
+      '$1_$2',
     )
     .toLowerCase();
 
