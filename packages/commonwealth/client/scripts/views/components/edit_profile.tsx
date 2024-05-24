@@ -164,7 +164,7 @@ const EditProfileComponent = () => {
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
 
-          if (userOnboardingEnabled && socials.length > 0) {
+          if (userOnboardingEnabled && socials?.length > 0) {
             markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
               profile.id,
