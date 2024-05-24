@@ -233,6 +233,13 @@ export async function __updateThread(
       { transaction },
     );
 
+    await this.models.ThreadVersionHistory.create(
+      { ...toUpdate, address },
+      {
+        transaction,
+      },
+    );
+
     if (versionHistory) {
       // The update above doesn't work because it can't detect array changes so doesn't write it to db
       await this.models.Thread.update(
