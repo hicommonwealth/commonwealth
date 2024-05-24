@@ -220,7 +220,7 @@ export const getContestBalance = async (
 
   const promises = [
     contestInstance.methods.contestToken().call(),
-    contestInstance.methods.FeeManagerAddress().call(),
+    contestInstance.methods.FeeMangerAddress().call(),
   ];
 
   const results = await Promise.all(promises);
