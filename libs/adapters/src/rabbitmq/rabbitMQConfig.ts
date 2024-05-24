@@ -74,15 +74,21 @@ export function getRabbitMQConfig(
       RascalQueues.ChainEvent,
       RascalQueues.NotificationsProvider,
       RascalQueues.ContestWorkerPolicy,
+      RascalQueues.ContestProjection,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
-      RascalBindings.ContestWorkerPolicyThreadCreated,
-      RascalBindings.ContestWorkerPolicyThreadUpvoted,
       RascalBindings.NotificationsProviderCommentCreated,
       RascalBindings.NotificationsProviderChainEventCreated,
       RascalBindings.NotificationsProviderSnapshotProposalCreated,
       RascalBindings.NotificationsProviderUserMentioned,
+      RascalBindings.ContestWorkerPolicyThreadCreated,
+      RascalBindings.ContestWorkerPolicyThreadUpvoted,
+      RascalBindings.ContestProjectionRecurringContestManagerDeployed,
+      RascalBindings.ContestProjectionOneOffContestManagerDeployed,
+      RascalBindings.ContestProjectionContestStarted,
+      RascalBindings.ContestProjectionContestContentAdded,
+      RascalBindings.ContestProjectionContestContentUpvoted,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -91,6 +97,7 @@ export function getRabbitMQConfig(
       RascalSubscriptions.ChainEvent,
       RascalSubscriptions.NotificationsProvider,
       RascalSubscriptions.ContestWorkerPolicy,
+      RascalSubscriptions.ContestProjection,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [

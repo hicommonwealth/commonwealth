@@ -232,7 +232,7 @@ export const ChainEventCreated = z.union([
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({
-  created_at: z.date().describe('When the event was emitted'),
+  created_at: z.date().nullish().describe('When the event was emitted'),
   // TODO: TBD
   // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
   // aggregateId: z.string().describe("Event emitter aggregate id")
@@ -258,7 +258,7 @@ const ContestManagerEvent = EventMetadata.extend({
   contest_id: z
     .number()
     .int()
-    .positive()
+    .gte(0)
     .optional()
     .describe('Recurring contest id'),
 });
@@ -282,14 +282,3 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
     .int()
     .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
-
-export const ContestWinnersRecorded = ContestManagerEvent.extend({
-  winners: z
-    .array(
-      z.object({
-        creator_address: z.string(),
-        prize: z.number().int().positive(),
-      }),
-    )
-    .describe('Contest winners from first to last'),
-}).describe('When contest winners are recorded and contest ends');

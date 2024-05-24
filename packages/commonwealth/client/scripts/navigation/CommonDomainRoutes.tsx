@@ -116,7 +116,6 @@ const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
   contestEnabled,
-  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -434,17 +433,13 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
-  ...(existingCommunityStakeIntegrationEnabled
-    ? [
-        <Route
-          key="/:scope/manage/integrations/stake"
-          path="/:scope/manage/integrations/stake"
-          element={withLayout(CommunityStakeIntegration, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/:scope/manage/integrations/stake"
+    path="/:scope/manage/integrations/stake"
+    element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"

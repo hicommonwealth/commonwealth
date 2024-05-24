@@ -205,8 +205,7 @@ ORDER BY
 
 let db: DB | undefined = undefined;
 /**
- * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
- * and creating/migrating a fresh instance if it doesn't exist.
+ * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */

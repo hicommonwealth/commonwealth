@@ -1,6 +1,8 @@
 import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { formatS3Url } from '@hicommonwealth/model';
 
+const BUCKET_NAME = 'common-sitemap';
 const s3 = new S3();
 
 export interface Resource {
@@ -27,7 +29,7 @@ export function createAsyncWriterMock() {
 export function createAsyncWriterS3(): AsyncWriter {
   async function write(filename: string, content: string): Promise<Resource> {
     const params: PutObjectCommandInput = {
-      Bucket: 'common-sitemap',
+      Bucket: BUCKET_NAME,
       Key: `${filename}`,
       Body: content,
       ContentType: 'text/xml; charset=utf-8',
@@ -42,7 +44,7 @@ export function createAsyncWriterS3(): AsyncWriter {
       throw new Error('Failed to return upload location');
     }
 
-    return { location: upload.Location };
+    return { location: formatS3Url(upload.Location, BUCKET_NAME) };
   }
 
   return { write };

@@ -98,7 +98,7 @@ export const uploadFileToS3 = async (
 
     // upload the file via the signed URL
     await axios.put(signedUploadUrl, compressedFile, {
-      params: {
+      headers: {
         'Content-Type': file.type,
       },
     });
