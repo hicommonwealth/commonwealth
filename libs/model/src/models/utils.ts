@@ -255,7 +255,7 @@ export const createFk = (
  */
 export const dropFk = (sequelize: Sequelize, { source, name }: FkMap) =>
   sequelize?.query(
-    `ALTER TABLE "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
+    `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
   );
 
 /**
