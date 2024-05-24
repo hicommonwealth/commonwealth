@@ -8,7 +8,6 @@ env:
   ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted'
   PRIVATE_KEY: 'web3-pk'
   USES_DOCKER_PGSQL: true
-  SERVER_URL: http://localhost:8080
   PORT: 8080
   REDIS_URL: redis://localhost:6379
   ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
