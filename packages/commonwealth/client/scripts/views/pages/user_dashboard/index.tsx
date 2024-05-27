@@ -9,7 +9,11 @@ import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPWAEvent,
+} from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -17,8 +21,8 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
-import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 import { fetchActivity } from './helpers';
+import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -59,6 +63,13 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  useBrowserAnalyticsTrack(
+    isAddedToHomeScreen
+      ? { payload: { event: MixpanelPWAEvent.PWA_USED } }
+      : { payload: { event: MixpanelPWAEvent.PWA_NOT_USED } },
+  );
   useEffect(() => {
     if (!type) {
       navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
@@ -86,7 +97,7 @@ const UserDashboard = (props: UserDashboardProps) => {
     <CWPageLayout>
       <div className="UserDashboard" key={`${isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
-          Home
+          {isAddedToHomeScreen ? 'TEST' : 'Home'}
         </CWText>
         <div ref={setScrollElement} className="content">
           <div className="user-dashboard-activity">
