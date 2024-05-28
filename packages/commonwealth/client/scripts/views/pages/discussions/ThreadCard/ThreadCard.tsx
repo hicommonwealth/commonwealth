@@ -16,6 +16,7 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
+import { CommentCard } from '../CommentCard';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
 import './ThreadCard.scss';
@@ -33,6 +34,8 @@ type CardProps = AdminActionsProps & {
   canComment?: boolean;
   disabledActionsTooltipText?: string;
   onCommentBtnClick?: () => any;
+  hideRecentComments?: boolean;
+  maxRecentCommentsToDisplay?: number;
 };
 
 export const ThreadCard = ({
@@ -56,6 +59,8 @@ export const ThreadCard = ({
   canComment = true,
   disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
+  hideRecentComments = false,
+  maxRecentCommentsToDisplay = 2,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -242,6 +247,37 @@ export const ThreadCard = ({
           </div>
         </div>
       </Link>
+      {!hideRecentComments &&
+      maxRecentCommentsToDisplay &&
+      thread?.recentComments?.length > 0 ? (
+        <div className="RecentComments">
+          {[...(thread?.recentComments || [])]
+            ?.filter((recentComment) => !recentComment.deleted)
+            ?.slice?.(0, maxRecentCommentsToDisplay)
+            ?.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
+            ?.map((recentComment) => (
+              <Link
+                to={`${threadHref}?comment=${recentComment.id}`}
+                key={recentComment.id}
+                className="Comment"
+                onClick={() => onBodyClick && onBodyClick()}
+              >
+                <CommentCard
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  canReply={!disabledActionsTooltipText}
+                  replyBtnVisible
+                  hideReactButton
+                  comment={recentComment}
+                  isThreadArchived={false}
+                  maxReplyLimitReached={false}
+                  viewUpvotesButtonVisible={false}
+                />
+              </Link>
+            ))}
+        </div>
+      ) : (
+        <></>
+      )}
       <ViewThreadUpvotesDrawer
         thread={thread}
         isOpen={isUpvoteDrawerOpen}

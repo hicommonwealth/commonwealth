@@ -168,3 +168,37 @@
     }
   }
 }
+
+.RecentComments {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 8px 72px;
+  padding-left: 8px;
+  border-left: 1px solid $neutral-200 !important;
+
+  @include extraSmall {
+    margin-left: 36px;
+  }
+
+  .Comment:hover {
+    text-decoration: none;
+    color: unset;
+  }
+
+  .comment-body {
+    padding: 12px;
+    border-radius: 6px;
+
+    &:hover {
+      background: $neutral-50;
+      text-decoration: none;
+      color: unset;
+      cursor: pointer;
+    }
+
+    .comment-content {
+      padding-left: 0px !important;
+    }
+  }
+}
