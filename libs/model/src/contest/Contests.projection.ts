@@ -45,6 +45,7 @@ async function updateOrCreateWithAlert(
   namespace: string,
   contest_address: string,
   interval: number,
+  isOneOff: bool,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -101,7 +102,7 @@ async function updateOrCreateWithAlert(
     const { startTime, endTime } = await getContestStatus(
       url,
       contest_address,
-      true,
+      isOneOff,
     );
     await models.Contest.create(
       {
@@ -255,6 +256,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.namespace,
           payload.contest_address,
           payload.interval,
+          false,
         );
       },
 
@@ -264,6 +266,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.namespace,
           payload.contest_address,
           0,
+          true,
         );
       },
 
