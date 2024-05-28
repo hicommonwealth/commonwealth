@@ -176,7 +176,7 @@ export const ThreadCard = ({
                 />
               )}
             </div>
-            <CWText type="caption" className="content-body">
+            <CWText type="b1" className="content-body">
               <QuillRenderer doc={thread.plaintext} />
             </CWText>
           </div>

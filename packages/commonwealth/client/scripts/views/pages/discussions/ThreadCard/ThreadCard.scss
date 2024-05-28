@@ -81,6 +81,7 @@
       .content-body {
         @include multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
+        font-size: 16px !important;
 
         @include extraSmall {
           overflow: hidden !important;
@@ -100,8 +101,12 @@
           h2,
           h3,
           h4,
-          h5 {
-            font-size: 12px;
+          h5,
+          p,
+          a,
+          span,
+          div {
+            font-size: 16px !important;
           }
         }
       }
@@ -118,6 +123,7 @@
 
         .Text {
           display: inline-block;
+          font-weight: 500 !important;
 
           .Tag.contest {
             display: inline-block;
