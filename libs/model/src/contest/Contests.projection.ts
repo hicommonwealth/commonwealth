@@ -98,7 +98,11 @@ async function updateOrCreateWithAlert(
     }
 
     // create contest
-    const { startTime, endTime } = await getContestStatus(url, contest_address);
+    const { startTime, endTime } = await getContestStatus(
+      url,
+      contest_address,
+      true,
+    );
     await models.Contest.create(
       {
         contest_address,
