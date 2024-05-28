@@ -88,7 +88,6 @@ erDiagram
     character-varying(255) community_id 
     character-varying(255) parent_id 
     integer address_id 
-    text[] version_history 
     character-varying(255) root_id 
     text plaintext 
     tsvector _search 
@@ -389,7 +388,6 @@ erDiagram
     boolean pinned 
     character-varying(255) kind 
     text url 
-    text[] version_history 
     boolean read_only 
     integer topic_id 
     text plaintext 

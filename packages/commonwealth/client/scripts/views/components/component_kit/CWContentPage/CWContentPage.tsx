@@ -201,7 +201,6 @@ export const CWContentPage = ({
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
         profile={thread?.profile}
-        versionHistory={thread?.versionHistory}
         changeContentText={setThreadBody}
       />
     </div>

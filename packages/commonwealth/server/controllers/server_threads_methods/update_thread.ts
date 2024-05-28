@@ -15,12 +15,10 @@ import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
   createThreadMentionNotifications,
   emitMentions,
-  findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
 } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
-import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -164,22 +162,17 @@ export async function __updateThread(
     isCollaborator,
   };
 
-  const { latestVersion, versionHistory } = addVersionHistory(
-    thread.version_history,
-    body,
-    address,
-  );
-
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
 
   const community = await this.models.Community.findByPk(thread.community_id);
 
-  const previousDraftMentions = parseUserMentions(latestVersion);
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+  const mentionedAddresses = await queryMentionedUsers(
+    currentDraftMentions,
+    this.models,
+  );
 
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
@@ -232,19 +225,6 @@ export async function __updateThread(
       },
       { transaction },
     );
-
-    if (versionHistory) {
-      // The update above doesn't work because it can't detect array changes so doesn't write it to db
-      await this.models.Thread.update(
-        {
-          version_history: versionHistory,
-        },
-        {
-          where: { id: threadId },
-          transaction,
-        },
-      );
-    }
 
     await updateThreadCollaborators(
       permissions,

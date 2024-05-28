@@ -125,7 +125,6 @@ export async function __createThread(
     author: address,
     body: decodeURIComponent(body),
   };
-  const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
     community_id: community.id,
@@ -133,7 +132,6 @@ export async function __createThread(
     title,
     body,
     plaintext,
-    version_history,
     kind,
     stage,
     url,

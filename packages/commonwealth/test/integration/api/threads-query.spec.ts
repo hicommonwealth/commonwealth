@@ -68,7 +68,6 @@ describe('Thread queries', () => {
           as: 'topic',
         },
       ],
-      attributes: { exclude: ['version_history'] },
       order: [['created_at', 'DESC']],
     });
     expect(threads).to.not.be.null;

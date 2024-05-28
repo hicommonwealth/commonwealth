@@ -13,17 +13,13 @@ import CWPopover, {
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { UserProfile } from '../../../../../models/MinimumProfile';
-import {
-  IThreadCollaborator,
-  VersionHistory,
-} from '../../../../../models/Thread';
+import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
 import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
-import { formatVersionText } from './utils';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
@@ -50,7 +46,6 @@ export type AuthorAndPublishInfoProps = {
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
-  versionHistory?: VersionHistory[];
   changeContentText?: (text: string) => void;
 };
 
@@ -75,7 +70,6 @@ export const AuthorAndPublishInfo = ({
   archivedAt,
   popoverPlacement,
   profile,
-  versionHistory,
   changeContentText,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
@@ -93,15 +87,7 @@ export const AuthorAndPublishInfo = ({
     }, {}) ?? {};
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
-  const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body,
-    label: formatVersionText(
-      v.timestamp,
-      v.author?.address,
-      profile,
-      collaboratorLookupInfo,
-    ),
-  }));
+  const versionHistoryOptions = []; //TODO: When refactoring version_history fix this
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>

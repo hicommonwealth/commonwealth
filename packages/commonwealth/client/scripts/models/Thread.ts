@@ -1,5 +1,4 @@
 import { ProposalType } from '@hicommonwealth/shared';
-import type MinimumProfile from 'models/MinimumProfile';
 import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import type { IUniqueId } from './interfaces';
@@ -14,30 +13,6 @@ function getDecodedString(str: string) {
     console.error(`Could not decode str: "${str}"`);
     return str;
   }
-}
-
-function processVersionHistory(versionHistory: any[]) {
-  let versionHistoryProcessed;
-  if (versionHistory) {
-    versionHistoryProcessed = versionHistory.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v);
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-            ? history.author
-            : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    });
-  }
-  return versionHistoryProcessed;
 }
 
 function emptyStringToNull(input: string) {
@@ -99,12 +74,6 @@ function processAssociatedReactions(
     }
   }
   return temp;
-}
-
-export interface VersionHistory {
-  author?: MinimumProfile & { profile_id: number };
-  timestamp: Moment;
-  body: string;
 }
 
 export interface IThreadCollaborator {
@@ -180,7 +149,6 @@ export class Thread implements IUniqueId {
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
-  public readonly versionHistory: VersionHistory[];
   public readonly communityId: string;
   public readonly lastEdited: Moment;
 
@@ -211,7 +179,6 @@ export class Thread implements IUniqueId {
     topic,
     kind,
     stage,
-    version_history,
     community_id,
     read_only,
     body,
@@ -283,7 +250,6 @@ export class Thread implements IUniqueId {
     reactionTimestamps?: string[];
     reactionWeights?: number[];
     reaction_weights_sum: number;
-    version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
     profile_id: number;
@@ -312,11 +278,7 @@ export class Thread implements IUniqueId {
     this.collaborators = collaborators || [];
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
     this.hasPoll = has_poll;
-    this.lastEdited = last_edited
-      ? moment(last_edited)
-      : this.versionHistory && this.versionHistory?.length > 1
-      ? this.versionHistory[0].timestamp
-      : null;
+    this.lastEdited = moment(updated_at);
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
     this.lockedAt = locked_at ? moment(locked_at) : null;
@@ -326,7 +288,6 @@ export class Thread implements IUniqueId {
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
-    this.versionHistory = processVersionHistory(version_history);
     this.reactionWeightsSum = reaction_weights_sum;
     this.associatedReactions =
       associatedReactions ??

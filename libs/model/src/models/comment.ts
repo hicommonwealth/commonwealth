@@ -21,7 +21,6 @@ export type CommentAttributes = {
   id?: number;
   community_id: string;
   parent_id?: string;
-  version_history?: string[];
 
   canvas_action: string;
   canvas_session: string;
@@ -69,11 +68,6 @@ export default (
       created_by: { type: Sequelize.STRING, allowNull: true },
       text: { type: Sequelize.TEXT, allowNull: false },
       plaintext: { type: Sequelize.TEXT, allowNull: true },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
-      },
       // signed data
       canvas_action: { type: Sequelize.JSONB, allowNull: true },
       canvas_session: { type: Sequelize.JSONB, allowNull: true },

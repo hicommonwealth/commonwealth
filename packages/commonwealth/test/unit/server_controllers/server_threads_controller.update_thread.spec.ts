@@ -101,7 +101,6 @@ describe('ServerThreadsController', () => {
           findOne: async () => ({
             Address: address,
             address_id: address.id,
-            version_history: ['{"body": ""}'],
             update: async () => null,
             toJSON: () => ({}),
           }),
