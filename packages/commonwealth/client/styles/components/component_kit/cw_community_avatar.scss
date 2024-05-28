@@ -22,6 +22,11 @@
     width: $small-icon;
   }
 
+  &.regular {
+    height: $regular-icon;
+    width: $regular-icon;
+  }
+
   &.medium {
     height: $medium-icon;
     width: $medium-icon;
