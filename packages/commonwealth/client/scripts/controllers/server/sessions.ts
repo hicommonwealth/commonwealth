@@ -69,8 +69,13 @@ export async function getSessionFromWallet(
   wallet: IWebWallet<any>,
 ) {
   const sessionSigner = await wallet.getSessionSigner();
-  const { payload: session } = await sessionSigner.getSession(CANVAS_TOPIC);
-  return session;
+  const session = await sessionSigner.getSession(CANVAS_TOPIC);
+  if (session) {
+    return session.payload;
+  } else {
+    const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
+    return payload;
+  }
 }
 
 function getCaip2Address(address: string) {
@@ -114,10 +119,10 @@ async function sign(
         lookupAddress = `polkadot:${chainIdFromAddress}:${swappedWalletAddress}`;
       }
 
-      const savedData = await signer.getSession(CANVAS_TOPIC, {
+      const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
         address: lookupAddress,
       });
-      if (!savedData) {
+      if (!savedSessionMessage) {
         throw new SessionKeyError({
           name: 'Authentication Error',
           message: `No session found for address ${address}`,
@@ -125,7 +130,7 @@ async function sign(
           ssoSource: WalletSsoSource.Unknown,
         });
       }
-      const { payload: session, signer: messageSigner } = savedData;
+      const { payload: session, signer: messageSigner } = savedSessionMessage;
 
       // check if session is expired
       if (session.duration !== null) {
