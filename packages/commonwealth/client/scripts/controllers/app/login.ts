@@ -3,7 +3,6 @@
  */
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
-import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 
@@ -94,8 +93,10 @@ export async function setActiveAccount(
       throw Error(`Unsuccessful status: ${response.status}`);
     }
   } catch (err) {
-    console.error(err?.response.data.error || err?.message);
-    notifyError('Could not set active account');
+    // Failed to set the user's active address to this account.
+    // This might be because this address isn't `verified`,
+    // so we don't show an error here.
+    console.error(err?.response?.data?.error || err?.message);
   }
 
   app.user.ephemerallySetActiveAccount(account);
