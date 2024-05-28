@@ -255,5 +255,7 @@ export const getContestBalance = async (
 
   const balanceResults = await Promise.all(balancePromises);
 
-  return balanceResults[0] + balanceResults[1];
+  const result = BigInt(balanceResults[0]) + BigInt(balanceResults[1]);
+
+  return Number(result);
 };
