@@ -35,7 +35,10 @@ type CardProps = AdminActionsProps & {
   disabledActionsTooltipText?: string;
   onCommentBtnClick?: () => any;
   hideRecentComments?: boolean;
+  hideReactionButton?: boolean;
+  hideUpvotesDrawer?: boolean;
   maxRecentCommentsToDisplay?: number;
+  layoutType?: 'author-first' | 'community-first';
 };
 
 export const ThreadCard = ({
@@ -60,7 +63,10 @@ export const ThreadCard = ({
   disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   hideRecentComments = false,
+  hideReactionButton = false,
+  hideUpvotesDrawer = false,
   maxRecentCommentsToDisplay = 2,
+  layoutType = 'author-first',
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -120,7 +126,7 @@ export const ThreadCard = ({
         onClick={() => onBodyClick && onBodyClick()}
         key={thread.id}
       >
-        {!isWindowSmallInclusive && (
+        {!hideReactionButton && !isWindowSmallInclusive && (
           <ReactionButton
             thread={thread}
             size="big"
@@ -145,6 +151,7 @@ export const ThreadCard = ({
               discord_meta={thread.discord_meta}
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
+              layoutType={layoutType}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -181,7 +188,7 @@ export const ThreadCard = ({
                 doc={thread.plaintext}
                 cutoffLines={4}
                 customShowMoreButton={
-                  <CWText type="b1" className="show-more">
+                  <CWText type="b1" className="show-more-btn">
                     Show more
                   </CWText>
                 }
@@ -229,7 +236,7 @@ export const ThreadCard = ({
               totalComments={thread.numberOfComments}
               shareEndpoint={discussionLink}
               thread={thread}
-              upvoteBtnVisible={isWindowSmallInclusive}
+              upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
               commentBtnVisible={!thread.readOnly}
               canUpdateThread={
                 isLoggedIn &&
@@ -251,6 +258,7 @@ export const ThreadCard = ({
               onCommentBtnClick={onCommentBtnClick}
               disabledActionTooltipText={disabledActionsTooltipText}
               setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+              hideUpvoteDrawerButton={hideUpvotesDrawer}
             />
           </div>
         </div>
@@ -286,11 +294,13 @@ export const ThreadCard = ({
       ) : (
         <></>
       )}
-      <ViewThreadUpvotesDrawer
-        thread={thread}
-        isOpen={isUpvoteDrawerOpen}
-        setIsOpen={setIsUpvoteDrawerOpen}
-      />
+      {!hideUpvotesDrawer && (
+        <ViewThreadUpvotesDrawer
+          thread={thread}
+          isOpen={isUpvoteDrawerOpen}
+          setIsOpen={setIsUpvoteDrawerOpen}
+        />
+      )}
     </>
   );
 };

@@ -96,9 +96,10 @@ export const CommentCard = ({
     (editDraft || commentText) ?? comment.text,
   );
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
-  const author = comment?.author
-    ? app.chain.accounts.get(comment?.author)
-    : null;
+  const author =
+    comment?.author && app.chain
+      ? app.chain.accounts.get(comment?.author)
+      : null;
 
   const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
     useState<boolean>(false);
@@ -143,7 +144,7 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorAddress={author?.address}
+            authorAddress={app.chain ? author?.address : comment?.author}
             authorCommunityId={author?.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}

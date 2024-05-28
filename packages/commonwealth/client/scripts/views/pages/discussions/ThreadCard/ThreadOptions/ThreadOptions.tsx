@@ -26,6 +26,7 @@ type OptionsProps = AdminActionsProps & {
   disabledActionTooltipText?: string;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
+  hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -52,6 +53,7 @@ export const ThreadOptions = ({
   disabledActionTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
+  hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
@@ -84,7 +86,7 @@ export const ThreadOptions = ({
     <>
       <div className="ThreadOptions">
         <div className="options-container">
-          {!upvoteDrawerBtnBelow && (
+          {!hideUpvoteDrawerButton && !upvoteDrawerBtnBelow && (
             <ViewUpvotesDrawerTrigger
               onClick={(e) => {
                 e.preventDefault();
@@ -146,7 +148,7 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {upvoteDrawerBtnBelow && (
+        {!hideUpvoteDrawerButton && upvoteDrawerBtnBelow && (
           <ViewUpvotesDrawerTrigger
             onClick={(e) => {
               e.preventDefault();
