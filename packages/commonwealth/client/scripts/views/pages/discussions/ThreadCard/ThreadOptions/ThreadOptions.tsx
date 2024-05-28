@@ -1,3 +1,4 @@
+import { pluralize } from 'client/scripts/helpers';
 import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
@@ -103,7 +104,7 @@ export const ThreadOptions = ({
 
           {commentBtnVisible && totalComments >= 0 && (
             <CWThreadAction
-              label={`${totalComments}`}
+              label={pluralize(totalComments, 'Comment')}
               action="comment"
               disabled={!canComment}
               onClick={(e) => {
@@ -117,10 +118,12 @@ export const ThreadOptions = ({
           <SharePopover
             // if share endpoint is present it will be used, else the current url will be used
             discussionLink={shareEndpoint}
+            label="Share"
           />
 
           <CWThreadAction
             action="subscribe"
+            label="Subscribe"
             onClick={handleToggleSubscribe}
             selected={!isSubscribed}
             disabled={!hasJoinedCommunity}

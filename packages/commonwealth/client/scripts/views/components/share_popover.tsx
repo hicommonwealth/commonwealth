@@ -10,6 +10,7 @@ type SharePopoverProps = {
   commentId?: number;
   discussionLink?: string;
   customUrl?: string;
+  label?: string;
 } & Partial<PopoverTriggerProps>;
 
 export const SharePopover = ({
@@ -17,6 +18,7 @@ export const SharePopover = ({
   discussionLink,
   renderTrigger,
   customUrl,
+  label,
 }: SharePopoverProps) => {
   const domain = document.location.origin;
   const { pathname: currentRoute } = useLocation();
@@ -26,6 +28,7 @@ export const SharePopover = ({
   ) => (
     <CWThreadAction
       action="share"
+      {...(label && { label })}
       onClick={(e) => {
         e.preventDefault();
         onClick(e);

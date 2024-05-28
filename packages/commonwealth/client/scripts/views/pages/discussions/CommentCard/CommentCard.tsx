@@ -8,6 +8,7 @@ import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
+import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -45,6 +46,8 @@ type CommentCardProps = {
   maxReplyLimitReached: boolean;
   // Reaction
   canReact?: boolean;
+  hideReactButton?: boolean;
+  viewUpvotesButtonVisible?: boolean;
   // Spam
   isSpam?: boolean;
   onSpamToggle?: () => any;
@@ -52,6 +55,8 @@ type CommentCardProps = {
   // actual comment
   comment: Comment<any>;
   isThreadArchived: boolean;
+  // other
+  className?: string;
 };
 
 export const CommentCard = ({
@@ -74,6 +79,8 @@ export const CommentCard = ({
   maxReplyLimitReached,
   // reaction
   canReact,
+  hideReactButton = false,
+  viewUpvotesButtonVisible = true,
   // spam
   isSpam,
   onSpamToggle,
@@ -81,6 +88,8 @@ export const CommentCard = ({
   // actual comment
   comment,
   isThreadArchived,
+  // other
+  className,
 }: CommentCardProps) => {
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = deserializeDelta(
@@ -128,7 +137,7 @@ export const CommentCard = ({
   };
 
   return (
-    <div className="comment-body">
+    <div className={clsx('comment-body', className)}>
       <div className="comment-header">
         {comment.deleted ? (
           <span>[deleted]</span>
@@ -185,29 +194,34 @@ export const CommentCard = ({
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton
-                comment={comment}
-                disabled={!canReact}
-                tooltipText={
-                  disabledActionsTooltipText ? 'Join community to upvote' : ''
-                }
-                onReaction={handleReaction}
-              />
+              {!hideReactButton && (
+                <CommentReactionButton
+                  comment={comment}
+                  disabled={!canReact}
+                  tooltipText={
+                    disabledActionsTooltipText ? 'Join community to upvote' : ''
+                  }
+                  onReaction={handleReaction}
+                />
+              )}
 
-              <ViewUpvotesDrawerTrigger
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsUpvoteDrawerOpen(true);
-                }}
-              />
+              {viewUpvotesButtonVisible && (
+                <>
+                  <ViewUpvotesDrawerTrigger
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsUpvoteDrawerOpen(true);
+                    }}
+                  />
+                  <ViewCommentUpvotesDrawer
+                    comment={comment}
+                    isOpen={isUpvoteDrawerOpen}
+                    setIsOpen={setIsUpvoteDrawerOpen}
+                  />
+                </>
+              )}
 
-              <ViewCommentUpvotesDrawer
-                comment={comment}
-                isOpen={isUpvoteDrawerOpen}
-                setIsOpen={setIsUpvoteDrawerOpen}
-              />
-
-              <SharePopover commentId={comment.id} />
+              <SharePopover commentId={comment.id} label="Share" />
 
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
