@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -32,6 +33,7 @@ export const FullUser = ({
   showSkeleton,
   popoverPlacement,
   profile,
+  className,
 }: FullUserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -236,7 +238,7 @@ export const FullUser = ({
 
   return shouldShowPopover ? (
     <div
-      className="user-popover-wrapper"
+      className={clsx('user-popover-wrapper', className)}
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >
