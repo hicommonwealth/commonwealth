@@ -51,9 +51,12 @@ const UserDashboard = (props: UserDashboardProps) => {
     DashboardViews.Global,
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DASHBOARD_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -63,12 +66,20 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
   useBrowserAnalyticsTrack(
     isAddedToHomeScreen
-      ? { payload: { event: MixpanelPWAEvent.PWA_USED } }
-      : { payload: { event: MixpanelPWAEvent.PWA_NOT_USED } },
+      ? {
+          payload: {
+            event: MixpanelPWAEvent.PWA_USED,
+            isPWA: isAddedToHomeScreen,
+          },
+        }
+      : {
+          payload: {
+            event: MixpanelPWAEvent.PWA_NOT_USED,
+            isPWA: isAddedToHomeScreen,
+          },
+        },
   );
   useEffect(() => {
     if (!type) {

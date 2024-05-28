@@ -118,6 +118,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   communitySelected?: string;
   proposalType?: string;
   chainBase?: ChainBase;
+  isPWA?: boolean;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
