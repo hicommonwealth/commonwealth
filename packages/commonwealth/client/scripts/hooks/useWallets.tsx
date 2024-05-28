@@ -47,6 +47,7 @@ import {
 } from '../views/components/component_kit/helpers';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
 import useBrowserWindow from './useBrowserWindow';
+import { useFlag } from './useFlag';
 
 type ProfileRowProps = {
   name: string;
@@ -87,6 +88,7 @@ type IuseWalletProps = {
 
 const useWallets = (walletProps: IuseWalletProps) => {
   const createAccountWithDefaultValues = true;
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
@@ -229,6 +231,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // then open the user auth type guidance modal
       // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
       if (
+        userOnboardingEnabled &&
         isAddressNew &&
         !isAttemptingToConnectAddressToCommunity &&
         !app.isLoggedIn()
@@ -550,33 +553,35 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } else {
       const selectedAddress = getAddressFromWallet(wallet);
 
-      // check if address exists
-      const profileAddresses = await fetchProfilesByAddress({
-        currentChainId: '',
-        profileAddresses: [
-          wallet.chain === ChainBase.Substrate
-            ? addressSwapper({
-                address: selectedAddress,
-                currentPrefix: parseInt(
-                  (app.chain as Substrate)?.meta.ss58Prefix,
-                  10,
-                ),
-              })
-            : selectedAddress,
-        ],
-        profileChainIds: [app.activeChainId() ?? wallet.chain],
-        initiateProfilesAfterFetch: false,
-      });
-      const addressExists = profileAddresses?.length > 0;
-      const isAttemptingToConnectAddressToCommunity =
-        app.isLoggedIn() && app.activeChainId();
-      if (
-        !addressExists &&
-        !isAttemptingToConnectAddressToCommunity &&
-        walletProps.onUnrecognizedAddressReceived
-      ) {
-        const shouldContinue = walletProps.onUnrecognizedAddressReceived();
-        if (!shouldContinue) return;
+      if (userOnboardingEnabled) {
+        // check if address exists
+        const profileAddresses = await fetchProfilesByAddress({
+          currentChainId: '',
+          profileAddresses: [
+            wallet.chain === ChainBase.Substrate
+              ? addressSwapper({
+                  address: selectedAddress,
+                  currentPrefix: parseInt(
+                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    10,
+                  ),
+                })
+              : selectedAddress,
+          ],
+          profileChainIds: [app.activeChainId() ?? wallet.chain],
+          initiateProfilesAfterFetch: false,
+        });
+        const addressExists = profileAddresses?.length > 0;
+        const isAttemptingToConnectAddressToCommunity =
+          app.isLoggedIn() && app.activeChainId();
+        if (
+          !addressExists &&
+          !isAttemptingToConnectAddressToCommunity &&
+          walletProps.onUnrecognizedAddressReceived
+        ) {
+          const shouldContinue = walletProps.onUnrecognizedAddressReceived();
+          if (!shouldContinue) return;
+        }
       }
 
       if (walletProps.useSessionKeyLoginFlow) {

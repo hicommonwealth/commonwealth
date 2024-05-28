@@ -59,10 +59,9 @@ export async function __getBulkThreads(
   if (stage && status) {
     throw new AppError('Cannot provide both stage and status');
   }
-  if (!((contestAddress && status) || (!contestAddress && !status))) {
-    throw new AppError(
-      'Must provide both contestAddress and status or neither',
-    );
+
+  if (status && !contestAddress) {
+    throw new AppError('Must provide contestAddress if status is provided');
   }
 
   // query params that bind to sql query
@@ -108,7 +107,7 @@ export async function __getBulkThreads(
   const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
     `
         WITH top_threads AS (
-        SELECT id, title, url, body, version_history, kind, stage, read_only, discord_meta,
+        SELECT id, title, url, body, kind, stage, read_only, discord_meta,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
             marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data as "canvasSignedData",
@@ -126,7 +125,7 @@ export async function __getBulkThreads(
             ${
               contestAddress ? ' AND CA.contest_address = :contestAddress ' : ''
             }
-            ${contestAddress ? contestStatus[status] : ''}
+            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
         ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'}
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (

@@ -1,5 +1,4 @@
 import { EventNames, events, logger } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
 import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { Model, ModelStatic, Transaction } from 'sequelize';
@@ -25,11 +24,15 @@ export function hashAbi(abi: AbiType): string {
 type EmitEventValues =
   | {
       event_name: EventNames.CommentCreated;
-      event_payload: z.infer<typeof schemas.Comment>;
+      event_payload: z.infer<typeof events.CommentCreated>;
     }
   | {
       event_name: EventNames.ThreadCreated;
-      event_payload: z.infer<typeof schemas.Thread>;
+      event_payload: z.infer<typeof events.ThreadCreated>;
+    }
+  | {
+      event_name: EventNames.ThreadUpvoted;
+      event_payload: z.infer<typeof events.ThreadUpvoted>;
     }
   | {
       event_name: EventNames.ChainEventCreated;
@@ -44,8 +47,24 @@ type EmitEventValues =
       event_payload: z.infer<typeof events.UserMentioned>;
     }
   | {
-      event_name: EventNames.ThreadUpvoted;
-      event_payload: z.infer<typeof events.ThreadUpvoted>;
+      event_name: EventNames.RecurringContestManagerDeployed;
+      event_payload: z.infer<typeof events.RecurringContestManagerDeployed>;
+    }
+  | {
+      event_name: EventNames.OneOffContestManagerDeployed;
+      event_payload: z.infer<typeof events.OneOffContestManagerDeployed>;
+    }
+  | {
+      event_name: EventNames.ContestStarted;
+      event_payload: z.infer<typeof events.ContestStarted>;
+    }
+  | {
+      event_name: EventNames.ContestContentAdded;
+      event_payload: z.infer<typeof events.ContestContentAdded>;
+    }
+  | {
+      event_name: EventNames.ContestContentUpvoted;
+      event_payload: z.infer<typeof events.ContestContentUpvoted>;
     };
 
 /**
@@ -79,4 +98,18 @@ export async function emitEvent(
   if (records.length > 0) {
     await outbox.bulkCreate(values, { transaction });
   }
+}
+
+/**
+ * Creates a valid S3 asset url from an upload.Location url
+ * @param uploadLocation The url returned by the Upload method of @aws-sdk/lib-storage
+ * @param bucketName The name of the bucket or the domain (alias) of the bucket. Defaults to assets.commonwealth.im
+ */
+export function formatS3Url(
+  uploadLocation: string,
+  bucketName: string = 'assets.commonwealth.im',
+): string {
+  return (
+    `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
+  );
 }

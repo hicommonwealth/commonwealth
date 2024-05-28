@@ -26,13 +26,11 @@ const featureFlags = {
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  existingCommunityStakeIntegrationEnabled: buildFlag(
-    process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
-  ),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
   knockInAppNotifications: buildFlag(
-    process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+    process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),
+  contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

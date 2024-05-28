@@ -478,23 +478,31 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  // check if this address exists in db
-  const profileAddresses = await fetchProfilesByAddress({
-    currentChainId: '',
-    profileAddresses: [magicAddress],
-    profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
-    initiateProfilesAfterFetch: false,
-  });
+  const client = OpenFeature.getClient();
+  const userOnboardingEnabled = client.getBooleanValue(
+    'userOnboardingEnabled',
+    false,
+  );
+  let isAddressNew = false;
+  if (userOnboardingEnabled) {
+    // check if this address exists in db
+    const profileAddresses = await fetchProfilesByAddress({
+      currentChainId: '',
+      profileAddresses: [magicAddress],
+      profileChainIds: [isCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum],
+      initiateProfilesAfterFetch: false,
+    });
 
-  const isAddressNew = profileAddresses?.length === 0;
-  const isAttemptingToConnectAddressToCommunity =
-    app.isLoggedIn() && app.activeChainId();
-  if (
-    isAddressNew &&
-    !isAttemptingToConnectAddressToCommunity &&
-    returnEarlyIfNewAddress
-  ) {
-    return { address: magicAddress, isAddressNew };
+    isAddressNew = profileAddresses?.length === 0;
+    const isAttemptingToConnectAddressToCommunity =
+      app.isLoggedIn() && app.activeChainId();
+    if (
+      isAddressNew &&
+      !isAttemptingToConnectAddressToCommunity &&
+      returnEarlyIfNewAddress
+    ) {
+      return { address: magicAddress, isAddressNew };
+    }
   }
 
   let session: Session;
@@ -574,11 +582,6 @@ export async function handleSocialLoginCallback({
       await updateActiveAddresses({ chain: c });
     }
 
-    const client = OpenFeature.getClient();
-    const userOnboardingEnabled = client.getBooleanValue(
-      'userOnboardingEnabled',
-      false,
-    );
     if (userOnboardingEnabled) {
       const {
         created_at: accountCreatedTime,

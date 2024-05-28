@@ -126,6 +126,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.ContestProjection]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
@@ -140,18 +146,6 @@ export function getAllRascalConfigs(
       destination: RascalQueues.DiscordListener,
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.DiscordListener,
-    },
-    [RascalBindings.ContestWorkerPolicyThreadCreated]: {
-      source: RascalExchanges.MessageRelayer,
-      destination: RascalQueues.ContestWorkerPolicy,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadCreated,
-    },
-    [RascalBindings.ContestWorkerPolicyThreadUpvoted]: {
-      source: RascalExchanges.MessageRelayer,
-      destination: RascalQueues.ContestWorkerPolicy,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadUpvoted,
     },
     [RascalBindings.NotificationsProviderCommentCreated]: {
       source: RascalExchanges.MessageRelayer,
@@ -177,6 +171,50 @@ export function getAllRascalConfigs(
       destination: RascalQueues.NotificationsProvider,
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.NotificationsProviderUserMentioned,
+    },
+    [RascalBindings.ContestWorkerPolicyThreadCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestWorkerPolicy,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadCreated,
+    },
+    [RascalBindings.ContestWorkerPolicyThreadUpvoted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestWorkerPolicy,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadUpvoted,
+    },
+    [RascalBindings.ContestProjectionRecurringContestManagerDeployed]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey:
+        RascalRoutingKeys.ContestProjectionRecurringContestManagerDeployed,
+    },
+    [RascalBindings.ContestProjectionOneOffContestManagerDeployed]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey:
+        RascalRoutingKeys.ContestProjectionOneOffContestManagerDeployed,
+    },
+    [RascalBindings.ContestProjectionContestStarted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestProjectionContestStarted,
+    },
+    [RascalBindings.ContestProjectionContestContentAdded]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestProjectionContestContentAdded,
+    },
+    [RascalBindings.ContestProjectionContestContentUpvoted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestProjectionContestContentUpvoted,
     },
   };
 
@@ -207,6 +245,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.ContestWorkerPolicy]: {
       queue: RascalQueues.ContestWorkerPolicy,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.ContestProjection]: {
+      queue: RascalQueues.ContestProjection,
       ...subscriptionConfig,
     },
   };
