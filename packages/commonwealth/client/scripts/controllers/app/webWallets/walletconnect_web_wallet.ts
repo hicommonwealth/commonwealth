@@ -84,7 +84,11 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       localStorage.removeItem('walletconnect');
       return;
     }
-    await this._provider.wc.killSession();
+    try {
+      await this._provider.wc.killSession();
+    } catch (err) {
+      // api may not be available
+    }
     this._provider.disconnect();
     this._enabled = false;
   }
