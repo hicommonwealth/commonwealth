@@ -177,7 +177,15 @@ export const ThreadCard = ({
               )}
             </div>
             <CWText type="b1" className="content-body">
-              <QuillRenderer doc={thread.plaintext} />
+              <QuillRenderer
+                doc={thread.plaintext}
+                cutoffLines={4}
+                customShowMoreButton={
+                  <CWText type="b1" className="show-more">
+                    Show more
+                  </CWText>
+                }
+              />
             </CWText>
           </div>
           {isTagsRowVisible && (

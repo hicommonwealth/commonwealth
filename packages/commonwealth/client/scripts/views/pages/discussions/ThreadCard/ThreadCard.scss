@@ -108,6 +108,21 @@
           div {
             font-size: 16px !important;
           }
+
+          &.collapsed {
+            div :last-child {
+              color: $neutral-300;
+            }
+          }
+        }
+
+        .show-more-btn {
+          padding-top: 4px;
+          color: $primary-500 !important;
+
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
 
