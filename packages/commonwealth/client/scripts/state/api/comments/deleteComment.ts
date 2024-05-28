@@ -96,6 +96,14 @@ const useDeleteCommentMutation = ({
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,
       });
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        {
+          recentComments: [{ id: response.softDeleted.id }] as any,
+        },
+        'removeFromExisting',
+      );
       return response;
     },
   });
