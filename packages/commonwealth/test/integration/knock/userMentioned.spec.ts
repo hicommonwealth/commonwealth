@@ -66,7 +66,6 @@ describe('userMentioned Event Handler', () => {
       deleted_at: null,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
   });
 

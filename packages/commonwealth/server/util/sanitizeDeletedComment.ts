@@ -22,6 +22,5 @@ export function sanitizeDeletedComment(
     canvas_session: '',
     plaintext: '[deleted]',
     text: '[deleted]',
-    version_history: [],
   };
 }

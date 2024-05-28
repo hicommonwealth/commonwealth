@@ -19,7 +19,6 @@ export const Thread = z.object({
   links: z.object(linksSchema).array().nullish(),
 
   read_only: z.boolean().nullish(),
-  version_history: z.array(z.string()).nullish(),
 
   has_poll: z.boolean().nullish(),
 
@@ -56,7 +55,6 @@ export const Comment = z.object({
   id: PG_INT.optional(),
   community_id: z.string(),
   parent_id: z.string().nullish(),
-  version_history: z.array(z.string()).optional(),
 
   canvas_action: z.string(),
   canvas_session: z.string(),

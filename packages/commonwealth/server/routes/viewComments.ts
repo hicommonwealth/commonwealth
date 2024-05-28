@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { getLastEdited } from 'server/util/getLastEdited';
 import { sanitizeDeletedComment } from 'server/util/sanitizeDeletedComment';
 
 export const Errors = {
@@ -80,7 +79,7 @@ const viewComments = async (
     const data = c.toJSON();
     return {
       ...sanitizeDeletedComment(data),
-      last_edited: getLastEdited(data),
+      last_edited: data.updated_at,
     };
   });
 

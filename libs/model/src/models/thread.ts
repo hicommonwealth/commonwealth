@@ -61,11 +61,6 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
-        allowNull: false,
-      },
       links: { type: Sequelize.JSONB, allowNull: true },
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
       has_poll: { type: Sequelize.BOOLEAN, allowNull: true },

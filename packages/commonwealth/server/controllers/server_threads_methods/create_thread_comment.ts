@@ -162,12 +162,10 @@ export async function __createThreadComment(
     author: address,
     body: decodeURIComponent(text),
   };
-  const version_history: string[] = [JSON.stringify(firstVersion)];
   const commentContent: CommentAttributes = {
     thread_id: threadId,
     text,
     plaintext,
-    version_history,
     address_id: address.id,
     community_id: thread.community_id,
     parent_id: null,

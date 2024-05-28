@@ -45,7 +45,6 @@ const deleteComment = async ({
       deleted: true,
       text: '[deleted]',
       plaintext: '[deleted]',
-      versionHistory: [],
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,

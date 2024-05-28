@@ -141,7 +141,6 @@ export const CommentCard = ({
             popoverPlacement="top"
             showUserAddressWithInfo={false}
             profile={comment.profile}
-            versionHistory={comment.versionHistory}
             changeContentText={setCommentText}
           />
         )}

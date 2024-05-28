@@ -11,11 +11,9 @@ import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createCommentMentionNotifications,
   emitMentions,
-  findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
 } from '../../util/parseUserMentions';
-import { addVersionHistory } from '../../util/versioning';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
@@ -91,12 +89,6 @@ export async function __updateComment(
     throw new AppError(Errors.NotAuthor);
   }
 
-  const { latestVersion, versionHistory } = addVersionHistory(
-    comment.version_history,
-    commentBody,
-    address,
-  );
-
   const text = commentBody;
   const plaintext = (() => {
     try {
@@ -108,20 +100,20 @@ export async function __updateComment(
     }
   })();
 
-  const previousDraftMentions = parseUserMentions(latestVersion);
   const currentDraftMentions = parseUserMentions(
     decodeURIComponent(commentBody),
   );
 
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+  const mentionedAddresses = await queryMentionedUsers(
+    currentDraftMentions,
+    this.models,
+  );
 
   await this.models.sequelize.transaction(async (transaction) => {
     await this.models.Comment.update(
       {
         text,
         plaintext,
-        version_history: versionHistory ?? undefined,
       },
       {
         where: { id: comment.id },

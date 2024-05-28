@@ -51,7 +51,6 @@ describe('Contest Worker Policy', () => {
       deleted_at: undefined,
       pinned: false,
       read_only: false,
-      version_history: [],
     });
   });
   after(async () => {
@@ -92,7 +91,6 @@ describe('Contest Worker Policy', () => {
             deleted_at: undefined,
             pinned: false,
             read_only: false,
-            version_history: [],
           },
         },
         true,

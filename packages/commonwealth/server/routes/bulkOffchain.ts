@@ -76,7 +76,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
         });
         const monthlyThreads = await models.Thread.findAll({
           where,
-          attributes: { exclude: ['version_history'] },
           include: [{ model: models.Address, as: 'Address' }],
         });
 

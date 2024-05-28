@@ -146,28 +146,11 @@ export async function __updateComment(
   if (!thread) {
     throw new AppError(Errors.ThreadNotFoundForComment);
   }
-
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(comment.version_history[0]).body;
-  } catch (e) {
-    console.log(e);
-  }
 ```
   
 `Business Rules`
 
 ```typescript
-  // If new comment body text has been submitted, create another version history entry
-  if (decodeURIComponent(commentBody) !== latestVersion) {
-    const recentEdit = {
-      timestamp: moment(),
-      body: decodeURIComponent(commentBody),
-    };
-    const arr = comment.version_history;
-    arr.unshift(JSON.stringify(recentEdit));
-    comment.version_history = arr;
-  }
   comment.text = commentBody;
   comment.plaintext = (() => {
     try {
