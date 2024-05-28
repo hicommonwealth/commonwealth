@@ -43,6 +43,7 @@ export type BulkThreadsRequestQuery = {
   from_date?: string;
   to_date?: string;
   archived?: string;
+  withXRecentComments?: number;
 };
 export type CountThreadsRequestQuery = {
   limit?: number;
@@ -104,6 +105,7 @@ export const getThreadsHandler = async (
       archived,
       contestAddress,
       status,
+      withXRecentComments,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -119,6 +121,7 @@ export const getThreadsHandler = async (
       archived: archived,
       contestAddress,
       status,
+      withXRecentComments,
     });
     return success(res, bulkThreads);
   }

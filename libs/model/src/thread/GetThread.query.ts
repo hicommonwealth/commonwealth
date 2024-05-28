@@ -21,6 +21,7 @@ export const GetBulkThreadsParamsSchema = z.object({
   to_date: z.string().optional(),
   contestAddress: z.string().optional(),
   status: z.string().optional(),
+  withXRecentComments: z.coerce.number().optional(),
 });
 
 export type GetThreadsParams = z.infer<typeof GetThreadsParamsSchema>;
