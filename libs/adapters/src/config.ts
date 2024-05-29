@@ -13,6 +13,7 @@ const {
   KNOCK_SIGNING_KEY,
   KNOCK_IN_APP_FEED_ID,
   KNOCK_PUBLIC_API_KEY,
+  FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
 } = process.env;
 
 export const config = configure(
@@ -42,6 +43,10 @@ export const config = configure(
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
       MIXPANEL_DEV_TOKEN,
+    },
+    PUSH_NOTIFICATIONS: {
+      FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED:
+        FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED === 'true',
     },
   },
   z.object({
@@ -89,13 +94,6 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
-        KNOCK_FCM_CHANNEL_ID: z
-          .string()
-          .optional()
-          .default('c9e1b544-2130-4814-833a-a79bc527051c')
-          .describe(
-            'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
-          ),
       })
       .refine(
         (data) => {
@@ -121,6 +119,35 @@ export const config = configure(
             'KNOCK_PUBLIC_API_KEY',
             'KNOCK_IN_APP_FEED_ID',
           ],
+        },
+      ),
+    PUSH_NOTIFICATIONS: z
+      .object({
+        FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe(
+            'A flag indicating whether the Knock push notifications is enabled or disabled',
+          ),
+        KNOCK_FCM_CHANNEL_ID: z
+          .string()
+          .optional()
+          .describe(
+            'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
+          ),
+      })
+      .refine(
+        (data) => {
+          if (data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
+            return data.KNOCK_FCM_CHANNEL_ID;
+          }
+          return true;
+        },
+        {
+          message:
+            'KNOCK_FCM_CHANNEL_ID is required when FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED is true',
+          path: ['KNOCK_FCM_CHANNEL_ID'],
         },
       ),
     ANALYTICS: z.object({

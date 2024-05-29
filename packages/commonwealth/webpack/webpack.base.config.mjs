@@ -27,8 +27,8 @@ const baseConfig = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.FLAG_KNOCK_PWA_INTEGRATION_ENABLED': JSON.stringify(
-        process.env.FLAG_KNOCK_PWA_INTEGRATION_ENABLED,
+      'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
+        process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
       ),
     }),
 
