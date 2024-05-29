@@ -15,6 +15,8 @@ const {
   KNOCK_PUBLIC_API_KEY,
   FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   KNOCK_FCM_CHANNEL_ID,
+  KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
+  KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
 } = process.env;
 
 export const config = configure(
@@ -49,6 +51,8 @@ export const config = configure(
       FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED:
         FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED === 'true',
       KNOCK_FCM_CHANNEL_ID,
+      KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
+      KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
     },
   },
   z.object({
@@ -138,18 +142,47 @@ export const config = configure(
           .describe(
             'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
           ),
+        KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY: z
+          .string()
+          .optional()
+          .describe('The Firebase VAPID key.'),
+        KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG: z
+          .string()
+          .refine(
+            (data) => {
+              try {
+                JSON.parse(data);
+                return true;
+              } catch {
+                return false;
+              }
+            },
+            {
+              message: 'Invalid JSON string',
+            },
+          )
+          .optional()
+          .describe('The public firebase config for FCM'),
       })
       .refine(
         (data) => {
-          return (
-            data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED &&
-            data.KNOCK_FCM_CHANNEL_ID
-          );
+          if (data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
+            return (
+              data.KNOCK_FCM_CHANNEL_ID &&
+              data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY &&
+              data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
+            );
+          }
+          return true;
         },
         {
           message:
-            'KNOCK_FCM_CHANNEL_ID is required when FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED is true',
-          path: ['KNOCK_FCM_CHANNEL_ID'],
+            'FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED requires additional properties.  See paths.',
+          path: [
+            'KNOCK_FCM_CHANNEL_ID',
+            'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY',
+            'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG',
+          ],
         },
       ),
     ANALYTICS: z.object({
