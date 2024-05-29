@@ -102,7 +102,7 @@ export const FullUser = ({
         profile?.name
       ) : (
         <>
-          <div>{profile?.name}</div>
+          <div className="profile-name">{profile?.name}</div>
           <div className="id-short">{fullAddress}</div>
         </>
       )}
