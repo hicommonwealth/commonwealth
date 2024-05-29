@@ -27,7 +27,7 @@ const OverviewPage = () => {
     queryType: 'active',
     communityId: app.activeChainId(),
     topicsPerThread: 3,
-    withXRecentComments: 3, // TODO: decide how many in here
+    withXRecentComments: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
 

@@ -1,5 +1,8 @@
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
+import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
+import app from 'client/scripts/state';
+import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 import Permissions from 'client/scripts/utils/Permissions';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -24,9 +27,18 @@ export const TopicSummaryRow = ({
   topic,
   isLoading,
 }: TopicSummaryRowProps) => {
+  useUserActiveAccount();
   const navigate = useCommonNavigate();
 
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    communityId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
+  });
+
   if (isLoading) return <TopicSummaryRowSkeleton />;
+
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topSortedThreads = monthlyThreads
     .sort((a, b) => {
@@ -76,31 +88,45 @@ export const TopicSummaryRow = ({
             true,
           );
 
+          const isTopicGated = !!(memberships || []).find((membership) =>
+            membership.topicIds.includes(thread?.topic?.id),
+          );
+
+          const isActionAllowedInGatedTopic = !!(memberships || []).find(
+            (membership) =>
+              membership.topicIds.includes(thread?.topic?.id) &&
+              membership.isAllowed,
+          );
+
+          const isRestrictedMembership =
+            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: Permissions.isCommunityMember(
               thread.communityId,
             ),
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            // isThreadTopicGated: isRestrictedMembership, // TODO
+            isThreadTopicGated: isRestrictedMembership,
           });
 
           return (
             <ThreadCard
               key={thread.id}
               thread={thread}
-              hideReactionButton
-              hideUpvotesDrawer
-              threadHref={discussionLink}
+              canReact={!disabledActionsTooltipText}
               canComment={!disabledActionsTooltipText}
-              disabledActionsTooltipText={disabledActionsTooltipText}
+              onEditStart={() => navigate(`${discussionLinkWithoutChain}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}
+              threadHref={discussionLink}
               onCommentBtnClick={() =>
                 navigate(`${discussionLinkWithoutChain}?focusEditor=true`)
               }
-              onEditStart={() => navigate(`${discussionLinkWithoutChain}`)}
+              disabledActionsTooltipText={disabledActionsTooltipText}
+              hideReactionButton
+              hideUpvotesDrawer
             />
           );
         })}
