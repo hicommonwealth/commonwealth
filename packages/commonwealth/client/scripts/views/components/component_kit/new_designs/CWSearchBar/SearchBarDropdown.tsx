@@ -101,11 +101,12 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
           ))}
         </div>
       )}
-      {!showResults && searchTerm.length >= 3 ? (
+      {!showResults && searchTerm.length >= 3 && (
         <div className="no-results">
           <CWText type="b2">No results found</CWText>
         </div>
-      ) : (
+      )}
+      {!showResults && searchTerm.length < 3 && (
         <div className="no-results">
           <CWText type="b2">Search term requires 3 or more characters</CWText>
         </div>
