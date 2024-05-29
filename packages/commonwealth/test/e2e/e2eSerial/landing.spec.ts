@@ -1,10 +1,22 @@
+import { config } from '@hicommonwealth/core';
 import { expect, test } from '@playwright/test';
-import { PORT } from '../../../server/config';
-import { removeUser } from '../utils/e2eUtils';
+import { E2E_Seeder, e2eSeeder } from '../utils/e2eUtils';
+
+let seeder: E2E_Seeder;
+
+test.beforeAll(async () => {
+  seeder = await e2eSeeder();
+});
 
 test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
-    await page.goto(`http://localhost:${PORT}/`);
+    page.on('response', (response) => {
+      if (response.url().startsWith('http://localhost:8080/api/')) {
+        expect(response.status()).toBeLessThan(400);
+      }
+    });
+
+    await page.goto(`${config.SERVER_URL}/`);
 
     // await login(page);
 
@@ -20,7 +32,7 @@ test.describe('Test landing login', () => {
 // Since we lazily import web3 in order to inject metamask into the window, it might not be available right away.
 // This allows us to wait until it becomes available by re-clicking the login button until it shows up.
 export async function login(page) {
-  await removeUser();
+  await seeder.removeUser();
 
   await page.getByText('Sign in').click();
   await page.waitForSelector('.LoginDesktop');

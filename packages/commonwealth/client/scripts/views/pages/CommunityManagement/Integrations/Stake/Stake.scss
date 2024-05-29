@@ -1,0 +1,23 @@
+@import '../../../../../../styles/shared';
+
+.Stake {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .flex-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .Icon {
+      color: $green-500;
+    }
+  }
+
+  .w-fit {
+    width: fit-content;
+  }
+}

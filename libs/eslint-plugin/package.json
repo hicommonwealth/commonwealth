@@ -1,0 +1,18 @@
+{
+  "name": "@hicommonwealth/eslint-plugin",
+  "private": "true",
+  "version": "0.1.0",
+  "main": "index.cjs",
+  "scripts": {
+    "build": "echo 'no build'",
+    "clean": "echo 'no clean'",
+    "check-types": "echo 'no check-types'",
+    "test": "echo 'no test'"
+  },
+  "peerDependencies": {
+    "eslint": "^8"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

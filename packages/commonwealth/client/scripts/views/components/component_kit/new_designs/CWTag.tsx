@@ -26,7 +26,8 @@ type TagType =
   | 'login'
   | 'input'
   | 'address'
-  | 'group';
+  | 'group'
+  | 'contest';
 
 export type TagProps = {
   iconName?: IconName;
@@ -36,6 +37,8 @@ export type TagProps = {
   trimAt?: number;
   classNames?: string;
   community?: ChainInfo;
+  onMouseEnter?: (e?: React.MouseEvent<HTMLElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
 export const CWTag = ({
@@ -46,6 +49,8 @@ export const CWTag = ({
   trimAt,
   classNames,
   community,
+  onMouseEnter,
+  onMouseLeave,
 }: TagProps) => {
   const displayLabel = () => {
     if (!trimAt) {
@@ -68,10 +73,13 @@ export const CWTag = ({
         ComponentType.Tag,
       )} ${classNames || ''}`}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {type === 'input' && (
         <CWCommunityAvatar size="small" community={community} />
       )}
+      {type === 'contest' && <CWIcon iconName="trophy" iconSize="small" />}
       {!!iconName && (
         <CWIcon iconName={iconName} iconSize="small" className={iconName} />
       )}

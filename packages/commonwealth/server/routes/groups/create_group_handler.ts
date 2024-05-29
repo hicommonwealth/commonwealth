@@ -1,11 +1,13 @@
-import { AppError, Requirement } from '@hicommonwealth/core';
-import { GroupAttributes, GroupMetadata } from '@hicommonwealth/model';
+import { AppError } from '@hicommonwealth/core';
+import { GroupAttributes } from '@hicommonwealth/model';
+import { GroupMetadata } from '@hicommonwealth/schemas';
+import { Requirement } from '@hicommonwealth/shared';
 import z from 'zod';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type CreateGroupBody = {
-  metadata: GroupMetadata;
+  metadata: z.infer<typeof GroupMetadata>;
   requirements: Requirement[];
   topics?: number[];
 };
@@ -16,9 +18,9 @@ export const createGroupHandler = async (
   req: TypedRequestBody<CreateGroupBody>,
   res: TypedResponse<CreateGroupResponse>,
 ) => {
-  const { user, address, community } = req;
+  const { user, community } = req;
 
-  // FIXME: this is the command schema
+  // Warning: this is the command schema
   const schema = z.object({
     body: z.object({
       metadata: z.object({
@@ -26,7 +28,7 @@ export const createGroupHandler = async (
         description: z.string(),
         required_requirements: z.number().optional(),
       }),
-      requirements: z.array(z.any()), // validated in controller
+      requirements: z.array(z.any()).min(1), // validated in controller
       topics: z.array(z.number()).optional(),
     }),
   });
@@ -41,13 +43,12 @@ export const createGroupHandler = async (
   const [group, analyticsOptions] = await controllers.groups.createGroup({
     user,
     community,
-    address,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
   });
 
-  // FIXME: keep for now, but should be a debounced async integration policy that get's triggered by creation events
+  // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events
   // refresh memberships in background
   controllers.groups
     .refreshCommunityMemberships({
@@ -56,7 +57,7 @@ export const createGroupHandler = async (
     })
     .catch(console.error);
 
-  // FIXME: replace with analytics middleware
+  // Warning: replace with analytics middleware
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, group);

@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { getActivityFeed } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { getActivityFeed } from '../util/activityQuery';
 
 export const Errors = {
   NotLoggedIn: 'Must be signed in to view user dashboard',

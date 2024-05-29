@@ -1,33 +1,71 @@
+import {
+  BrokerPublications,
+  BrokerSubscriptions,
+  EventNames,
+} from '@hicommonwealth/core';
+
 export enum RascalPublications {
-  SnapshotListener = 'SnapshotListenerPublication',
-  DiscordListener = 'DiscordMessageSubscription',
+  DiscordListener = BrokerPublications.DiscordListener,
+  MessageRelayer = BrokerPublications.MessageRelayer,
 }
 
+// SnapshotListener and ChainEvent subscriptions will eventually be replaced by NotificationsProvider
 export enum RascalSubscriptions {
-  SnapshotListener = 'SnapshotListenerSubscription',
-  DiscordListener = 'DiscordMessageSubscription',
+  DiscordListener = BrokerSubscriptions.DiscordListener,
+  ChainEvent = BrokerSubscriptions.ChainEvent,
+  NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
+  ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
+  ContestProjection = BrokerSubscriptions.ContestProjection,
 }
 
 export enum RascalExchanges {
-  SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange',
   Discobot = 'DiscobotExchange',
+  MessageRelayer = 'MessageRelayerExchange',
 }
 
 export enum RascalQueues {
   DeadLetter = 'DeadLetterQueue',
-  SnapshotListener = 'SnapshotListenerQueueV2',
   DiscordListener = 'DiscordMessageQueueV2',
+  ChainEvent = 'ChainEventQueue',
+  NotificationsProvider = 'NotificationsProviderQueue',
+  ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
+  ContestProjection = 'ContestProjection',
 }
 
 export enum RascalBindings {
-  SnapshotListener = 'SnapshotListenerBinding',
+  NotificationsProviderCommentCreated = 'NotificationsProviderCommentCreatedBinding',
+  NotificationsProviderChainEventCreated = 'NotificationsProviderChainEventCreatedBinding',
+  NotificationsProviderSnapshotProposalCreated = 'NotificationsProviderSnapshotProposalCreatedBinding',
+  NotificationsProviderUserMentioned = 'NotificationsProviderUserMentionedBinding',
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
+  ChainEvent = 'ChainEventBinding',
+
+  ContestWorkerPolicyThreadCreated = 'ContestWorkerPolicyThreadCreatedBinding',
+  ContestWorkerPolicyThreadUpvoted = 'ContestWorkerPolicyThreadUpvotedBinding',
+  ContestProjectionRecurringContestManagerDeployed = 'ContestProjectionRecurringContestManagerDeployed',
+  ContestProjectionOneOffContestManagerDeployed = 'ContestProjectionOneOffContestManagerDeployed',
+  ContestProjectionContestStarted = 'ContestProjectionContestStarted',
+  ContestProjectionContestContentAdded = 'ContestProjectionContestContentAdded',
+  ContestProjectionContestContentUpvoted = 'ContestProjectionContestContentUpvoted',
 }
 
 export enum RascalRoutingKeys {
-  SnapshotListener = 'SnapshotListener',
+  NotificationsProviderCommentCreated = EventNames.CommentCreated,
+  NotificationsProviderChainEventCreated = EventNames.ChainEventCreated,
+  NotificationsProviderSnapshotProposalCreated = EventNames.SnapshotProposalCreated,
+  NotificationsProviderUserMentioned = EventNames.UserMentioned,
+  SnapshotListener = EventNames.SnapshotProposalCreated,
   DeadLetter = 'DeadLetter',
-  DiscordListener = 'DiscordListener',
+  DiscordListener = EventNames.DiscordMessageCreated,
+  ChainEvent = EventNames.ChainEventCreated,
+
+  ContestWorkerPolicyThreadCreated = EventNames.ThreadCreated,
+  ContestWorkerPolicyThreadUpvoted = EventNames.ThreadUpvoted,
+  ContestProjectionRecurringContestManagerDeployed = EventNames.RecurringContestManagerDeployed,
+  ContestProjectionOneOffContestManagerDeployed = EventNames.OneOffContestManagerDeployed,
+  ContestProjectionContestStarted = EventNames.ContestStarted,
+  ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
+  ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
 }

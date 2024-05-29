@@ -1,7 +1,6 @@
-// const fetch = require('node-fetch');
-const syncRequest = require('sync-request');
-const fetch = require('node-fetch');
-const { syncPerformanceTester, asyncPerformanceTester } = require('./util');
+import fetch from 'node-fetch';
+import syncRequest from 'sync-request';
+import { syncPerformanceTester } from './util';
 
 const jwt =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIxMTMsImVtYWlsIjpudWxsLCJpYXQiOjE2NTI2NzA4MDR9.WN5vxIaAcAzpNvTJiCeelm071yErhRtcEgXbA5iS-wA';

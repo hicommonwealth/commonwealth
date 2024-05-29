@@ -1,0 +1,62 @@
+@import '../../../../../../../styles/shared';
+
+.MobileWalletConfirmationSubModal {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 16px;
+  padding-top: 48px;
+
+  @include extraSmall {
+    padding-top: 32px;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 0;
+    top: 16px;
+    margin-right: 16px;
+    cursor: pointer;
+  }
+
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+
+  .header {
+    text-align: center;
+  }
+
+  .content {
+    .header {
+      color: $neutral-600;
+    }
+
+    padding: 0 48px;
+
+    @include extraSmall {
+      padding: 0 32px;
+    }
+  }
+
+  .footer {
+    padding-bottom: 48px;
+
+    @include extraSmall {
+      padding-bottom: 32px;
+    }
+
+    justify-content: center;
+
+    .Text {
+      display: initial;
+      color: $neutral-400;
+    }
+  }
+}

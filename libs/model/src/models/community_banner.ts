@@ -1,6 +1,5 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import Sequelize from 'sequelize';
+import type { ModelInstance } from './types';
 
 export type CommunityBannerAttributes = {
   id?: number;
@@ -12,20 +11,17 @@ export type CommunityBannerAttributes = {
 
 export type CommunityBannerInstance = ModelInstance<CommunityBannerAttributes>;
 
-export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommunityBannerModelStatic => {
-  const CommunityBanner = <CommunityBannerModelStatic>sequelize.define(
+): Sequelize.ModelStatic<CommunityBannerInstance> =>
+  sequelize.define<CommunityBannerInstance>(
     'CommunityBanner',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      banner_text: { type: dataTypes.TEXT, allowNull: false },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      banner_text: { type: Sequelize.TEXT, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'CommunityBanners',
@@ -35,13 +31,3 @@ export default (
       timestamps: true,
     },
   );
-
-  CommunityBanner.associate = (models) => {
-    models.CommunityBanner.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-  };
-
-  return CommunityBanner;
-};

@@ -1,6 +1,5 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
@@ -15,10 +14,12 @@ import {
   MessageType,
   ThreadChannel,
 } from 'discord.js';
+import { fileURLToPath } from 'url';
 import v8 from 'v8';
-import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
+import { config } from '../config';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
@@ -39,6 +40,8 @@ log.info(
 );
 
 async function startDiscordListener() {
+  config.NODE_ENV !== 'production' && console.log(config);
+
   // async imports to delay calling logger
   const { handleMessage, handleThreadChannel } = await import(
     '../discord-listener/handlers'
@@ -47,7 +50,10 @@ async function startDiscordListener() {
   let controller: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.DiscobotService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -122,7 +128,7 @@ async function startDiscordListener() {
     }
   });
 
-  await client.login(DISCORD_TOKEN);
+  await client.login(config.DISCORD.DISCORD_TOKEN);
 }
 
 startDiscordListener().catch((e) => {

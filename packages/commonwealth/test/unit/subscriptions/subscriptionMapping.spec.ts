@@ -4,7 +4,7 @@ import {
   NotificationDataAndCategory,
   SnapshotEventType,
   SupportedNetwork,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { mapNotificationsDataToSubscriptions } from '../../../server/util/subscriptionMapping';

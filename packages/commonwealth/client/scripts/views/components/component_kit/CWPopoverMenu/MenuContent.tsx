@@ -3,8 +3,8 @@ import React from 'react';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { ComponentType } from 'views/components/component_kit/types';
 
 interface MenuContentProps {

@@ -1,17 +1,24 @@
-import { NotificationCategories } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { dispose } from '@hicommonwealth/core';
+import { tester, type DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
-import DatabaseCleaner from '../../server/util/databaseCleaner';
+import { DatabaseCleaner } from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('DatabaseCleaner Tests', () => {
-  before('Reset database', async () => {
-    await tester.seedDb();
+describe('DatabaseCleaner Tests', async () => {
+  let models: DB;
+
+  before(async () => {
+    models = await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   describe('Tests when the cleaner runs', () => {
@@ -170,7 +177,7 @@ describe('DatabaseCleaner Tests', () => {
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
       // create old user and address
-      const oldUser = await models.User.createWithProfile(models, {
+      const oldUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
       });
@@ -183,7 +190,7 @@ describe('DatabaseCleaner Tests', () => {
       });
 
       // create new user and address
-      const newUser = await models.User.createWithProfile(models, {
+      const newUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
       });

@@ -1,8 +1,5 @@
 import { models, UserAttributes } from '@hicommonwealth/model';
-import * as dotenv from 'dotenv';
 import { WhereOptions } from 'sequelize';
-
-dotenv.config();
 
 async function main() {
   if (
@@ -43,7 +40,7 @@ async function main() {
   );
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
       // note this stops rollbar errors reports from completing in the `dispatchWebhooks` function

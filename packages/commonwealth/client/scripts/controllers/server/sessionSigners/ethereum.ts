@@ -1,4 +1,3 @@
-import { ethers, utils } from 'ethers';
 import type {
   Action,
   ActionArgument,
@@ -6,8 +5,9 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { verify as verifyCanvasSessionSignature } from 'canvas';
 import { getEIP712SignableAction } from 'adapters/chain/ethereum/keys';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
+import { ethers, utils } from 'ethers';
 import { ISessionController, InvalidSession } from '.';
 
 export class EthereumSessionController implements ISessionController {
@@ -23,7 +23,7 @@ export class EthereumSessionController implements ISessionController {
 
   async hasAuthenticatedSession(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<boolean> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return (
@@ -34,7 +34,7 @@ export class EthereumSessionController implements ISessionController {
 
   async getOrCreateAddress(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<string> {
     return (await this.getOrCreateSigner(chainId, fromAddress)).address;
   }
@@ -43,7 +43,7 @@ export class EthereumSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     payload: SessionPayload,
-    signature: string
+    signature: string,
   ) {
     const valid = await verifyCanvasSessionSignature({
       session: { type: 'session', payload, signature },
@@ -56,7 +56,7 @@ export class EthereumSessionController implements ISessionController {
       this.signers[chainId][fromAddress].address.toLowerCase()
     ) {
       throw new Error(
-        `Invalid auth: ${payload.sessionAddress} vs. ${this.signers[chainId][fromAddress].address}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.signers[chainId][fromAddress].address}`,
       );
     }
 
@@ -65,13 +65,13 @@ export class EthereumSessionController implements ISessionController {
     const authStorageKey = `CW_SESSIONS-eth-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(
       authStorageKey,
-      JSON.stringify(this.auths[chainId][fromAddress])
+      JSON.stringify(this.auths[chainId][fromAddress]),
     );
   }
 
   private async getOrCreateSigner(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<ethers.Wallet> {
     this.auths[chainId] = this.auths[chainId] ?? {};
     this.signers[chainId] = this.signers[chainId] ?? {};
@@ -105,13 +105,13 @@ export class EthereumSessionController implements ISessionController {
         ) {
           console.log(
             'Restored authenticated session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
           console.log(
             'Restored signed-out session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
         }
       }
@@ -124,7 +124,7 @@ export class EthereumSessionController implements ISessionController {
         storageKey,
         JSON.stringify({
           privateKey: this.signers[chainId][fromAddress].privateKey,
-        })
+        }),
       );
     }
     return this.signers[chainId][fromAddress];
@@ -134,7 +134,7 @@ export class EthereumSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     call: string,
-    callArgs: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>,
   ): Promise<{
     session: Session;
     action: Action;
@@ -156,7 +156,7 @@ export class EthereumSessionController implements ISessionController {
       from: sessionPayload.from,
       timestamp: +Date.now(),
       chain: `eip155:${chainId}`,
-      block: sessionPayload.block,
+      block: sessionPayload.block ?? '',
       call,
       callArgs,
     };
@@ -171,7 +171,7 @@ export class EthereumSessionController implements ISessionController {
       domain as any,
       types,
       message,
-      signature
+      signature,
     );
     const valid = recoveredAddr === this.signers[chainId][fromAddress].address;
     if (!valid) throw new Error('Invalid signature!');

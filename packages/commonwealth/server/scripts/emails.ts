@@ -1,32 +1,34 @@
+import { logger } from '@hicommonwealth/core';
 import type {
+  AddressAttributes,
+  DB,
+  UserAttributes,
+} from '@hicommonwealth/model';
+import {
+  DynamicTemplate,
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '@hicommonwealth/core';
-import {
-  DynamicTemplate,
   NotificationCategories,
-  logger,
-} from '@hicommonwealth/core';
-import type { UserAttributes } from '@hicommonwealth/model';
-import { AddressAttributes, DB } from '@hicommonwealth/model';
-import { capitalize } from 'lodash';
+  getThreadUrl,
+} from '@hicommonwealth/shared';
+import sgMail from '@sendgrid/mail';
+import _ from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 import {
   formatAddressShort,
-  getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
+import { config } from '../config';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(SENDGRID_API_KEY);
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 const getForumNotificationCopy = async (
   models: DB,
@@ -166,7 +168,7 @@ export const createImmediateNotificationEmailObject = async (
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(
+      }${chainEventLabel.heading} event on ${_.capitalize(
         ceInstance.community_id,
       )}`;
 

@@ -1,5 +1,7 @@
-import { logger } from '@hicommonwealth/core';
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { logger, stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { fileURLToPath } from 'url';
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
@@ -11,7 +13,8 @@ import {
   filterProposals,
 } from './util';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.
@@ -63,9 +66,12 @@ export async function generateCosmosGovNotifications() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
-    .then(() => process.exit(0))
+    .then(() => {
+      stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');
+      process.exit(0);
+    })
     .catch((err) => {
       log.error(err);
       process.exit(1);

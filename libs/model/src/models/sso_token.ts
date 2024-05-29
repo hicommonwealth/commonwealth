@@ -1,7 +1,6 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type SsoTokenAttributes = {
   id?: number;
@@ -12,28 +11,25 @@ export type SsoTokenAttributes = {
   state_id?: string;
   created_at?: Date;
   updated_at?: Date;
-  Address: AddressAttributes;
+  Address?: AddressAttributes;
 };
 
 export type SsoTokenInstance = ModelInstance<SsoTokenAttributes>;
 
-export type SsoTokenModelStatic = ModelStatic<SsoTokenInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): SsoTokenModelStatic => {
-  const SsoToken = <SsoTokenModelStatic>sequelize.define(
+): Sequelize.ModelStatic<SsoTokenInstance> =>
+  sequelize.define<SsoTokenInstance>(
     'SsoToken',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      issued_at: { type: dataTypes.INTEGER, allowNull: true },
-      issuer: { type: dataTypes.STRING, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: true },
-      profile_id: { type: dataTypes.INTEGER, allowNull: true },
-      state_id: { type: dataTypes.STRING, allowNull: true },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      issued_at: { type: Sequelize.INTEGER, allowNull: true },
+      issuer: { type: Sequelize.STRING, allowNull: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: true },
+      profile_id: { type: Sequelize.INTEGER, allowNull: true },
+      state_id: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'SsoTokens',
@@ -57,17 +53,3 @@ export default (
       },
     },
   );
-
-  SsoToken.associate = (models) => {
-    models.SsoToken.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.SsoToken.belongsTo(models.Profile, {
-      foreignKey: 'profile_id',
-      targetKey: 'id',
-    });
-  };
-
-  return SsoToken;
-};

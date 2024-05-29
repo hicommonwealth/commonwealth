@@ -76,8 +76,12 @@ const getTextRows = (
           >
             <User
               shouldHideAvatar
-              userAddress={subscription.Comment.author}
-              userCommunityId={subscription.Comment.communityId}
+              userAddress={subscription?.Comment?.author}
+              userCommunityId={subscription?.Comment?.communityId}
+              shouldShowAsDeleted={
+                !subscription?.Comment?.author &&
+                !subscription?.Comment?.communityId
+              }
             />
             &apos;
           </CWText>

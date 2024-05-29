@@ -1,6 +1,6 @@
 import { OfflineAminoSigner } from '@cosmjs/amino';
 import type { OfflineDirectSigner } from '@cosmjs/proto-signing';
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import { SecretUtils } from '@keplr-wallet/types/build/secretjs';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 

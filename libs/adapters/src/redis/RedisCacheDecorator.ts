@@ -1,5 +1,7 @@
 import { CacheNamespaces, ILogger, cache, logger } from '@hicommonwealth/core';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { fileURLToPath } from 'url';
+import { config } from '../config';
 import {
   CacheKeyDuration,
   CustomRequest,
@@ -33,9 +35,10 @@ export class CacheDecorator {
   private _disabled = false;
 
   constructor() {
-    this._log = logger().getLogger(__filename);
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     // If cache is disabled, skip caching
-    if (process.env.DISABLE_CACHE === 'true') {
+    if (config.CACHE.DISABLE_CACHE) {
       this._log.info(`cacheMiddleware: cache disabled`);
       this._disabled = true;
     }
@@ -275,7 +278,7 @@ export class CacheDecorator {
         this._log!.warn(
           `calling next from cacheMiddleware catch ${req.originalUrl}`,
         );
-        err instanceof Error && this._log!.warn(err.message, err);
+        err instanceof Error && this._log!.warn(err.message, { err });
         if (!isNextCalled) {
           return next();
         }

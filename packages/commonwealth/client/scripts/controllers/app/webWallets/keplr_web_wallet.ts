@@ -1,6 +1,6 @@
 import type { Window as KeplrWindow } from '@keplr-wallet/types';
 
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import KeplrLikeWebWalletController from './keplr_like_web_wallet';
 
 declare global {

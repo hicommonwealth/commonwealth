@@ -111,6 +111,21 @@
         flex-wrap: wrap;
         gap: 8px;
         padding-right: 72px; // hack to be removed on completion of discussion listings
+
+        @include extraSmall {
+          padding-right: 0;
+        }
+
+        .Text {
+          display: inline-block;
+
+          .Tag.contest {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+            margin-bottom: 8px;
+          }
+        }
       }
     }
 

@@ -5,12 +5,12 @@ import app from '../../state';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 import '../../../styles/modals/feedback_modal.scss';
 

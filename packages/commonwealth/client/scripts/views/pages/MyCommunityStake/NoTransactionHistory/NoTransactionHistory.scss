@@ -1,0 +1,48 @@
+@import '../../../../../styles/shared';
+
+.NoTransactionHistory {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  padding: 40px;
+
+  @include extraSmall {
+    padding: 24px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+
+    img {
+      height: 40px;
+      width: 40px;
+      max-width: 40px;
+      max-height: 40px;
+    }
+
+    .h4 {
+      text-align: center;
+    }
+
+    .b1 {
+      text-align: center;
+
+      a {
+        color: $primary-500;
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: $primary-500;
+        }
+      }
+    }
+  }
+}

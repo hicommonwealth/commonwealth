@@ -13,22 +13,6 @@
 .NotificationSettingsPage {
   flex: 1;
 
-  @include large {
-    padding: 24px 176px;
-  }
-
-  @include mediumInclusive {
-    padding: 24px 72px;
-  }
-
-  @include smallInclusive {
-    padding: 16px;
-  }
-
-  @include extraSmall {
-    padding: 16px;
-  }
-
   .snapshot-icon {
     height: 24px;
     width: 24px;
@@ -41,10 +25,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-right: 12px;
+    gap: 16px;
 
     .text-description {
-      margin-left: 42px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -61,8 +44,6 @@
   }
 
   .email-input-section {
-    margin-left: 42px;
-    margin-right: 12px;
     margin-bottom: 40px;
 
     .email-input-row {

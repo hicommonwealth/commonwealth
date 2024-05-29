@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { CommentInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getCommentDepth } from 'server/util/getCommentDepth';
@@ -25,7 +26,7 @@ describe('getCommentDepth', () => {
     for (let i = 0; i < maxDepth; i++) {
       const result = await models.Comment.create({
         community_id,
-        thread_id: String(thread.id),
+        thread_id: thread.id,
         parent_id: comment ? String(comment.id) : undefined,
         address_id: address.id,
         text: String(i),
@@ -33,6 +34,10 @@ describe('getCommentDepth', () => {
       comments.push(result);
       comment = result;
     }
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('should correctly calculate comment depth (recursion terminated naturally)', async () => {

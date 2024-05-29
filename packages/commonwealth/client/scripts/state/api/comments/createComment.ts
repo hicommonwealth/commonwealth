@@ -1,13 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
-  address: string;
+  profile: UserProfile;
   threadId: number;
   communityId: string;
   unescapedText: string;
@@ -17,7 +21,7 @@ interface CreateCommentProps {
 
 const createComment = async ({
   communityId,
-  address,
+  profile,
   threadId,
   unescapedText,
   parentCommentId = null,
@@ -26,7 +30,7 @@ const createComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment(address, {
+  } = await app.sessions.signComment(profile.address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -37,7 +41,7 @@ const createComment = async ({
     {
       author_community_id: communityId,
       community_id: communityId,
-      address: address,
+      address: profile.address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
@@ -47,6 +51,10 @@ const createComment = async ({
     },
   );
 
+  response.data.result.Address.User = {
+    Profiles: [profile],
+  };
+
   return new Comment(response.data.result);
 };
 
@@ -55,11 +63,15 @@ const useCreateCommentMutation = ({
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
     communityId,
     threadId,
   });
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   return useMutation({
     mutationFn: createComment,
@@ -73,6 +85,15 @@ const useCreateCommentMutation = ({
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
+      }
+
       return newComment;
     },
   });

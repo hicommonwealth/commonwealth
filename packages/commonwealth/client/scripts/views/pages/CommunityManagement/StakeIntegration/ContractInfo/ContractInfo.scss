@@ -1,0 +1,29 @@
+@import '../../../../../../styles/shared';
+
+.ContractInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .b1 {
+      color: $neutral-700;
+    }
+
+    .b2 {
+      color: $neutral-500;
+    }
+
+    .copy-icon {
+      margin-left: 8px;
+      font-size: 18px;
+      color: $neutral-500;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,0 +1,1 @@
+export { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';

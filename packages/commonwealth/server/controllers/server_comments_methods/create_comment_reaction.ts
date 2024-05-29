@@ -1,15 +1,11 @@
-import {
-  AppError,
-  NotificationCategories,
-  ServerError,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
+import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
@@ -128,16 +124,16 @@ export async function __createCommentReaction(
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id,
       );
-      const stakeBalance =
+      const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          community.namespace,
+          community.namespace_address,
           stake.stake_id,
           node.eth_chain_id,
-          address.address,
+          [address.address],
           node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
-        stakeBalance,
+        stakeBalances[address.address],
         voteWeight,
       );
     }

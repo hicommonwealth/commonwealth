@@ -33,10 +33,6 @@
     }
   }
 
-  .cursor-pointer {
-    cursor: pointer;
-  }
-
   .dot-indicator.Text {
     color: $neutral-400;
   }
@@ -54,6 +50,24 @@
 
     &:hover {
       text-decoration: underline;
+    }
+  }
+
+  .version-history {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;
+    gap: 16px;
+
+    .CWSelectList {
+      min-width: 202px;
+      margin-left: -20px;
+      margin-right: -8px;
+
+      .SelectList:not(:focus):not(:focus-within) {
+        border-color: transparent !important;
+      }
     }
   }
 

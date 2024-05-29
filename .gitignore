@@ -2,7 +2,7 @@ docker-compose.yaml
 stellar
 node_modules/
 **/build
-**/dist
+**/*.tsbuildinfo
 **/.DS_Store
 *.env
 *.log
@@ -13,3 +13,6 @@ node_modules/
 redis-data
 **/.nyc_output
 **/dependency-graph.svg
+.ghostal
+*dump.sql
+**/yarn.lock

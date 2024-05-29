@@ -1,5 +1,5 @@
-import { NotificationCategories } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import request from 'superagent';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../../../config';
 import {

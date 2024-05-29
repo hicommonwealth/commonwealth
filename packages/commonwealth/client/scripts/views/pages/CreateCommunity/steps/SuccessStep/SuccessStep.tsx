@@ -3,7 +3,7 @@ import React from 'react';
 import { useAnimation } from 'hooks/useAnimation';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import './SuccessStep.scss';
 

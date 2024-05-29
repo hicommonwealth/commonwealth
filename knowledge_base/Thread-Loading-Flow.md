@@ -6,8 +6,6 @@ This doc describes the current state of thread flow + process logic, in as much 
 
 Providing a solution to improve existing thread workflows is a non-goal of this document.
 
-# Code Audit
-
 ## Threads Init
 
 1. In `state.ts`, the `/status` endpoint responds with recent threads (`recentThreads`) that are stored in `recent_activity.ts` and then used in different parts of the app to sort the communities/chains based on threads count.
@@ -25,7 +23,7 @@ Providing a solution to improve existing thread workflows is a non-goal of this 
 6. The `/reactionsCounts` api responds with user interaction data from the provided thread ids as payload. This data is then propagated to the `reactionCounts.ts` store and used in different parts of the app for reaction counts.
 7. `threads.ts` calls a method in `threadsUsersCountAndAvatars.ts`. The `/threadsUsersCountAndAvatars` api is triggered again but this time it is given given threads from the `/bulkThreads` api response as payload. The new response is handled in the same way. At this time we dont query for pinned threads (we don’t send the boolean pinned key as payload)
 
-#### Thread init on the “viewing a thread” page
+### Thread init on the “viewing a thread” page
 
 - The `/getThreads` api will get a thread details from the api. This is then added/merged/updated in `store` substore in `threads.ts`, if this thread was not fetched before then the `app.threads.numTotalThreads` is incremented by 1.
 - The `/reactionCounts` api is triggered and response is added to the `reactionCounts.ts` store and used in different parts of the app for reaction counts.

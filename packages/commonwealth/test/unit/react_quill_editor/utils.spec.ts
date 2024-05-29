@@ -111,11 +111,11 @@ describe('react quill editor unit tests', () => {
     });
 
     it('should deserialize a string (richtext) to DeltaStatic - bad input case', () => {
-      // bad input should return an empty richtext delta
+      // bad input should return an empty richtext delta with markdown true
       const original = null;
       const expectedOutput = {
         ops: [{ insert: '' }],
-        ___isMarkdown: false,
+        ___isMarkdown: true,
       } as SerializableDeltaStatic;
       const result = deserializeDelta(original);
       assert.deepEqual(result, expectedOutput);

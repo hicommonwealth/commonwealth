@@ -1,50 +1,43 @@
-import { models } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import cookieParser from 'cookie-parser';
-import express, { RequestHandler, json, urlencoded } from 'express';
-import session from 'express-session';
-import passport from 'passport';
-import { SESSION_SECRET } from 'server/config';
-import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
 
-const SequelizeStore = SessionSequelizeStore(session.Store);
+// const SequelizeStore = SessionSequelizeStore(session.Store);
 
-const sessionStore = new SequelizeStore({
-  db: models.sequelize,
-  tableName: 'Sessions',
-  checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-  expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
-});
+// const sessionStore = new SequelizeStore({
+//   db: models.sequelize,
+//   tableName: 'Sessions',
+//   checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+//   expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
+// });
 
-const sessionParser = session({
-  secret: SESSION_SECRET,
-  store: sessionStore,
-  resave: false,
-  saveUninitialized: true,
-});
+// const sessionParser = session({
+//   secret: SESSION_SECRET,
+//   store: sessionStore,
+//   resave: false,
+//   saveUninitialized: true,
+// });
 
-export const app = express();
-before(async () => {
-  app.use('/static', express.static('static'));
+// export const app = express();
+// before(async () => {
 
-  app.use(json() as RequestHandler);
-  app.use(urlencoded({ extended: false }) as RequestHandler);
-  app.use(cookieParser());
-  app.use(sessionParser);
-  setupPassport(models);
-  app.use(passport.initialize());
-  app.use(passport.session());
-});
+//   app.use('/static', express.static('static'));
+
+//   app.use(json() as RequestHandler);
+//   app.use(urlencoded({ extended: false }) as RequestHandler);
+//   app.use(cookieParser());
+//   app.use(sessionParser);
+//   setupPassport(models);
+//   app.use(passport.initialize());
+//   app.use(passport.session());
+// });
 
 export async function get(
   path: string,
   val: Record<string, unknown> = null,
   expectError = false,
-  passedApp = app,
+  passedApp,
 ) {
   const res = <any>(
     await chai
@@ -67,7 +60,7 @@ export async function put(
   path: string,
   val: Record<string, unknown>,
   expectError = false,
-  passedApp = app,
+  passedApp,
 ) {
   const res = <any>(
     await chai
@@ -90,7 +83,7 @@ export async function post(
   path: string,
   val: Record<string, unknown>,
   expectError = false,
-  expectedApp = app,
+  expectedApp,
 ) {
   const res = <any>(
     await chai
@@ -113,7 +106,7 @@ export async function del(
   path: string,
   val: Record<string, unknown>,
   expectError = false,
-  expectedApp = app,
+  expectedApp,
 ) {
   const res = <any>(
     await chai

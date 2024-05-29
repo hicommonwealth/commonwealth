@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import app from 'state';
 

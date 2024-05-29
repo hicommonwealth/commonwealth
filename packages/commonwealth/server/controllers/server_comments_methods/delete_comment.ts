@@ -79,7 +79,7 @@ export async function __deleteComment(
   // use callbacks so route returns and this completes in the background
   if (this.globalActivityCache) {
     this.globalActivityCache.deleteActivityFromCache(
-      parseInt(comment.thread_id, 10),
+      comment.thread_id,
       comment.id,
     );
   }

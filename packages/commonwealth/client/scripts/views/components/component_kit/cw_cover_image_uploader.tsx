@@ -1,11 +1,10 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useEffect, useMemo, useRef } from 'react';
-
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
-import { CWButton as OldCWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
-import { CWButton } from './new_designs/cw_button';
+import { CWButton } from './new_designs/CWButton';
 
 import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
@@ -83,6 +82,8 @@ export const CWCoverImageUploader = ({
   const attachButton = React.useRef<HTMLDivElement>(null);
   const pseudoInput = React.useRef<HTMLInputElement>(null);
 
+  const { isWindowExtraSmall } = useBrowserWindow({});
+
   const formContext = useFormContext();
   hookToForm && name && formContext.register(name);
   const formFieldErrorMessage =
@@ -102,7 +103,7 @@ export const CWCoverImageUploader = ({
       attachButton.current.style.display = 'flex';
 
       setImageURL(defaultFormContext.value);
-      setImageBehavior(ImageBehavior.Circle);
+      setImageBehavior(defaultImageBehaviour || ImageBehavior.Circle);
       setDefaultFormContext({
         isSet: true,
         value: defaultFormContext.value,
@@ -353,9 +354,9 @@ export const CWCoverImageUploader = ({
         {uploadStatus === 'success' &&
           enableGenerativeAI &&
           !showUploadAndGenerateText && (
-            <OldCWButton
+            <CWButton
               label="retry"
-              buttonType="mini-black"
+              buttonHeight="sm"
               className="retry-button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -399,9 +400,9 @@ export const CWCoverImageUploader = ({
                   }}
                   containerClassName="prompt-input"
                 />
-                <OldCWButton
+                <CWButton
                   label="Generate"
-                  buttonType="mini-black"
+                  buttonHeight="sm"
                   className="generate-btn"
                   onClick={async () => {
                     if (prompt.length < 1) return;
@@ -438,11 +439,12 @@ export const CWCoverImageUploader = ({
           )}
           {showUploadAndGenerateText && !isUploading && !imageURL && (
             <CWText
-              type="caption"
+              type={isWindowExtraSmall ? 'caption' : 'b1'}
               fontWeight="medium"
               className="upload-generate-text"
             >
-              Drag an image here or generate one below
+              {isWindowExtraSmall ? 'Tap ' : 'Click or drag '}
+              to upload an image here or generate one below
             </CWText>
           )}
           {enableGenerativeAI && !isUploading && (

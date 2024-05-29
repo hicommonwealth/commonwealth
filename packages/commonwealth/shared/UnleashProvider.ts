@@ -7,8 +7,7 @@ import {
   ResolutionDetails,
   StandardResolutionReasons,
 } from '@openfeature/web-sdk';
-import { UnleashClient } from 'unleash-proxy-client';
-import { IToggle } from 'unleash-proxy-client/src';
+import { IToggle, UnleashClient } from 'unleash-proxy-client';
 
 export class UnleashProvider implements Provider {
   readonly metadata: ProviderMetadata = {

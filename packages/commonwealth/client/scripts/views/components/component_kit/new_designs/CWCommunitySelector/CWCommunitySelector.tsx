@@ -5,11 +5,12 @@ import { ComponentType } from '../../types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import './CWCommunitySelector.scss';
 
 export enum CommunityType {
   Blast = 'blast',
+  Base = 'base',
   Ethereum = 'ethereum',
   Cosmos = 'cosmos',
   Polygon = 'polygon',
@@ -30,7 +31,8 @@ interface CWCommunitySelectorProps {
 }
 
 const BLAST_LOGO =
-  'https://assets-global.website-files.com/65a6baa1a3f8ed336f415cb4/65a6c39bae6093c6653dd016_Logo%20Yellow%20on%20Black%20Background%202x-p-500.png';
+  'https://assets-global.website-files.com/65a6baa1a3f8ed336f415cb4/65a6c39bae6093c6653dd016_' +
+  'Logo%20Yellow%20on%20Black%20Background%202x-p-500.png';
 
 const CWCommunitySelector = ({
   type,

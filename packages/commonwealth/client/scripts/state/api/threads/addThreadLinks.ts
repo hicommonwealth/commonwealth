@@ -5,7 +5,7 @@ import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface AddThreadLinksProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   links: Link[];
 }
@@ -27,18 +27,18 @@ const addThreadLinks = async ({
 };
 
 interface UseAddThreadLinksMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
 }
 
 const useAddThreadLinksMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: UseAddThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: addThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      updateThreadInAllCaches(communityId, threadId, updatedThread);
       return updatedThread;
     },
   });

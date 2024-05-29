@@ -3216,6 +3216,37 @@ export const CWTwitterNew = (props: IconProps) => {
   );
 };
 
+export const CWTwitterX = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      {...otherProps}
+    >
+      <path
+        d="M18.8274 2.25H22.1354L14.9084 10.51L23.4104 21.75H16.7534L11.5394 14.933L5.5734 21.75H2.2634L9.9934 12.915L1.8374 2.25H8.6634L13.3764 8.481L18.8274 2.25ZM17.6664 19.77H19.4994L7.6674 4.126H5.7004L17.6664 19.77Z"
+        fill="black"
+      />
+    </svg>
+  );
+};
+
 export const CWUnsubscribe = (props: IconProps) => {
   const {
     className,

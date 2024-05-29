@@ -8,7 +8,7 @@
   width: 392px;
   border-radius: 6px;
 
-  @include mediumSmallInclusive {
+  @include smallInclusive {
     min-height: 144px;
     max-width: 200px;
     min-width: 200px;

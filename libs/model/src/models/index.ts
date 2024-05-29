@@ -1,92 +1,46 @@
-import type { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
+import { buildAssociations } from './associations';
+import { Factories, type DB } from './factories';
+import { createFk, dropFk, manyToMany, oneToMany, oneToOne } from './utils';
 
-import type { AddressModelStatic } from './address';
-import type { BanModelStatic } from './ban';
-import type { ChainNodeModelStatic } from './chain_node';
-import type { CollaborationModelStatic } from './collaboration';
-import type { CommentModelStatic } from './comment';
-import type { CommunityModelStatic } from './community';
-import type { CommunityBannerModelStatic } from './community_banner';
-import type { CommunityContractModelStatic } from './community_contract';
-import type { CommunityContractTemplateMetadataStatic } from './community_contract_metadata';
-import type { CommunityContractTemplateStatic } from './community_contract_template';
-import type { CommunitySnapshotSpaceModelStatic } from './community_snapshot_spaces';
-import type { CommunityStakeModelStatic } from './community_stake';
-import type { ContractModelStatic } from './contract';
-import type { ContractAbiModelStatic } from './contract_abi';
-import type { DiscordBotConfigModelStatic } from './discord_bot_config';
-import type { EvmEventSourceModelStatic } from './evmEventSource';
-import type { GroupModelStatic } from './group';
-import type { LastProcessedEvmBlockModelStatic } from './lastProcessedEvmBlock';
-import type { LoginTokenModelStatic } from './login_token';
-import type { MembershipModelStatic } from './membership';
-import type { NotificationModelStatic } from './notification';
-import type { NotificationCategoryModelStatic } from './notification_category';
-import type { NotificationsReadModelStatic } from './notifications_read';
-import type { OutboxModelStatic } from './outbox';
-import type { PollModelStatic } from './poll';
-import type { ProfileModelStatic } from './profile';
-import type { ReactionModelStatic } from './reaction';
-import type { SnapshotProposalModelStatic } from './snapshot_proposal';
-import type { SnapshotSpaceModelStatic } from './snapshot_spaces';
-import type { SsoTokenModelStatic } from './sso_token';
-import type { StarredCommunityModelStatic } from './starred_community';
-import type { SubscriptionModelStatic } from './subscription';
-import type { TemplateModelStatic } from './template';
-import type { ThreadModelStatic } from './thread';
-import type { TopicModelStatic } from './topic';
-import type { UserModelStatic } from './user';
-import type { VoteModelStatic } from './vote';
-import { WalletModelStatic } from './wallets';
-import type { WebhookModelStatic } from './webhook';
-
-export type Models = {
-  Address: AddressModelStatic;
-  Ban: BanModelStatic;
-  Community: CommunityModelStatic;
-  ChainNode: ChainNodeModelStatic;
-  Contract: ContractModelStatic;
-  ContractAbi: ContractAbiModelStatic;
-  CommunityContract: CommunityContractModelStatic;
-  CommunityContractTemplate: CommunityContractTemplateStatic;
-  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
-  CommunityStake: CommunityStakeModelStatic;
-  Template: TemplateModelStatic;
-  CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
-  Collaboration: CollaborationModelStatic;
-  CommunityBanner: CommunityBannerModelStatic;
-  DiscordBotConfig: DiscordBotConfigModelStatic;
-  EvmEventSource: EvmEventSourceModelStatic;
-  LastProcessedEvmBlock: LastProcessedEvmBlockModelStatic;
-  LoginToken: LoginTokenModelStatic;
-  Notification: NotificationModelStatic;
-  NotificationCategory: NotificationCategoryModelStatic;
-  NotificationsRead: NotificationsReadModelStatic;
-  Comment: CommentModelStatic;
-  Poll: PollModelStatic;
-  Group: GroupModelStatic;
-  Membership: MembershipModelStatic;
-  Reaction: ReactionModelStatic;
-  Thread: ThreadModelStatic;
-  Topic: TopicModelStatic;
-  Vote: VoteModelStatic;
-  Profile: ProfileModelStatic;
-  SsoToken: SsoTokenModelStatic;
-  StarredCommunity: StarredCommunityModelStatic;
-  SnapshotProposal: SnapshotProposalModelStatic;
-  Subscription: SubscriptionModelStatic;
-  SnapshotSpace: SnapshotSpaceModelStatic;
-  User: UserModelStatic;
-  Webhook: WebhookModelStatic;
-  Outbox: OutboxModelStatic;
-  Wallets: WalletModelStatic;
+export type { DB };
+/**
+ * Wraps sequelize sync with the process of building composite foreign key constraints
+ * - This is not yet supported by sequelize
+ */
+export const syncDb = async (db: DB, log = false) => {
+  const fks = Object.keys(Factories).flatMap(
+    (k) => db[k as keyof typeof Factories]._fks,
+  );
+  fks.forEach((fk) => dropFk(db.sequelize, fk));
+  await db.sequelize.sync({
+    force: true,
+    logging: log ? console.log : false,
+  });
+  fks.forEach((fk) => createFk(db.sequelize, fk));
 };
 
-export type DB = Models & {
-  sequelize: Sequelize;
-  Sequelize: typeof Sequelize;
+/**
+ * Builds sequelize models by invoking factories with a sequelize instance, and linking associations
+ * @param sequelize sequelize instance
+ * @returns built db model
+ */
+export const buildDb = (sequelize: Sequelize): DB => {
+  const models = Object.entries(Factories).map(([key, factory]) => [
+    key,
+    Object.assign(factory(sequelize), {
+      _fks: [],
+      withOne: oneToOne,
+      withMany: oneToMany,
+      withManyToMany: manyToMany,
+    }),
+  ]);
+  const db = { sequelize, Sequelize, ...Object.fromEntries(models) } as DB;
+  buildAssociations(db);
+  return db;
 };
 
+// TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
 export * from './ban';
 export * from './chain_node';
@@ -95,11 +49,11 @@ export * from './comment';
 export * from './community';
 export * from './community_banner';
 export * from './community_contract';
-export * from './community_contract_metadata';
 export * from './community_contract_template';
+export * from './community_contract_template_metadata';
 export * from './community_role';
-export * from './community_snapshot_spaces';
 export * from './community_stake';
+export * from './community_tags';
 export * from './contract';
 export * from './contract_abi';
 export * from './discord_bot_config';
@@ -114,14 +68,15 @@ export * from './notifications_read';
 export * from './outbox';
 export * from './poll';
 export * from './profile';
+export * from './profile_tags';
 export * from './reaction';
 export * from './role';
 export * from './role_assignment';
-export * from './snapshot_proposal';
-export * from './snapshot_spaces';
 export * from './sso_token';
+export * from './stake_transaction';
 export * from './starred_community';
 export * from './subscription';
+export * from './tags';
 export * from './template';
 export * from './thread';
 export * from './topic';

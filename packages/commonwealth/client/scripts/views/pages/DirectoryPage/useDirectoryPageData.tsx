@@ -1,3 +1,4 @@
+import app from 'client/scripts/state';
 import { isCommandClick } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import ChainInfo from 'models/ChainInfo';
@@ -55,8 +56,10 @@ const useDirectoryPageData = ({
   const relatedCommunitiesData = useMemo(
     () =>
       relatedCommunities.map((c) => ({
+        ChainNode: app.config.nodes.getById(c.chain_node_id),
         name: c.community,
         nameLower: c.community.toLowerCase(),
+        namespace: c.namespace,
         description: c.description,
         members: c.address_count,
         threads: c.thread_count,

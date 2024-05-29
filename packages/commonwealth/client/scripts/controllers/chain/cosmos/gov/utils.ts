@@ -1,4 +1,4 @@
-import { CosmosGovernanceVersion } from '@hicommonwealth/core';
+import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import Cosmos from '../adapter';
 import CosmosGovernanceV1 from './v1/governance-v1';
 import { CosmosProposalV1 } from './v1/proposal-v1';

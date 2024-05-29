@@ -4,13 +4,13 @@ import React from 'react';
 import app from 'state';
 import { useDeleteGroupMutation } from 'state/api/groups';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './DeleteGroupModal.scss';
 
 type DeleteGroupModalAttrs = {
@@ -30,13 +30,13 @@ export const DeleteGroupModal = ({
 }: DeleteGroupModalAttrs) => {
   const navigate = useCommonNavigate();
   const { mutateAsync: deleteGroup } = useDeleteGroupMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const handleDelete = async () => {
     await deleteGroup({
       address: app.user.activeAccount.address,
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       groupId: groupId,
     })
       .then(() => {

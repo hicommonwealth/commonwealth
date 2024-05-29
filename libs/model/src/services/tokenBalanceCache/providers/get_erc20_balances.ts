@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import AbiCoder from 'web3-eth-abi';
+import { fileURLToPath } from 'url';
+import * as AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
@@ -9,7 +10,8 @@ import {
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export type GetErc20BalancesOptions = {
   chainNode: ChainNodeInstance;
@@ -145,10 +147,7 @@ async function getErc20Balance(
     return {};
   } else {
     return {
-      [address]: AbiCoder.decodeParameter(
-        'uint256',
-        data.result,
-      ) as unknown as string,
+      [address]: String(AbiCoder.decodeParameter('uint256', data.result)),
     };
   }
 }

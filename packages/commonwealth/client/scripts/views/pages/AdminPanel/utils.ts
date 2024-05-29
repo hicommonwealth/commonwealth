@@ -1,4 +1,4 @@
-import { BalanceType } from '@hicommonwealth/core';
+import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
 
@@ -70,6 +70,20 @@ export const updateCommunityId = async ({ community_id, new_community_id }) => {
     community_id,
     new_community_id,
     redirect: true,
+  });
+};
+
+export const updateCommunityCustomDomain = async ({
+  community_id,
+  custom_domain,
+}: {
+  community_id: string;
+  custom_domain: string;
+}) => {
+  await axios.patch(`${app.serverUrl()}/communities/${community_id}`, {
+    jwt: app.user.jwt,
+    id: community_id,
+    custom_domain,
   });
 };
 

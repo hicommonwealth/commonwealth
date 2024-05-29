@@ -1,7 +1,5 @@
-import { DB } from '@hicommonwealth/model';
+import { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import BanCache from '../util/banCheckCache';
-
-import GlobalActivityCache from '../util/globalActivityCache';
 
 import {
   CreateCommentReactionOptions,

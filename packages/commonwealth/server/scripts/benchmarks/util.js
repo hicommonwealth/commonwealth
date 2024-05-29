@@ -1,11 +1,11 @@
-const { performance } = require('perf_hooks');
-const fs = require('fs');
+import fs from 'fs';
+import { performance } from 'perf_hooks';
 
 export function getStandardDeviation(array) {
   const n = array.length;
   const mean = array.reduce((a, b) => a + b) / n;
   return Math.sqrt(
-    array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n
+    array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n,
   );
 }
 
@@ -32,7 +32,7 @@ export function syncPerformanceTester(
   numIter,
   execFunc,
   log,
-  outputFile
+  outputFile,
 ) {
   const results = [];
   for (let i = 0; i < numSamples; i++) {
@@ -60,7 +60,7 @@ export function syncPerformanceTester(
       sum / results.length
     }` +
     `\tStandard Deviation: ${getStandardDeviation(
-      results
+      results,
     )}\t Median: ${getMedian(results)}`;
   if (log) console.log(logString);
   if (outputFile) {

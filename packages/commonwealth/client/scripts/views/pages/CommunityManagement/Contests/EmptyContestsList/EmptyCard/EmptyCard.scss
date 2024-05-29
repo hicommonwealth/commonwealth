@@ -1,0 +1,26 @@
+@import '../../../../../../../styles/shared';
+
+.EmptyCard {
+  display: flex;
+  padding: 40px 100px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  max-width: 600px;
+  text-align: center;
+  gap: 24px;
+
+  @include extraSmall {
+    padding: 40px 16px;
+  }
+
+  .Text {
+    justify-content: center;
+  }
+
+  .subtitle {
+    color: $neutral-600;
+  }
+}

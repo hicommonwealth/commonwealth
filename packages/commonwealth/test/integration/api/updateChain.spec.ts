@@ -1,11 +1,12 @@
-import { ChainBase, ChainType } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import {
-  CommunityAttributes,
-  UserInstance,
-  models,
   tester,
   tokenBalanceCache,
+  type CommunityAttributes,
+  type DB,
+  type UserInstance,
 } from '@hicommonwealth/model';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { assert } from 'chai';
 import Sinon from 'sinon';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
@@ -26,8 +27,14 @@ const baseRequest: CommunityAttributes = {
 };
 
 describe('UpdateChain Tests', () => {
+  let models: DB;
+
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
+  });
+
+  after(async () => {
+    await dispose()();
   });
 
   it('Correctly updates chain', async () => {

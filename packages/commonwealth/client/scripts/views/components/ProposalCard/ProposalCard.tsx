@@ -5,13 +5,13 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 
+import { slugify } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import {
   useCosmosProposalMetadataQuery,
   useCosmosProposalTallyQuery,
 } from 'state/api/proposals';
-import { slugify } from 'utils';
 import { CWCard } from '../component_kit/cw_card';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';

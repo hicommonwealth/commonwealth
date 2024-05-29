@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { NewSnapshotProposalModal } from '../../modals/new_snapshot_proposal_modal';
 
@@ -37,7 +37,7 @@ export const SnapshotCreationCard = ({
             </CWText>
             {allowSnapshotCreation && (
               <CWButton
-                buttonType="mini-black"
+                buttonHeight="sm"
                 label="Create Snapshot"
                 onClick={() => setIsModalOpen(true)}
               />

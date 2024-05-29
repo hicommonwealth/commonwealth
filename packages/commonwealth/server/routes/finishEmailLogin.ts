@@ -1,5 +1,6 @@
-import { NotificationCategories, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -111,7 +112,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     });
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
-    const newUser = await models.User.createWithProfile(models, {
+    const newUser = await models.User.createWithProfile({
       email: email as string,
       emailVerified: true,
     });

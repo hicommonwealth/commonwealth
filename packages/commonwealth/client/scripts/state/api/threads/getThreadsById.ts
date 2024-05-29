@@ -7,20 +7,20 @@ import { ApiEndpoints } from 'state/api/config';
 const THREAD_STALE_TIME = 5000; // 5 seconds
 
 interface GetThreadsByIdProps {
-  chainId: string;
+  communityId: string;
   ids: number[];
   apiCallEnabled?: boolean;
 }
 
 const getThreadsById = async ({
-  chainId,
+  communityId,
   ids,
 }: GetThreadsByIdProps): Promise<Thread[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
     {
       params: {
-        community_id: chainId,
+        community_id: communityId,
         thread_ids: ids,
       },
     },
@@ -30,7 +30,7 @@ const getThreadsById = async ({
 };
 
 const useGetThreadsByIdQuery = ({
-  chainId,
+  communityId,
   ids = [],
   apiCallEnabled,
 }: GetThreadsByIdProps) => {
@@ -38,11 +38,11 @@ const useGetThreadsByIdQuery = ({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       ApiEndpoints.FETCH_THREADS,
-      chainId,
+      communityId,
       'single',
       ...ids.sort((a, b) => a - b),
     ],
-    queryFn: () => getThreadsById({ chainId, ids }),
+    queryFn: () => getThreadsById({ communityId, ids }),
     staleTime: THREAD_STALE_TIME,
     enabled: apiCallEnabled,
   });

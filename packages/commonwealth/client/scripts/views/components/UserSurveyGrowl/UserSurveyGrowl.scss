@@ -1,0 +1,79 @@
+@import '../../../../styles/shared';
+
+.UserSurveyGrowl {
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-bottom-left-radius: 0.3125rem;
+  border-bottom-right-radius: 0.3125rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.5);
+
+  .closeButton {
+    align-self: flex-end;
+    cursor: pointer;
+    position: absolute;
+    color: $white;
+    top: 1rem;
+    right: 0rem;
+    z-index: 2;
+
+    &:hover {
+      color: $neutral-400;
+    }
+  }
+
+  .img {
+    width: 320px;
+    height: 200px;
+    margin-bottom: 8px;
+    cursor: default;
+    border-top-left-radius: 0.3125rem;
+    border-top-right-radius: 0.3125rem;
+    overflow: hidden;
+    background-color: $black;
+    z-index: 1;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    gap: 1rem;
+    cursor: default;
+
+    .subtitle-text {
+      margin-top: -12px;
+    }
+
+    .body {
+      color: $neutral-600;
+      font-weight: 400;
+    }
+  }
+
+  .icon {
+    align-self: center;
+    padding-left: 6px;
+  }
+
+  .checkboxContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 20px;
+
+    .checkbox {
+      cursor: pointer;
+      color: $neutral-400;
+    }
+  }
+}

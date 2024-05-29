@@ -10,7 +10,7 @@ import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
-import { ChainNetwork } from '@hicommonwealth/core';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
@@ -18,7 +18,7 @@ import {
   useAaveProposalVotesQuery,
   useCompoundProposalVotesQuery,
 } from 'state/api/proposals';
-import Web3 from 'web3-utils';
+import { Web3 } from 'web3';
 import {
   AaveVotingResult,
   CompletedProposalVotingResult,
@@ -127,7 +127,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     );
 
     const yesBalanceString = `${formatNumberLong(
-      +Web3.fromWei(yesBalance.toString()),
+      +Web3.utils.fromWei(yesBalance.toString(), 'ether'),
     )} ${app.chain.meta.default_symbol}`;
 
     const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
@@ -138,7 +138,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     );
 
     const noBalanceString = `${formatNumberLong(
-      +Web3.fromWei(noBalance.toString()),
+      +Web3.utils.fromWei(noBalance.toString(), 'ether'),
     )} ${app.chain.meta.default_symbol}`;
 
     return (

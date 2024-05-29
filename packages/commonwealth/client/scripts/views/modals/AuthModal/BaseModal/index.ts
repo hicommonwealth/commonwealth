@@ -1,1 +1,0 @@
-export { BaseModal } from './BaseModal';

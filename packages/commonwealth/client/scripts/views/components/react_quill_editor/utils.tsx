@@ -98,7 +98,7 @@ export const uploadFileToS3 = async (
 
     // upload the file via the signed URL
     await axios.put(signedUploadUrl, compressedFile, {
-      params: {
+      headers: {
         'Content-Type': file.type,
       },
     });
@@ -130,7 +130,7 @@ export const deserializeDelta = (str: string): DeltaStatic => {
   try {
     if (typeof str !== 'string') {
       // empty richtext delta
-      return createDeltaFromText('', false);
+      return createDeltaFromText('', true);
     }
     // is richtext delta object
     const delta: DeltaStatic = JSON.parse(str);

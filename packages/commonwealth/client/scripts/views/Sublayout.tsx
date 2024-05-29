@@ -1,21 +1,30 @@
 import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { getUniqueUserAddresses } from '../helpers/user';
+import { useFlag } from '../hooks/useFlag';
+import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import useStickyHeader from '../hooks/useStickyHeader';
+import useUserLoggedIn from '../hooks/useUserLoggedIn';
+import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
-import { StakeGrowl } from './components/StakeGrowl';
+import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
+import { AuthModal, AuthModalType } from './modals/AuthModal';
+import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -27,18 +36,105 @@ const Sublayout = ({
   hideFooter = true,
   isInsideCommunity,
 }: SublayoutProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const [authModalType, setAuthModalType] = useState<AuthModalType>();
+  useStickyHeader({
+    elementId: 'mobile-auth-buttons',
+    stickyBehaviourEnabled: userOnboardingEnabled,
+    zIndex: 70,
+  });
   const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const communityStakeEnabled = useFlag('communityStake');
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
 
-  const { toggleMobileView } = useWindowResize({
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
+
+  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+
+  const {
+    onboardedProfiles,
+    setProfileAsOnboarded,
+    isWelcomeOnboardModalOpen,
+    setIsWelcomeOnboardModalOpen,
+  } = useWelcomeOnboardModal();
+
+  useNecessaryEffect(() => {
+    if (
+      isLoggedIn &&
+      userOnboardingEnabled &&
+      !isWelcomeOnboardModalOpen &&
+      profileId
+    ) {
+      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
+      const hasUsername = app?.user?.addresses?.find(
+        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
+      );
+
+      const userUniqueAddresses = getUniqueUserAddresses({});
+
+      // open welcome modal if user is not onboarded and there is a single connected address
+      if (
+        !hasUsername &&
+        !onboardedProfiles[profileId] &&
+        userUniqueAddresses.length === 1
+      ) {
+        setIsWelcomeOnboardModalOpen(true);
+      }
+
+      // if the user has a set username, mark as onboarded
+      if (hasUsername && !onboardedProfiles[profileId]) {
+        setProfileAsOnboarded(profileId);
+      }
+    }
+
+    if (!isLoggedIn && isWelcomeOnboardModalOpen) {
+      setIsWelcomeOnboardModalOpen(false);
+    }
+  }, [
+    profileId,
+    onboardedProfiles,
+    userOnboardingEnabled,
+    isWelcomeOnboardModalOpen,
+    setIsWelcomeOnboardModalOpen,
+    isLoggedIn,
+  ]);
+
+  const location = useLocation();
+
+  useWindowResize({
     setMenu,
   });
+
+  const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
+
+  const routesWithoutGenericSliders = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -77,6 +173,14 @@ const Sublayout = ({
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
         isInsideCommunity={isInsideCommunity}
+        onAuthModalOpen={(modalType) =>
+          setAuthModalType(modalType || AuthModalType.SignIn)
+        }
+      />
+      <AuthModal
+        type={authModalType}
+        onClose={() => setAuthModalType(undefined)}
+        isOpen={!!authModalType}
       />
       <div className="sidebar-and-body-container">
         <Sidebar
@@ -100,17 +204,35 @@ const Sublayout = ({
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
-            {!toggleMobileView && (
-              <div className="breadcrumbContainer">
-                <Breadcrumbs />
-              </div>
+            <div
+              className={clsx('mobile-auth-buttons', {
+                isVisible:
+                  !isLoggedIn && userOnboardingEnabled && isWindowExtraSmall,
+              })}
+              id="mobile-auth-buttons"
+            >
+              <AuthButtons
+                fullWidthButtons
+                onButtonClick={(selectedType) => setAuthModalType(selectedType)}
+              />
+            </div>
+            {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
+            {userOnboardingEnabled && !routesWithoutGenericSliders && (
+              <UserTrainingSlider />
             )}
-            {isInsideCommunity && <AdminOnboardingSlider />}
+            {isInsideCommunity && !routesWithoutGenericSliders && (
+              <AdminOnboardingSlider />
+            )}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
-        {communityStakeEnabled && !isWindowExtraSmall && <StakeGrowl />}
+        {userOnboardingEnabled && (
+          <WelcomeOnboardModal
+            isOpen={isWelcomeOnboardModalOpen}
+            onClose={() => setIsWelcomeOnboardModalOpen(false)}
+          />
+        )}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

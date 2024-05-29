@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 
 import './MobileSearchModal.scss';

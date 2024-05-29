@@ -8,7 +8,7 @@ import {
   useRemoveDiscordBotConfigMutation,
 } from 'state/api/discord';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './Discord.scss';
 import { DiscordConnections } from './DiscordConnections';

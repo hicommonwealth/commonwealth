@@ -28,7 +28,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
   width: 100%;
   overflow-y: scroll;
 
@@ -36,8 +35,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    width: 796px;
-    padding-top: 16px;
 
     @include smallInclusive {
       width: 100%;

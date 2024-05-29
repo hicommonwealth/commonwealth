@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Link, LinkSource, ThreadInstance } from '@hicommonwealth/model';
+import { ThreadInstance } from '@hicommonwealth/model';
+import { LinkSource, type Link } from '@hicommonwealth/shared';
 import type { NextFunction } from 'express';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';

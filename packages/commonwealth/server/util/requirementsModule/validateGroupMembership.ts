@@ -1,14 +1,14 @@
 import {
+  MembershipRejectReason,
+  OptionsWithBalances,
+} from '@hicommonwealth/model';
+import {
   AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
-} from '@hicommonwealth/core';
-import {
-  MembershipRejectReason,
-  OptionsWithBalances,
-} from '@hicommonwealth/model';
-import { toBN } from 'web3-utils';
+} from '@hicommonwealth/shared';
+import { toBigInt } from 'web3-utils';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -99,6 +99,12 @@ function _thresholdCheck(
     let chainId: string;
     let tokenId: string;
     switch (thresholdData.source.source_type) {
+      case 'spl': {
+        balanceSourceType = BalanceSourceType.SPL;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id.toString();
+        break;
+      }
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
@@ -171,6 +177,8 @@ function _thresholdCheck(
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.cosmosChainId.toString() === chainId
             );
+          case BalanceSourceType.SPL:
+            return b.options.mintAddress == contractAddress;
           default:
             return null;
         }
@@ -180,7 +188,7 @@ function _thresholdCheck(
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = toBN(balance).gt(toBN(thresholdData.threshold));
+    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
     return {
       result,
       message: !result

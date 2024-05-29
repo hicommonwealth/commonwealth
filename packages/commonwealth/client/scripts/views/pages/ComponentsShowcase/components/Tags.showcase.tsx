@@ -5,8 +5,8 @@ import { CWIdentificationTag } from 'views/components/component_kit/new_designs/
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
 const TagsShowcase = () => {
-  const allCommunities = app.config.chains.getAll();
-  const [communityId, setCommunityId] = useState(allCommunities[1]);
+  const dydx = app.config.chains.getById('dydx');
+  const [communityId, setCommunityId] = useState(dydx);
 
   return (
     <>
@@ -49,9 +49,9 @@ const TagsShowcase = () => {
       <div className="flex-row">
         {communityId && (
           <CWTag
-            label={allCommunities[1].name}
+            label={dydx.name}
             type="input"
-            community={allCommunities[1]}
+            community={dydx}
             onClick={() => setCommunityId(null)}
           />
         )}
@@ -92,6 +92,15 @@ const TagsShowcase = () => {
       <CWText type="h5">Identification</CWText>
       <div className="flex-row">
         <CWIdentificationTag address="0x725D899B56630780344F00146E1B29aBEf6D6303" />
+      </div>
+
+      <CWText type="h5">Contest</CWText>
+      <div className="flex-row">
+        <CWTag label="1st" type="contest" classNames="prize-1" />
+        <CWTag label="2nd" type="contest" classNames="prize-2" />
+        <CWTag label="3rd" type="contest" classNames="prize-3" />
+        <CWTag label="4th" type="contest" />
+        <CWTag label="5th" type="contest" />
       </div>
     </>
   );

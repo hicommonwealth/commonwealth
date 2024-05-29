@@ -1,0 +1,45 @@
+@import '../../../../styles/shared.scss';
+
+.WelcomeOnboardModal {
+  overflow-y: scroll;
+  position: relative;
+
+  .content {
+    .close-btn {
+      position: absolute;
+      right: 0;
+      top: 16px;
+      margin-right: 16px;
+      cursor: pointer;
+
+      &.disabled {
+        cursor: not-allowed !important;
+        pointer-events: painted;
+      }
+    }
+
+    padding: 48px;
+
+    @include extraSmall {
+      padding: 32px;
+    }
+
+    .progress {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding-bottom: 18px;
+
+      span {
+        width: 100%;
+        height: 6px;
+        border-radius: 5px;
+        background-color: $neutral-200;
+
+        &.completed {
+          background-color: $primary-600 !important;
+        }
+      }
+    }
+  }
+}

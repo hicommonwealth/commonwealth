@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { EventEmitter } from 'events';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -12,6 +11,7 @@ import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import axios from 'axios';
+import { EventEmitter } from 'events';
 import NotificationsController from './notifications';
 
 export class UserController {
@@ -24,6 +24,15 @@ export class UserController {
 
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
+  }
+
+  private _id: number;
+  public get id(): number {
+    return this._id;
+  }
+
+  public setId(id: number): void {
+    this._id = id;
   }
 
   private _email: string;
@@ -51,6 +60,24 @@ export class UserController {
 
   private _setEmailVerified(emailVerified: boolean): void {
     this._emailVerified = emailVerified;
+  }
+
+  private _promotionalEmailsEnabled: boolean;
+  public get promotionalEmailsEnabled(): boolean {
+    return this._promotionalEmailsEnabled;
+  }
+
+  private _setPromotionalEmailsEnabled(enabled: boolean): void {
+    this._promotionalEmailsEnabled = enabled;
+  }
+
+  private _knockJWT: string;
+  public get knockJWT(): string {
+    return this._knockJWT;
+  }
+
+  private _setKnockJWT(knockJWT: string): void {
+    this._knockJWT = knockJWT;
   }
 
   private _jwt: string;
@@ -86,13 +113,13 @@ export class UserController {
     }
   }
 
-  private _selectedChain: ChainInfo;
-  public get selectedChain(): ChainInfo {
-    return this._selectedChain;
+  private _selectedCommunity: ChainInfo;
+  public get selectedCommunity(): ChainInfo {
+    return this._selectedCommunity;
   }
 
-  private _setSelectedChain(selectedChain: ChainInfo): void {
-    this._selectedChain = selectedChain;
+  private _setSelectedCommunity(selectedCommunity: ChainInfo): void {
+    this._selectedCommunity = selectedCommunity;
   }
 
   private _isSiteAdmin: boolean;
@@ -144,7 +171,14 @@ export class UserController {
     this._setEmail(email);
   }
 
-  public async updateEmail(email: string): Promise<void> {
+  public setPromotionalEmailsEnabled(enabled: boolean): void {
+    this._setPromotionalEmailsEnabled(enabled);
+  }
+
+  public async updateEmail(
+    email: string,
+    shouldNotifyFailure = true,
+  ): Promise<void> {
     this._setEmail(email);
 
     try {
@@ -154,7 +188,9 @@ export class UserController {
       });
     } catch (e) {
       console.log(e);
-      notifyError('Unable to update email');
+      if (shouldNotifyFailure) {
+        notifyError('Unable to update email');
+      }
     }
   }
 
@@ -162,12 +198,20 @@ export class UserController {
     this._setEmailInterval(emailInterval);
   }
 
-  public async updateEmailInterval(emailInterval: string): Promise<void> {
+  public async writeEmailSettings(
+    emailInterval: string,
+    promotionalEmailsEnabled?: boolean,
+  ): Promise<void> {
+    const key = emailInterval
+      ? 'updateEmailInterval'
+      : 'promotional_emails_enabled';
+    const value = emailInterval ? emailInterval : `${promotionalEmailsEnabled}`;
+
     try {
       await axios.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
-        key: 'updateEmailInterval',
-        value: emailInterval,
+        key,
+        value,
       });
       this._setEmailInterval(emailInterval);
     } catch (e) {
@@ -178,6 +222,10 @@ export class UserController {
 
   public setEmailVerified(verified: boolean): void {
     this._setEmailVerified(verified);
+  }
+
+  public setKnockJWT(knockJWT: string): void {
+    this._setKnockJWT(knockJWT);
   }
 
   public setJWT(JWT: string): void {
@@ -217,14 +265,14 @@ export class UserController {
     );
   }
 
-  public setSelectedChain(selectedChain: ChainInfo): void {
-    this._setSelectedChain(selectedChain);
+  public setSelectedCommunity(selectedCommunity: ChainInfo): void {
+    this._setSelectedCommunity(selectedCommunity);
   }
 
-  public async selectChain(options: { chain: string }): Promise<void> {
+  public async selectCommunity(options: { community: string }): Promise<void> {
     try {
       const res = await axios.post(`${app.serverUrl()}/selectCommunity`, {
-        community_id: options.chain,
+        community_id: options.community,
         auth: true,
         jwt: this._jwt,
       });
@@ -232,11 +280,11 @@ export class UserController {
       if (res.data.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${res.data.status}`);
       } else {
-        const chain = app.config.chains.getById(options.chain);
-        if (!chain) {
-          throw new Error('unexpected chain');
+        const community = app.config.chains.getById(options.community);
+        if (!community) {
+          throw new Error('unexpected community');
         }
-        this.setSelectedChain(chain);
+        this.setSelectedCommunity(community);
       }
     } catch (error) {
       console.error('Failed to select node on server', error);

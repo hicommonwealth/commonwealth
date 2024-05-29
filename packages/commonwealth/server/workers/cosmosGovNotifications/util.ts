@@ -1,16 +1,18 @@
-import { fromTimestamp } from '@hicommonwealth/chains';
+import { Timestamp, fromTimestamp } from '@hicommonwealth/chains';
+import { logger } from '@hicommonwealth/core';
+import { DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   NotificationCategories,
   SupportedNetwork,
-  logger,
-} from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
+import { fileURLToPath } from 'url';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function fetchCosmosNotifCommunities(models: DB) {
   const subscriptions = await models.Subscription.findAll({
@@ -84,7 +86,7 @@ export function filterProposals(proposals: AllCosmosProposals) {
     const chainProposals = proposals.v1Beta1[chainId];
     filteredProposals.v1Beta1[chainId] = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
-      const submitTime = fromTimestamp(p.submitTime);
+      const submitTime = fromTimestamp(p.submitTime as Timestamp);
       return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
   }

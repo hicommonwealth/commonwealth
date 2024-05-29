@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { NearToken } from 'adapters/chain/near/types';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';

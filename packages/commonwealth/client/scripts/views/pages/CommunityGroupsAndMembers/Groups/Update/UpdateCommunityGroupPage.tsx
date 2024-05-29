@@ -1,12 +1,10 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import _ from 'lodash';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
-import useGroupMutationBannerStore from 'state/ui/group';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import { PageNotFound } from '../../../404';
@@ -25,11 +23,9 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
-  const { setShouldShowGroupMutationBannerForCommunity } =
-    useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -38,6 +34,22 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const foundGroup: Group = groups.find(
     (group) => group.id === parseInt(`${groupId}`),
   );
+
+  const initialAllowlist = useMemo(() => {
+    return foundGroup?.requirements
+      .filter((r) => r?.rule === 'allow') // Filter only the allowlist rules
+      .flatMap((r) => r?.data?.allow || []); // Flatten and aggregate all addresses
+  }, [foundGroup]);
+
+  const [allowedAddresses, setAllowedAddresses] = useState<string[]>(
+    initialAllowlist ?? [],
+  );
+
+  useEffect(() => {
+    if (initialAllowlist) {
+      setAllowedAddresses(initialAllowlist);
+    }
+  }, [initialAllowlist]);
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
@@ -61,39 +73,42 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
-          requirements: foundGroup.requirements.map((requirement) => ({
-            requirementType: {
-              value: requirement.data.source.source_type,
-              label: requirementTypes.find(
-                (requirementType) =>
-                  requirementType.value === requirement.data.source.source_type,
-              )?.label,
-            },
-            requirementTokenId: requirement.data.source.token_id,
-            requirementAmount: convertRequirementAmountFromWeiToTokens(
-              requirement.data.source.source_type,
-              requirement.data.threshold.trim(),
-            ),
-            requirementChain: {
-              value: `${
-                requirement.data.source.cosmos_chain_id ||
-                requirement.data.source.evm_chain_id ||
-                0
-              }`,
-              label: chainTypes.find(
-                (chain) =>
-                  chain.value ==
-                  (requirement.data.source.cosmos_chain_id ||
-                    requirement.data.source.evm_chain_id),
-              )?.label,
-            },
-            requirementContractAddress:
-              requirement.data.source.contract_address || '',
-            // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
-            requirementCondition: conditionTypes.find(
-              (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
-            ),
-          })),
+          requirements: foundGroup.requirements
+            .filter((r) => r?.data?.source) // filter erc groups
+            .map((requirement) => ({
+              requirementType: {
+                value: requirement.data.source.source_type,
+                label: requirementTypes.find(
+                  (requirementType) =>
+                    requirementType.value ===
+                    requirement.data.source.source_type,
+                )?.label,
+              },
+              requirementTokenId: requirement.data.source.token_id,
+              requirementAmount: convertRequirementAmountFromWeiToTokens(
+                requirement.data.source.source_type,
+                requirement.data.threshold.trim(),
+              ),
+              requirementChain: {
+                value: `${
+                  requirement.data.source.cosmos_chain_id ||
+                  requirement.data.source.evm_chain_id ||
+                  0
+                }`,
+                label: chainTypes.find(
+                  (chain) =>
+                    chain.value ==
+                    (requirement.data.source.cosmos_chain_id ||
+                      requirement.data.source.evm_chain_id),
+                )?.label,
+              },
+              requirementContractAddress:
+                requirement.data.source.contract_address || '',
+              // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
+              requirementCondition: conditionTypes.find(
+                (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
+              ),
+            })),
           requirementsToFulfill:
             foundGroup.requirementsToFulfill === foundGroup.requirements.length
               ? 'ALL'
@@ -104,30 +119,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(values);
+          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
           const finalPayload = {
             ...payload,
             groupId: groupId,
           };
 
-          // if requirements are equal, then don't send them to api
-          const isRequirementsEqual = _.isEqual(
-            foundGroup.requirements,
-            payload.requirements,
-          );
-          if (isRequirementsEqual) {
-            delete finalPayload.requirements;
-          }
-
           editGroup(finalPayload)
             .then(() => {
               notifySuccess('Group Updated');
-              if (!isRequirementsEqual) {
-                setShouldShowGroupMutationBannerForCommunity(
-                  app.activeChainId(),
-                  true,
-                );
-              }
               navigate(`/members?tab=groups`);
             })
             .catch(() => {
@@ -135,6 +135,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             });
         }}
         onDelete={() => setIsDeleteModalOpen(true)}
+        allowedAddresses={allowedAddresses}
+        setAllowedAddresses={setAllowedAddresses}
       />
       <DeleteGroupModal
         isOpen={isDeleteModalOpen}

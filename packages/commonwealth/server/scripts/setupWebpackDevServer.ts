@@ -1,7 +1,7 @@
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import devWebpackConfig from '../../webpack/webpack.dev.config';
+import devWebpackConfig from '../../webpack/webpack.dev.config.mjs';
 
 export default function setupWebpackDevServer(app) {
   // we don't want to require all the webpack dependencies during production

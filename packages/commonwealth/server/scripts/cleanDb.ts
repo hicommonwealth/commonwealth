@@ -1,8 +1,11 @@
 import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { databaseCleaner } from 'commonwealth/server/util/databaseCleaner';
+import { fileURLToPath } from 'url';
+import { DatabaseCleaner } from '../util/databaseCleaner';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
+const databaseCleaner = new DatabaseCleaner();
 databaseCleaner.init(models);
 databaseCleaner
   .executeQueries()

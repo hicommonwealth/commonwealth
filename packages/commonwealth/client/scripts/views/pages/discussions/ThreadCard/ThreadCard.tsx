@@ -1,3 +1,4 @@
+import { slugify } from '@hicommonwealth/shared';
 import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
@@ -7,7 +8,7 @@ import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { slugify } from 'utils';
+import ThreadContestTag from 'views/components/ThreadContestTag';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -91,6 +92,18 @@ export const ThreadCard = ({
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
 
+  const contestWinners = [
+    { date: '03/09/2024', round: 7, isRecurring: true },
+    { date: '03/10/2024', isRecurring: false },
+    {
+      date: '03/10/2024',
+      round: 8,
+      isRecurring: true,
+    },
+  ];
+  const showContestWinnerTag = false;
+  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+
   return (
     <>
       <Link
@@ -114,7 +127,7 @@ export const ThreadCard = ({
           <div className="content-header">
             <AuthorAndPublishInfo
               authorAddress={thread.author}
-              authorChainId={thread.authorChain}
+              authorCommunityId={thread.authorCommunity}
               publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
@@ -126,6 +139,7 @@ export const ThreadCard = ({
               })}
               discord_meta={thread.discord_meta}
               archivedAt={thread.archivedAt}
+              profile={thread?.profile}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -135,6 +149,10 @@ export const ThreadCard = ({
             {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
             <div className="content-title">
               <CWText type="h5" fontWeight="semiBold">
+                {showContestWinnerTag &&
+                  contestWinners?.map((winner, index) => (
+                    <ThreadContestTag key={index} {...winner} />
+                  ))}
                 {thread.title}
               </CWText>
             </div>

@@ -11,6 +11,7 @@ import {
 } from '@hicommonwealth/model';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
 import {
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
@@ -19,7 +20,8 @@ import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBal
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const Errors = {
   GroupNotFound: 'Group not found',
@@ -62,7 +64,7 @@ export async function __refreshCommunityMemberships(
 
     const getBalancesOptions = makeGetBalancesOptions(
       groupsToUpdate,
-      addresses,
+      addresses.map((a) => a.address),
     );
     const balances = await Promise.all(
       getBalancesOptions.map(async (options) => {

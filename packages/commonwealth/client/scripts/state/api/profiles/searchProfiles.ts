@@ -37,8 +37,6 @@ const searchProfiles = async ({
   limit,
   orderBy,
   orderDirection,
-  includeMembershipTypes,
-  includeGroupIds,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -57,8 +55,6 @@ const searchProfiles = async ({
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
-        ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
-        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
     },
   );
@@ -72,8 +68,6 @@ const useSearchProfilesQuery = ({
   orderBy,
   orderDirection,
   includeRoles,
-  includeGroupIds,
-  includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
@@ -83,8 +77,6 @@ const useSearchProfilesQuery = ({
       orderBy,
       orderDirection,
       includeRoles,
-      includeGroupIds,
-      includeMembershipTypes,
     },
   ];
   return useInfiniteQuery(
@@ -97,8 +89,6 @@ const useSearchProfilesQuery = ({
         limit,
         orderBy,
         orderDirection,
-        includeMembershipTypes,
-        includeGroupIds,
         includeRoles,
       }),
     {

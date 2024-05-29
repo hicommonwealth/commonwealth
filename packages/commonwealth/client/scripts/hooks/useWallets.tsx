@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
+import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   completeClientLogin,
@@ -32,13 +32,18 @@ import { setDarkMode } from '../helpers/darkMode';
 import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
+import {
+  DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
+  fetchProfilesByAddress,
+} from '../state/api/profiles/fetchProfilesByAddress';
+import { authModal } from '../state/ui/modals/authModal';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../views/components/component_kit/helpers';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
 import useBrowserWindow from './useBrowserWindow';
+import { useFlag } from './useFlag';
 
 type ProfileRowProps = {
   name: string;
@@ -71,13 +76,15 @@ type IuseWalletProps = {
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
-  onSuccess?: (address?: string | undefined) => void;
+  onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
+  onUnrecognizedAddressReceived?: () => boolean;
   useSessionKeyLoginFlow?: boolean;
 };
 
 const useWallets = (walletProps: IuseWalletProps) => {
   const createAccountWithDefaultValues = true;
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [activeStep, setActiveStep] = useState<LoginActiveStep>();
@@ -207,20 +214,42 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     try {
       const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
-      const { address: magicAddress } = await startLoginWithMagicLink({
-        email: tempEmailToUse,
-        isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
-        chain: app.chain?.id,
-      });
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      const { address: magicAddress, isAddressNew } =
+        await startLoginWithMagicLink({
+          email: tempEmailToUse,
+          isCosmos,
+          redirectTo: document.location.pathname + document.location.search,
+          chain: app.chain?.id,
+        });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+      // if SSO account address is not already present in db,
+      // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
+      // and the user isn't trying to link address to community,
+      // then open the user auth type guidance modal
+      // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
+      if (
+        userOnboardingEnabled &&
+        isAddressNew &&
+        !isAttemptingToConnectAddressToCommunity &&
+        !app.isLoggedIn()
+      ) {
+        authModal
+          .getState()
+          .validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
+        return;
+      }
+
+      if (walletProps.onSuccess) {
+        walletProps.onSuccess(magicAddress, isNewlyCreated);
+      }
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
+        walletProps?.onModalClose?.();
       } else {
-        walletProps.onModalClose();
+        walletProps?.onModalClose?.();
       }
 
       trackAnalytics({
@@ -253,12 +282,14 @@ const useWallets = (walletProps: IuseWalletProps) => {
       });
       setIsMagicLoading(false);
 
-      if (walletProps.onSuccess) walletProps.onSuccess(magicAddress);
+      if (walletProps.onSuccess) {
+        walletProps.onSuccess(magicAddress, isNewlyCreated);
+      }
 
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
-        walletProps.onModalClose();
+        walletProps?.onModalClose?.();
       } else {
-        walletProps.onModalClose();
+        walletProps?.onModalClose?.();
       }
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
@@ -280,6 +311,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const onLogInWithAccount = async (
     account: Account,
     exitOnComplete: boolean,
+    newelyCreated = false,
     shouldRedrawApp = true,
   ) => {
     const profile = account.profile;
@@ -299,7 +331,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       if (app.chain) {
         const community =
-          app.user.selectedChain ||
+          app.user.selectedCommunity ||
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,
@@ -309,8 +341,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (exitOnComplete) {
-      walletProps.onModalClose();
-      if (walletProps.onSuccess) walletProps.onSuccess(account.address);
+      walletProps?.onModalClose?.();
+      if (walletProps.onSuccess) {
+        walletProps.onSuccess(account.address, newelyCreated);
+      }
     }
   };
 
@@ -322,7 +356,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     currentWallet?: IWebWallet<any>,
   ) => {
     if (walletProps.useSessionKeyLoginFlow) {
-      walletProps.onSuccess?.(account.address);
+      walletProps.onSuccess?.(account.address, newlyCreated);
       return;
     }
 
@@ -341,7 +375,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         sessionPayload,
         signature,
       );
-      await onLogInWithAccount(account, true);
+      await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
 
@@ -379,7 +413,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           sessionPayload,
           signature,
         );
-        await onLogInWithAccount(account, true);
+        await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         console.log(e);
       }
@@ -394,7 +428,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           setCachedTimestamp(timestamp);
           setCachedChainId(chainId);
           setCachedSessionPayload(sessionPayload);
-          walletProps.onSuccess?.(account.address);
+          walletProps.onSuccess?.(account.address, newlyCreated);
           setSidebarType('newOrReturning');
           setActiveStep('selectAccountType');
 
@@ -408,7 +442,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
               sessionPayload,
               account,
             );
-            await onSaveProfileInfo(account);
+            await onSaveProfileInfo(account, newlyCreated);
           }
         } catch (e) {
           console.log(e);
@@ -454,7 +488,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
           cachedWalletSignatureToUse,
         );
       }
-      await onLogInWithAccount(primaryAccountToUse, false, false);
+      await onLogInWithAccount(primaryAccountToUse, false, true, false);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
@@ -479,7 +513,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
-      walletProps.onModalClose();
+      walletProps?.onModalClose?.();
     }
     setActiveStep('welcome');
   };
@@ -520,7 +554,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   // Handle saving profile information
-  const onSaveProfileInfo = async (currentPrimaryAccount?: Account) => {
+  const onSaveProfileInfo = async (
+    currentPrimaryAccount?: Account,
+    newelyCreated?: boolean,
+  ) => {
     const primaryAccountToUse = currentPrimaryAccount || primaryAccount;
 
     try {
@@ -534,14 +571,18 @@ const useWallets = (walletProps: IuseWalletProps) => {
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
-      if (walletProps.onSuccess)
-        walletProps.onSuccess(primaryAccountToUse.profile.address);
+      if (walletProps.onSuccess) {
+        walletProps.onSuccess(
+          primaryAccountToUse.profile.address,
+          newelyCreated,
+        );
+      }
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
-      walletProps.onModalClose();
+      walletProps?.onModalClose?.();
     } catch (e) {
       console.log(e);
       notifyError('Failed to save profile info');
-      walletProps.onModalClose();
+      walletProps?.onModalClose?.();
     }
   };
 
@@ -568,6 +609,37 @@ const useWallets = (walletProps: IuseWalletProps) => {
       await loginToNear(app.chain as Near, app.isCustomDomain());
     } else {
       const selectedAddress = getAddressFromWallet(wallet);
+
+      if (userOnboardingEnabled) {
+        // check if address exists
+        const profileAddresses = await fetchProfilesByAddress({
+          currentChainId: '',
+          profileAddresses: [
+            wallet.chain === ChainBase.Substrate
+              ? addressSwapper({
+                  address: selectedAddress,
+                  currentPrefix: parseInt(
+                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    10,
+                  ),
+                })
+              : selectedAddress,
+          ],
+          profileChainIds: [app.activeChainId() ?? wallet.chain],
+          initiateProfilesAfterFetch: false,
+        });
+        const addressExists = profileAddresses?.length > 0;
+        const isAttemptingToConnectAddressToCommunity =
+          app.isLoggedIn() && app.activeChainId();
+        if (
+          !addressExists &&
+          !isAttemptingToConnectAddressToCommunity &&
+          walletProps.onUnrecognizedAddressReceived
+        ) {
+          const shouldContinue = walletProps.onUnrecognizedAddressReceived();
+          if (!shouldContinue) return;
+        }
+      }
 
       if (walletProps.useSessionKeyLoginFlow) {
         await onSessionKeyRevalidation(wallet, selectedAddress);
@@ -657,20 +729,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
         validationBlockInfo,
       );
 
+      setIsNewlyCreated(newlyCreated);
       if (isMobile) {
         setSignerAccount(signingAccount);
-        setIsNewlyCreated(newlyCreated);
         setIsLinkingOnMobile(isLinkingWallet);
-        if (createAccountWithDefaultValues) {
-          onAccountVerified(
-            signingAccount,
-            newlyCreated,
-            isLinkingWallet,
-            wallet,
-          );
-        } else {
-          setActiveStep('redirectToSign');
-        }
+        setActiveStep('redirectToSign');
       } else {
         onAccountVerified(
           signingAccount,
@@ -753,15 +816,28 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);
       if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      if (createAccountWithDefaultValues) {
-        onAccountVerified(account, false, false);
-      } else {
-        setActiveStep('redirectToSign');
-      }
-      return;
+      setActiveStep('redirectToSign');
     } else {
       onAccountVerified(account, false, false);
     }
+  };
+
+  const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
+    useState(false);
+  useEffect(() => {
+    setIsMobileWalletVerificationStep(
+      isMobile && activeStep === 'redirectToSign',
+    );
+  }, [isMobile, activeStep]);
+  const onVerifyMobileWalletSignature = async () => {
+    await onAccountVerified(
+      signerAccount,
+      isNewlyCreated,
+      isLinkingWallet,
+      selectedWallet,
+    );
+    setIsMobileWalletVerificationStep(false);
+    walletProps?.onModalClose?.();
   };
 
   return {
@@ -795,6 +871,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     setUsername,
     setSidebarType,
     onSessionKeyRevalidation,
+    isMobileWalletVerificationStep,
+    onVerifyMobileWalletSignature,
   };
 };
 

@@ -1,6 +1,6 @@
 import { createCanvasSessionPayload } from 'canvas';
 
-import { ChainBase, WalletId } from '@hicommonwealth/core';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
 import {
@@ -20,8 +20,8 @@ import { useSearchParams } from 'react-router-dom';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import { AuthModal } from '../modals/AuthModal';
 
 // TODO:
@@ -77,7 +77,7 @@ const FinishNearLogin = () => {
       const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
       const community =
-        app.user.selectedChain ||
+        app.user.selectedCommunity ||
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing

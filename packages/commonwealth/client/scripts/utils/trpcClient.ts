@@ -1,14 +1,14 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-import type { AppRouter } from '../../../server/routes/ddd/index';
+import type { ApiV1 } from '../../../server/api/index';
 import app from '../state/index';
 
-export const trpc = createTRPCReact<AppRouter>();
+export const trpc = createTRPCReact<ApiV1>();
 
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: '/ddd/trpc',
+      url: '/api/v1',
       async headers() {
         return {
           authorization: app.user.jwt,

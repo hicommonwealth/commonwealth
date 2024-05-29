@@ -1,6 +1,9 @@
-import { UserAttributes, type DB } from '@hicommonwealth/model';
-import type { TypedRequestQuery, TypedResponse } from 'server/types';
-import { TypedRequestBody } from 'server/types';
+import type { DB, UserAttributes } from '@hicommonwealth/model';
+import type {
+  TypedRequestBody,
+  TypedRequestQuery,
+  TypedResponse,
+} from 'server/types';
 
 // We don't care about express internals when performing unit tests,
 // so we just cast it to avoid typescript from complaining

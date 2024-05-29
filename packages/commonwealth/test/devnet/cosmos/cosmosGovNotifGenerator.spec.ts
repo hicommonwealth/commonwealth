@@ -1,6 +1,6 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import { dispose } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import {
   encodeMsgSubmitProposal,
@@ -33,46 +33,48 @@ async function createTestProposal(rpcUrl: string, content: Any) {
   expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 }
 
-async function enableCommunities(communities: string[]) {
-  const possibleCommunities = [v1CommunityId, v1Beta1CommunityId];
-  await models.sequelize.query(`
+describe('Cosmos Governance Notification Generator with real proposals', () => {
+  let models: DB;
+
+  async function enableCommunities(communities: string[]) {
+    const possibleCommunities = [v1CommunityId, v1Beta1CommunityId];
+    await models.sequelize.query(`
       DELETE FROM "NotificationsRead";
     `);
-  await models.sequelize.query(`
+    await models.sequelize.query(`
       DELETE FROM "Notifications";
     `);
 
-  const [user] = await models.User.findOrCreate({
-    where: {
-      email: 'drewstone329@gmail.com',
-      emailVerified: true,
-      isAdmin: true,
-    },
-  });
+    const [user] = await models.User.findOrCreate({
+      where: {
+        email: 'drewstone329@gmail.com',
+        emailVerified: true,
+        isAdmin: true,
+      },
+    });
 
-  for (const id of possibleCommunities) {
-    if (communities.includes(id)) {
-      await models.Subscription.findOrCreate({
-        where: {
-          subscriber_id: user.id,
-          community_id: id,
-          category_id: 'chain-event',
-        },
-      });
-    } else {
-      await models.Subscription.destroy({
-        where: {
-          subscriber_id: user.id,
-          community_id: id,
-        },
-      });
+    for (const id of possibleCommunities) {
+      if (communities.includes(id)) {
+        await models.Subscription.findOrCreate({
+          where: {
+            subscriber_id: user.id,
+            community_id: id,
+            category_id: 'chain-event',
+          },
+        });
+      } else {
+        await models.Subscription.destroy({
+          where: {
+            subscriber_id: user.id,
+            community_id: id,
+          },
+        });
+      }
     }
   }
-}
 
-describe('Cosmos Governance Notification Generator with real proposals', () => {
   before(async () => {
-    await tester.seedDb();
+    models = await tester.seedDb();
     await enableCommunities([v1CommunityId, v1Beta1CommunityId]);
     await createTestProposal(v1RpcUrl, v1Content);
     await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);

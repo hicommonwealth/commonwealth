@@ -15,6 +15,6 @@ const _validateCommunityStakeConfig = Sinon.stub(
   'validateCommunityStakeConfig',
 ).resolves();
 Sinon.stub(contractHelpers, 'getNamespace').resolves('');
-Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves('0');
+Sinon.stub(contractHelpers, 'getNamespaceBalance').resolves({});
 
 export { _validateCommunityStakeConfig, _validateNamespace };

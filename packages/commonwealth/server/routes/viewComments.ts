@@ -24,7 +24,25 @@ const viewComments = async (
   const comments = await models.Comment.findAll({
     where: { community_id: community.id, thread_id: threadId },
     include: [
-      models.Address,
+      {
+        model: models.Address,
+        include: [
+          {
+            model: models.User,
+            as: 'User',
+            required: true,
+            attributes: ['id'],
+            include: [
+              {
+                model: models.Profile,
+                as: 'Profiles',
+                required: true,
+                attributes: ['id', 'avatar_url', 'profile_name'],
+              },
+            ],
+          },
+        ],
+      },
       {
         model: models.Reaction,
         as: 'reactions',
@@ -33,6 +51,23 @@ const viewComments = async (
             model: models.Address,
             as: 'Address',
             required: true,
+            attributes: ['address', 'last_active'],
+            include: [
+              {
+                model: models.User,
+                as: 'User',
+                required: true,
+                attributes: ['id'],
+                include: [
+                  {
+                    model: models.Profile,
+                    as: 'Profiles',
+                    required: true,
+                    attributes: ['id', 'avatar_url', 'profile_name'],
+                  },
+                ],
+              },
+            ],
           },
         ],
       },

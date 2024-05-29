@@ -5,11 +5,11 @@ import React, { useState } from 'react';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import Account from '../../../models/Account';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { User } from '../../components/user/user';
 import ViewTemplateModal from '../../modals/view_template_modal';
@@ -90,7 +90,9 @@ export const TemplateDisplayTab = ({
         </div>
         {templates.length > 0 ? (
           templates.map((template, index) => {
-            const creator: Account = app.chain.accounts.get(template.createdBy);
+            const creator: Account = template?.createdBy
+              ? app.chain.accounts.get(template?.createdBy)
+              : null;
             return (
               <div className="table-row" key={index}>
                 <div className="table-column">
@@ -98,9 +100,13 @@ export const TemplateDisplayTab = ({
                 </div>
                 <div className="table-column">
                   <User
-                    userAddress={creator.address}
+                    userAddress={creator?.address}
                     userCommunityId={
-                      creator.community?.id || creator?.profile?.chain
+                      creator?.community?.id || creator?.profile?.chain
+                    }
+                    shouldShowAsDeleted={
+                      !creator?.address &&
+                      !(creator?.community?.id || creator?.profile?.chain)
                     }
                     shouldShowAddressWithDisplayName
                   />
@@ -164,7 +170,7 @@ export const TemplateDisplayTab = ({
       </div>
       <CWButton
         className="add-template-btn"
-        buttonType="tertiary-black"
+        buttonType="tertiary"
         label="Create template"
         iconLeft="plus"
         onClick={() => navigate('/new/contract_template/blank')}

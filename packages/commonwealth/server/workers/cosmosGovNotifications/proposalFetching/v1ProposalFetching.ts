@@ -7,10 +7,12 @@ import {
 } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
+import { fileURLToPath } from 'url';
 import { getCosmosClient } from './getCosmosClient';
 import { numberToUint8ArrayBE, uint8ArrayToNumberBE } from './util';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * Fetches the most recent (latest) proposal from a Cosmos community that uses the v1 gov module. Depending on the

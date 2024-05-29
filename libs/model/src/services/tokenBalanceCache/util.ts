@@ -1,11 +1,13 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/core';
-import AbiCoder from 'web3-eth-abi';
-import { toBN } from 'web3-utils';
+import { ethers } from 'ethers';
+import { fileURLToPath } from 'url';
+import * as AbiCoder from 'web3-eth-abi';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * This function batches hundreds of RPC requests (1 per address) into a few batched RPC requests.
@@ -115,8 +117,8 @@ export async function evmOffChainRpcBatching(
 
     const address = idAddressMap[data.id];
     balances[address] = source.contractAddress
-      ? AbiCoder.decodeParameter('uint256', data.result).toString()
-      : toBN(data.result).toString(10);
+      ? String(AbiCoder.decodeParameter('uint256', data.result))
+      : ethers.BigNumber.from(data.result).toString();
   }
 
   return { balances, failedAddresses };
@@ -213,9 +215,12 @@ export async function evmBalanceFetcherBatching(
         continue;
       }
 
-      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
+      const balances = AbiCoder.decodeParameter(
+        'uint256[]',
+        data.result,
+      ) as number[];
       relevantAddresses.forEach(
-        (key, i) => (addressBalanceMap[key] = balances[i]),
+        (key, i) => (addressBalanceMap[key] = String(balances[i])),
       );
     }
   }

@@ -12,17 +12,23 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { User } from 'views/components/user/user';
-import { IThreadCollaborator } from '../../../../../models/Thread';
+import { UserProfile } from '../../../../../models/MinimumProfile';
+import {
+  IThreadCollaborator,
+  VersionHistory,
+} from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
+import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
+import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
+import { formatVersionText } from './utils';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
   authorAddress: string;
-  authorChainId: string;
+  authorCommunityId: string;
   discord_meta?: {
     user: { id: string; username: string };
     channel_id: string;
@@ -43,12 +49,15 @@ export type AuthorAndPublishInfoProps = {
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
   archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
+  profile?: UserProfile;
+  versionHistory?: VersionHistory[];
+  changeContentText?: (text: string) => void;
 };
 
 export const AuthorAndPublishInfo = ({
   isHot,
   authorAddress,
-  authorChainId,
+  authorCommunityId,
   isLocked,
   lockedAt,
   lastUpdated,
@@ -65,6 +74,9 @@ export const AuthorAndPublishInfo = ({
   collaboratorsInfo,
   archivedAt,
   popoverPlacement,
+  profile,
+  versionHistory,
+  changeContentText,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -74,20 +86,37 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
+  const collaboratorLookupInfo: Record<string, string> =
+    collaboratorsInfo?.reduce((acc, collaborator) => {
+      acc[collaborator.address] = collaborator.User.Profiles[0].name;
+      return acc;
+    }, {}) ?? {};
+
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+  const versionHistoryOptions = versionHistory?.map((v) => ({
+    value: v.body,
+    label: formatVersionText(
+      v.timestamp,
+      v.author?.address,
+      profile,
+      collaboratorLookupInfo,
+    ),
+  }));
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
-      <User
+      <FullUser
         avatarSize={24}
         userAddress={authorAddress}
-        userCommunityId={authorChainId}
+        userCommunityId={authorCommunityId}
         shouldShowPopover
         shouldLinkProfile
+        shouldShowAsDeleted={!authorAddress && !authorCommunityId}
         shouldShowAddressWithDisplayName={
           fromDiscordBot ? false : showUserAddressWithInfo
         }
         popoverPlacement={popoverPlacement}
+        profile={profile}
       />
 
       {fromDiscordBot && (
@@ -120,13 +149,14 @@ export const AuthorAndPublishInfo = ({
             <CWPopover
               content={
                 <div className="collaborators">
-                  {collaboratorsInfo.map(({ address, community_id }) => {
+                  {collaboratorsInfo.map(({ address, community_id, User }) => {
                     return (
-                      <User
+                      <FullUser
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
                         userCommunityId={community_id}
+                        profile={User.Profiles[0]}
                       />
                     );
                   })}
@@ -141,29 +171,46 @@ export const AuthorAndPublishInfo = ({
       {publishDate && (
         <>
           {dotIndicator}
-
-          <CWTooltip
-            placement="top"
-            content={
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
-                {publishDate.format('h:mm A')}
-              </div>
-            }
-            renderTrigger={(handleInteraction) => (
-              <CWText
-                type="caption"
-                fontWeight="regular"
-                className="section-text publish-date"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              >
-                {showPublishLabelWithDate ? 'Published ' : ''}
-                {showEditedLabelWithDate ? 'Edited ' : ''}
-                {getRelativeTimestamp(publishDate?.toISOString())}
-              </CWText>
-            )}
-          />
+          {versionHistoryOptions?.length > 1 ? (
+            <div className="version-history">
+              <CWSelectList
+                options={versionHistoryOptions}
+                placeholder={`Edited ${getRelativeTimestamp(
+                  publishDate?.toISOString(),
+                )}`}
+                onChange={({ value }) => {
+                  changeContentText(value);
+                }}
+                formatOptionLabel={(option) => {
+                  return option.label.split('\n')[0];
+                }}
+                isSearchable={false}
+              />
+            </div>
+          ) : (
+            <CWTooltip
+              placement="top"
+              content={
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
+                  {publishDate.format('h:mm A')}
+                </div>
+              }
+              renderTrigger={(handleInteraction) => (
+                <CWText
+                  type="caption"
+                  fontWeight="regular"
+                  className="section-text publish-date"
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {showPublishLabelWithDate ? 'Published ' : ''}
+                  {showEditedLabelWithDate ? 'Edited ' : ''}
+                  {getRelativeTimestamp(publishDate?.toISOString())}
+                </CWText>
+              )}
+            />
+          )}
         </>
       )}
 

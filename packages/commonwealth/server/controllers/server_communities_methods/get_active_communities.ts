@@ -69,6 +69,7 @@ export async function __getActiveCommunities(
           },
         },
         include: [
+          { model: this.models.CommunityStake },
           {
             model: this.models.Topic,
             required: true,

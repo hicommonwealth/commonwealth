@@ -1,5 +1,5 @@
-import { BalanceSourceType, Requirement } from '@hicommonwealth/core';
 import { OptionsWithBalances } from '@hicommonwealth/model';
+import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import validateGroupMembership from 'server/util/requirementsModule/validateGroupMembership';
 

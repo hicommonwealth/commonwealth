@@ -83,8 +83,11 @@ export const VoteListing = (props: VoteListingProps) => {
   }) => {
     return (
       <User
-        userAddress={voter.address}
-        userCommunityId={voter.community?.id || voter.profile?.chain}
+        userAddress={voter?.address}
+        userCommunityId={voter?.community?.id || voter?.profile?.chain}
+        shouldShowAsDeleted={
+          voter?.address && !(voter?.community?.id || voter?.profile?.chain)
+        }
         shouldLinkProfile
         shouldShowPopover={shouldShowPopover}
       />

@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://s3.amazonaws.com/assets.commonwealth.im/sitemap-index.xml

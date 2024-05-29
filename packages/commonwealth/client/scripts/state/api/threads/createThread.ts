@@ -1,10 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
 
@@ -12,7 +15,7 @@ interface CreateThreadProps {
   address: string;
   kind: 'discussion' | 'link';
   stage: string;
-  chainId: string;
+  communityId: string;
   title: string;
   topic: Topic;
   body?: string;
@@ -25,7 +28,7 @@ const createThread = async ({
   address,
   kind,
   stage,
-  chainId,
+  communityId,
   title,
   topic,
   body,
@@ -38,7 +41,7 @@ const createThread = async ({
     session = null,
     hash = null,
   } = await app.sessions.signThread(address, {
-    community: chainId,
+    community: communityId,
     title,
     body,
     link: url,
@@ -46,8 +49,8 @@ const createThread = async ({
   });
 
   const response = await axios.post(`${app.serverUrl()}/threads`, {
-    author_chain: chainId,
-    community_id: chainId,
+    author_community_id: communityId,
+    community_id: communityId,
     address,
     author: JSON.stringify(authorProfile),
     title: encodeURIComponent(title),
@@ -67,11 +70,17 @@ const createThread = async ({
   return new Thread(response.data.result);
 };
 
-const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
+const useCreateThreadMutation = ({
+  communityId,
+}: Partial<CreateThreadProps>) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
+
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
-      addThreadInAllCaches(chainId, newThread);
+      addThreadInAllCaches(communityId, newThread);
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
         ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
@@ -82,6 +91,15 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
               : totalThreadsInCommunityForVoting,
         }),
       );
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          profileId,
+        );
+      }
+
       return newThread;
     },
   });

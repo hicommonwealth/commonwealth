@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import ThreadContestTag from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -77,6 +78,7 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
+  setThreadBody?: (body: string) => void;
 };
 
 export const CWContentPage = ({
@@ -113,6 +115,7 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
+  setThreadBody,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -120,7 +123,7 @@ export const CWContentPage = ({
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -185,9 +188,11 @@ export const CWContentPage = ({
           lastUpdated: thread.updatedAt.toISOString(),
         })}
         authorAddress={author?.address}
-        authorChainId={authorCommunityId}
+        authorCommunityId={authorCommunityId}
         collaboratorsInfo={collaborators}
-        publishDate={moment(createdOrEditedDate)}
+        publishDate={moment(createdOrEditedDate, 'X')}
+        //second parameter in moment() is case sensitive.
+        //If 'x' is passed instead of 'X' it will show "Published 54 years ago" again.
         viewsCount={viewCount}
         showPublishLabelWithDate={!lastEdited}
         showEditedLabelWithDate={!!lastEdited}
@@ -195,6 +200,9 @@ export const CWContentPage = ({
         threadStage={stageLabel}
         archivedAt={thread?.archivedAt}
         isHot={isHot(thread)}
+        profile={thread?.profile}
+        versionHistory={thread?.versionHistory}
+        changeContentText={setThreadBody}
       />
     </div>
   );
@@ -206,11 +214,29 @@ export const CWContentPage = ({
     isThreadTopicGated: isRestrictedMembership,
   });
 
+  const contestWinners = [
+    { date: '03/09/2024', round: 7, isRecurring: true },
+    { date: '03/10/2024', isRecurring: false },
+    {
+      date: '03/10/2024',
+      round: 8,
+      isRecurring: true,
+    },
+  ];
+  const showContestWinnerTag = false;
+  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
-          <h1 className="title">{truncate(title)}</h1>
+          <h1 className="title">
+            {showContestWinnerTag &&
+              contestWinners?.map((winner, index) => (
+                <ThreadContestTag key={index} {...winner} />
+              ))}
+            {truncate(title)}
+          </h1>
         ) : (
           title
         )}

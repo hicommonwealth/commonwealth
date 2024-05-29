@@ -10,10 +10,8 @@ import type {
   CommunityContractTemplateInstance,
   ContractInstance,
   DB,
-  ThreadInstance,
 } from '@hicommonwealth/model';
 import type { Response } from 'express';
-import { Op, QueryTypes } from 'sequelize';
 import { TypedRequest } from 'server/types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
@@ -23,15 +21,11 @@ export const Errors = {};
 // Topics, comments, reactions, members+admins, threads
 const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
   const { community } = req;
-  // globally shared SQL replacements
-  const communityOptions = 'community_id = :community_id';
-  const replacements = { community_id: community.id };
 
   // parallelized queries
   const [
     admins,
-    mostActiveUsers,
-    threadsInVoting,
+    numVotingThreads,
     numTotalThreads,
     communityBanner,
     contractsWithTemplatesData,
@@ -39,8 +33,7 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
     Promise<
       [
         RoleInstanceWithPermission[],
-        unknown,
-        ThreadInstance[],
+        number,
         number,
         CommunityBannerInstance,
         Array<{
@@ -58,56 +51,13 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
       community.id,
       ['admin', 'moderator'],
     ),
-    // most active users
-    new Promise(async (resolve, reject) => {
-      try {
-        const thirtyDaysAgo = new Date(
-          (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
-        );
-        const activeUsers = {};
-        const where = {
-          updated_at: { [Op.gt]: thirtyDaysAgo },
-          community_id: community.id,
-        };
-
-        const monthlyComments = await models.Comment.findAll({
-          where,
-          include: [models.Address],
-        });
-        const monthlyThreads = await models.Thread.findAll({
-          where,
-          attributes: { exclude: ['version_history'] },
-          include: [{ model: models.Address, as: 'Address' }],
-        });
-
-        (monthlyComments as any).concat(monthlyThreads).forEach((post) => {
-          if (!post.Address) return;
-          const addr = post.Address.address;
-          if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
-          else
-            activeUsers[addr] = {
-              info: post.Address,
-              count: 1,
-            };
-        });
-        const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
-          return (b as any).count - (a as any).count;
-        });
-        resolve(mostActiveUsers_);
-      } catch (e) {
-        reject(new ServerError('Could not fetch most active users'));
-      }
-    }),
-    models.sequelize.query(
-      `
-     SELECT id, title, stage FROM "Threads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
-      {
-        replacements,
-        type: QueryTypes.SELECT,
+    models.Thread.count({
+      where: {
+        community_id: community.id,
+        stage: 'voting',
       },
-    ),
-    await models.Thread.count({
+    }),
+    models.Thread.count({
       where: {
         community_id: community.id,
         marked_as_spam_at: null,
@@ -169,17 +119,12 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
     }),
   ]));
 
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting',
-  ).length;
-
   return res.json({
     status: 'Success',
     result: {
       numVotingThreads,
       numTotalThreads,
       admins: admins.map((a) => a.toJSON()),
-      activeUsers: mostActiveUsers,
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
         return {

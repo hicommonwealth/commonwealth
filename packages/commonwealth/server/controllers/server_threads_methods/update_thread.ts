@@ -1,9 +1,4 @@
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-  ServerError,
-} from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommunityInstance,
@@ -12,13 +7,20 @@ import {
   ThreadInstance,
   UserInstance,
 } from '@hicommonwealth/model';
-import { uniq } from 'lodash';
-import moment from 'moment';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import _ from 'lodash';
 import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  createThreadMentionNotifications,
+  emitMentions,
+  findMentionDiff,
+  parseUserMentions,
+  queryMentionedUsers,
+} from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
+import { addVersionHistory } from '../../util/versioning';
 import { TrackOptions } from '../server_analytics_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -162,31 +164,22 @@ export async function __updateThread(
     isCollaborator,
   };
 
-  const now = new Date();
-
-  // update version history
-  let latestVersion;
-  try {
-    latestVersion = JSON.parse(thread.version_history[0]).body;
-  } catch (err) {
-    console.log(err);
-  }
-  if (decodeURIComponent(body) !== latestVersion) {
-    const recentEdit: any = {
-      timestamp: moment(now),
-      author: address.address,
-      body: decodeURIComponent(body),
-    };
-    const versionHistory: string = JSON.stringify(recentEdit);
-    const arr = thread.version_history;
-    arr.unshift(versionHistory);
-    thread.version_history = arr;
-  }
+  const { latestVersion, versionHistory } = addVersionHistory(
+    thread.version_history,
+    body,
+    address,
+  );
 
   // build analytics
   const allAnalyticsOptions: TrackOptions[] = [];
 
   const community = await this.models.Community.findByPk(thread.community_id);
+
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   //  patch thread properties
   const transaction = await this.models.sequelize.transaction();
@@ -240,6 +233,19 @@ export async function __updateThread(
       { transaction },
     );
 
+    if (versionHistory) {
+      // The update above doesn't work because it can't detect array changes so doesn't write it to db
+      await this.models.Thread.update(
+        {
+          version_history: versionHistory,
+        },
+        {
+          where: { id: threadId },
+          transaction,
+        },
+      );
+    }
+
     await updateThreadCollaborators(
       permissions,
       thread,
@@ -247,6 +253,15 @@ export async function __updateThread(
       this.models,
       transaction,
     );
+
+    await emitMentions(this.models, transaction, {
+      authorAddressId: address.id,
+      authorUserId: user.id,
+      authorAddress: address.address,
+      authorProfileId: address.profile_id,
+      mentions: mentionedAddresses,
+      thread,
+    });
 
     await transaction.commit();
   } catch (err) {
@@ -269,15 +284,51 @@ export async function __updateThread(
   const finalThread = await this.models.Thread.findOne({
     where: { id: thread.id },
     include: [
-      { model: this.models.Address, as: 'Address' },
+      {
+        model: this.models.Address,
+        as: 'Address',
+        include: [
+          {
+            model: this.models.User,
+            as: 'User',
+            required: true,
+            attributes: ['id'],
+            include: [
+              {
+                model: this.models.Profile,
+                as: 'Profiles',
+                required: true,
+                attributes: ['id', 'avatar_url', 'profile_name'],
+              },
+            ],
+          },
+        ],
+      },
       {
         model: this.models.Address,
         as: 'collaborators',
+        include: [
+          {
+            model: this.models.User,
+            as: 'User',
+            required: true,
+            attributes: ['id'],
+            include: [
+              {
+                model: this.models.Profile,
+                as: 'Profiles',
+                required: true,
+                attributes: ['id', 'avatar_url', 'profile_name'],
+              },
+            ],
+          },
+        ],
       },
       { model: this.models.Topic, as: 'topic' },
     ],
   });
 
+  const now = new Date();
   // build notifications
   const allNotificationOptions: EmitOptions[] = [];
 
@@ -297,71 +348,9 @@ export async function __updateThread(
     excludeAddresses: [address.address],
   });
 
-  let mentions;
-  try {
-    const previousDraftMentions = parseUserMentions(latestVersion);
-    const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
-    mentions = currentDraftMentions.filter((addrArray) => {
-      let alreadyExists = false;
-      previousDraftMentions.forEach((addrArray_) => {
-        if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
-          alreadyExists = true;
-        }
-      });
-      return !alreadyExists;
-    });
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
-
-  // grab mentions to notify tagged users
-  let mentionedAddresses;
-  if (mentions?.length > 0) {
-    mentionedAddresses = await Promise.all(
-      mentions.map(async (mention) => {
-        try {
-          const mentionedUser = await this.models.Address.findOne({
-            where: {
-              community_id: mention[0],
-              address: mention[1],
-            },
-            include: [this.models.User],
-          });
-          return mentionedUser;
-        } catch (err) {
-          return null;
-        }
-      }),
-    );
-    // filter null results
-    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-  }
-
-  // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length > 0) {
-    mentionedAddresses.forEach((mentionedAddress) => {
-      if (!mentionedAddress.User) {
-        return; // some Addresses may be missing users, e.g. if the user removed the address
-      }
-      allNotificationOptions.push({
-        notification: {
-          categoryId: NotificationCategories.NewMention,
-          data: {
-            mentioned_user_id: mentionedAddress.User.id,
-            created_at: now,
-            thread_id: +finalThread.id,
-            root_type: ProposalType.Thread,
-            root_title: finalThread.title,
-            comment_text: finalThread.body,
-            community_id: finalThread.community_id,
-            author_address: finalThread.Address.address,
-            author_community_id: finalThread.Address.community_id,
-          },
-        },
-        excludeAddresses: [finalThread.Address.address],
-      });
-    });
-  }
+  allNotificationOptions.push(
+    ...createThreadMentionNotifications(mentionedAddresses, finalThread),
+  );
 
   return [finalThread.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }
@@ -669,8 +658,8 @@ async function updateThreadCollaborators(
       isSuperAdmin: true,
     });
 
-    const toAddUnique = uniq(toAdd || []);
-    const toRemoveUnique = uniq(toRemove || []);
+    const toAddUnique = _.uniq(toAdd || []);
+    const toRemoveUnique = _.uniq(toRemove || []);
 
     // check for overlap between toAdd and toRemove
     for (const r of toRemoveUnique) {

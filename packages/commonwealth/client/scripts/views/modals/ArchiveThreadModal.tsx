@@ -1,10 +1,10 @@
-import React from 'react';
 import 'modals/ArchiveThreadModal.scss';
-import type Thread from '../../models/Thread';
+import React from 'react';
 import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { useEditThreadMutation } from 'state/api/threads';
+import type Thread from '../../models/Thread';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 
 import {
   notifyError,
@@ -21,7 +21,7 @@ export const ArchiveThreadModal = ({
   thread,
 }: ArchiveThreadModalProps) => {
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -30,20 +30,20 @@ export const ArchiveThreadModal = ({
   const handleArchiveThread = async () => {
     editThread({
       threadId: thread.id,
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       archived: !thread.archivedAt,
       address: app.user?.activeAccount?.address,
       pinned: false,
     })
       .then(() => {
         notifySuccess(
-          `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`
+          `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`,
         );
         onModalClose();
       })
       .catch(() => {
         notifyError(
-          `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`
+          `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`,
         );
       });
   };
@@ -73,13 +73,14 @@ export const ArchiveThreadModal = ({
 
         <div className="actions">
           <CWButton
+            buttonHeight="sm"
             label="Cancel"
-            buttonType="secondary-black"
+            buttonType="secondary"
             onClick={onModalClose}
           />
           <CWButton
+            buttonHeight="sm"
             label="Confirm"
-            buttonType="primary-black"
             onClick={handleArchiveThread}
           />
         </div>

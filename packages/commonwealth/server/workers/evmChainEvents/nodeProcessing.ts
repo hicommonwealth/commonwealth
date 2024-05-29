@@ -1,11 +1,39 @@
-import { logger, stats } from '@hicommonwealth/core';
-import { NotificationInstance, models } from '@hicommonwealth/model';
-import { emitChainEventNotifs } from './emitChainEventNotifs';
+import {
+  ChainEventSigs,
+  ContestContentAdded,
+  ContestContentUpvoted,
+  ContestStarted,
+  EventNames,
+  OneOffContestManagerDeployed,
+  RecurringContestManagerDeployed,
+  events as coreEvents,
+  logger,
+  parseEvmEventToContestEvent,
+  stats,
+} from '@hicommonwealth/core';
+import { DB, emitEvent } from '@hicommonwealth/model';
+import { ethers } from 'ethers';
+import { fileURLToPath } from 'url';
+import { z } from 'zod';
 import { getEventSources } from './getEventSources';
-import { getEvents } from './logProcessing';
-import { EvmSource } from './types';
+import { getEvents, getProvider, migrateEvents } from './logProcessing';
+import { EvmEvent, EvmSource } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
+
+const EvmContestEventSignatures = {
+  NewContest:
+    '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
+  NewRecurringContestStarted:
+    '0x32391ebd47fc736bb885d21a45d95c3da80aef6987aa90a5c6e747e9bc755bc9',
+  NewSingleContestStarted:
+    '0x002817006cf5e3f9ac0de6817ca39830ac7e731a4949a59e4ac3c8bef988b20c',
+  ContentAdded:
+    '0x2f0d66b98c7708890a982e2194479b066a117a6f9a8f418f7f14c6001965b78b',
+  VoterVoted:
+    '0xba2ce2b4fab99c4186fd3e0a8e93ffb61e332d0c4709bd01d01e7ac60631437a',
+};
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since
@@ -13,9 +41,10 @@ const log = logger().getLogger(__filename);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
+  models: DB,
   chainNodeId: number,
   evmSource: EvmSource,
-): Promise<Promise<void | NotificationInstance>[] | void> {
+): Promise<void> {
   try {
     log.info(
       'Processing:\n' +
@@ -26,34 +55,130 @@ export async function processChainNode(
       chainNodeId: String(chainNodeId),
     });
 
-    const startBlock = await models.LastProcessedEvmBlock.findOne({
+    const lastProcessedBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
         chain_node_id: chainNodeId,
       },
     });
 
-    const startBlockNum = startBlock?.block_number
-      ? startBlock.block_number + 1
-      : null;
+    const provider = getProvider(evmSource.rpc);
+    const currentBlock = await provider.getBlockNumber();
 
-    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
-    const promises = await emitChainEventNotifs(chainNodeId, events);
-
-    if (!startBlock) {
-      await models.LastProcessedEvmBlock.create({
-        chain_node_id: chainNodeId,
-        block_number: lastBlockNum,
-      });
+    let startBlockNum: number;
+    if (lastProcessedBlock?.block_number < currentBlock) {
+      startBlockNum = lastProcessedBlock?.block_number + 1;
+    } else if (lastProcessedBlock?.block_number === undefined) {
+      startBlockNum = currentBlock - 10;
     } else {
-      startBlock.block_number = lastBlockNum;
-      startBlock.save();
+      // the last processed block is the same as the current block
+      // this occurs if the poll interval is shorter than the block time
+      return;
     }
 
-    log.info(
-      `Processed ${events.length} events for chainNodeId ${chainNodeId}`,
-    );
+    const allEvents: EvmEvent[] = [];
+    const migratedData = await migrateEvents(evmSource, startBlockNum);
+    if (migratedData?.events?.length > 0)
+      allEvents.push(...migratedData.events);
 
-    return promises;
+    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
+    allEvents.push(...events);
+
+    await models.sequelize.transaction(async (transaction) => {
+      if (!lastProcessedBlock) {
+        await models.LastProcessedEvmBlock.create(
+          {
+            chain_node_id: chainNodeId,
+            block_number: lastBlockNum,
+          },
+          { transaction },
+        );
+      } else if (lastProcessedBlock.block_number !== lastBlockNum) {
+        lastProcessedBlock.block_number = lastBlockNum;
+        await lastProcessedBlock.save({ transaction });
+      }
+
+      if (allEvents.length > 0) {
+        const contestEvents = allEvents
+          .map((event) => {
+            const contractAddress = ethers.utils.getAddress(
+              event.rawLog.address,
+            );
+
+            const parseEvent = (e: keyof typeof ChainEventSigs) =>
+              parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
+
+            switch (event.eventSource.eventSignature) {
+              case EvmContestEventSignatures.NewContest:
+                return parseEvent('NewContest') as
+                  | {
+                      event_name: EventNames.RecurringContestManagerDeployed;
+                      event_payload: z.infer<
+                        typeof RecurringContestManagerDeployed
+                      >;
+                    }
+                  | {
+                      event_name: EventNames.OneOffContestManagerDeployed;
+                      event_payload: z.infer<
+                        typeof OneOffContestManagerDeployed
+                      >;
+                    };
+              case EvmContestEventSignatures.NewRecurringContestStarted:
+                return parseEvent('NewRecurringContestStarted') as {
+                  event_name: EventNames.ContestStarted;
+                  event_payload: z.infer<typeof ContestStarted>;
+                };
+              case EvmContestEventSignatures.NewSingleContestStarted:
+                return parseEvent('NewSingleContestStarted') as {
+                  event_name: EventNames.ContestStarted;
+                  event_payload: z.infer<typeof ContestStarted>;
+                };
+              case EvmContestEventSignatures.ContentAdded:
+                return parseEvent('ContentAdded') as {
+                  event_name: EventNames.ContestContentAdded;
+                  event_payload: z.infer<typeof ContestContentAdded>;
+                };
+              case EvmContestEventSignatures.VoterVoted:
+                return parseEvent('VoterVoted') as {
+                  event_name: EventNames.ContestContentUpvoted;
+                  event_payload: z.infer<typeof ContestContentUpvoted>;
+                };
+            }
+
+            return null;
+          })
+          .filter(Boolean);
+
+        // filter out the rest of the events from contest events,
+        // temp solution until chain events are broken down
+        const contestEventSignatures = Object.values(EvmContestEventSignatures);
+        const restEvents = allEvents
+          .filter((event) => {
+            return !contestEventSignatures.includes(
+              event.eventSource.eventSignature,
+            );
+          })
+          .map(
+            (
+              event,
+            ): {
+              event_name: EventNames.ChainEventCreated;
+              event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
+            } => ({
+              event_name: EventNames.ChainEventCreated,
+              event_payload: event as z.infer<
+                typeof coreEvents.ChainEventCreated
+              >,
+            }),
+          );
+
+        const records = [...contestEvents, ...restEvents];
+        await emitEvent(models.Outbox, records, transaction);
+      }
+    });
+
+    log.info(
+      `Processed ${allEvents.length} events for chainNodeId ${chainNodeId}`,
+    );
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
@@ -69,13 +194,15 @@ export async function processChainNode(
  * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
  */
 export async function scheduleNodeProcessing(
+  models: DB,
   interval: number,
   processFn: (
+    models: DB,
     chainNodeId: number,
     sources: EvmSource,
-  ) => Promise<Promise<void | NotificationInstance>[] | void>,
+  ) => Promise<void>,
 ) {
-  const evmSources = await getEventSources();
+  const evmSources = await getEventSources(models);
 
   const numEvmSources = Object.keys(evmSources).length;
   if (!numEvmSources) {
@@ -89,10 +216,7 @@ export async function scheduleNodeProcessing(
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      const promises = await processFn(+chainNodeId, evmSources[chainNodeId]);
-      if (promises) {
-        await Promise.allSettled(promises);
-      }
+      await processFn(models, +chainNodeId, evmSources[chainNodeId]);
     }, delay);
   });
 }

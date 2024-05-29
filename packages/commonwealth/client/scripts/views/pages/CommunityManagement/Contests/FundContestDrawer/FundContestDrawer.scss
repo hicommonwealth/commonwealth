@@ -1,0 +1,16 @@
+@import '../../../../../../styles/shared';
+
+.FundContestDrawer {
+  .Drawer {
+    padding-bottom: 0;
+  }
+
+  .fund-contest-drawer-container {
+    padding: 20px 56px 0 56px;
+    height: calc(100% - 52px);
+
+    @include extraSmall {
+      padding: 0 36px;
+    }
+  }
+}

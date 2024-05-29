@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-import app from '../../state';
+import { notifyError } from '../../controllers/app/notifications';
 import { useCommonNavigate } from '../../navigation/helpers';
-import { CWText } from '../components/component_kit/cw_text';
+import app from '../../state';
+import { CWDivider } from '../components/component_kit/cw_divider';
 import {
   CWDropdown,
   DropdownItemType,
 } from '../components/component_kit/cw_dropdown';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { notifyError } from '../../controllers/app/notifications';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
@@ -103,7 +103,7 @@ const ManageContractTemplateModal = ({
 
     try {
       await app.contracts.addCommunityContractTemplate(
-        communityContractTemplateAndMetadata
+        communityContractTemplateAndMetadata,
       );
 
       onModalClose();
@@ -128,7 +128,7 @@ const ManageContractTemplateModal = ({
 
     try {
       await app.contracts.editCommunityContractTemplate(
-        editedCommunityContractTemplate
+        editedCommunityContractTemplate,
       );
 
       onModalClose();
@@ -144,7 +144,7 @@ const ManageContractTemplateModal = ({
   const handleSelectTemplate = (item: DropdownItemType) => {
     const selectedTemplateId = +item.value;
     const selectedTemplate = contractTemplates.find(
-      (t) => t.id === selectedTemplateId
+      (t) => t.id === selectedTemplateId,
     );
 
     setForm((prevState) => ({
@@ -213,7 +213,7 @@ const ManageContractTemplateModal = ({
           )}
           {!isEditMode && (
             <CWText className="create-template-info" type="caption">
-              Don't see a template that fits your needs?
+              Don&apos;t see a template that fits your needs?
               <CWText
                 type="caption"
                 fontWeight="medium"

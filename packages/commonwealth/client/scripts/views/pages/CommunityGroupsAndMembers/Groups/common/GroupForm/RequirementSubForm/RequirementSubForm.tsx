@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -8,6 +8,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
+  SPL_SPECIFICATION,
   TOKENS,
   chainTypes,
   conditionTypes,
@@ -30,9 +31,11 @@ const RequirementSubForm = ({
     requirementType === TOKENS.COSMOS_TOKEN ||
     requirementType === CW_SPECIFICATIONS.CW_721 ||
     requirementType === CW_SPECIFICATIONS.CW_20;
+  const isSPLRequirement = requirementType === SPL_SPECIFICATION;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
+    [SPL_SPECIFICATION]: 'Using 6 decimal precision',
     [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
     [ERC_SPECIFICATIONS.ERC_721]: '',
     [CW_SPECIFICATIONS.CW_721]: '',
@@ -64,6 +67,8 @@ const RequirementSubForm = ({
                     TOKENS.COSMOS_TOKEN,
                     ...Object.values(CW_SPECIFICATIONS),
                   ].includes(x.value)
+                : app.chain.base === ChainBase.Solana
+                ? [SPL_SPECIFICATION].includes(x.value)
                 : [
                     TOKENS.EVM_TOKEN,
                     ...Object.values(ERC_SPECIFICATIONS),
@@ -119,7 +124,12 @@ const RequirementSubForm = ({
             options={chainTypes
               .filter(
                 (x) =>
-                  x.chainBase === (isCosmosRequirement ? 'cosmos' : 'ethereum'),
+                  x.chainBase ===
+                  (isCosmosRequirement
+                    ? 'cosmos'
+                    : isSPLRequirement
+                    ? 'solana'
+                    : 'ethereum'),
               )
               .map((chainType) => ({
                 label: chainType.label,

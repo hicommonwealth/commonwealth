@@ -1,4 +1,4 @@
-import { ChainNetwork } from '@hicommonwealth/core';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';

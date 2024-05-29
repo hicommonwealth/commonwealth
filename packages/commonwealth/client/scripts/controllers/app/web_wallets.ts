@@ -1,4 +1,4 @@
-import type { ChainBase, WalletId } from '@hicommonwealth/core';
+import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
 import Account from '../../models/Account';

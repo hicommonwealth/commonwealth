@@ -1,11 +1,13 @@
-import { logger, stats } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
+import Sequelize from 'sequelize';
+import { fileURLToPath } from 'url';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export type ReactionAttributes = {
   address_id: number;
@@ -25,40 +27,37 @@ export type ReactionAttributes = {
   created_at?: Date;
   updated_at?: Date;
 
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
 };
 
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
-export type ReactionModelStatic = ModelStatic<ReactionInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ReactionModelStatic => {
-  const Reaction = <ReactionModelStatic>sequelize.define(
+): Sequelize.ModelStatic<ReactionInstance> =>
+  sequelize.define<ReactionInstance>(
     'Reaction',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      thread_id: { type: dataTypes.INTEGER, allowNull: true },
-      proposal_id: { type: dataTypes.STRING, allowNull: true },
-      comment_id: { type: dataTypes.INTEGER, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
-      reaction: { type: dataTypes.STRING, allowNull: false },
-      calculated_voting_weight: { type: dataTypes.INTEGER, allowNull: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
+      thread_id: { type: Sequelize.INTEGER, allowNull: true },
+      proposal_id: { type: Sequelize.STRING, allowNull: true },
+      comment_id: { type: Sequelize.INTEGER, allowNull: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: false },
+      reaction: { type: Sequelize.ENUM('like'), allowNull: false },
+      calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      canvas_action: { type: Sequelize.JSONB, allowNull: true },
+      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      canvas_hash: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {
         afterCreate: async (reaction: ReactionInstance, options) => {
           let thread_id = reaction.thread_id;
           const comment_id = reaction.comment_id;
-          const { Thread, Comment } = sequelize.models;
+          const { Thread, Comment, Outbox } = sequelize.models;
           try {
             if (thread_id) {
               const thread = await Thread.findOne({
@@ -73,6 +72,21 @@ export default (
                     by: reaction.calculated_voting_weight,
                     transaction: options.transaction,
                   });
+                }
+                if (reaction.reaction === 'like') {
+                  await emitEvent(
+                    Outbox,
+                    [
+                      {
+                        event_name: EventNames.ThreadUpvoted,
+                        event_payload: {
+                          ...reaction.get({ plain: true }),
+                          reaction: 'like',
+                        },
+                      },
+                    ],
+                    options.transaction,
+                  );
                 }
                 stats().increment('cw.hook.reaction-count', {
                   thread_id: String(thread_id),
@@ -171,6 +185,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
+        { fields: ['thread_id'] },
         { fields: ['address_id'] },
         {
           fields: [
@@ -181,6 +196,7 @@ export default (
             'comment_id',
             'reaction',
           ],
+          name: 'reactions_unique',
           unique: true,
         },
         { fields: ['community_id', 'thread_id'] },
@@ -188,25 +204,3 @@ export default (
       ],
     },
   );
-
-  Reaction.associate = (models) => {
-    models.Reaction.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Comment, {
-      foreignKey: 'comment_id',
-      targetKey: 'id',
-    });
-    models.Reaction.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      targetKey: 'id',
-    });
-  };
-
-  return Reaction;
-};

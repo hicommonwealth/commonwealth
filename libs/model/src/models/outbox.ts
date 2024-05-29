@@ -1,34 +1,50 @@
-import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import type { DataTypes } from 'sequelize';
+import { EventContext, Events, Outbox } from '@hicommonwealth/core';
+import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
-import { ModelInstance, ModelStatic } from './types';
+import { ModelInstance } from './types';
 
-export type OutboxAttributes = z.infer<typeof schemas.entities.Outbox>;
+export type OutboxAttributes = z.infer<typeof Outbox>;
+
+export type InsertOutboxEvent = EventContext<Events> & {
+  created_at?: Date;
+};
 
 export type OutboxInstance = ModelInstance<OutboxAttributes>;
 
-export type OutboxModelStatic = ModelStatic<OutboxInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): OutboxModelStatic => {
-  const outbox = <OutboxModelStatic>sequelize.define(
+): Sequelize.ModelStatic<OutboxInstance> => {
+  const outbox = sequelize.define<OutboxInstance>(
     'Outbox',
     {
-      // Sequelize v6 doesn't support having an id column that isn't a primary key
-      // https://github.com/sequelize/sequelize/pull/14386
-      // id: { type: dataTypes.BIGINT, autoIncrement: true, primaryKey: false },
-      event_name: { type: dataTypes.STRING, allowNull: false },
-      event_payload: { type: dataTypes.JSONB, allowNull: false },
+      event_id: {
+        /**
+         * This column is intentionally not a primary key in the DB. The primary
+         * key is set to true here only so that `sequelize.sync()` works. This
+         * is ok since the Outbox is not partitioned for tests. The primary key
+         * is not enforced on the actual database because you cannot have a
+         * primary key on a partitioned table. Additionally, setting
+         * autoIncrement without primaryKey: true is not possible so this
+         * ensures that sequelize leaves the generation of the event_id to the
+         * DB. Issue to track: https://github.com/sequelize/sequelize/issues/12718
+         */
+        primaryKey: true,
+        type: Sequelize.BIGINT,
+        autoIncrement: true,
+        autoIncrementIdentity: true,
+        set() {
+          throw new Error('event_id is read-only');
+        },
+      },
+      event_name: { type: Sequelize.TEXT, allowNull: false },
+      event_payload: { type: Sequelize.JSONB, allowNull: false },
       relayed: {
-        type: dataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      created_at: { type: dataTypes.DATE, allowNull: true },
-      updated_at: { type: dataTypes.DATE, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Outbox',

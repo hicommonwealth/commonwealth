@@ -1,0 +1,109 @@
+@import '../../../../../../../styles/shared';
+
+.ContestCard {
+  max-width: 600px;
+  width: unset;
+  padding: 0;
+
+  .contest-image {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    width: 100%;
+    max-height: 275px;
+    object-fit: cover;
+
+    @include extraSmall {
+      min-height: 195px;
+    }
+  }
+
+  .contest-body {
+    width: 100%;
+    padding: 16px;
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 32px;
+
+      & > .Text {
+        word-break: break-word;
+      }
+
+      @include extraSmall {
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+
+    .topics {
+      color: $neutral-500;
+    }
+
+    .prizes-header {
+      margin-top: 8px;
+    }
+
+    .prizes {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+
+      .prize-row {
+        display: flex;
+        justify-content: space-between;
+
+        .label {
+          color: $neutral-600;
+        }
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+
+      @include extraSmall {
+        justify-content: space-between;
+        margin-top: 12px;
+
+        .ThreadAction {
+          .Text.caption {
+            display: none;
+          }
+
+          svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+      }
+    }
+  }
+
+  .contest-footer {
+    padding-inline: 16px;
+    padding-bottom: 16px;
+    width: 100%;
+
+    .Divider {
+      margin-bottom: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+
+      @include extraSmall {
+        flex-direction: column;
+
+        .cta-btn,
+        .Button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

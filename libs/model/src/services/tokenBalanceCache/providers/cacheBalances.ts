@@ -1,13 +1,7 @@
-import {
-  BalanceSourceType,
-  CacheNamespaces,
-  cache,
-} from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
+import { config } from '../../../config';
 import { Balances, GetBalancesOptions } from '../types';
-
-const balanceTTL = process.env.TBC_BALANCE_TTL_SECONDS
-  ? parseInt(process.env.TBC_BALANCE_TTL_SECONDS, 10)
-  : 300;
 
 /**
  * This function retrieves cached balances and modifies (in-place) the given addresses array
@@ -50,7 +44,7 @@ export async function cacheBalances(
         result[transformedKey] = balances[address];
         return result;
       }, {} as Balances),
-      ttl ?? balanceTTL,
+      ttl ?? config.TBC.TTL_SECS,
       false,
     );
   }
@@ -85,6 +79,8 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
         `${options.sourceOptions.cosmosChainId}_` +
         `${options.sourceOptions.contractAddress}_${address}`
       );
+    case BalanceSourceType.SPL:
+      return `sol_${options.mintAddress}_${address}`;
   }
 }
 

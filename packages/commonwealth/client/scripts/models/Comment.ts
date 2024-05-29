@@ -2,8 +2,9 @@ import { VersionHistory } from 'models/Thread';
 import type momentType from 'moment';
 import moment from 'moment';
 import AddressInfo from './AddressInfo';
-import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';
+import { addressToUserProfile, UserProfile } from './MinimumProfile';
+import Reaction from './Reaction';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class Comment<T extends IUniqueId> {
@@ -30,6 +31,8 @@ export class Comment<T extends IUniqueId> {
   public readonly canvasSession: string;
   public readonly canvasHash: string;
   public readonly discord_meta: any;
+
+  public readonly profile: UserProfile;
 
   constructor({
     id,
@@ -97,6 +100,8 @@ export class Comment<T extends IUniqueId> {
     this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
+
+    this.profile = addressToUserProfile(Address);
   }
 }
 

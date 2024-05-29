@@ -1,56 +1,60 @@
+import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
 
-type Member = {
+export type Member = {
   id: number;
   avatarUrl: string;
   name: string;
   role: 'admin' | 'moderator' | '';
   groups: string[];
+  stakeBalance?: string;
+  lastActive?: string;
+  address?: string;
 };
 
 type MembersSectionProps = {
   filteredMembers: Member[];
-  onLoadMoreMembers: () => any;
+  onLoadMoreMembers?: () => unknown;
   isLoadingMoreMembers?: boolean;
+  tableState: CWTableState;
+  selectedAccounts?: string[];
+  handleCheckboxChange?: (address: string) => void;
+  extraColumns?: (member: Member) => object;
 };
-
-const columns = [
-  {
-    key: 'name',
-    header: 'Name',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'groups',
-    header: 'Groups',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: true,
-  },
-];
 
 const MembersSection = ({
   filteredMembers,
   onLoadMoreMembers,
   isLoadingMoreMembers,
+  tableState,
+  selectedAccounts,
+  handleCheckboxChange,
+  extraColumns,
 }: MembersSectionProps) => {
   return (
     <div className="MembersSection">
       <CWTable
-        columnInfo={columns}
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
         rowData={filteredMembers.map((member) => ({
           name: {
             sortValue: member.name + (member.role || ''),
             customElement: (
               <div className="table-cell">
+                {handleCheckboxChange && (
+                  <CWCheckbox
+                    checked={selectedAccounts.includes(member.address)}
+                    onChange={() => handleCheckboxChange(member.address)}
+                  />
+                )}
                 <Link to={`/profile/id/${member.id}`} className="user-info">
                   <Avatar
                     url={member.avatarUrl}
@@ -81,6 +85,13 @@ const MembersSection = ({
               </div>
             ),
           },
+          stakeBalance: {
+            sortValue: parseInt(member.stakeBalance || '0', 10),
+            customElement: (
+              <div className="table-cell text-right">{member.stakeBalance}</div>
+            ),
+          },
+          ...extraColumns(member),
         }))}
         onScrollEnd={onLoadMoreMembers}
         isLoadingMoreRows={isLoadingMoreMembers}

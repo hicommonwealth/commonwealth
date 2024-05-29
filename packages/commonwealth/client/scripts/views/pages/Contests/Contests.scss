@@ -1,0 +1,10 @@
+@import '../../../../styles/shared';
+
+.Contests {
+  .description {
+    color: $neutral-500;
+    max-width: 600px;
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+}

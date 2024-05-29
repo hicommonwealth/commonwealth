@@ -1,13 +1,19 @@
 /* eslint-disable max-len */
-import type {
+import { logger, stats } from '@hicommonwealth/core';
+import {
+  config,
+  type DB,
+  type NotificationInstance,
+} from '@hicommonwealth/model';
+import {
   IChainEventNotificationData,
   IForumNotificationData,
+  NotificationCategories,
   NotificationDataAndCategory,
-} from '@hicommonwealth/core';
-import { NotificationCategories, logger, stats } from '@hicommonwealth/core';
-import type { DB, NotificationInstance } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
-import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
+import { fileURLToPath } from 'url';
+import { SEND_WEBHOOKS_EMAILS } from '../config';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
@@ -15,7 +21,8 @@ import {
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const { Op } = Sequelize;
 
@@ -183,7 +190,7 @@ export default async function emitNotifications(
     // emails
     for (const subscription of subscriptions) {
       if (msg && isChainEventData && chainEvent.community_id) {
-        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
+        msg.dynamic_template_data.notification.path = `${config.SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
       }
       if (msg && subscription?.immediate_email && subscription?.User) {
         // kick off async call and immediately return

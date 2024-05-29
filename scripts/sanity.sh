@@ -1,22 +1,32 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # Sanity scripts we should run locally before pushing code
-set -e 
+set -e
 
-# lint changes
-yarn lint-branch-warnings
+function step() {
+  echo -e "\n \033[1;33m > $1 ... \033[0m \n"
+}
 
-# check types 
-# build libs to update types (tsc -b --noEmit is not allowed)
-yarn workspaces run clean
-yarn workspace @hicommonwealth/adapters build
-yarn workspace @hicommonwealth/chains build
-yarn workspace @hicommonwealth/model build
-yarn workspaces run check-types
+step 'Linting'
+pnpm lint-branch-warnings
 
-# run unit tests
-# this should be: yarn workspaces run test
-# this should be added to CI: yarn workspace @hicommonwealth/adapters test
-yarn workspace @hicommonwealth/core test
-yarn workspace @hicommonwealth/model test
-yarn workspace commonwealth unit-test
+step 'Initial cleaning'
+pnpm -r clean
+
+step 'Building'
+pnpm -F commonwealth build
+pnpm -F sitemaps build
+
+step 'Type checking'
+pnpm -r check-types
+
+step 'Unit testing'
+pnpm -r test
+
+step 'Integration testing'
+pnpm -F commonwealth test-api
+pnpm -F commonwealth test-integration-util
+
+# we are aiming for a devx without builds
+step 'Final cleaning'
+pnpm -r clean

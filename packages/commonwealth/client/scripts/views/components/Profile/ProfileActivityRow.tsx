@@ -155,7 +155,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
               {
                 iconLeft: 'twitterOutline',
                 iconLeftSize: 'regular',
-                label: 'Share on Twitter',
+                label: 'Share on  X (Twitter)',
                 onClick: async () => {
                   if (isThread) {
                     await window.open(

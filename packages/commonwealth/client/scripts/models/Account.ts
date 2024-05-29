@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
@@ -29,6 +29,10 @@ class Account {
 
   public get profile() {
     return this._profile;
+  }
+
+  public set profile(profile) {
+    this._profile = profile;
   }
 
   constructor({

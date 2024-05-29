@@ -1,8 +1,5 @@
-import {
-  AppError,
-  BalanceSourceType,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { getBalances } from '../tokenBalanceCache';
@@ -26,7 +23,7 @@ export const validateNamespace = async (
   txHash: string,
   address: string,
   community: CommunityAttributes,
-) => {
+): Promise<string> => {
   // const community = await model.Community.findOne({
   //   where: {
   //     id: communityId,
@@ -61,12 +58,12 @@ export const validateNamespace = async (
 
   //validate contract data
   const activeNamespace = await getNamespace(
-    web3,
+    community.ChainNode.url,
     namespace,
     factoryData.factory,
   );
 
-  if (activeNamespace !== txReceipt.logs[0].address) {
+  if (activeNamespace.toLowerCase() !== txReceipt.logs[0].address) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 
@@ -84,4 +81,6 @@ export const validateNamespace = async (
   if (balance[address] !== '1') {
     throw new AppError('User not admin of namespace');
   }
+
+  return activeNamespace;
 };

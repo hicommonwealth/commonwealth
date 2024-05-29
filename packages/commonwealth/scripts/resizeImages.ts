@@ -4,15 +4,15 @@
 // It will then re-upload these compressed images to s3.
 // Lastly it will update the icon_url with the new compressed image link
 
-import { models, sequelize } from '@hicommonwealth/model';
-import type { S3 } from 'aws-sdk';
-import AWS from 'aws-sdk';
+import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { formatS3Url, models, sequelize } from '@hicommonwealth/model';
 import * as https from 'https';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import sharp from 'sharp';
 
-const s3 = new AWS.S3();
+const s3 = new S3();
 
 const startChainsFrom = process.argv[2];
 const startProfilesFrom = process.argv[3];
@@ -184,21 +184,21 @@ async function uploadToS3AndReplace(
       contentType = 'image/jpeg';
     }
 
-    const params: S3.Types.PutObjectRequest = {
+    const params: PutObjectCommandInput = {
       Bucket: 'assets.commonwealth.im',
       Key: `${datum.id}_resized.${contentType.split('/')[1]}`,
       Body: resizedImage,
       ContentType: contentType,
     };
 
-    const newImage = await s3.upload(params).promise();
+    const newImage = await new Upload({
+      client: s3,
+      params,
+    }).done();
 
     // although it gets added to the assets.commonwealth.im bucket, the location of the newImage object points
     // to the bucket directly. We want to swap this out with the cloudflare url.
-    const newLocation = newImage.Location.replace(
-      's3.amazonaws.com/assets.commonwealth.im',
-      'assets.commonwealth.im',
-    );
+    const newLocation = formatS3Url(newImage.Location);
 
     console.log(
       `Successfully resized ${name} ${datum.id} with new url ${newLocation}`,
