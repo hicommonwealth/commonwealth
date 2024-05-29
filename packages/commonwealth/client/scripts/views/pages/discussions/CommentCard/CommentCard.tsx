@@ -250,7 +250,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {!isThreadArchived && (canEdit || canDelete) && (
+              {!isThreadArchived && (canEdit || canDelete || canToggleSpam) && (
                 <PopoverMenu
                   className="CommentActions"
                   renderTrigger={(onClick) => (

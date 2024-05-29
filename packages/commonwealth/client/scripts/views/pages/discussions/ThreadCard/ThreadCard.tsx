@@ -92,8 +92,8 @@ export const ThreadCard = ({
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin() ||
-    Permissions.isCommunityModerator();
+    Permissions.isCommunityAdmin(null, thread.communityId) ||
+    Permissions.isCommunityModerator(null, thread.communityId);
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 

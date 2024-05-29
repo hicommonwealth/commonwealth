@@ -24,7 +24,7 @@ const isCommunityMember = (communityId?: string) => {
 
 const isCommunityAdmin = (account?: Account, communityId?: string) => {
   return (
-    app.user.activeAccount &&
+    (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
     app.roles.isRoleOfCommunity({
       role: ROLES.ADMIN,
       community: communityId || app.activeChainId(),
@@ -33,12 +33,12 @@ const isCommunityAdmin = (account?: Account, communityId?: string) => {
   );
 };
 
-const isCommunityModerator = (account?: Account) => {
+const isCommunityModerator = (account?: Account, communityId?: string) => {
   return (
-    app.user.activeAccount &&
+    (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
     app.roles.isRoleOfCommunity({
       role: ROLES.MODERATOR,
-      community: app.activeChainId(),
+      community: communityId || app.activeChainId(),
       ...(account && { account }),
     })
   );
@@ -46,19 +46,19 @@ const isCommunityModerator = (account?: Account) => {
 
 const isThreadCollaborator = (thread: Thread) => {
   return (
-    thread.collaborators?.filter((c) => {
+    thread?.collaborators?.filter((c) => {
       return (
-        c.address === app.user.activeAccount?.address &&
-        c.community_id === app.user.activeAccount?.community.id
+        c?.address === app?.user?.activeAccount?.address &&
+        c?.community_id === app?.user?.activeAccount?.community.id
       );
-    }).length > 0
+    })?.length > 0
   );
 };
 
 const isThreadAuthor = (thread: Thread) => {
   return (
-    app.user.activeAccount?.address === thread.author &&
-    app.user.activeAccount?.community.id === thread.authorCommunity
+    app?.user?.activeAccount?.address === thread?.author &&
+    app?.user?.activeAccount?.community.id === thread?.authorCommunity
   );
 };
 
