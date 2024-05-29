@@ -577,7 +577,7 @@ const namespaceFactoryAbi = [
   },
 ];
 
-const contestAbi = [
+const recurringContestAbi = [
   {
     inputs: [
       {
@@ -1187,6 +1187,586 @@ const contestAbi = [
   },
 ];
 
+const singleContestAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_contestLength',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_votingStrategy',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_claimHookAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_contentHookAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256[]',
+        name: '_winnerShares',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'address',
+        name: '_contestToken',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_voterShare',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_namespace',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_protocolFeePercentage',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protocolFeeDestination',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableInvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableUnauthorizedAccount',
+    type: 'error',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'contentId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'creator',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'url',
+        type: 'string',
+      },
+    ],
+    name: 'ContentAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'startTime',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'endTime',
+        type: 'uint256',
+      },
+    ],
+    name: 'NewSingleContestStarted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'TokenSwept',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'voter',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'contentId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'votingPower',
+        type: 'uint256',
+      },
+    ],
+    name: 'VoterVoted',
+    type: 'event',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'creator',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'url',
+        type: 'string',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'addContent',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'claimContentRewards',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'claimHook',
+    outputs: [
+      {
+        internalType: 'contract IContestGovernorClaimHook',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'voter',
+        type: 'address',
+      },
+    ],
+    name: 'claimVoterRewards',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'content',
+    outputs: [
+      {
+        internalType: 'string',
+        name: 'url',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'cumulativeVotes',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'creator',
+        type: 'address',
+      },
+      {
+        internalType: 'bool',
+        name: 'completed',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contentHook',
+    outputs: [
+      {
+        internalType: 'contract IContestGovernorContentHook',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contestEnded',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contestLength',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contestStarted',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contestToken',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'currMinWinVotes',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'currentContentId',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'endContest',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'endTime',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'namespace',
+    outputs: [
+      {
+        internalType: 'contract INamespace',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFee',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFeeDestination',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFeePercentage',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'startTime',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+    ],
+    name: 'sweepTokens',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalPrize',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'voter',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+    ],
+    name: 'voteContent',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'voterShare',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'votingStrategy',
+    outputs: [
+      {
+        internalType: 'contract IVotingStrategy',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    stateMutability: 'payable',
+    type: 'receive',
+  },
+];
+
 const hashInstance = hasher({
   coerce: true,
   sort: true,
@@ -1196,7 +1776,8 @@ const hashInstance = hasher({
 });
 
 const namespaceFactoryHash = hashInstance.hash(namespaceFactoryAbi);
-const contestHash = hashInstance.hash(contestAbi);
+const recurringContestHash = hashInstance.hash(recurringContestAbi);
+const singleContestHash = hashInstance.hash(singleContestAbi);
 
 async function uploadABIs(queryInterface, transaction) {
   const namespaceFactoryAbiId = (
@@ -1225,7 +1806,7 @@ async function uploadABIs(queryInterface, transaction) {
     )
   )[0][0].id;
 
-  const contestAbiId = (
+  const recurringContestAbiId = (
     await queryInterface.sequelize.query(
       `
         INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
@@ -1243,15 +1824,45 @@ async function uploadABIs(queryInterface, transaction) {
         raw: true,
         type: QueryTypes.INSERT,
         replacements: {
-          abi: JSON.stringify(contestAbi),
-          nickname: 'Contest',
-          abi_hash: contestHash,
+          abi: JSON.stringify(recurringContestAbi),
+          nickname: 'RecurringContest',
+          abi_hash: recurringContestHash,
         },
       },
     )
   )[0][0].id;
 
-  return { namespaceFactoryAbiId, contestAbiId };
+  const singleContestAbiId = (
+    await queryInterface.sequelize.query(
+      `
+        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
+        VALUES (
+            :abi,
+            true,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            :nickname,
+            :abi_hash
+        ) RETURNING id;
+      `,
+      {
+        transaction,
+        raw: true,
+        type: QueryTypes.INSERT,
+        replacements: {
+          abi: JSON.stringify(singleContestAbi),
+          nickname: 'SingleContest',
+          abi_hash: singleContestHash,
+        },
+      },
+    )
+  )[0][0].id;
+
+  return {
+    namespaceFactoryAbiId,
+    recurringContestAbiId,
+    singleContestAbiId,
+  };
 }
 
 async function getChainNodeId(chainId, queryInterface, transaction) {
@@ -1342,7 +1953,11 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ContractAbis',
         {
-          abi_hash: [namespaceFactoryHash, contestHash],
+          abi_hash: [
+            namespaceFactoryHash,
+            recurringContestHash,
+            singleContestHash,
+          ],
         },
         { transaction },
       );

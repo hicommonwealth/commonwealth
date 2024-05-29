@@ -1,5 +1,6 @@
 import {
-  EvmContestEventSignatures,
+  EvmRecurringContestEventSignatures,
+  EvmSingleContestEventSignatures,
   InvalidState,
   Projection,
   events,
@@ -45,7 +46,7 @@ async function updateOrCreateWithAlert(
   namespace: string,
   contest_address: string,
   interval: number,
-  isOneOff: bool,
+  isOneOff: boolean,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -115,24 +116,26 @@ async function updateOrCreateWithAlert(
     );
 
     // create EVM event sources so chain listener will listen to events on new contest contract
+    const abiNickname = isOneOff ? 'SingleContest' : 'RecurringContest';
     const contestAbi = await models.ContractAbi.findOne({
-      where: { nickname: 'Contest' },
+      where: { nickname: abiNickname },
     });
-    if (mustExist(`Contest ABI with nickname "Contest"`, contestAbi)) {
-      const sourcesToCreate: EvmEventSourceAttributes[] = Object.keys(
-        EvmContestEventSignatures,
-      ).map((eventName) => {
-        const eventSignature = (
-          EvmContestEventSignatures as Record<string, string>
-        )[eventName];
-        return {
-          chain_node_id: community!.ChainNode!.id!,
-          contract_address: contest_address,
-          event_signature: eventSignature,
-          kind: eventName,
-          abi_id: contestAbi.id,
-        };
-      });
+    if (mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi)) {
+      const sigs = isOneOff
+        ? EvmSingleContestEventSignatures
+        : EvmRecurringContestEventSignatures;
+      const sourcesToCreate: EvmEventSourceAttributes[] = Object.keys(sigs).map(
+        (eventName) => {
+          const eventSignature = (sigs as Record<string, string>)[eventName];
+          return {
+            chain_node_id: community!.ChainNode!.id!,
+            contract_address: contest_address,
+            event_signature: eventSignature,
+            kind: eventName,
+            abi_id: contestAbi.id,
+          };
+        },
+      );
       await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
     }
   });

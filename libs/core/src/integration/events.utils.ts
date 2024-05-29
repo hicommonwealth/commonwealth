@@ -54,8 +54,10 @@ export const ChainEventSigs = {
   NewSingleContestStarted: 'uint256 startTime, uint256 endTime' as const,
   ContentAdded:
     'uint256 indexed contentId, address indexed creator, string url' as const,
-  VoterVoted:
+  VoterVotedRecurring:
     'address indexed voter, uint256 indexed contentId, uint256 contestId, uint256 votingPower' as const,
+  VoterVotedOneOff:
+    'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
 };
 
 const RecurringContestManagerDeployedMapper: EvmMapper<
@@ -149,11 +151,11 @@ const NewContestContentAddedMapper: EvmMapper<
   }),
 };
 
-const ContestContentUpvotedMapper: EvmMapper<
-  typeof ChainEventSigs.VoterVoted,
+const ContestContentUpvotedRecurringMapper: EvmMapper<
+  typeof ChainEventSigs.VoterVotedRecurring,
   typeof ContestContentUpvoted
 > = {
-  signature: ChainEventSigs.VoterVoted,
+  signature: ChainEventSigs.VoterVotedRecurring,
   output: ContestContentUpvoted,
   mapEvmToSchema: (
     contestAddress,
@@ -170,6 +172,24 @@ const ContestContentUpvotedMapper: EvmMapper<
   }),
 };
 
+const ContestContentUpvotedOneOffMapper: EvmMapper<
+  typeof ChainEventSigs.VoterVotedOneOff,
+  typeof ContestContentUpvoted
+> = {
+  signature: ChainEventSigs.VoterVotedOneOff,
+  output: ContestContentUpvoted,
+  mapEvmToSchema: (contestAddress, { contentId, voter, votingPower }) => ({
+    event_name: EventNames.ContestContentUpvoted,
+    event_payload: {
+      contest_address: contestAddress!,
+      contest_id: ethers.BigNumber.from(0).toNumber(),
+      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      voter_address: voter,
+      voting_power: ethers.BigNumber.from(votingPower).toNumber(),
+    },
+  }),
+};
+
 // EvmMappers maps each chain event to one or more zod event schema types
 const EvmMappers = {
   NewContest: [
@@ -179,7 +199,8 @@ const EvmMappers = {
   NewRecurringContestStarted: NewRecurringContestStartedMapper,
   NewSingleContestStarted: NewSingleContestStartedMapper,
   ContentAdded: NewContestContentAddedMapper,
-  VoterVoted: ContestContentUpvotedMapper,
+  VoterVotedRecurring: ContestContentUpvotedRecurringMapper,
+  VoterVotedOneOff: ContestContentUpvotedOneOffMapper,
 };
 
 // parseEthersResult converts the raw EVM result into key-value pairs
