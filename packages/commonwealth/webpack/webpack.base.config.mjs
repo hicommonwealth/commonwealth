@@ -27,6 +27,12 @@ const baseConfig = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      'process.env.FLAG_PWA_NOTIFICATIONS': JSON.stringify(
+        process.env.FLAG_PWA_NOTIFICATIONS,
+      ),
+    }),
+
+    new webpack.DefinePlugin({
       'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
         process.env.KNOCK_PUBLIC_API_KEY,
       ),
