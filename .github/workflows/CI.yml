@@ -1,11 +1,18 @@
 name: CI
 
 env:
-  ROLLBAR_ENV: 'GitHubCI'
+  IS_CI: true
   NODE_ENV: 'test'
+  ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
   ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted'
   PRIVATE_KEY: 'web3-pk'
+  USES_DOCKER_PGSQL: true
+  PORT: 8080
+  REDIS_URL: redis://localhost:6379
+  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+  ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+  GITHUB_BASE_REF: ${{ github.base_ref }}
 
 on:
   pull_request:
@@ -55,12 +62,6 @@ jobs:
       - uses: ./.github/actions/e2e
 
       - name: Run e2e tests
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
           pnpm -F commonwealth e2e-start-server --forbid-only &
@@ -121,12 +122,6 @@ jobs:
       - uses: ./.github/actions/e2e
 
       - name: Run e2e tests
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
           pnpm -F commonwealth e2e-start-server --forbid-only &
@@ -159,7 +154,7 @@ jobs:
         image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -188,16 +183,9 @@ jobs:
 
       - name: Run serial e2e tests
         run: |
-          (cd packages/commonwealth && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
-
-        env:
-          SERVER_URL: http://localhost:8080
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-          DATABASE_URL: postgresql://commonwealth:edgeware@localhost/commonwealth # required in production
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
@@ -223,8 +211,6 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
         run: pnpm lint-branch-warnings
 
   # Lint and Typecheck
@@ -258,8 +244,6 @@ jobs:
         run: pnpm -r check-types
 
       - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
         run: pnpm lint-branch
 
       # To disable eslint-diff just comment the following two lines
@@ -277,6 +261,8 @@ jobs:
     strategy:
       matrix:
         node: [ 20 ]
+    env:
+      NO_CLIENT: true
 
     services:
       postgres:
@@ -320,13 +306,9 @@ jobs:
 
       - name: Run API tests
         run: pnpm -F commonwealth test-api --forbid-only
-        env:
-          NO_CLIENT: true
 
       - name: Run util integration tests
         run: pnpm -F commonwealth test-integration-util --forbid-only
-        env:
-          NO_CLIENT: true
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -367,8 +349,6 @@ jobs:
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet evm --forbid-only
-        env:
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
 
   # These tests run slowly, so run them in a separate job
   commonwealth-cosmos-tests:
@@ -444,7 +424,4 @@ jobs:
         run: |
           pnpm -F commonwealth start &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet cosmos --forbid-only)
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-          REDIS_URL: redis://localhost:6379
+

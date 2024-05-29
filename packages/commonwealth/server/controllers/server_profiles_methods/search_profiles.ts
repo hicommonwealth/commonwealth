@@ -19,6 +19,7 @@ export type SearchProfilesOptions = {
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
   includeGroupIds?: boolean;
+  includeCount?: boolean;
 };
 
 type Profile = {
@@ -46,6 +47,7 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
+    includeCount,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
@@ -121,13 +123,15 @@ export async function __searchProfiles(
       bind,
       type: QueryTypes.SELECT,
     }),
-    this.models.sequelize.query(
-      `SELECT COUNT(*) FROM ( ${sqlWithoutPagination} ) as count`,
-      {
-        bind,
-        type: QueryTypes.SELECT,
-      },
-    ),
+    !includeCount
+      ? [{ count: 0 }]
+      : this.models.sequelize.query(
+          `SELECT COUNT(*) FROM ( ${sqlWithoutPagination} ) as count`,
+          {
+            bind,
+            type: QueryTypes.SELECT,
+          },
+        ),
   ]);
 
   const totalResults = parseInt(count, 10);

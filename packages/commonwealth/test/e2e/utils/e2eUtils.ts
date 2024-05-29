@@ -226,10 +226,20 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
 let seeder;
 
+/**
+ * Legacy e2e seeder
+ *
+ * @deprecated Use `seed` from `libs/model/src/tester/seed.ts` instead
+ * - Seed data is too coupled with integration seeds
+ *
+ * @returns e2e seeder
+ */
 export const e2eSeeder = async (): Promise<E2E_Seeder> => {
   if (!seeder) {
     try {
+      console.log('Seeding e2e test data...');
       seeder = await buildSeeder();
+      console.log('Seeding e2e test data...DONE');
     } catch (error) {
       console.error('Error seeding E2E:', error);
       throw error;

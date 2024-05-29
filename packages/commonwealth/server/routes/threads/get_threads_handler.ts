@@ -74,8 +74,15 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const { thread_ids, bulk, active, search, count, community_id } =
-    queryValidationResult.data;
+  const {
+    thread_ids,
+    bulk,
+    active,
+    search,
+    count,
+    community_id,
+    include_count,
+  } = queryValidationResult.data;
 
   // get threads by IDs
   if (thread_ids) {
@@ -158,6 +165,7 @@ export const getThreadsHandler = async (
       page: parseInt(page, 10) || 0,
       orderBy: order_by,
       orderDirection: order_direction as any,
+      includeCount: include_count,
     });
     return success(res, searchResults);
   }

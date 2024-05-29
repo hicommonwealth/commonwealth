@@ -127,6 +127,7 @@ export const voteContent = async (
 export const getContestStatus = async (
   rpcNodeUrl: string,
   contest: string,
+  oneOff?: boolean,
 ): Promise<ContestStatus> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
@@ -137,7 +138,9 @@ export const getContestStatus = async (
   const promise = await Promise.all([
     contestInstance.methods.startTime().call(),
     contestInstance.methods.endTime().call(),
-    contestInstance.methods.contestInterval().call(),
+    oneOff
+      ? contestInstance.methods.contestLength().call()
+      : contestInstance.methods.contestInterval().call(),
     contestInstance.methods.currentContentId().call(),
   ]);
 

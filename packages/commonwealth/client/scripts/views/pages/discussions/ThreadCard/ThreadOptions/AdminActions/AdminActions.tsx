@@ -205,7 +205,8 @@ export const AdminActions = ({
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
         onLockToggle?.(!thread?.readOnly);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         notifyError('Could not update thread read_only');
       });
   };

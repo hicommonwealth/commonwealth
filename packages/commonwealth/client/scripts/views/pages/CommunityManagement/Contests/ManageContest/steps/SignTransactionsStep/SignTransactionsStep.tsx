@@ -24,6 +24,7 @@ import {
   LaunchContestStep,
 } from '../../types';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
@@ -33,6 +34,7 @@ interface SignTransactionsStepProps {
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
+const FIVE_MINS_IN_SECONDS = 60 * 5;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -55,16 +57,22 @@ const SignTransactionsStep = ({
   const isDirectDepositSelected =
     contestFormData.feeType === ContestFeeType.DirectDeposit;
 
+  const devContest = useFlag('contestDev');
+
   const signTransaction = async () => {
     const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
     const chainRpc = app?.chain?.meta?.ChainNode?.url;
     const namespaceName = app?.chain?.meta?.namespace;
-    const contestLength = SEVEN_DAYS_IN_SECONDS;
+    const contestLength = devContest
+      ? FIVE_MINS_IN_SECONDS
+      : SEVEN_DAYS_IN_SECONDS;
     const stakeId = app?.chain?.meta?.CommunityStakes?.[0]?.stakeId;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = Number(app?.chain?.meta?.CommunityStakes?.[0]?.voteWeight);
-    const contestInterval = SEVEN_DAYS_IN_SECONDS;
+    const contestInterval = devContest
+      ? FIVE_MINS_IN_SECONDS
+      : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected

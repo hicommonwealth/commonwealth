@@ -7,6 +7,7 @@ export const GetThreadsParamsSchema = z.object({
   active: z.string().optional(),
   search: z.string().optional(),
   count: z.coerce.boolean().optional().default(false),
+  include_count: z.coerce.boolean().default(false),
 });
 
 export const GetBulkThreadsParamsSchema = z.object({
