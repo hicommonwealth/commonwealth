@@ -2,7 +2,7 @@ import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy';
 import {
   LocalAccountSigner,
   SmartAccountSigner,
-  baseSepolia,
+  sepolia,
 } from '@alchemy/aa-core';
 import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
@@ -44,11 +44,11 @@ export const createWalletHandler = async (
 
   // verify signature
   const web3 = new Web3();
-  const messageHash = web3.utils.soliditySha3(message);
+
   const { address, signedMessage } = req.body;
 
   // Calculate the signer's address
-  const signerAddress = web3.eth.accounts.recover(messageHash, mockSig);
+  const signerAddress = web3.eth.accounts.recover(message, mockSig);
 
   if (signerAddress.toLowerCase() !== address.toLowerCase()) {
     throw new AppError('Validation Error: Invalid signature');
@@ -58,7 +58,8 @@ export const createWalletHandler = async (
   let newWalletAddress: string;
 
   //Figure out specific chain for this
-  const chain = baseSepolia;
+  const chain = sepolia;
+
   const signer: SmartAccountSigner =
     LocalAccountSigner.privateKeyToAccountSigner(
       `0x${process.env.AA_PRIVATE_KEY}`,
@@ -66,13 +67,14 @@ export const createWalletHandler = async (
   const AAsignerAddress = await signer.getAddress();
 
   const smartAccountClient = await createModularAccountAlchemyClient({
-    apiKey: 'rtbehTeM8zklG0PQq5vxg4GtAu2lTFtI',
+    apiKey: '4b9000EKY9q82xeEYKv7FDwq8ViBWA5Y',
     chain,
     signer,
     owners: [AAsignerAddress, `0x${address.replace('0x', '')}`],
   });
 
   newWalletAddress = smartAccountClient.account.address;
+  console.log(newWalletAddress);
 
   // Insert into DB
   const wallet = await models.Wallets.create({
@@ -80,6 +82,7 @@ export const createWalletHandler = async (
     user_address: address,
     relay_address: AAsignerAddress,
     wallet_address: newWalletAddress,
+    created_at: new Date(),
   });
 
   return success(res, {

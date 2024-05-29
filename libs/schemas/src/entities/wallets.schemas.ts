@@ -8,4 +8,5 @@ export const Wallets = z.object({
   relay_address: z.string().startsWith('0x').length(42),
   wallet_address: z.string().startsWith('0x').length(42),
   created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
