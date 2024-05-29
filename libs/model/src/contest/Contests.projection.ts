@@ -179,6 +179,13 @@ async function getContestDetails(
  */
 async function updateScore(contest_address: string, contest_id: number) {
   try {
+    const contestManager = await models.ContestManager.findOne({
+      where: {
+        contest_address,
+      },
+    });
+    const oneOff = contestManager!.interval === 0;
+
     const details = await getContestDetails(contest_address);
     if (!details?.url)
       throw new InvalidState(
@@ -190,6 +197,7 @@ async function updateScore(contest_address: string, contest_id: number) {
         details.url,
         contest_address,
         contest_id,
+        oneOff,
       );
     const prizePool =
       (Number(contestBalance) * Number(details.prize_percentage)) / 100;
@@ -273,7 +281,7 @@ export function Contests(): Projection<typeof inputs> {
         );
       },
 
-      // This event is NOT emitted at the start of the contest, but at each interval
+      // TODO: confirm when this event is emitted
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id || 0;
         // update winners on ended contests
