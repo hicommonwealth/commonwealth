@@ -203,7 +203,7 @@ export const AdminActions = ({
     })
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
-        onLockToggle(!thread?.readOnly);
+        onLockToggle?.(!thread?.readOnly);
       })
       .catch(() => {
         notifyError('Could not update thread read_only');
@@ -219,7 +219,7 @@ export const AdminActions = ({
     })
       .then(() => {
         notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
-        onPinToggle && onPinToggle(!thread.pinned);
+        onPinToggle?.(!thread.pinned);
       })
       .catch(() => {
         notifyError('Could not update pinned state');
