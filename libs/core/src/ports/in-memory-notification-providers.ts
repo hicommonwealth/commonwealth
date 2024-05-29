@@ -16,6 +16,7 @@ export function SpyNotificationsProvider(
       sandbox.stub().returns(Promise.resolve(true)),
     getMessages:
       stubs?.getMessagesStub || sandbox.stub().returns(Promise.resolve([])),
+    registerClientRegistrationToken: () => Promise.resolve('none'),
   };
 }
 
@@ -35,5 +36,6 @@ export function ThrowingSpyNotificationsProvider(
       stubs?.triggerWorkflowStub || sandbox.stub().rejects(ProviderError),
     getMessages:
       stubs?.getMessagesStub || sandbox.stub().rejects(ProviderError),
+    registerClientRegistrationToken: () => Promise.resolve('none'),
   };
 }

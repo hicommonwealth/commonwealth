@@ -13,12 +13,11 @@ const DEFAULT_FIREBASE_CONFIG = {
   measurementId: 'G-4PNZZQDNFE',
 };
 
-// FIXME: move to env...
-const PUBLIC_VAPID_KEY =
-  'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
+const PUBLIC_VAPID_KEY = process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY;
 
-const PUBLIC_FIREBASE_CONFIG = process.env.PUBLIC_FIREBASE_CONFIG
-  ? JSON.parse(process.env.PUBLIC_FIREBASE_CONFIG)
+const PUBLIC_FIREBASE_CONFIG = process.env
+  .KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
+  ? JSON.parse(process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG)
   : DEFAULT_FIREBASE_CONFIG;
 
 // Initialize Firebase
@@ -26,10 +25,6 @@ const app = initializeApp(PUBLIC_FIREBASE_CONFIG);
 
 // Initialize Firebase Cloud Messaging and get a reference to the service
 const messaging = getMessaging(app);
-
-export function getFirebaseMessaging() {
-  return messaging;
-}
 
 export async function getFirebaseMessagingToken() {
   return await getToken(messaging, { vapidKey: PUBLIC_VAPID_KEY });

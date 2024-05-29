@@ -9,7 +9,7 @@ import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { getFirebaseMessagingToken } from 'views/pages/notification_settings/getFirebaseMessaging';
+import { getFirebaseMessagingToken } from 'views/pages/notification_settings/getFirebaseMessagingToken';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';

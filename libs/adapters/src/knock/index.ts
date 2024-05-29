@@ -39,7 +39,7 @@ export function KnockProvider(): NotificationsProvider {
     async registerClientRegistrationToken(userId: number, token: string) {
       await knock.users.setChannelData(
         `${userId}`,
-        config.NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID!,
+        config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID!,
         {
           tokens: [token],
         },
