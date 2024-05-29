@@ -106,10 +106,18 @@ export async function __searchThreads(
     ${paginationSort}
   `;
 
-  const results: any[] = await this.models.sequelize.query(sqlBaseQuery, {
-    bind,
-    type: QueryTypes.SELECT,
-  });
+  const results: ThreadSearchData[] = await this.models.sequelize.query(
+    sqlBaseQuery,
+    {
+      bind,
+      type: QueryTypes.SELECT,
+      raw: true,
+    },
+  );
 
-  return buildPaginatedResponse(results, results.length, bind);
+  return buildPaginatedResponse(
+    results,
+    results.length,
+    bind,
+  ) as unknown as SearchThreadsResult;
 }
