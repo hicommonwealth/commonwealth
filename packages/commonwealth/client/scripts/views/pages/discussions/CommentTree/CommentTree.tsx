@@ -501,6 +501,7 @@ export const CommentTree = ({
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)
                   }
                   comment={comment}
+                  shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
                 />
               </div>
               <div ref={scrollToRef}></div>

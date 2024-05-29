@@ -268,6 +268,7 @@ export const CWContentPage = ({
             disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+            shareEndpoint={`${window.location.origin}${window.location.pathname}`}
           />,
         )}
 

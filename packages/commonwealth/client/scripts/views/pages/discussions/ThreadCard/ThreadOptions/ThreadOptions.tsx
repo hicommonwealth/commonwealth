@@ -1,10 +1,10 @@
 import { pluralize } from 'client/scripts/helpers';
+import Permissions from 'client/scripts/utils/Permissions';
 import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useState } from 'react';
+import { SharePopover } from 'views/components/SharePopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { SharePopover } from 'views/components/share_popover';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -62,7 +62,7 @@ export const ThreadOptions = ({
       getReactionSubscription(thread)?.isActive,
   );
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
 
   const handleToggleSubscribe = async (e) => {
     // prevent clicks from propagating to discussion row
@@ -117,18 +117,14 @@ export const ThreadOptions = ({
             />
           )}
 
-          <SharePopover
-            // if share endpoint is present it will be used, else the current url will be used
-            discussionLink={shareEndpoint}
-            label="Share"
-          />
+          <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           <CWThreadAction
             action="subscribe"
             label="Subscribe"
             onClick={handleToggleSubscribe}
             selected={!isSubscribed}
-            disabled={!hasJoinedCommunity}
+            disabled={!isCommunityMember}
           />
 
           {canUpdateThread && thread && (

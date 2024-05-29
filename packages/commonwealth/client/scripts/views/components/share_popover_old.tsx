@@ -13,7 +13,7 @@ type SharePopoverProps = {
   label?: string;
 } & Partial<PopoverTriggerProps>;
 
-export const SharePopover = ({
+export const SharePopoverOld = ({
   commentId,
   discussionLink,
   renderTrigger,

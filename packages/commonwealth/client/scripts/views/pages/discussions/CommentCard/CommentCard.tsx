@@ -4,6 +4,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 
+import { SharePopover } from 'client/scripts/views/components/SharePopover';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
@@ -21,7 +22,6 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { SharePopover } from 'views/components/share_popover';
 import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
@@ -57,6 +57,7 @@ type CommentCardProps = {
   isThreadArchived: boolean;
   // other
   className?: string;
+  shareURL: string;
 };
 
 export const CommentCard = ({
@@ -90,6 +91,7 @@ export const CommentCard = ({
   isThreadArchived,
   // other
   className,
+  shareURL,
 }: CommentCardProps) => {
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = deserializeDelta(
@@ -222,7 +224,7 @@ export const CommentCard = ({
                 </>
               )}
 
-              <SharePopover commentId={comment.id} label="Share" />
+              <SharePopover linkToShare={shareURL} buttonLabel="Share" />
 
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
