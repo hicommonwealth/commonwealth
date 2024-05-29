@@ -505,6 +505,7 @@ describe('ServerCommentsController', () => {
         page: 2,
         orderBy: 'created_at',
         orderDirection: 'DESC',
+        includeCount: true,
       };
       const comments = await serverCommentsController.searchComments(
         searchOptions,
