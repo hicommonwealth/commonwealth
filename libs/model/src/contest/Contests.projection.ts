@@ -281,7 +281,7 @@ export function Contests(): Projection<typeof inputs> {
         );
       },
 
-      // TODO: confirm when this event is emitted
+      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id || 0;
         // update winners on ended contests
