@@ -465,7 +465,10 @@ export const CommentTree = ({
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
-                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                    !!hasJoinedCommunity &&
+                    !thread.archivedAt &&
+                    !thread.lockedAt &&
+                    canReply
                   }
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
