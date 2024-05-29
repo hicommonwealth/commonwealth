@@ -27,6 +27,12 @@ const baseConfig = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      'process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG':
+        JSON.stringify(
+          process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
+        ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY': JSON.stringify(
         process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
       ),
