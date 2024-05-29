@@ -115,9 +115,9 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.content_url).to.eq('/threads/1');
   });
 
-  it('should map VoterVoted raw evm result to ContestContentUpvoted outbox shape', () => {
+  it('should map VoterVotedRecurring raw evm result to ContestContentUpvoted outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
-      'VoterVoted',
+      'VoterVotedRecurring',
       contestAddress,
       [
         '0x2', // voterAddress
@@ -136,10 +136,28 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.voting_power).to.eq(9000);
   });
 
+  it('should map VoterVotedOneOff raw evm result to ContestContentUpvoted outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'VoterVotedOneOff',
+      contestAddress,
+      [
+        '0x2', // voterAddress
+        ethers.BigNumber.from(10), // contentId
+        ethers.BigNumber.from(9000), // votingPower
+      ],
+    );
+    expect(event_name).to.eq(EventNames.ContestContentUpvoted);
+    const parsedEvent = ContestContentUpvoted.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.content_id).to.eq(10);
+    expect(parsedEvent.voter_address).to.eq('0x2');
+    expect(parsedEvent.voting_power).to.eq(9000);
+  });
+
   it('should throw if the wrong number of args are used outbox shape', () => {
     expect(() => {
-      // VoterVoted event requires 3 args
-      parseEvmEventToContestEvent('VoterVoted', contestAddress, [
+      parseEvmEventToContestEvent('VoterVotedRecurring', contestAddress, [
         '0x2', // voterAddress
       ]);
     }).to.throw('evm parsed args does not match signature');

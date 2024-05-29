@@ -14,7 +14,6 @@ import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { getContestStatus } from '../services/commonProtocol/contestHelper';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -100,11 +99,12 @@ async function updateOrCreateWithAlert(
     }
 
     // create contest
-    const { startTime, endTime } = await getContestStatus(
-      url,
-      contest_address,
-      isOneOff,
-    );
+    const { startTime, endTime } =
+      await protocol.contestHelper.getContestStatus(
+        url,
+        contest_address,
+        isOneOff,
+      );
     await models.Contest.create(
       {
         contest_address,
@@ -285,6 +285,10 @@ export function Contests(): Projection<typeof inputs> {
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id || 0;
         // update winners on ended contests
+        await models.Contest.create({
+          ...payload,
+          contest_id,
+        });
         contest_id > 0 &&
           setImmediate(() =>
             updateEndedContests(payload.contest_address, contest_id),
