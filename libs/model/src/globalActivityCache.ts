@@ -71,7 +71,8 @@ export async function getActivityFeed(models: DB, id = 0) {
         'user_id', P.user_id
       ))) as "recentComments"
       FROM (
-        Select * FROM "Comments" 
+        Select tempC.* FROM "Comments" tempC
+        JOIN ranked_thread_notifications tempRTN ON tempRTN.thread_id = tempC.thread_id
         WHERE deleted_at IS NULL
         ORDER BY created_at DESC
         LIMIT 2

@@ -236,7 +236,8 @@ export async function __getBulkThreads(
               'user_id', P.user_id
           ))) as "recentComments"
           FROM (
-            Select * FROM "Comments" 
+            Select tempC.* FROM "Comments" tempC
+	          JOIN top_threads tempTT ON tempTT.id = tempC.thread_id
             WHERE deleted_at IS NULL
             ORDER BY created_at DESC
             LIMIT :withXRecentComments
