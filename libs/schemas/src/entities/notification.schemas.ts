@@ -53,21 +53,23 @@ export const ThreadSubscription = z.object({
     comment_count: true,
     created_at: true,
     url: true,
-  }).merge(
-    z.object({
-      Community: Community.pick({
-        id: true,
-        name: true,
-        icon_url: true,
+  })
+    .merge(
+      z.object({
+        Community: Community.pick({
+          id: true,
+          name: true,
+          icon_url: true,
+        }),
+        Address: Address.pick({
+          id: true,
+          profile_id: true,
+          user_id: true,
+          address: true,
+        }),
       }),
-      Address: Address.pick({
-        id: true,
-        profile_id: true,
-        user_id: true,
-        address: true,
-      }),
-    }),
-  ),
+    )
+    .optional(),
 });
 
 export const CommentSubscription = z.object({

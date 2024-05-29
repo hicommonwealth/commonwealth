@@ -39,9 +39,6 @@ export default (
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      // Thread: {
-      //   type: typeof Thread
-      // }
     },
     {
       tableName: 'ThreadSubscriptions',
