@@ -8,6 +8,11 @@ const {
   CLOUDAMQP_URL,
   REDIS_URL, // local + staging
   REDIS_TLS_URL, // staging + production
+  KNOCK_AUTH_TOKEN,
+  KNOCK_SECRET_KEY,
+  KNOCK_SIGNING_KEY,
+  KNOCK_IN_APP_FEED_ID,
+  KNOCK_PUBLIC_API_KEY,
 } = process.env;
 
 export const config = configure(
@@ -28,11 +33,11 @@ export const config = configure(
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
         process.env.FLAG_KNOCK_INTEGRATION_ENABLED === 'true',
-      KNOCK_AUTH_TOKEN: process.env.KNOCK_AUTH_TOKEN,
-      KNOCK_SECRET_KEY: process.env.KNOCK_SECRET_KEY,
-      KNOCK_SIGNING_KEY: process.env.KNOCK_SIGNING_KEY,
-      KNOCK_IN_APP_FEED_ID: process.env.KNOCK_IN_APP_FEED_ID,
-      KNOCK_PUBLIC_API_KEY: process.env.KNOCK_PUBLIC_API_KEY,
+      KNOCK_AUTH_TOKEN,
+      KNOCK_SECRET_KEY,
+      KNOCK_SIGNING_KEY,
+      KNOCK_IN_APP_FEED_ID,
+      KNOCK_PUBLIC_API_KEY,
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
