@@ -325,6 +325,39 @@ export async function __updateThread(
         ],
       },
       { model: this.models.Topic, as: 'topic' },
+      {
+        model: this.models.Comment,
+        limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
+        order: [['created_at', 'DESC']],
+        attributes: [
+          'id',
+          'address_id',
+          'text',
+          ['plaintext', 'plainText'],
+          'created_at',
+          'updated_at',
+          'deleted_at',
+          'marked_as_spam_at',
+          'discord_meta',
+        ],
+        include: [
+          {
+            model: this.models.Address,
+            attributes: ['address'],
+            include: [
+              {
+                model: this.models.Profile,
+                attributes: [
+                  ['id', 'profile_id'],
+                  'profile_name',
+                  ['avatar_url', 'profile_avatar_url'],
+                  'user_id',
+                ],
+              },
+            ],
+          },
+        ],
+      },
     ],
   });
 
@@ -352,7 +385,28 @@ export async function __updateThread(
     ...createThreadMentionNotifications(mentionedAddresses, finalThread),
   );
 
-  return [finalThread.toJSON(), allNotificationOptions, allAnalyticsOptions];
+  const updatedThreadWithComments = { ...finalThread.toJSON() } as any;
+  updatedThreadWithComments.recentComments = (
+    updatedThreadWithComments.Comments || []
+  ).map((c) => {
+    const temp = {
+      ...c,
+      ...(c?.Address?.Profile || {}),
+      address: c?.Address?.address || '',
+    };
+
+    if (temp.Address) delete temp.Address;
+
+    return temp;
+  });
+
+  delete updatedThreadWithComments.Comments;
+
+  return [
+    updatedThreadWithComments,
+    allNotificationOptions,
+    allAnalyticsOptions,
+  ];
 }
 
 // -----
