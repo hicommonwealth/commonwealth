@@ -390,6 +390,7 @@ export class Thread implements IUniqueId {
           marked_as_spam_at: rc?.marked_as_spam_at,
           deleted_at: rc?.deleted_at,
           // fallback, we are not using this in display for thread preview
+          // and these should not be added here unless needed.
           parent_id: null,
           reactions: [],
           version_history: [],

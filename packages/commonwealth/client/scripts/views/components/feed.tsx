@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -17,10 +16,7 @@ import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
 import Topic from 'client/scripts/models/Topic';
 import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
-import {
-  getScopePrefix,
-  useCommonNavigate,
-} from 'client/scripts/navigation/helpers';
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import app from 'client/scripts/state';
 import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 import Permissions from 'client/scripts/utils/Permissions';
@@ -69,7 +65,6 @@ type FeedProps = {
 
 const DEFAULT_COUNT = 10;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
 
@@ -128,7 +123,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
           }/discussions?stage=${thread.stage}`,
         );
       }}
-      threadHref={`${getScopePrefix()}${discussionLink}`}
+      threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusEditor=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
       customStages={chain.customStages}
@@ -305,9 +300,7 @@ export const Feed = ({
             );
           }
 
-          const thread = data[i] as Thread;
-
-          return <FeedThread key={1} thread={thread} />;
+          return <FeedThread key={1} thread={data[i] as Thread} />;
         }}
       />
     </div>

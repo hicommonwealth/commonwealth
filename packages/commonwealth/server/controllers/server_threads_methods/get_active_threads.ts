@@ -62,7 +62,7 @@ export async function __getActiveThreads(
   if (withXRecentComments) {
     threadInclude.push({
       model: this.models.Comment,
-      limit: withXRecentComments,
+      limit: withXRecentComments > 10 ? 10 : withXRecentComments, // cap to 10,
       order: [['created_at', 'DESC']],
       attributes: [
         'id',
@@ -92,7 +92,6 @@ export async function __getActiveThreads(
           ],
         },
       ],
-      // TODO: flatten sequelize includes
       // TODO: get deleted_at null comments
       // where: {
       //   deleted_at: {
@@ -122,17 +121,16 @@ export async function __getActiveThreads(
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
 
   const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
-    let t = thread.toJSON();
-    // TODO: cleanup
-    t = {
-      ...t,
-      numberOfComments: t.comment_count || 0,
-      ...(t?.Address?.Profile || {}),
+    let tempThread = thread.toJSON();
+    tempThread = {
+      ...tempThread,
+      numberOfComments: tempThread.comment_count || 0,
+      ...(tempThread?.Address?.Profile || {}),
     };
-    if (t?.Address?.Profile) delete t.Address.Profile;
+    if (tempThread?.Address?.Profile) delete tempThread.Address.Profile;
 
     if (withXRecentComments) {
-      t.recentComments = (t.Comments || []).map((c) => {
+      tempThread.recentComments = (tempThread.Comments || []).map((c) => {
         const temp = {
           ...c,
           ...(c?.Address?.Profile || {}),
@@ -144,9 +142,9 @@ export async function __getActiveThreads(
         return temp;
       });
 
-      delete t.Comments;
+      delete tempThread.Comments;
     }
-    return t;
+    return tempThread;
   });
 
   communityTopics.forEach((topic) => {

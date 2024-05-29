@@ -100,7 +100,7 @@ export const CommentCard = ({
   );
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
   const author =
-    comment?.author && app.chain
+    comment?.author && app?.chain?.accounts
       ? app.chain.accounts.get(comment?.author)
       : null;
 
