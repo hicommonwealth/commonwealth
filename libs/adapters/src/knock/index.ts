@@ -37,13 +37,17 @@ export function KnockProvider(): NotificationsProvider {
       return res.items;
     },
     async registerClientRegistrationToken(userId: number, token: string) {
-      await knock.users.setChannelData(
-        `${userId}`,
-        config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID!,
-        {
-          tokens: [token],
-        },
-      );
+      if (config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID) {
+        await knock.users.setChannelData(
+          `${userId}`,
+          config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID,
+          {
+            tokens: [token],
+          },
+        );
+      } else {
+        console.warn('Push notifications not enabled');
+      }
     },
   };
 }
