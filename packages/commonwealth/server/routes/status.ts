@@ -375,9 +375,6 @@ async function computeKnockJwtToken(userId: number) {
       signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
       expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
     });
-  } else {
-    log.warn('No process.env.KNOCK_SIGNING_KEY defined');
-    return '';
   }
 }
 
