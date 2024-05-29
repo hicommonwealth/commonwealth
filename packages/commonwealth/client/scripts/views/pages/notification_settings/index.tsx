@@ -40,7 +40,7 @@ const emailIntervalFrequencyMap = {
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-  const enablePushNotifications = useFlag('pushNotifications');
+  const enableKnockPushNotifications = useFlag('knockPushNotifications');
 
   const {
     email,
@@ -99,7 +99,7 @@ const NotificationSettingsPage = () => {
           and chain events in the following communities.
         </CWText>
 
-        {enablePushNotifications && (
+        {enableKnockPushNotifications && (
           <div>
             <CWText type="h5">Push Notifications</CWText>
 
