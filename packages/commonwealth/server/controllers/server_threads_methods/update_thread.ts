@@ -326,6 +326,33 @@ export async function __updateThread(
       },
       { model: this.models.Topic, as: 'topic' },
       {
+        model: this.models.Reaction,
+        as: 'reactions',
+        include: [
+          {
+            model: this.models.Address,
+            as: 'Address',
+            required: true,
+            include: [
+              {
+                model: this.models.User,
+                as: 'User',
+                required: true,
+                attributes: ['id'],
+                include: [
+                  {
+                    model: this.models.Profile,
+                    as: 'Profiles',
+                    required: true,
+                    attributes: ['id', 'avatar_url', 'profile_name'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
         model: this.models.Comment,
         limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
         order: [['created_at', 'DESC']],
