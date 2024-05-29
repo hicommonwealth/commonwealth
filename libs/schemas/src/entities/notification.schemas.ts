@@ -54,7 +54,6 @@ export const ThreadSubscription = z.object({
     created_at: true,
     url: true,
   })
-    // FIXME: try to pull in the ENTIRE object here.
     .merge(
       z.object({
         Community: Community.pick({

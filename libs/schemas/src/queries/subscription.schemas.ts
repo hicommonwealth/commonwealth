@@ -21,33 +21,7 @@ export const GetCommentSubscriptions = {
   output: CommentSubscription.array(),
 };
 
-export const ThreadSubscriptionRecord = ThreadSubscription.extend({
-  // Thread: Thread.pick({
-  //   id: true,
-  //   community_id: true,
-  //   address_id: true,
-  //   title: true,
-  //   comment_count: true,
-  //   created_at: true,
-  //   url: true,
-  // }).merge(
-  //   z.object({
-  //     Community: Community.pick({
-  //       id: true,
-  //       name: true,
-  //       icon_url: true,
-  //     }),
-  //     Address: Address.pick({
-  //       id: true,
-  //       profile_id: true,
-  //       user_id: true,
-  //       address: true,
-  //     }),
-  //   }),
-  // ),
-});
-
 export const GetThreadSubscriptions = {
   input: z.object({}),
-  output: ThreadSubscriptionRecord.array(),
+  output: ThreadSubscription.array(),
 };
