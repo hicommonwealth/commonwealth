@@ -47,6 +47,7 @@ import ThreadSubscription from './thread_subscriptions';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
+import Wallets from './wallets';
 import Webhook from './webhook';
 
 export const Factories = {
@@ -97,6 +98,7 @@ export const Factories = {
   User,
   Vote,
   Webhook,
+  Wallets,
 };
 
 export type DB = {

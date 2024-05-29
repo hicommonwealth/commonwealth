@@ -1,8 +1,15 @@
+import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy';
+import {
+  LocalAccountSigner,
+  SmartAccountSigner,
+  baseSepolia,
+} from '@alchemy/aa-core';
 import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { TypedRequest, TypedResponse, success } from 'server/types';
 import Web3 from 'web3';
-
+const mockSig =
+  '0x716eac74630c92680a71eba4c728554480fa94e8f78e3f2f3f2da2b8ee907d09613c53effcd5d9735dd0224fc3e2c329c0d60c673d949225ce58e4b34b65cc481c';
 const message =
   'I approve commonwealth to create a smart wallet on behalf of this account';
 
@@ -40,32 +47,38 @@ export const createWalletHandler = async (
   const messageHash = web3.utils.soliditySha3(message);
   const { address, signedMessage } = req.body;
 
-  // Extract the v, r, and s components from the signature
-  const signatureComponents = {
-    v: '0x' + signedMessage.slice(130, 132),
-    r: signedMessage.slice(0, 66),
-    s: '0x' + signedMessage.slice(66, 130),
-  };
   // Calculate the signer's address
-  const signerAddress = web3.eth.accounts.recover({
-    messageHash: messageHash,
-    v: signatureComponents.v,
-    r: signatureComponents.r,
-    s: signatureComponents.s,
-  });
+  const signerAddress = web3.eth.accounts.recover(messageHash, mockSig);
 
-  if (signerAddress !== address) {
+  if (signerAddress.toLowerCase() !== address.toLowerCase()) {
     throw new AppError('Validation Error: Invalid signature');
   }
 
-  // Call groupOS
+  // Call alchemy
   let newWalletAddress: string;
+
+  //Figure out specific chain for this
+  const chain = baseSepolia;
+  const signer: SmartAccountSigner =
+    LocalAccountSigner.privateKeyToAccountSigner(
+      `0x${process.env.AA_PRIVATE_KEY}`,
+    );
+  const AAsignerAddress = await signer.getAddress();
+
+  const smartAccountClient = await createModularAccountAlchemyClient({
+    apiKey: 'rtbehTeM8zklG0PQq5vxg4GtAu2lTFtI',
+    chain,
+    signer,
+    owners: [AAsignerAddress, `0x${address.replace('0x', '')}`],
+  });
+
+  newWalletAddress = smartAccountClient.account.address;
 
   // Insert into DB
   const wallet = await models.Wallets.create({
     user_id: req.user.id,
     user_address: address,
-    relay_address: '0x0', //TODO this should be an env var
+    relay_address: AAsignerAddress,
     wallet_address: newWalletAddress,
   });
 

@@ -72,6 +72,9 @@
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {
+    "@alchemy/aa-accounts": "^3.17.0",
+    "@alchemy/aa-alchemy": "^3.17.0",
+    "@alchemy/aa-core": "^3.16.0",
     "@apollo/client": "^3.3.18",
     "@aws-sdk/client-s3": "^3.577.0",
     "@aws-sdk/lib-storage": "^3.578.0",
