@@ -24,6 +24,7 @@ interface SearchCommentsProps {
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
+  includeCount?: boolean;
   enabled?: boolean;
 }
 
@@ -34,6 +35,7 @@ const searchComments = async ({
   limit,
   orderBy,
   orderDirection,
+  includeCount,
 }: SearchCommentsProps & { pageParam: number }) => {
   const {
     data: { result },
@@ -50,6 +52,7 @@ const searchComments = async ({
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
+        include_count: includeCount,
       },
     },
   );
@@ -62,6 +65,7 @@ const useSearchCommentsQuery = ({
   limit,
   orderBy,
   orderDirection,
+  includeCount,
   enabled = true,
 }: SearchCommentsProps) => {
   const key = [
@@ -82,6 +86,7 @@ const useSearchCommentsQuery = ({
         limit,
         orderBy,
         orderDirection,
+        includeCount,
       }),
     {
       getNextPageParam: (lastPage) => {

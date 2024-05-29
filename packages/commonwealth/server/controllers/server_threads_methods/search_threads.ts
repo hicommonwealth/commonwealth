@@ -18,6 +18,7 @@ export type SearchThreadsOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
+  includeCount?: boolean;
 };
 
 type ThreadSearchData = ThreadAttributes;
@@ -36,6 +37,7 @@ export async function __searchThreads(
     page,
     orderBy,
     orderDirection,
+    includeCount,
   }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
@@ -122,10 +124,12 @@ export async function __searchThreads(
       bind,
       type: QueryTypes.SELECT,
     }),
-    await this.models.sequelize.query(sqlCountQuery, {
-      bind,
-      type: QueryTypes.SELECT,
-    }),
+    !includeCount
+      ? [{ count: 0 }]
+      : await this.models.sequelize.query(sqlCountQuery, {
+          bind,
+          type: QueryTypes.SELECT,
+        }),
   ]);
 
   const totalResults = parseInt(count, 10);
