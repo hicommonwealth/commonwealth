@@ -28,6 +28,7 @@ export type GetThreadsRequestQuery = {
 };
 export type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
+  withXRecentComments?: number;
 };
 export type SearchThreadsRequestQuery = {
   search: string;
@@ -128,11 +129,13 @@ export const getThreadsHandler = async (
 
   // get active threads
   if (active) {
-    const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
+    const { threads_per_topic, withXRecentComments } =
+      req.query as ActiveThreadsRequestQuery;
 
     const activeThreads = await controllers.threads.getActiveThreads({
       communityId: community_id,
       threadsPerTopic: parseInt(threads_per_topic, 10),
+      withXRecentComments,
     });
     return success(res, activeThreads);
   }

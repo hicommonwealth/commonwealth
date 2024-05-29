@@ -8,13 +8,18 @@ const MAX_THREADS_PER_TOPIC = 10;
 export type GetActiveThreadsOptions = {
   communityId: string;
   threadsPerTopic: number;
+  withXRecentComments?: number;
 };
 
 export type GetActiveThreadsResult = ThreadAttributes[];
 
 export async function __getActiveThreads(
   this: ServerThreadsController,
-  { communityId, threadsPerTopic }: GetActiveThreadsOptions,
+  {
+    communityId,
+    threadsPerTopic,
+    withXRecentComments = 0,
+  }: GetActiveThreadsOptions,
 ): Promise<GetActiveThreadsResult> {
   const allThreads = [];
   if (
@@ -34,10 +39,68 @@ export async function __getActiveThreads(
   });
 
   const threadInclude = [
-    { model: this.models.Address, as: 'Address' },
+    {
+      model: this.models.Address,
+      as: 'Address',
+      attributes: ['id', 'address', 'community_id'],
+      include: [
+        {
+          model: this.models.Profile,
+          attributes: [
+            ['id', 'profile_id'],
+            'profile_name',
+            ['avatar_url', 'profile_avatar_url'],
+            'user_id',
+          ],
+        },
+      ],
+    },
     { model: this.models.Address, as: 'collaborators' },
     { model: this.models.Topic, as: 'topic', required: true },
   ];
+
+  if (withXRecentComments) {
+    threadInclude.push({
+      model: this.models.Comment,
+      limit: withXRecentComments,
+      order: [['created_at', 'DESC']],
+      attributes: [
+        'id',
+        'address_id',
+        'text',
+        ['plaintext', 'plainText'],
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'marked_as_spam_at',
+        'discord_meta',
+      ],
+      include: [
+        {
+          model: this.models.Address,
+          attributes: ['address'],
+          include: [
+            {
+              model: this.models.Profile,
+              attributes: [
+                ['id', 'profile_id'],
+                'profile_name',
+                ['avatar_url', 'profile_avatar_url'],
+                'user_id',
+              ],
+            },
+          ],
+        },
+      ],
+      // TODO: flatten sequelize includes
+      // TODO: get deleted_at null comments
+      // where: {
+      //   deleted_at: {
+      //     [Op.is]: null,
+      //   },
+      // },
+    } as any);
+  }
 
   let allRecentTopicThreadsRaw = [];
   allRecentTopicThreadsRaw = await Promise.all(
@@ -46,7 +109,7 @@ export async function __getActiveThreads(
         where: {
           topic_id: topic.id,
         },
-        include: threadInclude,
+        include: threadInclude as any, // TODO: fix type
         limit: threadsPerTopic,
         order: [
           ['created_at', 'DESC'],
@@ -59,8 +122,30 @@ export async function __getActiveThreads(
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
 
   const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
-    const t = thread.toJSON();
-    t.numberOfComments = t.comment_count || 0;
+    let t = thread.toJSON();
+    // TODO: cleanup
+    t = {
+      ...t,
+      numberOfComments: t.comment_count || 0,
+      ...(t?.Address?.Profile || {}),
+    };
+    if (t?.Address?.Profile) delete t.Address.Profile;
+
+    if (withXRecentComments) {
+      t.recentComments = (t.Comments || []).map((c) => {
+        const temp = {
+          ...c,
+          ...(c?.Address?.Profile || {}),
+          address: c?.Address?.address || '',
+        };
+
+        if (temp.Address) delete temp.Address;
+
+        return temp;
+      });
+
+      delete t.Comments;
+    }
     return t;
   });
 
