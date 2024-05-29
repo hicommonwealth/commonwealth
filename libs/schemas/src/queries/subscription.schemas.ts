@@ -23,5 +23,6 @@ export const GetCommentSubscriptions = {
 
 export const GetThreadSubscriptions = {
   input: z.object({}),
+  // FIXME: extend the output here to join agaisnt the thread...
   output: ThreadSubscription.array(),
 };
