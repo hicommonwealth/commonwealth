@@ -129,7 +129,7 @@ export const HeaderWithFilters = ({
 
   const contestNameOptions = (contestsData || []).map((contest) => ({
     label: contest?.name,
-    value: contest?.name,
+    value: contest?.contest_address,
     id: contest?.contest_address,
     type: 'contest',
   }));
@@ -395,12 +395,11 @@ export const HeaderWithFilters = ({
               )}
               {matchesContestFilterRoute ? (
                 <Select
-                  selected={urlParams.status || 'all-statuses'}
+                  selected={urlParams.status || 'all'}
                   onSelect={(item: any) =>
                     onFilterSelect({
                       filterKey: 'status',
-                      filterVal:
-                        item.value === 'all-statuses' ? '' : item.value,
+                      filterVal: item.value === 'all' ? '' : item.value,
                     })
                   }
                   options={[
@@ -412,12 +411,12 @@ export const HeaderWithFilters = ({
                     {
                       id: 1,
                       label: 'Past winners',
-                      value: 'past-winners',
+                      value: 'pastWinners',
                     },
                     {
                       id: 2,
                       label: 'All Statuses',
-                      value: 'all-statuses',
+                      value: 'all',
                     },
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}

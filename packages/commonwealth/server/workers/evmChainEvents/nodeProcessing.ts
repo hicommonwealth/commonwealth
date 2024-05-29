@@ -98,49 +98,55 @@ export async function processChainNode(
       }
 
       if (allEvents.length > 0) {
-        const contestEvents = allEvents.map((event) => {
-          const contractAddress = ethers.utils.getAddress(event.rawLog.address);
+        const contestEvents = allEvents
+          .map((event) => {
+            const contractAddress = ethers.utils.getAddress(
+              event.rawLog.address,
+            );
 
-          const parseEvent = (e: keyof typeof ChainEventSigs) =>
-            parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
+            const parseEvent = (e: keyof typeof ChainEventSigs) =>
+              parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
 
-          switch (event.eventSource.eventSignature) {
-            case EvmContestEventSignatures.NewContest:
-              return parseEvent('NewContest') as
-                | {
-                    event_name: EventNames.RecurringContestManagerDeployed;
-                    event_payload: z.infer<
-                      typeof RecurringContestManagerDeployed
-                    >;
-                  }
-                | {
-                    event_name: EventNames.OneOffContestManagerDeployed;
-                    event_payload: z.infer<typeof OneOffContestManagerDeployed>;
-                  };
-            case EvmContestEventSignatures.NewRecurringContestStarted:
-              return parseEvent('NewRecurringContestStarted') as {
-                event_name: EventNames.ContestStarted;
-                event_payload: z.infer<typeof ContestStarted>;
-              };
-            case EvmContestEventSignatures.NewSingleContestStarted:
-              return parseEvent('NewSingleContestStarted') as {
-                event_name: EventNames.ContestStarted;
-                event_payload: z.infer<typeof ContestStarted>;
-              };
-            case EvmContestEventSignatures.ContentAdded:
-              return parseEvent('ContentAdded') as {
-                event_name: EventNames.ContestContentAdded;
-                event_payload: z.infer<typeof ContestContentAdded>;
-              };
-            case EvmContestEventSignatures.VoterVoted:
-              return parseEvent('VoterVoted') as {
-                event_name: EventNames.ContestContentUpvoted;
-                event_payload: z.infer<typeof ContestContentUpvoted>;
-              };
-          }
+            switch (event.eventSource.eventSignature) {
+              case EvmContestEventSignatures.NewContest:
+                return parseEvent('NewContest') as
+                  | {
+                      event_name: EventNames.RecurringContestManagerDeployed;
+                      event_payload: z.infer<
+                        typeof RecurringContestManagerDeployed
+                      >;
+                    }
+                  | {
+                      event_name: EventNames.OneOffContestManagerDeployed;
+                      event_payload: z.infer<
+                        typeof OneOffContestManagerDeployed
+                      >;
+                    };
+              case EvmContestEventSignatures.NewRecurringContestStarted:
+                return parseEvent('NewRecurringContestStarted') as {
+                  event_name: EventNames.ContestStarted;
+                  event_payload: z.infer<typeof ContestStarted>;
+                };
+              case EvmContestEventSignatures.NewSingleContestStarted:
+                return parseEvent('NewSingleContestStarted') as {
+                  event_name: EventNames.ContestStarted;
+                  event_payload: z.infer<typeof ContestStarted>;
+                };
+              case EvmContestEventSignatures.ContentAdded:
+                return parseEvent('ContentAdded') as {
+                  event_name: EventNames.ContestContentAdded;
+                  event_payload: z.infer<typeof ContestContentAdded>;
+                };
+              case EvmContestEventSignatures.VoterVoted:
+                return parseEvent('VoterVoted') as {
+                  event_name: EventNames.ContestContentUpvoted;
+                  event_payload: z.infer<typeof ContestContentUpvoted>;
+                };
+            }
 
-          return null;
-        });
+            return null;
+          })
+          .filter(Boolean);
 
         // filter out the rest of the events from contest events,
         // temp solution until chain events are broken down

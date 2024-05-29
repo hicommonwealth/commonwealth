@@ -2,7 +2,7 @@ import { S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { HotShotsStats } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
+import { config, formatS3Url } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
@@ -68,7 +68,12 @@ async function uploadToS3(filePath: string): Promise<boolean> {
       client: s3,
       params,
     }).done();
-    log.info(`File uploaded successfully at ${data.Location}`);
+    log.info(
+      `File uploaded successfully at ${formatS3Url(
+        data.Location,
+        S3_BUCKET_NAME,
+      )}`,
+    );
     return true;
   } catch (error) {
     log.error(`S3 upload failed`, error, {

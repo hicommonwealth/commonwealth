@@ -3,6 +3,7 @@ import useDeployRecurringContestOnchainMutation from './deployRecurringContestOn
 import useDeploySingleContestOnchainMutation from './deploySingleContestOnchain';
 import useFundContestOnchainMutation from './fundContestOnchain';
 import useGetContestBalanceQuery from './getContestBalance';
+import useGetContestsQuery from './getContests';
 
 export {
   useCreateContestMutation,
@@ -10,4 +11,5 @@ export {
   useDeploySingleContestOnchainMutation,
   useFundContestOnchainMutation,
   useGetContestBalanceQuery,
+  useGetContestsQuery,
 };

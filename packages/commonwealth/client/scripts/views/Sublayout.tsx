@@ -126,6 +126,16 @@ const Sublayout = ({
     location,
   );
 
+  const routesWithoutGenericSliders = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
+
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
 
@@ -207,8 +217,12 @@ const Sublayout = ({
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {userOnboardingEnabled && <UserTrainingSlider />}
-            {isInsideCommunity && <AdminOnboardingSlider />}
+            {userOnboardingEnabled && !routesWithoutGenericSliders && (
+              <UserTrainingSlider />
+            )}
+            {isInsideCommunity && !routesWithoutGenericSliders && (
+              <AdminOnboardingSlider />
+            )}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
