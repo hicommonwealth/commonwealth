@@ -1,18 +1,15 @@
-import { useCommunityStake } from 'views/components/CommunityStake';
-
 import app from 'state';
-import { trpc } from 'utils/trpcClient';
+import { useGetContestsQuery } from 'state/api/contests';
+import { useCommunityStake } from 'views/components/CommunityStake';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import { useFlag } from '../../../../hooks/useFlag';
 
 const useCommunityContests = () => {
+  const enabled = useFlag('contest');
   const { stakeEnabled } = useCommunityStake();
 
   const { data: contestsData, isLoading: isContestDataLoading } =
-    trpc.contest.getAllContests.useQuery(
-      {
-        community_id: app.activeChainId(),
-      },
-      { enabled: !!app.activeChainId() },
-    );
+    useGetContestsQuery({ community_id: app.activeChainId(), enabled });
 
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;
 
@@ -25,8 +22,8 @@ const useCommunityContests = () => {
   return {
     stakeEnabled,
     isContestAvailable,
-    contestsData,
-    isContestDataLoading,
+    contestsData: contestsData as unknown as Contest[],
+    isContestDataLoading: isContestDataLoading && enabled,
     getContestByAddress,
   };
 };
