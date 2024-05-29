@@ -95,7 +95,6 @@ export const config = configure(
       .refine(
         (data) => {
           if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
-            console.log('FIXME: data: ', JSON.stringify(data, null, '  '));
             return (
               data.KNOCK_AUTH_TOKEN &&
               data.KNOCK_SECRET_KEY &&
