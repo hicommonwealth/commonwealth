@@ -100,7 +100,7 @@ const useSearchThreadsQuery = ({
         return undefined;
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
-      enabled,
+      enabled: enabled && searchTerm.length >= 3,
     },
   );
 };

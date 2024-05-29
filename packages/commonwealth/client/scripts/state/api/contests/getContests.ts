@@ -16,7 +16,9 @@ const useGetContestsQuery = ({
       community_id,
       running,
     },
-    { enabled: !!community_id },
+    // { enabled: !!community_id },
+    // TODO: When we hook up community, fix this, also make sure its behind a FF.
+    { enabled: false },
   );
 };
 

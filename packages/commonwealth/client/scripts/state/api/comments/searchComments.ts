@@ -92,7 +92,7 @@ const useSearchCommentsQuery = ({
         return undefined;
       },
       staleTime: SEARCH_COMMENTS_STALE_TIME,
-      enabled,
+      enabled: enabled && searchTerm.length >= 3,
     },
   );
 };
