@@ -175,46 +175,6 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
-  //   db.ChainNode.withMany(db.Community, 'chain_node_id')
-  //db.Thread.withMany(db.ThreadSubscription, 'thread_id' )
-
-  // FIXME:
-
-  // db.ThreadSubscription.withOne(db.Thread, ['id', 'thread_id'], {
-  //   as: 'Thread',
-  // })
-
-  // .withOne(db.Community, ['selected_community_id', 'id'], {
-  //     as: 'selectedCommunity',
-  //   })
-
-  // db.User.withMany(db.Address, 'user_id')
-  //   .withMany(db.Profile, 'user_id', { onUpdate: 'CASCADE' })
-  //   .withMany(db.Subscription, 'subscriber_id')
-  //   .withMany(db.NotificationsRead, 'user_id')
-  //   .withOne(db.Community, ['selected_community_id', 'id'], {
-  //     as: 'selectedCommunity',
-  //   })
-  //   .withOne(db.SubscriptionPreference, ['id', 'user_id'], {
-  //     as: 'SubscriptionPreferences',
-  //     onDelete: 'CASCADE',
-  //   });
-  //
-
-  //
-  // db.User.withMany(db.Address, 'user_id')
-  //   // .withMany(db.Profile, 'user_id', { onUpdate: 'CASCADE' })
-  //   // .withMany(db.Subscription, 'subscriber_id')
-  //   // .withMany(db.NotificationsRead, 'user_id')
-  //   .withOne(db.Community, ['selected_community_id', 'id'], {
-  //     as: 'selectedCommunity',
-  //   })
-
-  // // FIXMEL I think this is right
-  // db.Thread.withMany(db.ThreadSubscription, 'thread_id') // FIXME: ok pretty sure this is right.
-  //   .withOne(db.ThreadSubscription, ['thread_id', 'id'], {as: 'Thread'});
-  //
-
   db.ThreadSubscription.withManyToMany(
     {
       model: db.Thread,
@@ -228,23 +188,6 @@ export const buildAssociations = (db: DB) => {
       as: 'threadSubscriptions',
       onDelete: 'CASCADE',
     },
-    // {
-    //   model: models.Thread,
-    //   key: 'thread_id',
-    //   as: 'Thread',
-    //   // include: [
-    //   //   {
-    //   //     model: models.Address,
-    //   //     as: 'Address',
-    //   //   },
-    //   //   {
-    //   //     model: models.Community,
-    //   //     as: 'Community',
-    //   //     required: true,
-    //   //     where: { active: true },
-    //   //   },
-    //   // ],
-    // },
   );
   db.CommentSubscription.withManyToMany(
     {
