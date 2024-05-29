@@ -76,7 +76,7 @@ export const TopicSummaryRow = ({
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
       </div>
       <div className="recent-threads-column">
-        {threadsToDisplay.map((thread, idx) => {
+        {threadsToDisplay.map((thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`,

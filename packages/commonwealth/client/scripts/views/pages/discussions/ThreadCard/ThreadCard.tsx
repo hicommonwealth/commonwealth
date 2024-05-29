@@ -293,7 +293,8 @@ export const ThreadCard = ({
                   replyBtnVisible
                   hideReactButton
                   comment={recentComment}
-                  isThreadArchived={false}
+                  isThreadArchived={!!thread.archivedAt}
+                  isSpam={!!recentComment.markedAsSpamAt}
                   maxReplyLimitReached={false}
                   viewUpvotesButtonVisible={false}
                   shareURL={`${window.location.origin}${threadHref}?comment=${recentComment.id}`}
