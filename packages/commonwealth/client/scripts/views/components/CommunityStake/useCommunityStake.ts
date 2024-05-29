@@ -99,6 +99,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     isLoading,
     activeChainId,
     refetchStakeQuery,
+    featureFlagEnabled: communityStakeEnabled,
   };
 };
 

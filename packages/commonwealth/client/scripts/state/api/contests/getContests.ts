@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { GetAllContests } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
+import { useFlag } from '../../../hooks/useFlag';
 
 type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input>;
 
@@ -10,15 +11,14 @@ const useGetContestsQuery = ({
   community_id,
   running,
 }: UseGetContestsQueryProps) => {
+  const enabled = useFlag('contest');
   return trpc.contest.getAllContests.useQuery(
     {
       contest_id,
       community_id,
       running,
     },
-    // { enabled: !!community_id },
-    // TODO: When we hook up community, fix this, also make sure its behind a FF.
-    { enabled: false },
+    { enabled: enabled && !!community_id },
   );
 };
 
