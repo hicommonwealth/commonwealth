@@ -11,10 +11,7 @@ function getDifferences(
 ): Partial<z.infer<typeof SubscriptionPreference>> {
   const differences: Record<string, any> = {};
   for (const key in subsetObject) {
-    if (
-      subsetObject.hasOwnProperty(key) &&
-      subsetObject[key] !== fullObject[key]
-    ) {
+    if (key in subsetObject && subsetObject[key] !== fullObject[key]) {
       differences[key] = subsetObject[key];
     }
   }
@@ -61,9 +58,9 @@ export function UpdateSubscriptionPreferences(): Command<
 
         // for now only emit email preference updates
         if (
-          preferenceUpdates.email_notifications_enabled ||
-          preferenceUpdates.digest_email_enabled ||
-          preferenceUpdates.recap_email_enabled
+          'email_notifications_enabled' in preferenceUpdates ||
+          'digest_email_enabled' in preferenceUpdates ||
+          'recap_email_enabled' in preferenceUpdates
         ) {
           await emitEvent(
             models.Outbox,

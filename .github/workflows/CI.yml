@@ -4,7 +4,7 @@ env:
   ROLLBAR_ENV: 'GitHubCI'
   NODE_ENV: 'test'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted'
+  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted,SubscriptionPreferencesUpdated'
   PRIVATE_KEY: 'web3-pk'
 
 on:

@@ -63,9 +63,7 @@ export function KnockProvider(): NotificationsProvider {
 
     async getSchedules(options): Promise<NotificationsProviderSchedulesReturn> {
       const res = await knock.users.getSchedules(options.user_id, {
-        // TODO: Knock SDK doesn't have type support for this option but it technically works since
-        //  the Knock API supports it
-        // @ts-expect-error
+        // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
         workflow: options.workflow_id,
       });
       return formatScheduleResponse(res.entries);
