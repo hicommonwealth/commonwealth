@@ -1038,6 +1038,9 @@ importers:
       '@types/react-helmet-async':
         specifier: ^1.0.3
         version: 1.0.3(react@18.3.1)
+      '@types/sinon':
+        specifier: ^17.0.3
+        version: 17.0.3
       '@types/swagger-ui-express':
         specifier: ^4.1.6
         version: 4.1.6
@@ -1338,6 +1341,9 @@ importers:
       serve-favicon:
         specifier: ^2.5.0
         version: 2.5.0
+      sinon:
+        specifier: ^17.0.2
+        version: 17.0.2
       siwe:
         specifier: ^2.1.4
         version: 2.3.2(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
@@ -19707,6 +19713,7 @@ packages:
       {
         integrity: sha512-uihLiaB9FhzesElPDFZA7hDcNABzsVHwr3YfmM9sBllVwab3l0ltGlRV1XhpNfIacNDLGD1QRZNLs5nU5+hTuA==,
       }
+    deprecated: There
 
   sirv@2.0.4:
     resolution:

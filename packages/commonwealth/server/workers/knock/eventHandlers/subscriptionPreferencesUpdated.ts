@@ -15,6 +15,27 @@ const log = logger(__filename);
 
 const output = z.boolean();
 
+function mapDateToDaysOfWeek(
+  date: Date,
+): typeof DaysOfWeek[keyof typeof DaysOfWeek] {
+  switch (date.getDay()) {
+    case 0:
+      return DaysOfWeek.Sun;
+    case 1:
+      return DaysOfWeek.Mon;
+    case 2:
+      return DaysOfWeek.Tue;
+    case 3:
+      return DaysOfWeek.Wed;
+    case 4:
+      return DaysOfWeek.Thu;
+    case 5:
+      return DaysOfWeek.Fri;
+    case 6:
+      return DaysOfWeek.Sat;
+  }
+}
+
 async function createScheduleIfNotExists(
   workflowKey: WorkflowKeys.EmailRecap | WorkflowKeys.EmailDigest,
   userId: string,
@@ -75,27 +96,6 @@ async function deleteScheduleIfExists(
   return true;
 }
 
-function mapDateToDaysOfWeek(
-  date: Date,
-): typeof DaysOfWeek[keyof typeof DaysOfWeek] {
-  switch (date.getDay()) {
-    case 0:
-      return DaysOfWeek.Sun;
-    case 1:
-      return DaysOfWeek.Mon;
-    case 2:
-      return DaysOfWeek.Tue;
-    case 3:
-      return DaysOfWeek.Wed;
-    case 4:
-      return DaysOfWeek.Thu;
-    case 5:
-      return DaysOfWeek.Fri;
-    case 6:
-      return DaysOfWeek.Sat;
-  }
-}
-
 export const processSubscriptionPreferencesUpdated: EventHandler<
   'SubscriptionPreferencesUpdated',
   typeof output
@@ -127,6 +127,7 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
 
   const subPreferences = await models.SubscriptionPreference.findOne({
     where: {
+      id: payload.id,
       user_id: payload.user_id,
     },
   });
