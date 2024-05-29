@@ -1,11 +1,9 @@
-import { Community, Subscription } from '@hicommonwealth/schemas';
+import { Subscription } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { z } from 'zod';
 import { Comment as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
-
-type CommunityT = z.infer<typeof Community>;
 
 class NotificationSubscription {
   public readonly category: string;
@@ -14,7 +12,6 @@ class NotificationSubscription {
   public readonly communityId?: string;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
-  public readonly Community: CommunityT;
 
   public readonly id?: number;
 
@@ -66,7 +63,6 @@ class NotificationSubscription {
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT,
     snapshotId?: string,
-    community?: CommunityT,
   ) {
     this.id = id;
     this.category = category;
@@ -77,7 +73,6 @@ class NotificationSubscription {
     this.Comment = comment;
     this.Thread = thread;
     this.snapshotId = snapshotId;
-    this.Community = community;
   }
 }
 
@@ -85,7 +80,6 @@ export const modelFromServer = (
   subscription: z.infer<typeof Subscription> & {
     Thread?: any;
     Comment?: any;
-    Community?: any;
   },
 ) => {
   const {
@@ -97,7 +91,6 @@ export const modelFromServer = (
     community_id,
     Comment,
     Thread,
-    Community,
     snapshot_id,
   } = subscription;
 
