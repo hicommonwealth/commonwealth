@@ -101,7 +101,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       isOnArchivePage: isOnArchivePage,
       contestAddress,
       contestStatus,
-      withXRecentComments: 2,
+      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));

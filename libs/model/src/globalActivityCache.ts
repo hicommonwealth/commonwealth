@@ -77,7 +77,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         JOIN ranked_thread_notifications tempRTN ON tempRTN.thread_id = tempC.thread_id
         WHERE deleted_at IS NULL
         ORDER BY created_at DESC
-        LIMIT 2
+        LIMIT 3 -- Optionally a prop can be added for this
       ) C
       JOIN "Addresses" A ON A.id = C.address_id
       JOIN "Profiles" P ON P.user_id = A.user_id
