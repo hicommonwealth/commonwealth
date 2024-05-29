@@ -4,6 +4,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
 import { SharePopover } from 'client/scripts/views/components/SharePopover';
 import {
   ViewCommentUpvotesDrawer,
@@ -27,7 +28,7 @@ import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
 type CommentCardProps = {
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -202,7 +203,9 @@ export const CommentCard = ({
                   comment={comment}
                   disabled={!canReact}
                   tooltipText={
-                    disabledActionsTooltipText ? 'Join community to upvote' : ''
+                    typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('upvote')
+                      : disabledActionsTooltipText
                   }
                   onReaction={handleReaction}
                 />
@@ -232,11 +235,12 @@ export const CommentCard = ({
                   label="Reply"
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
-                    disabledActionsTooltipText
-                      ? 'Join community to reply'
-                      : canReply && maxReplyLimitReached
+                    (typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('reply')
+                      : disabledActionsTooltipText) ||
+                    (canReply && maxReplyLimitReached
                       ? 'Nested reply limit reached'
-                      : ''
+                      : '')
                   }
                   onClick={async (e) => {
                     e.preventDefault();

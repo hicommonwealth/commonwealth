@@ -1,4 +1,5 @@
 import { pluralize } from 'client/scripts/helpers';
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
 import Permissions from 'client/scripts/utils/Permissions';
 import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
 import Thread from 'models/Thread';
@@ -23,7 +24,7 @@ type OptionsProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   totalComments?: number;
-  disabledActionTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
@@ -50,7 +51,7 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-  disabledActionTooltipText = '',
+  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
@@ -100,7 +101,11 @@ export const ThreadOptions = ({
               thread={thread}
               size="small"
               disabled={!canReact}
-              tooltipText={disabledActionTooltipText}
+              tooltipText={
+                typeof disabledActionsTooltipText === 'function'
+                  ? disabledActionsTooltipText?.('upvote')
+                  : disabledActionsTooltipText
+              }
             />
           )}
 
@@ -113,7 +118,11 @@ export const ThreadOptions = ({
                 e.preventDefault();
                 onCommentBtnClick();
               }}
-              tooltipText={disabledActionTooltipText}
+              tooltipText={
+                typeof disabledActionsTooltipText === 'function'
+                  ? disabledActionsTooltipText?.('comment')
+                  : disabledActionsTooltipText
+              }
             />
           )}
 

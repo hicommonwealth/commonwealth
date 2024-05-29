@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -44,7 +45,7 @@ type CommentsTreeAttrs = {
   canReply?: boolean;
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
 };
 
 export const CommentTree = ({

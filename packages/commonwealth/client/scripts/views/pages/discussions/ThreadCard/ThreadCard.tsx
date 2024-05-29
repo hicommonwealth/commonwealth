@@ -4,7 +4,10 @@ import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divi
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
-import { filterLinks } from 'helpers/threads';
+import {
+  GetThreadActionTooltipTextResponse,
+  filterLinks,
+} from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
@@ -33,7 +36,7 @@ type CardProps = AdminActionsProps & {
   showSkeleton?: boolean;
   canReact?: boolean;
   canComment?: boolean;
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   hideRecentComments?: boolean;
   hideReactionButton?: boolean;
@@ -130,7 +133,11 @@ export const ThreadCard = ({
             thread={thread}
             size="big"
             disabled={!canReact}
-            tooltipText={disabledActionsTooltipText}
+            tooltipText={
+              typeof disabledActionsTooltipText === 'function'
+                ? disabledActionsTooltipText?.('upvote')
+                : disabledActionsTooltipText
+            }
           />
         )}
         <div className="content-wrapper">
@@ -255,7 +262,7 @@ export const ThreadCard = ({
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
               onCommentBtnClick={onCommentBtnClick}
-              disabledActionTooltipText={disabledActionsTooltipText}
+              disabledActionsTooltipText={disabledActionsTooltipText}
               setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
               hideUpvoteDrawerButton={hideUpvotesDrawer}
             />
