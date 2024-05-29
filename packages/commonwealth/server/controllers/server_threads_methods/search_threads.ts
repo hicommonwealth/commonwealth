@@ -106,30 +106,10 @@ export async function __searchThreads(
     ${paginationSort}
   `;
 
-  const sqlCountQuery = `
-    SELECT
-      COUNT (*) as count
-    FROM "Threads"
-    JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
-    websearch_to_tsquery('english', $searchTerm) as query
-    WHERE
-      ${communityWhere}
-      "Threads".deleted_at IS NULL AND
-      ${searchWhere}
-  `;
+  const results: any[] = await this.models.sequelize.query(sqlBaseQuery, {
+    bind,
+    type: QueryTypes.SELECT,
+  });
 
-  const [results, [{ count }]]: [any[], any[]] = await Promise.all([
-    await this.models.sequelize.query(sqlBaseQuery, {
-      bind,
-      type: QueryTypes.SELECT,
-    }),
-    await this.models.sequelize.query(sqlCountQuery, {
-      bind,
-      type: QueryTypes.SELECT,
-    }),
-  ]);
-
-  const totalResults = parseInt(count, 10);
-
-  return buildPaginatedResponse(results, totalResults, bind);
+  return buildPaginatedResponse(results, results.length, bind);
 }

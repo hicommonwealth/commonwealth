@@ -92,12 +92,8 @@ const useSearchThreadsQuery = ({
         threadTitleOnly,
       }),
     {
-      getNextPageParam: (lastPage) => {
-        const nextPageNum = lastPage.page + 1;
-        if (nextPageNum <= lastPage.totalPages) {
-          return nextPageNum;
-        }
-        return undefined;
+      getNextPageParam: (_) => {
+        console.error('Not implemented');
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
       enabled: enabled && searchTerm.length >= 3,
