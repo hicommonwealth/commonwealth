@@ -80,8 +80,7 @@ export async function __searchThreads(
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
   if (!threadTitleOnly) {
-    // for full search, use search column too
-    searchWhere += ` OR query @@ "Threads"._search`;
+    searchWhere = `("Threads".title ILIKE '%' || $searchTerm || '%' OR query @@ "Threads"._search)`;
   }
 
   const sqlBaseQuery = `
