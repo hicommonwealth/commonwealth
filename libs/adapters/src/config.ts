@@ -14,6 +14,7 @@ const {
   KNOCK_IN_APP_FEED_ID,
   KNOCK_PUBLIC_API_KEY,
   FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
+  KNOCK_FCM_CHANNEL_ID,
 } = process.env;
 
 export const config = configure(
@@ -47,6 +48,7 @@ export const config = configure(
     PUSH_NOTIFICATIONS: {
       FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED:
         FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED === 'true',
+      KNOCK_FCM_CHANNEL_ID,
     },
   },
   z.object({
@@ -139,10 +141,10 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
-            return data.KNOCK_FCM_CHANNEL_ID;
-          }
-          return true;
+          return (
+            data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED &&
+            data.KNOCK_FCM_CHANNEL_ID
+          );
         },
         {
           message:
