@@ -264,5 +264,5 @@ export const getContestBalance = async (
 
   return balanceResults.length === 2
     ? balanceResults[0] + balanceResults[1]
-    : balanceResults[1];
+    : balanceResults[0];
 };
