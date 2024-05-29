@@ -39,7 +39,8 @@ export async function getActivityFeed(models: DB, id = 0) {
         'profile_name', P.profile_name,
         'profile_avatar_url', P.avatar_url,
         'user_id', P.user_id,
-        'user_address', A.address
+        'user_address', A.address,
+        'topic', Tp
       ) as thread,
       T.max_notif_id
       FROM "Threads" T
@@ -47,7 +48,8 @@ export async function getActivityFeed(models: DB, id = 0) {
       ${filterByCommunityForUsers} 
       ${id ? 'A.user_id = ?' : `A.id = T.address_id`}
       JOIN "Profiles" P ON P.user_id = A.user_id
-      WHERE deleted_at IS NULL
+      JOIN "Topics" Tp ON Tp.id = T.topic_id
+      WHERE T.deleted_at IS NULL
       ORDER BY T.max_notif_id DESC
       LIMIT 50
     ),

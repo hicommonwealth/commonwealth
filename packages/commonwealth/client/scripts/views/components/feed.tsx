@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -11,18 +12,20 @@ import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 import { slugify } from '@hicommonwealth/shared';
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
+import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
+import Topic from 'client/scripts/models/Topic';
 import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
 import {
   getScopePrefix,
   useCommonNavigate,
 } from 'client/scripts/navigation/helpers';
 import app from 'client/scripts/state';
+import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 import Permissions from 'client/scripts/utils/Permissions';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
-// import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 
 type ActivityResponse = {
   notification_id: number;
@@ -48,6 +51,7 @@ type ActivityResponse = {
     profile_avatar_url?: string;
     user_id: number;
     user_address: string;
+    topic: Topic;
   };
   recentcomments?: [];
   category_id: string;
@@ -65,6 +69,77 @@ type FeedProps = {
 
 const DEFAULT_COUNT = 10;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const FeedThread = ({ thread }: { thread: Thread }) => {
+  const navigate = useCommonNavigate();
+
+  const discussionLink = getProposalUrlPath(
+    thread.slug,
+    `${thread.identifier}-${slugify(thread.title)}`,
+    false,
+    thread.communityId,
+  );
+
+  const chain = app.config.chains.getById(thread.communityId);
+
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin(null, thread.communityId);
+
+  const account = app?.user?.addresses?.find(
+    (a) => a?.community?.id === thread?.communityId,
+  );
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    communityId: thread.communityId,
+    address: account?.address,
+    apiEnabled: !!account?.address,
+  });
+
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: isRestrictedMembership,
+  });
+
+  return (
+    <ThreadCard
+      thread={thread}
+      canReact={!disabledActionsTooltipText}
+      canComment={!disabledActionsTooltipText}
+      // onEditStart={() => navigate(`${discussionLink}`)}
+      onStageTagClick={() => {
+        navigate(
+          `${
+            app.isCustomDomain() ? '' : `/${thread.communityId}`
+          }/discussions?stage=${thread.stage}`,
+        );
+      }}
+      threadHref={`${getScopePrefix()}${discussionLink}`}
+      onCommentBtnClick={() => navigate(`${discussionLink}?focusEditor=true`)}
+      disabledActionsTooltipText={disabledActionsTooltipText}
+      customStages={chain.customStages}
+      hideReactionButton
+      hideUpvotesDrawer
+      layoutType="community-first"
+    />
+  );
+};
+
+// eslint-disable-next-line react/no-multi-comp
 export const Feed = ({
   defaultCount,
   fetchData,
@@ -73,8 +148,7 @@ export const Feed = ({
   customScrollParent,
   isChainEventsRow,
 }: FeedProps) => {
-  const navigate = useCommonNavigate();
-
+  useUserActiveAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<
@@ -159,9 +233,9 @@ export const Feed = ({
                   address: x.thread.user_address,
                   community_id: x.community_id,
                 },
+                topic: x?.thread?.topic,
                 // filler values
                 version_history: null,
-                topic: null,
                 last_commented_on: '',
                 address_last_active: '',
                 reaction_weights_sum: 0,
@@ -233,58 +307,7 @@ export const Feed = ({
 
           const thread = data[i] as Thread;
 
-          const discussionLink = getProposalUrlPath(
-            thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`,
-            false,
-            thread.communityId,
-          );
-
-          const chain = app.config.chains.getById(thread.communityId);
-
-          console.log('discussionLink => ', discussionLink);
-
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: Permissions.isCommunityMember(
-              thread.communityId,
-            ),
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            // isThreadTopicGated: isRestrictedMembership,
-            // TODO: gating check here
-          });
-
-          // const { data: memberships = [] } = useRefreshMembershipQuery({
-          //   communityId: thread.communityId,
-          //   address: app?.user?.activeAccount?.address,
-          //   apiEnabled: !!app?.user?.activeAccount?.address,
-          // });
-
-          return (
-            <ThreadCard
-              key={i}
-              thread={thread}
-              hideReactionButton
-              hideUpvotesDrawer
-              layoutType="community-first"
-              onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
-              }
-              // TODO: should we show modification options
-              threadHref={`${getScopePrefix()}${discussionLink}`}
-              customStages={chain.customStages}
-              onStageTagClick={() => {
-                navigate(
-                  `${
-                    app.isCustomDomain() ? '' : `/${thread.communityId}`
-                  }/discussions?stage=${thread.stage}`,
-                );
-              }}
-              // onEditStart={() => navigate(`${discussionLink}`)}
-              canComment={!disabledActionsTooltipText}
-              disabledActionsTooltipText={disabledActionsTooltipText}
-            />
-          );
+          return <FeedThread key={1} thread={thread} />;
         }}
       />
     </div>

@@ -8,7 +8,10 @@ const ROLES = {
 };
 
 const isSiteAdmin = () => {
-  return app.user.activeAccount && app.user.isSiteAdmin;
+  return (
+    (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
+    app.user.isSiteAdmin
+  );
 };
 
 const isCommunityMember = (communityId?: string) => {
@@ -19,12 +22,12 @@ const isCommunityMember = (communityId?: string) => {
   );
 };
 
-const isCommunityAdmin = (account?: Account) => {
+const isCommunityAdmin = (account?: Account, communityId?: string) => {
   return (
     app.user.activeAccount &&
     app.roles.isRoleOfCommunity({
       role: ROLES.ADMIN,
-      community: app.activeChainId(),
+      community: communityId || app.activeChainId(),
       ...(account && { account }),
     })
   );
