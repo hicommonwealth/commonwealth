@@ -1,10 +1,9 @@
-import { slugify } from '@hicommonwealth/shared';
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -39,6 +38,7 @@ type CardProps = AdminActionsProps & {
   hideUpvotesDrawer?: boolean;
   maxRecentCommentsToDisplay?: number;
   layoutType?: 'author-first' | 'community-first';
+  customStages?: string[];
 };
 
 export const ThreadCard = ({
@@ -67,7 +67,9 @@ export const ThreadCard = ({
   hideUpvotesDrawer = false,
   maxRecentCommentsToDisplay = 2,
   layoutType = 'author-first',
+  customStages,
 }: CardProps) => {
+  const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
@@ -93,12 +95,7 @@ export const ThreadCard = ({
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
 
-  const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
-  );
-
-  const isStageDefault = isDefaultStage(thread.stage);
+  const isStageDefault = isDefaultStage(thread.stage, customStages);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
@@ -234,7 +231,7 @@ export const ThreadCard = ({
           >
             <ThreadOptions
               totalComments={thread.numberOfComments}
-              shareEndpoint={discussionLink}
+              shareEndpoint={`${window.location.origin}${threadHref}`}
               thread={thread}
               upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
               commentBtnVisible={!thread.readOnly}
@@ -287,6 +284,14 @@ export const ThreadCard = ({
                   isThreadArchived={false}
                   maxReplyLimitReached={false}
                   viewUpvotesButtonVisible={false}
+                  shareURL={`${window.location.origin}${threadHref}?comment=${recentComment.id}`}
+                  onReply={() =>
+                    navigate(
+                      `${threadHref}?comment=${recentComment.id}`,
+                      {},
+                      null,
+                    )
+                  }
                 />
               </Link>
             ))}

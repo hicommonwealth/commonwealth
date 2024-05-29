@@ -8,11 +8,21 @@ import type DashboardActivityNotification from '../../models/DashboardActivityNo
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
+import { slugify } from '@hicommonwealth/shared';
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
+import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
+import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
 import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
+import {
+  getScopePrefix,
+  useCommonNavigate,
+} from 'client/scripts/navigation/helpers';
+import app from 'client/scripts/state';
+import Permissions from 'client/scripts/utils/Permissions';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
+// import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 
 type ActivityResponse = {
   notification_id: number;
@@ -63,6 +73,8 @@ export const Feed = ({
   customScrollParent,
   isChainEventsRow,
 }: FeedProps) => {
+  const navigate = useCommonNavigate();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<
@@ -208,20 +220,69 @@ export const Feed = ({
         endReached={loadMore}
         style={{ height: '100%' }}
         itemContent={(i) => {
-          return isChainEventsRow ? (
-            <UserDashboardRow
-              key={i}
-              notification={data[i]}
-              label={labels[i]}
-              isLoggedIn={isLoggedIn}
-            />
-          ) : (
+          if (isChainEventsRow) {
+            return (
+              <UserDashboardRow
+                key={i}
+                notification={data[i]}
+                label={labels[i]}
+                isLoggedIn={isLoggedIn}
+              />
+            );
+          }
+
+          const thread = data[i] as Thread;
+
+          const discussionLink = getProposalUrlPath(
+            thread.slug,
+            `${thread.identifier}-${slugify(thread.title)}`,
+            false,
+            thread.communityId,
+          );
+
+          const chain = app.config.chains.getById(thread.communityId);
+
+          console.log('discussionLink => ', discussionLink);
+
+          const disabledActionsTooltipText = getThreadActionTooltipText({
+            isCommunityMember: Permissions.isCommunityMember(
+              thread.communityId,
+            ),
+            isThreadArchived: !!thread?.archivedAt,
+            isThreadLocked: !!thread?.lockedAt,
+            // isThreadTopicGated: isRestrictedMembership,
+            // TODO: gating check here
+          });
+
+          // const { data: memberships = [] } = useRefreshMembershipQuery({
+          //   communityId: thread.communityId,
+          //   address: app?.user?.activeAccount?.address,
+          //   apiEnabled: !!app?.user?.activeAccount?.address,
+          // });
+
+          return (
             <ThreadCard
               key={i}
-              thread={data[i] as Thread}
+              thread={thread}
               hideReactionButton
               hideUpvotesDrawer
               layoutType="community-first"
+              onCommentBtnClick={() =>
+                navigate(`${discussionLink}?focusEditor=true`)
+              }
+              // TODO: should we show modification options
+              threadHref={`${getScopePrefix()}${discussionLink}`}
+              customStages={chain.customStages}
+              onStageTagClick={() => {
+                navigate(
+                  `${
+                    app.isCustomDomain() ? '' : `/${thread.communityId}`
+                  }/discussions?stage=${thread.stage}`,
+                );
+              }}
+              // onEditStart={() => navigate(`${discussionLink}`)}
+              canComment={!disabledActionsTooltipText}
+              disabledActionsTooltipText={disabledActionsTooltipText}
             />
           );
         }}
