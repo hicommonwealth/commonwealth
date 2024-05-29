@@ -82,7 +82,7 @@ export function UpdateSubscriptionPreferences(): Command<
         }
       });
 
-      return result![0].get({ plain: true });
+      return result![1][0].get({ plain: true });
     },
   };
 }
