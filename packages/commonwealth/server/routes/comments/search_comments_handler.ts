@@ -17,6 +17,7 @@ const Errors = {
 type SearchCommentsRequestQuery = {
   search: string;
   community_id?: string;
+  include_count?: boolean;
 } & PaginationQueryParams;
 
 type SearchCommentsResponse = SearchCommentsResult;
@@ -39,6 +40,7 @@ export const searchCommentsHandler = async (
     page: parseInt(options.page, 10) || 0,
     orderBy: options.order_by,
     orderDirection: options.order_direction as any,
+    includeCount: options.include_count,
   });
 
   return success(res, commentSearchResults);

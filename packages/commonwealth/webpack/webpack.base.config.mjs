@@ -134,6 +134,11 @@ const baseConfig = {
         process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_CONTEST_DEV': JSON.stringify(
+        process.env.FLAG_CONTEST_DEV,
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {

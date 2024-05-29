@@ -84,11 +84,11 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
   onSearchItemClick,
 }) => {
   const showResults =
-    searchTerm.length > 0 && Object.values(searchResults).flat(1).length > 0;
+    searchTerm.length >= 3 && Object.values(searchResults).flat(1).length > 0;
 
   return (
     <div className="SearchBarDropdown">
-      {showResults ? (
+      {showResults && (
         <div className="previews-section">
           {Object.entries(searchResults).map(([scope, results]) => (
             <SearchBarPreviewSection
@@ -100,9 +100,15 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
             />
           ))}
         </div>
-      ) : (
+      )}
+      {!showResults && searchTerm.length >= 3 && (
         <div className="no-results">
           <CWText type="b2">No results found</CWText>
+        </div>
+      )}
+      {!showResults && searchTerm.length < 3 && (
+        <div className="no-results">
+          <CWText type="b2">Search term requires 3 or more characters</CWText>
         </div>
       )}
     </div>

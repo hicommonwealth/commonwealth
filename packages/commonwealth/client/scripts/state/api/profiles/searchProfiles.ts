@@ -27,6 +27,7 @@ interface SearchProfilesProps {
   includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;
+  includeCount?: boolean;
   enabled?: boolean;
 }
 
@@ -38,6 +39,7 @@ const searchProfiles = async ({
   orderBy,
   orderDirection,
   includeRoles,
+  includeCount,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
     data: { result },
@@ -55,6 +57,7 @@ const searchProfiles = async ({
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
+        include_count: includeCount,
       },
     },
   );
@@ -68,6 +71,7 @@ const useSearchProfilesQuery = ({
   orderBy,
   orderDirection,
   includeRoles,
+  includeCount,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
@@ -90,6 +94,7 @@ const useSearchProfilesQuery = ({
         orderBy,
         orderDirection,
         includeRoles,
+        includeCount,
       }),
     {
       getNextPageParam: (lastPage) => {
@@ -100,7 +105,7 @@ const useSearchProfilesQuery = ({
         return undefined;
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
-      enabled,
+      enabled: enabled && searchTerm.length >= 3,
     },
   );
 };
