@@ -1,16 +1,19 @@
-import { Thread } from '@hicommonwealth/schemas';
+import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getRelativeTimestamp } from 'helpers/dates';
 import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getCommunityUrl } from 'utils';
 import { trpc } from 'utils/trpcClient';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { User } from 'views/components/user/user';
 import { z } from 'zod';
 
 interface SubscriptionEntryProps {
-  readonly thread: z.infer<typeof Thread>;
+  readonly thread: z.infer<typeof ThreadSubscription>['Thread'];
   readonly onUnsubscribe: (id: number) => void;
 }
 
@@ -64,27 +67,27 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
     <div className="SubEntry">
       <div className="SubHeader">
         <div>
-          {/*<CWCommunityAvatar*/}
-          {/*  community={{*/}
-          {/*    iconUrl: thread.Community.icon_url,*/}
-          {/*    name: thread.Community.name,*/}
-          {/*  }}*/}
-          {/*  size="small"*/}
-          {/*/>*/}
+          <CWCommunityAvatar
+            community={{
+              iconUrl: thread.Community.icon_url,
+              name: thread.Community.name,
+            }}
+            size="small"
+          />
         </div>
         <div style={{ marginLeft: '8px' }}>
-          {/*<Link to={getCommunityUrl(thread.Community.name)}>*/}
-          {/*  <CWText fontWeight="semiBold">{thread.Community.name}</CWText>*/}
-          {/*</Link>*/}
+          <Link to={getCommunityUrl(thread.Community.name)}>
+            <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
+          </Link>
         </div>
 
         <div style={{ marginLeft: '8px', marginRight: '8px' }}>•</div>
 
         <div>
-          {/*<User*/}
-          {/*  userAddress={thread.Address.address}*/}
-          {/*  userCommunityId={thread.Community.id}*/}
-          {/*/>*/}
+          <User
+            userAddress={thread.Address.address}
+            userCommunityId={thread.Community.id}
+          />
         </div>
 
         <div style={{ marginLeft: '8px', marginRight: '8px' }}>•</div>
