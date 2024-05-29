@@ -1,6 +1,8 @@
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
+import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -263,7 +265,7 @@ export const ThreadCard = ({
       {!hideRecentComments &&
       maxRecentCommentsToDisplay &&
       thread?.recentComments?.length > 0 ? (
-        <div className="RecentComments">
+        <div className={clsx('RecentComments', { hideReactionButton })}>
           {[...(thread?.recentComments || [])]
             ?.filter((recentComment) => !recentComment.deleted)
             ?.slice?.(0, maxRecentCommentsToDisplay)
@@ -306,6 +308,7 @@ export const ThreadCard = ({
           setIsOpen={setIsUpvoteDrawerOpen}
         />
       )}
+      <CWDivider className="ThreadDivider" />
     </>
   );
 };

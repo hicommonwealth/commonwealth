@@ -82,6 +82,7 @@
         @include multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
         font-size: 16px !important;
+        overflow: hidden;
 
         @include extraSmall {
           overflow: hidden !important;
@@ -90,6 +91,7 @@
 
         .MarkdownFormattedText {
           @include caption;
+          overflow: hidden;
 
           @include extraSmall {
             p {
@@ -199,7 +201,11 @@
   border-left: 1px solid $neutral-200 !important;
 
   @include extraSmall {
-    margin-left: 36px;
+    margin-left: 32px;
+  }
+
+  &.hideReactionButton {
+    margin: 8px 0 8px 48px;
   }
 
   .Comment:hover {
@@ -222,4 +228,8 @@
       padding-left: 0px !important;
     }
   }
+}
+
+.ThreadDivider {
+  margin-top: 0 !important;
 }
