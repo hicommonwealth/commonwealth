@@ -1,4 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -39,6 +40,7 @@ const emailIntervalFrequencyMap = {
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const enablePushNotifications = useFlag('pushNotifications');
 
   const {
     email,
@@ -61,42 +63,22 @@ const NotificationSettingsPage = () => {
   const { mutateAsync: registerClientRegistrationToken } =
     trpc.subscription.registerClientRegistrationToken.useMutation();
 
-  useEffect(() => {
-    app.user.notifications.isLoaded.once('redraw', forceRerender);
-  }, [forceRerender]);
-
-  const handleSubs = useCallback(() => {
+  const handlePushNotificationSubscription = useCallback(() => {
     async function doAsync() {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         console.log('Notification permission granted.');
         const token = await getFirebaseMessagingToken();
-        console.log('FIXME: got the token: ' + token);
         await registerClientRegistrationToken({ id: 'none', token });
       }
     }
 
     doAsync().catch(console.error);
-  }, []);
+  }, [registerClientRegistrationToken]);
 
-  const handleFakeNotification = useCallback(() => {
-    const img = '/static/img/branding/common.png';
-
-    function showNotification(title, options) {
-      if (Notification.permission === 'granted') {
-        new Notification(title, options);
-      } else {
-        console.log('Notification permission not granted.');
-      }
-    }
-
-    showNotification('Hello!', {
-      body: 'This is a notification from your PWA.',
-      image: img,
-      icon: img, // Replace with the path to your notification icon
-      badge: img, // Replace with the path to your notification badge
-    });
-  }, []);
+  useEffect(() => {
+    app.user.notifications.isLoaded.once('redraw', forceRerender);
+  }, [forceRerender]);
 
   if (!app.loginStatusLoaded()) {
     return <PageLoading />;
@@ -104,20 +86,33 @@ const NotificationSettingsPage = () => {
     navigate('/', { replace: true });
     return <PageLoading />;
   }
+
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage">
         <CWText type="h3" fontWeight="semiBold" className="page-header-text">
           Notification Management
         </CWText>
+
         <CWText className="page-subheader-text">
           Notification settings for all new threads, comments, mentions, likes,
           and chain events in the following communities.
         </CWText>
-        <div className="email-management-section">
-          <button onClick={handleSubs}>DO IT</button>
 
-          <button onClick={handleFakeNotification}>FAKE IT</button>
+        {enablePushNotifications && (
+          <div>
+            <CWText type="h5">Push Notifications</CWText>
+
+            <p>
+              <CWButton
+                label="Subscribe to Push Notifications"
+                onClick={handlePushNotificationSubscription}
+              />
+            </p>
+          </div>
+        )}
+
+        <div className="email-management-section">
           <div className="text-description">
             <CWText type="h5">Scheduled Email Digest</CWText>
             <CWText type="b2" className="subtitle-text">
