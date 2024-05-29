@@ -120,7 +120,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       thread={thread}
       canReact={!disabledActionsTooltipText}
       canComment={!disabledActionsTooltipText}
-      // onEditStart={() => navigate(`${discussionLink}`)}
+      canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
           `${

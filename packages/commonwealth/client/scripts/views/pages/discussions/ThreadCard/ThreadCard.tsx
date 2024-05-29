@@ -36,6 +36,7 @@ type CardProps = AdminActionsProps & {
   showSkeleton?: boolean;
   canReact?: boolean;
   canComment?: boolean;
+  canUpdateThread?: boolean;
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   hideRecentComments?: boolean;
@@ -65,6 +66,7 @@ export const ThreadCard = ({
   showSkeleton,
   canReact = true,
   canComment = true,
+  canUpdateThread = true,
   disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   hideRecentComments = false,
@@ -245,6 +247,7 @@ export const ThreadCard = ({
               upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
               commentBtnVisible={!thread.readOnly}
               canUpdateThread={
+                canUpdateThread &&
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }

@@ -116,7 +116,7 @@ export const TopicSummaryRow = ({
               thread={thread}
               canReact={!disabledActionsTooltipText}
               canComment={!disabledActionsTooltipText}
-              onEditStart={() => navigate(`${discussionLinkWithoutChain}`)}
+              canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}
