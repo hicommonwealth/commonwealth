@@ -280,11 +280,8 @@ export const CWCoverImageUploader = ({
 
     pseudoInput.current.addEventListener('change', pseudoInputHandler);
     attachZone.current.addEventListener('click', (e: any) => {
-      if (
-        e.target.classList.contains('attach-btn') ||
-        e.target.classList.contains('attach-zone')
-      )
-        clickHandler(e);
+      if (e.target.classList.contains('attach-btn')) clickHandler(e);
+      if (e.target.classList.contains('attach-zone')) clickHandler(e);
     });
 
     attachZone.current.addEventListener('dragenter', dragEnterHandler);
