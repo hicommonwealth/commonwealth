@@ -15,11 +15,6 @@ function useThreadSubscriptions() {
     {},
   );
 
-  console.log(
-    'FIXME: raw threadSubscriptions: ' +
-      JSON.stringify(threadSubscriptions, null, '  '),
-  );
-
   return useMemo(() => {
     return {
       ...threadSubscriptions,
@@ -66,7 +61,7 @@ const Index = () => {
           .map((current) => (
             <SubEntry
               key={current.Thread.id}
-              thread={current.Thread}
+              subscription={current}
               onUnsubscribe={handleUnsubscribe}
             />
           ))}

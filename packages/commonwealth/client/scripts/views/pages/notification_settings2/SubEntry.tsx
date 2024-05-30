@@ -14,12 +14,13 @@ import { z } from 'zod';
 import './SubEntry.scss';
 
 interface SubscriptionEntryProps {
-  readonly thread: z.infer<typeof ThreadSubscription>['Thread'];
+  readonly subscription: z.infer<typeof ThreadSubscription>;
   readonly onUnsubscribe: (id: number) => void;
 }
 
 export const SubEntry = (props: SubscriptionEntryProps) => {
-  const { thread, onUnsubscribe } = props;
+  const { subscription, onUnsubscribe } = props;
+  const thread = subscription.Thread;
   const thread_id = thread.id;
 
   const threadUrl = getThreadUrl(
@@ -41,16 +42,8 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
     trpc.subscription.deleteThreadSubscription.useMutation();
 
   const deleteThreadSubscription = useCallback(async () => {
-    // FIXME: There are two problems here:
-    //
-    // - The first is that the 'id' property is not defined anywhere but the
-    // backend keeps complaining that the 'id' property is missing but I can't
-    // figure out where it's failing.
-    //
-    // - The mutateAsync args are not typed.  This might be a larger problem
-    // though
-
     await deleteThreadSubscriptionMutation.mutateAsync({
+      id: `${thread_id}`,
       thread_ids: [thread_id],
     });
   }, [deleteThreadSubscriptionMutation, thread_id]);
