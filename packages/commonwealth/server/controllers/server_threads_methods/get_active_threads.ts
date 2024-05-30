@@ -92,12 +92,6 @@ export async function __getActiveThreads(
           ],
         },
       ],
-      // TODO: get deleted_at null comments
-      // where: {
-      //   deleted_at: {
-      //     [Op.is]: null,
-      //   },
-      // },
     });
   }
 
