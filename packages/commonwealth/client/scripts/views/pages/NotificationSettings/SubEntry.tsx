@@ -69,13 +69,13 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
             size="small"
           />
         </div>
-        <div style={{ marginLeft: '8px' }}>
+        <div>
           <Link to={getCommunityUrl(thread.Community.name)}>
             <CWText fontWeight="semiBold">{thread.Community.name}</CWText>
           </Link>
         </div>
 
-        <div style={{ marginLeft: '8px', marginRight: '8px' }}>•</div>
+        <div>•</div>
 
         <div>
           <User
@@ -84,7 +84,7 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
           />
         </div>
 
-        <div style={{ marginLeft: '8px', marginRight: '8px' }}>•</div>
+        <div>•</div>
 
         <div>{getRelativeTimestamp(thread.created_at.getTime())}</div>
       </div>
