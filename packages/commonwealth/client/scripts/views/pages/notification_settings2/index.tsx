@@ -43,14 +43,12 @@ const Index = () => {
     [threadsFilter],
   );
 
-  if (!threadSubscriptions.data) {
+  if (threadSubscriptions.isLoading) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
     navigate('/', { replace: true });
     return <PageLoading />;
   }
-
-  // FIXME: this layout isn't correct yet.
 
   return (
     <CWPageLayout>
