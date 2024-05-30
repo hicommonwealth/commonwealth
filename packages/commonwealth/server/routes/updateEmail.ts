@@ -1,17 +1,16 @@
-import { AppError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import type { DB } from '@hicommonwealth/model';
+import { AppError, logger } from '@hicommonwealth/core';
+import { type DB } from '@hicommonwealth/model';
 import { DynamicTemplate } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
-import { SENDGRID_API_KEY, SERVER_URL } from '../config';
+import { config } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -57,7 +56,7 @@ const updateEmail = async (
 
   // create and email the token
   const tokenObj = await models.EmailUpdateToken.createForEmail(email);
-  const loginLink = `${SERVER_URL}/api/finishUpdateEmail?token=${
+  const loginLink = `${config.SERVER_URL}/api/finishUpdateEmail?token=${
     tokenObj.token
   }&email=${encodeURIComponent(email)}`;
   const msg = {

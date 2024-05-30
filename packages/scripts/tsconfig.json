@@ -6,7 +6,6 @@
   "include": ["src"],
   "references": [
     { "path": "../../libs/core/tsconfig.build.json" },
-    { "path": "../../libs/logging/tsconfig.build.json" },
     { "path": "../../libs/model/tsconfig.build.json" },
     { "path": "../../libs/sitemaps/tsconfig.build.json" }
   ]

@@ -1,10 +1,14 @@
-import { Broker, BrokerPublications, EventContext } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import {
+  Broker,
+  BrokerPublications,
+  EventContext,
+  logger,
+} from '@hicommonwealth/core';
 import { DiscordAction } from '@hicommonwealth/model';
 import { Client, Message, ThreadChannel } from 'discord.js';
 import { fileURLToPath } from 'url';
 import { getImageUrls } from '../discord-listener/util';
-import { getForumLinkedTopic } from '../utils/util';
+import { getForumLinkedTopic } from '../util';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);

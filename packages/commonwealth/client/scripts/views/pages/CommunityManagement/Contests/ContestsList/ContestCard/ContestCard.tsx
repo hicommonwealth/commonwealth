@@ -1,10 +1,11 @@
 import moment from 'moment';
 import React from 'react';
 
-import { CWCard } from 'views/components/component_kit/cw_card';
-
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import useCancelContestMutation from 'state/api/contests/cancelContest';
+import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -22,7 +23,13 @@ interface ContestCardProps {
   imageUrl?: string;
   finishDate: string;
   topics: { id?: number; name?: string }[];
-  winners: { prize?: number; creator_address?: string }[];
+  score: {
+    creator_address?: string;
+    content_id?: string;
+    votes?: number;
+    prize?: string;
+    tickerPrize?: number;
+  }[];
   isAdmin: boolean;
   isActive: boolean;
   onFund: () => void;
@@ -34,13 +41,24 @@ const ContestCard = ({
   imageUrl,
   finishDate,
   topics,
-  winners,
+  score,
   isAdmin,
   isActive,
   onFund,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { mutateAsync: cancelContest } = useCancelContestMutation();
+
+  const handleCancel = () => {
+    cancelContest({
+      contest_address: address,
+      id: app.activeChainId(),
+    }).catch((error) => {
+      console.error('Failed to cancel contest: ', error);
+    });
+  };
 
   const handleCancelContest = () => {
     openConfirmation({
@@ -57,7 +75,7 @@ const ContestCard = ({
           label: 'Cancel contest',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: () => console.log('cancel contest'),
+          onClick: handleCancel,
         },
       ],
     });
@@ -68,11 +86,11 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    navigate(`/discussions?featured=mostLikes&contest=${name}`);
+    navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
   const handleWinnersClick = () => {
-    navigate(`/discussions?contest=${name}`);
+    navigate(`/discussions?contest=${address}`);
   };
 
   const handleFundClick = () => {
@@ -96,12 +114,12 @@ const ContestCard = ({
           Current Prizes
         </CWText>
         <div className="prizes">
-          {winners.map((winner, index) => (
-            <div className="prize-row" key={winner.creator_address}>
+          {score?.map((s, index) => (
+            <div className="prize-row" key={s.content_id}>
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{winner.prize} ETH</CWText>
+              <CWText fontWeight="bold">{s.tickerPrize} ETH</CWText>
             </div>
           ))}
         </div>

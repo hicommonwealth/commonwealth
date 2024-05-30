@@ -1,6 +1,9 @@
 import {
   EventNames,
+  ProviderError,
   SnapshotProposalCreated,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -15,10 +18,6 @@ import sinon from 'sinon';
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
 import { getSnapshotUrl } from '../../../server/workers/knock/util';
-import {
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-} from './util';
 
 chai.use(chaiAsPromised);
 
@@ -28,7 +27,8 @@ const proposalId = '0x1';
 describe('snapshotProposalCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let userProfile: z.infer<typeof schemas.Profile> | undefined;
+  let userProfile: z.infer<typeof schemas.Profile> | undefined,
+    sandbox: sinon.SinonSandbox;
 
   before(async () => {
     [user] = await tester.seed('User', {});
@@ -50,6 +50,15 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   beforeEach(async () => {
     await models.CommunityAlert.truncate();
+  });
+
+  afterEach(() => {
+    const provider = notificationsProvider();
+    disposeAdapter(provider.name);
+
+    if (sandbox) {
+      sandbox.restore();
+    }
   });
 
   after(async () => {
@@ -77,7 +86,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   it('should do nothing if there are no relevant community alert subscriptions', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
     const res = await processSnapshotProposalCreated({
@@ -90,13 +99,10 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
     expect(res).to.be.true;
     expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
-
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
   });
 
   it('should execute triggerWorkflow with the appropriate data', async () => {
-    const sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
     await tester.seed('CommunityAlert', {
@@ -126,41 +132,32 @@ describe('snapshotProposalCreated Event Handler', () => {
       key: WorkflowKeys.SnapshotProposals,
       users: [{ id: String(user!.id) }],
       data: {
-        community_name: community.name,
+        community_id: community!.id,
+        community_name: community!.name,
         space_name: space,
         snapshot_proposal_url: getSnapshotUrl(community!.id, space, proposalId),
       },
     });
-
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
   });
 
   it('should throw if triggerWorkflow fails', async () => {
-    const sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      ThrowingSpyNotificationsProvider(sandbox),
-    );
+    sandbox = sinon.createSandbox();
+    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
     await tester.seed('CommunityAlert', {
       community_id: community.id,
       user_id: user!.id,
     });
 
-    try {
-      await processSnapshotProposalCreated({
+    await expect(
+      processSnapshotProposalCreated({
         name: EventNames.SnapshotProposalCreated,
         payload: {
           event: SnapshotEventType.Created,
           space,
           id: proposalId,
         } as z.infer<typeof SnapshotProposalCreated>,
-      });
-    } catch (error) {
-      expect((provider.triggerWorkflow as sinon.SinonStub).threw('some error'))
-        .to.be.true;
-    }
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
+      }),
+    ).to.eventually.be.rejectedWith(ProviderError);
   });
 });

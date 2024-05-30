@@ -2,7 +2,7 @@ import { dispose } from '@hicommonwealth/core';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
-import { TESTING, TEST_DB_NAME } from '../config';
+import { config } from '../config';
 import { buildDb, syncDb, type DB } from '../models';
 
 /**
@@ -205,8 +205,7 @@ ORDER BY
 
 let db: DB | undefined = undefined;
 /**
- * Bootstraps testing, by verifying the existence of TEST_DB_NAME on the server,
- * and creating/migrating a fresh instance if it doesn't exist.
+ * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */
@@ -214,14 +213,15 @@ export const bootstrap_testing = async (
   truncate = false,
   log = false,
 ): Promise<DB> => {
-  if (!TESTING) throw new Error('Seeds only work when testing!');
+  if (config.NODE_ENV !== 'test')
+    throw new Error('Seeds only work when testing!');
   if (!db) {
-    await verify_db(TEST_DB_NAME);
+    await verify_db(config.DB.NAME);
     try {
       db = buildDb(
         new Sequelize({
           dialect: 'postgres',
-          database: TEST_DB_NAME,
+          database: config.DB.NAME,
           username: 'commonwealth',
           password: 'edgeware',
           logging: false,
@@ -236,4 +236,4 @@ export const bootstrap_testing = async (
   return db;
 };
 
-TESTING && dispose(async () => truncate_db(db));
+config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));

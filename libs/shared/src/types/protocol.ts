@@ -6,6 +6,7 @@ export enum BalanceSourceType {
   CosmosNative = 'cosmos_native',
   CW20 = 'cw20',
   CW721 = 'cw721',
+  SPL = 'spl',
 }
 
 export enum BalanceType {
@@ -31,7 +32,8 @@ export type ContractSource = {
   source_type:
     | BalanceSourceType.ERC20
     | BalanceSourceType.ERC721
-    | BalanceSourceType.ERC1155;
+    | BalanceSourceType.ERC1155
+    | BalanceSourceType.SPL;
   evm_chain_id: number;
   contract_address: string;
   token_id?: string;

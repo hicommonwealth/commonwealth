@@ -9,11 +9,12 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { getUniqueUserAddresses } from '../helpers/user';
 import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
-import { useWelcomeOnboardModal } from '../state/ui/modals';
+import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
@@ -41,6 +42,7 @@ const Sublayout = ({
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const [authModalType, setAuthModalType] = useState<AuthModalType>();
+  const [profileId, setProfileId] = useState(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: userOnboardingEnabled,
@@ -50,8 +52,14 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
 
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
   const {
     onboardedProfiles,
@@ -59,6 +67,21 @@ const Sublayout = ({
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
   } = useWelcomeOnboardModal();
+
+  useEffect(() => {
+    let timeout = null;
+    if (isLoggedIn) {
+      timeout = setTimeout(() => {
+        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
+      }, 100);
+    } else {
+      setProfileId(null);
+    }
+
+    return () => {
+      if (timeout !== null) clearTimeout(timeout);
+    };
+  }, [isLoggedIn]);
 
   useNecessaryEffect(() => {
     if (
@@ -72,8 +95,14 @@ const Sublayout = ({
         (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
       );
 
-      // open welcome modal if user is not onboarded
-      if (!hasUsername && !onboardedProfiles[profileId]) {
+      const userUniqueAddresses = getUniqueUserAddresses({});
+
+      // open welcome modal if user is not onboarded and there is a single connected address
+      if (
+        !hasUsername &&
+        !onboardedProfiles[profileId] &&
+        userUniqueAddresses.length === 1
+      ) {
         setIsWelcomeOnboardModalOpen(true);
       }
 
@@ -92,6 +121,7 @@ const Sublayout = ({
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
+    setProfileAsOnboarded,
     isLoggedIn,
   ]);
 
@@ -102,6 +132,16 @@ const Sublayout = ({
   });
 
   const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
+
+  const routesWithoutGenericSliders = matchRoutes(
     [
       { path: '/discussions/*' },
       { path: ':scope/discussions/*' },
@@ -149,7 +189,7 @@ const Sublayout = ({
         onMobile={isWindowExtraSmall}
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
-          setAuthModalType(modalType || 'sign-in')
+          setAuthModalType(modalType || AuthModalType.SignIn)
         }
       />
       <AuthModal
@@ -192,8 +232,12 @@ const Sublayout = ({
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {userOnboardingEnabled && <UserTrainingSlider />}
-            {isInsideCommunity && <AdminOnboardingSlider />}
+            {userOnboardingEnabled && !routesWithoutGenericSliders && (
+              <UserTrainingSlider />
+            )}
+            {isInsideCommunity && !routesWithoutGenericSliders && (
+              <AdminOnboardingSlider />
+            )}
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>

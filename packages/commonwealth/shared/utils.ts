@@ -37,6 +37,7 @@ export const getThreadUrlWithoutObject = (
     : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
+// WARN: Using process.env to avoid webpack failures
 export const getCommunityUrl = (community: string): string => {
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${community}`

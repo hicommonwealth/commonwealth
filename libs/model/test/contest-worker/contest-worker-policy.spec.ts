@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
-import Web3 from 'web3';
 
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import { commonProtocol, models } from '../../src';
@@ -50,6 +49,9 @@ describe('Contest Worker Policy', () => {
       address_id: addressId,
       topic_id: undefined,
       deleted_at: undefined,
+      pinned: false,
+      read_only: false,
+      version_history: [],
     });
   });
   after(async () => {
@@ -58,13 +60,9 @@ describe('Contest Worker Policy', () => {
   });
 
   it('Policy should handle ThreadCreated and ThreadUpvoted events', async () => {
-    Sinon.stub(commonProtocol.ContestHelper, 'createWeb3Provider').resolves(
-      new Web3(),
-    );
-
     {
       const addContentStub = Sinon.stub(
-        commonProtocol.ContestHelper,
+        commonProtocol.contestHelper,
         'addContent',
       ).resolves({
         txReceipt: 'aaa',
@@ -92,6 +90,9 @@ describe('Contest Worker Policy', () => {
             comment_count: 0,
             max_notif_id: 0,
             deleted_at: undefined,
+            pinned: false,
+            read_only: false,
+            version_history: [],
           },
         },
         true,
@@ -114,7 +115,7 @@ describe('Contest Worker Policy', () => {
 
     {
       const voteContentStub = Sinon.stub(
-        commonProtocol.ContestHelper,
+        commonProtocol.contestHelper,
         'voteContent',
       ).resolves('abc');
 
@@ -126,7 +127,7 @@ describe('Contest Worker Policy', () => {
         contest_id: contestId,
         start_time: new Date(),
         end_time: new Date(),
-        winners: [],
+        score: [],
       });
 
       await models.ContestAction.create({

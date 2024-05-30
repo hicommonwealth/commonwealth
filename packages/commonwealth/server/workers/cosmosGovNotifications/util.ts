@@ -1,5 +1,5 @@
 import { Timestamp, fromTimestamp } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import {
   ChainBase,

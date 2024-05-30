@@ -1,7 +1,7 @@
 // Note, this login will not work for the homepage
 import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
 import { expect } from '@playwright/test';
-import * as process from 'process';
+import { config } from '../../../server/config';
 
 export type E2E_Seeder = E2E_TestEntities & {
   testDb: DB;
@@ -68,7 +68,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
     ...e2eEntities,
 
     addAlchemyKey: async function () {
-      const apiKey = process.env.ETH_ALCHEMY_API_KEY;
+      const apiKey = config.EVM.ETH_ALCHEMY_API_KEY;
       if (!apiKey) {
         throw Error('ETH_ALCHEMY_API_KEY not found');
       }
@@ -226,10 +226,20 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
 let seeder;
 
+/**
+ * Legacy e2e seeder
+ *
+ * @deprecated Use `seed` from `libs/model/src/tester/seed.ts` instead
+ * - Seed data is too coupled with integration seeds
+ *
+ * @returns e2e seeder
+ */
 export const e2eSeeder = async (): Promise<E2E_Seeder> => {
   if (!seeder) {
     try {
+      console.log('Seeding e2e test data...');
       seeder = await buildSeeder();
+      console.log('Seeding e2e test data...DONE');
     } catch (error) {
       console.error('Error seeding E2E:', error);
       throw error;

@@ -6,11 +6,12 @@ import {
   EventSchemas,
   Events,
   EventsHandlerMetadata,
+  ILogger,
   InvalidInput,
   RetryStrategyFn,
   handleEvent,
+  logger,
 } from '@hicommonwealth/core';
-import { ILogger, logger } from '@hicommonwealth/logging';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 import { fileURLToPath } from 'url';

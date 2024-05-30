@@ -24,4 +24,4 @@ If errors occur try these steps:
 
 1. Make sure homebrew is installed in the `/opt/` directory
 
-2. If `yarn` stalls out at node-sass, ensure that Python is installed in your Rosetta Terminal path.
+2. If `pnpm` stalls out at node-sass, ensure that Python is installed in your Rosetta Terminal path.

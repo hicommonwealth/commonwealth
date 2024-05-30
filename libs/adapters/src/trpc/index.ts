@@ -1,14 +1,16 @@
 import * as core from '@hicommonwealth/core';
 import {
+  AuthStrategies,
   Events,
+  ExternalServiceUserIds,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  logger,
   type CommandMetadata,
   type EventSchemas,
   type EventsHandlerMetadata,
   type QueryMetadata,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import { TRPCError, initTRPC } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request } from 'express';
@@ -23,6 +25,7 @@ import {
 } from 'trpc-openapi';
 import { fileURLToPath } from 'url';
 import { ZodObject, ZodSchema, ZodUndefined, z } from 'zod';
+import { config } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -33,10 +36,33 @@ export interface Context {
 
 const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 
-const authenticate = async (req: Request) => {
+const authenticate = async (
+  req: Request,
+  authStrategy: AuthStrategies = { name: 'jwt' },
+) => {
   try {
-    await passport.authenticate('jwt', { session: false });
+    if (authStrategy.name === 'authtoken') {
+      switch (req.headers['authorization']) {
+        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
+          req.user = {
+            id: ExternalServiceUserIds.Knock,
+            email: 'hello@knock.app',
+          };
+          break;
+        default:
+          throw new Error('Not authenticated');
+      }
+    } else {
+      await passport.authenticate(authStrategy.name, { session: false });
+    }
+
     if (!req.user) throw new Error('Not authenticated');
+    if (
+      authStrategy.userId &&
+      (req.user as core.User).id !== authStrategy.userId
+    ) {
+      throw new Error('Not authenticated');
+    }
   } catch (error) {
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),
@@ -181,7 +207,8 @@ export const query = <Input extends ZodSchema, Output extends ZodSchema>(
     .input(md.input)
     .output(md.output)
     .query(async ({ ctx, input }) => {
-      if (md.secure) await authenticate(ctx.req);
+      // enable secure by default
+      if (md.secure !== false) await authenticate(ctx.req, md.authStrategy);
       try {
         return await core.query(
           md,

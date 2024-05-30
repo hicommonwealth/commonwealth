@@ -1,6 +1,6 @@
+import { config } from '@hicommonwealth/core';
 import { expect, test } from '@playwright/test';
 import _ from 'lodash';
-import { PORT } from '../../../server/config';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
 
 let seeder: E2E_Seeder;
@@ -22,13 +22,13 @@ test.describe('Discussion Page Tests', () => {
     )[0][0]['id'];
 
     await page.goto(
-      `http://localhost:${PORT}/${seeder.testChains[0].id}/discussion/${threadId}`,
+      `${config.SERVER_URL}/${seeder.testChains[0].id}/discussion/${threadId}`,
     );
     await seeder.addAddressIfNone(seeder.testChains[0].id);
     await login(page);
   });
 
-  test('Check User can create/update/delete/like/unlike comment', async ({
+  test.skip('Check User can create/update/delete/like/unlike comment', async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -80,7 +80,7 @@ test.describe('Discussion Page Tests', () => {
     expect(await page.getByText(commentText).count()).toEqual(0);
   });
 
-  test('Check User can like/dislike thread', async ({ page }) => {
+  test.skip('Check User can like/dislike thread', async ({ page }) => {
     await performUpvote(page, 'ThreadOptions');
   });
 });

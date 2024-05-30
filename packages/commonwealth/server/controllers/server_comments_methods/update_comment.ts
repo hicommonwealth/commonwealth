@@ -10,6 +10,7 @@ import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createCommentMentionNotifications,
+  emitMentions,
   findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
@@ -107,16 +108,36 @@ export async function __updateComment(
     }
   })();
 
-  await this.models.Comment.update(
-    {
-      text,
-      plaintext,
-      version_history: versionHistory ?? undefined,
-    },
-    {
-      where: { id: comment.id },
-    },
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(
+    decodeURIComponent(commentBody),
   );
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
+  await this.models.sequelize.transaction(async (transaction) => {
+    await this.models.Comment.update(
+      {
+        text,
+        plaintext,
+        version_history: versionHistory ?? undefined,
+      },
+      {
+        where: { id: comment.id },
+        transaction,
+      },
+    );
+
+    await emitMentions(this.models, transaction, {
+      authorAddressId: address.id,
+      authorUserId: user.id,
+      authorAddress: address.address,
+      authorProfileId: address.profile_id,
+      mentions: mentionedAddresses,
+      comment,
+    });
+  });
 
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
@@ -144,14 +165,6 @@ export async function __updateComment(
     },
     excludeAddresses: [finalComment.Address.address],
   });
-
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(
-    decodeURIComponent(commentBody),
-  );
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
     ...createCommentMentionNotifications(

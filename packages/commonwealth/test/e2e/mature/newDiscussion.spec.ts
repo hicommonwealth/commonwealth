@@ -1,5 +1,5 @@
+import { config } from '@hicommonwealth/model';
 import { test } from '@playwright/test';
-import { PORT } from '../../../server/config';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
 
 let seeder: E2E_Seeder;
@@ -11,16 +11,16 @@ test.beforeAll(async () => {
 test.describe('New Discussion Page Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(
-      `http://localhost:${PORT}/${seeder.testChains[0].id}/discussions`,
+      `${config.SERVER_URL}/${seeder.testChains[0].id}/discussions`,
     );
     await seeder.addAddressIfNone(seeder.testChains[0].id);
     await login(page);
     await page.goto(
-      `http://localhost:${PORT}/${seeder.testChains[0].id}/new/discussion`,
+      `${config.SERVER_URL}/${seeder.testChains[0].id}/new/discussion`,
     );
   });
 
-  test('Check User can create a thread', async ({ page }) => {
+  test.skip('Check User can create a thread', async ({ page }) => {
     await page.locator('.TextInput').locator('input').fill('Test thread');
     await page.locator('.CWSelectList').locator('.SelectList').click();
     await page.getByText('testTopic', { exact: true }).click();

@@ -1,3 +1,4 @@
+import type { ILogger } from '@hicommonwealth/core';
 import {
   BrokerPublications,
   BrokerSubscriptions,
@@ -7,7 +8,6 @@ import {
   Policy,
   events,
 } from '@hicommonwealth/core';
-import type { ILogger } from '@hicommonwealth/logging';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import { AckOrNack } from 'rascal';

@@ -1,7 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { bootstrap_testing, seed } from 'model/src/tester';
+import { models } from '../../src/database';
 
 describe('Reactions lifecycle', () => {
   const addressId = 555;
@@ -49,6 +49,9 @@ describe('Reactions lifecycle', () => {
         address_id: community?.Addresses?.at(0)?.id,
         topic_id: undefined,
         deleted_at: undefined, // so we can find it!
+        pinned: false,
+        read_only: false,
+        version_history: [],
       },
       //{ mock: true, log: true },
     );

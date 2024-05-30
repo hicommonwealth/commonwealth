@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { EVM_CE_POLL_INTERVAL_MS } from '../../config';

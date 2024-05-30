@@ -116,6 +116,7 @@ const SearchPage = () => {
     limit: 20,
     orderBy,
     orderDirection,
+    includeCount: true,
   };
 
   const {

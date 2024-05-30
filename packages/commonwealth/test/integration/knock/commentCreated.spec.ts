@@ -1,6 +1,9 @@
 import {
   CommentCreated,
   EventNames,
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -15,10 +18,6 @@ import sinon from 'sinon';
 import z from 'zod';
 import { processCommentCreated } from '../../../server/workers/knock/eventHandlers/commentCreated';
 import { getCommentUrl } from '../../../server/workers/knock/util';
-import {
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-} from './util';
 
 chai.use(chaiAsPromised);
 
@@ -30,9 +29,8 @@ describe('CommentCreated Event Handler', () => {
     subscriberProfile: z.infer<typeof schemas.Profile> | undefined,
     thread: z.infer<typeof schemas.Thread> | undefined,
     rootComment: z.infer<typeof schemas.Comment> | undefined,
-    replyComment: z.infer<typeof schemas.Comment> | undefined;
-
-  let sandbox: sinon.SinonSandbox;
+    replyComment: z.infer<typeof schemas.Comment> | undefined,
+    sandbox: sinon.SinonSandbox;
 
   before(async () => {
     const [chainNode] = await tester.seed(
@@ -97,6 +95,15 @@ describe('CommentCreated Event Handler', () => {
     await models.CommentSubscription.truncate();
   });
 
+  afterEach(() => {
+    const provider = notificationsProvider();
+    disposeAdapter(provider.name);
+
+    if (sandbox) {
+      sandbox.restore();
+    }
+  });
+
   after(async () => {
     await dispose()();
   });
@@ -135,9 +142,6 @@ describe('CommentCreated Event Handler', () => {
     });
     expect(res).to.be.true;
     expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
-
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
   });
 
   it('should execute the triggerWorkflow function with appropriate data for a root comment', async () => {
@@ -175,9 +179,6 @@ describe('CommentCreated Event Handler', () => {
       },
       actor: { id: String(author.id) },
     });
-
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
   });
 
   it('should execute the triggerWorkflow function with appropriate data for a reply comment', async () => {
@@ -215,33 +216,22 @@ describe('CommentCreated Event Handler', () => {
       },
       actor: { id: String(author.id) },
     });
-
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
   });
 
   it('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(
-      ThrowingSpyNotificationsProvider(sandbox),
-    );
+    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
     await tester.seed('ThreadSubscription', {
       user_id: subscriber.id,
       thread_id: rootComment.thread_id,
     });
 
-    try {
-      await processCommentCreated({
+    await expect(
+      processCommentCreated({
         name: EventNames.CommentCreated,
         payload: { ...rootComment },
-      });
-    } catch (error) {
-      expect((provider.triggerWorkflow as sinon.SinonStub).threw('some error'))
-        .to.be.true;
-    }
-
-    disposeAdapter(notificationsProvider.name);
-    sandbox.restore();
+      }),
+    ).to.eventually.be.rejectedWith(ProviderError);
   });
 });

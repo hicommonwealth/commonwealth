@@ -1,6 +1,8 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useWallets from 'client/scripts/hooks/useWallets';
 import app from 'client/scripts/state';
+import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
 import AuthButton from 'client/scripts/views/components/AuthButton';
 import {
   AuthTypes,
@@ -12,7 +14,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
@@ -20,21 +22,29 @@ import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
-import { ModalBaseProps, ModalBaseTabs } from '../../types';
+import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
 
 const MODAL_COPY = {
-  'create-account': {
+  [AuthModalType.AccountTypeGuidance]: {
+    title: '',
+    description: `We don't recognize the address you're trying to sign in with. \nWould you like to:`,
+    showFooter: false,
+    showExistingAccountSignInFooter: false,
+  },
+  [AuthModalType.CreateAccount]: {
     title: 'Create account',
     description: `Common is built on web3 technology that utilizes wallets. \nHow would you like to sign up?`,
+    showFooter: true,
     showExistingAccountSignInFooter: true,
   },
-  'sign-in': {
+  [AuthModalType.SignIn]: {
     title: 'Sign into Common',
     description: '',
+    showFooter: true,
     showExistingAccountSignInFooter: false,
   },
 };
@@ -49,7 +59,9 @@ const ModalBase = ({
   showWalletsFor,
   bodyClassName,
   onSignInClick,
+  onChangeModalType,
 }: ModalBaseProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const copy = MODAL_COPY[layoutType];
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -59,12 +71,13 @@ const ModalBase = ({
       : 0,
   );
   useEffect(() => {
-    setActiveTabIndex(
-      showAuthenticationOptionsFor?.includes('sso') &&
-        showAuthenticationOptionsFor.length === 1
+    setActiveTabIndex((prevActiveTab) => {
+      return (showAuthenticationOptionsFor?.includes('sso') &&
+        showAuthenticationOptionsFor.length === 1) ||
+        prevActiveTab === 1
         ? 1
-        : 0,
-    );
+        : 0;
+    });
   }, [showAuthenticationOptionsFor]);
 
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
@@ -85,6 +98,20 @@ const ModalBase = ({
     await handleClose();
   };
 
+  const handleUnrecognizedAddressReceived = () => {
+    // if this is the `layoutType == SignIn` modal, and we get an unrecognized
+    // address, then change modal type to `AccountTypeGuidance`
+    if (layoutType === AuthModalType.SignIn) {
+      onChangeModalType(AuthModalType.AccountTypeGuidance);
+      return false;
+    }
+
+    return true;
+  };
+
+  const { setShouldOpenGuidanceModalAfterMagicSSORedirect } =
+    useAuthModalStore();
+
   const {
     wallets = [],
     isMagicLoading,
@@ -100,6 +127,7 @@ const ModalBase = ({
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
+    onUnrecognizedAddressReceived: handleUnrecognizedAddressReceived,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -171,6 +199,10 @@ const ModalBase = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
+      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
+      }
+
       setIsAuthenticatingWithEmail(true);
       return;
     }
@@ -188,6 +220,10 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
+      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
+      }
+
       // TODO: decide if twitter references are to be updated to 'x'
       await onSocialLogin(
         option === 'x' ? WalletSsoSource.Twitter : (option as WalletSsoSource),
@@ -208,11 +244,11 @@ const ModalBase = ({
 
         {copy.description && !hideDescription && (
           <CWText type="b1" className="description" isCentered>
-            {...copy.description.split('\n').map((line) => (
-              <>
+            {...copy.description.split('\n').map((line, index) => (
+              <Fragment key={index}>
                 {line}
                 <br />
-              </>
+              </Fragment>
             ))}
           </CWText>
         )}
@@ -273,19 +309,23 @@ const ModalBase = ({
         </CWModalBody>
 
         <CWModalFooter className="footer">
-          <CWText isCentered>
-            By connecting to Common you agree to our&nbsp;
-            <br />
-            <Link to="/terms">Terms of Service</Link>
-            &nbsp;and&nbsp;
-            <Link to="/privacy">Privacy Policy</Link>
-          </CWText>
+          {copy.showFooter && (
+            <>
+              <CWText isCentered>
+                By connecting to Common you agree to our&nbsp;
+                <br />
+                <Link to="/terms">Terms of Service</Link>
+                &nbsp;and&nbsp;
+                <Link to="/privacy">Privacy Policy</Link>
+              </CWText>
 
-          {copy.showExistingAccountSignInFooter && (
-            <CWText isCentered>
-              Already have an account?&nbsp;
-              <button onClick={() => onSignInClick?.()}>Sign in</button>
-            </CWText>
+              {copy.showExistingAccountSignInFooter && (
+                <CWText isCentered>
+                  Already have an account?&nbsp;
+                  <button onClick={() => onSignInClick?.()}>Sign in</button>
+                </CWText>
+              )}
+            </>
           )}
         </CWModalFooter>
       </section>

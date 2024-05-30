@@ -1,4 +1,4 @@
-import type * as Rascal from 'rascal';
+import * as Rascal from 'rascal';
 import { getAllRascalConfigs } from './configuration/rascalConfig';
 import {
   RascalBindings,
@@ -73,10 +73,22 @@ export function getRabbitMQConfig(
     copyConfigs(allQueues, vhostConfig.queues, [
       RascalQueues.ChainEvent,
       RascalQueues.NotificationsProvider,
+      RascalQueues.ContestWorkerPolicy,
+      RascalQueues.ContestProjection,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
-      RascalBindings.NotificationsProvider,
+      RascalBindings.NotificationsProviderCommentCreated,
+      RascalBindings.NotificationsProviderChainEventCreated,
+      RascalBindings.NotificationsProviderSnapshotProposalCreated,
+      RascalBindings.NotificationsProviderUserMentioned,
+      RascalBindings.ContestWorkerPolicyThreadCreated,
+      RascalBindings.ContestWorkerPolicyThreadUpvoted,
+      RascalBindings.ContestProjectionRecurringContestManagerDeployed,
+      RascalBindings.ContestProjectionOneOffContestManagerDeployed,
+      RascalBindings.ContestProjectionContestStarted,
+      RascalBindings.ContestProjectionContestContentAdded,
+      RascalBindings.ContestProjectionContestContentUpvoted,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -84,6 +96,8 @@ export function getRabbitMQConfig(
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.ChainEvent,
       RascalSubscriptions.NotificationsProvider,
+      RascalSubscriptions.ContestWorkerPolicy,
+      RascalSubscriptions.ContestProjection,
     ]);
   } else if (service === RascalConfigServices.DiscobotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [

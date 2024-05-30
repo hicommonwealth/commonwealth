@@ -1,38 +1,81 @@
+import { config as adapters_config } from '@hicommonwealth/adapters';
+import { configure } from '@hicommonwealth/core';
+import { config as evm_config } from '@hicommonwealth/evm-testing';
+import { config as model_config } from '@hicommonwealth/model';
 import { ChainBase } from '@hicommonwealth/shared';
-import * as dotenv from 'dotenv';
+import { z } from 'zod';
 
-dotenv.config();
+const {
+  SENDGRID_API_KEY,
+  TELEGRAM_BOT_TOKEN,
+  TELEGRAM_BOT_TOKEN_DEV,
+  SESSION_SECRET,
+  JWT_SECRET,
+  SEND_EMAILS: _SEND_EMAILS,
+  NO_CLIENT: _NO_CLIENT,
+  NO_PRERENDER: _NO_PRERENDER,
+  NO_GLOBAL_ACTIVITY_CACHE,
+  LOGIN_RATE_LIMIT_TRIES,
+  LOGIN_RATE_LIMIT_MINS,
+  SLACK_FEEDBACK_WEBHOOK,
+} = process.env;
 
-export const NODE_ENV = process.env.NODE_ENV || 'development';
+const SEND_EMAILS = _SEND_EMAILS === 'true';
+const NO_CLIENT = _NO_CLIENT === 'true' || SEND_EMAILS;
+const NO_PRERENDER = _NO_PRERENDER || NO_CLIENT;
 
-export const PORT = process.env.PORT || '8080';
-
-export const SERVER_URL =
-  process.env.SERVER_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : 'http://localhost:8080');
-
-export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
-export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
+export const config = configure(
+  { ...model_config, ...adapters_config, ...evm_config },
+  {
+    SEND_EMAILS,
+    NO_CLIENT,
+    NO_PRERENDER: NO_PRERENDER === 'true',
+    NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
+    // limit logins in the last 5 minutes
+    // increased because of chain waitlist registrations
+    LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
+    LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
+    SLACK_FEEDBACK_WEBHOOK,
+    AUTH: {
+      SESSION_SECRET: SESSION_SECRET || 'my secret',
+      JWT_SECRET: JWT_SECRET || 'my secret',
+      SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
+    },
+    SENDGRID: {
+      API_KEY: SENDGRID_API_KEY,
+    },
+    TELEGRAM: {
+      BOT_TOKEN:
+        model_config.NODE_ENV === 'production'
+          ? TELEGRAM_BOT_TOKEN
+          : TELEGRAM_BOT_TOKEN_DEV,
+    },
+  },
+  z.object({
+    SEND_EMAILS: z.boolean(),
+    NO_CLIENT: z.boolean(),
+    NO_PRERENDER: z.boolean(),
+    NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
+    LOGIN_RATE_LIMIT_TRIES: z.number().int(),
+    LOGIN_RATE_LIMIT_MINS: z.number().int(),
+    SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
+    AUTH: z.object({
+      SESSION_SECRET: z.string(),
+      JWT_SECRET: z.string(),
+      SESSION_EXPIRY_MILLIS: z.number().int(),
+    }),
+    SENDGRID: z.object({
+      API_KEY: z.string().optional(),
+    }),
+    TELEGRAM: z.object({
+      BOT_TOKEN: z.string().optional(),
+    }),
+  }),
+);
 
 export const ADDRESS_TOKEN_EXPIRES_IN = 10;
 
-export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
-
-export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-
-export const RABBITMQ_URI = process.env.CLOUDAMQP_URL ?? 'amqp://127.0.0.1';
-
-// if a tls redis url is provided then that takes priority over everything else
-// then if a normal non-tls url is provided that is the second best option (local/staging)
-export const REDIS_URL = (() => {
-  if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
-  if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
-  return undefined;
-})();
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
@@ -47,24 +90,7 @@ export const DEFAULT_COMMONWEALTH_LOGO =
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
 
-export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
-export const ETH_RPC = process.env.ETH_RPC || 'prod';
-
-export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
-  ? process.env.COSMOS_GOV_V1.split(',')
-  : [];
-
-export const COSMOS_REGISTRY_API =
-  process.env.COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro';
-
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
-// Don't set default value so if env var is not set the database cleaner will not run
-export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;
-
-export const TELEGRAM_BOT_TOKEN =
-  process.env.NODE_ENV === 'production'
-    ? process.env.TELEGRAM_BOT_TOKEN
-    : process.env.TELEGRAM_BOT_TOKEN_DEV;
 
 // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
 // Risks sending webhooks/emails to real users if incorrectly set to true
@@ -115,8 +141,3 @@ export const MESSAGE_RELAYER_PREFETCH =
 
 export const EVM_CE_POLL_INTERVAL_MS =
   parseInt(process.env.EVM_CE_POLL_INTERVAL || '') || 120_000;
-
-export const NEW_SUBSCRIPTION_API_FLAG =
-  process.env.NEW_SUBSCRIPTION_API_FLAG === 'true' || false;
-
-export const KNOCK_SIGNING_KEY = process.env.KNOCK_SIGNING_KEY;
