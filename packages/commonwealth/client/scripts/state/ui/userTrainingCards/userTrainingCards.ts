@@ -26,12 +26,19 @@ export const UserTrainingCardsStore = createStore<UserTrainingCardsStore>()(
         completedActions: [],
         markTrainingActionAsComplete: (action, profileId) => {
           set((state) => {
+            const isAlreadyCompleted = (
+              state?.trainingActionPermanentlyHidden?.[profileId] || []
+            )?.includes(action);
+
             return {
               ...state,
               // once an action is complete, it should show us with a completed checkmark
               completedActions: [
                 ...state.completedActions,
-                ...(state.completedActions?.includes(action) ? [] : [action]),
+                ...(state.completedActions?.includes(action) ||
+                isAlreadyCompleted
+                  ? []
+                  : [action]),
               ],
               // and the next time, the page is reloaded it shouldn't be visible
               trainingActionPermanentlyHidden: {
