@@ -1,32 +1,14 @@
-import {
-  GetThreadSubscriptions,
-  ThreadSubscription,
-} from '@hicommonwealth/schemas';
+import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import app from 'state';
-import { trpc } from 'utils/trpcClient';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
-
-function useThreadSubscriptions() {
-  const threadSubscriptions = trpc.subscription.getThreadSubscriptions.useQuery(
-    {},
-  );
-
-  return useMemo(() => {
-    return {
-      ...threadSubscriptions,
-      data: threadSubscriptions.data
-        ? GetThreadSubscriptions.output.parse(threadSubscriptions.data)
-        : threadSubscriptions.data,
-    };
-  }, [threadSubscriptions]);
-}
 
 const Index = () => {
   const navigate = useCommonNavigate();
