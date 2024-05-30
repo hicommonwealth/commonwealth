@@ -10,7 +10,6 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "traceResolution": false,
-    "noErrorTruncation": true,
     "paths": {
       "@hicommonwealth/*": ["../libs/*/src/index.ts"]
     }
