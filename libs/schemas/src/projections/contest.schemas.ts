@@ -10,10 +10,10 @@ export const ContestAction = z
     content_id: PG_INT.describe('On-Chain content id, 0 when adding'),
     actor_address: z.string(),
     action: z.enum(CONTEST_ACTIONS).describe('Type of content action'),
-    content_url: z.string().url().describe('Content url').optional(),
+    content_url: z.string().describe('Content url').nullish(),
     thread_id: PG_INT.nullish().describe('Thread id mapped from content url'),
     thread_title: z.string().nullish(),
-    voting_power: PG_INT.positive().describe(
+    voting_power: PG_INT.gte(0).describe(
       'Voting power of address when action was recorded',
     ),
     created_at: z.date().describe('Date-time when action was recorded'),

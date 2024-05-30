@@ -269,13 +269,13 @@ export const ContestStarted = ContestManagerEvent.extend({
 }).describe('When a contest instance gets started');
 
 export const ContestContentAdded = ContestManagerEvent.extend({
-  content_id: z.number().int().positive().describe('New content id'),
+  content_id: z.number().int().gte(0).describe('New content id'),
   creator_address: z.string().describe('Address of content creator'),
   content_url: z.string(),
 }).describe('When new content is added to a running contest');
 
 export const ContestContentUpvoted = ContestManagerEvent.extend({
-  content_id: z.number().int().positive().describe('Content id'),
+  content_id: z.number().int().gte(0).describe('Content id'),
   voter_address: z.string().describe('Address upvoting on content'),
   voting_power: z
     .number()

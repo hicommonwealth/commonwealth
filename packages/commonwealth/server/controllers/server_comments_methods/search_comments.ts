@@ -12,6 +12,7 @@ export type SearchCommentsOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
+  includeCount?: boolean;
 };
 export type SearchCommentsResult = TypedPaginatedResult<{
   id: number;
@@ -36,6 +37,7 @@ export async function __searchComments(
     page,
     orderBy,
     orderDirection,
+    includeCount,
   }: SearchCommentsOptions,
 ): Promise<SearchCommentsResult> {
   // sort by rank by default
@@ -121,10 +123,12 @@ export async function __searchComments(
       bind,
       type: QueryTypes.SELECT,
     }),
-    this.models.sequelize.query(sqlCountQuery, {
-      bind,
-      type: QueryTypes.SELECT,
-    }),
+    !includeCount
+      ? [{ count: 0 }]
+      : this.models.sequelize.query(sqlCountQuery, {
+          bind,
+          type: QueryTypes.SELECT,
+        }),
   ]);
 
   const totalResults = parseInt(count, 10);
