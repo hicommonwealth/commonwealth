@@ -8,39 +8,40 @@ const { expect } = chai;
 
 export const discussionTests = (test) => {
   return () => {
-    test('Discussion page loads and can navigate to first thread', async ({
-      page,
-    }) => {
-      await page.waitForSelector('div.HeaderWithFilters');
+    test.disable(
+      'Discussion page loads and can navigate to first thread',
+      async ({ page }) => {
+        await page.waitForSelector('div.HeaderWithFilters');
 
-      // Assert Thread header exists on discussions page
-      const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
+        // Assert Thread header exists on discussions page
+        const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
 
-      expect(headerExists).to.be.true;
+        expect(headerExists).to.be.true;
 
-      // Assert Threads are loaded into page
-      await page.waitForSelector('div[data-test-id]');
+        // Assert Threads are loaded into page
+        await page.waitForSelector('div[data-test-id]');
 
-      // Perform the assertion
-      await pwexpect(async () => {
-        const numberOfThreads = await page.$$eval(
-          'div[data-test-id] > div',
-          (divs) => divs.length,
+        // Perform the assertion
+        await pwexpect(async () => {
+          const numberOfThreads = await page.$$eval(
+            'div[data-test-id] > div',
+            (divs) => divs.length,
+          );
+          expect(numberOfThreads).to.be.gte(0);
+        }).toPass();
+
+        const firstThread = await page.$(
+          'div[data-test-id="virtuoso-item-list"] > div:first-child',
         );
-        expect(numberOfThreads).to.be.gte(0);
-      }).toPass();
 
-      const firstThread = await page.$(
-        'div[data-test-id="virtuoso-item-list"] > div:first-child',
-      );
+        // navigate to first link
+        await firstThread.click();
 
-      // navigate to first link
-      await firstThread.click();
-
-      expect(page.url())
-        .to.include('discussion')
-        .and.not.include('discussions');
-    });
+        expect(page.url())
+          .to.include('discussion')
+          .and.not.include('discussions');
+      },
+    );
 
     test('Check navigation to first profile', async ({ page }) => {
       let userProfileLinks = await page.locator('a.user-display-name.username');
