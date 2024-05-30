@@ -17,6 +17,6 @@ export default async (
     return next(new AppError(Errors.NotLoggedIn));
   }
   const { id } = req.user;
-  const notificationsWithProfiles = await getActivityFeed(models, id);
-  return res.json({ status: 'Success', result: notificationsWithProfiles });
+  const notificationsWithActivity = await getActivityFeed(models, id);
+  return res.json({ status: 'Success', result: notificationsWithActivity });
 };
