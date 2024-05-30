@@ -11,6 +11,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
+import './SubEntry.scss';
 
 interface SubscriptionEntryProps {
   readonly thread: z.infer<typeof ThreadSubscription>['Thread'];

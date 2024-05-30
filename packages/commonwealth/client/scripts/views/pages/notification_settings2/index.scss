@@ -1,26 +1,38 @@
 @import '../../../../styles/shared';
 
-.NotificationSettingsPage2 .SubEntry {
-  border-bottom: 1px solid $neutral-300;
-  margin-bottom: 16px;
-  padding-left: 8px;
-  padding-right: 8px;
-}
+.NotificationSettingsPage2 {
+  .page-header-text.Text {
+    margin-bottom: 8px;
+  }
 
-.NotificationSettingsPage2 .SubHeader {
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
+  .SubEntry {
+    border-bottom: 1px solid $neutral-300;
+    margin-bottom: 16px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 
-.NotificationSettingsPage2 .SubFooter {
-  margin-top: 16px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  row-gap: 8px;
-  column-gap: 8px;
-  font-size: 14px;
+  .SubHeader {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: $neutral-500;
+  }
+
+  .User a.user-display-name,
+  .SubHeader * {
+    color: $neutral-500;
+  }
+
+  .SubFooter {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    row-gap: 8px;
+    column-gap: 8px;
+    font-size: 14px;
+  }
 }
