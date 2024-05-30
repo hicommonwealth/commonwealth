@@ -22,6 +22,7 @@ const CWCommunityAvatarSkeleton = () => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCommunityAvatar = (props: CommunityAvatarProps) => {
   const { community, onClick, size = 'large', showSkeleton } = props;
 
