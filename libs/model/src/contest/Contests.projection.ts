@@ -284,7 +284,7 @@ export function Contests(): Projection<typeof inputs> {
 
       // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
-        const contest_id = payload.contest_id || 0;
+        const contest_id = payload.contest_id || 1;
         // update winners on ended contests
         await models.Contest.create({
           ...payload,
