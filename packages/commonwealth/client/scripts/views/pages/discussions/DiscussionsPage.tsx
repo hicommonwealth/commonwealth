@@ -97,6 +97,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
+      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));

@@ -10,18 +10,6 @@ export type AddressDisplayOptions = {
 };
 
 export type UserAttrs = {
-  // addressDisplayOptions?: AddressDisplayOptions; // display full or truncated address
-  // avatarOnly?: boolean; // overrides most other properties
-  // avatarSize?: number;
-  // hideAvatar?: boolean;
-  // linkify?: boolean;
-  // onClick?: (e: any) => void;
-  // popover?: boolean;
-  // showAddressWithDisplayName?: boolean; // show address inline with the display name
-  // showAsDeleted?: boolean;
-  // showRole?: boolean;
-  // user: Account | AddressInfo | MinimumProfile | undefined;
-  // role?: { permission: string };
   userAddress: string;
   userCommunityId: string;
   shouldShowAsDeleted?: boolean;
@@ -34,6 +22,7 @@ export type UserAttrs = {
   avatarSize?: number;
   role?: { permission: string };
   popoverPlacement?: PopperPlacementType;
+  className?: string;
 };
 
 export type UserAttrsWithSkeletonProp = UserAttrs & {

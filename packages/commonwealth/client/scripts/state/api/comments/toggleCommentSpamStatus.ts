@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import Comment from 'models/Comment';
+import moment from 'moment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface ToggleCommentSpamStatusProps {
@@ -53,10 +54,11 @@ const useToggleCommentSpamStatusMutation = ({
       const foundCommentIndex = comments.findIndex(
         (x) => x.id === response.data.result.id,
       );
-      const updatedComment = new Comment({
-        ...comments[foundCommentIndex],
-        ...response.data.result,
-      });
+      const updatedComment = comments[foundCommentIndex];
+      const { marked_as_spam_at } = response.data.result;
+      updatedComment.markedAsSpamAt = marked_as_spam_at
+        ? moment(marked_as_spam_at)
+        : null;
 
       // update fetch comments query state with updated comment
       if (foundCommentIndex > -1) {
@@ -68,6 +70,13 @@ const useToggleCommentSpamStatusMutation = ({
           return [...updatedComments];
         });
       }
+
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        { recentComments: [updatedComment] },
+        'combineAndRemoveDups',
+      );
 
       return updatedComment;
     },

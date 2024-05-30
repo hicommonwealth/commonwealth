@@ -166,7 +166,7 @@ describe('User Dashboard API', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.result).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const threadIds = res.body.result.map((a) => a.thread.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -202,7 +202,7 @@ describe('User Dashboard API', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.result).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const threadIds = res.body.result.map((a) => a.thread.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -218,6 +218,7 @@ describe('User Dashboard API', () => {
         { community_id: 'ethereum' },
       ]);
     });
+
     it('should return correctly ranked user activity', async () => {
       for (let i = 0; i < 48; i++) {
         const threadArgs: ThreadArgs = {

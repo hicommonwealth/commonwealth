@@ -1,9 +1,11 @@
+import { pluralize } from 'client/scripts/helpers';
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
+import Permissions from 'client/scripts/utils/Permissions';
 import { ViewUpvotesDrawerTrigger } from 'client/scripts/views/components/UpvoteDrawer';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useState } from 'react';
+import { SharePopover } from 'views/components/SharePopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { SharePopover } from 'views/components/share_popover';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -22,9 +24,10 @@ type OptionsProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   totalComments?: number;
-  disabledActionTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
+  hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -48,9 +51,10 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-  disabledActionTooltipText = '',
+  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
+  hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
@@ -59,7 +63,7 @@ export const ThreadOptions = ({
       getReactionSubscription(thread)?.isActive,
   );
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
 
   const handleToggleSubscribe = async (e) => {
     // prevent clicks from propagating to discussion row
@@ -83,7 +87,7 @@ export const ThreadOptions = ({
     <>
       <div className="ThreadOptions">
         <div className="options-container">
-          {!upvoteDrawerBtnBelow && (
+          {!hideUpvoteDrawerButton && !upvoteDrawerBtnBelow && (
             <ViewUpvotesDrawerTrigger
               onClick={(e) => {
                 e.preventDefault();
@@ -97,33 +101,39 @@ export const ThreadOptions = ({
               thread={thread}
               size="small"
               disabled={!canReact}
-              tooltipText={disabledActionTooltipText}
+              tooltipText={
+                typeof disabledActionsTooltipText === 'function'
+                  ? disabledActionsTooltipText?.('upvote')
+                  : disabledActionsTooltipText
+              }
             />
           )}
 
           {commentBtnVisible && totalComments >= 0 && (
             <CWThreadAction
-              label={`${totalComments}`}
+              label={pluralize(totalComments, 'Comment')}
               action="comment"
               disabled={!canComment}
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
               }}
-              tooltipText={disabledActionTooltipText}
+              tooltipText={
+                typeof disabledActionsTooltipText === 'function'
+                  ? disabledActionsTooltipText?.('comment')
+                  : disabledActionsTooltipText
+              }
             />
           )}
 
-          <SharePopover
-            // if share endpoint is present it will be used, else the current url will be used
-            discussionLink={shareEndpoint}
-          />
+          <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           <CWThreadAction
             action="subscribe"
+            label="Subscribe"
             onClick={handleToggleSubscribe}
             selected={!isSubscribed}
-            disabled={!hasJoinedCommunity}
+            disabled={!isCommunityMember}
           />
 
           {canUpdateThread && thread && (
@@ -143,7 +153,7 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {upvoteDrawerBtnBelow && (
+        {!hideUpvoteDrawerButton && upvoteDrawerBtnBelow && (
           <ViewUpvotesDrawerTrigger
             onClick={(e) => {
               e.preventDefault();

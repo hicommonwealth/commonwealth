@@ -13,7 +13,7 @@ export const formatVersionText = (
     return formattedTime;
   }
   let formattedName = collabInfo[address] ?? 'Anonymous';
-  if (profile.address === address) {
+  if (profile?.address === address) {
     formattedName = profile.name ?? 'Anonymous';
   }
 

@@ -10,7 +10,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { SharePopover } from 'views/components/share_popover';
+import { SharePopoverOld } from 'views/components/share_popover_old';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import ContestCountdown from '../ContestCountdown';
@@ -129,7 +129,7 @@ const ContestCard = ({
             onClick={handleWinnersClick}
           />
 
-          <SharePopover
+          <SharePopoverOld
             customUrl="/contests"
             renderTrigger={(handleInteraction) => (
               <CWThreadAction

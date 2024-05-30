@@ -1,8 +1,10 @@
 import { PopperPlacementType } from '@mui/base/Popper';
+import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
 import { threadStageToLabel } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
+import app from 'state';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -29,6 +31,7 @@ export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
   authorAddress: string;
   authorCommunityId: string;
+  layoutType?: 'author-first' | 'community-first';
   discord_meta?: {
     user: { id: string; username: string };
     channel_id: string;
@@ -58,6 +61,7 @@ export const AuthorAndPublishInfo = ({
   isHot,
   authorAddress,
   authorCommunityId,
+  layoutType = 'author-first',
   isLocked,
   lockedAt,
   lastUpdated,
@@ -103,17 +107,35 @@ export const AuthorAndPublishInfo = ({
     ),
   }));
 
+  const isCommunityFirstLayout = layoutType === 'community-first';
+  const communtyInfo = app.config.chains.getById(authorCommunityId);
+
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
+      {isCommunityFirstLayout && (
+        <>
+          <CommunityInfo
+            name={communtyInfo.name}
+            iconUrl={communtyInfo.iconUrl}
+            iconSize="regular"
+            communityId={authorCommunityId}
+          />
+          {dotIndicator}
+        </>
+      )}
       <FullUser
+        className={isCommunityFirstLayout ? 'community-user-info' : ''}
         avatarSize={24}
         userAddress={authorAddress}
         userCommunityId={authorCommunityId}
         shouldShowPopover
         shouldLinkProfile
+        shouldHideAvatar={isCommunityFirstLayout}
         shouldShowAsDeleted={!authorAddress && !authorCommunityId}
         shouldShowAddressWithDisplayName={
-          fromDiscordBot ? false : showUserAddressWithInfo
+          fromDiscordBot || isCommunityFirstLayout
+            ? false
+            : showUserAddressWithInfo
         }
         popoverPlacement={popoverPlacement}
         profile={profile}
