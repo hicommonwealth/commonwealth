@@ -10,7 +10,7 @@ import { PageLoading } from '../loading';
 import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
 
-const Index = () => {
+const NotificationSettings = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
 
@@ -55,4 +55,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default NotificationSettings;
