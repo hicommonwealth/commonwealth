@@ -115,6 +115,7 @@ async function updateOrCreateWithAlert(
       { transaction },
     );
 
+    // TODO: move EVM concerns out of projection
     // create EVM event sources so chain listener will listen to events on new contest contract
     const abiNickname = isOneOff ? 'SingleContest' : 'RecurringContest';
     const contestAbi = await models.ContractAbi.findOne({
