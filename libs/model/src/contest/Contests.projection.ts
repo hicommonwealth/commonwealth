@@ -1,10 +1,18 @@
-import { InvalidState, Projection, events, logger } from '@hicommonwealth/core';
+import {
+  EvmRecurringContestEventSignatures,
+  EvmSingleContestEventSignatures,
+  InvalidState,
+  Projection,
+  events,
+  logger,
+} from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
+import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,10 +45,14 @@ async function updateOrCreateWithAlert(
   namespace: string,
   contest_address: string,
   interval: number,
+  isOneOff: boolean,
 ) {
   const community = await models.Community.findOne({
-    where: { namespace },
-    include: models.ChainNode.scope('withPrivateData'),
+    where: { namespace_address: namespace },
+    include: {
+      model: models.ChainNode.scope('withPrivateData'),
+      required: false,
+    },
   });
   const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
   if (!url)
@@ -49,35 +61,85 @@ async function updateOrCreateWithAlert(
     );
 
   const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(url, contest_address);
+    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
 
-  const [updated] = await models.ContestManager.update(
-    {
-      interval,
-      ticker,
-      decimals,
-    },
-    { where: { contest_address }, returning: true },
+  const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
+    url,
+    contest_address,
+    isOneOff,
   );
-  if (!updated) {
-    // when contest manager metadata is not found, it means it failed creation or was deleted
-    // here we are alerting admins and creating a default entry
-    const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
-    log.error(msg, new MissingContestManager(msg, namespace, contest_address));
 
-    if (mustExist(`Community with namespace: ${namespace}`, community))
-      await models.ContestManager.create({
-        contest_address,
-        community_id: community.id!,
+  await models.sequelize.transaction(async (transaction) => {
+    const [updated] = await models.ContestManager.update(
+      {
         interval,
         ticker,
         decimals,
-        created_at: new Date(),
-        name: community.name,
-        image_url: 'http://default.image', // TODO: can we have a default image for this?
-        payout_structure: [],
-      });
-  }
+      },
+      { where: { contest_address }, returning: true, transaction },
+    );
+    if (!updated) {
+      // when contest manager metadata is not found, it means it failed creation or was deleted
+      // here we are alerting admins and creating a default entry
+      const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
+      log.error(
+        msg,
+        new MissingContestManager(msg, namespace, contest_address),
+      );
+
+      if (mustExist(`Community with namespace: ${namespace}`, community))
+        await models.ContestManager.create(
+          {
+            contest_address,
+            community_id: community.id!,
+            interval,
+            ticker,
+            decimals,
+            created_at: new Date(),
+            name: community.name,
+            image_url: 'http://default.image', // TODO: can we have a default image for this?
+            payout_structure: [],
+          },
+          { transaction },
+        );
+    }
+
+    // create first contest instance
+    await models.Contest.create(
+      {
+        contest_address,
+        start_time: new Date(startTime * 1000),
+        end_time: new Date(endTime * 1000),
+        contest_id: 0,
+      },
+      { transaction },
+    );
+
+    // TODO: move EVM concerns out of projection
+    // create EVM event sources so chain listener will listen to events on new contest contract
+    const abiNickname = isOneOff ? 'SingleContest' : 'RecurringContest';
+    const contestAbi = await models.ContractAbi.findOne({
+      where: { nickname: abiNickname },
+    });
+    if (mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi)) {
+      const sigs = isOneOff
+        ? EvmSingleContestEventSignatures
+        : EvmRecurringContestEventSignatures;
+      const sourcesToCreate: EvmEventSourceAttributes[] = Object.keys(sigs).map(
+        (eventName) => {
+          const eventSignature = (sigs as Record<string, string>)[eventName];
+          return {
+            chain_node_id: community!.ChainNode!.id!,
+            contract_address: contest_address,
+            event_signature: eventSignature,
+            kind: eventName,
+            abi_id: contestAbi.id,
+          };
+        },
+      );
+      await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
+    }
+  });
 }
 
 type ContestDetails = {
@@ -118,6 +180,13 @@ async function getContestDetails(
  */
 async function updateScore(contest_address: string, contest_id: number) {
   try {
+    const contestManager = await models.ContestManager.findOne({
+      where: {
+        contest_address,
+      },
+    });
+    const oneOff = contestManager!.interval === 0;
+
     const details = await getContestDetails(contest_address);
     if (!details?.url)
       throw new InvalidState(
@@ -129,17 +198,18 @@ async function updateScore(contest_address: string, contest_id: number) {
         details.url,
         contest_address,
         contest_id,
+        oneOff,
       );
     const prizePool =
-      (BigInt(contestBalance) * BigInt(details.prize_percentage)) / 100n;
+      (Number(contestBalance) * Number(details.prize_percentage)) / 100;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
-      content_id: s.winningContent,
+      content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
-      votes: +s.voteCount,
+      votes: Number(s.voteCount),
       prize:
-        i < details.payout_structure.length
+        i < Number(details.payout_structure.length)
           ? (
-              (prizePool * BigInt(details.payout_structure[i])) /
+              (BigInt(prizePool) * BigInt(details.payout_structure[i])) /
               100n
             ).toString()
           : '0',
@@ -198,6 +268,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.namespace,
           payload.contest_address,
           payload.interval,
+          false,
         );
       },
 
@@ -207,16 +278,18 @@ export function Contests(): Projection<typeof inputs> {
           payload.namespace,
           payload.contest_address,
           0,
+          true,
         );
       },
 
+      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id || 0;
+        // update winners on ended contests
         await models.Contest.create({
           ...payload,
           contest_id,
         });
-        // update winners on ended contests
         contest_id > 0 &&
           setImmediate(() =>
             updateEndedContests(payload.contest_address, contest_id),
