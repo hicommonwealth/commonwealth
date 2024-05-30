@@ -2,8 +2,9 @@ import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getRelativeTimestamp } from 'helpers/dates';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getCommunityUrl } from 'utils';
 import { trpc } from 'utils/trpcClient';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
@@ -32,7 +33,7 @@ export const SubEntry = (props: SubscriptionEntryProps) => {
     true,
   );
 
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   const handleComment = useCallback(() => {
     navigate(threadUrl);
