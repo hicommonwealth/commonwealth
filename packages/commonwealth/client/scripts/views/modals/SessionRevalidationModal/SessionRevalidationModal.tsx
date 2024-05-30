@@ -6,6 +6,7 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
 import useWallets from 'hooks/useWallets';
+import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
@@ -52,7 +53,18 @@ const SessionRevalidationModal = ({
 
       // if user tries to sign in with different address than
       // expected for session key revalidation
-      if (signedAddress !== walletAddress) {
+      if (
+        signedAddress === walletAddress ||
+        (app.user.activeAccounts.find((addr) => addr.address === walletAddress)
+          .community.ss58Prefix &&
+          addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
+            signedAddress)
+      ) {
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === walletAddress,
+        );
+        await setActiveAccount(updatedAddress);
+      } else {
         openConfirmation({
           title: 'Address mismatch',
           description: (
@@ -61,18 +73,13 @@ const SessionRevalidationModal = ({
               the wallet you signed in with has address{' '}
               <b>{formatAddress(signedAddress)}</b>.
               <br />
-              Please try sign again with expected address.
+              Please try to sign again with the expected address.
               <br />
             </>
           ),
           buttons: [],
           className: 'AddressMismatch',
         });
-      } else {
-        const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === walletAddress,
-        );
-        await setActiveAccount(updatedAddress);
       }
     },
   });

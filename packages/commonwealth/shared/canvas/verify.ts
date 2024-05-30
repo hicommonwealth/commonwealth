@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SolanaSigner } from '@canvas-js/chain-solana';
 import type {
   Action,
   Message,
@@ -10,11 +11,7 @@ import { ed25519 } from '@canvas-js/signatures';
 import assert from 'assert';
 import { configure } from 'safe-stable-stringify';
 import { CANVAS_TOPIC } from './constants';
-import {
-  CosmosSignerCW,
-  SolanaSignerCW,
-  SubstrateSignerCW,
-} from './sessionSigners';
+import { CosmosSignerCW, SubstrateSignerCW } from './sessionSigners';
 export const stringify = configure({
   bigint: false,
   circularValue: Error,
@@ -27,7 +24,7 @@ export const getSessionSigners = () => {
     new SIWESigner(),
     new CosmosSignerCW(),
     new SubstrateSignerCW(),
-    new SolanaSignerCW(),
+    new SolanaSigner(),
   ];
 };
 
