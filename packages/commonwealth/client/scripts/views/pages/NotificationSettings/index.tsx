@@ -10,7 +10,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
-import { SubEntry } from './SubEntry';
+import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
 
 function useThreadSubscriptions() {
@@ -50,7 +50,7 @@ const Index = () => {
 
   return (
     <CWPageLayout>
-      <div className="NotificationSettingsPage NotificationSettingsPage2">
+      <div className="NotificationSettingsPage NotificationSettings">
         <CWText type="h3" fontWeight="semiBold" className="page-header-text">
           Notification settings
         </CWText>
@@ -62,7 +62,7 @@ const Index = () => {
           .filter((current) => current.Thread)
           .filter((current) => !threadsFilter.includes(current.Thread.id))
           .map((current) => (
-            <SubEntry
+            <SubscriptionEntry
               key={current.Thread.id}
               subscription={current as z.infer<typeof ThreadSubscription>}
               onUnsubscribe={handleUnsubscribe}

@@ -18,7 +18,7 @@ interface SubscriptionEntryProps {
   readonly onUnsubscribe: (id: number) => void;
 }
 
-export const SubEntry = (props: SubscriptionEntryProps) => {
+export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
   const { subscription, onUnsubscribe } = props;
   const thread = subscription.Thread;
   const thread_id = thread.id;
