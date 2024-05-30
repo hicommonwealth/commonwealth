@@ -1,11 +1,17 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction } from 'express';
+import { TypedRequest, TypedResponse } from 'server/types';
+
+type finishUpdateEmailReq = {
+  token: string;
+  email: string;
+};
 
 const finishUpdateEmail = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequest<finishUpdateEmailReq>,
+  res: TypedResponse<void>,
   next: NextFunction,
 ) => {
   // fetch token and confirm validity

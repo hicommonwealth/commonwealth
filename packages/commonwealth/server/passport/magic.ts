@@ -581,6 +581,7 @@ async function magicLoginRoute(
     // the ONLY time this should trigger is for claiming ghost addresses on discourse communities,
     // which requires the email-specific magic login, as the email usage on social providers
     // is insecure.
+    console.log('checking for ghost address...');
     existingUserInstance = await models.User.scope('withPrivateData').findOne({
       where: { email: magicUserMetadata.email },
       include: [
@@ -597,6 +598,7 @@ async function magicLoginRoute(
         },
       ],
     });
+    console.log('ghost address result: ', JSON.stringify(existingUserInstance));
   }
 
   log.trace(
