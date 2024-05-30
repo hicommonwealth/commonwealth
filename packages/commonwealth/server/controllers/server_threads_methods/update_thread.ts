@@ -1,6 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
+  CommentAttributes,
   CommunityInstance,
   DB,
   ThreadAttributes,
@@ -412,7 +413,12 @@ export async function __updateThread(
     ...createThreadMentionNotifications(mentionedAddresses, finalThread),
   );
 
-  const updatedThreadWithComments = { ...finalThread.toJSON() } as any;
+  const updatedThreadWithComments = {
+    ...finalThread.toJSON(),
+  } as ThreadAttributes & {
+    Comments?: CommentAttributes[];
+    recentComments?: CommentAttributes[];
+  };
   updatedThreadWithComments.recentComments = (
     updatedThreadWithComments.Comments || []
   ).map((c) => {

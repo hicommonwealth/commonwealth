@@ -73,7 +73,7 @@ export const QuillFormattedText = ({
      * Type guard function to check if a React element is a TextWithHighlights element.
      *
      * @param {React.ReactElement} child - The React element to check.
-     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - True if the element is a TextWithHighlights element, false otherwise.
+     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - Only true when element is TextWithHighlights.
      */
     const isTextWithHighlights = (
       child: React.ReactElement,

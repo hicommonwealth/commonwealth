@@ -36,9 +36,10 @@ export const SharePopover = ({
           iconLeft: 'linkPhosphor',
           iconLeftSize: 'regular',
           label: 'Copy link',
-          onClick: async () => {
-            await navigator.clipboard
+          onClick: () => {
+            navigator.clipboard
               .writeText(linkToShare)
+              .then()
               .catch(console.error);
           },
         },

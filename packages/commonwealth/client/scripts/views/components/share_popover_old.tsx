@@ -45,7 +45,7 @@ export const SharePopoverOld = ({
           iconLeft: 'linkPhosphor',
           iconLeftSize: 'regular',
           label: 'Copy link',
-          onClick: async () => {
+          onClick: () => {
             let urlToCopy = `${domain}${currentRoute}`; // If we copy the thread on discussion page
 
             if (commentId) {
@@ -73,14 +73,17 @@ export const SharePopoverOld = ({
               urlToCopy = `${domain}/${app.activeChainId()}${customUrl}`;
             }
 
-            await navigator.clipboard.writeText(urlToCopy);
+            navigator.clipboard
+              .writeText(urlToCopy)
+              .then()
+              .catch(console.error);
           },
         },
         {
           iconLeft: 'twitterOutline',
           iconLeftSize: 'regular',
           label: 'Share on X (Twitter)',
-          onClick: async () => {
+          onClick: () => {
             if (discussionLink) {
               window.open(
                 `${twitterPrefix}${domain}${discussionLink}`,

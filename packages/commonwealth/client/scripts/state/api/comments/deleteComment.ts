@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import Comment from 'models/Comment';
+import { IUniqueId } from 'models/interfaces';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
@@ -100,7 +102,9 @@ const useDeleteCommentMutation = ({
         communityId,
         threadId,
         {
-          recentComments: [{ id: response.softDeleted.id }] as any,
+          recentComments: [
+            { id: response.softDeleted.id },
+          ] as Comment<IUniqueId>[],
         },
         'removeFromExisting',
       );

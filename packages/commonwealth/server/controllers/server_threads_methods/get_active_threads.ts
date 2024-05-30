@@ -1,5 +1,5 @@
 import { ThreadAttributes, TopicAttributes } from '@hicommonwealth/model';
-import { WhereOptions } from 'sequelize';
+import { Includeable, WhereOptions } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const MIN_THREADS_PER_TOPIC = 0;
@@ -38,7 +38,7 @@ export async function __getActiveThreads(
     where: communityWhere,
   });
 
-  const threadInclude = [
+  const threadInclude: Includeable[] = [
     {
       model: this.models.Address,
       as: 'Address',
@@ -98,7 +98,7 @@ export async function __getActiveThreads(
       //     [Op.is]: null,
       //   },
       // },
-    } as any);
+    });
   }
 
   let allRecentTopicThreadsRaw = [];
@@ -108,7 +108,7 @@ export async function __getActiveThreads(
         where: {
           topic_id: topic.id,
         },
-        include: threadInclude as any, // TODO: fix type
+        include: threadInclude,
         limit: threadsPerTopic,
         order: [
           ['created_at', 'DESC'],

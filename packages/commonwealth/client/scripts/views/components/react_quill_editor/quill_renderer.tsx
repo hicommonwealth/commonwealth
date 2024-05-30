@@ -115,6 +115,7 @@ export const QuillRenderer = ({
     docInfo.format,
     markdownCutoffLength,
     customClass,
+    customShowMoreButton,
   ]);
 
   if (containerClass) {
