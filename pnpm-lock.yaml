@@ -838,23 +838,23 @@ importers:
         specifier: ^0.2.2
         version: 0.2.3
       '@canvas-js/chain-cosmos':
-        specifier: 0.10.0-beta.1
-        version: 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-ethereum':
-        specifier: 0.10.0-beta.1
-        version: 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-solana':
-        specifier: 0.10.0-beta.1
-        version: 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-substrate':
-        specifier: 0.10.0-beta.1
-        version: 0.10.0-beta.1(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/interfaces':
-        specifier: 0.10.0-beta.1
-        version: 0.10.0-beta.1
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2
       '@canvas-js/signatures':
-        specifier: 0.10.0-beta.1
-        version: 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@cosmjs/amino':
         specifier: ^0.31.3
         version: 0.31.3
@@ -2948,47 +2948,47 @@ packages:
         integrity: sha512-1T8WlD75eeFSMrptGy8jiLHmfHgMmSjWvLOIUvHmSVZt+6k0eQqYUoK4KbmE4T9pVLIfxvZSOm2D68VEqKRHRw==,
       }
 
-  '@canvas-js/chain-cosmos@0.10.0-beta.1':
+  '@canvas-js/chain-cosmos@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-eNYyp0WrCQ4uGadwDOZ0ZGfpWaRZyYWqXNHOGmvWN+h6EO6Pj2rU9svIq3lGh977Tj0sLpzSvTzxu/0we7GpLQ==,
+        integrity: sha512-lc/WvPEvwj42ZJpgMAFI0d2F4TymOnAQLGW3RXHzGfOJKR/sDIlWoSVW8CSI41AC1r5f2BqJKenOTgve8v/Dmg==,
       }
 
-  '@canvas-js/chain-ethereum@0.10.0-beta.1':
+  '@canvas-js/chain-ethereum@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-6d40J4zMYz8mDQLg+RheQuyyK+M3mwk83jEajrzJ2PZzbQiMxWnUkxLib7u8M17afwHOeK4aVSL4LVqvpXpXFA==,
+        integrity: sha512-89sQttwHe1LXkS3XYwjFKyQLR4e2CNDoaOPp5s9hSE1LCUztQxgmP57Mlb5o85qW9E22T9VI0K1eR5F9NL3JVw==,
       }
 
-  '@canvas-js/chain-solana@0.10.0-beta.1':
+  '@canvas-js/chain-solana@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-/o3tLRJ3dYrNS+FD8zciGjRsvvYLI1wRnmj8oD/ysrNwNrRXYEcLHMKYtdKxPgpg9EiJ3TkO7wXHKs251nR7Jw==,
+        integrity: sha512-P2kQjc6/Z2UvXhHyZafl9JM9e9vrIzs2Xw4wgrTZE/bKtYzasA9AOnYHNqggoNndjUyi6kG8nK39mmqXb4eTlw==,
       }
 
-  '@canvas-js/chain-substrate@0.10.0-beta.1':
+  '@canvas-js/chain-substrate@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-Vg7YUT4K6btTphfZ1ca8rPL7JHBb162UN2pxLtPxYBeR8LLGQpnEGl6KcOop9VPomuetPOfflJMOqZ+lk2u+lg==,
+        integrity: sha512-VtuX1lBN8rcDtzODAOzJ++wWAX6Voq3qHNTyWpq3lG8cvqe+OpIbXuMeMi7LcMo8ssHizEUnJJqmXB//tXHMpA==,
       }
 
-  '@canvas-js/interfaces@0.10.0-beta.1':
+  '@canvas-js/interfaces@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-CJGUqTDhz5EYZwyrajpT/6QNohskkSszpFN2K9k3mqDD7NFxDTPBGqfbZ1F02G6mYUis3zfYNgeraRwC1j4PVQ==,
+        integrity: sha512-F2Kp/I7YxygjSjlngDx5xCOvM7wG0Gt0y0kzSsw3am9GVIuWoBTM+ywM3+jvp1o2oq/yQOfb5v++x8HBARsmOg==,
       }
 
-  '@canvas-js/signatures@0.10.0-beta.1':
+  '@canvas-js/signatures@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-hPbZXi+mWjo+aZjpXJVzTiZCB+cMwWW08u5bD7f3Y+lQ6sT9yJsHbnwjrGBfU/7qprIlcFzOwxdiDeu+jO9y2w==,
+        integrity: sha512-gIGlnMGT3zT5sXvinkzvgzQZhcaFSgMnAQO7puj1TCSjq+LGNsNEL9eSX81IwSdWuDVf3kJJUr/tQd6rzUQIFA==,
       }
     engines: { node: '>=18.0.0' }
 
-  '@canvas-js/utils@0.10.0-beta.1':
+  '@canvas-js/utils@0.10.0-beta.2':
     resolution:
       {
-        integrity: sha512-7Tg/H7lbgYFz7blWQQM5qiE9qT0ubgfYWxOVttmOOHwxh2mf58CuDgJfmAD5RmJq49673eD31Lu2QL7EV/WPtQ==,
+        integrity: sha512-8ZLDJi/9nLneEy6vBLE8Me6TlOiux2sbjwR7VzEuWe6Fl8ycHpFeCwoy+KsoyxS7xIQ8yombW/6ZJvTMQaHFMw==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -23046,11 +23046,11 @@ snapshots:
 
   '@brillout/import@0.2.3': {}
 
-  '@canvas-js/chain-cosmos@0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-cosmos@0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.0-beta.1
-      '@canvas-js/signatures': 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.0-beta.1
+      '@canvas-js/interfaces': 0.10.0-beta.2
+      '@canvas-js/signatures': 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.0-beta.2
       '@cosmjs/amino': 0.32.3
       '@cosmjs/crypto': 0.32.3
       '@cosmjs/encoding': 0.32.3
@@ -23068,11 +23068,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/chain-ethereum@0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-ethereum@0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.0-beta.1
-      '@canvas-js/signatures': 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.0-beta.1
+      '@canvas-js/interfaces': 0.10.0-beta.2
+      '@canvas-js/signatures': 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.0-beta.2
       '@ipld/dag-json': 10.2.0
       '@libp2p/logger': 4.0.13
       ethers: 6.12.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -23083,11 +23083,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/chain-solana@0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-solana@0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.0-beta.1
-      '@canvas-js/signatures': 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.0-beta.1
+      '@canvas-js/interfaces': 0.10.0-beta.2
+      '@canvas-js/signatures': 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.0-beta.2
       '@ipld/dag-json': 10.2.0
       '@libp2p/logger': 4.0.13
       '@noble/curves': 1.4.0
@@ -23099,11 +23099,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/chain-substrate@0.10.0-beta.1(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-substrate@0.10.0-beta.2(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.0-beta.1
-      '@canvas-js/signatures': 0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/utils': 0.10.0-beta.1
+      '@canvas-js/interfaces': 0.10.0-beta.2
+      '@canvas-js/signatures': 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/utils': 0.10.0-beta.2
       '@ipld/dag-json': 10.2.0
       '@libp2p/logger': 4.0.13
       '@noble/curves': 1.4.0
@@ -23119,14 +23119,14 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/interfaces@0.10.0-beta.1':
+  '@canvas-js/interfaces@0.10.0-beta.2':
     dependencies:
       multiformats: 13.1.0
 
-  '@canvas-js/signatures@0.10.0-beta.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/signatures@0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.0-beta.1
-      '@canvas-js/utils': 0.10.0-beta.1
+      '@canvas-js/interfaces': 0.10.0-beta.2
+      '@canvas-js/utils': 0.10.0-beta.2
       '@ipld/dag-cbor': 9.2.0
       '@ipld/dag-json': 10.2.0
       '@libp2p/logger': 4.0.13
@@ -23139,7 +23139,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/utils@0.10.0-beta.1': {}
+  '@canvas-js/utils@0.10.0-beta.2': {}
 
   '@chainsafe/is-ip@2.0.2': {}
 
