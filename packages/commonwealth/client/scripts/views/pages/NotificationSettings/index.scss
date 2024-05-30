@@ -5,14 +5,14 @@
     margin-bottom: 8px;
   }
 
-  .SubEntry {
+  .SubscriptionEntry {
     border-bottom: 1px solid $neutral-300;
     margin-bottom: 16px;
     padding-left: 8px;
     padding-right: 8px;
   }
 
-  .SubHeader {
+  .SubscriptionHeader {
     display: flex;
     align-items: center;
     margin-top: 8px;
@@ -23,11 +23,11 @@
   }
 
   .User a.user-display-name,
-  .SubHeader * {
+  .SubscriptionHeader * {
     color: $neutral-500;
   }
 
-  .SubFooter {
+  .SubscriptionFooter {
     margin-top: 16px;
     margin-bottom: 16px;
     display: flex;

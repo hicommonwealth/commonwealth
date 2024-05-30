@@ -58,8 +58,8 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
   }, [deleteThreadSubscription, onUnsubscribe, thread_id]);
 
   return (
-    <div className="SubEntry">
-      <div className="SubHeader">
+    <div className="SubscriptionEntry">
+      <div className="SubscriptionHeader">
         <div>
           <CWCommunityAvatar
             community={{
@@ -96,7 +96,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
         </CWText>
       </div>
 
-      <div className="SubFooter">
+      <div className="SubscriptionFooter">
         <CWThreadAction
           label={`${thread.comment_count}`}
           action="comment"
