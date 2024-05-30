@@ -83,8 +83,8 @@ describe('Thread subscription lifecycle', () => {
   it('should get thread subscriptions', async () => {
     const [threadSubOne, threadSubTwo] =
       await models.ThreadSubscription.bulkCreate([
-        { user_id: actor.user.id!, thread_id: threadOne!.id! },
-        { user_id: actor.user.id!, thread_id: threadTwo!.id! },
+        { user_id: actor.user.id!, thread_id: threadOne!.id!, Thread: null },
+        { user_id: actor.user.id!, thread_id: threadTwo!.id!, Thread: null },
       ]);
 
     const res = await query(GetThreadSubscriptions(), {
