@@ -6,6 +6,7 @@ import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';
@@ -17,6 +18,7 @@ import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 import {
   chainBaseToCaip2,
@@ -79,6 +81,14 @@ const useUserMenuItems = ({
     useAdminOnboardingSliderMutationStore();
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isMenuOpen,
+  });
+  const [sessionKeyRevalidationError, setSessionKeyRevalidationError] =
+    useState<SessionKeyError | null>(null);
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: () => {
+      setSessionKeyRevalidationError(null);
+    },
+    error: sessionKeyRevalidationError,
   });
 
   const navigate = useCommonNavigate();
@@ -179,83 +189,86 @@ const useUserMenuItems = ({
     },
   );
 
-  return [
-    // if a user is in a stake enabled community without membership, show user addresses that
-    // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
-    ...(shouldShowAddressesSwitcherForNonMember
-      ? ([
-          {
-            type: 'header',
-            label: 'Addresses',
-          },
-          ...uniqueChainAddressOptions,
-          { type: 'divider' },
-        ] as PopoverMenuItem[])
-      : []),
-    ...(app.user.activeAccounts.length > 0
-      ? ([
-          {
-            type: 'header',
-            label: 'Addresses',
-          },
-          ...addresses,
-          {
-            type: 'default',
-            label: 'Connect a new address',
-            onClick: () => {
-              onAuthModalOpen();
-              onAddressItemClick?.();
+  return {
+    RevalidationModal,
+    userMenuItems: [
+      // if a user is in a stake enabled community without membership, show user addresses that
+      // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
+      ...(shouldShowAddressesSwitcherForNonMember
+        ? ([
+            {
+              type: 'header',
+              label: 'Addresses',
             },
-          },
-          { type: 'divider' },
-        ] as PopoverMenuItem[])
-      : []),
-    {
-      type: 'header',
-      label: 'Settings',
-    },
-    {
-      type: 'default',
-      label: 'View profile',
-      onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
-    },
-    {
-      type: 'default',
-      label: 'Edit profile',
-      onClick: () => navigate(`/profile/edit`, {}, null),
-    },
-    {
-      type: 'default',
-      label: 'My community stake',
-      onClick: () => navigate(`/myCommunityStake`, {}, null),
-    },
-    {
-      type: 'default',
-      label: 'Notifications',
-      onClick: () => navigate('/notification-settings', {}, null),
-    },
-    {
-      type: 'default',
-      label: (
-        <div className="UserMenuItem">
-          <div>Dark mode</div>
-          <CWToggle readOnly checked={isDarkModeOn} />
-        </div>
-      ),
-      preventClosing: true,
-      onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
-    },
-    {
-      type: 'default',
-      label: 'Sign out',
-      onClick: () => {
-        clearSetGatingGroupBannerForCommunities();
-        clearSetAdminOnboardingCardVisibilityForCommunities();
-
-        handleLogout();
+            ...uniqueChainAddressOptions,
+            { type: 'divider' },
+          ] as PopoverMenuItem[])
+        : []),
+      ...(app.user.activeAccounts.length > 0
+        ? ([
+            {
+              type: 'header',
+              label: 'Addresses',
+            },
+            ...addresses,
+            {
+              type: 'default',
+              label: 'Connect a new address',
+              onClick: () => {
+                onAuthModalOpen();
+                onAddressItemClick?.();
+              },
+            },
+            { type: 'divider' },
+          ] as PopoverMenuItem[])
+        : []),
+      {
+        type: 'header',
+        label: 'Settings',
       },
-    },
-  ] as PopoverMenuItem[];
+      {
+        type: 'default',
+        label: 'View profile',
+        onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
+      },
+      {
+        type: 'default',
+        label: 'Edit profile',
+        onClick: () => navigate(`/profile/edit`, {}, null),
+      },
+      {
+        type: 'default',
+        label: 'My community stake',
+        onClick: () => navigate(`/myCommunityStake`, {}, null),
+      },
+      {
+        type: 'default',
+        label: 'Notifications',
+        onClick: () => navigate('/notification-settings', {}, null),
+      },
+      {
+        type: 'default',
+        label: (
+          <div className="UserMenuItem">
+            <div>Dark mode</div>
+            <CWToggle readOnly checked={isDarkModeOn} />
+          </div>
+        ),
+        preventClosing: true,
+        onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
+      },
+      {
+        type: 'default',
+        label: 'Sign out',
+        onClick: () => {
+          clearSetGatingGroupBannerForCommunities();
+          clearSetAdminOnboardingCardVisibilityForCommunities();
+
+          handleLogout();
+        },
+      },
+    ] as PopoverMenuItem[],
+  };
 };
 
 export default useUserMenuItems;
