@@ -63,6 +63,12 @@ async function updateOrCreateWithAlert(
   const { ticker, decimals } =
     await protocol.contractHelpers.getTokenAttributes(contest_address, url);
 
+  const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
+    url,
+    contest_address,
+    isOneOff,
+  );
+
   await models.sequelize.transaction(async (transaction) => {
     const [updated] = await models.ContestManager.update(
       {
@@ -98,13 +104,7 @@ async function updateOrCreateWithAlert(
         );
     }
 
-    // create contest
-    const { startTime, endTime } =
-      await protocol.contestHelper.getContestStatus(
-        url,
-        contest_address,
-        isOneOff,
-      );
+    // create first contest instance
     await models.Contest.create(
       {
         contest_address,
