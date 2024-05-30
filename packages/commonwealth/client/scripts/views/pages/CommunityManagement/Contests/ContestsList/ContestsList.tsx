@@ -8,7 +8,7 @@ import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
-type Contest = {
+export type Contest = {
   contest_address?: string;
   name?: string;
   image_url?: string;
