@@ -92,22 +92,22 @@ export async function setActiveAccount(
     if (response.data.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
+
+    app.user.ephemerallySetActiveAccount(account);
+    if (
+      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+        .length === 0
+    ) {
+      app.user.setActiveAccounts(
+        app.user.activeAccounts.concat([account]),
+        shouldRedraw,
+      );
+    }
   } catch (err) {
     // Failed to set the user's active address to this account.
     // This might be because this address isn't `verified`,
     // so we don't show an error here.
     console.error(err?.response?.data?.error || err?.message);
-  }
-
-  app.user.ephemerallySetActiveAccount(account);
-  if (
-    app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
-    0
-  ) {
-    app.user.setActiveAccounts(
-      app.user.activeAccounts.concat([account]),
-      shouldRedraw,
-    );
   }
 }
 
