@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
 import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
+import { processSubscriptionPreferencesUpdated } from './eventHandlers/subscriptionPreferencesUpdated';
 import { processUserMentioned } from './eventHandlers/userMentioned';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +15,7 @@ const notificationInputs = {
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   UserMentioned: events.UserMentioned,
+  SubscriptionPreferencesUpdated: events.SubscriptionPreferencesUpdated,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -39,6 +41,10 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       // eslint-disable-next-line @typescript-eslint/require-await
       UserMentioned: async (event) => {
         await processUserMentioned(event);
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      SubscriptionPreferencesUpdated: async (event) => {
+        await processSubscriptionPreferencesUpdated(event);
       },
     },
   };
