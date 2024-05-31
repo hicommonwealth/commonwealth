@@ -36,7 +36,10 @@ export function KnockProvider(): NotificationsProvider {
 
       return res.items;
     },
-    async registerClientRegistrationToken(userId: number, token: string) {
+    async registerClientRegistrationToken(
+      userId: number,
+      token: string,
+    ): Promise<boolean> {
       if (config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID) {
         await knock.users.setChannelData(
           `${userId}`,
@@ -45,8 +48,10 @@ export function KnockProvider(): NotificationsProvider {
             tokens: [token],
           },
         );
+        return true;
       } else {
         console.warn('Push notifications not enabled');
+        return false;
       }
     },
   };

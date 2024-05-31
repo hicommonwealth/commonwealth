@@ -272,5 +272,5 @@ export interface NotificationsProvider extends Disposable {
   registerClientRegistrationToken(
     userId: number,
     token: string,
-  ): Promise<unknown>;
+  ): Promise<boolean>;
 }

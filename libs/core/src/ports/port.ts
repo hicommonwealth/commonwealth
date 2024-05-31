@@ -183,7 +183,7 @@ export const notificationsProvider = port(function notificationsProvider(
       dispose: () => Promise.resolve(),
       triggerWorkflow: () => Promise.resolve(true),
       getMessages: () => Promise.resolve([]),
-      registerClientRegistrationToken: () => Promise.resolve(),
+      registerClientRegistrationToken: () => Promise.resolve(false),
     }
   );
 });
