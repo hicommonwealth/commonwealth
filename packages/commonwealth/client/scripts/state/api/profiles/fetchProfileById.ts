@@ -6,10 +6,15 @@ import { ApiEndpoints } from 'state/api/config';
 
 const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
-type UseFetchProfileByIdQueryCommonProps = {
-  profileId?: string;
-  shouldFetchSelfProfile?: boolean;
-};
+type UseFetchProfileByIdQueryCommonProps =
+  | {
+      profileId: string;
+      shouldFetchSelfProfile?: never;
+    }
+  | {
+      profileId?: never;
+      shouldFetchSelfProfile: boolean;
+    };
 
 const fetchProfileById = async ({
   profileId,
@@ -63,7 +68,7 @@ const useFetchProfileByIdQuery = ({
       fetchProfileById({
         profileId,
         shouldFetchSelfProfile,
-      }),
+      } as UseFetchProfileByIdQueryCommonProps),
     // eslint-disable-next-line @tanstack/query/no-deprecated-options
     onSuccess: (response) => {
       // update user addresses when
