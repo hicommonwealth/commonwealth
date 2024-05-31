@@ -14,6 +14,7 @@ import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
+import { decodeThreadContentUrl } from '../utils';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -297,18 +298,14 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const thread = await models.Thread.findOne({
-          where: { url: payload.content_url },
-          attributes: ['id'],
-          raw: true,
-        });
+        const { threadId } = decodeThreadContentUrl(payload.content_url);
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
           actor_address: payload.creator_address,
           action: 'added',
           content_url: payload.content_url,
-          thread_id: thread?.id,
+          thread_id: threadId,
           voting_power: 0,
           created_at: new Date(),
         });

@@ -122,3 +122,20 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
   // content url only contains path
   return new URL(fullContentUrl).pathname;
 }
+
+// returns community ID and thread ID from content url
+export function decodeThreadContentUrl(contentUrl: string): {
+  communityId: string;
+  threadId: number;
+} {
+  if (!contentUrl.includes('/discussion/')) {
+    throw new Error(`invalid content url: ${contentUrl}`);
+  }
+  const [communityId, threadId] = contentUrl
+    .split('/discussion/')
+    .map((part) => part.replaceAll('/', ''));
+  return {
+    communityId,
+    threadId: parseInt(threadId, 10),
+  };
+}
