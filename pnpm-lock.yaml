@@ -711,9 +711,6 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
-      '@knocklabs/node':
-        specifier: ^0.6.11
-        version: 0.6.11
       '@solana/spl-token':
         specifier: ^0.4.6
         version: 0.4.6(@solana/web3.js@1.91.8(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)

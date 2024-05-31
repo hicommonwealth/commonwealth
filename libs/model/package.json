@@ -30,7 +30,6 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
-    "@knocklabs/node": "^0.6.11",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
     "ethers": "5.7.2",
