@@ -20,7 +20,7 @@ export const fetchProfilesByAddress = async ({
   initiateProfilesAfterFetch = true,
 }: FetchProfilesByAddressProps) => {
   const response = await axios.post(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES}`,
+    `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ADDRESS}`,
     {
       addresses: profileAddresses,
       communities: profileChainIds,
@@ -57,7 +57,7 @@ const useFetchProfilesByAddressesQuery = ({
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
-      ApiEndpoints.FETCH_PROFILES,
+      ApiEndpoints.FETCH_PROFILES_BY_ADDRESS,
       // we should not cache by currentChainId as it can break logic for DISCOURAGED_NONREACTIVE_fetchProfilesByAddress
       // currentChainId,
       // sort the chain/address ids by ascending so the keys are always in the same order
@@ -90,7 +90,7 @@ export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
   address: string,
 ) => {
   return queryClient.fetchQuery(
-    [ApiEndpoints.FETCH_PROFILES, chainId, address],
+    [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chainId, address],
     {
       queryFn: () =>
         fetchProfilesByAddress({

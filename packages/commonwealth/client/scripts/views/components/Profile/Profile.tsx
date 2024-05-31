@@ -1,4 +1,4 @@
-import { useFetchSelfProfileQuery } from 'client/scripts/state/api/profiles';
+import { useFetchProfilesByIdQuery } from 'client/scripts/state/api/profiles';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -31,7 +31,7 @@ const Profile = ({ profileId }: ProfileProps) => {
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
 
-  const { data, error, isLoading } = useFetchSelfProfileQuery({
+  const { data, error, isLoading } = useFetchProfilesByIdQuery({
     apiCallEnabled: !!profileId,
     updateAddressesOnSuccess: true,
     profileId,

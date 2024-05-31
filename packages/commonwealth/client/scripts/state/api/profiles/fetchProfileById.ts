@@ -6,15 +6,15 @@ import { ApiEndpoints } from 'state/api/config';
 
 const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
-interface UseFetchSelfProfileQueryCommonProps {
+interface UseFetchProfileByIdQueryCommonProps {
   profileId?: string;
 }
 
-const fetchSelfProfile = async ({
+const fetchProfileById = async ({
   profileId,
-}: UseFetchSelfProfileQueryCommonProps) => {
+}: UseFetchProfileByIdQueryCommonProps) => {
   const response = await axios.get(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_SELF_PROFILE}`,
+    `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ID}`,
     {
       params: {
         ...(profileId && { profileId }),
@@ -43,19 +43,19 @@ const fetchSelfProfile = async ({
   return response.data.result;
 };
 
-interface UseFetchSelfProfileQuery {
+interface UseFetchProfileByIdQuery {
   apiCallEnabled?: boolean;
   updateAddressesOnSuccess?: boolean;
 }
 
-const useFetchSelfProfileQuery = ({
+const useFetchProfileByIdQuery = ({
   profileId,
   apiCallEnabled = true,
   updateAddressesOnSuccess = false,
-}: UseFetchSelfProfileQuery & UseFetchSelfProfileQueryCommonProps) => {
+}: UseFetchProfileByIdQuery & UseFetchProfileByIdQueryCommonProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_SELF_PROFILE, profileId],
-    queryFn: () => fetchSelfProfile({ profileId }),
+    queryKey: [ApiEndpoints.FETCH_PROFILES_BY_ID, profileId],
+    queryFn: () => fetchProfileById({ profileId }),
     // eslint-disable-next-line @tanstack/query/no-deprecated-options
     onSuccess: (profile) => {
       if (
@@ -86,4 +86,4 @@ const useFetchSelfProfileQuery = ({
   });
 };
 
-export default useFetchSelfProfileQuery;
+export default useFetchProfileByIdQuery;

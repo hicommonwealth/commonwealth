@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import {
-  useFetchSelfProfileQuery,
+  useFetchProfilesByIdQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -86,7 +86,7 @@ const EditProfileComponent = () => {
     isLoading: isLoadingProfile,
     error,
     refetch,
-  } = useFetchSelfProfileQuery({
+  } = useFetchProfilesByIdQuery({
     apiCallEnabled: isLoggedIn,
   });
 

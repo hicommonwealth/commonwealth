@@ -75,7 +75,7 @@ const useUpdateProfileByAddressMutation = ({
     mutationFn: updateProfileByAddress,
     onSuccess: async (updatedProfile) => {
       addressesWithChainsToUpdate?.map(({ address, chain }) => {
-        const key = [ApiEndpoints.FETCH_PROFILES, chain, address];
+        const key = [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chain, address];
         const existingProfile = queryClient.getQueryData(key);
 
         // TEMP: since we don't get the updated data from API, we will cancel existing and refetch profile
@@ -87,8 +87,8 @@ const useUpdateProfileByAddressMutation = ({
 
       if (refetchSelfProfileQueryOnSuccess) {
         const keys = [
-          [ApiEndpoints.FETCH_SELF_PROFILE, undefined],
-          [ApiEndpoints.FETCH_SELF_PROFILE, updatedProfile.id.toString()],
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
         ];
         keys.map((key) => {
           queryClient.cancelQueries(key);
