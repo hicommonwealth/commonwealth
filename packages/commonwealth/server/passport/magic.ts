@@ -27,13 +27,10 @@ import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { MAGIC_API_KEY, config } from '../config';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
-import { createRole } from '../util/roles';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -63,9 +60,9 @@ async function createMagicAddressInstances(
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
-  const serverAnalyticsController = new ServerAnalyticsController();
 
   for (const { community_id, address } of generatedAddresses) {
+    log.info(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
@@ -93,23 +90,7 @@ async function createMagicAddressInstances(
       throw new ServerError('Address owned by somebody else!');
     }
 
-    // xx: ?
-    if (created) {
-      await createRole(
-        models,
-        addressInstance.id,
-        community_id,
-        'member',
-        false,
-        t,
-      );
-
-      serverAnalyticsController.track({
-        community: community_id,
-        userId: user_id,
-        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
-      });
-    } else {
+    if (!created) {
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
 
@@ -238,6 +219,7 @@ async function loginExistingMagicUser({
       ],
       transaction,
     });
+    log.info('SsoToken: ' + JSON.stringify(ssoToken));
 
     let malformedSsoToken: SsoTokenInstance;
     if (ssoToken) {
@@ -251,7 +233,7 @@ async function loginExistingMagicUser({
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
       await ssoToken.save({ transaction });
-      log.trace('SSO TOKEN HANDLED NORMALLY');
+      log.info('SSO TOKEN HANDLED NORMALLY');
     } else {
       // situation for legacy SsoToken instances:
       // - they only have profile_id set, no issuer or address_id
@@ -266,7 +248,7 @@ async function loginExistingMagicUser({
         transaction,
       });
       if (malformedSsoToken) {
-        log.trace('DETECTED LEGACY / MALFORMED SSO TOKEN');
+        log.info('DETECTED LEGACY / MALFORMED SSO TOKEN');
         if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
           log.warn('Replay attack detected.');
           throw new Error(
@@ -320,10 +302,37 @@ async function loginExistingMagicUser({
       );
     }
 
-    // TODO: we should also remove ghost addresses her, per code in /updateAddress...
-    // or we can leave it alone, although it wont migrate address ownership, most parameters
-    // are by profile anyway.
+    // remove ghost addresses once replacements have been generated
+    console.log('remove ghost addresses now');
+    const ghostAddresses =
+      existingUserInstance?.Addresses?.filter(
+        ({ ghost_address }: AddressAttributes) => !!ghost_address,
+      ) || [];
+    console.log('remove ghost addresses now ' + JSON.stringify(ghostAddresses));
+    for (const ghost of ghostAddresses as AddressAttributes[]) {
+      const replacementAddress = addressInstances.find(
+        ({ community_id, ghost_address }: AddressAttributes) =>
+          !ghost_address && community_id === ghost.community_id,
+      );
 
+      // update data objects and delete ghost address
+      await models.Comment.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.Reaction.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.Thread.update(
+        { address_id: replacementAddress.id },
+        { where: { address_id: ghost.id }, transaction },
+      );
+      await models.Address.destroy({
+        where: { id: ghost.id },
+        transaction,
+      });
+    }
     return existingUserInstance;
   });
 }
@@ -405,7 +414,7 @@ async function magicLoginRoute(
   decodedMagicToken: MagicUser,
   cb: DoneFunc,
 ) {
-  log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
+  log.info(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let communityToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
   const walletSsoSource = req.body.walletSsoSource;
@@ -462,7 +471,7 @@ async function magicLoginRoute(
           },
         ],
       });
-      log.trace(
+      log.info(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
       );
       if (!loggedInUser) {
@@ -480,7 +489,7 @@ async function magicLoginRoute(
     isCosmos ? WalletType.COSMOS : WalletType.ETH,
   );
 
-  log.trace(
+  log.info(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
 
@@ -599,16 +608,32 @@ async function magicLoginRoute(
       ],
     });
     console.log('ghost address result: ', JSON.stringify(existingUserInstance));
+
+    // generate replacement magic addresses for all ghost addresses, which will be deleted in `loginExistingMagicUser`
+    if (existingUserInstance?.Addresses) {
+      for (const ghost of existingUserInstance.Addresses as AddressAttributes[]) {
+        const needsReplacementAddress = !generatedAddresses.some(
+          ({ community_id }) => community_id === ghost.community_id,
+        );
+        if (needsReplacementAddress) {
+          // note that discourse imports not supported on cosmos
+          generatedAddresses.push({
+            address: canonicalAddress,
+            community_id: ghost.community_id,
+          });
+        }
+      }
+    }
   }
 
-  log.trace(
+  log.info(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
     // already logged in as existing user, just ensure generated addresses are all linked
     // we don't need to setup a canonical address/SsoToken, that should already be done
-    log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
+    log.info('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
     await createMagicAddressInstances(
       models,
       generatedAddresses,
@@ -637,19 +662,19 @@ async function magicLoginRoute(
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
       // merge the existing magic user with the logged in user
-      log.trace('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
+      log.info('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
       finalUser = await mergeLogins(magicContext);
     } else if (!loggedInUser && existingUserInstance) {
       // user is logging in with an existing magic account
-      log.trace('CASE 2: LOGGING INTO EXISTING MAGIC USER');
+      log.info('CASE 2: LOGGING INTO EXISTING MAGIC USER');
       finalUser = await loginExistingMagicUser(magicContext);
     } else if (loggedInUser && !existingUserInstance) {
       // user is already logged in and is linking a new magic login to their account
-      log.trace('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
+      log.info('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
       finalUser = await addMagicToUser(magicContext);
     } else {
       // completely new user: create user, profile, addresses
-      log.trace('CASE 4: CREATING NEW MAGIC USER');
+      log.info('CASE 4: CREATING NEW MAGIC USER');
       finalUser = await createNewMagicUser(magicContext);
     }
   } catch (e) {
@@ -657,7 +682,7 @@ async function magicLoginRoute(
     return cb(e);
   }
 
-  log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
+  log.info(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
   return cb(null, finalUser);
 }
 

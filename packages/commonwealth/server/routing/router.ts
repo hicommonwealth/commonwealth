@@ -84,7 +84,6 @@ import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import updateAddress from '../routes/updateAddress';
 import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
@@ -238,16 +237,6 @@ function setupRouter(
   // Routes API
   app.use('/api', apiRouter);
 
-  // Updating the address
-  registerRoute(
-    router,
-    'post',
-    '/updateAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
-    updateAddress.bind(this, models),
-  );
   registerRoute(
     router,
     'post',

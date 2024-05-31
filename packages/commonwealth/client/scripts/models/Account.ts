@@ -172,7 +172,6 @@ class Account {
     signature: string,
     timestamp: number,
     chainId: string | number,
-    shouldRedraw = true,
   ) {
     if (!signature) {
       throw new Error('signature required for validation');
@@ -195,41 +194,7 @@ class Account {
       session_block_data: this.validationBlockInfo,
     };
 
-    const res = await axios.post(`${app.serverUrl()}/verifyAddress`, params);
-
-    if (res.data.result.status === 'Success') {
-      // update ghost address for discourse users
-      // XXX Jake 5/17/24: this code needs to apply for social logins too?
-      //  Actually, when does this get run at all?
-      console.log('Checking if user has ghost address...');
-      const hasGhostAddress = app.user.addresses.some(
-        ({ address, ghostAddress, community }) =>
-          ghostAddress &&
-          this.community.id === community.id &&
-          app.user.activeAccounts.some(
-            (account) => account.address === address,
-          ),
-      );
-
-      if (hasGhostAddress) {
-        console.log('User has ghost address! calling updateAddress...');
-        const response = await axios.post(
-          `${app.serverUrl()}/updateAddress`,
-          params,
-        );
-
-        if (response.data.success && response.data.ghostAddressId) {
-          console.log('Removing ghost address.');
-          // remove ghost address from addresses
-          app.user.setAddresses(
-            app.user.addresses.filter(({ ghostAddress }) => {
-              return !ghostAddress;
-            }),
-          );
-          app.user.setActiveAccounts([], shouldRedraw);
-        }
-      }
-    }
+    return await axios.post(`${app.serverUrl()}/verifyAddress`, params);
   }
 }
 
