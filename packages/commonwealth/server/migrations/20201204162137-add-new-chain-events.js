@@ -19,8 +19,8 @@ const EventKinds = {
 
 const EventChains = [
   'edgeware',
-  'edgeware-local',
-  'edgeware-testnet',
+  // 'edgeware-local',
+  // 'edgeware-testnet',
   'kusama',
   'kusama-local',
   'polkadot',
@@ -37,7 +37,7 @@ module.exports = {
     });
 
     const [chains] = await queryInterface.sequelize.query(
-      'SELECT * FROM "Chains"'
+      'SELECT * FROM "Chains"',
     );
     const eventSupportingChains = chains
       .map((c) => c.id)
