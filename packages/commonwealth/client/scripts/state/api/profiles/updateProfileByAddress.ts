@@ -64,10 +64,12 @@ interface AddressesWithChainsToUpdate {
 
 interface UseUpdateProfileByAddressMutation {
   addressesWithChainsToUpdate?: AddressesWithChainsToUpdate[];
+  refetchSelfProfileQueryOnSuccess?: boolean;
 }
 
 const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
+  refetchSelfProfileQueryOnSuccess,
 }: UseUpdateProfileByAddressMutation = {}) => {
   return useMutation({
     mutationFn: updateProfileByAddress,
@@ -82,6 +84,17 @@ const useUpdateProfileByAddressMutation = ({
           queryClient.setQueryData(key, () => updatedProfile);
         }
       });
+
+      if (refetchSelfProfileQueryOnSuccess) {
+        const keys = [
+          [ApiEndpoints.FETCH_SELF_PROFILE, undefined],
+          [ApiEndpoints.FETCH_SELF_PROFILE, updatedProfile.id.toString()],
+        ];
+        keys.map((key) => {
+          queryClient.cancelQueries(key);
+          queryClient.refetchQueries(key);
+        });
+      }
 
       return updatedProfile;
     },
