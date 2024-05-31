@@ -6,11 +6,18 @@ import { ApiEndpoints } from 'state/api/config';
 
 const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
-const fetchSelfProfile = async () => {
+interface UseFetchSelfProfileQueryCommonProps {
+  profileId?: string;
+}
+
+const fetchSelfProfile = async ({
+  profileId,
+}: UseFetchSelfProfileQueryCommonProps) => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_SELF_PROFILE}`,
     {
       params: {
+        ...(profileId && { profileId }),
         jwt: app.user.jwt,
       },
     },
@@ -40,13 +47,16 @@ interface UseFetchSelfProfileQuery {
   apiCallEnabled?: boolean;
   updateAddressesOnSuccess?: boolean;
 }
+
 const useFetchSelfProfileQuery = ({
+  profileId,
   apiCallEnabled = true,
   updateAddressesOnSuccess = false,
-}: UseFetchSelfProfileQuery) => {
+}: UseFetchSelfProfileQuery & UseFetchSelfProfileQueryCommonProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_SELF_PROFILE],
-    queryFn: fetchSelfProfile,
+    queryKey: [ApiEndpoints.FETCH_SELF_PROFILE, profileId],
+    queryFn: () => fetchSelfProfile({ profileId }),
+    // eslint-disable-next-line @tanstack/query/no-deprecated-options
     onSuccess: (profile) => {
       if (
         updateAddressesOnSuccess &&
