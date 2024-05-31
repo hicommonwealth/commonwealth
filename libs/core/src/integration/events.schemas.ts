@@ -4,6 +4,7 @@ import {
   EVM_ADDRESS,
   Reaction,
   Thread,
+  zDate,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
@@ -264,8 +265,8 @@ const ContestManagerEvent = EventMetadata.extend({
 });
 
 export const ContestStarted = ContestManagerEvent.extend({
-  start_time: z.date().describe('Contest start time'),
-  end_time: z.date().describe('Contest end time'),
+  start_time: zDate.describe('Contest start time'),
+  end_time: zDate.describe('Contest end time'),
 }).describe('When a contest instance gets started');
 
 export const ContestContentAdded = ContestManagerEvent.extend({

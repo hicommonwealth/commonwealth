@@ -326,7 +326,7 @@ export function Contests(): Projection<typeof inputs> {
           attributes: ['thread_id'],
           raw: true,
         });
-        await models.ContestAction.create({
+        await models.ContestAction.upsert({
           ...payload,
           contest_id,
           actor_address: payload.voter_address,

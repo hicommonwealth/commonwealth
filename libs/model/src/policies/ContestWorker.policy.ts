@@ -39,17 +39,20 @@ export function ContestWorker(): Policy<typeof inputs> {
         // content url only contains path
         const contentUrl = new URL(fullContentUrl).pathname;
 
-        for (const contestManager of community!.contest_managers!) {
-          const { address: userAddress } = (await models.Address.findByPk(
-            payload!.address_id,
-          ))!;
-          await contestHelper.addContent(
-            chainNodeUrl!,
-            contestManager.contest_address!,
-            userAddress,
-            contentUrl,
-          );
-        }
+        // TODO: optimize with bulk fetch
+        await Promise.allSettled(
+          community!.contest_managers!.map(async (contestManager) => {
+            const { address: userAddress } = (await models.Address.findByPk(
+              payload!.address_id,
+            ))!;
+            await contestHelper.addContent(
+              chainNodeUrl!,
+              contestManager.contest_address!,
+              userAddress,
+              contentUrl,
+            );
+          }),
+        );
       },
       ThreadUpvoted: async ({ payload }) => {
         const community = await models.Community.findByPk(
@@ -75,25 +78,28 @@ export function ContestWorker(): Policy<typeof inputs> {
           id: payload.thread_id!,
         });
         const contentUrl = new URL(fullContentUrl).pathname;
-        for (const contestManager of community!.contest_managers!) {
-          const contestAddress = contestManager.contest_address;
-          console.log({ contestAddress, contentUrl, action: 'added' });
-          const addAction = await models.ContestAction.findOne({
-            where: {
-              contest_address: contestAddress,
-              content_url: contentUrl,
-              action: 'added',
-            },
-          });
-          const userAddress = addAction!.actor_address!;
-          const contentId = addAction!.content_id!;
-          await contestHelper.voteContent(
-            chainNodeUrl!,
-            contestAddress,
-            userAddress,
-            contentId.toString(),
-          );
-        }
+
+        // TODO: optimize with bulk fetch
+        await Promise.allSettled(
+          community!.contest_managers!.map(async (contestManager) => {
+            const contestAddress = contestManager.contest_address;
+            const addAction = await models.ContestAction.findOne({
+              where: {
+                contest_address: contestAddress,
+                content_url: contentUrl,
+                action: 'added',
+              },
+            });
+            const userAddress = addAction!.actor_address!;
+            const contentId = addAction!.content_id!;
+            await contestHelper.voteContent(
+              chainNodeUrl!,
+              contestAddress,
+              userAddress,
+              contentId.toString(),
+            );
+          }),
+        );
       },
     },
   };
