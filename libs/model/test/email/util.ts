@@ -22,6 +22,7 @@ import {
   User,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { seed } from '../../src/tester';
 
 type ArrayItemType<T> = T extends Array<infer U> ? U : never;
 
@@ -301,5 +302,67 @@ export function generateProtocolData(
     notifications,
     enrichedNotifications,
     messages,
+  };
+}
+
+export async function generateThreads(
+  communityOne: z.infer<typeof Community>,
+  communityTwo: z.infer<typeof Community>,
+  communityThree: z.infer<typeof Community>,
+) {
+  await seed('Thread', {
+    address_id: communityThree?.Addresses?.at(0)?.id,
+    community_id: communityThree?.id,
+    topic_id: communityThree?.topics?.at(0)?.id,
+    pinned: false,
+    read_only: false,
+    version_history: [],
+  });
+
+  // 3 threads for communityOne and 1 thread for communityTwo
+  const [threadOne] = await seed('Thread', {
+    address_id: communityOne?.Addresses?.at(0)?.id,
+    community_id: communityOne?.id,
+    topic_id: communityOne?.topics?.at(0)?.id,
+    pinned: false,
+    read_only: false,
+    version_history: [],
+    view_count: 10,
+  });
+  const [threadTwo] = await seed('Thread', {
+    address_id: communityOne?.Addresses?.at(0)?.id,
+    community_id: communityOne?.id,
+    topic_id: communityOne?.topics?.at(0)?.id,
+    pinned: false,
+    read_only: false,
+    version_history: [],
+    view_count: 5,
+  });
+
+  const [threadThree] = await seed('Thread', {
+    address_id: communityOne?.Addresses?.at(0)?.id,
+    community_id: communityOne?.id,
+    topic_id: communityTwo?.topics?.at(0)?.id,
+    pinned: false,
+    read_only: false,
+    version_history: [],
+    view_count: 1,
+  });
+
+  const [threadFour] = await seed('Thread', {
+    address_id: communityTwo?.Addresses?.at(0)?.id,
+    community_id: communityTwo?.id,
+    topic_id: communityTwo?.topics?.at(0)?.id,
+    pinned: false,
+    read_only: false,
+    version_history: [],
+    view_count: 10,
+  });
+
+  return {
+    threadOne,
+    threadTwo,
+    threadThree,
+    threadFour,
   };
 }
