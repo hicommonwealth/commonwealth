@@ -267,6 +267,7 @@ const ContestManagerEvent = EventMetadata.extend({
 export const ContestStarted = ContestManagerEvent.extend({
   start_time: zDate.describe('Contest start time'),
   end_time: zDate.describe('Contest end time'),
+  contest_id: z.number().int().gte(1).describe('Recurring contest id'),
 }).describe('When a contest instance gets started');
 
 export const ContestContentAdded = ContestManagerEvent.extend({

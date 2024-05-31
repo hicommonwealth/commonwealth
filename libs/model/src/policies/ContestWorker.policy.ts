@@ -1,8 +1,8 @@
 import { events, Policy } from '@hicommonwealth/core';
-import { getThreadUrl } from '@hicommonwealth/shared';
-import { URL } from 'url';
+import { Op } from 'sequelize';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
+import { buildThreadContentUrl } from '../utils';
 
 const inputs = {
   ThreadCreated: events.ThreadCreated,
@@ -14,6 +14,22 @@ export function ContestWorker(): Policy<typeof inputs> {
     inputs,
     body: {
       ThreadCreated: async ({ payload }) => {
+        if (!payload.topic_id) {
+          return;
+        }
+        const contestTopics = await models.ContestTopic.findAll({
+          where: {
+            topic_id: payload.topic_id,
+          },
+        });
+        if (contestTopics.length === 0) {
+          return;
+        }
+
+        const { address: userAddress } = (await models.Address.findByPk(
+          payload!.address_id,
+        ))!;
+
         const community = await models.Community.findByPk(
           payload.community_id,
           {
@@ -29,32 +45,80 @@ export function ContestWorker(): Policy<typeof inputs> {
             ],
           },
         );
+
         const chainNodeUrl =
           community?.ChainNode?.private_url || community?.ChainNode?.url;
 
-        const fullContentUrl = getThreadUrl({
-          chain: community!.id!,
-          id: payload.id!,
-        });
-        // content url only contains path
-        const contentUrl = new URL(fullContentUrl).pathname;
+        const contentUrl = buildThreadContentUrl(community!.id!, payload.id!);
 
-        // TODO: optimize with bulk fetch
-        await Promise.allSettled(
-          community!.contest_managers!.map(async (contestManager) => {
-            const { address: userAddress } = (await models.Address.findByPk(
-              payload!.address_id,
-            ))!;
+        // add content only for contest managers that don't already
+        // have the content
+
+        const contestAddresses = community!
+          .contest_managers!.filter((c) => !c.cancelled) // must be active
+          .filter((c) =>
+            contestTopics.find(
+              (ct) => ct.contest_address === c.contest_address,
+            ),
+          ) // must have an associated contest topic
+          .map((c) => c.contest_address);
+
+        const existingAddActions = await models.ContestAction.findAll({
+          where: {
+            content_url: contentUrl,
+            contest_address: {
+              [Op.in]: contestAddresses,
+            },
+            action: 'added',
+          },
+        });
+        const processedContestAddresses = existingAddActions.map(
+          (action) => action.contest_address,
+        );
+        const unprocessedContestAddresses = contestAddresses.filter(
+          (a) => !processedContestAddresses.includes(a),
+        );
+
+        const results = await Promise.allSettled(
+          unprocessedContestAddresses.map(async (contestAddress) => {
             await contestHelper.addContent(
               chainNodeUrl!,
-              contestManager.contest_address!,
+              contestAddress,
               userAddress,
               contentUrl,
             );
           }),
         );
+
+        const errors = results
+          .filter(({ status }) => status === 'rejected')
+          .map(
+            (result) =>
+              (result as PromiseRejectedResult).reason || '<unknown reason>',
+          );
+
+        if (errors.length > 0) {
+          throw new Error(
+            `addContent failed ${errors.length} times: ${errors.join(', ')}"`,
+          );
+        }
       },
       ThreadUpvoted: async ({ payload }) => {
+        const { topic_id } = (await models.Thread.findByPk(payload.thread_id!, {
+          attributes: ['topic_id'],
+        }))!;
+        if (!topic_id) {
+          return;
+        }
+        const contestTopics = await models.ContestTopic.findAll({
+          where: {
+            topic_id: topic_id,
+          },
+        });
+        if (contestTopics.length === 0) {
+          return;
+        }
+
         const community = await models.Community.findByPk(
           payload.community_id,
           {
@@ -73,25 +137,53 @@ export function ContestWorker(): Policy<typeof inputs> {
         const chainNodeUrl =
           community?.ChainNode?.private_url || community?.ChainNode?.url;
 
-        const fullContentUrl = getThreadUrl({
-          chain: community!.id!,
-          id: payload.thread_id!,
-        });
-        const contentUrl = new URL(fullContentUrl).pathname;
+        const contentUrl = buildThreadContentUrl(
+          community!.id!,
+          payload.thread_id!,
+        );
 
-        // TODO: optimize with bulk fetch
-        await Promise.allSettled(
-          community!.contest_managers!.map(async (contestManager) => {
-            const contestAddress = contestManager.contest_address;
-            const addAction = await models.ContestAction.findOne({
-              where: {
-                contest_address: contestAddress,
-                content_url: contentUrl,
-                action: 'added',
-              },
-            });
-            const userAddress = addAction!.actor_address!;
-            const contentId = addAction!.content_id!;
+        const contestAddresses = community!
+          .contest_managers!.filter((c) => !c.cancelled) // must be active
+          .filter((c) =>
+            contestTopics.find(
+              (ct) => ct.contest_address === c.contest_address,
+            ),
+          ) // must have an associated contest topic
+          .map((c) => c.contest_address);
+
+        const addAction = await models.ContestAction.findOne({
+          where: {
+            content_url: contentUrl,
+            contest_address: {
+              [Op.in]: contestAddresses,
+            },
+            action: 'added',
+          },
+        });
+
+        // add upvotes on the content only if not already added
+        const existingVoteActions = await models.ContestAction.findAll({
+          where: {
+            content_id: addAction!.content_id,
+            contest_address: {
+              [Op.in]: contestAddresses,
+            },
+            action: 'upvoted',
+          },
+        });
+
+        const processedContestAddresses = existingVoteActions.map(
+          (action) => action.contest_address,
+        );
+        const unprocessedContestAddresses = contestAddresses.filter(
+          (a) => !processedContestAddresses.includes(a),
+        );
+
+        const userAddress = addAction!.actor_address!;
+        const contentId = addAction!.content_id!;
+
+        const results = await Promise.allSettled(
+          unprocessedContestAddresses.map(async (contestAddress) => {
             await contestHelper.voteContent(
               chainNodeUrl!,
               contestAddress,
@@ -100,6 +192,19 @@ export function ContestWorker(): Policy<typeof inputs> {
             );
           }),
         );
+
+        const errors = results
+          .filter(({ status }) => status === 'rejected')
+          .map(
+            (result) =>
+              (result as PromiseRejectedResult).reason || '<unknown reason>',
+          );
+
+        if (errors.length > 0) {
+          throw new Error(
+            `voteContent failed ${errors.length} times: ${errors.join(', ')}"`,
+          );
+        }
       },
     },
   };
