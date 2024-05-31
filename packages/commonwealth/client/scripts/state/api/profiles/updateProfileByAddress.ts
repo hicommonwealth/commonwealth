@@ -64,12 +64,10 @@ interface AddressesWithChainsToUpdate {
 
 interface UseUpdateProfileByAddressMutation {
   addressesWithChainsToUpdate?: AddressesWithChainsToUpdate[];
-  refetchSelfProfileQueryOnSuccess?: boolean;
 }
 
 const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
-  refetchSelfProfileQueryOnSuccess,
 }: UseUpdateProfileByAddressMutation = {}) => {
   return useMutation({
     mutationFn: updateProfileByAddress,
@@ -85,7 +83,11 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      if (refetchSelfProfileQueryOnSuccess) {
+      // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
+      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const doesProfileIdMatch =
+        userProfileId && userProfileId === updatedProfile?.id;
+      if (doesProfileIdMatch) {
         const keys = [
           [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
           [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],

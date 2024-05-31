@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import {
-  useFetchProfilesByIdQuery,
+  useFetchProfileByIdQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -72,7 +72,6 @@ const EditProfileComponent = () => {
         address: a.address,
         chain: a.community.id,
       })),
-      refetchSelfProfileQueryOnSuccess: true,
     });
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
@@ -86,8 +85,9 @@ const EditProfileComponent = () => {
     isLoading: isLoadingProfile,
     error,
     refetch,
-  } = useFetchProfilesByIdQuery({
+  } = useFetchProfileByIdQuery({
     apiCallEnabled: isLoggedIn,
+    shouldFetchSelfProfile: true,
   });
 
   const checkForUpdates = () => {

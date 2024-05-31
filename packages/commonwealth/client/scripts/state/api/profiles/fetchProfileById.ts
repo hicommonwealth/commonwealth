@@ -6,9 +6,10 @@ import { ApiEndpoints } from 'state/api/config';
 
 const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
-interface UseFetchProfileByIdQueryCommonProps {
+type UseFetchProfileByIdQueryCommonProps = {
   profileId?: string;
-}
+  shouldFetchSelfProfile?: boolean;
+};
 
 const fetchProfileById = async ({
   profileId,
@@ -17,8 +18,11 @@ const fetchProfileById = async ({
     `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ID}`,
     {
       params: {
-        ...(profileId && { profileId }),
-        jwt: app.user.jwt,
+        ...(profileId
+          ? { profileId }
+          : {
+              jwt: app.user.jwt,
+            }),
       },
     },
   );
@@ -45,26 +49,36 @@ const fetchProfileById = async ({
 
 interface UseFetchProfileByIdQuery {
   apiCallEnabled?: boolean;
-  updateAddressesOnSuccess?: boolean;
 }
 
 const useFetchProfileByIdQuery = ({
   profileId,
+  shouldFetchSelfProfile,
   apiCallEnabled = true,
-  updateAddressesOnSuccess = false,
 }: UseFetchProfileByIdQuery & UseFetchProfileByIdQueryCommonProps) => {
   return useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [ApiEndpoints.FETCH_PROFILES_BY_ID, profileId],
-    queryFn: () => fetchProfileById({ profileId }),
+    queryFn: () =>
+      fetchProfileById({
+        profileId,
+        shouldFetchSelfProfile,
+      }),
     // eslint-disable-next-line @tanstack/query/no-deprecated-options
-    onSuccess: (profile) => {
+    onSuccess: (response) => {
+      // update user addresses when
+      // - self profile is fetched
+      // - or `profileId` is matches auth user's profile id
+      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const doesProfileIdMatch =
+        userProfileId && userProfileId === response?.profile?.id;
       if (
-        updateAddressesOnSuccess &&
-        profile?.addresses &&
-        profile?.addresses?.length > 0
+        response?.addresses &&
+        response?.addresses?.length > 0 &&
+        (shouldFetchSelfProfile || doesProfileIdMatch)
       ) {
         app.user.setAddresses(
-          profile.addresses.map(
+          response.addresses.map(
             (a) =>
               new AddressInfo({
                 id: a?.id,
