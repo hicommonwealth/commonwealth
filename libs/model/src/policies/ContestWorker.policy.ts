@@ -1,8 +1,12 @@
-import { events, Policy } from '@hicommonwealth/core';
+import { events, logger, Policy } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
 import { buildThreadContentUrl } from '../utils';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const inputs = {
   ThreadCreated: events.ThreadCreated,
@@ -15,6 +19,7 @@ export function ContestWorker(): Policy<typeof inputs> {
     body: {
       ThreadCreated: async ({ payload }) => {
         if (!payload.topic_id) {
+          log.warn('ThreadCreated: payload does not contain topic_id');
           return;
         }
         const contestTopics = await models.ContestTopic.findAll({
@@ -23,6 +28,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           },
         });
         if (contestTopics.length === 0) {
+          log.warn('ThreadCreated: no matching contest topics');
           return;
         }
 
@@ -78,6 +84,10 @@ export function ContestWorker(): Policy<typeof inputs> {
         const unprocessedContestAddresses = contestAddresses.filter(
           (a) => !processedContestAddresses.includes(a),
         );
+        if (unprocessedContestAddresses.length === 0) {
+          log.warn('ThreadCreated: no contest addresses to process');
+          return;
+        }
 
         const results = await Promise.allSettled(
           unprocessedContestAddresses.map(async (contestAddress) => {
@@ -108,6 +118,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           attributes: ['topic_id'],
         }))!;
         if (!topic_id) {
+          log.warn('ThreadUpvoted: thread does not contain topic_id');
           return;
         }
         const contestTopics = await models.ContestTopic.findAll({
@@ -116,6 +127,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           },
         });
         if (contestTopics.length === 0) {
+          log.warn('ThreadUpvoted: no matching contest topics');
           return;
         }
 
@@ -178,6 +190,10 @@ export function ContestWorker(): Policy<typeof inputs> {
         const unprocessedContestAddresses = contestAddresses.filter(
           (a) => !processedContestAddresses.includes(a),
         );
+        if (unprocessedContestAddresses.length === 0) {
+          log.warn('ThreadUpvoted: no contest addresses to process');
+          return;
+        }
 
         const userAddress = addAction!.actor_address!;
         const contentId = addAction!.content_id!;
