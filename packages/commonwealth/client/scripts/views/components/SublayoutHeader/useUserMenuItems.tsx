@@ -24,6 +24,7 @@ import {
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
 } from 'shared/canvas/chainMappings';
+import { getSessionSigners } from 'shared/canvas/verify';
 
 import { useCommunityStake } from '../CommunityStake';
 
@@ -45,6 +46,9 @@ export const handleLogout = async () => {
     await axios.get(`${app.serverUrl()}/logout`);
     await initAppState();
     await resetWalletConnectSession();
+    for (const signer of getSessionSigners()) {
+      signer.target.clear();
+    }
     notifySuccess('Signed out');
     setDarkMode(false);
   } catch (err) {
