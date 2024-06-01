@@ -3,6 +3,7 @@ import type { AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { Model, ModelStatic, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
+import { isAddress } from 'web3-validator';
 import { z } from 'zod';
 import { config } from './config';
 import { OutboxAttributes } from './models';
@@ -116,4 +117,32 @@ export function formatS3Url(
   return (
     `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
   );
+}
+
+/**
+ * Checks whether two Ethereum addresses are equal.
+ * The comparison is done in lowercase to ensure case insensitivity.
+ *
+ * @param address1 - The first Ethereum address.
+ * @param address2 - The second Ethereum address.
+ * @returns True if the strings are equal, valid EVM addresses - false otherwise.
+ */
+export function equalEvmAddresses(
+  address1: string | undefined,
+  address2: string | undefined,
+): boolean {
+  if (!address1 || !address2) {
+    return false;
+  }
+
+  // Validate both addresses
+  if (!isAddress(address1) || !isAddress(address2)) {
+    return false;
+  }
+
+  // Convert addresses to lowercase and compare
+  const normalizedAddress1 = address1.toLowerCase();
+  const normalizedAddress2 = address2.toLowerCase();
+
+  return normalizedAddress1 === normalizedAddress2;
 }
