@@ -18,22 +18,6 @@ const newChainRecords = [
     name: 'Edgeware',
     active: true,
   },
-  // {
-  //   id: 'edgeware-testnet',
-  //   network: 'edgeware',
-  //   symbol: 'testEDG',
-  //   icon_url: '/static/img/protocols/edg.png',
-  //   name: 'Edgeware Testnet',
-  //   active: true,
-  // },
-  // {
-  //   id: 'edgeware-local',
-  //   network: 'edgeware',
-  //   symbol: 'testEDG',
-  //   icon_url: '/static/img/protocols/edg.png',
-  //   name: 'Edgeware Local',
-  //   active: true,
-  // },
   {
     id: 'kusama',
     network: 'kusama',
@@ -101,7 +85,7 @@ module.exports = {
           'chain',
           {
             type: Sequelize.STRING,
-            defaultValue: 'edgeware-testnet', // set default value to populate preexisting models' fields
+            defaultValue: 'edgeware', // set default value to populate preexisting models' fields
             references: { model: 'Chains', key: 'id' },
             onUpdate: 'CASCADE',
             onDelete: 'SET NULL',
@@ -133,7 +117,6 @@ module.exports = {
       await queryInterface.bulkInsert(
         'ChainNodes',
         [
-          { chain: 'edgeware-local', url: 'localhost:9944' },
           { chain: 'edgeware', url: 'mainnet1.edgewa.re' },
           { chain: 'edgeware', url: 'mainnet2.edgewa.re' },
           { chain: 'edgeware', url: 'mainnet3.edgewa.re' },
