@@ -102,7 +102,7 @@ export class ServerProposalsController {
       );
     } catch (e) {
       throw new ServerError(
-        `Failed to create EVM provider for ${ethNetworkUrl}. ${e}`,
+        `Failed to create EVM provider for ${communityId}. ${e}`,
       );
     }
   }
