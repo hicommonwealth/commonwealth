@@ -364,7 +364,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     // Handle Logged in and joining community of different chain base
     if (isInCommunityPage && app.isLoggedIn()) {
-      await getSessionFromWallet(walletToUse);
+      const session = await getSessionFromWallet(walletToUse);
+      await account.validate(session);
 
       await onLogInWithAccount(account, true, newlyCreated);
       return;
@@ -735,7 +736,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
     await account.validate(session);
     await verifySession(session);
-    console.log('Started new session for', wallet.chain);
+    console.log('Started new session for', wallet.chain, chainIdentifier);
 
     // ensure false for newlyCreated / linking vars on revalidate
     if (isMobile) {
