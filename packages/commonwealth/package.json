@@ -54,6 +54,7 @@
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true tsx server.ts",
     "start-knock": "tsx server/workers/knock/knockWorker.ts",
     "start-message-relayer": "tsx ./server/workers/messageRelayer/messageRelayer.ts",
+    "start-vite": "vite",
     "stylelint": "stylelint client/styles/*",
     "test": "pnpm unit-test",
     "test-api": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha --allow-uncaught './test/integration/api/**/*.spec.ts'",

@@ -2,10 +2,10 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import 'index.scss';
-import 'normalize.css'; // reset
 import 'react-toastify/dist/ReactToastify.css';
 import 'shared.scss';
 import '../../static/fonts/fonts.css';
+import '../styles/normalize.css'; // reset
 
 import App from './App';
 import { getBrowserInfo } from './helpers/browser';
