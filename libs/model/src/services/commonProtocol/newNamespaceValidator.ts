@@ -64,9 +64,7 @@ export const validateNamespace = async (
     factoryData.factory,
   );
 
-  if (
-    !equalEvmAddresses(activeNamespace.toLowerCase(), txReceipt.logs[0].address)
-  ) {
+  if (!equalEvmAddresses(activeNamespace, txReceipt.logs[0].address)) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 
