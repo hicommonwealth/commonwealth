@@ -120,29 +120,29 @@ export function formatS3Url(
 }
 
 /**
- * Checks whether two Ethereum addresses are equal.
- * The comparison is done in lowercase to ensure case insensitivity.
- *
+ * Checks whether two Ethereum addresses are equal. Throws if a provided string is not a valid EVM address.
+ * Address comparison is done in lowercase to ensure case insensitivity.
  * @param address1 - The first Ethereum address.
  * @param address2 - The second Ethereum address.
  * @returns True if the strings are equal, valid EVM addresses - false otherwise.
  */
 export function equalEvmAddresses(
-  address1: string | undefined,
-  address2: string | undefined,
+  address1: string | unknown,
+  address2: string | unknown,
 ): boolean {
-  if (!address1 || !address2) {
-    return false;
-  }
+  const isRealAddress = (address: string | unknown) => {
+    if (!address || typeof address !== 'string' || !isAddress(address)) {
+      throw new Error(`Invalid address ${address}`);
+    }
+    return address;
+  };
 
-  // Validate both addresses
-  if (!isAddress(address1) || !isAddress(address2)) {
-    return false;
-  }
+  const validAddress1 = isRealAddress(address1);
+  const validAddress2 = isRealAddress(address2);
 
   // Convert addresses to lowercase and compare
-  const normalizedAddress1 = address1.toLowerCase();
-  const normalizedAddress2 = address2.toLowerCase();
+  const normalizedAddress1 = validAddress1.toLowerCase();
+  const normalizedAddress2 = validAddress2.toLowerCase();
 
   return normalizedAddress1 === normalizedAddress2;
 }
