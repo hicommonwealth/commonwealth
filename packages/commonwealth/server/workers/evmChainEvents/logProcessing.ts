@@ -1,6 +1,5 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
-import { equalEvmAddresses } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
@@ -120,8 +119,8 @@ export async function parseLogs(
   for (const log of logs) {
     const address = ethers.utils.getAddress(log.address);
     const data: AbiSignatures = sources[address];
-    const evmEventSource = data.sources.find((s) =>
-      equalEvmAddresses(s.event_signature, log.topics[0]),
+    const evmEventSource = data.sources.find(
+      (s) => s.event_signature === log.topics[0],
     );
     if (!evmEventSource) continue;
 
