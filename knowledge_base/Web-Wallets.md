@@ -1,45 +1,76 @@
-**For the wallet/SSO support:**
+# Web Wallets
 
-1. [These](https://github.com/hicommonwealth/commonwealth/blob/master/libs/shared/src/types/protocol.ts#L66-L80) are all the wallet types we support
-1. `magic` is the wallet type we use for SSO's account
-2. `walletconnect` wallet supports a lot of Ethereum wallets, those are not mentioned in the wallet types `type`.
-1. [These](https://github.com/hicommonwealth/commonwealth/blob/master/libs/shared/src/types/protocol.ts#L83-L91) are all the SSO types we support
-1. the `unknown` type here is for legacy support
-1. SSO accounts like Google/Github/Discord/Twitter/Apple/Email are treated as an address in the app (similar to how we treat wallet addresses)
-2. Every auth method ends up giving an `address` for user account, this address can be of [these](https://github.com/hicommonwealth/commonwealth/blob/master/libs/shared/src/types/protocol.ts#L93-L99) types.
-1. An exception for this is SSO accounts which either have an Ethereum or a Cosmos address.
-2. If an SSO account is created in a `cosmos` based community, then the final `address` of account will be a cosmos address, in all other cases the `address` will be an Ethereum address.
-1. We display wallets conditionally per context of the page, [here](https://github.com/hicommonwealth/commonwealth/blob/e888479b54582ee2dd8526ce6085184426ba1e9c/packages/commonwealth/client/scripts/views/modals/AuthModal/common/ModalBase/ModalBase.tsx#L148-L157) is the full wallet display logic with notes for which wallets gets displayed when
-2. If the user doesn't have a wallet required for the context of the page, then the wallet list is empty with `No wallets found` message. The SSO list is still displayed and user can use that to signup and join a community.
-3. [This](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/client/scripts/views/modals/AuthModal/common/ModalBase/ModalBase.tsx) is the **main** component responsible for rendering wallets (depending on page context) and handling auth flow. The auth logic is distributed among some other areas as well but the main component is again linked.
+## Contents
 
-**For the sign-in flow:**
+- [Wallet & SSO Support](#wallet--sso-support)
+- [Sign-in & Onboarding Flow](#sign-in--onboarding-flow)
 
-We were recently working on the new User-Onboarding feature which updates the sign-in flow. I will list both pre-post user-onboarding flows.
+## Wallet & SSO Support
 
-Pre-UserOnboarding:
+1. The [WalletId enum](../libs/shared/src/types/protocol.ts) lists the wallet types we current support.
 
-1. The user needs to get to auth modal for signin/signup. This can be done by the `Signup` button in header or trying to perform an auth-gated action, both of which trigger the auth modal.
-2. On the auth modal, wallets and SSO options are displayed, any of the options the user can select and authenticate
-3. We don't make a distinction here for new vs old account. All the users are shown the same modal and are navigated with the same flow.
+    + `magic` is the wallet type we use for SSO's account
 
-Post-UserOnboarding:
+    + the `walletconnect` type supports a plethora of Ethereum wallets not listed in the `WalletId` enum.
 
-1. The user needs to get to auth modal for signin/signup. This can be done by the `Signup` or `Create account` button in header or trying to perform an auth-gated action, both of which trigger the auth modal.
-2. Now the `Signup` modal is different from `Create account` modal. In terms of code, its the same component with a slightly different layout.
-3. Assuming a user clicked on the `Create account` button, which opens the `Create account` modal
-1. the user is shown 2 options, `Create a wallet` and `I have a wallet`
-2. if `Create a wallet` is selected, we only show SSO options
-3. if `I have a wallet` is selected, we only show web3 wallets.
-4. the user can select from the displayed wallet or SSO options
-5. if the user already has an account of the selected wallet or SSO option, then they will be signed in the app once auth process is complete
-6. if the user didn't have an account of the selected wallet or SSO option, we open the welcome onboard modal once the auth process is complete
-1. Assuming a user clicked on the `Signup` button, which opens the `Signin` modal
-1. the user can select from any available wallet or SSO options
-2. if the user already has an account of the selected wallet or SSO option, then they will be signed in the app once auth process is complete
-3. if the user didn't have an account of the selected wallet or SSO option, we open the `Auth guidance modal` which looks like screenshot 1
-4. From the `Auth guidance modal`
-1. if `Create an account` is selected we display the `Create account modal`
-2. if `Sign in another way` is selected we again display the `Signin` modal
+2. The [WalletSsoSource enum](../libs/shared/src/types/protocol.ts) lists all the SSO types we currently support.
 
-image.png
+    + the `unknown` type here is used legacy support
+
+3. SSO accounts (Google, Github, Discord, Twitter, etc) are treated as an address in the app (similar to how we treat wallet addresses).
+
+4. All authentication messages pass an `address` for user account, this address can be of any [ChainBase type](../libs/shared/src/types/protocol.ts) types.
+
+    + An exception for this is SSO accounts which either have an Ethereum or a Cosmos address.
+
+    + If an SSO account is created in a `cosmos` based community, then the final `address` of account will be a cosmos address, in all other cases the `address` will be an Ethereum address.
+
+5. The [ModalBase](../packages/commonwealth/client/scripts/views/modals/AuthModal/common/ModalBase/ModalBase.tsx) is the primary component responsible for contextually rendering wallets and handling authentication flow. It displays wallets conditionally dependent on the context of the page. The variable `showWalletsFor` determines which ChainBase's wallets are rendered.
+
+    + Within non-community pages, 'Ethereum', 'Cosmos', 'Solana', and 'Substrate'-based wallets are rendered.
+
+    + Within communities based on 'Ethereum', 'Cosmos', 'Solana', or 'Substrate' chains, wallets specific to the respective community chain are rendered.
+
+    + Within the Near community, the Near wallet is rendered.
+
+    + Within the 'terra' community, only the 'terrastation' and 'terra-walletconnect' wallets are rendered.
+
+    + Within the 'evmos' and 'injective' communities, only 'cosm-metamask' and 'keplr-ethereum' wallets are rendered.
+
+    + If the user doesn't have any of the wallets which are required for the context of the page, then the wallet list is rendered empty, with a `No wallets found` message. The SSO list is still displayed and user can use that to register an account and join a community.
+
+## Sign-in & Onboarding Flow
+
+As of 240601, a new User Onboarding flow has been introduced:
+
+1. The user the authentication modal by clicking either the `Signup` or `Create account` button in the header, or else by attempting to perform an auth-gated action.
+
+2. Assuming a user clicked on the `Create account` button, the [CreateAccountModal](../packages/commonwealth/client/scripts/views/modals/AuthModal/CreateAccountModal/CreateAccountModal.tsx) is opened.
+
+    1. The user is shown 2 options, `Create a wallet` and `I have a wallet`.
+
+        + If `Create a wallet` is selected, only SSO options are rendered.
+
+        + If `I have a wallet` is selected, only Web3 wallets are rendered.
+
+    2. The user selects from the displayed wallet or SSO options.
+
+        + If the user already has an account linked to the selected wallet or SSO option, then they will be signed into the app once the auth process is complete.
+
+        + If the user does not have an account linked to the selected wallet or SSO option, the Onboarding modal is opened once the authentication process completes.
+
+3. Assuming a user clicked on the `Signup` button, the [SignInModal](../packages/commonwealth/client/scripts/views/modals/AuthModal/SignInModal/SignInModal.tsx) is opened.
+
+    + The user can select from any available wallet or SSO option.
+
+    + If the user already has an account linked to the selected wallet or SSO option, they are signed into the app once the authentication process completes.
+
+4. If the user does not have an account linked to the selected wallet or SSO option, the [`AuthTypeGuidanceModal`](../packages/commonwealth/client/scripts/views/modals/AuthModal/AuthTypeGuidanceModal/AuthTypeGuidanceModal.tsx) is opened.
+
+    + If `Create an account` is selected, the `CreateAccountModal` is displayed.
+
+    + If `Sign in another way` is selected, the `SignInModal` is displayed.
+
+## Change Log
+
+- 240601: Authored by Graham Johnson and Malik.
