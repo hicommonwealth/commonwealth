@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import Web3 from 'web3';
+import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
@@ -55,17 +55,28 @@ export const addContent = async (
   contest: string,
   creator: string,
   url: string,
+  web3?: Web3,
+  nonce?: number,
 ): Promise<AddContentResponse> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
+  if (!web3) {
+    web3 = await createWeb3Provider(rpcNodeUrl);
+  }
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
   let txReceipt;
   try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '200000',
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
     txReceipt = await contestInstance.methods
       .addContent(creator, url, [])
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send(txDetails);
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -265,4 +276,25 @@ export const getContestBalance = async (
   return balanceResults.length === 2
     ? balanceResults[0] + balanceResults[1]
     : balanceResults[0];
+};
+
+export const addContentBatch = async (
+  rpcNodeUrl: string,
+  contest: string[],
+  creator: string,
+  url: string,
+): Promise<Promise<AddContentResponse>[]> => {
+  const web3 = await createWeb3Provider(rpcNodeUrl);
+  let currNonce = Number(
+    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+  );
+
+  const promises: Promise<AddContentResponse>[] = [];
+
+  contest.forEach((c) => {
+    promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+    currNonce++;
+  });
+
+  return promises;
 };
