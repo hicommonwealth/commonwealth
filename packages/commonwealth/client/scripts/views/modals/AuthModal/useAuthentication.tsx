@@ -217,7 +217,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     if (app.isLoggedIn()) {
-      completeClientLogin(account);
+      await completeClientLogin(account);
     } else {
       // log in as the new user
       await initAppState(false, shouldRedrawApp);
