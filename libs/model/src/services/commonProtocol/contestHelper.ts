@@ -5,6 +5,14 @@ import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
 
+const getNonce = (function () {
+  // start nonce at random value, then increment on each call
+  let nonce = Math.floor(Math.random() * 10_000);
+  return function () {
+    return nonce++;
+  };
+})();
+
 export type AddContentResponse = {
   txReceipt: any;
   contentId: string;
@@ -65,7 +73,11 @@ export const addContent = async (
   try {
     txReceipt = await contestInstance.methods
       .addContent(creator, url, [])
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send({
+        from: web3.eth.defaultAccount,
+        gas: '200000',
+        nonce: getNonce().toString(),
+      });
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -110,7 +122,11 @@ export const voteContent = async (
   try {
     txReceipt = await contestInstance.methods
       .voteContent(voter, contentId)
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send({
+        from: web3.eth.defaultAccount,
+        gas: '200000',
+        nonce: getNonce().toString(),
+      });
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
