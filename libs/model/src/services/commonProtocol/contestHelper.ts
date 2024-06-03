@@ -321,7 +321,7 @@ export const voteContentBatch = async (
     await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
   );
 
-  const promises: Promise<AddContentResponse>[] = [];
+  const promises: Promise<any>[] = [];
 
   contest.forEach((c) => {
     promises.push(
