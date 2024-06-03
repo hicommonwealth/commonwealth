@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import axios from 'axios';
@@ -47,12 +46,15 @@ type UseAuthenticationProps = {
   useSessionKeyLoginFlow?: boolean;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Wallet = IWebWallet<any>;
+
 const useAuthentication = (props: UseAuthenticationProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [username, setUsername] = useState<string>('Anonymous');
   const [email, setEmail] = useState<string>();
-  const [wallets, setWallets] = useState<Array<IWebWallet<any>>>();
-  const [selectedWallet, setSelectedWallet] = useState<IWebWallet<any>>();
+  const [wallets, setWallets] = useState<Array<Wallet>>();
+  const [selectedWallet, setSelectedWallet] = useState<Wallet>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   const [signerAccount, setSignerAccount] = useState<Account>(null);
@@ -78,12 +80,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
-      import('../../../helpers/mockMetaMaskUtil').then((f) => {
-        window['ethereum'] = new f.MockMetaMaskProvider(
-          'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
-          '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
-        );
-      });
+      import('../../../helpers/mockMetaMaskUtil')
+        .then((f) => {
+          window['ethereum'] = new f.MockMetaMaskProvider(
+            'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+            '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
+          );
+        })
+        .catch(console.error);
     }
 
     // if in a community, display wallets for that community
@@ -242,7 +246,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account: Account,
     newlyCreated: boolean,
     linking: boolean,
-    wallet?: IWebWallet<any>,
+    wallet?: Wallet,
   ) => {
     if (props.useSessionKeyLoginFlow) {
       props?.onSuccess?.(account.address, newlyCreated);
@@ -330,7 +334,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (
-    wallet?: IWebWallet<any>,
+    wallet?: Wallet,
     walletSignature?: string,
     cachedTimestamp?: number,
     cachedChainId?: string,
@@ -418,7 +422,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     await wallet.reset();
   };
 
-  const onWalletSelect = async (wallet: IWebWallet<any>) => {
+  const onWalletSelect = async (wallet: Wallet) => {
     await wallet.enable();
     setSelectedWallet(wallet);
 
@@ -466,10 +470,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onWalletAddressSelect = async (
-    wallet: IWebWallet<any>,
-    address: string,
-  ) => {
+  const onWalletAddressSelect = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
     if (props.useSessionKeyLoginFlow) {
       await onSessionKeyRevalidation(wallet, address);
@@ -478,10 +479,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const getWalletRecentBlock = async (
-    wallet: IWebWallet<any>,
-    chain: string,
-  ) => {
+  const getWalletRecentBlock = async (wallet: Wallet, chain: string) => {
     try {
       if (!wallet.getRecentBlock) return;
       return await wallet?.getRecentBlock?.(chain);
@@ -491,10 +489,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onNormalWalletLogin = async (
-    wallet: IWebWallet<any>,
-    address: string,
-  ) => {
+  const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
 
     if (app.isLoggedIn()) {
@@ -577,10 +572,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onSessionKeyRevalidation = async (
-    wallet: IWebWallet<any>,
-    address: string,
-  ) => {
+  const onSessionKeyRevalidation = async (wallet: Wallet, address: string) => {
     const timestamp = +new Date();
     const sessionAddress = await app.sessions.getOrCreateAddress(
       wallet.chain,
