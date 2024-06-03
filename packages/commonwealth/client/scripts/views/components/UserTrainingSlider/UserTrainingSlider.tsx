@@ -1,6 +1,6 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import app from 'client/scripts/state';
-import { useFetchSelfProfileQuery } from 'client/scripts/state/api/profiles';
+import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -25,8 +25,9 @@ export const UserTrainingSlider = () => {
   >();
 
   const { data: profile, isLoading: isLoadingProfile } =
-    useFetchSelfProfileQuery({
+    useFetchProfileByIdQuery({
       apiCallEnabled: isLoggedIn,
+      shouldFetchSelfProfile: true,
     });
 
   const { isVisible: isAdminSliderVisible } = useAdminActionCardsStore();

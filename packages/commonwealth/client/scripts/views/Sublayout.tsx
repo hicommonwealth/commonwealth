@@ -42,6 +42,7 @@ const Sublayout = ({
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const [authModalType, setAuthModalType] = useState<AuthModalType>();
+  const [profileId, setProfileId] = useState(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: userOnboardingEnabled,
@@ -60,14 +61,27 @@ const Sublayout = ({
     }
   }, [triggerOpenModalType, setTriggerOpenModalType]);
 
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
-
   const {
     onboardedProfiles,
     setProfileAsOnboarded,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
   } = useWelcomeOnboardModal();
+
+  useEffect(() => {
+    let timeout = null;
+    if (isLoggedIn) {
+      timeout = setTimeout(() => {
+        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
+      }, 100);
+    } else {
+      setProfileId(null);
+    }
+
+    return () => {
+      if (timeout !== null) clearTimeout(timeout);
+    };
+  }, [isLoggedIn]);
 
   useNecessaryEffect(() => {
     if (
@@ -107,6 +121,7 @@ const Sublayout = ({
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
+    setProfileAsOnboarded,
     isLoggedIn,
   ]);
 

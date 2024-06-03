@@ -117,7 +117,7 @@ export class RolesController {
       );
       if (!referencedAddress) return;
       const isSame =
-        this.User.activeAccount.address === referencedAddress.address;
+        this.User?.activeAccount?.address === referencedAddress.address;
       const ofCommunity = r.community_id === options.community;
       return permission && referencedAddress && isSame && ofCommunity;
     });

@@ -181,7 +181,9 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError('Contest Id not found on Contest address');
+    throw new AppError(
+      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    );
   }
 
   const votePromises: any[] = [];
@@ -227,7 +229,8 @@ export const getContestBalance = async (
   }
 
   const results = await Promise.all(promises);
-  let balancePromises: Promise<number>[] = [];
+
+  const balancePromises: Promise<number>[] = [];
 
   if (!oneOff) {
     const feeManager = new web3.eth.Contract(
@@ -262,7 +265,9 @@ export const getContestBalance = async (
 
   const balanceResults = await Promise.all(balancePromises);
 
-  return balanceResults.length === 2
-    ? balanceResults[0] + balanceResults[1]
-    : balanceResults[0];
+  return Number(
+    balanceResults.length === 2
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]),
+  );
 };

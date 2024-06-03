@@ -381,7 +381,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
-    action: 'comment',
   });
 
   const getMetaDescription = (meta: string) => {
@@ -609,7 +608,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <CreateComment
                         rootThread={thread}
                         canComment={canComment}
-                        tooltipText={disabledActionsTooltipText}
+                        tooltipText={
+                          typeof disabledActionsTooltipText === 'function'
+                            ? disabledActionsTooltipText?.('comment')
+                            : disabledActionsTooltipText
+                        }
                       />
                       {foundGatedTopic &&
                         !hideGatingBanner &&

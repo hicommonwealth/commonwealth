@@ -72,12 +72,12 @@ const authenticate = async (
 };
 
 const logError = (path: string | undefined, error: TRPCError) => {
-  log.error(
-    `[${error.cause?.name ?? error.name}] ${path}: ${
-      error.cause?.message ?? error.message
-    }`,
-    error.cause,
-  );
+  const msg = `${error.code}: [${error.cause?.name ?? error.name}] ${path}: ${
+    error.cause?.message ?? error.message
+  }`;
+  error.code === 'INTERNAL_SERVER_ERROR'
+    ? log.error(msg, error.cause)
+    : log.warn(msg);
 };
 
 const trpcerror = (error: unknown): TRPCError => {
