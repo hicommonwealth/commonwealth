@@ -229,7 +229,6 @@ const DetailsFormStep = ({
                   png)
                 </CWText>
                 <CWCoverImageUploader
-                  uploadCompleteCallback={console.log}
                   canSelectImageBehaviour={false}
                   showUploadAndGenerateText
                   onImageProcessStatusChange={setIsProcessingProfileImage}

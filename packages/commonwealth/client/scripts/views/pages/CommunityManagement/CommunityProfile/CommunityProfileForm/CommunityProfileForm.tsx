@@ -345,7 +345,6 @@ const CommunityProfileForm = () => {
               showUploadAndGenerateText
               name="communityProfileImageURL"
               canSelectImageBehaviour={false}
-              uploadCompleteCallback={console.log}
               defaultImageBehaviour={ImageBehavior.Circle}
               onImageProcessStatusChange={setIsProcessingProfileImage}
               subheaderText="Community Profile Image (Accepts JPG and PNG files)"
