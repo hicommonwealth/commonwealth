@@ -27,3 +27,7 @@ document.body.classList.add(
     browserInfo.version
   }`,
 );
+
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
