@@ -7,6 +7,6 @@ instances:
     username: <YOUR USERNAME>
     password: <YOUR PASSWORD>
     dbname: <YOUR DBNAME>
-    ssl: True
+    ssl: require
   - query_samples:
       explain_parameterized_queries: true
