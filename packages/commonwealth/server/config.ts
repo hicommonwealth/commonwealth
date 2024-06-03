@@ -139,7 +139,7 @@ export const config = configure(
     DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
-    REACTION_WEIGHT_OVERRIDE: z.number().int().optional(),
+    REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
     CW_BOT_KEY: z.string().optional(),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
