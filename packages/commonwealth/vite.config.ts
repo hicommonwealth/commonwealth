@@ -21,7 +21,7 @@ function createClientResolver(folder: string): Alias {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
+export default defineConfig(({ command }) => {
   return {
     plugins: [
       react(),
