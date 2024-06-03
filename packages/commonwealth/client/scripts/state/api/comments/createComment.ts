@@ -85,6 +85,12 @@ const useCreateCommentMutation = ({
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        { recentComments: [newComment] },
+        'combineAndRemoveDups',
+      );
 
       if (userOnboardingEnabled) {
         const profileId = app?.user?.addresses?.[0]?.profile?.id;

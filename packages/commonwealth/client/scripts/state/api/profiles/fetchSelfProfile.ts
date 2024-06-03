@@ -47,6 +47,9 @@ const useFetchSelfProfileQuery = ({
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_SELF_PROFILE],
     queryFn: fetchSelfProfile,
+    // disabling this rule as we want to do the onSuccess action whenever
+    // `useFetchSelfProfileQuery` succeeds.
+    // eslint-disable-next-line @tanstack/query/no-deprecated-options
     onSuccess: (profile) => {
       if (
         updateAddressesOnSuccess &&

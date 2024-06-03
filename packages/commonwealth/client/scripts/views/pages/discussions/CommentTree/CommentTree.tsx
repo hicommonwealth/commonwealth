@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -44,7 +45,7 @@ type CommentsTreeAttrs = {
   canReply?: boolean;
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
 };
 
 export const CommentTree = ({
@@ -464,7 +465,10 @@ export const CommentTree = ({
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
-                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                    !!hasJoinedCommunity &&
+                    !thread.archivedAt &&
+                    !thread.lockedAt &&
+                    canReply
                   }
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
@@ -501,6 +505,7 @@ export const CommentTree = ({
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)
                   }
                   comment={comment}
+                  shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
                 />
               </div>
               <div ref={scrollToRef}></div>

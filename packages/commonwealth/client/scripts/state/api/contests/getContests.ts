@@ -3,12 +3,15 @@ import { z } from 'zod';
 import { GetAllContests } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
 
-type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input>;
+type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input> & {
+  enabled: boolean;
+};
 
 const useGetContestsQuery = ({
   contest_id,
   community_id,
   running,
+  enabled,
 }: UseGetContestsQueryProps) => {
   return trpc.contest.getAllContests.useQuery(
     {
@@ -16,7 +19,7 @@ const useGetContestsQuery = ({
       community_id,
       running,
     },
-    { enabled: !!community_id },
+    { enabled: enabled && !!community_id },
   );
 };
 

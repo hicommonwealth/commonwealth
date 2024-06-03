@@ -19,7 +19,8 @@ export function ContestWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
+                required: false,
               },
               {
                 model: models.ContestManager,
@@ -28,7 +29,8 @@ export function ContestWorker(): Policy<typeof inputs> {
             ],
           },
         );
-        const chainNodeUrl = community!.ChainNode!.private_url!;
+        const chainNodeUrl =
+          community?.ChainNode?.private_url || community?.ChainNode?.url;
 
         const fullContentUrl = getThreadUrl({
           chain: community!.id!,
@@ -37,12 +39,13 @@ export function ContestWorker(): Policy<typeof inputs> {
         });
         // content url only contains path
         const contentUrl = new URL(fullContentUrl).pathname;
+
         const contestAddress = community!.contest_managers![0].contest_address;
         const { address: userAddress } = (await models.Address.findByPk(
           payload!.address_id,
         ))!;
         await contestHelper.addContent(
-          chainNodeUrl,
+          chainNodeUrl!,
           contestAddress!,
           userAddress,
           contentUrl,
@@ -54,7 +57,8 @@ export function ContestWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
+                required: false,
               },
               {
                 model: models.ContestManager,
@@ -63,8 +67,9 @@ export function ContestWorker(): Policy<typeof inputs> {
             ],
           },
         );
+        const chainNodeUrl =
+          community?.ChainNode?.private_url || community?.ChainNode?.url;
 
-        const chainNodeUrl = community!.ChainNode!.private_url!;
         const contestAddress = community!.contest_managers![0].contest_address;
         const addAction = await models.ContestAction.findOne({
           where: {
@@ -76,7 +81,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         const userAddress = addAction!.actor_address!;
         const contentId = addAction!.content_id!;
         await contestHelper.voteContent(
-          chainNodeUrl,
+          chainNodeUrl!,
           contestAddress!,
           userAddress,
           contentId.toString(),

@@ -10,7 +10,7 @@ import type NotificationSubscription from '../../../models/NotificationSubscript
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import { CWThreadAction } from '../../components/component_kit/new_designs/cw_thread_action';
-import { SharePopover } from '../../components/share_popover';
+import { SharePopoverOld } from '../../components/share_popover_old';
 import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
 import { subscribeToThread } from './helpers';
 
@@ -95,7 +95,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
         selected={bothActive}
         className="subscribe-btn"
       />
-      <SharePopover
+      <SharePopoverOld
         // if share endpoint is present it will be used, else the current url will be used
         discussionLink={
           discussionLink.startsWith('/') ? discussionLink : `/${discussionLink}`

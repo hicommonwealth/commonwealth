@@ -3,6 +3,7 @@ import {
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
   Reaction,
+  SubscriptionPreference,
   Thread,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
@@ -269,16 +270,27 @@ export const ContestStarted = ContestManagerEvent.extend({
 }).describe('When a contest instance gets started');
 
 export const ContestContentAdded = ContestManagerEvent.extend({
-  content_id: z.number().int().positive().describe('New content id'),
+  content_id: z.number().int().gte(0).describe('New content id'),
   creator_address: z.string().describe('Address of content creator'),
   content_url: z.string(),
 }).describe('When new content is added to a running contest');
 
 export const ContestContentUpvoted = ContestManagerEvent.extend({
-  content_id: z.number().int().positive().describe('Content id'),
+  content_id: z.number().int().gte(0).describe('Content id'),
   voter_address: z.string().describe('Address upvoting on content'),
   voting_power: z
     .number()
     .int()
     .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
+
+export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
+  email_notifications_enabled: true,
+  digest_email_enabled: true,
+  recap_email_enabled: true,
+  mobile_push_notifications_enabled: true,
+  mobile_push_discussion_activity_enabled: true,
+  mobile_push_admin_alerts_enabled: true,
+  created_at: true,
+  updated_at: true,
+}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));

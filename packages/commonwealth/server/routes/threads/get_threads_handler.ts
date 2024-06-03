@@ -28,6 +28,7 @@ export type GetThreadsRequestQuery = {
 };
 export type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
+  withXRecentComments?: number;
 };
 export type SearchThreadsRequestQuery = {
   search: string;
@@ -43,6 +44,7 @@ export type BulkThreadsRequestQuery = {
   from_date?: string;
   to_date?: string;
   archived?: string;
+  withXRecentComments?: number;
 };
 export type CountThreadsRequestQuery = {
   limit?: number;
@@ -72,8 +74,15 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const { thread_ids, bulk, active, search, count, community_id } =
-    queryValidationResult.data;
+  const {
+    thread_ids,
+    bulk,
+    active,
+    search,
+    count,
+    community_id,
+    include_count,
+  } = queryValidationResult.data;
 
   // get threads by IDs
   if (thread_ids) {
@@ -104,6 +113,7 @@ export const getThreadsHandler = async (
       archived,
       contestAddress,
       status,
+      withXRecentComments,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -119,17 +129,20 @@ export const getThreadsHandler = async (
       archived: archived,
       contestAddress,
       status,
+      withXRecentComments,
     });
     return success(res, bulkThreads);
   }
 
   // get active threads
   if (active) {
-    const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
+    const { threads_per_topic, withXRecentComments } =
+      req.query as ActiveThreadsRequestQuery;
 
     const activeThreads = await controllers.threads.getActiveThreads({
       communityId: community_id,
       threadsPerTopic: parseInt(threads_per_topic, 10),
+      withXRecentComments,
     });
     return success(res, activeThreads);
   }
@@ -152,6 +165,7 @@ export const getThreadsHandler = async (
       page: parseInt(page, 10) || 0,
       orderBy: order_by,
       orderDirection: order_direction as any,
+      includeCount: include_count,
     });
     return success(res, searchResults);
   }

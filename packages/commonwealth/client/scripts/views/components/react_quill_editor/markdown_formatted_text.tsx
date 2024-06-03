@@ -63,6 +63,7 @@ export const MarkdownFormattedText = ({
   searchTerm,
   cutoffLines,
   customClass,
+  customShowMoreButton,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -185,12 +186,16 @@ export const MarkdownFormattedText = ({
         {finalDoc}
       </div>
       {isTruncated && (
-        <div className="show-more-button-wrapper">
-          <div className="show-more-button" onClick={toggleDisplay}>
-            <CWIcon iconName="plus" iconSize="small" />
-            <div className="show-more-text">Show More</div>
-          </div>
-        </div>
+        <>
+          {customShowMoreButton || (
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div className="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   );

@@ -25,6 +25,7 @@ interface SearchThreadsProps {
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   threadTitleOnly?: boolean;
+  includeCount?: boolean;
 
   enabled?: boolean;
 }
@@ -37,6 +38,7 @@ const searchThreads = async ({
   orderBy,
   orderDirection,
   threadTitleOnly,
+  includeCount,
 }: SearchThreadsProps & {
   pageParam: number;
 }): Promise<SearchThreadsResponse> => {
@@ -56,6 +58,7 @@ const searchThreads = async ({
         order_by: orderBy,
         order_direction: orderDirection,
         thread_title_only: threadTitleOnly,
+        include_count: includeCount,
       },
     },
   );
@@ -69,6 +72,7 @@ const useSearchThreadsQuery = ({
   orderBy,
   orderDirection,
   threadTitleOnly,
+  includeCount,
   enabled = true,
 }: SearchThreadsProps) => {
   const key = [
@@ -90,6 +94,7 @@ const useSearchThreadsQuery = ({
         orderBy,
         orderDirection,
         threadTitleOnly,
+        includeCount,
       }),
     {
       getNextPageParam: (lastPage) => {
@@ -100,7 +105,7 @@ const useSearchThreadsQuery = ({
         return undefined;
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
-      enabled,
+      enabled: enabled && searchTerm.length >= 3,
     },
   );
 };
