@@ -73,7 +73,7 @@ const useUpdateProfileByAddressMutation = ({
     mutationFn: updateProfileByAddress,
     onSuccess: async (updatedProfile) => {
       addressesWithChainsToUpdate?.map(({ address, chain }) => {
-        const key = [ApiEndpoints.FETCH_PROFILES, chain, address];
+        const key = [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chain, address];
         const existingProfile = queryClient.getQueryData(key);
 
         // TEMP: since we don't get the updated data from API, we will cancel existing and refetch profile
@@ -82,6 +82,21 @@ const useUpdateProfileByAddressMutation = ({
           queryClient.setQueryData(key, () => updatedProfile);
         }
       });
+
+      // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
+      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const doesProfileIdMatch =
+        userProfileId && userProfileId === updatedProfile?.id;
+      if (doesProfileIdMatch) {
+        const keys = [
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
+        ];
+        keys.map((key) => {
+          queryClient.cancelQueries(key).catch(console.error);
+          queryClient.refetchQueries(key).catch(console.error);
+        });
+      }
 
       return updatedProfile;
     },
