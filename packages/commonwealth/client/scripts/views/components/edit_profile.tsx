@@ -421,7 +421,7 @@ const EditProfileComponent = () => {
                 addresses={addresses}
                 profile={profile}
                 refreshProfiles={(address: string) => {
-                  refetch();
+                  refetch().catch(console.error);
                   app.user.removeAddress(
                     addresses.find((a) => a.address === address),
                   );

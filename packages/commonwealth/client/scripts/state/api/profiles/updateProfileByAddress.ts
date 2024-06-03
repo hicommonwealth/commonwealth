@@ -93,8 +93,8 @@ const useUpdateProfileByAddressMutation = ({
           [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
         ];
         keys.map((key) => {
-          queryClient.cancelQueries(key);
-          queryClient.refetchQueries(key);
+          queryClient.cancelQueries(key).catch(console.error);
+          queryClient.refetchQueries(key).catch(console.error);
         });
       }
 
