@@ -7,6 +7,7 @@ import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
+import { useCommunityAlerts } from 'views/pages/NotificationSettings/useCommunityAlerts';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -19,6 +20,7 @@ type NotificationSection = 'community-alerts' | 'subscriptions';
 const NotificationSettings = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
+  const communityAlerts = useCommunityAlerts();
 
   const [threadsFilter, setThreadsFilter] = useState<readonly number[]>([]);
   const [section, setSection] =
