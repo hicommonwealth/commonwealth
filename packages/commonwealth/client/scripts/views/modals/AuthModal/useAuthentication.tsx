@@ -125,6 +125,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     );
   }, [isMobile, activeStep]);
 
+  const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
+    trackAnalytics({
+      event: MixpanelLoginEvent.LOGIN,
+      community: app?.activeChainId(),
+      communityType: app?.chain?.meta?.base,
+      loginOption: loginOption,
+      isSocialLogin: isSocialLogin,
+      loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
+      isMobile,
+    });
+  };
+
   // Handles Magic Link Login
   const onEmailLogin = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
@@ -171,15 +183,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       props?.onSuccess?.(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
 
-      trackAnalytics({
-        event: MixpanelLoginEvent.LOGIN,
-        community: app?.activeChainId(),
-        communityType: app?.chain?.meta?.base,
-        loginOption: 'email',
-        isSocialLogin: true,
-        loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
-        isMobile,
-      });
+      trackLoginEvent('email', true);
     } catch (e) {
       notifyError(`Error authenticating with email`);
       console.error(`Error authenticating with email: ${e}`);
@@ -204,15 +208,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       props?.onSuccess?.(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
 
-      trackAnalytics({
-        event: MixpanelLoginEvent.LOGIN,
-        community: app?.activeChainId(),
-        communityType: app?.chain?.meta?.base,
-        loginOption: provider,
-        isSocialLogin: true,
-        loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
-        isMobile,
-      });
+      trackLoginEvent(provider, true);
     } catch (e) {
       notifyError(`Error authenticating with sso account`);
       console.error(`Error authenticating with sso account: ${e}`);
@@ -608,15 +604,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         });
       }
 
-      trackAnalytics({
-        event: MixpanelLoginEvent.LOGIN,
-        community: app?.activeChainId(),
-        communityType: app?.chain?.meta?.base,
-        loginOption: wallet.name,
-        isSocialLogin: true,
-        loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
-        isMobile,
-      });
+      trackLoginEvent(wallet.name, true);
       return;
     } catch (err) {
       notifyError(`Error authenticating with wallet`);
