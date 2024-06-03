@@ -35,7 +35,6 @@ export function GetThreadSubscriptions(): Query<
             user_id: actor.user.id,
           },
           include: [...associationParams],
-          logging: console.log,
         })
       ).map((subscription) => subscription.get({ plain: true }));
     },

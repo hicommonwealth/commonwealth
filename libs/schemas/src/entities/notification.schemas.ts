@@ -80,10 +80,20 @@ export const CommentSubscription = z.object({
   updated_at: z.date().optional(),
 });
 
-export const CommunityAlert = z.object({
-  id: PG_INT.optional(),
-  user_id: PG_INT,
-  community_id: z.string(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
+export const CommunityAlert = z
+  .object({
+    id: PG_INT.optional(),
+    user_id: PG_INT,
+    community_id: z.string(),
+    created_at: z.date().optional(),
+    updated_at: z.date().optional(),
+  })
+  .merge(
+    z.object({
+      Community: Community.pick({
+        id: true,
+        name: true,
+        icon_url: true,
+      }),
+    }),
+  );

@@ -8,5 +8,6 @@ import { trpc } from 'utils/trpcClient';
 export function useCommunityAlerts() {
   const communityAlerts = trpc.subscription.getCommunityAlerts.useQuery({});
 
+  console.log('FIXME: ', JSON.stringify(communityAlerts, null, '  '));
   return communityAlerts;
 }
