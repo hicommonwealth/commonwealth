@@ -65,11 +65,20 @@ export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function formatAssetUrlToS3(uploadLocation: string): string {
+  const S3Domain = 's3.us-east-1.amazonaws.com/assets.commonwealth.im';
+  if (uploadLocation.includes(S3Domain)) {
+    return uploadLocation;
+  }
+  return uploadLocation.replace('assets.commonwealth.im', S3Domain);
+}
+
 export async function getFileSizeBytes(url: string): Promise<number> {
   try {
-    if (!url) return 0;
+    const s3Url = formatAssetUrlToS3(url);
+    if (!s3Url) return 0;
     // Range header is to prevent it from reading any bytes from the GET request because we only want the headers.
-    const response = await fetch(url, { headers: { Range: 'bytes=0-0' } });
+    const response = await fetch(s3Url, { headers: { Range: 'bytes=0-0' } });
     if (!response) return 0;
     const contentRange = response.headers.get('content-range');
     return contentRange ? parseInt(contentRange.split('/')[1], 10) : 0;
