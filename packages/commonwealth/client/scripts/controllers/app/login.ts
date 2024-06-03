@@ -612,13 +612,16 @@ export async function handleSocialLoginCallback({
 
       // if account is created in last few minutes and has a single
       // profile and address (no account linking) then open the welcome modal.
+      const profileId = profiles?.[0]?.id;
       const isCreatedInLast5Minutes =
         accountCreatedTime &&
         moment().diff(moment(accountCreatedTime), 'minutes') < 5;
       if (
         isCreatedInLast5Minutes &&
         profiles?.length === 1 &&
-        userUniqueAddresses.length === 1
+        userUniqueAddresses.length === 1 &&
+        profileId &&
+        !welcomeOnboardModal?.getState?.()?.onboardedProfiles?.[profileId]
       ) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);

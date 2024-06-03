@@ -10,13 +10,15 @@ type SharePopoverProps = {
   commentId?: number;
   discussionLink?: string;
   customUrl?: string;
+  label?: string;
 } & Partial<PopoverTriggerProps>;
 
-export const SharePopover = ({
+export const SharePopoverOld = ({
   commentId,
   discussionLink,
   renderTrigger,
   customUrl,
+  label,
 }: SharePopoverProps) => {
   const domain = document.location.origin;
   const { pathname: currentRoute } = useLocation();
@@ -26,6 +28,7 @@ export const SharePopover = ({
   ) => (
     <CWThreadAction
       action="share"
+      {...(label && { label })}
       onClick={(e) => {
         e.preventDefault();
         onClick(e);
@@ -42,7 +45,7 @@ export const SharePopover = ({
           iconLeft: 'linkPhosphor',
           iconLeftSize: 'regular',
           label: 'Copy link',
-          onClick: async () => {
+          onClick: () => {
             let urlToCopy = `${domain}${currentRoute}`; // If we copy the thread on discussion page
 
             if (commentId) {
@@ -70,14 +73,17 @@ export const SharePopover = ({
               urlToCopy = `${domain}/${app.activeChainId()}${customUrl}`;
             }
 
-            await navigator.clipboard.writeText(urlToCopy);
+            navigator.clipboard
+              .writeText(urlToCopy)
+              .then()
+              .catch(console.error);
           },
         },
         {
           iconLeft: 'twitterOutline',
           iconLeftSize: 'regular',
           label: 'Share on X (Twitter)',
-          onClick: async () => {
+          onClick: () => {
             if (discussionLink) {
               window.open(
                 `${twitterPrefix}${domain}${discussionLink}`,

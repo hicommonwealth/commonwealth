@@ -11,6 +11,7 @@ import {
   Disposable,
   Disposer,
   NotificationsProvider,
+  NotificationsProviderSchedulesReturn,
   Stats,
 } from './interfaces';
 
@@ -183,6 +184,12 @@ export const notificationsProvider = port(function notificationsProvider(
       dispose: () => Promise.resolve(),
       triggerWorkflow: () => Promise.resolve(true),
       getMessages: () => Promise.resolve([]),
+      getSchedules: () =>
+        Promise.resolve([] as NotificationsProviderSchedulesReturn),
+      createSchedules: () =>
+        Promise.resolve([] as NotificationsProviderSchedulesReturn),
+      deleteSchedules: ({ schedule_ids }) =>
+        Promise.resolve(new Set(schedule_ids)),
       registerClientRegistrationToken: () => Promise.resolve(false),
     }
   );

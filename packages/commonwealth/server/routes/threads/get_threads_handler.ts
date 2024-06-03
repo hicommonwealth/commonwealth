@@ -28,6 +28,7 @@ export type GetThreadsRequestQuery = {
 };
 export type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
+  withXRecentComments?: number;
 };
 export type SearchThreadsRequestQuery = {
   search: string;
@@ -43,6 +44,7 @@ export type BulkThreadsRequestQuery = {
   from_date?: string;
   to_date?: string;
   archived?: string;
+  withXRecentComments?: number;
 };
 export type CountThreadsRequestQuery = {
   limit?: number;
@@ -111,6 +113,7 @@ export const getThreadsHandler = async (
       archived,
       contestAddress,
       status,
+      withXRecentComments,
     } = bulkQueryValidationResult.data;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
@@ -126,17 +129,20 @@ export const getThreadsHandler = async (
       archived: archived,
       contestAddress,
       status,
+      withXRecentComments,
     });
     return success(res, bulkThreads);
   }
 
   // get active threads
   if (active) {
-    const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
+    const { threads_per_topic, withXRecentComments } =
+      req.query as ActiveThreadsRequestQuery;
 
     const activeThreads = await controllers.threads.getActiveThreads({
       communityId: community_id,
       threadsPerTopic: parseInt(threads_per_topic, 10),
+      withXRecentComments,
     });
     return success(res, activeThreads);
   }

@@ -1429,9 +1429,15 @@ importers:
       '@types/passport-auth-token':
         specifier: ^1.0.4
         version: 1.0.4
+      '@types/sinon':
+        specifier: ^17.0.3
+        version: 17.0.3
       '@types/uuid':
         specifier: ^9.0.7
         version: 9.0.8
+      sinon:
+        specifier: ^17.0.2
+        version: 17.0.2
 
   packages/discord-bot:
     dependencies:
@@ -20071,6 +20077,7 @@ packages:
       {
         integrity: sha512-uihLiaB9FhzesElPDFZA7hDcNABzsVHwr3YfmM9sBllVwab3l0ltGlRV1XhpNfIacNDLGD1QRZNLs5nU5+hTuA==,
       }
+    deprecated: There
 
   sirv@2.0.4:
     resolution:

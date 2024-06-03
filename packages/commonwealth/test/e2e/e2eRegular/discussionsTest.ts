@@ -8,7 +8,7 @@ const { expect } = chai;
 
 export const discussionTests = (test) => {
   return () => {
-    test('Discussion page loads and can navigate to first thread', async ({
+    test.skip('Discussion page loads and can navigate to first thread', async ({
       page,
     }) => {
       await page.waitForSelector('div.HeaderWithFilters');

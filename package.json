@@ -26,7 +26,7 @@
     "psql": "pnpm -F commonwealth psql",
     "reset-db": "pnpm -F commonwealth reset-db",
     "sanity": "chmod u+x scripts/sanity.sh && ./scripts/sanity.sh",
-    "start": "pnpm -F commonwealth start",
+    "start": "chmod u+x scripts/start.sh && ./scripts/start.sh",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",

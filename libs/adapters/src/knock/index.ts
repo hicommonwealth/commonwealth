@@ -2,10 +2,34 @@ import {
   NotificationsProvider,
   NotificationsProviderGetMessagesOptions,
   NotificationsProviderGetMessagesReturn,
+  NotificationsProviderScheduleRepeats,
+  NotificationsProviderSchedulesReturn,
   NotificationsProviderTriggerOptions,
 } from '@hicommonwealth/core';
-import { Knock } from '@knocklabs/node';
+import { Knock, Schedule } from '@knocklabs/node';
+import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
 import { config } from '../config';
+
+function formatScheduleResponse(
+  schedules: Schedule[],
+): NotificationsProviderSchedulesReturn {
+  return schedules.map((s) => ({
+    id: s.id,
+    actor: s.actor !== null ? s.actor : undefined,
+    recipient: s.recipient,
+    data: s.data,
+    workflow: s.workflow,
+    repeats: s.repeats as unknown as NotificationsProviderScheduleRepeats,
+    last_occurrence_at: s.last_occurrence_at
+      ? new Date(s.last_occurrence_at)
+      : undefined,
+    next_occurrence_at: s.next_occurrence_at
+      ? new Date(s.next_occurrence_at)
+      : undefined,
+    inserted_at: s.inserted_at,
+    updated_at: s.updated_at,
+  }));
+}
 
 export function KnockProvider(): NotificationsProvider {
   const knock = new Knock(config.NOTIFICATIONS.KNOCK_SECRET_KEY);
@@ -36,6 +60,28 @@ export function KnockProvider(): NotificationsProvider {
 
       return res.items;
     },
+
+    async getSchedules(options): Promise<NotificationsProviderSchedulesReturn> {
+      const res = await knock.users.getSchedules(options.user_id, {
+        // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
+        workflow: options.workflow_id,
+      });
+      return formatScheduleResponse(res.entries);
+    },
+
+    async createSchedules(options) {
+      const res = await knock.workflows.createSchedules(options.workflow_id, {
+        recipients: options.user_ids,
+        repeats: options.schedule as unknown as ScheduleRepeatProperties[],
+      });
+      return formatScheduleResponse(res);
+    },
+
+    async deleteSchedules(options) {
+      const res = await knock.workflows.deleteSchedules(options);
+      return new Set(res.map((s) => s.id));
+    },
+
     async registerClientRegistrationToken(
       userId: number,
       token: string,
