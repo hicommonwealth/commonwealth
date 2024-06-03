@@ -31,6 +31,7 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useFlag } from '../../../hooks/useFlag';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
@@ -100,6 +101,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -191,6 +194,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 

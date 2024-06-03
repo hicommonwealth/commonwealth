@@ -11,6 +11,7 @@ import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 
 export enum ViewType {
   Rows = 'Rows',
@@ -33,6 +34,8 @@ const useDirectoryPageData = ({
       chainNodeId,
     });
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
       onAction: true,
@@ -43,6 +46,7 @@ const useDirectoryPageData = ({
       e.preventDefault();
       trackAnalytics({
         event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
+        isPWA: isAddedToHomeScreen,
       });
       if (isCommandClick(e)) {
         window.open(`/${communityId}`, '_blank');
@@ -50,7 +54,7 @@ const useDirectoryPageData = ({
       }
       navigateToCommunity({ navigate, path: '', chain: communityId });
     },
-    [navigate, trackAnalytics],
+    [navigate, trackAnalytics, isAddedToHomeScreen],
   );
 
   const relatedCommunitiesData = useMemo(

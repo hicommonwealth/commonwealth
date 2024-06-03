@@ -27,6 +27,7 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
 } from '../../../../shared/analytics/types';
+import useAppStatus from '../../hooks/useAppStatus';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { ProposalSelector } from '../components/ProposalSelector';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -81,6 +82,8 @@ export const UpdateProposalStatusModal = ({
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
   >(getInitialCosmosProposals(thread));
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
@@ -268,6 +271,7 @@ export const UpdateProposalStatusModal = ({
 
     trackAnalytics({
       event: MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
+      isPWA: isAddedToHomeScreen,
     });
 
     onChangeHandler?.(tempStage, links);

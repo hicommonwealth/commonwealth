@@ -14,6 +14,7 @@ import { useLocation } from 'react-router';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -53,6 +54,8 @@ export const NewSnapshotProposalForm = ({
   const [userScore, setUserScore] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState(false);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const location = useLocation();
   const pathVars = useMemo(() => {
     const search = new URLSearchParams(location.search);
@@ -79,6 +82,7 @@ export const NewSnapshotProposalForm = ({
       clearLocalStorage();
       trackAnalytics({
         event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
       notifySuccess('Snapshot Created!');
       navigate(`/snapshot/${space.id}`);

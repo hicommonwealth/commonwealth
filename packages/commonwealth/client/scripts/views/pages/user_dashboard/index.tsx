@@ -108,7 +108,7 @@ const UserDashboard = (props: UserDashboardProps) => {
     <CWPageLayout>
       <div className="UserDashboard" key={`${isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
-          {isAddedToHomeScreen ? 'TEST' : 'Home'}
+          Home
         </CWText>
         <div ref={setScrollElement} className="content">
           <div className="user-dashboard-activity">

@@ -21,6 +21,7 @@ import {
   minimalToNaturalDenom,
   naturalDenomToMinimal,
 } from '../../../../../shared/utils';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { Skeleton } from '../../components/Skeleton';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
@@ -45,6 +46,8 @@ export const CosmosProposalForm = () => {
   const [title, setTitle] = useState<string>('');
 
   const navigate = useCommonNavigate();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -105,6 +108,7 @@ export const CosmosProposalForm = () => {
       );
       trackAnalytics({
         event: MixpanelGovernanceEvents.COSMOS_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
       navigate(`/proposal/${result}`);
     } catch (err) {

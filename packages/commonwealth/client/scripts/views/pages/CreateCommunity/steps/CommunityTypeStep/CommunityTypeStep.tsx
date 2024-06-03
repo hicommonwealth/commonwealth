@@ -19,6 +19,7 @@ import { communityTypeOptions } from './helpers';
 
 import { ChainBase } from '@hicommonwealth/shared';
 import { AuthModal } from 'views/modals/AuthModal';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CommunityTypeStep.scss';
 
 interface CommunityTypeStepProps {
@@ -40,6 +41,8 @@ const CommunityTypeStep = ({
 
   const { isLoggedIn } = useUserLoggedIn();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
   >({
@@ -54,6 +57,7 @@ const CommunityTypeStep = ({
       event: MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
       communityType: selectedType,
       chainBase: selectedChainBase,
+      isPWA: isAddedToHomeScreen,
     });
 
     setSelectedCommunity({ type: selectedType, chainBase: selectedChainBase });

@@ -23,6 +23,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from '../../../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../../../../hooks/useBrowserAnalyticsTrack';
 import './BasicInformationForm.scss';
 import {
@@ -35,9 +36,8 @@ import {
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import { BasicInformationFormProps, FormSubmitValues } from './types';
-import { basicInformationFormValidationSchema } from './validation';
-
 import useSocialLinks from './useSocialLinks';
+import { basicInformationFormValidationSchema } from './validation';
 
 const socialLinksDisplay = false; // TODO: Set this when design figures out how we will integrate the social links
 
@@ -59,6 +59,8 @@ const BasicInformationForm = ({
     validateSocialLinks,
     updateAndValidateSocialLinkAtIndex,
   } = useSocialLinks();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -175,6 +177,7 @@ const BasicInformationForm = ({
   const handleCancel = () => {
     trackAnalytics({
       event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_CANCELLED,
+      isPWA: isAddedToHomeScreen,
     });
 
     openConfirmation({

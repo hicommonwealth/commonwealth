@@ -11,6 +11,7 @@ import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import { useCommunityCardPrice } from '../../../../../hooks/useCommunityCardPrice';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -44,6 +45,7 @@ export const CWRelatedCommunityCard = ({
 }: CWRelatedCommunityCardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
     community: community,
@@ -65,6 +67,7 @@ export const CWRelatedCommunityCard = ({
       e.preventDefault();
       trackAnalytics({
         event: MixpanelClickthroughEvent.DIRECTORY_TO_COMMUNITY_PAGE,
+        isPWA: isAddedToHomeScreen,
       });
       if (isCommandClick(e)) {
         window.open(`/${community.id}`, '_blank');

@@ -107,6 +107,7 @@ export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 
 export interface AnalyticsPayload {
   event: AnalyticsEvent; // base event type
+  isPWA?: boolean;
 }
 
 export interface BaseMixpanelPayload extends AnalyticsPayload {

@@ -31,6 +31,7 @@ import { useBrowserAnalyticsTrack } from '/hooks/useBrowserAnalyticsTrack';
 import app from 'state';
 
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -51,6 +52,8 @@ export const VotingActions = (props: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
   const [, setConviction] = useState<number>();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -119,6 +122,7 @@ export const VotingActions = (props: VotingActionsProps) => {
           emitRedraw();
           trackAnalytics({
             event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+            isPWA: isAddedToHomeScreen,
           });
         } catch (error) {
           notifyError(error.toString());
@@ -132,6 +136,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.COMPOUND_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -142,6 +147,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.AAVE_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -154,6 +160,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -177,6 +184,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -189,6 +197,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.COMPOUND_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -199,6 +208,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.AAVE_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -211,6 +221,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
         notifyError(err.toString());

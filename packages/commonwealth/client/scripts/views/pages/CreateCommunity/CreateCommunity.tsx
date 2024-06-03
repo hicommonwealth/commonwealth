@@ -13,6 +13,7 @@ import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 
 const CreateCommunity = () => {
@@ -32,8 +33,13 @@ const CreateCommunity = () => {
     selectedChainId,
   } = useCreateCommunity();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED },
+    payload: {
+      event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_VISITED,
+      isPWA: isAddedToHomeScreen,
+    },
   });
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;

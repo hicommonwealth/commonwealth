@@ -6,6 +6,7 @@ import { notifyError } from 'controllers/app/notifications';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
 import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import useAppStatus from 'hooks/useAppStatus';
 import 'pages/new_proposal/aave_proposal_form.scss';
 import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -37,6 +38,9 @@ export const AaveProposalForm = () => {
 
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   useEffect(() => {
@@ -113,6 +117,7 @@ export const AaveProposalForm = () => {
       await aave.governance.propose(details);
       trackAnalytics({
         event: MixpanelGovernanceEvents.AAVE_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       notifyError(err.data?.message || err.message);

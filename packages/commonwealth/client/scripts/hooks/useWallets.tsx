@@ -41,6 +41,7 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../views/components/component_kit/helpers';
+import useAppStatus from './useAppStatus';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
 import useBrowserWindow from './useBrowserWindow';
 import { useFlag } from './useFlag';
@@ -129,6 +130,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
   });
 
   const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   useBrowserWindow({
     onResize: () =>
@@ -260,6 +263,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         isSocialLogin: true,
         loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
         isMobile,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (e) {
       notifyError("Couldn't send magic link");
@@ -299,6 +303,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         isSocialLogin: true,
         loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
         isMobile,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (e) {
       notifyError("Couldn't send magic link");
@@ -746,6 +751,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (joinedCommunity) {
         trackAnalytics({
           event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+          isPWA: isAddedToHomeScreen,
         });
       }
 
@@ -757,6 +763,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         isSocialLogin: true,
         loginPageLocation: isInCommunityPage ? 'community' : 'homepage',
         isMobile,
+        isPWA: isAddedToHomeScreen,
       });
       return;
     } catch (err) {
