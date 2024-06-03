@@ -89,16 +89,14 @@ export function ContestWorker(): Policy<typeof inputs> {
           return;
         }
 
-        const results = await Promise.allSettled(
-          unprocessedContestAddresses.map(async (contestAddress) => {
-            await contestHelper.addContent(
-              chainNodeUrl!,
-              contestAddress,
-              userAddress,
-              contentUrl,
-            );
-          }),
+        const promises = await contestHelper.addContentBatch(
+          chainNodeUrl!,
+          unprocessedContestAddresses,
+          userAddress,
+          contentUrl,
         );
+
+        const results = await Promise.allSettled(promises);
 
         const errors = results
           .filter(({ status }) => status === 'rejected')
@@ -198,16 +196,14 @@ export function ContestWorker(): Policy<typeof inputs> {
         const userAddress = addAction!.actor_address!;
         const contentId = addAction!.content_id!;
 
-        const results = await Promise.allSettled(
-          unprocessedContestAddresses.map(async (contestAddress) => {
-            await contestHelper.voteContent(
-              chainNodeUrl!,
-              contestAddress,
-              userAddress,
-              contentId.toString(),
-            );
-          }),
+        const promises = await contestHelper.voteContentBatch(
+          chainNodeUrl!,
+          unprocessedContestAddresses,
+          userAddress,
+          contentId.toString(),
         );
+
+        const results = await Promise.allSettled(promises);
 
         const errors = results
           .filter(({ status }) => status === 'rejected')
