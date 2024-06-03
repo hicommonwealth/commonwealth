@@ -26,19 +26,19 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelLoginEvent,
   MixpanelLoginPayload,
-} from '../../../shared/analytics/types';
-import NewProfilesController from '../controllers/server/newProfiles';
-import { setDarkMode } from '../helpers/darkMode';
-import { getAddressFromWallet, loginToNear } from '../helpers/wallet';
-import Account from '../models/Account';
-import IWebWallet from '../models/IWebWallet';
+} from '../../../../../shared/analytics/types';
+import NewProfilesController from '../../../controllers/server/newProfiles';
+import { setDarkMode } from '../../../helpers/darkMode';
+import { getAddressFromWallet, loginToNear } from '../../../helpers/wallet';
+import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
+import { useFlag } from '../../../hooks/useFlag';
+import Account from '../../../models/Account';
+import IWebWallet from '../../../models/IWebWallet';
 import {
   DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
   fetchProfilesByAddress,
-} from '../state/api/profiles/fetchProfilesByAddress';
-import { authModal } from '../state/ui/modals/authModal';
-import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
-import { useFlag } from './useFlag';
+} from '../../../state/api/profiles/fetchProfilesByAddress';
+import { authModal } from '../../../state/ui/modals/authModal';
 
 type LoginActiveStep =
   | 'redirectToSign'
@@ -47,14 +47,14 @@ type LoginActiveStep =
   | 'selectProfile'
   | 'welcome';
 
-type IuseWalletProps = {
+type UseAuthenticationProps = {
   onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
   onUnrecognizedAddressReceived?: () => boolean;
   useSessionKeyLoginFlow?: boolean;
 };
 
-const useWallets = (walletProps: IuseWalletProps) => {
+const useAuthentication = (props: UseAuthenticationProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [username, setUsername] = useState<string>('Anonymous');
   const [email, setEmail] = useState<string>();
@@ -89,7 +89,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
-      import('../helpers/mockMetaMaskUtil').then((f) => {
+      import('../../../helpers/mockMetaMaskUtil').then((f) => {
         window['ethereum'] = new f.MockMetaMaskProvider(
           'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
           '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
@@ -168,8 +168,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
         return;
       }
 
-      walletProps?.onSuccess?.(magicAddress, isNewlyCreated);
-      walletProps?.onModalClose?.();
+      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      props?.onModalClose?.();
 
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
@@ -201,8 +201,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
       });
       setIsMagicLoading(false);
 
-      walletProps?.onSuccess?.(magicAddress, isNewlyCreated);
-      walletProps?.onModalClose?.();
+      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      props?.onModalClose?.();
 
       trackAnalytics({
         event: MixpanelLoginEvent.LOGIN,
@@ -253,8 +253,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     }
 
     if (exitOnComplete) {
-      walletProps?.onModalClose?.();
-      walletProps?.onSuccess?.(account.address, newelyCreated);
+      props?.onModalClose?.();
+      props?.onSuccess?.(account.address, newelyCreated);
     }
   };
 
@@ -265,8 +265,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
     linking: boolean,
     wallet?: IWebWallet<any>,
   ) => {
-    if (walletProps.useSessionKeyLoginFlow) {
-      walletProps?.onSuccess?.(account.address, newlyCreated);
+    if (props.useSessionKeyLoginFlow) {
+      props?.onSuccess?.(account.address, newlyCreated);
       return;
     }
 
@@ -333,7 +333,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const { signature, chainId, sessionPayload } =
           await signSessionWithAccount(walletToUse, account, timestamp);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
-        walletProps.onSuccess?.(account.address, newlyCreated);
+        props.onSuccess?.(account.address, newlyCreated);
         setActiveStep('selectAccountType');
 
         // Create the account with default values
@@ -405,7 +405,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     } catch (e) {
       notifyError(`Error creating account. Please try again.`);
       console.error(`Error creating account: ${e}`);
-      walletProps?.onModalClose?.();
+      props?.onModalClose?.();
     }
     setActiveStep('welcome');
   };
@@ -425,13 +425,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
-      walletProps?.onSuccess?.(account.profile.address, newelyCreated);
+      props?.onSuccess?.(account.profile.address, newelyCreated);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
     } catch (e) {
       notifyError('Failed to save profile info');
       console.error(`Failed to save profile info: ${e}`);
     }
-    walletProps?.onModalClose?.();
+    props?.onModalClose?.();
   };
 
   const onResetWalletConnect = async () => {
@@ -482,14 +482,14 @@ const useWallets = (walletProps: IuseWalletProps) => {
         if (
           !addressExists &&
           !isAttemptingToConnectAddressToCommunity &&
-          walletProps.onUnrecognizedAddressReceived
+          props.onUnrecognizedAddressReceived
         ) {
-          const shouldContinue = walletProps.onUnrecognizedAddressReceived();
+          const shouldContinue = props.onUnrecognizedAddressReceived();
           if (!shouldContinue) return;
         }
       }
 
-      if (walletProps.useSessionKeyLoginFlow) {
+      if (props.useSessionKeyLoginFlow) {
         await onSessionKeyRevalidation(wallet, selectedAddress);
       } else {
         await onNormalWalletLogin(wallet, selectedAddress);
@@ -502,7 +502,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     address: string,
   ) => {
     setSelectedWallet(wallet);
-    if (walletProps.useSessionKeyLoginFlow) {
+    if (props.useSessionKeyLoginFlow) {
       await onSessionKeyRevalidation(wallet, address);
     } else {
       await onNormalWalletLogin(wallet, address);
@@ -688,7 +688,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       selectedWallet,
     );
     setIsMobileWalletVerificationStep(false);
-    walletProps?.onModalClose?.();
+    props?.onModalClose?.();
   };
 
   return {
@@ -707,4 +707,4 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 };
 
-export default useWallets;
+export default useAuthentication;
