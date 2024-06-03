@@ -40,13 +40,6 @@ import {
 } from '../../../state/api/profiles/fetchProfilesByAddress';
 import { authModal } from '../../../state/ui/modals/authModal';
 
-type LoginActiveStep =
-  | 'redirectToSign'
-  | 'selectAccountType'
-  | 'selectPrevious'
-  | 'selectProfile'
-  | 'welcome';
-
 type UseAuthenticationProps = {
   onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
@@ -64,8 +57,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   const [signerAccount, setSignerAccount] = useState<Account>(null);
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
-  const [isLinkingOnMobile, setIsLinkingOnMobile] = useState<boolean>(false);
-  const [activeStep, setActiveStep] = useState<LoginActiveStep>();
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
 
@@ -76,8 +67,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         w instanceof TerraWalletConnectWebWalletController) &&
       w.enabled,
   );
-
-  const isLinkingWallet = activeStep === 'selectPrevious';
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -111,19 +100,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       ];
       setWallets(
         _.flatten(
-          sortedChainBases.map((base) => {
-            return WebWalletController.Instance.availableWallets(base);
-          }),
+          sortedChainBases.map((base) =>
+            WebWalletController.Instance.availableWallets(base),
+          ),
         ),
       );
     }
   }, []);
-
-  useEffect(() => {
-    setIsMobileWalletVerificationStep(
-      isMobile && activeStep === 'redirectToSign',
-    );
-  }, [isMobile, activeStep]);
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
     trackAnalytics({
@@ -319,10 +302,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         console.error(`Error verifying account: ${e}`);
       }
     } else {
-      if (linking) {
-        setActiveStep('selectProfile');
-        return;
-      }
+      if (linking) return;
 
       try {
         const timestamp = +new Date();
@@ -330,7 +310,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           await signSessionWithAccount(walletToUse, account, timestamp);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
         props.onSuccess?.(account.address, newlyCreated);
-        setActiveStep('selectAccountType');
 
         // Create the account with default values
         await onCreateNewAccount(
@@ -403,7 +382,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       console.error(`Error creating account: ${e}`);
       props?.onModalClose?.();
     }
-    setActiveStep('welcome');
   };
 
   // Handle saving profile information
@@ -442,12 +420,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const onWalletSelect = async (wallet: IWebWallet<any>) => {
     await wallet.enable();
-
-    if (activeStep === 'selectPrevious') {
-      // TODO: remove this
-    } else {
-      setSelectedWallet(wallet);
-    }
+    setSelectedWallet(wallet);
 
     if (wallet.chain === 'near') {
       await loginToNear(app.chain as Near, app.isCustomDomain());
@@ -515,7 +488,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     } catch (err) {
       // if getRecentBlock fails, continue with null blockhash
       console.error(`Error getting recent validation block: ${err}`);
-      return;
     }
   };
 
@@ -587,15 +559,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
         setSignerAccount(signingAccount);
-        setIsLinkingOnMobile(isLinkingWallet);
-        setActiveStep('redirectToSign');
+        setIsMobileWalletVerificationStep(true);
       } else {
-        onAccountVerified(
-          signingAccount,
-          newlyCreated,
-          isLinkingWallet,
-          wallet,
-        );
+        onAccountVerified(signingAccount, newlyCreated, false, wallet);
       }
 
       if (joinedCommunity) {
@@ -605,7 +571,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
 
       trackLoginEvent(wallet.name, true);
-      return;
     } catch (err) {
       notifyError(`Error authenticating with wallet`);
       console.error(`Error authenticating with wallet: ${err}`);
@@ -659,10 +624,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // ensure false for newlyCreated / linking vars on revalidate
     if (isMobile) {
-      if (setSignerAccount) setSignerAccount(account);
-      if (setIsNewlyCreated) setIsNewlyCreated(false);
-      if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
-      setActiveStep('redirectToSign');
+      setSignerAccount(account);
+      setIsNewlyCreated(false);
+      setIsMobileWalletVerificationStep(true);
     } else {
       onAccountVerified(account, false, false);
     }
@@ -672,7 +636,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     await onAccountVerified(
       signerAccount,
       isNewlyCreated,
-      isLinkingWallet,
+      false,
       selectedWallet,
     );
     setIsMobileWalletVerificationStep(false);
@@ -682,7 +646,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   return {
     wallets,
     isMagicLoading,
-    isLinkingOnMobile,
     isWalletConnectEnabled,
     isMobileWalletVerificationStep,
     onWalletAddressSelect,
