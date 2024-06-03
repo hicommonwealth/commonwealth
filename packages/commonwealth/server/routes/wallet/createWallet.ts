@@ -8,6 +8,8 @@ import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { TypedRequest, TypedResponse, success } from 'server/types';
 import Web3 from 'web3';
+
+//Keep this for testing purposes
 const mockSig =
   '0x716eac74630c92680a71eba4c728554480fa94e8f78e3f2f3f2da2b8ee907d09613c53effcd5d9735dd0224fc3e2c329c0d60c673d949225ce58e4b34b65cc481c';
 const message =
@@ -48,7 +50,7 @@ export const createWalletHandler = async (
   const { address, signedMessage } = req.body;
 
   // Calculate the signer's address
-  const signerAddress = web3.eth.accounts.recover(message, mockSig);
+  const signerAddress = web3.eth.accounts.recover(message, signedMessage);
 
   if (signerAddress.toLowerCase() !== address.toLowerCase()) {
     throw new AppError('Validation Error: Invalid signature');
@@ -57,7 +59,7 @@ export const createWalletHandler = async (
   // Call alchemy
   let newWalletAddress: string;
 
-  //Figure out specific chain for this
+  //Figure out specific chain for this at later time
   const chain = sepolia;
 
   const signer: SmartAccountSigner =
@@ -65,16 +67,29 @@ export const createWalletHandler = async (
       `0x${process.env.AA_PRIVATE_KEY}`,
     );
   const AAsignerAddress = await signer.getAddress();
-
   const smartAccountClient = await createModularAccountAlchemyClient({
-    apiKey: '4b9000EKY9q82xeEYKv7FDwq8ViBWA5Y',
+    apiKey: process.env.AA_ALCHEMY_KEY,
     chain,
     signer,
-    owners: [AAsignerAddress, `0x${address.replace('0x', '')}`],
+    owners: [`0x${address.replace('0x', '')}`],
+    gasManagerConfig: {
+      policyId: process.env.AA_GAS_POLICY,
+    },
   });
 
   newWalletAddress = smartAccountClient.account.address;
-  console.log(newWalletAddress);
+
+  const uo = await smartAccountClient.sendUserOperation({
+    uo: {
+      target: `0x${address.replace('0x', '')}`,
+      data: `0x`,
+      value: web3.utils.toBigInt(0),
+    },
+    account: smartAccountClient.account,
+  });
+
+  const txHash = await smartAccountClient.waitForUserOperationTransaction(uo);
+  console.log(txHash);
 
   // Insert into DB
   const wallet = await models.Wallets.create({
