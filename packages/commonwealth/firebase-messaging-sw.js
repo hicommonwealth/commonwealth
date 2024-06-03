@@ -40,7 +40,6 @@ self.addEventListener('push', function (event) {
 
 // Listen for 'notificationclick' events to handle notification interactions
 self.addEventListener('notificationclick', function (event) {
-  // Close the notification
   event.notification.close();
 
   // Extract the data from the notification

@@ -60,7 +60,7 @@ const NotificationSettingsPage = () => {
     relevantSubscribedCommunities,
   } = useNotificationSettings();
 
-  const { mutateAsync: registerClientRegistrationToken } =
+  const registerClientRegistrationToken =
     trpc.subscription.registerClientRegistrationToken.useMutation();
 
   const handlePushNotificationSubscription = useCallback(() => {
@@ -69,7 +69,10 @@ const NotificationSettingsPage = () => {
       if (permission === 'granted') {
         console.log('Notification permission granted.');
         const token = await getFirebaseMessagingToken();
-        await registerClientRegistrationToken({ id: 'none', token });
+        await registerClientRegistrationToken.mutateAsync({
+          id: 'none',
+          token,
+        });
       }
     }
 
