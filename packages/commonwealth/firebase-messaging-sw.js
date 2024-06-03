@@ -23,8 +23,8 @@ self.addEventListener('push', function (event) {
   const options = {
     body: data.body || data.comment_body || 'No body',
     image: img,
-    icon: img, // Replace with the path to your notification icon
-    badge: img, // Replace with the path to your notification badge
+    icon: img,
+    badge: img,
     // tag: 'notification-tag', // Optional: A tag for the notification (useful for stacking notifications)
     data: {
       url: data.url || data.comment_url || 'https://common.xyz',
