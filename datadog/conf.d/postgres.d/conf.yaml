@@ -8,3 +8,5 @@ instances:
     password: <YOUR PASSWORD>
     dbname: <YOUR DBNAME>
     ssl: True
+  - query_samples:
+      explain_parameterized_queries: true
