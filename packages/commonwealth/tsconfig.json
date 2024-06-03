@@ -6,6 +6,7 @@
     "outDir": "build",
     "jsx": "react",
     "sourceMap": true,
+    "strictNullChecks": true,
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
       "*": ["./*", "shared/*", "client/scripts/*"]
