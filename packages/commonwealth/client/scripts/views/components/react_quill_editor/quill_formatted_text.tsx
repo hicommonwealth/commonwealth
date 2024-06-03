@@ -35,6 +35,7 @@ export const QuillFormattedText = ({
   cutoffLines,
   openLinksInNewTab,
   searchTerm,
+  customShowMoreButton,
 }: QuillFormattedTextProps) => {
   const navigate = useCommonNavigate();
 
@@ -72,7 +73,7 @@ export const QuillFormattedText = ({
      * Type guard function to check if a React element is a TextWithHighlights element.
      *
      * @param {React.ReactElement} child - The React element to check.
-     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - True if the element is a TextWithHighlights element, false otherwise.
+     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - Only true when element is TextWithHighlights.
      */
     const isTextWithHighlights = (
       child: React.ReactElement,
@@ -155,12 +156,16 @@ export const QuillFormattedText = ({
         {finalDoc}
       </div>
       {isTruncated && (
-        <div className="show-more-button-wrapper">
-          <div className="show-more-button" onClick={toggleDisplay}>
-            <CWIcon iconName="plus" iconSize="small" />
-            <div className="show-more-text">Show More</div>
-          </div>
-        </div>
+        <>
+          {customShowMoreButton || (
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div className="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   );

@@ -1,3 +1,4 @@
+import { Thread } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import {
   ChainProposalsNotification,
@@ -51,4 +52,18 @@ export const GetRecapEmailData = {
       ]),
     ),
   }),
+};
+
+export const EnrichedThread = Thread.extend({
+  name: z
+    .string()
+    .describe('The name of the community that the thread belongs to'),
+  icon_url: z
+    .string()
+    .describe('The icon url of the community that the thread belongs to'),
+});
+
+export const GetDigestEmailData = {
+  input: z.object({}),
+  output: z.record(z.string(), z.array(EnrichedThread)),
 };

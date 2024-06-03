@@ -146,6 +146,10 @@ export default (
         allowNull: false,
         defaultValue: [],
       },
+      include_in_digest_email: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',
@@ -153,5 +157,6 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
+      indexes: [{ fields: ['include_in_digest_email'] }],
     },
   );
