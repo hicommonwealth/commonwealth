@@ -293,7 +293,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         const { signature, sessionPayload, chainId } =
           await signSessionWithAccount(walletToUse, account, timestamp);
         await account.validate(signature, timestamp, chainId);
-        await app.sessions.authSession(
+        app.sessions.authSession(
           app.chain ? app.chain.base : walletToUse.chain,
           chainId,
           account.address,
@@ -351,7 +351,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           cachedChainId,
           false,
         );
-        await app.sessions.authSession(
+        app.sessions.authSession(
           walletToUse.chain,
           cachedChainId,
           account.address,
@@ -556,7 +556,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         setSignerAccount(signingAccount);
         setIsMobileWalletVerificationStep(true);
       } else {
-        onAccountVerified(signingAccount, newlyCreated, false, wallet);
+        await onAccountVerified(signingAccount, newlyCreated, false, wallet);
       }
 
       if (joinedCommunity) {
@@ -605,7 +605,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       timestamp,
     );
     await account.validate(signature, timestamp, chainId);
-    await app.sessions.authSession(
+    app.sessions.authSession(
       wallet.chain,
       chainId,
       account.address,
@@ -620,7 +620,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsNewlyCreated(false);
       setIsMobileWalletVerificationStep(true);
     } else {
-      onAccountVerified(account, false, false);
+      await onAccountVerified(account, false, false);
     }
   };
 
