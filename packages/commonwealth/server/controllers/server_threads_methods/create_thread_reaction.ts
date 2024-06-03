@@ -6,8 +6,8 @@ import {
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
-import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -95,8 +95,8 @@ export async function __createThreadReaction(
   }
 
   let calculatedVotingWeight: number | null = null;
-  if (REACTION_WEIGHT_OVERRIDE) {
-    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  if (config.REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = config.REACTION_WEIGHT_OVERRIDE;
   } else {
     // calculate voting weight
     const stake = await this.models.CommunityStake.findOne({

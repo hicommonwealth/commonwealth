@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { addressSwapper, bech32ToHex } from '../../shared/utils';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { Errors } from '../routes/createAddress';
 import { createRole, findOneRole } from './roles';
@@ -138,7 +138,7 @@ export async function createAddressHelper(
     // Address.updateWithToken
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
+      +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     if (updatedId) {
       existingAddress.user_id = updatedId;
@@ -186,7 +186,7 @@ export async function createAddressHelper(
     // Address.createWithToken
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
+      +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     const last_active = new Date();
     let profile_id: number | undefined;

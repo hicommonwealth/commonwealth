@@ -317,7 +317,7 @@ export const status = async (
         notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: config.EVM.ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     } else {
@@ -356,7 +356,7 @@ export const status = async (
         loggedIn: true,
         user: { ...user, profileId: profileInstance.id },
         evmTestEnv: config.EVM.ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     }

@@ -1,10 +1,6 @@
 /* eslint-disable max-len */
 import { logger, stats } from '@hicommonwealth/core';
-import {
-  config,
-  type DB,
-  type NotificationInstance,
-} from '@hicommonwealth/model';
+import { type DB, type NotificationInstance } from '@hicommonwealth/model';
 import {
   IChainEventNotificationData,
   IForumNotificationData,
@@ -13,7 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { SEND_WEBHOOKS_EMAILS } from '../config';
+import { config } from '../config';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
@@ -186,7 +182,7 @@ export default async function emitNotifications(
     });
   }
 
-  if (SEND_WEBHOOKS_EMAILS) {
+  if (config.SEND_WEBHOOKS_EMAILS) {
     // emails
     for (const subscription of subscriptions) {
       if (msg && isChainEventData && chainEvent.community_id) {
