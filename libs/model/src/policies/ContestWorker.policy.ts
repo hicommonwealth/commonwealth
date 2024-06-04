@@ -71,10 +71,11 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const existingAddActions = await models.ContestAction.findAll({
           where: {
-            content_url: contentUrl,
             contest_address: {
               [Op.in]: contestAddresses,
             },
+            content_url: contentUrl,
+            actor_address: userAddress,
             action: 'added',
           },
         });
