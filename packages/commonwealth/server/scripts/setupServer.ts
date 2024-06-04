@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import type { Express } from 'express';
 import http from 'http';
 import { fileURLToPath } from 'url';
@@ -17,11 +17,11 @@ const setupServer = (app: Express, port: number) => {
     switch (error.code) {
       case 'EACCES':
         log.error('Port requires elevated privileges');
-        process.exit(1);
+        dispose()('ERROR', true);
       // eslint-disable-next-line no-fallthrough
       case 'EADDRINUSE':
         log.error(`Port ${port} is already in use`);
-        process.exit(1);
+        dispose()('ERROR', true);
       // eslint-disable-next-line no-fallthrough
       default:
         throw error;

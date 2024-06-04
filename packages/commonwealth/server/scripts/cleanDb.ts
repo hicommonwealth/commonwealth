@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { DatabaseCleaner } from '../util/databaseCleaner';
@@ -10,8 +10,9 @@ databaseCleaner.init(models);
 databaseCleaner
   .executeQueries()
   .then(() => {
-    process.exit(0);
+    dispose()('EXIT', true);
   })
   .catch((err) => {
     log.error(`Failed to clean the database.`, err);
+    dispose()('EXIT', true);
   });

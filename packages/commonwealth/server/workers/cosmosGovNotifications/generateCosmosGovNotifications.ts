@@ -1,5 +1,5 @@
 import { HotShotsStats } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import {
@@ -70,10 +70,10 @@ if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
     .then(() => {
       stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');
-      process.exit(0);
+      dispose()('EXIT', true);
     })
     .catch((err) => {
       log.error(err);
-      process.exit(1);
+      dispose()('ERROR', true);
     });
 }

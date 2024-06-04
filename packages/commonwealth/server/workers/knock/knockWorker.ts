@@ -11,6 +11,7 @@ import {
   Broker,
   BrokerSubscriptions,
   broker,
+  dispose,
   logger,
   notificationsProvider,
   stats,
@@ -75,7 +76,7 @@ async function startKnockWorker() {
         topic: BrokerSubscriptions.NotificationsProvider,
       },
     );
-    process.exit(1);
+    await dispose()('ERROR', true);
   }
 
   isServiceHealthy = true;
@@ -85,6 +86,6 @@ async function startKnockWorker() {
 if (import.meta.url.endsWith(process.argv[1])) {
   startKnockWorker().catch((err) => {
     log.fatal('A fatal error occurred with the Knock Worker', err);
-    process.exit(1);
+    dispose()('ERROR', true);
   });
 }
