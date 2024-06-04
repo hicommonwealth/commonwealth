@@ -91,7 +91,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
         </CWText>
         <div className="dot">.</div>
         <CWText type="caption" fontWeight="medium" className="gray-text">
-          {moment(created_at).format('MM/DD/YY')}
+          {moment(created_at).format('DD/MM/YYYY')}
         </CWText>
       </div>
       <div className="comment-thread-info">

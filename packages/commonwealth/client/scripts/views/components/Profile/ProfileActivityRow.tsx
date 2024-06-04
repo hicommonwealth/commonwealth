@@ -87,7 +87,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         <div className="dot">.</div>
         <div className="date">
           <CWText type="caption" fontWeight="medium">
-            {moment(createdAt).format('MM/DD/YYYY')}
+            {moment(createdAt).format('DD/MM/YYYY')}
           </CWText>
         </div>
       </div>
