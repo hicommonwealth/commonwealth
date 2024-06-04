@@ -23,8 +23,6 @@ export async function __createWallet(
     attributes: ['wallet_address'],
   });
   if (existingWallet) {
-    const newAccount = await commonProtocol.aaWallet.newSmartAccount([address]);
-
     return {
       walletAddress: existingWallet.wallet_address,
       new: false,
@@ -34,7 +32,7 @@ export async function __createWallet(
   commonProtocol.aaWallet.verifySignature(address, signedMessage);
   const newAccount = await commonProtocol.aaWallet.newSmartAccount([address]);
 
-  const wallet = await this.models.Wallets.create({
+  await this.models.Wallets.create({
     user_id: user.id,
     user_address: address,
     relay_address: newAccount.relayAddress,
