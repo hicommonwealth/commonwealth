@@ -59,6 +59,7 @@ export const CWCoverImageUploader = ({
   subheaderText,
   enableGenerativeAI,
   generatedImageCallback,
+  uploadCompleteCallback,
   defaultImageUrl,
   defaultImageBehavior,
   canSelectImageBehaviour = true,
@@ -184,6 +185,7 @@ export const CWCoverImageUploader = ({
         }
 
         generatedImageCallback?.(generatedImageURL, currentImageBehavior);
+        uploadCompleteCallback?.(generatedImageURL, currentImageBehavior);
       }
 
       setIsUploading(false);
