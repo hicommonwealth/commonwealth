@@ -10,31 +10,37 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { bech32_prefix: 'cosmos' },
         { id: 'cosmos' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { bech32_prefix: 'str' },
         { id: 'straightedge' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { bech32_prefix: 'osmo' },
         { id: 'osmosis' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { bech32_prefix: 'inj' },
         { id: 'injective' },
-        { transaction }
+        { transaction },
+      );
+      await queryInterface.bulkUpdate(
+        'Chains',
+        { bech32_prefix: 'terra' },
+        { id: 'terra' },
+        { transaction },
       );
     });
   },
