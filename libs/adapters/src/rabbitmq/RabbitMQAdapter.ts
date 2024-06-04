@@ -27,13 +27,7 @@ import { fileURLToPath } from 'url';
  * @returns {RetryStrategyFn} The built retry strategy function.
  */
 function buildRetryStrategy(
-  customRetryStrategiesMap?: (
-    err: Error | InvalidInput | CustomRetryStrategyError,
-    topic: BrokerSubscriptions,
-    content: any,
-    ackOrNackFn: AckOrNack,
-    log: ILogger,
-  ) => boolean,
+  customRetryStrategiesMap?: (...args: Parameters<RetryStrategyFn>) => boolean,
   defaultDefer: number = 2000,
   defaultAttempts: number = 3,
 ): RetryStrategyFn {
