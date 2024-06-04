@@ -196,7 +196,10 @@ export const AuthorAndPublishInfo = ({
             <div className="version-history">
               <CWSelectList
                 options={versionHistoryOptions}
-                placeholder={`Edited ${publishDate?.format('DD/MM/YYYY')}`}
+                placeholder={`Edited ${publishDate
+                  ?.utc?.()
+                  ?.local?.()
+                  ?.format('DD/MM/YYYY')}`}
                 onChange={({ value }) => {
                   changeContentText(value);
                 }}
@@ -211,8 +214,9 @@ export const AuthorAndPublishInfo = ({
               placement="top"
               content={
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {publishDate.format('MMMM Do, YYYY')} {dotIndicator}{' '}
-                  {publishDate.format('h:mm A')}
+                  {publishDate?.utc?.()?.local?.()?.format('MMMM Do, YYYY')}{' '}
+                  {dotIndicator}{' '}
+                  {publishDate?.utc?.()?.local?.()?.format('h:mm A')}
                 </div>
               }
               renderTrigger={(handleInteraction) => (
@@ -225,7 +229,7 @@ export const AuthorAndPublishInfo = ({
                 >
                   {showPublishLabelWithDate ? 'Published ' : ''}
                   {showEditedLabelWithDate ? 'Edited ' : ''}
-                  {publishDate?.format('DD/MM/YYYY')}
+                  {publishDate?.utc?.()?.local?.()?.format('DD/MM/YYYY')}
                 </CWText>
               )}
             />
