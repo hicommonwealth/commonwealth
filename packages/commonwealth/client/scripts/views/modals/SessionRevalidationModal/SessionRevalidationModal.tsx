@@ -5,8 +5,6 @@ import { setActiveAccount } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
-import useWallets from 'hooks/useWallets';
-import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
@@ -21,6 +19,7 @@ import {
 import { formatAddress } from 'views/components/user/user_block';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import useAuthentication from '../AuthModal/useAuthentication'; // TODO: This modal should be absorbed into AuthModal
 import './SessionRevalidationModal.scss';
 
 interface SessionRevalidationModalProps {
@@ -43,7 +42,7 @@ const SessionRevalidationModal = ({
     onSocialLogin,
     setEmail,
     isMagicLoading,
-  } = useWallets({
+  } = useAuthentication({
     useSessionKeyLoginFlow: true,
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
