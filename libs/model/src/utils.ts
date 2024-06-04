@@ -1,5 +1,5 @@
 import { EventNames, events, logger } from '@hicommonwealth/core';
-import type { AbiType } from '@hicommonwealth/shared';
+import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { Model, ModelStatic, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -116,4 +116,30 @@ export function formatS3Url(
   return (
     `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
   );
+}
+
+export function buildThreadContentUrl(communityId: string, threadId: number) {
+  const fullContentUrl = getThreadUrl({
+    chain: communityId,
+    id: threadId,
+  });
+  // content url only contains path
+  return new URL(fullContentUrl).pathname;
+}
+
+// returns community ID and thread ID from content url
+export function decodeThreadContentUrl(contentUrl: string): {
+  communityId: string;
+  threadId: number;
+} {
+  if (!contentUrl.includes('/discussion/')) {
+    throw new Error(`invalid content url: ${contentUrl}`);
+  }
+  const [communityId, threadId] = contentUrl
+    .split('/discussion/')
+    .map((part) => part.replaceAll('/', ''));
+  return {
+    communityId,
+    threadId: parseInt(threadId, 10),
+  };
 }

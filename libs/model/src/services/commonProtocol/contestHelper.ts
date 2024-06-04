@@ -181,7 +181,9 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError('Contest Id not found on Contest address');
+    throw new AppError(
+      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    );
   }
 
   const votePromises: any[] = [];
