@@ -1,7 +1,7 @@
 import { S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { HotShotsStats } from '@hicommonwealth/adapters';
-import { dispose, logger, rollbar, stats } from '@hicommonwealth/core';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import { config, formatS3Url } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
@@ -141,9 +141,8 @@ async function getTablesToBackup(): Promise<string[]> {
   for (let i = 0; i < tablesInPg.length; i++) {
     const s3Res = archiveExists[i];
     if (
-      s3Res.status === 'fulfilled' &&
-      !s3Res.value
-      // (s3Res.status === 'rejected' && s3Res.reason.name === 'NotFound')
+      (s3Res.status === 'fulfilled' && !s3Res.value) ||
+      (s3Res.status === 'rejected' && s3Res.reason.name === 'NotFound')
     ) {
       tablesToArchive.push(tablesInPg[i]);
     } else if (s3Res.status === 'rejected') {
@@ -166,7 +165,6 @@ function getCompressedDumpName(dumpName: string): string {
 }
 
 async function main() {
-  rollbar.error('FAILED ARCHIVAL');
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
   log.info(`Found ${tables.length} to archive`, {
