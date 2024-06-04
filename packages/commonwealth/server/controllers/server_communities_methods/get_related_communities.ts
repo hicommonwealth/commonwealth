@@ -33,31 +33,15 @@ export async function __getRelatedCommunities(
   this: ServerCommunitiesController,
   { chainNodeId }: GetRelatedCommunitiesQuery,
 ): Promise<GetRelatedCommunitiesResult> {
-  // Although this subquery is not necessary as is currently, We should keep it because in the future if we want to
-  // paginate, then we will need to paginate through the subquery.
   return await sequelize.query(
     `
-    SELECT 
-        popular_communities.id as id, 
-        popular_communities.name as community, 
-        popular_communities.description as description,
-        popular_communities.icon_url, 
-        popular_communities.thread_count, 
-        popular_communities.namespace,
-        popular_communities.chain_node_id,
-        COUNT(a) as address_count 
-    FROM 
-        (SELECT c.id, c.icon_url, c.name, c.description, COUNT(t) as thread_count, c.namespace, c.chain_node_id
-        FROM "ChainNodes" as cn 
-        JOIN "Communities" as c on c.chain_node_id = cn.id 
-        LEFT JOIN "Threads" as t on t.community_id = c.id 
-        WHERE cn.id = :chainNodeId and t.deleted_at IS NULL
-        GROUP BY c.id) as popular_communities 
-    LEFT JOIN "Addresses" as a on a.community_id = popular_communities.id 
-    GROUP BY popular_communities.id, popular_communities.icon_url, popular_communities.name,
-     popular_communities.description, popular_communities.thread_count, popular_communities.namespace, 
-     popular_communities.chain_node_id 
-    ORDER BY address_count DESC;
+      SELECT c.id, c.icon_url, c.name as community, c.description,
+      c.thread_count, c.address_count, c.namespace, c.chain_node_id
+      FROM "ChainNodes" as cn 
+      JOIN "Communities" as c on c.chain_node_id = cn.id
+      WHERE cn.id = :chainNodeId
+      GROUP BY c.id
+      ORDER BY c.address_count DESC;
     `,
     {
       type: QueryTypes.SELECT,

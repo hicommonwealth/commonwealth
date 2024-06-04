@@ -97,7 +97,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       MAX("Addresses".last_active) as last_active
     FROM
       "Profiles"
-    JOIN
+    RIGHT JOIN
       "Addresses" ON "Profiles".user_id = "Addresses".user_id
     WHERE
       ${communityWhere}
