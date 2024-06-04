@@ -38,8 +38,13 @@ async function main() {
 }
 
 main()
-  .then(async () => await dispose()('EXIT', true))
+  .then(
+    async () =>
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      await dispose()('EXIT', true),
+  )
   .catch((err) => {
     log.error('Failed to refresh all membership', err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
   });

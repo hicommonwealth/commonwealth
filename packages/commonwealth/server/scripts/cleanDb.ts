@@ -10,9 +10,11 @@ databaseCleaner.init(models);
 databaseCleaner
   .executeQueries()
   .then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('EXIT', true);
   })
   .catch((err) => {
     log.error(`Failed to clean the database.`, err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('EXIT', true);
   });
