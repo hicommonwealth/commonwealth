@@ -123,10 +123,10 @@ async function createNewMagicUser({
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.createWithProfile(
       {
-        // never use emails from magic, even for "email" login -- magic maintains the mapping
-        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
-        // of login information.
-        email: null,
+        // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
+        // so it is safe to set emails from magic as part of User data, even though they may be unverified.
+        // although not usable for login, this email (used for outreach) is still considered sensitive user data.
+        email: magicUserMetadata.email,
       },
       { transaction },
     );
