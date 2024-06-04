@@ -99,8 +99,10 @@ const addComponentShowcase = () => {
 
 try {
   addComponentShowcase();
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   dispose()('EXIT', true);
 } catch (err) {
   log.error('Failed to add component showcase', err);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   dispose()('ERROR', true);
 }

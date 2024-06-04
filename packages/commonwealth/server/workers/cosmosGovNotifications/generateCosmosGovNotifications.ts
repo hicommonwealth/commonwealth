@@ -70,10 +70,12 @@ if (import.meta.url.endsWith(process.argv[1])) {
   generateCosmosGovNotifications()
     .then(() => {
       stats(HotShotsStats()).increment('cw.scheduler.send-cosmos-notifs');
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispose()('EXIT', true);
     })
     .catch((err) => {
       log.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispose()('ERROR', true);
     });
 }

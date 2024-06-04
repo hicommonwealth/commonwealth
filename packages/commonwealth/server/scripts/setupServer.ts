@@ -17,10 +17,12 @@ const setupServer = (app: Express, port: number) => {
     switch (error.code) {
       case 'EACCES':
         log.error('Port requires elevated privileges');
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         dispose()('ERROR', true);
       // eslint-disable-next-line no-fallthrough
       case 'EADDRINUSE':
         log.error(`Port ${port} is already in use`);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         dispose()('ERROR', true);
       // eslint-disable-next-line no-fallthrough
       default:
