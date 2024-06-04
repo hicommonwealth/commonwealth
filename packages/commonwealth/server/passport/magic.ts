@@ -192,7 +192,7 @@ async function createNewMagicUser({
   });
 }
 
-// User is logged out + selects magic, and provides an existing email. Log them in.
+// User is logged out + selects magic, and provides an existing magic account. Log them in.
 async function loginExistingMagicUser({
   models,
   existingUserInstance,
@@ -458,7 +458,6 @@ async function magicLoginRoute(
         config.AUTH.JWT_SECRET,
       ) as {
         id: number;
-        email: string | null;
       };
       loggedInUser = await models.User.findOne({
         where: { id },

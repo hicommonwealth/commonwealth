@@ -345,12 +345,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     try {
       if (walletToUse.chain !== 'near') {
-        await account.validate(
-          walletSignature,
-          cachedTimestamp,
-          cachedChainId,
-          false,
-        );
+        await account.validate(walletSignature, cachedTimestamp, cachedChainId);
         app.sessions.authSession(
           walletToUse.chain,
           cachedChainId,
