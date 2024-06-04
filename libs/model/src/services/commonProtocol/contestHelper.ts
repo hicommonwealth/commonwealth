@@ -48,7 +48,7 @@ const createWeb3Provider = async (rpc: string): Promise<Web3> => {
  * @param contest the address of the contest
  * @param creator the address of the user to create content on behalf of
  * @param url the common/commonwealth url of the content
- * @returns txReceipt and contentId of new content(NOTE: this should be saved for future voting)
+ * @returns txReceipt and contentId of new content (NOTE: this should be saved for future voting)
  */
 export const addContent = async (
   rpcNodeUrl: string,
