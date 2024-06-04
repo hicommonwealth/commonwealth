@@ -199,9 +199,9 @@ export async function __createThreadComment(
       await this.models.CommentVersionHistory.create(
         {
           comment_id: comment.id,
-          text: comment.text,
           address: address.address,
-          created_at: comment.created_at,
+          text: comment.text,
+          timestamp: comment.created_at,
         },
         {
           transaction,

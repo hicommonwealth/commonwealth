@@ -180,7 +180,7 @@ export async function __createThread(
           thread_id: thread.id,
           body: thread.body,
           address: address.address,
-          created_at: thread.created_at,
+          timestamp: thread.created_at,
         },
         {
           transaction,

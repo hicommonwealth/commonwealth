@@ -24,10 +24,11 @@ export default (
       thread_id: { type: Sequelize.INTEGER, primaryKey: true },
       address: { type: Sequelize.STRING, allowNull: true },
       body: { type: Sequelize.STRING, allowNull: true },
-      created_at: { type: Sequelize.DATE, allowNull: true },
+      timestamp: { type: Sequelize.DATE, allowNull: true },
     },
     {
       tableName: 'ThreadVersionHistories',
+      timestamps: false,
       indexes: [{ fields: ['thread_id'] }],
     },
   );

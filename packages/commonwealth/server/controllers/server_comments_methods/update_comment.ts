@@ -130,7 +130,12 @@ export async function __updateComment(
     );
 
     await this.models.CommentVersionHistory.create(
-      { comment_id: comment.id, text, address },
+      {
+        comment_id: comment.id,
+        text,
+        address: address.address,
+        timestamp: Date.now(),
+      },
       {
         transaction,
       },

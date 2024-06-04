@@ -6,5 +6,5 @@ export const CommentVersionHistory = z.object({
   comment_id: PG_INT,
   address: z.string(),
   text: z.string(),
-  created_at: z.date().optional(),
+  timestamp: z.date().optional(),
 });

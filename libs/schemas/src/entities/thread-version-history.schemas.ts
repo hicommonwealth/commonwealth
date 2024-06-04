@@ -6,5 +6,5 @@ export const ThreadVersionHistory = z.object({
   thread_id: PG_INT,
   address: z.string(),
   body: z.string(),
-  created_at: z.date().optional(),
+  timestamp: z.date().optional(),
 });

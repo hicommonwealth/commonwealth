@@ -19,10 +19,11 @@ module.exports = {
           },
           address: { type: Sequelize.STRING, allowNull: false },
           text: { type: Sequelize.STRING, allowNull: false },
-          created_at: { type: Sequelize.DATE, allowNull: false },
+          timestamp: { type: Sequelize.DATE, allowNull: false },
         },
         {
           underscored: true,
+          timestamps: false,
           indexes: [{ fields: ['comment_id'] }],
         },
         { transaction: t },
@@ -43,7 +44,7 @@ module.exports = {
           },
           address: { type: Sequelize.STRING, allowNull: false },
           body: { type: Sequelize.STRING, allowNull: false },
-          created_at: { type: Sequelize.DATE, allowNull: false },
+          timestamp: { type: Sequelize.DATE, allowNull: false },
         },
         {
           underscored: true,

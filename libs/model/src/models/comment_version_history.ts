@@ -23,13 +23,12 @@ export default (
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       comment_id: { type: Sequelize.INTEGER, primaryKey: true },
       address: { type: Sequelize.STRING, allowNull: true },
-      body: { type: Sequelize.STRING, allowNull: true },
-      created_at: { type: Sequelize.DATE, allowNull: true },
+      text: { type: Sequelize.STRING, allowNull: true },
+      timestamp: { type: Sequelize.DATE, allowNull: true },
     },
     {
       tableName: 'CommentVersionHistories',
-      timestamps: true,
-      createdAt: 'created_at',
+      timestamps: false,
       indexes: [{ fields: ['comment_id'] }],
     },
   );

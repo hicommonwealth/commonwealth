@@ -226,7 +226,7 @@ export async function __updateThread(
       toUpdate,
     );
 
-    await thread.update(
+    const updatedThread = await thread.update(
       {
         ...toUpdate,
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -235,7 +235,12 @@ export async function __updateThread(
     );
 
     await this.models.ThreadVersionHistory.create(
-      { ...toUpdate, address },
+      {
+        thread_id: updatedThread.id,
+        address: address.address,
+        body: toUpdate.body,
+        timestamp: updatedThread.created_at,
+      },
       {
         transaction,
       },
