@@ -340,7 +340,7 @@ export const status = async (
       } = communityStatus;
       const { roles, user, id, email } = userStatus;
 
-      const jwtToken = jwt.sign({ id, email }, config.AUTH.JWT_SECRET, {
+      const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
         expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
 
