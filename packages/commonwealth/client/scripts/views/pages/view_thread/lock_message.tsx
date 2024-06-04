@@ -17,9 +17,8 @@ const buildLockMessage = (
       'DD/MM/YYYY',
     )}, meaning it can no longer be edited or commented on.`;
   }
-  return `This thread has been locked, meaning it can no longer be edited or commented on. Thread was locked prior to ${updatedAt.format(
-    'DD/MM/YYYY',
-  )}.`;
+  return `This thread has been locked, meaning it can no longer be edited or commented on. 
+  Thread was locked prior to ${updatedAt.format('DD/MM/YYYY')}.`;
 };
 
 type LockMessageProps = {
