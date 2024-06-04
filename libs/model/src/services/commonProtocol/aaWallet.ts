@@ -61,7 +61,7 @@ export const newSmartAccount = async (owners: string[]) => {
     uo: {
       target: `0x${owners[0].replace('0x', '')}`,
       data: `0x`,
-      value: Web3.utils.toBigInt(5e16),
+      value: Web3.utils.toBigInt(0),
     },
     account: client.account,
   });
