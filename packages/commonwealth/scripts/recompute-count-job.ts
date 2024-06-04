@@ -157,10 +157,12 @@ if (import.meta.url.endsWith(process.argv[1])) {
   recomputeCounts(console.log)
     .then(() => {
       log.info('Recompute job completed successfully');
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispose()('EXIT', true);
     })
     .catch((err) => {
       log.error('Recompute job exit with error', err);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispose()('ERROR', true);
     });
 }
