@@ -18,6 +18,7 @@ type SearchProfilesRequestParams = {
   community_id?: string;
   include_roles?: string;
   include_group_ids?: string;
+  include_count?: boolean;
 } & PaginationQueryParams;
 
 type SearchProfilesResponse = SearchProfilesResult;
@@ -42,6 +43,7 @@ export const searchProfilesHandler = async (
     orderBy: options.order_by,
     orderDirection: options.order_direction as any,
     includeGroupIds: options.include_group_ids === 'true',
+    includeCount: options.include_count,
   });
 
   return success(res, profileSearchResults);

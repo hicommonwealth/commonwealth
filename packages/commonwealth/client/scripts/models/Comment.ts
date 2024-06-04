@@ -13,7 +13,7 @@ export class Comment<T extends IUniqueId> {
   public readonly Address: AddressInfo;
   public readonly text: string;
   public readonly plaintext: string;
-  public readonly reactions: Reaction[];
+  public reactions: Reaction[];
   public reactionWeightsSum: number;
   public readonly id: number;
   public readonly createdAt: momentType.Moment;

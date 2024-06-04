@@ -6,6 +6,7 @@ import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface EditCommentProps {
@@ -78,6 +79,13 @@ const useEditCommentMutation = ({
           x.id === updatedComment.id ? updatedComment : x,
         );
       });
+
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        { recentComments: [updatedComment] },
+        'combineAndRemoveDups',
+      );
 
       return updatedComment;
     },

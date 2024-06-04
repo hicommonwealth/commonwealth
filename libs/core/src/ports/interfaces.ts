@@ -189,6 +189,8 @@ export enum WorkflowKeys {
   UserMentioned = 'user-mentioned',
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
+  EmailRecap = 'email-recap',
+  EmailDigest = 'email-digest',
 }
 
 export enum KnockChannelIds {
@@ -196,6 +198,13 @@ export enum KnockChannelIds {
   SendGrid = 'a7e200fa-7d18-444c-8e42-ba7c28bb8891',
   FCM = 'c9e1b544-2130-4814-833a-a79bc527051c',
 }
+
+export type NotificationsProviderRecipient =
+  | string
+  | {
+      collection: string;
+      id: string;
+    };
 
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
@@ -236,12 +245,7 @@ export type NotificationsProviderGetMessagesOptions = {
 export type NotificationsProviderGetMessagesReturn = Array<{
   id: string;
   channel_id: string;
-  recipient:
-    | string
-    | {
-        collection: string;
-        id: string;
-      };
+  recipient: NotificationsProviderRecipient;
   tenant: string | null;
   status: 'queued' | 'sent' | 'delivered' | 'undelivered' | 'not_sent';
   read_at: string | null;
@@ -257,6 +261,48 @@ export type NotificationsProviderGetMessagesReturn = Array<{
   __cursor?: string;
 }>;
 
+export const RepeatFrequency = {
+  Monthly: 'monthly',
+  Weekly: 'weekly',
+  Daily: 'daily',
+  Hourly: 'hourly',
+} as const;
+
+const DaysOfWeek = {
+  Mon: 'mon',
+  Tue: 'tue',
+  Wed: 'wed',
+  Thu: 'thu',
+  Fri: 'fri',
+  Sat: 'sat',
+  Sun: 'sun',
+} as const;
+
+export type NotificationsProviderScheduleRepeats = Array<{
+  frequency: typeof RepeatFrequency[keyof typeof RepeatFrequency];
+  interval?: number;
+  day_of_month?: number;
+  days?:
+    | Array<typeof DaysOfWeek[keyof typeof DaysOfWeek]>
+    | 'weekdays'
+    | 'weekends';
+  hours?: number;
+  minutes?: number;
+}>;
+
+export type NotificationsProviderSchedulesReturn = Array<{
+  id: string;
+  actor?: NotificationsProviderRecipient;
+  recipient: NotificationsProviderRecipient;
+  data: Record<string, unknown>;
+  workflow: string;
+  repeats: NotificationsProviderScheduleRepeats;
+  last_occurrence_at?: Date;
+  next_occurrence_at?: Date;
+  inserted_at: string;
+  updated_at: string;
+}>;
+
 /**
  * Notifications Provider Port
  */
@@ -268,4 +314,22 @@ export interface NotificationsProvider extends Disposable {
   getMessages(
     options: NotificationsProviderGetMessagesOptions,
   ): Promise<NotificationsProviderGetMessagesReturn>;
+
+  getSchedules(options: {
+    user_id: string;
+    workflow_id?: WorkflowKeys;
+  }): Promise<NotificationsProviderSchedulesReturn>;
+
+  createSchedules(options: {
+    user_ids: string[];
+    workflow_id: WorkflowKeys;
+    schedule: NotificationsProviderScheduleRepeats;
+  }): Promise<NotificationsProviderSchedulesReturn>;
+
+  /**
+   * Deletes scheduled workflows
+   * @param options An object containing the schedule_ids string array
+   * @returns A set containing the ids of the schedules that were successfully deleted
+   */
+  deleteSchedules(options: { schedule_ids: string[] }): Promise<Set<string>>;
 }

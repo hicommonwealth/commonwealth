@@ -8,7 +8,7 @@ import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import {
-  useFetchSelfProfileQuery,
+  useFetchProfileByIdQuery,
   useSearchProfilesQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
@@ -42,9 +42,9 @@ const PersonalInformationStep = ({
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
-  const { refetch: refetchProfileData } = useFetchSelfProfileQuery({
+  const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
-    updateAddressesOnSuccess: true,
+    shouldFetchSelfProfile: true,
   });
 
   useNecessaryEffect(() => {

@@ -59,4 +59,5 @@ export const Community = z.object({
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
   snapshot_spaces: z.array(z.string().max(255)).default([]).optional(),
+  include_in_digest_email: z.boolean().nullish(),
 });

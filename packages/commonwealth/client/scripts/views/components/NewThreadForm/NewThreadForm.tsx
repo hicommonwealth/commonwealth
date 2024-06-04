@@ -234,8 +234,8 @@ export const NewThreadForm = () => {
                 setContentDelta={setThreadContentDelta}
                 isDisabled={isRestrictedMembership || !hasJoinedCommunity}
                 tooltipLabel={
-                  !hasJoinedCommunity
-                    ? 'Join community to submit'
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('submit')
                     : disabledActionsTooltipText
                 }
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."

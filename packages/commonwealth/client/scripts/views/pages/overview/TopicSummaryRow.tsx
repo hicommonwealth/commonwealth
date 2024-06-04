@@ -1,23 +1,17 @@
 import { slugify } from '@hicommonwealth/shared';
-import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
+import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
+import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
+import app from 'client/scripts/state';
+import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
+import Permissions from 'client/scripts/utils/Permissions';
 import { getProposalUrlPath } from 'identifiers';
-import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
-import app from 'state';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { getClasses } from '../../components/component_kit/helpers';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { SharePopover } from '../../components/share_popover';
-import { User } from '../../components/user/user';
-import { getLastUpdated, isHot, isNewThread } from '../discussions/helpers';
+import { ThreadCard } from '../discussions/ThreadCard';
 import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
 
 type TopicSummaryRowProps = {
@@ -33,9 +27,18 @@ export const TopicSummaryRow = ({
   topic,
   isLoading,
 }: TopicSummaryRowProps) => {
+  useUserActiveAccount();
   const navigate = useCommonNavigate();
 
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    communityId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+    apiEnabled: !!app?.user?.activeAccount?.address,
+  });
+
   if (isLoading) return <TopicSummaryRowSkeleton />;
+
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topSortedThreads = monthlyThreads
     .sort((a, b) => {
@@ -73,114 +76,58 @@ export const TopicSummaryRow = ({
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
       </div>
       <div className="recent-threads-column">
-        {threadsToDisplay.map((thread, idx) => {
+        {threadsToDisplay.map((thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`,
+            false,
+          );
+          const discussionLinkWithoutChain = getProposalUrlPath(
+            thread.slug,
+            `${thread.identifier}-${slugify(thread.title)}`,
+            true,
           );
 
-          const user = thread?.author
-            ? app.chain.accounts.get(thread?.author)
-            : null;
+          const isTopicGated = !!(memberships || []).find((membership) =>
+            membership.topicIds.includes(thread?.topic?.id),
+          );
 
-          const isStageDefault = isDefaultStage(thread.stage);
-          const isTagsRowVisible = thread.stage && !isStageDefault;
-          const stageLabel = threadStageToLabel(thread.stage);
+          const isActionAllowedInGatedTopic = !!(memberships || []).find(
+            (membership) =>
+              membership.topicIds.includes(thread?.topic?.id) &&
+              membership.isAllowed,
+          );
+
+          const isRestrictedMembership =
+            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+          const disabledActionsTooltipText = getThreadActionTooltipText({
+            isCommunityMember: Permissions.isCommunityMember(
+              thread.communityId,
+            ),
+            isThreadArchived: !!thread?.archivedAt,
+            isThreadLocked: !!thread?.lockedAt,
+            isThreadTopicGated: isRestrictedMembership,
+          });
 
           return (
-            <div key={idx}>
-              <div
-                className={getClasses<{ isPinned?: boolean }>(
-                  { isPinned: thread.pinned },
-                  'recent-thread-row',
-                )}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(discussionLink);
-                }}
-              >
-                <div className="row-top">
-                  <div className="user-and-date-row">
-                    <User
-                      userAddress={user?.address}
-                      userCommunityId={
-                        user?.community?.id || user.profile?.chain
-                      }
-                      shouldShowAsDeleted={
-                        !user?.address &&
-                        !(user?.community?.id || user.profile?.chain)
-                      }
-                      shouldShowAddressWithDisplayName
-                      shouldLinkProfile
-                      avatarSize={24}
-                    />
-                    <CWText className="last-updated-text">•</CWText>
-                    <CWText
-                      type="caption"
-                      fontWeight="medium"
-                      className="last-updated-text"
-                    >
-                      {moment(getLastUpdated(thread)).format('l')}
-                    </CWText>
-                    {isNewThread(thread.createdAt) && (
-                      <CWTag label="New" type="new" iconName="newStar" />
-                    )}
-                    {thread.readOnly && (
-                      <CWIcon iconName="lock" iconSize="small" />
-                    )}
-                  </div>
-                  <div className="row-top-icons">
-                    {isHot(thread) && <div className="flame" />}
-                    {thread.pinned && <CWIcon iconName="pin" />}
-                  </div>
-                </div>
-
-                <CWText type="b2" fontWeight="bold">
-                  {thread.title}
-                </CWText>
-
-                <CWText type="caption" className="thread-preview">
-                  <QuillRenderer doc={thread.plaintext} />
-                </CWText>
-
-                {isTagsRowVisible && (
-                  <div className="tags-row">
-                    <CWTag
-                      label={stageLabel}
-                      classNames={stageLabel}
-                      trimAt={20}
-                      type="stage"
-                    />
-                  </div>
-                )}
-
-                <div className="row-bottom">
-                  <div className="comments-and-users">
-                    <CWThreadAction
-                      label={`${pluralize(thread.numberOfComments, 'Comment')}`}
-                      action="comment"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        navigate(`${discussionLink}?focusEditor=true`);
-                      }}
-                    />
-                  </div>
-                  <div className="row-bottom-menu">
-                    <div
-                      onClick={(e) => {
-                        // prevent clicks from propagating to discussion row
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                    >
-                      <SharePopover discussionLink={discussionLink} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {idx !== threadsToDisplay.length - 1 && <CWDivider />}
-            </div>
+            <ThreadCard
+              key={thread.id}
+              thread={thread}
+              canReact={!disabledActionsTooltipText}
+              canComment={!disabledActionsTooltipText}
+              canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
+              onStageTagClick={() => {
+                navigate(`/discussions?stage=${thread.stage}`);
+              }}
+              threadHref={discussionLink}
+              onCommentBtnClick={() =>
+                navigate(`${discussionLinkWithoutChain}?focusEditor=true`)
+              }
+              disabledActionsTooltipText={disabledActionsTooltipText}
+              hideReactionButton
+              hideUpvotesDrawer
+            />
           );
         })}
       </div>

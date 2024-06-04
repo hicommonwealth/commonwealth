@@ -1,12 +1,12 @@
+import moment from 'moment';
 import React from 'react';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import moment from 'moment';
 
 const buildLockMessage = (
   fromDiscordBot: boolean,
   lockedAt?: moment.Moment,
-  updatedAt?: moment.Moment
+  updatedAt?: moment.Moment,
 ) => {
   if (fromDiscordBot) {
     return `This thread was started on Discord and cannot be edited or commented on in Common. 
@@ -14,12 +14,11 @@ const buildLockMessage = (
   }
   if (lockedAt) {
     return `This thread was locked on ${lockedAt.format(
-      'MM/DD/YYYY'
+      'DD/MM/YYYY',
     )}, meaning it can no longer be edited or commented on.`;
   }
-  return `This thread has been locked, meaning it can no longer be edited or commented on. Thread was locked prior to ${updatedAt.format(
-    'MM/DD/YYYY'
-  )}.`;
+  return `This thread has been locked, meaning it can no longer be edited or commented on. 
+  Thread was locked prior to ${updatedAt.format('DD/MM/YYYY')}.`;
 };
 
 type LockMessageProps = {

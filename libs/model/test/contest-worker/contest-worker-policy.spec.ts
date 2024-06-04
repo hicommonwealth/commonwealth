@@ -13,6 +13,7 @@ describe('Contest Worker Policy', () => {
   const threadId = 888;
   const threadTitle = 'Hello There';
   const contestAddress = '0x1';
+  let topicId: number = 0;
 
   before(async () => {
     await bootstrap_testing();
@@ -25,7 +26,7 @@ describe('Contest Worker Policy', () => {
       },
       //{ mock: true, log: true },
     );
-    await seed('Community', {
+    const [community] = await seed('Community', {
       id: communityId,
       chain_node_id: chainNode!.id,
       Addresses: [
@@ -40,14 +41,27 @@ describe('Contest Worker Policy', () => {
       contest_managers: [
         {
           contest_address: contestAddress,
+          cancelled: false,
         },
       ],
+      topics: [
+        {
+          name: 'zzz',
+        },
+      ],
+    });
+    topicId = community!.topics![0].id!;
+    expect(topicId, 'topicId not assigned').to.exist;
+    await models.ContestTopic.create({
+      topic_id: topicId,
+      contest_address: community!.contest_managers![0].contest_address!,
+      created_at: new Date(),
     });
     await seed('Thread', {
       id: threadId,
       community_id: communityId,
       address_id: addressId,
-      topic_id: undefined,
+      topic_id: topicId,
       deleted_at: undefined,
       pinned: false,
       read_only: false,
@@ -92,11 +106,13 @@ describe('Contest Worker Policy', () => {
             pinned: false,
             read_only: false,
             version_history: [],
+            topic_id: topicId,
           },
         },
         true,
       );
 
+      expect(addContentStub.called, 'addContent was not called').to.be.true;
       const fnArgs = addContentStub.args[0];
       expect(fnArgs[1]).to.equal(
         contestAddress,
@@ -107,7 +123,7 @@ describe('Contest Worker Policy', () => {
         'addContent called with wrong userAddress',
       );
       expect(fnArgs[3]).to.equal(
-        '/ethhh/discussion/888-hello-there',
+        '/ethhh/discussion/888',
         'addContent called with wrong contentUrl',
       );
     }
@@ -135,7 +151,7 @@ describe('Contest Worker Policy', () => {
         content_id: contentId,
         actor_address: address,
         action: 'added',
-        content_url: '/ethhh/discussion/888-hello-there',
+        content_url: '/ethhh/discussion/888',
         thread_id: threadId,
         thread_title: threadTitle,
         voting_power: 10,

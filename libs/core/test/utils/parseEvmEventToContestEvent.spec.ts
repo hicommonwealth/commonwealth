@@ -74,28 +74,6 @@ describe('parseEvmEventToContestEvent', () => {
     );
   });
 
-  it('should map NewSingleContestStarted raw evm result to ContestStarted outbox shape', () => {
-    const { event_name, event_payload } = parseEvmEventToContestEvent(
-      'NewSingleContestStarted',
-      contestAddress,
-      [
-        ethers.BigNumber.from(2000), // startTime
-        ethers.BigNumber.from(2001), // endTime
-      ],
-    );
-    expect(event_name).to.eq(EventNames.ContestStarted);
-    const parsedEvent = ContestStarted.parse(event_payload);
-    console.debug(parsedEvent);
-    expect(parsedEvent.contest_address).to.eq(contestAddress);
-    expect(parsedEvent.contest_id).to.eq(0); // single == 0
-    expect(parsedEvent.start_time.getTime()).to.eq(
-      new Date(2000 * 1000).getTime(),
-    );
-    expect(parsedEvent.end_time.getTime()).to.eq(
-      new Date(2001 * 1000).getTime(),
-    );
-  });
-
   it('should map ContentAdded raw evm result to ContestContentAdded outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'ContentAdded',
@@ -115,9 +93,30 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.content_url).to.eq('/threads/1');
   });
 
-  it('should map VoterVoted raw evm result to ContestContentUpvoted outbox shape', () => {
+  it('should map VoterVotedRecurring raw evm result to ContestContentUpvoted outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
-      'VoterVoted',
+      'VoterVotedRecurring',
+      contestAddress,
+      [
+        '0x2', // voterAddress
+        ethers.BigNumber.from(10), // contentId
+        ethers.BigNumber.from(888), // contestId
+        ethers.BigNumber.from(9000), // votingPower
+      ],
+    );
+    expect(event_name).to.eq(EventNames.ContestContentUpvoted);
+    const parsedEvent = ContestContentUpvoted.parse(event_payload);
+    console.debug(parsedEvent);
+    expect(parsedEvent.contest_address).to.eq(contestAddress);
+    expect(parsedEvent.content_id).to.eq(10);
+    expect(parsedEvent.contest_id).to.eq(888);
+    expect(parsedEvent.voter_address).to.eq('0x2');
+    expect(parsedEvent.voting_power).to.eq(9000);
+  });
+
+  it('should map VoterVotedOneOff raw evm result to ContestContentUpvoted outbox shape', () => {
+    const { event_name, event_payload } = parseEvmEventToContestEvent(
+      'VoterVotedOneOff',
       contestAddress,
       [
         '0x2', // voterAddress
@@ -129,7 +128,6 @@ describe('parseEvmEventToContestEvent', () => {
     const parsedEvent = ContestContentUpvoted.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.contest_address).to.eq(contestAddress);
-    expect(parsedEvent.contest_id).to.eq(0); // TODO: this should come from contract
     expect(parsedEvent.content_id).to.eq(10);
     expect(parsedEvent.voter_address).to.eq('0x2');
     expect(parsedEvent.voting_power).to.eq(9000);
@@ -137,8 +135,7 @@ describe('parseEvmEventToContestEvent', () => {
 
   it('should throw if the wrong number of args are used outbox shape', () => {
     expect(() => {
-      // VoterVoted event requires 3 args
-      parseEvmEventToContestEvent('VoterVoted', contestAddress, [
+      parseEvmEventToContestEvent('VoterVotedRecurring', contestAddress, [
         '0x2', // voterAddress
       ]);
     }).to.throw('evm parsed args does not match signature');
