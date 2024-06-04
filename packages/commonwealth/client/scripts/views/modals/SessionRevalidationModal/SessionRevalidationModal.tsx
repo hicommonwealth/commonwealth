@@ -5,6 +5,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
+import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
