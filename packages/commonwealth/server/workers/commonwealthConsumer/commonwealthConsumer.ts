@@ -71,7 +71,7 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   const contestWorkerSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ContestWorkerPolicy,
     ContestWorker(),
-    buildRetryStrategy(undefined, 3, 20_000),
+    buildRetryStrategy(undefined, 20_000),
   );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
