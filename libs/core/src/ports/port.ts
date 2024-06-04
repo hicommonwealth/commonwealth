@@ -71,6 +71,7 @@ const disposeAndExit = async (
   if (config.NODE_ENV !== 'test' && code !== 'UNIT_TEST') {
     rollbar.wait(() => {
       log.info('Rollbar logs flushed');
+      // eslint-disable-next-line n/no-process-exit
       process.exit(code === 'ERROR' ? 1 : 0);
     });
   }
