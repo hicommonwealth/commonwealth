@@ -172,6 +172,12 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.NotificationsProviderUserMentioned,
     },
+    [RascalBindings.NotificationsProviderPreferencesUpdated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderPreferencesUpdated,
+    },
     [RascalBindings.ContestWorkerPolicyThreadCreated]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ContestWorkerPolicy,

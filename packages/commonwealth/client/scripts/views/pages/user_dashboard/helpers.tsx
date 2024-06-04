@@ -85,7 +85,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
     activity = response.data;
   }
 
-  if (activity.result) {
+  if (activity.result && requestType === DashboardViews.Chain) {
     const uniqueActivity: number[] = [];
     activity.result = activity?.result?.filter(
       (x) =>

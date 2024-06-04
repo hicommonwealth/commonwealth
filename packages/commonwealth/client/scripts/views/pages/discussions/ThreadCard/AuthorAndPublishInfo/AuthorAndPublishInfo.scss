@@ -6,6 +6,32 @@
   flex-wrap: wrap;
   gap: 8px;
 
+  .CommunityInfo {
+    gap: 8px !important;
+
+    &:visited,
+    &:hover,
+    &:active {
+      color: $neutral-800 !important;
+      text-decoration: underline !important;
+    }
+
+    .Text {
+      color: $neutral-800 !important;
+    }
+
+    .name {
+      @include b1;
+      line-height: 16px !important;
+    }
+  }
+
+  .community-user-info {
+    a {
+      color: $neutral-500 !important;
+    }
+  }
+
   // this is needed to make sure that "applyLeftMarginToItems" works correctly
   > * {
     height: 24px !important;

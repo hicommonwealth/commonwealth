@@ -1,7 +1,7 @@
-import React from 'react';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import moment from 'moment';
+import React from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 
 type ArchiveTrayWithTooltipProps = {
   archivedAt: moment.Moment;
@@ -13,7 +13,7 @@ export const ArchiveTrayWithTooltip = ({
   return (
     <CWTooltip
       placement="right"
-      content={`Archived on ${archivedAt.format('MM/DD/YYYY')}`}
+      content={`Archived on ${archivedAt.format('DD/MM/YYYY')}`}
       renderTrigger={(handleInteraction) => (
         <CWIcon
           iconName="archiveTrayFilled"

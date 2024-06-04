@@ -163,6 +163,7 @@ export const getContestScore = async (
   rpcNodeUrl: string,
   contest: string,
   contestId?: number,
+  oneOff?: boolean,
 ): Promise<ContestScores> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
@@ -174,13 +175,15 @@ export const getContestScore = async (
     contestId
       ? contestInstance.methods.getPastWinners(contestId).call()
       : contestInstance.methods.getWinnerIds().call(),
-    getContestBalance(rpcNodeUrl, contest),
+    getContestBalance(rpcNodeUrl, contest, oneOff),
   ]);
 
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError('Contest Id not found on Contest address');
+    throw new AppError(
+      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    );
   }
 
   const votePromises: any[] = [];
@@ -211,6 +214,7 @@ export const getContestScore = async (
 export const getContestBalance = async (
   rpcNodeUrl: string,
   contest: string,
+  oneOff?: boolean,
 ): Promise<number> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
@@ -218,19 +222,26 @@ export const getContestBalance = async (
     contest,
   );
 
-  const promises = [
-    contestInstance.methods.contestToken().call(),
-    contestInstance.methods.FeeManagerAddress().call(),
-  ];
+  const promises = [contestInstance.methods.contestToken().call()];
+
+  if (!oneOff) {
+    promises.push(contestInstance.methods.FeeMangerAddress().call());
+  }
 
   const results = await Promise.all(promises);
-  const feeManager = new web3.eth.Contract(
-    feeManagerABI as AbiItem[],
-    String(results[1]),
-  );
-  const balancePromises: Promise<number>[] = [
-    feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
-  ];
+
+  const balancePromises: Promise<number>[] = [];
+
+  if (!oneOff) {
+    const feeManager = new web3.eth.Contract(
+      feeManagerABI as AbiItem[],
+      String(results[1]),
+    );
+    balancePromises.push(
+      feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
+    );
+  }
+
   if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
@@ -255,5 +266,9 @@ export const getContestBalance = async (
 
   const balanceResults = await Promise.all(balancePromises);
 
-  return balanceResults[0] + balanceResults[1];
+  return Number(
+    balanceResults.length === 2
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]),
+  );
 };
