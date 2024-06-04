@@ -1,7 +1,6 @@
 import { PopperPlacementType } from '@mui/base/Popper';
 import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
 import { threadStageToLabel } from 'helpers';
-import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
 import app from 'state';
@@ -197,9 +196,7 @@ export const AuthorAndPublishInfo = ({
             <div className="version-history">
               <CWSelectList
                 options={versionHistoryOptions}
-                placeholder={`Edited ${getRelativeTimestamp(
-                  publishDate?.toISOString(),
-                )}`}
+                placeholder={`Edited ${publishDate?.format('DD/MM/YYYY')}`}
                 onChange={({ value }) => {
                   changeContentText(value);
                 }}
@@ -214,7 +211,7 @@ export const AuthorAndPublishInfo = ({
               placement="top"
               content={
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
+                  {publishDate.format('MMMM Do, YYYY')} {dotIndicator}{' '}
                   {publishDate.format('h:mm A')}
                 </div>
               }
@@ -228,7 +225,7 @@ export const AuthorAndPublishInfo = ({
                 >
                   {showPublishLabelWithDate ? 'Published ' : ''}
                   {showEditedLabelWithDate ? 'Edited ' : ''}
-                  {getRelativeTimestamp(publishDate?.toISOString())}
+                  {publishDate?.format('DD/MM/YYYY')}
                 </CWText>
               )}
             />

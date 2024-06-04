@@ -114,7 +114,7 @@ export const getTopThreads = async (
         author_name: profile ? profile.profile_name : 'Anonymous',
         author_profile_img_url: profile ? profile.avatar_url : '',
         thread_id: row.thread_id,
-        publish_date_string: moment(row.created_at).format('MM/DD/YY'),
+        publish_date_string: moment(row.created_at).format('DD/MM/YYYY'),
         thread_url: `https://www.commonwealth.im/${communityId}/discussion/${row.thread_id}`,
       };
       threadData.push(data);
