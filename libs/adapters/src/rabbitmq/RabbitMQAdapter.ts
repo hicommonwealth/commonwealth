@@ -26,7 +26,7 @@ import { fileURLToPath } from 'url';
  * @param defaultAttempts
  * @returns {RetryStrategyFn} The built retry strategy function.
  */
-function buildRetryStrategy(
+export function buildRetryStrategy(
   customRetryStrategiesMap?: (...args: Parameters<RetryStrategyFn>) => boolean,
   defaultDefer: number = 2000,
   defaultAttempts: number = 3,
