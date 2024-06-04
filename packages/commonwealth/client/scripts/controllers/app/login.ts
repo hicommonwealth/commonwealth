@@ -522,7 +522,10 @@ export async function handleSocialLoginCallback({
         magicAddress,
         canvasChainId,
       );
-      const sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
+      let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
+      if (!sessionObject) {
+        sessionObject = await sessionSigner.newSession(CANVAS_TOPIC);
+      }
       session = sessionObject?.payload;
 
       console.log(
