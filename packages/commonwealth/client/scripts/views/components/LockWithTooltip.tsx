@@ -14,8 +14,8 @@ export const LockWithTooltip = ({ lockedAt, updatedAt }: LockWithTooltip) => {
     <CWTooltip
       content={
         lockedAt
-          ? `Locked on ${lockedAt.format('MM/DD/YYYY')}`
-          : `Locked prior to ${updatedAt?.format('MM/DD/YYYY') || 'N/A'}`
+          ? `Locked on ${lockedAt.format('DD/MM/YYYY')}`
+          : `Locked prior to ${updatedAt?.format('DD/MM/YYYY') || 'N/A'}`
       }
       placement="top"
       renderTrigger={(handleInteraction) => (
