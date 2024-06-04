@@ -234,6 +234,7 @@ export const CWCoverImageUploader = ({
       if (defaultImageBehaviour !== ImageBehavior.Circle) {
         attachButton.current.style.display = 'none';
       }
+      uploadCompleteCallback?.(_imageURL, currentImageBehavior);
     }
   };
 
@@ -481,6 +482,7 @@ export const CWCoverImageUploader = ({
             name="image-behaviour"
             onChange={(e) => {
               setImageBehavior(e.target.value);
+              uploadCompleteCallback?.(imageURL, e.target.value);
             }}
             toggledOption={imageBehavior}
             options={[
