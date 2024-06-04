@@ -14,6 +14,19 @@ import { addressSwapper } from 'shared/utils';
  * We can do this by overriding the `getAddress` method of the session signer class (e.g. CosmosSigner).
  */
 
+function parseAddress(address: string): [chain: string, walletAddress: string] {
+  const addressPattern = /^cosmos:([0-9a-z\-_]+):([a-zA-Fa-f0-9]+)$/;
+  const result = addressPattern.exec(address);
+  if (result === null) {
+    throw new Error(
+      `invalid address: ${address} did not match ${addressPattern}`,
+    );
+  }
+
+  const [_, chain, walletAddress] = result;
+  return [chain, walletAddress];
+}
+
 export class CosmosSignerCW extends CosmosSigner {
   public async getAddress(): Promise<string> {
     const chainId = await this._signer.getChainId();
@@ -26,22 +39,6 @@ export class CosmosSignerCW extends CosmosSigner {
   // Use this._signer.getChainId() instead of the chainId inferred from the CAIP-2 address
   public async authorize(data: AbstractSessionData): Promise<Session<any>> {
     const { topic, address, timestamp, publicKey, duration } = data;
-
-    const addressPattern = /^cosmos:([0-9a-z\-_]+):([a-zA-Fa-f0-9]+)$/;
-    function parseAddress(
-      address: string,
-    ): [chain: string, walletAddress: string] {
-      const result = addressPattern.exec(address);
-      if (result === null) {
-        throw new Error(
-          `invalid address: ${address} did not match ${addressPattern}`,
-        );
-      }
-
-      const [_, chain, walletAddress] = result;
-      return [chain, walletAddress];
-    }
-
     const [chainId, walletAddress] = parseAddress(address);
 
     const issuedAt = new Date(timestamp);
@@ -61,7 +58,7 @@ export class CosmosSignerCW extends CosmosSigner {
     const signResult = await this._signer.sign(
       message,
       walletAddress,
-      this._signer.getChainId(),
+      await this._signer.getChainId(),
     );
 
     return {
@@ -77,9 +74,11 @@ export class CosmosSignerCW extends CosmosSigner {
 }
 
 export class SubstrateSignerCW extends SubstrateSigner {
+  // override SubstrateSigner to always use 42 as the ss58 id
+  // TODO: Could we pass the ss58prefix to this._signer.getAddress()
+  // in packages/chain-substrate instead?
   public async getAddress(): Promise<string> {
-    const chainId = await this._signer.getChainId();
-    const walletAddress = await this._signer.getAddress(chainId);
+    const walletAddress = await this._signer.getAddress();
     const finalAddress = addressSwapper({
       currentPrefix: 42,
       address: walletAddress,
@@ -87,6 +86,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
     return `polkadot:42:${finalAddress}`;
   }
 
+  // override AbstractSessionSigner to use ss58 id 42 in hasSession
   hasSession(topic, address) {
     const [namespace, chainId, walletAddress] = address.split(':');
     const finalAddress = addressSwapper({

@@ -391,9 +391,8 @@ export class Thread implements IUniqueId {
           reactions: [],
           version_history: [],
           reaction_weights_sum: 0,
-          canvas_action: null,
+          canvas_signed_data: null,
           canvas_hash: null,
-          canvas_session: null,
         }),
     );
     this.latestActivity = last_commented_on
