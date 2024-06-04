@@ -442,14 +442,12 @@ export async function handleSocialLoginCallback({
   walletSsoSource?: string;
   returnEarlyIfNewAddress?: boolean;
 }): Promise<{ address: string; isAddressNew: boolean }> {
-  console.log(1);
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
   const isEmail = walletSsoSource === WalletSsoSource.Email;
-  console.log(2);
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
@@ -465,9 +463,7 @@ export async function handleSocialLoginCallback({
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
-    console.log(2.1);
     const result = await magic.oauth.getRedirectResult();
-    console.log(`magic.oauth.getRedirectResult()`, result);
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');
@@ -483,7 +479,6 @@ export async function handleSocialLoginCallback({
       magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
     }
   }
-  console.log(3);
 
   const client = OpenFeature.getClient();
   const userOnboardingEnabled = client.getBooleanValue(
@@ -556,12 +551,10 @@ export async function handleSocialLoginCallback({
         'Reauthenticated Ethereum session from magic address:',
         checksumAddress,
       );
-      console.log(sessionObject);
-      console.log(session);
     }
   } catch (err) {
-    console.log(err);
     // if session auth fails, do nothing
+    console.log('Magic session auth failed', err);
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
