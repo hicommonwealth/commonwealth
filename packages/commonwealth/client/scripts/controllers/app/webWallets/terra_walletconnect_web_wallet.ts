@@ -5,6 +5,7 @@ import type {
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import app from 'state';
 import IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
@@ -63,6 +64,7 @@ class TerraWalletConnectWebWalletController
 
   public getSessionSigner() {
     return new CosmosSignerCW({
+      bech32Prefix: app.chain?.meta.bech32Prefix,
       signer: {
         type: 'bytes',
         getAddress: () => this._accounts[0].address,
