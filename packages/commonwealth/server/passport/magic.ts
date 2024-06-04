@@ -127,6 +127,11 @@ async function createNewMagicUser({
         // so it is safe to set emails from magic as part of User data, even though they may be unverified.
         // although not usable for login, this email (used for outreach) is still considered sensitive user data.
         email: magicUserMetadata.email,
+
+        // we mark email verified so that we are OK to send update emails, but we should note that
+        // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
+        // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
+        emailVerified: !!magicUserMetadata.email,
       },
       { transaction },
     );
