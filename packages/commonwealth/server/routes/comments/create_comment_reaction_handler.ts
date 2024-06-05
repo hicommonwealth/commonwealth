@@ -7,6 +7,7 @@ import {
 } from 'shared/canvas/types';
 import { addressSwapper } from 'shared/utils';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -16,9 +17,7 @@ const Errors = {
 };
 
 type CreateCommentReactionRequestParams = { id: string };
-type CreateCommentReactionRequestBody = {
-  reaction: string;
-};
+type CreateCommentReactionRequestBody = { reaction: string };
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
@@ -53,7 +52,7 @@ export const createCommentReactionHandler = async (
     commentReactionFields.canvasSignedData = req.body.canvas_signed_data;
     commentReactionFields.canvasHash = req.body.canvas_hash;
 
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
       await verifyReaction(canvasSignedData, {

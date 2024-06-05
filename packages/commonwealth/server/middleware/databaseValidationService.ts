@@ -2,7 +2,7 @@ import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { CommunityInstance } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { CW_BOT_KEY } from '../config';
+import { config } from '../config';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import {
   validateCommunity,
@@ -54,7 +54,7 @@ export default class DatabaseValidationService {
     next: NextFunction,
   ) => {
     //1. Check for bot token
-    if (req.body.auth !== CW_BOT_KEY) {
+    if (req.body.auth !== config.CW_BOT_KEY) {
       return next(new AppError('Approved Bot Only Endpoint'));
     }
     //2. Get Bot User and inject

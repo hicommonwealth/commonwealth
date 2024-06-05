@@ -7,6 +7,7 @@ import {
 } from 'shared/canvas/types';
 import { addressSwapper } from 'shared/utils';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -61,7 +62,7 @@ export const createThreadCommentHandler = async (
     threadCommentFields.canvasSignedData = req.body.canvas_signed_data;
     threadCommentFields.canvasHash = req.body.canvas_hash;
 
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
       await verifyComment(canvasSignedData, {
         thread_id: parseInt(threadId, 10) || undefined,

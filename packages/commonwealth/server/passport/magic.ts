@@ -31,7 +31,7 @@ import { deserializeCanvas } from 'shared/canvas/types';
 import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getSessionSignerForAddress } from '../../shared/canvas/verify';
-import { MAGIC_API_KEY, config } from '../config';
+import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -525,7 +525,7 @@ async function magicLoginRoute(
       }
     }
 
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    if (config.ENFORCE_SESSION_KEYS) {
       // verify the session signature using session signer
       const sessionSigner = getSessionSignerForAddress(session.address);
       if (!sessionSigner) {
@@ -643,9 +643,9 @@ async function magicLoginRoute(
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
-  if (MAGIC_API_KEY) {
+  if (config.AUTH.MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
-    const magic = new Magic(MAGIC_API_KEY);
+    const magic = new Magic(config.AUTH.MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         try {

@@ -6,6 +6,7 @@ import {
 } from 'shared/canvas/types';
 import { addressSwapper } from 'shared/utils';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -57,7 +58,7 @@ export const createThreadHandler = async (
     threadFields.canvasSignedData = req.body.canvas_signed_data;
     threadFields.canvasHash = req.body.canvas_hash;
 
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
       await verifyThread(canvasSignedData, {

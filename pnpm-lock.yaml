@@ -245,6 +245,9 @@ importers:
       eslint-plugin-functional:
         specifier: ^6.1.1
         version: 6.5.1(eslint@8.57.0)(typescript@5.4.5)
+      eslint-plugin-n:
+        specifier: ^17.7.0
+        version: 17.7.0(eslint@8.57.0)
       eslint-plugin-prettier:
         specifier: ^4.2.1
         version: 4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@2.7.1)
@@ -11416,6 +11419,15 @@ packages:
       }
     engines: { node: '>=12' }
 
+  eslint-compat-utils@0.5.1:
+    resolution:
+      {
+        integrity: sha512-3z3vFexKIEnjHE3zCMRo6fn/e44U7T1khUjg+Hp0ZQMCigh28rALD0nPFBcGZuiLC5rLZa2ubQHDRln09JfU2Q==,
+      }
+    engines: { node: '>=12' }
+    peerDependencies:
+      eslint: '>=6.0.0'
+
   eslint-config-prettier@8.10.0:
     resolution:
       {
@@ -11473,6 +11485,15 @@ packages:
     peerDependencies:
       eslint: '>=6.7.0'
 
+  eslint-plugin-es-x@7.6.0:
+    resolution:
+      {
+        integrity: sha512-I0AmeNgevgaTR7y2lrVCJmGYF0rjoznpDvqV/kIkZSZbZ8Rw3eu4cGlvBBULScfkSOCzqKbff5LR4CNrV7mZHA==,
+      }
+    engines: { node: ^14.18.0 || >=16.0.0 }
+    peerDependencies:
+      eslint: '>=8'
+
   eslint-plugin-functional@6.5.1:
     resolution:
       {
@@ -11498,6 +11519,15 @@ packages:
     peerDependenciesMeta:
       '@typescript-eslint/parser':
         optional: true
+
+  eslint-plugin-n@17.7.0:
+    resolution:
+      {
+        integrity: sha512-4Jg4ZKVE4VjHig2caBqPHYNW5na84RVufUuipFLJbgM/G57O6FdpUKJbHakCDJb/yjQuyqVzYWRtU3HNYaZUwg==,
+      }
+    engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
+    peerDependencies:
+      eslint: '>=8.23.0'
 
   eslint-plugin-prettier@4.2.1:
     resolution:
@@ -12641,6 +12671,13 @@ packages:
         integrity: sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==,
       }
     engines: { node: '>=8' }
+
+  globals@15.3.0:
+    resolution:
+      {
+        integrity: sha512-cCdyVjIUVTtX8ZsPkq1oCsOsLmGIswqnjZYMJJTGaNApj1yHtLSymKhwH51ttirREn75z3p4k051clwg7rvNKA==,
+      }
+    engines: { node: '>=18' }
 
   globalthis@1.0.4:
     resolution:
@@ -29459,6 +29496,11 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
+  eslint-compat-utils@0.5.1(eslint@8.57.0):
+    dependencies:
+      eslint: 8.57.0
+      semver: 7.6.0
+
   eslint-config-prettier@8.10.0(eslint@8.57.0):
     dependencies:
       eslint: 8.57.0
@@ -29503,6 +29545,13 @@ snapshots:
     dependencies:
       eslint: 8.57.0
 
+  eslint-plugin-es-x@7.6.0(eslint@8.57.0):
+    dependencies:
+      '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
+      '@eslint-community/regexpp': 4.10.0
+      eslint: 8.57.0
+      eslint-compat-utils: 0.5.1(eslint@8.57.0)
+
   eslint-plugin-functional@6.5.1(eslint@8.57.0)(typescript@5.4.5):
     dependencies:
       '@typescript-eslint/utils': 7.8.0(eslint@8.57.0)(typescript@5.4.5)
@@ -29543,6 +29592,18 @@ snapshots:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
       - supports-color
+
+  eslint-plugin-n@17.7.0(eslint@8.57.0):
+    dependencies:
+      '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
+      enhanced-resolve: 5.16.1
+      eslint: 8.57.0
+      eslint-plugin-es-x: 7.6.0(eslint@8.57.0)
+      get-tsconfig: 4.7.4
+      globals: 15.3.0
+      ignore: 5.3.1
+      minimatch: 9.0.4
+      semver: 7.6.0
 
   eslint-plugin-prettier@4.2.1(eslint-config-prettier@8.10.0(eslint@8.57.0))(eslint@8.57.0)(prettier@2.7.1):
     dependencies:
@@ -30419,6 +30480,8 @@ snapshots:
   globals@13.24.0:
     dependencies:
       type-fest: 0.20.2
+
+  globals@15.3.0: {}
 
   globalthis@1.0.4:
     dependencies:
