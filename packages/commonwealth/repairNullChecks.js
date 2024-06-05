@@ -117,6 +117,9 @@ const compilationErrorsPerFileSorted = sortCompilationErrorsPerFile(
 );
 
 for (const key of Object.keys(compilationErrorsPerFileSorted)) {
-  const entry = compilationErrorsPerFileSorted[key];
-  repairNullChecks(entry.file, entry.lineNumber, entry.columnNumber);
+  const entries = compilationErrorsPerFileSorted[key];
+
+  for (const entry of entries) {
+    repairNullChecks(entry.file, entry.lineNumber, entry.columnNumber);
+  }
 }
