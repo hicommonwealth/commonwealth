@@ -211,7 +211,7 @@ export async function __getBulkThreads(
               'end_time', CON.end_time
           ))) as "associatedContests"
           FROM "Contests" CON
-          JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+          JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
           JOIN top_threads TT ON TT.id = CA.thread_id
           GROUP BY TT.id
     )${
