@@ -147,7 +147,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     // eslint-disable-next-line @typescript-eslint/await-thenable
-    await (this._web3.givenProvider as Web3BaseProvider).on(
+    await (this._web3.currentProvider as Web3BaseProvider).on(
       'accountsChanged',
       async (accounts: string[]) => {
         const encodedAccounts = accounts.map((a) =>
