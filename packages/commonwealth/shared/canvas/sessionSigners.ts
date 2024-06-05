@@ -23,7 +23,8 @@ function parseAddress(address: string): [chain: string, walletAddress: string] {
     );
   }
 
-  const [_, chain, walletAddress] = result;
+  const chain = result[1];
+  const walletAddress = result[2];
   return [chain, walletAddress];
 }
 
