@@ -69,7 +69,6 @@ export default defineConfig(({ command, mode }) => {
     define: {
       global: {},
       'process.env.NODE_ENV': JSON.stringify('development'),
-      'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
       'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
         env.KNOCK_PUBLIC_API_KEY,
       ),

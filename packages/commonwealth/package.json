@@ -71,7 +71,7 @@
     "ts-exec": "tsx ",
     "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' mocha ./test/unit/**/*.spec.ts",
     "unit-test:watch": "NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'",
-    "vite": "wait-on http://localhost:3000/api/health && vite",
+    "vite": "wait-on http://localhost:3000/api/health && vite --host",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {
