@@ -79,6 +79,7 @@ const addComponentShowcase = () => {
     componentType = ComponentType.Components;
   }
 
+  // @ts-expect-error StrictNullChecks
   if (!componentType) {
     console.error(
       `🛑 Invalid component type. Please choose either "${ComponentType.Foundations}" or "${ComponentType.Components}".`,

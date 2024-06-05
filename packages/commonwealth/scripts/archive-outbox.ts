@@ -70,6 +70,7 @@ async function uploadToS3(filePath: string): Promise<boolean> {
     }).done();
     log.info(
       `File uploaded successfully at ${formatS3Url(
+        // @ts-expect-error StrictNullChecks
         data.Location,
         S3_BUCKET_NAME,
       )}`,

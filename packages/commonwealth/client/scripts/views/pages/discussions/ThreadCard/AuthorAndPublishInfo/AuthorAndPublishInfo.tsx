@@ -246,10 +246,12 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
+      {/*@ts-expect-error StrictNullChecks*/}
       {viewsCount !== null && viewsCount >= 0 && (
         <>
           {dotIndicator}
           <CWText type="caption" className="section-text">
+            {/* @ts-expect-error StrictNullChecks*/}
             {`${viewsCount} view${viewsCount > 1 ? 's' : ''}`}
           </CWText>
         </>
@@ -269,6 +271,7 @@ export const AuthorAndPublishInfo = ({
               },
               'proposal-stage-text',
             )}
+            // @ts-expect-error StrictNullChecks
             onClick={async () => await onThreadStageLabelClick(threadStage)}
           >
             {threadStageToLabel(threadStage)}

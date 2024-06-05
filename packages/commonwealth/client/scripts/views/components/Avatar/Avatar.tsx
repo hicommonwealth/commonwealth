@@ -14,14 +14,17 @@ interface AvatarProps {
 
 export const Avatar = ({ url, size, address, showSkeleton }: AvatarProps) => {
   if (showSkeleton) {
+    // @ts-expect-error StrictNullChecks
     return <CWAvatarSkeleton size={size} />;
   }
 
   if (url) {
+    // @ts-expect-error StrictNullChecks
     return <CWAvatar avatarUrl={url} size={size} />;
   }
 
   if (address) {
+    // @ts-expect-error StrictNullChecks
     return <CWJdenticon address={String(address)} size={size} />;
   }
 
