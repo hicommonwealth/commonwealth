@@ -66,15 +66,18 @@ const SessionRevalidationModal = ({
         await setActiveAccount(updatedAddress);
       } else {
         openConfirmation({
-          title: 'Address mismatch',
+          title: 'Address switch required',
           description: (
             <>
-              Expected the address <b>{formatAddress(walletAddress)}</b>, but
-              the wallet you signed in with has address{' '}
-              <b>{formatAddress(signedAddress)}</b>.
-              <br />
-              Please try to sign again with the expected address.
-              <br />
+              <p>
+                The wallet you just signed in with has the address{' '}
+                <b>{formatAddress(signedAddress)}</b>, but we were expecting{' '}
+                <b>{formatAddress(walletAddress)}</b>.
+              </p>
+              <p>
+                Try switching addresses in your wallet, or link this address by
+                selecting <b>Connect a new address</b> in the user menu.
+              </p>
             </>
           ),
           buttons: [],
