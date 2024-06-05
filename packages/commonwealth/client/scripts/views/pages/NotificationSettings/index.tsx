@@ -1,14 +1,13 @@
-import { ThreadSubscription } from '@hicommonwealth/schemas';
+import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
-import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
+import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { useCommunityAlerts } from 'views/pages/NotificationSettings/useCommunityAlerts';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
@@ -24,6 +23,10 @@ const NotificationSettings = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlerts();
+
+  const communityAlertsIndex = createIndexForCommunityAlerts(
+    communityAlerts.data || [],
+  );
 
   const { bundledSubs } = useNotificationSettings();
 
@@ -69,7 +72,7 @@ const NotificationSettings = () => {
           />
         </CWTabsRow>
 
-        {section === 'community-alerts' && (
+        {!communityAlerts.isLoading && section === 'community-alerts' && (
           <>
             <CWText type="h4" fontWeight="semiBold" className="section-header">
               Community Alerts
@@ -87,25 +90,11 @@ const NotificationSettings = () => {
                 if (!communityInfo?.id) return null; // handles incomplete loading case
 
                 return (
-                  <div key={communityInfo?.id} className="notification-row">
-                    <div className="notification-row-header">
-                      <div className="left-content-container">
-                        <div className="avatar-and-name">
-                          <CWCommunityAvatar
-                            size="medium"
-                            community={communityInfo}
-                          />
-                          <CWText type="h5" fontWeight="medium">
-                            {communityInfo?.name}
-                          </CWText>
-
-                          <div style={{ marginLeft: 'auto' }}>
-                            <CWToggle />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <CommunityEntry
+                    key={communityInfo.id}
+                    communityInfo={communityInfo}
+                    communityAlert={communityAlertsIndex[communityInfo.id]}
+                  />
                 );
               })}
           </>
@@ -139,5 +128,15 @@ const NotificationSettings = () => {
     </CWPageLayout>
   );
 };
+
+function createIndexForCommunityAlerts(
+  communityAlerts: ReadonlyArray<z.infer<typeof CommunityAlert>>,
+): Readonly<{ [id: string]: z.infer<typeof CommunityAlert> }> {
+  const result: { [id: string]: z.infer<typeof CommunityAlert> } = {};
+  communityAlerts.forEach(
+    (current) => (result[current.community_id] = current),
+  );
+  return result;
+}
 
 export default NotificationSettings;
