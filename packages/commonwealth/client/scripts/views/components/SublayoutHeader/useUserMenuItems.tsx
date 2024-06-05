@@ -264,7 +264,7 @@ const useUserMenuItems = ({
       {
         type: 'default',
         label: 'Sign out',
-        onClick: () => {
+        onClick: async () => {
           clearSetGatingGroupBannerForCommunities();
           clearSetAdminOnboardingCardVisibilityForCommunities();
           await handleLogout();
