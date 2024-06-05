@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -49,7 +50,7 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       thread_id: threadId,
       // @ts-expect-error StrictNullChecks

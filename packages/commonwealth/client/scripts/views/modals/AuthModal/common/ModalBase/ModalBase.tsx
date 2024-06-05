@@ -1,6 +1,5 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import useWallets from 'client/scripts/hooks/useWallets';
 import app from 'client/scripts/state';
 import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
 import AuthButton from 'client/scripts/views/components/AuthButton';
@@ -23,6 +22,7 @@ import {
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
+import useAuthentication from '../../useAuthentication';
 import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
@@ -123,7 +123,7 @@ const ModalBase = ({
     onWalletSelect,
     onSocialLogin,
     onVerifyMobileWalletSignature,
-  } = useWallets({
+  } = useAuthentication({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

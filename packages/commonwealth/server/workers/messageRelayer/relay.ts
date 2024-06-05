@@ -9,7 +9,7 @@ import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { MESSAGE_RELAYER_PREFETCH } from '../../config';
+import { config } from '../../config';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -29,7 +29,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
       {
         transaction,
         type: QueryTypes.SELECT,
-        replacements: { prefetch: MESSAGE_RELAYER_PREFETCH },
+        replacements: { prefetch: config.WORKERS.MESSAGE_RELAYER_PREFETCH },
       },
     );
 

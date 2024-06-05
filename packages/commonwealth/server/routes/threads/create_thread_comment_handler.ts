@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -60,7 +61,7 @@ export const createThreadCommentHandler = async (
     throw new AppError(Errors.MissingText);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyComment(canvasAction, canvasSession, canvasHash, {
       thread_id: parseInt(threadId, 10) || undefined,
       text,

@@ -6,7 +6,7 @@ import type { Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { addressSwapper, bech32ToHex } from '../../shared/utils';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import { createRole, findOneRole } from '../util/roles';
@@ -75,7 +75,7 @@ const linkExistingAddressToCommunity = async (
 
     verificationToken = crypto.randomBytes(18).toString('hex');
     verificationTokenExpires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
+      +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
 
     await models.Address.update(

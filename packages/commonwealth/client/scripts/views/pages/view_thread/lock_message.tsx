@@ -14,13 +14,11 @@ const buildLockMessage = (
   }
   if (lockedAt) {
     return `This thread was locked on ${lockedAt.format(
-      'MM/DD/YYYY',
+      'DD/MM/YYYY',
     )}, meaning it can no longer be edited or commented on.`;
   }
-  // @ts-expect-error <StrictNullChecks/>
-  return `This thread has been locked, meaning it can no longer be edited or commented on. Thread was locked prior to ${updatedAt.format(
-    'MM/DD/YYYY',
-  )}.`;
+  return `This thread has been locked, meaning it can no longer be edited or commented on. 
+  Thread was locked prior to ${updatedAt.format('DD/MM/YYYY')}.`;
 };
 
 type LockMessageProps = {
@@ -34,7 +32,6 @@ export const LockMessage = ({
   updatedAt,
   fromDiscordBot,
 }: LockMessageProps) => {
-  // @ts-expect-error <StrictNullChecks/>
   const message = buildLockMessage(fromDiscordBot, lockedAt, updatedAt);
   return (
     <div className="callout-text">

@@ -103,7 +103,7 @@ export const ContractTemplateCard = ({
   const enabler = templateInfo?.enabledBy
     ? app.chain.accounts.get(templateInfo?.enabledBy)
     : null;
-  const enabledOn = moment(templateInfo.enabledAt).format('MM/DD/YY');
+  const enabledOn = moment(templateInfo.enabledAt).format('DD/MM/YYYY');
 
   return (
     <CWCard fullWidth className="ContractTemplateCard">
