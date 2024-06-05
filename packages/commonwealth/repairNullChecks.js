@@ -1,5 +1,12 @@
 import fs from 'fs';
 
+const DISABLE_COMMENT = '// @ts-expect-error StrictNullChecks';
+
+function getWhitespacePrefix(line) {
+  const match = line.match(/^\s*/);
+  return match ? match[0] : '';
+}
+
 async function repairNullChecks(path, lineNr, columnNr) {
   // TODO make this idempotent so that if the char at the given position is ALREADY '!' then abort
 
@@ -9,18 +16,16 @@ async function repairNullChecks(path, lineNr, columnNr) {
   const lines = content.split('\n');
   const line = lines[lineNr - 1];
 
-  if (line[columnNr] === '!') {
-    console.log(`Skipping: ${path}:${lineNr}:${columnNr}`);
+  if (line.indexOf('@ts-expect-error') !== -1) {
+    console.log(`Skipped: ${path}:${lineNr}:${columnNr}`);
+    return;
   }
 
-  const lineArr = line.split('');
-  lineArr.splice(columnNr, 0, '!');
-  const lineFixed = lineArr.join('');
-  const newLines = [...lines];
-  newLines[lineNr - 1] = lineFixed;
+  // get the whitespace prefix...
+  const whitespacePrefix = getWhitespacePrefix(line);
 
-  console.log(`line: '${line}'`);
-  console.log(`lineFixed: '${lineFixed}'`);
+  let newLines = [...lines];
+  newLines.splice(lineNr - 1, 0, whitespacePrefix + DISABLE_COMMENT);
 
   const newContent = newLines.join('\n');
   fs.writeFileSync(path, Buffer.from(newContent));
