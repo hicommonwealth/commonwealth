@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import {
   NotificationInstance,
   SubscriptionInstance,
@@ -336,7 +336,7 @@ async function main() {
           'Wallet address not found. ' +
             'Make sure the given address is an address you have used to sign in before.',
         );
-        process.exit(1);
+        await dispose()('ERROR', true);
       } else {
         userId = address.user_id;
       }
@@ -413,10 +413,12 @@ async function main() {
 if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
-      process.exit(0);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
     })
     .catch((err) => {
       console.log('Failed to emit a notification:', err);
-      process.exit(1);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }
