@@ -142,6 +142,7 @@ class SessionsController {
     this.near = new NEARSessionController();
   }
 
+  // @ts-expect-error StrictNullChecks
   getSessionController(chainBase: ChainBase): ISessionController {
     if (chainBase === 'ethereum') return this.ethereum;
     else if (chainBase === 'substrate') return this.substrate;
@@ -197,6 +198,7 @@ class SessionsController {
       chainBase === ChainBase.CosmosSDK
         ? app.chain?.meta.bech32Prefix
         : app.chain?.meta.node?.ethChainId;
+    // @ts-expect-error StrictNullChecks
     const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
 
     // Try to request a new session from the user, if one was not found.
@@ -218,6 +220,7 @@ class SessionsController {
         name: 'Authentication Error',
         message: 'Session key expired',
         address,
+        // @ts-expect-error StrictNullChecks
         ssoSource: matchingAccount.walletSsoSource,
       });
     }

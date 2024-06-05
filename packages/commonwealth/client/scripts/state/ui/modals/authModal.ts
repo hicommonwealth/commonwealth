@@ -26,6 +26,7 @@ export const authModal = createStore<AuthModalStore>()(
             };
           });
         },
+        // @ts-expect-error StrictNullChecks
         triggerOpenModalType: null,
         setTriggerOpenModalType: (modalType) => {
           set((state) => {

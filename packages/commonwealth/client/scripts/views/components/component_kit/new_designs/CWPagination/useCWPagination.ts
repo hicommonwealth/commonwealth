@@ -122,6 +122,7 @@ const useCWPagination = ({
 
     return {
       onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        // @ts-expect-error StrictNullChecks
         handleClick(event, buttonTypeToPageNumber(item));
       },
       type: item,

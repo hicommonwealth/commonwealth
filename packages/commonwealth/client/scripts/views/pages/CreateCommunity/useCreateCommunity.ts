@@ -10,8 +10,10 @@ const useCreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
     useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
+    // @ts-expect-error StrictNullChecks
     { type: null, chainBase: null },
   );
+  // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
   const [selectedChainId, setSelectedChainId] = useState(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
@@ -43,6 +45,7 @@ const useCreateCommunity = () => {
 
   const isSupportedChainSelected = Object.values(
     commonProtocol.ValidChains,
+    // @ts-expect-error StrictNullChecks
   ).includes(parseInt(selectedChainId));
 
   const showCommunityStakeStep =
