@@ -28,6 +28,15 @@ module.exports = {
               FROM "ChainNodes"
               WHERE name = 'evmos')
           );
+
+          INSERT INTO "Topics" (community_id, name, featured_in_sidebar, featured_in_new_post, created_at, updated_at) VALUES (
+              'evmos-dev',
+              'Test Topic',
+              true,
+              true,
+              NOW(),
+              NOW()
+          );
           `,
           { raw: true, transaction: t },
         );
