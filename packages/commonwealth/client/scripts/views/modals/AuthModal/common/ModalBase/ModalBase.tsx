@@ -216,7 +216,7 @@ const ModalBase = ({
         return;
       }
 
-      // @ts-expect-error <StrictNullChecks/>
+      // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
 

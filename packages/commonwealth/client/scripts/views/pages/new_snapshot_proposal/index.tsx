@@ -244,10 +244,7 @@ export const NewSnapshotProposalForm = ({
           )}
           {showScoreWarning ? (
             <CWText>
-              {/* @ts-expect-error StrictNullChecks*/}
-              You need to have a minimum of {
-                space.validation.params.minScore
-              }{' '}
+              You need to have a minimum of {space!.validation.params.minScore}{' '}
               {/* @ts-expect-error StrictNullChecks*/}
               {space.symbol} in order to submit a proposal.
             </CWText>
