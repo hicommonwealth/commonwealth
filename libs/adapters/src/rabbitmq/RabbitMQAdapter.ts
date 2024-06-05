@@ -2,6 +2,7 @@ import {
   Broker,
   BrokerPublications,
   BrokerSubscriptions,
+  CustomRetryStrategyError,
   EventContext,
   EventSchemas,
   Events,
@@ -16,30 +17,63 @@ import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 import { fileURLToPath } from 'url';
 
-const defaultRetryStrategy: RetryStrategyFn = (
-  err: Error | undefined,
-  topic: BrokerSubscriptions,
-  content: any,
-  ackOrNackFn: AckOrNack,
-  log: ILogger,
-) => {
-  if (err instanceof InvalidInput) {
-    log.error(`Invalid event`, err, {
+/**
+ * Build a retry strategy function based on custom retry strategies map.
+ *
+ * @param {Function} customRetryStrategiesMap - A function which maps errors to retry strategies. The function should
+ * return `true` if an error was successfully mapped to a strategy and `false` otherwise.
+ * @param defaultDefer
+ * @param defaultAttempts
+ * @returns {RetryStrategyFn} The built retry strategy function.
+ */
+export function buildRetryStrategy(
+  customRetryStrategiesMap?: (...args: Parameters<RetryStrategyFn>) => boolean,
+  defaultDefer: number = 2000,
+  defaultAttempts: number = 3,
+): RetryStrategyFn {
+  return function (
+    err: Error | InvalidInput | CustomRetryStrategyError,
+    topic: BrokerSubscriptions,
+    content: any,
+    ackOrNackFn: AckOrNack,
+    log: ILogger,
+  ) {
+    const logContext = {
       topic,
       message: content,
-    });
-    ackOrNackFn(err, { strategy: 'nack' });
-  } else {
-    log.error(`Failed to process event`, err, {
-      topic,
-      message: content,
-    });
-    ackOrNackFn(err, [
-      { strategy: 'republish', defer: 2000, attempts: 3 },
-      { strategy: 'nack' },
-    ]);
-  }
-};
+    };
+
+    if (err instanceof InvalidInput) {
+      log.error(`Invalid event`, err, logContext);
+      ackOrNackFn(err, { strategy: 'nack' });
+      return;
+    } else if (err instanceof CustomRetryStrategyError) {
+      log.error(err.message, err, logContext);
+      ackOrNackFn(err, err.recoveryStrategy);
+      return;
+    }
+
+    let res = false;
+    if (customRetryStrategiesMap) {
+      res = customRetryStrategiesMap(err, topic, content, ackOrNackFn, log);
+    }
+
+    if (!res) {
+      log.error(`Failed to process event`, err, logContext);
+      ackOrNackFn(err, [
+        {
+          strategy: 'republish',
+          defer: defaultDefer,
+          attempts: defaultAttempts,
+        },
+        { strategy: 'nack' },
+      ]);
+      return;
+    }
+  };
+}
+
+const defaultRetryStrategy = buildRetryStrategy();
 
 export class RabbitMQAdapter implements Broker {
   protected _initialized = false;
@@ -48,7 +82,7 @@ export class RabbitMQAdapter implements Broker {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  private _log: ILogger;
+  private readonly _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     const __filename = fileURLToPath(import.meta.url);
@@ -190,7 +224,7 @@ export class RabbitMQAdapter implements Broker {
               });
               ackOrNackFn();
             })
-            .catch((err: Error | undefined) => {
+            .catch((err: Error) => {
               if (retryStrategy)
                 retryStrategy(err, topic, content, ackOrNackFn, this._log);
               else
