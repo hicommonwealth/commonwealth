@@ -264,6 +264,7 @@ const useUserMenuItems = ({
       {
         type: 'default',
         label: 'Sign out',
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick: async () => {
           clearSetGatingGroupBannerForCommunities();
           clearSetAdminOnboardingCardVisibilityForCommunities();
