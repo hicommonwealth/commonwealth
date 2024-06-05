@@ -8,6 +8,7 @@ import { Op } from 'sequelize';
 import { formatAddressShort } from '../../shared/utils';
 import { config } from '../config';
 
+// @ts-expect-error StrictNullChecks
 sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 export type ThreadData = {
@@ -90,7 +91,9 @@ export const getTopThreads = async (
 
       const profile = await models.Profile.findOne({
         where: {
+          // @ts-expect-error StrictNullChecks
           id: addressData.profile_id,
+          // @ts-expect-error StrictNullChecks
           user_id: addressData.user_id,
         },
       });
@@ -110,8 +113,11 @@ export const getTopThreads = async (
         comment_count: row.comment_count,
         view_count: row.view_count,
         author_address: row.author_address,
+        // @ts-expect-error StrictNullChecks
         author_address_short: shortAddress,
+        // @ts-expect-error StrictNullChecks
         author_name: profile ? profile.profile_name : 'Anonymous',
+        // @ts-expect-error StrictNullChecks
         author_profile_img_url: profile ? profile.avatar_url : '',
         thread_id: row.thread_id,
         publish_date_string: moment(row.created_at).format('MM/DD/YY'),
@@ -182,17 +188,22 @@ export const emailDigestBuilder = async (
   // For each community, get the top threads, activity score, and new posts/comments
   for (const community of communities) {
     // if community includes a ' character skip it- SQL queries break and these are fake communities
+    // @ts-expect-error StrictNullChecks
     if (community.id.includes("'")) continue;
 
     try {
+      // @ts-expect-error StrictNullChecks
       const topThreads = await getTopThreads(community.id);
 
+      // @ts-expect-error StrictNullChecks
       const activityScore = await getCommunityActivityScore(community.id);
 
       const { totalComments, totalThreads } = await getActivityCounts(
+        // @ts-expect-error StrictNullChecks
         community.id,
       );
 
+      // @ts-expect-error StrictNullChecks
       communityDigestInfo[community.id] = {
         community_name: community.name,
         community_icon: community.icon_url,
@@ -244,15 +255,19 @@ export const emailDigestBuilder = async (
     for (const community_id of userCommunities) {
       const communityDigest = communityDigestInfo[community_id];
       if (!communityDigest || communityDigest.top_threads.length < 1) continue;
+      // @ts-expect-error StrictNullChecks
       emailObject.push(communityDigest);
     }
 
     // Build Email Object
+    // @ts-expect-error StrictNullChecks
     allEmailObjects.push({
+      // @ts-expect-error StrictNullChecks
       data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
       newThreads:
         emailObject.length > 0
           ? emailObject.reduce((acc, community) => {
+              // @ts-expect-error StrictNullChecks
               acc += +community.new_posts;
               return acc;
             }, 0)
@@ -260,6 +275,7 @@ export const emailDigestBuilder = async (
       newComments:
         emailObject.length > 0
           ? emailObject.reduce((acc, community) => {
+              // @ts-expect-error StrictNullChecks
               acc += +community.new_comments;
               return acc;
             }, 0)
@@ -268,10 +284,12 @@ export const emailDigestBuilder = async (
 
     // Build Template Data
     const dynamicData = {
+      // @ts-expect-error StrictNullChecks
       data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
       newThreads:
         emailObject.length > 0
           ? emailObject.reduce((acc, community) => {
+              // @ts-expect-error StrictNullChecks
               acc += +community.new_posts;
               return acc;
             }, 0)
@@ -279,6 +297,7 @@ export const emailDigestBuilder = async (
       newComments:
         emailObject.length > 0
           ? emailObject.reduce((acc, community) => {
+              // @ts-expect-error StrictNullChecks
               acc += +community.new_comments;
               return acc;
             }, 0)
@@ -296,6 +315,7 @@ export const emailDigestBuilder = async (
     if (process.env.NODE_ENV === 'production' && dynamicData.data.length > 0) {
       try {
         if (user.email) {
+          // @ts-expect-error StrictNullChecks
           await sgMail.send(msg);
           emailsSent += 1;
         }

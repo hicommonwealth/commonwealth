@@ -119,6 +119,7 @@ async function paginateAddresses(
   callback: (addresses: AddressAttributes[]) => Promise<void>,
 ): Promise<void> {
   const addresses = await models.Address.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       community_id: communityId,
       verified: {
@@ -178,6 +179,7 @@ async function computeMembership(
     reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
+  // @ts-expect-error StrictNullChecks
   return computedMembership;
 }
 
@@ -195,6 +197,7 @@ async function processMemberships(
   for (const currentGroup of groupsToUpdate) {
     for (const address of addresses) {
       // populate toCreate and toUpdate arrays
+      // @ts-expect-error StrictNullChecks
       const existingMembership = address.Memberships.find(
         ({ group_id }) => group_id === currentGroup.id,
       );
@@ -214,6 +217,7 @@ async function processMemberships(
           currentGroup,
           balances,
         );
+        // @ts-expect-error StrictNullChecks
         toUpdate.push(computedMembership);
         continue;
       }
@@ -224,6 +228,7 @@ async function processMemberships(
         currentGroup,
         balances,
       );
+      // @ts-expect-error StrictNullChecks
       toCreate.push(computedMembership);
     }
   }

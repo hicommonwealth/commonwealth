@@ -29,9 +29,13 @@ export const createCommentReactionHandler = async (
 ) => {
   const { user, address } = req;
   const {
+    // @ts-expect-error StrictNullChecks
     reaction,
+    // @ts-expect-error StrictNullChecks
     canvas_action: canvasAction,
+    // @ts-expect-error StrictNullChecks
     canvas_session: canvasSession,
+    // @ts-expect-error StrictNullChecks
     canvas_hash: canvasHash,
   } = req.body;
 
@@ -39,6 +43,7 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidReaction);
   }
 
+  // @ts-expect-error StrictNullChecks
   const commentId = parseInt(req.params.id, 10);
   if (!commentId) {
     throw new AppError(Errors.InvalidCommentId);
@@ -47,6 +52,7 @@ export const createCommentReactionHandler = async (
   if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       comment_id: commentId,
+      // @ts-expect-error StrictNullChecks
       address: address.address,
       value: reaction,
     });
@@ -55,7 +61,9 @@ export const createCommentReactionHandler = async (
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
       reaction,
       commentId,

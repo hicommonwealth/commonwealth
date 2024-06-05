@@ -75,6 +75,7 @@ export default async function emitNotifications(
       const userIdsDedup = userIds.filter(
         (a, b) => userIds.indexOf(a) === b && a !== null,
       );
+      // @ts-expect-error StrictNullChecks
       return userIdsDedup;
     } else {
       return [];
@@ -102,13 +103,17 @@ export default async function emitNotifications(
 
   // get notification if it already exists
   let notification: NotificationInstance;
+  // @ts-expect-error StrictNullChecks
   if (isChainEventData && chainEvent.id) {
+    // @ts-expect-error StrictNullChecks
     notification = await models.Notification.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         chain_event_id: chainEvent.id,
       },
     });
   } else {
+    // @ts-expect-error StrictNullChecks
     notification = await models.Notification.findOne({
       where: {
         notification_data: JSON.stringify(notification_data),
@@ -119,13 +124,18 @@ export default async function emitNotifications(
   // if the notification does not yet exist create it here
   if (!notification) {
     if (isChainEventData) {
+      // @ts-expect-error StrictNullChecks
       notification = await models.Notification.create({
+        // @ts-expect-error StrictNullChecks
         notification_data: JSON.stringify(chainEvent),
+        // @ts-expect-error StrictNullChecks
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
+        // @ts-expect-error StrictNullChecks
         community_id: chainEvent.community_id,
       });
     } else {
+      // @ts-expect-error StrictNullChecks
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
@@ -164,6 +174,7 @@ export default async function emitNotifications(
       });
       query += `(?, ?, ?, ?), `;
       replacements.push(
+        // @ts-expect-error StrictNullChecks
         notification.id,
         subscription.id,
         false,
@@ -189,7 +200,9 @@ export default async function emitNotifications(
   if (SEND_WEBHOOKS_EMAILS) {
     // emails
     for (const subscription of subscriptions) {
+      // @ts-expect-error StrictNullChecks
       if (msg && isChainEventData && chainEvent.community_id) {
+        // @ts-expect-error StrictNullChecks
         msg.dynamic_template_data.notification.path = `${config.SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
       }
       if (msg && subscription?.immediate_email && subscription?.User) {

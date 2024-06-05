@@ -16,7 +16,9 @@ export const updateTopicsOrderHandler = async (
   const { user, community, body } = req;
 
   const topics = await controllers.topics.updateTopicsOrder({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     community,
     body,
   });

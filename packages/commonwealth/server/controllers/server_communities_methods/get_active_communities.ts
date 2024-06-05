@@ -63,6 +63,7 @@ export async function __getActiveCommunities(
   const [communities, totalCommunitiesCount]: [CommunityInstance[], number] =
     await Promise.all([
       this.models.Community.findAll({
+        // @ts-expect-error StrictNullChecks
         where: {
           id: {
             [Op.in]: communityIds,

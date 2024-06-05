@@ -97,6 +97,7 @@ export const fetchEtherscanContract = async (
       });
 
       if (!contractAbi) {
+        // @ts-expect-error StrictNullChecks
         contractAbi = await models.ContractAbi.create({
           nickname,
           abi: abiRecord,

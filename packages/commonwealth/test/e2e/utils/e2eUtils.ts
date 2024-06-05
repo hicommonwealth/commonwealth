@@ -109,6 +109,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       }
 
       // If ethChainNode already has the apiKey, early return
+      // @ts-expect-error StrictNullChecks
       if (ethChainNodeExists[0][0]['url'].includes(apiKey)) {
         return;
       }
@@ -187,6 +188,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         'never'
       ) RETURNING id`);
 
+      // @ts-expect-error StrictNullChecks
       const profileId = (
         await testDb.sequelize.query(`
     INSERT INTO "Profiles" (
@@ -196,6 +198,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         profile_name,
         socials
       ) VALUES (
+        // @ts-expect-error StrictNullChecks
         ${userId[0][0]['id']},
         '2023-07-14 13:03:56.203-07',
         '2023-07-14 13:03:56.415-07',
@@ -205,6 +208,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
     `)
       )[0][0]['id'];
 
+      // @ts-expect-error StrictNullChecks
       await createAddress('ethereum', profileId, userId[0][0]['id']);
     },
 
@@ -215,6 +219,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       );
 
       // address already exists
+      // @ts-expect-error StrictNullChecks
       if (addresses.length && addresses.some((u) => u['chain'] === chain))
         return;
 

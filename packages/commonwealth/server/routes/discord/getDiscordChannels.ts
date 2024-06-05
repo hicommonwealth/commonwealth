@@ -31,6 +31,7 @@ const getDiscordChannels = async (
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
     },
   });

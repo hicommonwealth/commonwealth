@@ -31,6 +31,7 @@ export async function generateCosmosGovNotifications() {
   // fetch proposal id of the latest proposal notification for each community
   const latestProposalIds = await fetchLatestNotifProposalIds(
     models,
+    // @ts-expect-error StrictNullChecks
     communities.map((c) => c.id),
   );
   log.info(
@@ -41,6 +42,7 @@ export async function generateCosmosGovNotifications() {
 
   // fetch new proposals for each community
   const communitiesWithPropId = communities.filter(
+    // @ts-expect-error StrictNullChecks
     (c) => latestProposalIds[c.id],
   );
   if (communitiesWithPropId.length > 0) {
@@ -55,6 +57,7 @@ export async function generateCosmosGovNotifications() {
 
   // if a proposal id cannot be found, fetch the latest proposal from the community
   const missingPropIdCommunities = communities.filter(
+    // @ts-expect-error StrictNullChecks
     (c) => !latestProposalIds[c.id],
   );
   if (missingPropIdCommunities.length > 0) {

@@ -40,6 +40,7 @@ describe('POST communityStakes Tests', () => {
   });
 
   it('The handler creates and updates community stake', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
       models: server.models,
@@ -119,6 +120,7 @@ describe('POST communityStakes Tests', () => {
     const actualGetResponse = (
       await get(
         `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
+        // @ts-expect-error StrictNullChecks
         null,
         true,
         server.app,
@@ -152,6 +154,7 @@ describe('POST communityStakes Tests', () => {
       attributes: ['namespace', 'namespace_address'],
     });
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      // @ts-expect-error StrictNullChecks
       community,
       2,
     );
