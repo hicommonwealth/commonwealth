@@ -321,7 +321,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     try {
       if (walletToUse.chain !== 'near') {
-        await primaryAccount.validate(session, false);
+        await account.validate(session, false);
         await verifySession(session);
       }
       await onLogInWithAccount(account, false, true, false);
