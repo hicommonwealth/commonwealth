@@ -52,6 +52,26 @@ module.exports = {
         },
         { transaction: t },
       );
+      await queryInterface.addColumn(
+        'Threads',
+        'version_history_updated',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction: t },
+      );
+      await queryInterface.addColumn(
+        'Comments',
+        'version_history_updated',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction: t },
+      );
     });
   },
 
@@ -61,6 +81,12 @@ module.exports = {
         transaction: t,
       });
       await queryInterface.dropTable('ThreadVersionHistories', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('Threads', 'version_history_updated', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('Comments', 'version_history_updated', {
         transaction: t,
       });
     });
