@@ -59,6 +59,7 @@ const SessionRevalidationModal = ({
             <>
               Expected the address <b>{formatAddress(walletAddress)}</b>, but
               the wallet you signed in with has address{' '}
+              {/* @ts-expect-error StrictNullChecks*/}
               <b>{formatAddress(signedAddress)}</b>.
               <br />
               Please try sign again with expected address.
@@ -72,6 +73,7 @@ const SessionRevalidationModal = ({
         const updatedAddress = app.user.activeAccounts.find(
           (addr) => addr.address === walletAddress,
         );
+        // @ts-expect-error <StrictNullChecks/>
         await setActiveAccount(updatedAddress);
       }
     },

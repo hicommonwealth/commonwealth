@@ -47,11 +47,13 @@ const CommunityPreviewCard = ({
               {community.name}
             </CWText>
           )}
+          {/* @ts-expect-error StrictNullChecks*/}
           {monthlyThreadCount > 0 && (
             <div className="thread-counts">
               <CWIcon iconName="notepad" weight="light" />
               <CWText className="card-subtext" type="b2" fontWeight="medium">
                 {`${pluralize(
+                  // @ts-expect-error <StrictNullChecks/>
                   monthlyThreadCount,
                   'new thread',
                 )} created this month`}

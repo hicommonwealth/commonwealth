@@ -108,6 +108,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const [isInCommunityPage, setIsInCommunityPage] = useState<boolean>();
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   const [showMobile, setShowMobile] = useState<boolean>();
+  // @ts-expect-error <StrictNullChecks/>
   const [signerAccount, setSignerAccount] = useState<Account>(null);
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isLinkingOnMobile, setIsLinkingOnMobile] = useState<boolean>(false);
@@ -133,6 +134,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
   useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
+        // @ts-expect-error <StrictNullChecks/>
         showMobile,
         (state: boolean) => {
           setShowMobile(state);
@@ -317,7 +319,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const profile = account.profile;
     setAddress(account.address);
 
+    // @ts-expect-error <StrictNullChecks/>
     if (profile.name && profile.initialized) {
+      // @ts-expect-error <StrictNullChecks/>
       setUsername(profile.name);
     }
 
@@ -366,6 +370,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     if (isInCommunityPage && app.isLoggedIn()) {
       const timestamp = +new Date();
       const { signature, chainId, sessionPayload } =
+        // @ts-expect-error <StrictNullChecks/>
         await signSessionWithAccount(walletToUse, account, timestamp);
       await account.validate(signature, timestamp, chainId);
       app.sessions.authSession(
@@ -383,18 +388,21 @@ const useWallets = (walletProps: IuseWalletProps) => {
     if (!linking) {
       setPrimaryAccount(account);
       setAddress(account.address);
+      // @ts-expect-error <StrictNullChecks/>
       setProfiles([account.profile]);
     } else {
       if (newlyCreated) {
         notifyError("This account doesn't exist");
         return;
       }
+      // @ts-expect-error <StrictNullChecks/>
       if (account.address === primaryAccount.address) {
         notifyError("You can't link to the same account");
         return;
       }
       setSecondaryLinkAccount(account);
       setProfiles(
+        // @ts-expect-error <StrictNullChecks/>
         [account.profile], // TODO: Update when User -> Many Profiles goes in
       );
     }
@@ -404,9 +412,11 @@ const useWallets = (walletProps: IuseWalletProps) => {
       try {
         const timestamp = +new Date();
         const { signature, sessionPayload, chainId } =
+          // @ts-expect-error <StrictNullChecks/>
           await signSessionWithAccount(walletToUse, account, timestamp);
         await account.validate(signature, timestamp, chainId);
         await app.sessions.authSession(
+          // @ts-expect-error <StrictNullChecks/>
           app.chain ? app.chain.base : walletToUse.chain,
           chainId,
           account.address,
@@ -422,6 +432,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
         try {
           const timestamp = +new Date();
           const { signature, chainId, sessionPayload } =
+            // @ts-expect-error <StrictNullChecks/>
             await signSessionWithAccount(walletToUse, account, timestamp);
           // Can't call authSession now, since chain.base is unknown, so we wait till action
           setCachedWalletSignature(signature);
@@ -473,39 +484,50 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const primaryAccountToUse = currentPrimaryAccount || primaryAccount;
 
     try {
+      // @ts-expect-error <StrictNullChecks/>
       if (walletToUse.chain !== 'near') {
+        // @ts-expect-error <StrictNullChecks/>
         await primaryAccountToUse.validate(
+          // @ts-expect-error <StrictNullChecks/>
           cachedWalletSignatureToUse,
           cachedTimestampToUse,
           cachedChainIdToUse,
           false,
         );
         await app.sessions.authSession(
+          // @ts-expect-error <StrictNullChecks/>
           walletToUse.chain,
+          // @ts-expect-error <StrictNullChecks/>
           cachedChainIdToUse,
+          // @ts-expect-error <StrictNullChecks/>
           primaryAccountToUse.address,
           cachedSessionPayloadToUse,
           cachedWalletSignatureToUse,
         );
       }
+      // @ts-expect-error <StrictNullChecks/>
       await onLogInWithAccount(primaryAccountToUse, false, true, false);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
       const updatedProfiles =
         await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
+          // @ts-expect-error <StrictNullChecks/>
           primaryAccountToUse.profile.chain,
+          // @ts-expect-error <StrictNullChecks/>
           primaryAccountToUse.profile.address,
         );
       const currentUserUpdatedProfile = updatedProfiles[0];
       if (!currentUserUpdatedProfile) {
         console.log('No profile yet.');
       } else {
+        // @ts-expect-error <StrictNullChecks/>
         primaryAccountToUse.profile.initialize(
           currentUserUpdatedProfile?.name,
           currentUserUpdatedProfile.address,
           currentUserUpdatedProfile?.avatarUrl,
           currentUserUpdatedProfile.id,
+          // @ts-expect-error <StrictNullChecks/>
           primaryAccountToUse.profile.chain,
           currentUserUpdatedProfile?.lastActive,
         );
@@ -530,22 +552,27 @@ const useWallets = (walletProps: IuseWalletProps) => {
       const secondaryTimestamp = +new Date();
       const { signature: secondarySignature, chainId: secondaryChainId } =
         await signSessionWithAccount(
+          // @ts-expect-error <StrictNullChecks/>
           selectedLinkingWallet,
           secondaryLinkAccount,
           secondaryTimestamp,
         );
+      // @ts-expect-error <StrictNullChecks/>
       await secondaryLinkAccount.validate(
         secondarySignature,
         secondaryTimestamp,
         secondaryChainId,
       );
+      // @ts-expect-error <StrictNullChecks/>
       await primaryAccount.validate(
+        // @ts-expect-error <StrictNullChecks/>
         cachedWalletSignature,
         cachedTimestamp,
         cachedChainId,
       );
       // TODO: call authSession here, which requires special handling because of
       // the call to signSessionWithAccount() earlier
+      // @ts-expect-error <StrictNullChecks/>
       await onLogInWithAccount(primaryAccount, true);
     } catch (e) {
       console.log(e);
@@ -563,7 +590,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
     try {
       if (username || avatarUrl) {
         await updateProfile({
+          // @ts-expect-error <StrictNullChecks/>
           address: primaryAccountToUse.profile.address,
+          // @ts-expect-error <StrictNullChecks/>
           chain: primaryAccountToUse.profile.chain,
           name: username,
           avatarUrl,
@@ -573,6 +602,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       }
       if (walletProps.onSuccess) {
         walletProps.onSuccess(
+          // @ts-expect-error <StrictNullChecks/>
           primaryAccountToUse.profile.address,
           newelyCreated,
         );
@@ -587,12 +617,14 @@ const useWallets = (walletProps: IuseWalletProps) => {
   };
 
   const onResetWalletConnect = async () => {
+    // @ts-expect-error <StrictNullChecks/>
     const wallet = wallets.find(
       (w) =>
         w instanceof WalletConnectWebWalletController ||
         w instanceof TerraWalletConnectWebWalletController,
     );
 
+    // @ts-expect-error <StrictNullChecks/>
     await wallet.reset();
   };
 
@@ -702,6 +734,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     try {
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
+        // @ts-expect-error <StrictNullChecks/>
         wallet.getChainId().toString(),
         selectedAddress,
       );
@@ -723,6 +756,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       } = await createUserWithAddress(
         selectedAddress,
         wallet.name,
+        // @ts-expect-error <StrictNullChecks/>
         null, // no sso source
         chainIdentifier,
         sessionPublicAddress,
@@ -771,6 +805,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const timestamp = +new Date();
     const sessionAddress = await app.sessions.getOrCreateAddress(
       wallet.chain,
+      // @ts-expect-error <StrictNullChecks/>
       wallet.getChainId().toString(),
       selectedAddress,
     );
@@ -787,12 +822,14 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const { account } = await createUserWithAddress(
       selectedAddress,
       wallet.name,
+      // @ts-expect-error <StrictNullChecks/>
       null, // no sso source?
       chainIdentifier,
       sessionAddress,
       validationBlockInfo,
     );
     account.setValidationBlockInfo(
+      // @ts-expect-error <StrictNullChecks/>
       validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
 

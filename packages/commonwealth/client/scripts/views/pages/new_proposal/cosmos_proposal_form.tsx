@@ -54,9 +54,11 @@ export const CosmosProposalForm = () => {
 
   const { data: stakingDenom } = useStakingParamsQuery();
   const { data: depositParams, isLoading: isLoadingDepositParams } =
+    // @ts-expect-error <StrictNullChecks/>
     useDepositParamsQuery(stakingDenom);
 
   const minDeposit = parseFloat(
+    // @ts-expect-error <StrictNullChecks/>
     minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals),
   );
 
@@ -73,6 +75,7 @@ export const CosmosProposalForm = () => {
 
     const _deposit = deposit
       ? new CosmosToken(
+          // @ts-expect-error <StrictNullChecks/>
           depositParams?.minDeposit?.denom,
           depositInMinimalDenom,
           false,
@@ -91,6 +94,7 @@ export const CosmosProposalForm = () => {
         description,
         recipient,
         spendAmountInMinimalDenom,
+        // @ts-expect-error <StrictNullChecks/>
         depositParams?.minDeposit?.denom,
       );
     } else {
@@ -100,6 +104,7 @@ export const CosmosProposalForm = () => {
     try {
       const result = await cosmos.governance.submitProposalTx(
         author,
+        // @ts-expect-error <StrictNullChecks/>
         _deposit,
         prop,
       );

@@ -27,6 +27,7 @@ async function main() {
         address: process.env.SUPER_ADMIN_WALLET_ADDRESS,
       },
     });
+    // @ts-expect-error StrictNullChecks
     where['id'] = address.user_id;
   }
 

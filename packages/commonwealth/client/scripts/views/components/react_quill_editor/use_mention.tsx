@@ -83,6 +83,7 @@ export const useMention = ({
             tip.innerText = 'Type to tag a member';
             node.appendChild(tip);
             formattedMatches = [
+              // @ts-expect-error <StrictNullChecks/>
               {
                 link: '#',
                 name: '',
@@ -153,6 +154,7 @@ export const useMention = ({
               addrSpan.className = 'ql-mention-addr';
 
               const lastActiveSpan = document.createElement('span');
+              // @ts-expect-error <StrictNullChecks/>
               lastActiveSpan.innerText = profile.lastActive
                 ? `Last active ${moment(profile.lastActive).fromNow()}`
                 : null;

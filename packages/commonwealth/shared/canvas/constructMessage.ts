@@ -25,6 +25,7 @@ export const createCanvasSessionPayload = (
     from,
     sessionAddress,
     sessionDuration: 86400 * 1000,
+    // @ts-expect-error StrictNullChecks
     sessionIssued,
   };
 

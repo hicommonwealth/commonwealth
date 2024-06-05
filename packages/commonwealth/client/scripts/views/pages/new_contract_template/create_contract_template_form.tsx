@@ -38,6 +38,7 @@ const CreateContractTemplateForm = () => {
         name: form.displayName,
         template: form.template,
         description: form.description,
+        // @ts-expect-error <StrictNullChecks/>
         contract_id: stagedContractId,
         community: app.activeChainId(),
       });
@@ -71,6 +72,7 @@ const CreateContractTemplateForm = () => {
           <CWDropdown
             containerClassName="DropdownInput"
             label="Select the contract you want your template to built on"
+            // @ts-expect-error <StrictNullChecks/>
             initialValue={
               contract_id !== 'blank'
                 ? {
@@ -128,6 +130,7 @@ const CreateContractTemplateForm = () => {
               template: e.target.value,
             }));
           }}
+          // @ts-expect-error <StrictNullChecks/>
           inputValidationFn={(value: string) => {
             try {
               const jsonValid = isValidJson(

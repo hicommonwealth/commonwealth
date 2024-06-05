@@ -64,6 +64,7 @@ export const CWTag = ({
     return label.slice(0, trimAt) + '...';
   };
 
+  // @ts-expect-error <StrictNullChecks/>
   const handleClick = () => onClick();
 
   return (
@@ -77,6 +78,7 @@ export const CWTag = ({
       onMouseLeave={onMouseLeave}
     >
       {type === 'input' && (
+        // @ts-expect-error <StrictNullChecks/>
         <CWCommunityAvatar size="small" community={community} />
       )}
       {type === 'contest' && <CWIcon iconName="trophy" iconSize="small" />}

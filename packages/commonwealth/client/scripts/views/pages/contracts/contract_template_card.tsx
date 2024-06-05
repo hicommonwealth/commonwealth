@@ -143,7 +143,9 @@ export const ContractTemplateCard = ({
                 </CWText>
                 <div className="enabledby-row">
                   <User
+                    // @ts-expect-error <StrictNullChecks/>
                     userAddress={enabler?.address}
+                    // @ts-expect-error <StrictNullChecks/>
                     userCommunityId={
                       enabler?.community?.id || enabler?.profile?.chain
                     }

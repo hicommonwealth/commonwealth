@@ -198,8 +198,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         profile_name,
         socials
       ) VALUES (
-        // @ts-expect-error StrictNullChecks
-        ${userId[0][0]['id']},
+        ${userId[0][0]!['id']},
         '2023-07-14 13:03:56.203-07',
         '2023-07-14 13:03:56.415-07',
         'TestAddress',

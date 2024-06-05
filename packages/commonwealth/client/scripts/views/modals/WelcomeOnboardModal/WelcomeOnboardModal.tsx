@@ -36,6 +36,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
               onComplete={() => {
                 // set profile as onboarded, once this step is complete
                 const profileId = app?.user?.addresses?.[0]?.profile?.id;
+                // @ts-expect-error <StrictNullChecks/>
                 setProfileAsOnboarded(profileId);
 
                 setActiveStep(WelcomeOnboardModalSteps.Preferences);
