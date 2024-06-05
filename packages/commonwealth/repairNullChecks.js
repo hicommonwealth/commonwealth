@@ -20,7 +20,7 @@ function getWhitespacePrefix(line) {
   return match ? match[0] : '';
 }
 
-async function repairNullChecks(path, lineNr, columnNr) {
+function repairNullChecks(path, lineNr, columnNr) {
   // TODO make this idempotent so that if the char at the given position is ALREADY '!' then abort
 
   const buff = fs.readFileSync(path);
@@ -116,4 +116,7 @@ const compilationErrorsPerFileSorted = sortCompilationErrorsPerFile(
   compilationErrorsPerFile,
 );
 
-// now repair the files
+for (const key of Object.keys(compilationErrorsPerFileSorted)) {
+  const entry = compilationErrorsPerFileSorted[key];
+  repairNullChecks(entry.file, entry.lineNumber, entry.columnNumber);
+}
