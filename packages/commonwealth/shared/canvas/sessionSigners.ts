@@ -37,6 +37,7 @@ export class CosmosSignerCW extends CosmosSigner {
   }
 
   // Use this._signer.getChainId() instead of the chainId inferred from the CAIP-2 address
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async authorize(data: AbstractSessionData): Promise<Session<any>> {
     const { topic, address, timestamp, publicKey, duration } = data;
     const [chainId, walletAddress] = parseAddress(address);

@@ -267,8 +267,7 @@ const useUserMenuItems = ({
         onClick: () => {
           clearSetGatingGroupBannerForCommunities();
           clearSetAdminOnboardingCardVisibilityForCommunities();
-
-          handleLogout();
+          await handleLogout();
         },
       },
     ] as PopoverMenuItem[],
