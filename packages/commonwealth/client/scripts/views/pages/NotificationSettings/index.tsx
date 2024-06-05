@@ -25,7 +25,9 @@ const NotificationSettings = () => {
   const communityAlerts = useCommunityAlerts();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
-    communityAlerts.data || [],
+    (communityAlerts.data as unknown as ReadonlyArray<
+      z.infer<typeof CommunityAlert>
+    >) || [],
   );
 
   const { bundledSubs } = useNotificationSettings();

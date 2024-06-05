@@ -26,14 +26,14 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
   const toggleSubscription = useCallback(async () => {
     async function doAsync() {
       if (subscribed) {
-        await createCommunityAlert.mutateAsync({
-          id: communityInfo.id,
-          community_id: communityInfo.id,
-        });
-      } else {
         await deleteCommunityAlert.mutateAsync({
           id: communityInfo.id,
           community_ids: [communityInfo.id],
+        });
+      } else {
+        await createCommunityAlert.mutateAsync({
+          id: communityInfo.id,
+          community_id: communityInfo.id,
         });
       }
 
