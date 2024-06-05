@@ -5,7 +5,7 @@ import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { fileURLToPath } from 'url';
-import { MAGIC_DEFAULT_CHAIN, MAGIC_SUPPORTED_BASES, config } from '../config';
+import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 
 sgMail.setApiKey(config.SENDGRID.API_KEY);
@@ -61,7 +61,9 @@ const startEmailLogin = async (
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
+  const context = req.body.chain
+    ? req.body
+    : { chain: config.AUTH.MAGIC_DEFAULT_CHAIN };
   const [chain] = await validateCommunity(models, context);
   const magicChain = chain;
 
@@ -72,7 +74,7 @@ const startEmailLogin = async (
     isExistingMagicUser || // existing magic users should always use magic login, even if they're in the wrong community
     (isNewRegistration &&
       magicChain?.base &&
-      MAGIC_SUPPORTED_BASES.includes(magicChain.base) &&
+      config.AUTH.MAGIC_SUPPORTED_BASES.includes(magicChain.base) &&
       !req.body.forceEmailLogin)
   ) {
     return res.json({

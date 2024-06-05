@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -44,7 +45,7 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       comment_id: commentId,
       address: address.address,
