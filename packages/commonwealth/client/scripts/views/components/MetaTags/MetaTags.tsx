@@ -1,6 +1,7 @@
 import 'Layout.scss';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import commonUrl from '/img/branding/common.png';
 
 type MetaTagName =
   | 'application-name'
@@ -81,7 +82,7 @@ const defaultMeta = {
   },
   'twitter:image': {
     name: 'twitter:image',
-    content: 'https://commonwealth.im/static/img/branding/common.png',
+    content: commonUrl,
   },
   'og:type': {
     property: 'og:type',
@@ -105,7 +106,7 @@ const defaultMeta = {
   },
   'og:image': {
     property: 'og:image',
-    content: 'https://commonwealth.im/static/img/branding/common.png',
+    content: commonUrl,
   },
 } as const;
 

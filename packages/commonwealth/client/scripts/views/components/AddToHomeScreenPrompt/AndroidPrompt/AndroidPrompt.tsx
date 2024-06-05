@@ -6,6 +6,7 @@ import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { HIDE_PROMPT } from '../constants';
 import './AndroidPrompt.scss';
+import commonUrl from '/img/branding/common.svg';
 
 interface AndroidPromptProps {
   hidePromptAction: () => void;
@@ -77,7 +78,7 @@ export const AndroidPrompt = ({
         <CWText className="title">Install App</CWText>
         <div className="header">
           <div className="icon">
-            <img src="/static/img/branding/common.svg" alt="Commonwealth" />
+            <img src={commonUrl} alt="Commonwealth" />
           </div>
           <div className="app">
             <CWText className="app-name">Common</CWText>

@@ -199,25 +199,6 @@ export async function main(
   setupCosmosProxies(app, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
-  if (withFrontendBuild) {
-    if (config.NODE_ENV !== 'production') {
-      // lazy import because we want to keep all of webpacks dependencies in devDependencies
-      const setupWebpackDevServer = (
-        await import('./server/scripts/setupWebpackDevServer')
-      ).default;
-      await setupWebpackDevServer(app);
-    } else {
-      app.use(
-        '/build',
-        express.static('build', {
-          setHeaders: (res) => {
-            res.setHeader('Cache-Control', 'public');
-          },
-        }),
-      );
-    }
-  }
-
   app.get('*', (req: Request, res: Response) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);
     res.sendFile(`${__dirname}/index.html`);

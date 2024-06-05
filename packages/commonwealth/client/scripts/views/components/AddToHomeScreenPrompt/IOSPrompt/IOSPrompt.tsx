@@ -4,6 +4,7 @@ import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './IOSPrompt.scss';
+import commonUrl from '/img/branding/common.svg';
 
 interface IOSPromptProps {
   hidePromptAction: () => void;
@@ -21,7 +22,7 @@ export const IOSPrompt = ({ hidePromptAction }: IOSPromptProps) => {
       <div className="prompt-content" style={animationStyles}>
         <div className="header">
           <div className="icon">
-            <img src="/static/img/branding/common.svg" alt="Commonwealth" />
+            <img src={commonUrl} alt="Commonwealth" />
           </div>
           <CWText className="title">Add to Home Screen</CWText>
         </div>

@@ -32,7 +32,6 @@ export default defineConfig(({ command, mode }) => {
       }),
       tsconfigPaths(),
     ],
-    publicDir: 'static',
     server: {
       port: 8080,
       host: 'localhost',

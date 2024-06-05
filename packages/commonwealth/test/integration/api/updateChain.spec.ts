@@ -20,7 +20,7 @@ const baseRequest: CommunityAttributes = {
   default_symbol: 'EDG',
   network: null,
   base: ChainBase.Substrate,
-  icon_url: '/static/img/protocols/edg.png',
+  icon_url: '/public/img/protocols/edg.png',
   active: true,
   type: ChainType.Chain,
   social_links: [],

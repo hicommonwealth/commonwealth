@@ -3,6 +3,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { isNotUndefined } from '../helpers/typeGuards';
+import brandAssetUrl from '/brand_assets/512x512.svg';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -33,7 +34,7 @@ export const Footer = () => {
 
   return (
     <div className="Footer">
-      <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
+      <img src={brandAssetUrl} alt="Commonwealth" />
       <div className="footer-links-container">
         {footercontents.map((item) => {
           return isNotUndefined(item.redirectTo) ? (
