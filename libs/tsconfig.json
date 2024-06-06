@@ -3,7 +3,6 @@
     "moduleResolution": "bundler",
     "module": "es2020",
     "target": "esnext",
-    "noErrorTruncation": true,
 
     "baseUrl": ".",
     "composite": true,
