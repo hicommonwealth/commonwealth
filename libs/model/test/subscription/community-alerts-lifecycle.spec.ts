@@ -2,6 +2,7 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import {
@@ -15,7 +16,7 @@ describe('Community alerts lifecycle', () => {
   let actor: Actor;
   let community: z.infer<typeof schemas.Community> | undefined;
   let communityTwo: z.infer<typeof schemas.Community> | undefined;
-  before(async () => {
+  beforeAll(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
     });
@@ -38,7 +39,7 @@ describe('Community alerts lifecycle', () => {
     };
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -46,7 +47,7 @@ describe('Community alerts lifecycle', () => {
     await models.CommunityAlert.truncate({});
   });
 
-  it('should create a new community alert', async () => {
+  test('should create a new community alert', async () => {
     const payload = {
       community_id: community!.id!,
     };
@@ -62,7 +63,7 @@ describe('Community alerts lifecycle', () => {
     });
   });
 
-  it('should delete a single community alert via id', async () => {
+  test('should delete a single community alert via id', async () => {
     const [alert] = await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,
@@ -78,7 +79,7 @@ describe('Community alerts lifecycle', () => {
     expect(res).to.equal(1);
   });
 
-  it('should delete multiple community alerts via ids', async () => {
+  test('should delete multiple community alerts via ids', async () => {
     const [alertOne] = await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,
@@ -98,7 +99,7 @@ describe('Community alerts lifecycle', () => {
     expect(res).to.equal(2);
   });
 
-  it('should delete a single community alert via community id', async () => {
+  test('should delete a single community alert via community id', async () => {
     await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,
@@ -113,7 +114,7 @@ describe('Community alerts lifecycle', () => {
     expect(res).to.equal(1);
   });
 
-  it('should delete multiple community alerts via community ids', async () => {
+  test('should delete multiple community alerts via community ids', async () => {
     await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,
@@ -132,7 +133,7 @@ describe('Community alerts lifecycle', () => {
     expect(res).to.equal(2);
   });
 
-  it('should get community alerts', async () => {
+  test('should get community alerts', async () => {
     const [alertOne] = await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,

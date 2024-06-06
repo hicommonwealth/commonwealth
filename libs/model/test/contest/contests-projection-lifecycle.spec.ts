@@ -13,6 +13,7 @@ import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
@@ -60,7 +61,7 @@ describe.skip('Contests projection lifecycle', () => {
   let getContestScore: Sinon.SinonStub;
   let getContestStatus: Sinon.SinonStub;
 
-  before(async () => {
+  beforeAll(async () => {
     getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
@@ -168,7 +169,7 @@ describe.skip('Contests projection lifecycle', () => {
     );
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -176,7 +177,7 @@ describe.skip('Contests projection lifecycle', () => {
     Sinon.restore();
   });
 
-  it('should project events on multiple contests', async () => {
+  test('should project events on multiple contests', async () => {
     const contestBalance = 10000000000;
     const prizePool =
       (BigInt(contestBalance) * BigInt(prize_percentage)) / 100n;
@@ -392,7 +393,7 @@ describe.skip('Contests projection lifecycle', () => {
     ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
   });
 
-  it('should raise invalid state when community with namespace not found', async () => {
+  test('should raise invalid state when community with namespace not found', async () => {
     expect(
       handleEvent(Contests(), {
         name: EventNames.RecurringContestManagerDeployed,
@@ -406,7 +407,7 @@ describe.skip('Contests projection lifecycle', () => {
     ).to.eventually.be.rejectedWith(InvalidState);
   });
 
-  it('should raise retryable error when protocol helper fails', async () => {
+  test('should raise retryable error when protocol helper fails', async () => {
     getTokenAttributes.rejects(new Error());
     expect(
       handleEvent(Contests(), {
