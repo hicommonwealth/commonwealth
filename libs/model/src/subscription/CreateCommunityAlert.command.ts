@@ -10,6 +10,13 @@ export function CreateCommunityAlert(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
+      const where = {
+        user_id: actor.user.id!,
+        ...payload,
+      };
+
+      console.log('FIXME: where: ', JSON.stringify(where, null, '  '));
+
       const { 0: alert } = await models.CommunityAlert.findOrCreate({
         where: {
           user_id: actor.user.id!,
