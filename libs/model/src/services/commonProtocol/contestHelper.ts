@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import Web3 from 'web3';
+import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
@@ -48,24 +48,35 @@ const createWeb3Provider = async (rpc: string): Promise<Web3> => {
  * @param contest the address of the contest
  * @param creator the address of the user to create content on behalf of
  * @param url the common/commonwealth url of the content
- * @returns txReceipt and contentId of new content(NOTE: this should be saved for future voting)
+ * @returns txReceipt and contentId of new content (NOTE: this should be saved for future voting)
  */
-export const addContent = async (
+const addContent = async (
   rpcNodeUrl: string,
   contest: string,
   creator: string,
   url: string,
+  web3?: Web3,
+  nonce?: number,
 ): Promise<AddContentResponse> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
+  if (!web3) {
+    web3 = await createWeb3Provider(rpcNodeUrl);
+  }
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
   let txReceipt;
   try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '200000',
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
     txReceipt = await contestInstance.methods
       .addContent(creator, url, [])
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send(txDetails);
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -94,13 +105,17 @@ export const addContent = async (
  * @param contentId The contentId on the contest to vote
  * @returns a tx receipt
  */
-export const voteContent = async (
+const voteContent = async (
   rpcNodeUrl: string,
   contest: string,
   voter: string,
   contentId: string,
+  web3?: Web3,
+  nonce?: number,
 ): Promise<any> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
+  if (!web3) {
+    web3 = await createWeb3Provider(rpcNodeUrl);
+  }
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -108,9 +123,16 @@ export const voteContent = async (
 
   let txReceipt;
   try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '200000',
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
     txReceipt = await contestInstance.methods
       .voteContent(voter, contentId)
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send(txDetails);
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -241,7 +263,6 @@ export const getContestBalance = async (
       feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
     );
   }
-
   if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
@@ -271,4 +292,48 @@ export const getContestBalance = async (
       ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
       : BigInt(balanceResults[0]),
   );
+};
+
+export const addContentBatch = async (
+  rpcNodeUrl: string,
+  contest: string[],
+  creator: string,
+  url: string,
+): Promise<Promise<AddContentResponse>[]> => {
+  const web3 = await createWeb3Provider(rpcNodeUrl);
+  let currNonce = Number(
+    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+  );
+
+  const promises: Promise<AddContentResponse>[] = [];
+
+  contest.forEach((c) => {
+    promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+    currNonce++;
+  });
+
+  return promises;
+};
+
+export const voteContentBatch = async (
+  rpcNodeUrl: string,
+  contest: string[],
+  voter: string,
+  contentId: string,
+): Promise<Promise<any>[]> => {
+  const web3 = await createWeb3Provider(rpcNodeUrl);
+  let currNonce = Number(
+    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+  );
+
+  const promises: Promise<any>[] = [];
+
+  contest.forEach((c) => {
+    promises.push(
+      voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+    );
+    currNonce++;
+  });
+
+  return promises;
 };

@@ -1,8 +1,9 @@
-import { command, logger } from '@hicommonwealth/core';
+import { command, dispose, logger } from '@hicommonwealth/core';
 import { Community, models } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 
 import { fileURLToPath } from 'url';
+
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
@@ -45,15 +46,15 @@ async function main() {
       }
     }
   }
-
-  process.exit(0);
 }
 
-main().catch((err) => {
-  if (err instanceof Error) {
-    log.fatal('Fatal error occurred', err);
-  } else {
-    log.fatal('Fatal error occurred', undefined, { err });
-  }
-  process.exit(1);
-});
+main()
+  .then(async () => await dispose()('EXIT', true))
+  .catch((err) => {
+    if (err instanceof Error) {
+      log.fatal('Fatal error occurred', err);
+    } else {
+      log.fatal('Fatal error occurred', undefined, { err });
+    }
+    dispose()('ERROR', true);
+  });

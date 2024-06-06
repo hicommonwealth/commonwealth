@@ -77,11 +77,8 @@ describe('Contest Worker Policy', () => {
     {
       const addContentStub = Sinon.stub(
         commonProtocol.contestHelper,
-        'addContent',
-      ).resolves({
-        txReceipt: 'aaa',
-        contentId: 'bbb',
-      });
+        'addContentBatch',
+      ).resolves([]);
 
       await handleEvent(
         ContestWorker(),
@@ -120,7 +117,7 @@ describe('Contest Worker Policy', () => {
         'addContent called with wrong contractAddress',
       );
       expect(fnArgs[2]).to.equal(
-        address,
+        [address],
         'addContent called with wrong userAddress',
       );
       expect(fnArgs[3]).to.equal(
@@ -132,8 +129,8 @@ describe('Contest Worker Policy', () => {
     {
       const voteContentStub = Sinon.stub(
         commonProtocol.contestHelper,
-        'voteContent',
-      ).resolves('abc');
+        'voteContentBatch',
+      ).resolves([]);
 
       const contestId = 2;
       const contentId = 199;
@@ -176,7 +173,7 @@ describe('Contest Worker Policy', () => {
         'voteContent called with wrong contractAddress',
       );
       expect(fnArgs[2]).to.equal(
-        address,
+        [address],
         'voteContent called with wrong userAddress',
       );
       expect(fnArgs[3]).to.equal(

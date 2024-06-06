@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
@@ -41,6 +41,7 @@ export async function startEvmPolling(
 if (import.meta.url.endsWith(process.argv[1])) {
   startEvmPolling(config.WORKERS.EVM_CE_POLL_INTERVAL_MS).catch((e) => {
     log.fatal('Evm poller shutting down due to a critical error:', e);
-    process.exit(1);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('ERROR', true);
   });
 }

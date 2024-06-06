@@ -1,7 +1,12 @@
+import { dispose, logger } from '@hicommonwealth/core';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import readlineSync from 'readline-sync';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const ComponentType = {
   Foundations: 'Foundations',
@@ -81,10 +86,10 @@ const addComponentShowcase = () => {
 
   // @ts-expect-error StrictNullChecks
   if (!componentType) {
-    console.error(
-      `🛑 Invalid component type. Please choose either "${ComponentType.Foundations}" or "${ComponentType.Components}".`,
+    throw new Error(
+      '🛑 Invalid component type. ' +
+        `Please choose either "${ComponentType.Foundations}" or "${ComponentType.Components}".`,
     );
-    process.exit(1);
   }
 
   console.log(`⏱️ Creating ${displayName} of type ${componentType}...`);
@@ -95,8 +100,10 @@ const addComponentShowcase = () => {
 
 try {
   addComponentShowcase();
-  process.exit(0);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  dispose()('EXIT', true);
 } catch (err) {
-  console.error(err);
-  process.exit(1);
+  log.error('Failed to add component showcase', err);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  dispose()('ERROR', true);
 }

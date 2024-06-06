@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { WebhookInstance, models } from '@hicommonwealth/model';
 import {
   NotificationCategories,
@@ -248,11 +249,12 @@ async function main() {
 if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
-      // note this stops rollbar errors reports from completing in the `dispatchWebhooks` function
-      process.exit(0);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
     })
     .catch((err) => {
       console.log('Failed to emit a notification:', err);
-      process.exit(1);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }

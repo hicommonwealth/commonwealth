@@ -256,7 +256,6 @@ const BasicInformationForm = ({
 
       <CWCoverImageUploader
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
-        uploadCompleteCallback={console.log}
         canSelectImageBehaviour={false}
         showUploadAndGenerateText
         onImageProcessStatusChange={setIsProcessingProfileImage}

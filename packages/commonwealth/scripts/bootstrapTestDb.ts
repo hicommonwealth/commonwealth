@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 
 async function main() {
@@ -9,6 +10,6 @@ async function main() {
     console.log('Bootstrapping test db...FAIL!');
     console.error(e);
   }
-  process.exit(0);
+  await dispose()('EXIT', true);
 }
 void main();
