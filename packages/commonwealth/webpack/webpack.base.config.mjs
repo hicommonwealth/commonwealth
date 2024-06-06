@@ -28,7 +28,12 @@ const baseConfig = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: 'client/firebase-messaging-sw.js', to: 'build' }],
+      patterns: [
+        {
+          from: `${__dirname}/../client/firebase-messaging-sw.js`,
+          to: `${__dirname}/../build`,
+        },
+      ],
     }),
     new webpack.DefinePlugin({
       'process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG':

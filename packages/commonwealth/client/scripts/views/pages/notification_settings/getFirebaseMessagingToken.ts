@@ -27,5 +27,12 @@ const app = initializeApp(PUBLIC_FIREBASE_CONFIG);
 const messaging = getMessaging(app);
 
 export async function getFirebaseMessagingToken() {
-  return await getToken(messaging, { vapidKey: PUBLIC_VAPID_KEY });
+  const reg = await navigator.serviceWorker.register(
+    '/build/firebase-messaging-sw.js',
+  );
+  await navigator.serviceWorker.ready;
+  return await getToken(messaging, {
+    serviceWorkerRegistration: reg,
+    vapidKey: PUBLIC_VAPID_KEY,
+  });
 }
