@@ -43,7 +43,7 @@ const SessionRevalidationModal = ({
     setEmail,
     isMagicLoading,
   } = useAuthentication({
-    useSessionKeyLoginFlow: true,
+    withSessionKeyLoginFlow: true,
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
     },

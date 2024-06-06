@@ -43,7 +43,7 @@ type UseAuthenticationProps = {
   onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
   onModalClose: () => void;
   onUnrecognizedAddressReceived?: () => boolean;
-  useSessionKeyLoginFlow?: boolean;
+  withSessionKeyLoginFlow?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -248,7 +248,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     linking: boolean,
     wallet?: Wallet,
   ) => {
-    if (props.useSessionKeyLoginFlow) {
+    if (props.withSessionKeyLoginFlow) {
       props?.onSuccess?.(account.address, newlyCreated);
       return;
     }
@@ -462,7 +462,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         }
       }
 
-      if (props.useSessionKeyLoginFlow) {
+      if (props.withSessionKeyLoginFlow) {
         await onSessionKeyRevalidation(wallet, selectedAddress);
       } else {
         await onNormalWalletLogin(wallet, selectedAddress);
@@ -472,7 +472,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const onWalletAddressSelect = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
-    if (props.useSessionKeyLoginFlow) {
+    if (props.withSessionKeyLoginFlow) {
       await onSessionKeyRevalidation(wallet, address);
     } else {
       await onNormalWalletLogin(wallet, address);
