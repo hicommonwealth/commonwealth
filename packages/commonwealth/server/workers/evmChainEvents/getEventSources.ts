@@ -34,7 +34,7 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
                                         JOIN ContractsAgg CA ON CN.id = CA.chain_node_id)
         SELECT jsonb_object_agg(chain_node_id, jsonb_build_object(
                 'rpc', rpc,
-                'maxBlockRange' : COALESCE (max_ce_block_range, ${DEFAULT_MAX_BLOCK_RANGE}),
+                'maxBlockRange', COALESCE (max_ce_block_range, ${DEFAULT_MAX_BLOCK_RANGE}),
                 'contracts', contracts)
                ) as aggregate
         FROM ChainNodesAgg;
