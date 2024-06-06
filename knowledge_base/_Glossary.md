@@ -155,6 +155,8 @@ When a USER SIGNS IN, a session key is created for their active ADDRESS, which i
 
 System which allows USERS to enter into sessions on the Common app and perform user actions. All "log-in" and similar language is deprecated and semantically incorrect.
 
+See the [Web Wallets](./Web-Wallets.md) entry for documentation of the sign-in flow.
+
 ### Stake
 
 Community Stake is a feature whereby COMMUNITY ADMINS allow MEMBER PROFILES' ADDRESSES to deposit Ethereum into a smart contract in exchange for ERC1155 tokens. The received tokens are considered "stake." Stake is used for GATING content and features across a FORUM COMMUNITY.
