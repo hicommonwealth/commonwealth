@@ -48,6 +48,12 @@ const MODAL_COPY = {
     showFooter: true,
     showExistingAccountSignInFooter: false,
   },
+  [AuthModalType.RevalidateSession]: {
+    title: 'Session Expired',
+    description: 'To continue what you were doing, please sign in again',
+    showFooter: true,
+    showExistingAccountSignInFooter: false,
+  },
 };
 
 const SSO_OPTIONS: AuthSSOs[] = [
@@ -114,9 +120,13 @@ const ModalBase = ({
   };
 
   const handleUnrecognizedAddressReceived = () => {
-    // if this is the `layoutType == SignIn` modal, and we get an unrecognized
-    // address, then change modal type to `AccountTypeGuidance`
-    if (layoutType === AuthModalType.SignIn) {
+    // if this is the `layoutType == SignIn | RevalidateSession` modal
+    // and we get an unrecognized address, then change modal type to `AccountTypeGuidance`
+    if (
+      layoutType === AuthModalType.SignIn ||
+      layoutType === AuthModalType.RevalidateSession
+    ) {
+      setActiveTabIndex(0); // reset tab state back to initial
       onChangeModalType(AuthModalType.AccountTypeGuidance);
       return false;
     }
@@ -138,6 +148,7 @@ const ModalBase = ({
     onSocialLogin,
     onVerifyMobileWalletSignature,
   } = useAuthentication({
+    withSessionKeyLoginFlow: layoutType === AuthModalType.RevalidateSession,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

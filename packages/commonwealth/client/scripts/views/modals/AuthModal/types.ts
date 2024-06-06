@@ -6,6 +6,7 @@ export enum AuthModalType {
   AccountTypeGuidance = 'auth-type-guidance',
   CreateAccount = 'create-account',
   SignIn = 'sign-in',
+  RevalidateSession = 'revalidate-session',
 }
 
 export type ModalBaseTabs = {

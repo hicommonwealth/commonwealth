@@ -6,6 +6,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
 import { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
 import { CreateAccountModal } from './CreateAccountModal';
+import { RevalidateSessionModal } from './RevalidateSessionModal';
 import { SignInModal } from './SignInModal';
 import { AuthModalProps, AuthModalType } from './types';
 
@@ -53,37 +54,26 @@ const AuthModal = ({
   };
 
   const getActiveModalComponent = () => {
+    const commonVariantProps = {
+      onClose,
+      onSuccess: handleSuccess,
+      showWalletsFor,
+      onSignInClick: handleOnSignInClick,
+      onChangeModalType: (selectedType) => setModalType(selectedType),
+    };
+
     switch (modalType) {
       case AuthModalType.AccountTypeGuidance: {
-        return (
-          <AuthTypeGuidanceModal
-            onClose={onClose}
-            onSuccess={handleSuccess}
-            onSignInClick={handleOnSignInClick}
-            onChangeModalType={(selectedType) => setModalType(selectedType)}
-          />
-        );
+        return <AuthTypeGuidanceModal {...commonVariantProps} />;
       }
       case AuthModalType.CreateAccount: {
-        return (
-          <CreateAccountModal
-            onClose={onClose}
-            onSuccess={handleSuccess}
-            onSignInClick={handleOnSignInClick}
-            onChangeModalType={(selectedType) => setModalType(selectedType)}
-          />
-        );
+        return <CreateAccountModal {...commonVariantProps} />;
       }
       case AuthModalType.SignIn: {
-        return (
-          <SignInModal
-            onClose={onClose}
-            onSuccess={handleSuccess}
-            showWalletsFor={showWalletsFor}
-            onSignInClick={handleOnSignInClick}
-            onChangeModalType={(selectedType) => setModalType(selectedType)}
-          />
-        );
+        return <SignInModal {...commonVariantProps} />;
+      }
+      case AuthModalType.RevalidateSession: {
+        return <RevalidateSessionModal {...commonVariantProps} />;
       }
     }
   };
