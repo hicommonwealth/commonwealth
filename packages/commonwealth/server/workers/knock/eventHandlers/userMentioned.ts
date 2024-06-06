@@ -57,14 +57,20 @@ export const processUserMentioned: EventHandler<
       author: profile.profile_name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
-          ? payload.thread.body.substring(255)
-          : payload.comment.text.substring(255),
+          ? // @ts-expect-error StrictNullChecks
+            payload.thread.body.substring(255)
+          : // @ts-expect-error StrictNullChecks
+            payload.comment.text.substring(255),
       object_url:
         'thread' in payload
-          ? getThreadUrl(payload.thread.community_id, payload.thread.id)
+          ? // @ts-expect-error StrictNullChecks
+            getThreadUrl(payload.thread.community_id, payload.thread.id)
           : getCommentUrl(
+              // @ts-expect-error StrictNullChecks
               payload.comment.community_id,
+              // @ts-expect-error StrictNullChecks
               payload.comment.thread_id,
+              // @ts-expect-error StrictNullChecks
               payload.comment.id,
             ),
     },

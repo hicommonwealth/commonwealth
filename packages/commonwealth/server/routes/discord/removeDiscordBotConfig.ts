@@ -17,6 +17,7 @@ const removeDiscordBotConfig = async (
 ) => {
   const config = await models.DiscordBotConfig.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       community_id: req.community.id,
     },
   });
@@ -33,6 +34,7 @@ const removeDiscordBotConfig = async (
       },
       {
         where: {
+          // @ts-expect-error StrictNullChecks
           id: req.community.id,
         },
         transaction,
@@ -40,14 +42,17 @@ const removeDiscordBotConfig = async (
     );
     await models.DiscordBotConfig.destroy({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: req.community.id,
       },
       transaction,
     });
     await models.Topic.update(
+      // @ts-expect-error StrictNullChecks
       { channel_id: null },
       {
         where: {
+          // @ts-expect-error StrictNullChecks
           community_id: req.community.id,
         },
         transaction,

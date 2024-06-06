@@ -20,6 +20,7 @@ const setDefaultRole = async (
     return next(new AppError(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({
+    // @ts-expect-error StrictNullChecks
     where: {
       address: req.body.address,
       community_id: req.body.author_community_id,
@@ -36,6 +37,7 @@ const setDefaultRole = async (
   await models.Address.update(
     { is_user_default: false },
     {
+      // @ts-expect-error StrictNullChecks
       where: {
         address: { [Sequelize.Op.ne]: req.body.address },
         community_id: req.body.author_community_id,

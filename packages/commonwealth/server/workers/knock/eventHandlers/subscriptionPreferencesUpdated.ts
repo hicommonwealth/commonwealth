@@ -17,6 +17,7 @@ const output = z.boolean();
 
 function mapDateToDaysOfWeek(
   date: Date,
+  // @ts-expect-error StrictNullChecks
 ): typeof DaysOfWeek[keyof typeof DaysOfWeek] {
   switch (date.getDay()) {
     case 0:
@@ -132,6 +133,7 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     },
   });
 
+  // @ts-expect-error StrictNullChecks
   if (subPreferences.email_notifications_enabled) {
     if (payload.recap_email_enabled === true) {
       await createScheduleIfNotExists(

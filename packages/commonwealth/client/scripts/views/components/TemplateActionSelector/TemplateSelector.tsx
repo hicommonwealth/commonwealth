@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { CWTextInput } from '../component_kit/cw_text_input';
-import { QueryList } from '../component_kit/cw_query_list';
-import { TemplateSelectorItem } from './TemplateSelectorItem';
 import Thread from 'models/Thread';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
+import { QueryList } from '../component_kit/cw_query_list';
+import { CWTextInput } from '../component_kit/cw_text_input';
+import { TemplateSelectorItem } from './TemplateSelectorItem';
 
-import 'components/TemplateSelector.scss'
+import 'components/TemplateSelector.scss';
 
 type TemplateSelectorProps = {
   onSelect: (template: any) => void;
@@ -28,11 +28,12 @@ export const TemplateSelector = ({
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
     const fetchedTemplates = [];
-    try{
+    try {
       for (const contract of contracts) {
         const templates = await app.contracts.getTemplatesForContract(
-          contract.id
+          contract.id,
         );
+        // @ts-expect-error <StrictNullChecks/>
         fetchedTemplates.push(...templates);
       }
     } catch {
@@ -53,7 +54,8 @@ export const TemplateSelector = ({
     if (!searchTerm.length) return allTemplates;
     else {
       return allTemplates.filter(({ name }) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase())
+        // @ts-expect-error <StrictNullChecks/>
+        name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
   }, [allTemplates, searchTerm]);
@@ -61,7 +63,7 @@ export const TemplateSelector = ({
   const renderItem = useCallback(
     (i: number, template: any) => {
       const isSelected = !!tempTemplates.find(
-        ({ identifier }) => String(template.id) === identifier
+        ({ identifier }) => String(template.id) === identifier,
       );
 
       return (
@@ -72,7 +74,7 @@ export const TemplateSelector = ({
         />
       );
     },
-    [onSelect, tempTemplates]
+    [onSelect, tempTemplates],
   );
 
   if (!app.chain || !app.activeChainId()) {

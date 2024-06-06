@@ -102,6 +102,7 @@ const ModalBase = ({
     // if this is the `layoutType == SignIn` modal, and we get an unrecognized
     // address, then change modal type to `AccountTypeGuidance`
     if (layoutType === AuthModalType.SignIn) {
+      // @ts-expect-error <StrictNullChecks/>
       onChangeModalType(AuthModalType.AccountTypeGuidance);
       return false;
     }
@@ -215,6 +216,7 @@ const ModalBase = ({
         return;
       }
 
+      // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
 
@@ -256,8 +258,10 @@ const ModalBase = ({
         <CWModalBody className={clsx('content', bodyClassName)}>
           {customBody}
 
+          {/* @ts-expect-error StrictNullChecks*/}
           {showAuthenticationOptionsFor?.length > 0 && (
             <>
+              {/* @ts-expect-error StrictNullChecks*/}
               {showAuthenticationOptionsFor?.length > 1 && (
                 <CWTabsRow className="tabs">
                   {tabsList.map((tab, index) => (

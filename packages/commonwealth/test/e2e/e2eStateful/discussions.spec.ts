@@ -8,7 +8,7 @@ test.describe('test discussion page', () => {
   test('assert elements show up on page load', async ({ page }) => {
     await page
       .getByText(
-        'All Discussions24 ThreadsCreate ThreadThis section is for the community to discu'
+        'All Discussions24 ThreadsCreate ThreadThis section is for the community to discu',
       )
       .click();
     await page.getByText('DiscussionGovernance').click();
@@ -28,17 +28,21 @@ test.describe('test discussion page', () => {
     const reactionCountElement = await reactionButton[0].$('.reactions-count');
 
     // Get the initial reaction count
+    // @ts-expect-error StrictNullChecks
     const initialReactionCount = await reactionCountElement.textContent();
 
     // Click the reaction button
     await reactionButton[0].click();
 
     // Get the updated reaction count
+    // @ts-expect-error StrictNullChecks
     const updatedReactionCount = await reactionCountElement.textContent();
 
     // Assert that the reaction count has incremented by one
+    // @ts-expect-error StrictNullChecks
     expect(parseInt(updatedReactionCount)).toBe(
-      parseInt(initialReactionCount) + 1
+      // @ts-expect-error StrictNullChecks
+      parseInt(initialReactionCount) + 1,
     );
   });
 });

@@ -90,6 +90,7 @@ export const DiscussionSection = ({
   const topics = (topicsData || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
+    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
@@ -157,6 +158,7 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
+    // @ts-expect-error <StrictNullChecks/>
     ...(contestsEnabled && isContestAvailable
       ? [
           {
@@ -186,6 +188,7 @@ export const DiscussionSection = ({
           },
         ]
       : []),
+    // @ts-expect-error <StrictNullChecks/>
     {
       title: 'Overview',
       containsChildren: false,
@@ -208,6 +211,7 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
+    // @ts-expect-error <StrictNullChecks/>
     app.activeChainId() === 'near' && {
       title: 'Sputnik Daos',
       containsChildren: false,

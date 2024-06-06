@@ -1209,6 +1209,7 @@ function setupRouter(
     '/auth/magic',
     passport.authenticate('magic'),
     (req, res) => {
+      // @ts-expect-error StrictNullChecks
       return res.json({ status: 'Success', result: req.user.toJSON() });
     },
   );
