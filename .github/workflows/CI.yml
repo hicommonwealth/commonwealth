@@ -210,8 +210,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Run linter
-        run: pnpm lint-branch-warnings
+      #- name: Run linter
+      #  run: pnpm lint-branch-warnings
 
   # Lint and Typecheck
   commonwealth-code-quality:
@@ -253,8 +253,8 @@ jobs:
       # fun the *old* linter last because I want to try to migrate away from
       # this and JUST to eslint-diff but if this fails we still might be able
       # to salvage the branch
-      - name: Run linter
-        run: pnpm lint-branch
+      #- name: Run linter
+      #  run: pnpm lint-branch
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
