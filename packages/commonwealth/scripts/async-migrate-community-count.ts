@@ -1,4 +1,3 @@
-//TODO: This should be deleted after community counts are recovered
 import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
@@ -32,13 +31,13 @@ async function run() {
         { replacements: { community_id } },
       );
     }
+    console.log('Finished migration');
   } catch (error) {
     console.error('Error:', error.message);
-    process.exit(1);
+    throw new Error('Migration failed'); // Let the environment handle the exit
   }
-
-  console.log('Finished migration');
-  process.exit(0);
 }
 
-run();
+run().catch((error) => {
+  console.error('Failed to migrate community counts:', error);
+});
