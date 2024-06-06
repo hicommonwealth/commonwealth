@@ -9,6 +9,7 @@ import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { incrementProfileCount } from '../util/denormalizedCountUtils';
 import { createRole, findOneRole } from '../util/roles';
 
 const { Op } = Sequelize;
@@ -130,11 +131,12 @@ const linkExistingAddressToCommunity = async (
     addressId = updatedObj.id;
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
-      await models.Community.increment('profile_count', {
-        by: 1,
-        where: { id: community.id },
+      await incrementProfileCount(
+        models,
+        community.id,
+        originalAddress.user_id,
         transaction,
-      });
+      );
 
       return await models.Address.create(
         {
