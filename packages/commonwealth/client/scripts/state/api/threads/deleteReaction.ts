@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { useAuthModalStore } from '../../ui/modals';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
@@ -58,6 +59,8 @@ const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
 }: UseDeleteThreadReactionMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -72,6 +75,7 @@ const useDeleteThreadReactionMutation = ({
         'removeFromExisting',
       );
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

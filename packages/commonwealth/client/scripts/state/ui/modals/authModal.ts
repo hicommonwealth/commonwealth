@@ -1,3 +1,4 @@
+import { SessionKeyError } from 'client/scripts/controllers/server/sessions';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal/types';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { devtools, persist } from 'zustand/middleware';
@@ -11,6 +12,8 @@ interface AuthModalStore {
   triggerOpenModalType: AuthModalType;
   setTriggerOpenModalType: (modalType: AuthModalType) => void;
   validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived: () => void;
+  sessionKeyValidationError?: SessionKeyError;
+  checkForSessionKeyRevalidationErrors: (error: unknown) => void;
 }
 
 export const authModal = createStore<AuthModalStore>()(
@@ -50,6 +53,20 @@ export const authModal = createStore<AuthModalStore>()(
               shouldOpenGuidanceModalAfterMagicSSORedirect: false,
             };
           });
+        },
+        checkForSessionKeyRevalidationErrors: (error) => {
+          const sessionKeyValidationError =
+            error instanceof SessionKeyError && error;
+
+          if (sessionKeyValidationError) {
+            set((state) => {
+              return {
+                ...state,
+                sessionKeyValidationError: sessionKeyValidationError,
+                triggerOpenModalType: AuthModalType.RevalidateSession,
+              };
+            });
+          }
         },
       }),
       {

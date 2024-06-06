@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { useAuthModalStore } from '../../ui/modals';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
@@ -24,6 +25,7 @@ const deleteReaction = async ({
   } = await app.sessions.signDeleteCommentReaction(address, {
     comment_id: canvasHash,
   });
+
   return await axios
     .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
       data: {
@@ -65,6 +67,8 @@ const useDeleteCommentReactionMutation = ({
     threadId,
   });
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -86,6 +90,7 @@ const useDeleteCommentReactionMutation = ({
         });
       });
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ThreadStage } from 'models/types';
 import app from 'state';
+import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
 
@@ -48,6 +49,8 @@ const useDeleteThreadMutation = ({
   threadId,
   currentStage,
 }: UseDeleteThreadMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteThread,
     onSuccess: async (response) => {
@@ -64,6 +67,7 @@ const useDeleteThreadMutation = ({
       removeThreadFromAllCaches(communityId, threadId);
       return response.data;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

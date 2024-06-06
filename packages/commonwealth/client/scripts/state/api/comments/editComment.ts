@@ -4,6 +4,7 @@ import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { useAuthModalStore } from '../../ui/modals';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -71,6 +72,8 @@ const useEditCommentMutation = ({
     threadId,
   });
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: editComment,
     onSuccess: async (updatedComment) => {
@@ -93,6 +96,7 @@ const useEditCommentMutation = ({
 
       return updatedComment;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -14,7 +14,6 @@ import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSm
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { AuthModal } from 'views/modals/AuthModal';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
@@ -48,34 +47,17 @@ export const ReactionButton = ({
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
   const popoverProps = usePopover();
 
-  const {
-    mutateAsync: createThreadReaction,
-    isLoading: isAddingReaction,
-    error: createThreadReactionError,
-    reset: resetCreateThreadReactionMutation,
-  } = useCreateThreadReactionMutation({
-    communityId: app.activeChainId(),
-    threadId: thread.id,
-  });
-  const {
-    mutateAsync: deleteThreadReaction,
-    isLoading: isDeletingReaction,
-    error: deleteThreadReactionError,
-    reset: resetDeleteThreadReactionMutation,
-  } = useDeleteThreadReactionMutation({
-    communityId: app.activeChainId(),
-    address: app.user.activeAccount?.address,
-    threadId: thread.id,
-  });
-
-  const resetSessionRevalidationModal = createThreadReactionError
-    ? resetCreateThreadReactionMutation
-    : resetDeleteThreadReactionMutation;
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetSessionRevalidationModal,
-    error: createThreadReactionError || deleteThreadReactionError,
-  });
+  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
+    useCreateThreadReactionMutation({
+      communityId: app.activeChainId(),
+      threadId: thread.id,
+    });
+  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
+    useDeleteThreadReactionMutation({
+      communityId: app.activeChainId(),
+      address: app.user.activeAccount?.address,
+      threadId: thread.id,
+    });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
@@ -85,7 +67,7 @@ export const ReactionButton = ({
     event.preventDefault();
     if (isLoading || disabled) return;
 
-    if (!app.isLoggedIn() || !app.user.activeAccount) {
+    if (!app.isLoggedIn() || !app.user?.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }
@@ -165,7 +147,6 @@ export const ReactionButton = ({
         onClose={() => setIsAuthModalOpen(false)}
         isOpen={isAuthModalOpen}
       />
-      {RevalidationModal}
     </>
   );
 };

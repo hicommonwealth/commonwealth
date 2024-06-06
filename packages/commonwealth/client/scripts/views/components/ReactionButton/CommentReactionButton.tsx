@@ -4,7 +4,6 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
@@ -29,33 +28,19 @@ export const CommentReactionButton = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const {
-    mutateAsync: createCommentReaction,
-    error: createCommentReactionError,
-    reset: resetCreateCommentReaction,
-  } = useCreateCommentReactionMutation({
-    threadId: comment.threadId,
-    commentId: comment.id,
-    communityId: app.activeChainId(),
-  });
-  const {
-    mutateAsync: deleteCommentReaction,
-    error: deleteCommentReactionError,
-    reset: resetDeleteCommentReaction,
-  } = useDeleteCommentReactionMutation({
-    commentId: comment.id,
-    communityId: app.activeChainId(),
-    threadId: comment.threadId,
-  });
+  const { mutateAsync: createCommentReaction } =
+    useCreateCommentReactionMutation({
+      threadId: comment.threadId,
+      commentId: comment.id,
+      communityId: app.activeChainId(),
+    });
 
-  const resetSessionRevalidationModal = createCommentReactionError
-    ? resetCreateCommentReaction
-    : resetDeleteCommentReaction;
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetSessionRevalidationModal,
-    error: createCommentReactionError || deleteCommentReactionError,
-  });
+  const { mutateAsync: deleteCommentReaction } =
+    useDeleteCommentReactionMutation({
+      commentId: comment.id,
+      communityId: app.activeChainId(),
+      threadId: comment.threadId,
+    });
 
   const activeAddress = app.user.activeAccount?.address;
   const hasReacted = !!(comment.reactions || []).find(
@@ -115,7 +100,6 @@ export const CommentReactionButton = ({
         onClose={() => setIsAuthModalOpen(false)}
         isOpen={isAuthModalOpen}
       />
-      {RevalidationModal}
       <CWUpvoteSmall
         voteCount={reactionWeightsSum}
         disabled={!hasJoinedCommunity || disabled}

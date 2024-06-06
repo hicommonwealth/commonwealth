@@ -6,7 +6,6 @@ import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -66,19 +65,10 @@ export const CreateComment = ({
   }
   const author = app.user.activeAccount;
 
-  const {
-    mutateAsync: createComment,
-    error: createCommentError,
-    reset: resetCreateCommentMutation,
-  } = useCreateCommentMutation({
+  const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
     communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
-  });
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetCreateCommentMutation,
-    error: createCommentError,
   });
 
   const handleSubmitComment = async () => {
@@ -149,29 +139,22 @@ export const CreateComment = ({
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
-  return (
-    <>
-      {rootThread.archivedAt === null ? (
-        <>
-          <CommentEditor
-            parentType={parentType}
-            canComment={canComment}
-            handleSubmitComment={handleSubmitComment}
-            errorMsg={errorMsg}
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-            disabled={disabled}
-            onCancel={handleCancel}
-            author={author}
-            editorValue={editorValue}
-            shouldFocus={canComment && focusEditorParam}
-            tooltipText={tooltipText}
-          />
-          {RevalidationModal}
-        </>
-      ) : (
-        <ArchiveMsg archivedAt={rootThread.archivedAt} />
-      )}
-    </>
+  return rootThread.archivedAt === null ? (
+    <CommentEditor
+      parentType={parentType}
+      canComment={canComment}
+      handleSubmitComment={handleSubmitComment}
+      errorMsg={errorMsg}
+      contentDelta={contentDelta}
+      setContentDelta={setContentDelta}
+      disabled={disabled}
+      onCancel={handleCancel}
+      author={author}
+      editorValue={editorValue}
+      shouldFocus={canComment && focusEditorParam}
+      tooltipText={tooltipText}
+    />
+  ) : (
+    <ArchiveMsg archivedAt={rootThread.archivedAt} />
   );
 };

@@ -8,6 +8,7 @@ import { ThreadStage } from 'models/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
 
@@ -74,8 +75,11 @@ const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return useMutation({
     mutationFn: createThread,
@@ -102,6 +106,7 @@ const useCreateThreadMutation = ({
 
       return newThread;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -4,6 +4,7 @@ import { useFlag } from 'hooks/useFlag';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
@@ -51,6 +52,8 @@ const useCreateThreadReactionMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
@@ -76,6 +79,7 @@ const useCreateThreadReactionMutation = ({
         );
       }
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

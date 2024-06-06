@@ -1,7 +1,11 @@
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { useWelcomeOnboardModal } from 'client/scripts/state/ui/modals';
+import {
+  useAuthModalStore,
+  useWelcomeOnboardModal,
+} from 'client/scripts/state/ui/modals';
 import React, { useEffect, useState } from 'react';
+import { AuthTypes } from '../../components/AuthButton/types';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
 import { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
@@ -20,6 +24,7 @@ const AuthModal = ({
 }: AuthModalProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [modalType, setModalType] = useState(type);
+  const { sessionKeyValidationError } = useAuthModalStore();
   const { setIsWelcomeOnboardModalOpen } = useWelcomeOnboardModal();
 
   useEffect(() => {
@@ -73,7 +78,13 @@ const AuthModal = ({
         return <SignInModal {...commonVariantProps} />;
       }
       case AuthModalType.RevalidateSession: {
-        return <RevalidateSessionModal {...commonVariantProps} />;
+        return (
+          <RevalidateSessionModal
+            {...commonVariantProps}
+            // TODO: session keys should support all wallet types, this is broken in master branch
+            showAuthOptionFor={sessionKeyValidationError.ssoSource as AuthTypes}
+          />
+        );
       }
     }
   };
