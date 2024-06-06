@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
-import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { WalletId } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -46,20 +46,12 @@ export const handleLogout = async () => {
 
 interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
 }
 
 const useUserMenuItems = ({
   onAuthModalOpen,
-  onRevalidationModalData,
   isMenuOpen,
   onAddressItemClick,
 }: UseUserMenuItemsProps) => {
@@ -108,13 +100,13 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
+  const addresses: PopoverMenuItem[] = app.user?.activeAccounts?.map(
     (account) => {
       const signed = authenticatedAddresses[account.address];
       const isActive = app.user.activeAccount?.address === account.address;
-      const walletSsoSource = app.user.addresses.find(
-        (address) => address.address === account.address,
-      )?.walletSsoSource;
+      // const walletSsoSource = app.user.addresses.find(
+      //   (address) => address.address === account.address,
+      // )?.walletSsoSource;
 
       return {
         type: 'default',
@@ -133,10 +125,10 @@ const useUserMenuItems = ({
 
           onAddressItemClick?.();
 
-          onRevalidationModalData({
-            walletSsoSource: walletSsoSource,
-            walletAddress: account.address,
-          });
+          // onRevalidationModalData({
+          //   walletSsoSource: walletSsoSource,
+          //   walletAddress: account.address,
+          // });
         },
       };
     },

@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import React, { useState } from 'react';
 import app from 'state';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { User } from 'views/components/user/user';
@@ -13,24 +12,13 @@ import './UserDropdown.scss';
 
 interface UserDropdownProps {
   onAuthModalOpen: () => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
 }
 
-const UserDropdown = ({
-  onAuthModalOpen,
-  onRevalidationModalData,
-}: UserDropdownProps) => {
+const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const userMenuItems = useUserMenuItems({
     onAuthModalOpen,
-    onRevalidationModalData,
     isMenuOpen: isOpen,
   });
 
