@@ -61,6 +61,7 @@ const JoinCommunityCard = ({
           iconLeftWeight: 'fill',
         })}
         disabled={!canJoin}
+        // @ts-expect-error <StrictNullChecks/>
         onClick={canJoin ? onJoinClick : null}
       />
     </div>

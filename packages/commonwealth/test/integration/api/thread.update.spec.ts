@@ -69,6 +69,7 @@ describe('Thread Patch Update', () => {
         group_ids: [],
       },
     });
+    // @ts-expect-error StrictNullChecks
     topicId = topic.id;
   });
 
@@ -93,10 +94,13 @@ describe('Thread Patch Update', () => {
 
       const res = await chai.request
         .agent(server.app)
+        // @ts-expect-error StrictNullChecks
         .patch(`/api/threads/${thread.id}`)
         .set('Accept', 'application/json')
         .send({
+          // @ts-expect-error StrictNullChecks
           author_chain: thread.community_id,
+          // @ts-expect-error StrictNullChecks
           chain: thread.community_id,
           address: userAddress,
           topicId,
@@ -110,6 +114,7 @@ describe('Thread Patch Update', () => {
 
       expect(res.status).to.equal(200);
       expect(res.body.result).to.contain({
+        // @ts-expect-error StrictNullChecks
         id: thread.id,
         community_id: 'ethereum',
         title: 'newTitle',
@@ -138,10 +143,13 @@ describe('Thread Patch Update', () => {
       {
         const res = await chai.request
           .agent(server.app)
+          // @ts-expect-error StrictNullChecks
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
+            // @ts-expect-error StrictNullChecks
             author_chain: thread.community_id,
+            // @ts-expect-error StrictNullChecks
             chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
@@ -154,10 +162,13 @@ describe('Thread Patch Update', () => {
       {
         const res = await chai.request
           .agent(server.app)
+          // @ts-expect-error StrictNullChecks
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
+            // @ts-expect-error StrictNullChecks
             author_chain: thread.community_id,
+            // @ts-expect-error StrictNullChecks
             chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
@@ -187,10 +198,13 @@ describe('Thread Patch Update', () => {
       {
         const res = await chai.request
           .agent(server.app)
+          // @ts-expect-error StrictNullChecks
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
+            // @ts-expect-error StrictNullChecks
             author_chain: thread.community_id,
+            // @ts-expect-error StrictNullChecks
             chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
@@ -205,10 +219,13 @@ describe('Thread Patch Update', () => {
       {
         const res = await chai.request
           .agent(server.app)
+          // @ts-expect-error StrictNullChecks
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
+            // @ts-expect-error StrictNullChecks
             author_chain: thread.community_id,
+            // @ts-expect-error StrictNullChecks
             chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,

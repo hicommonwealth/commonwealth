@@ -13,6 +13,7 @@ export const getStatsHandler = async (
   res: TypedResponse<GetStatsResponse>,
 ) => {
   const stats = await controllers.admin.getStats({
+    // @ts-expect-error StrictNullChecks
     user: req.user,
     communityId: req.query.community_id,
   });

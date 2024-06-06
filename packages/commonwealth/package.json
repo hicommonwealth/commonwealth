@@ -273,8 +273,8 @@
     "@types/moment": "^2.13.0",
     "@types/passport": "^1.0.16",
     "@types/passport-auth-token": "^1.0.4",
-    "@types/uuid": "^9.0.7",
     "@types/sinon": "^17.0.3",
+    "@types/uuid": "^9.0.7",
     "sinon": "^17.0.2"
   }
 }

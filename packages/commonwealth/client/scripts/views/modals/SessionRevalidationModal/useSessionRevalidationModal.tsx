@@ -1,7 +1,7 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import React from 'react';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
 
 const useSessionRevalidationModal = ({ handleClose, error }) => {
   const sessionKeyValidationError = error instanceof SessionKeyError && error;
@@ -12,7 +12,9 @@ const useSessionRevalidationModal = ({ handleClose, error }) => {
       content={
         <SessionRevalidationModal
           onModalClose={handleClose}
+          // @ts-expect-error <StrictNullChecks/>
           walletSsoSource={sessionKeyValidationError.ssoSource}
+          // @ts-expect-error <StrictNullChecks/>
           walletAddress={sessionKeyValidationError.address}
         />
       }

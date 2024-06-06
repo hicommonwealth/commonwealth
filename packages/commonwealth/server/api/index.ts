@@ -51,6 +51,7 @@ router.get('/v1/openapi.json', (req, res) => {
 router.use('/v1/docs', swaggerUi.serve);
 router.get(
   '/v1/docs',
+  // @ts-expect-error StrictNullChecks
   swaggerUi.setup(null, { swaggerUrl: '../openapi.json' }),
 );
 

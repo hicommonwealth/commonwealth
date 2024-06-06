@@ -191,6 +191,7 @@ const CommunityProfileForm = () => {
 
       await editBanner({
         communityId: community.id,
+        // @ts-expect-error <StrictNullChecks/>
         bannerText: values.communityBanner,
       });
 
@@ -345,7 +346,6 @@ const CommunityProfileForm = () => {
               showUploadAndGenerateText
               name="communityProfileImageURL"
               canSelectImageBehaviour={false}
-              uploadCompleteCallback={console.log}
               defaultImageBehaviour={ImageBehavior.Circle}
               onImageProcessStatusChange={setIsProcessingProfileImage}
               subheaderText="Community Profile Image (Accepts JPG and PNG files)"

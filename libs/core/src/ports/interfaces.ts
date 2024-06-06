@@ -3,6 +3,7 @@ import {
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
+  InvalidInput,
 } from '../framework';
 import { Events } from '../integration/events';
 import {
@@ -147,12 +148,47 @@ export interface Analytics extends Disposable {
 }
 
 export type RetryStrategyFn = (
-  err: Error | undefined,
+  err: Error | InvalidInput | CustomRetryStrategyError,
   topic: BrokerSubscriptions,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
 ) => void;
+
+export type RepublishStrategy = {
+  strategy: 'republish';
+  attempts: number;
+  defer: number;
+};
+
+export type NackStrategy = {
+  strategy: 'nack';
+};
+
+export type AckStrategy = {
+  strategy: 'ack';
+};
+
+export type RequeueStrategy = {
+  strategy: 'nack';
+  defer: number;
+  requeue: boolean;
+};
+
+export type RetryStrategies =
+  | [RepublishStrategy, ...RepublishStrategy[], NackStrategy]
+  | NackStrategy
+  | AckStrategy
+  | RequeueStrategy;
+
+export class CustomRetryStrategyError extends Error {
+  recoveryStrategy: RetryStrategies;
+
+  constructor(message: string, recoveryStrategy: RetryStrategies) {
+    super(message);
+    this.recoveryStrategy = recoveryStrategy;
+  }
+}
 
 export enum BrokerPublications {
   MessageRelayer = 'MessageRelayer',

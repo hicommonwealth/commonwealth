@@ -8,6 +8,7 @@ const useNamespaceFactory = (ethChainId: number) => {
   const chainRpc = app.config.nodes
     .getAll()
     .find((node) => node.ethChainId === ethChainId)?.url;
+  // @ts-expect-error StrictNullChecks
   const namespaceFactory = new NamespaceFactory(goerliFactoryAddress, chainRpc);
 
   return { namespaceFactory };

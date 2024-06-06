@@ -6,12 +6,13 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
 
   public add(
     proposal: ProposalT,
-    options?: { eqFn?: (a: ProposalT) => boolean; pushToIndex?: number }
+    options?: { eqFn?: (a: ProposalT) => boolean; pushToIndex?: number },
   ) {
     // if the proposal exists already then super.add will serialize it
     super.add(proposal, {
       eqFn: (x) => x.identifier === proposal.identifier,
       ...(options &&
+        // @ts-expect-error StrictNullChecks
         options.pushToIndex >= 0 && { pushToIndex: options.pushToIndex }),
     });
     this._storeId[proposal.identifier] = proposal;

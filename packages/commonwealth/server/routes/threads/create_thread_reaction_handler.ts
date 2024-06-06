@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -29,9 +30,13 @@ export const createThreadReactionHandler = async (
 ) => {
   const { user, address } = req;
   const {
+    // @ts-expect-error StrictNullChecks
     reaction,
+    // @ts-expect-error StrictNullChecks
     canvas_action: canvasAction,
+    // @ts-expect-error StrictNullChecks
     canvas_session: canvasSession,
+    // @ts-expect-error StrictNullChecks
     canvas_hash: canvasHash,
   } = req.body;
 
@@ -39,14 +44,16 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidReaction);
   }
 
+  // @ts-expect-error StrictNullChecks
   const threadId = parseInt(req.params.id, 10);
   if (!threadId) {
     throw new AppError(Errors.InvalidThreadId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       thread_id: threadId,
+      // @ts-expect-error StrictNullChecks
       address: address.address,
       value: reaction,
     });
@@ -55,7 +62,9 @@ export const createThreadReactionHandler = async (
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadReaction({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
       reaction,
       threadId,
@@ -65,7 +74,9 @@ export const createThreadReactionHandler = async (
     });
 
   // update address last active
+  // @ts-expect-error StrictNullChecks
   address.last_active = new Date();
+  // @ts-expect-error StrictNullChecks
   address.save().catch(console.error);
 
   // emit notification

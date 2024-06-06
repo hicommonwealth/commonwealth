@@ -96,6 +96,7 @@ export async function __getActiveThreads(
   }
 
   let allRecentTopicThreadsRaw = [];
+  // @ts-expect-error StrictNullChecks
   allRecentTopicThreadsRaw = await Promise.all(
     communityTopics.map(async (topic) => {
       return await this.models.Thread.findAll({
@@ -115,6 +116,7 @@ export async function __getActiveThreads(
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
 
   const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
+    // @ts-expect-error StrictNullChecks
     let tempThread = thread.toJSON();
     tempThread = {
       ...tempThread,
@@ -145,6 +147,7 @@ export async function __getActiveThreads(
     const threadsWithCommentsCount = allRecentTopicThreads.filter(
       (thread) => thread.topic_id === topic.id,
     );
+    // @ts-expect-error StrictNullChecks
     allThreads.push(...(threadsWithCommentsCount || []));
   });
 

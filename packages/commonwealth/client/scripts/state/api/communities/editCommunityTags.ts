@@ -31,6 +31,7 @@ const useEditCommunityTagsMutation = () => {
   return useMutation({
     mutationFn: editCommunityTags,
     onSuccess: async ({ tags, community_id }) => {
+      // @ts-expect-error StrictNullChecks
       app.config.chainCategoryMap[community_id] = tags;
     },
   });

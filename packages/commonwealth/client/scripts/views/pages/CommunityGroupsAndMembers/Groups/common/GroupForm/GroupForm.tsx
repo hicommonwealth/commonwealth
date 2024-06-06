@@ -88,6 +88,7 @@ const CWRequirementsRadioButton = ({
         options={options}
         value={value}
         onChange={(selectedOption) => {
+          // @ts-expect-error <StrictNullChecks/>
           onInputValueChange(`${selectedOption.value}`);
         }}
       />
@@ -264,11 +265,13 @@ const GroupForm = ({
     // manually using javascript
     const isTokenRequirementTypeAdded =
       !Object.values(TOKENS).includes(
+        // @ts-expect-error <StrictNullChecks/>
         allRequirements[index].values.requirementType,
       ) &&
       val.requirementType &&
       Object.values(TOKENS).includes(val.requirementType);
     if (isTokenRequirementTypeAdded) {
+      // @ts-expect-error <StrictNullChecks/>
       allRequirements[index].errors.requirementContractAddress = '';
     }
 
@@ -284,6 +287,7 @@ const GroupForm = ({
       // HACK ALERT: this type of validation change should be done internally by zod,
       // but we are doing this manually using javascript
       const schema = getRequirementSubFormSchema(
+        // @ts-expect-error <StrictNullChecks/>
         allRequirements[index].values.requirementType,
       );
       schema.pick({ [key]: true }).parse(val);
@@ -312,6 +316,7 @@ const GroupForm = ({
     if (val.requirementContractAddress) {
       const isInvalidEthAddress =
         [...Object.values(ERC_SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+          // @ts-expect-error <StrictNullChecks/>
           allRequirements[index].values.requirementType,
         ) && !isValidEthAddress(val.requirementContractAddress);
 
@@ -337,6 +342,7 @@ const GroupForm = ({
         // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
         // manually using javascript
         const schema = getRequirementSubFormSchema(
+          // @ts-expect-error <StrictNullChecks/>
           subForm.values.requirementType,
         );
         if (subForm.values.requirementType === '') {
@@ -365,6 +371,7 @@ const GroupForm = ({
 
     setRequirementSubForms([...updatedSubForms]);
 
+    // @ts-expect-error <StrictNullChecks/>
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
 
@@ -476,6 +483,7 @@ const GroupForm = ({
               {requirementSubForms.map((subForm, index) => (
                 <RequirementSubForm
                   key={index}
+                  // @ts-expect-error <StrictNullChecks/>
                   defaultValues={subForm.defaultValues}
                   errors={subForm.errors}
                   onChange={(val) => validateChangedValue(val, index)}
@@ -491,6 +499,7 @@ const GroupForm = ({
                     ? 'Cannot add more than 10 requirements'
                     : 'Add requirement'
                 }
+                // @ts-expect-error <StrictNullChecks/>
                 iconLeft={
                   requirementSubForms.length === MAX_REQUIREMENTS
                     ? null
@@ -529,6 +538,7 @@ const GroupForm = ({
                 <CWRequirementsRadioButton
                   maxRequirements={maxRequirements}
                   inputValue={cwRequiremenetsLabelInputValue}
+                  // @ts-expect-error <StrictNullChecks/>
                   isSelected={isSelectedCustomRequirementsToFulfillOption}
                   onSelect={() =>
                     setIsSelectedCustomRequirementsToFulfillOption(true)

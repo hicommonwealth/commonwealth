@@ -1,6 +1,6 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import app from 'client/scripts/state';
-import { useFetchSelfProfileQuery } from 'client/scripts/state/api/profiles';
+import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -25,8 +25,9 @@ export const UserTrainingSlider = () => {
   >();
 
   const { data: profile, isLoading: isLoadingProfile } =
-    useFetchSelfProfileQuery({
+    useFetchProfileByIdQuery({
       apiCallEnabled: isLoggedIn,
+      shouldFetchSelfProfile: true,
     });
 
   const { isVisible: isAdminSliderVisible } = useAdminActionCardsStore();
@@ -45,12 +46,14 @@ export const UserTrainingSlider = () => {
       UserTrainingCardTypes.CreateContent,
       UserTrainingCardTypes.FinishProfile,
       UserTrainingCardTypes.ExploreCommunities,
+      // @ts-expect-error <StrictNullChecks/>
     ].map((card) => markTrainingActionAsPermanentlyHidden(card, profileId));
   };
 
   const isCardVisible = (cardName: UserTrainingCardTypes) => {
     return (
       completedActions.includes(cardName) ||
+      // @ts-expect-error <StrictNullChecks/>
       !trainingActionPermanentlyHidden?.[profileId]?.includes(cardName)
     );
   };
@@ -74,6 +77,7 @@ export const UserTrainingSlider = () => {
     if (cardToDismiss === 'all') {
       hideAllCards();
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       markTrainingActionAsPermanentlyHidden(cardToDismiss, profileId);
     }
     setCardToDismiss(undefined);
@@ -142,6 +146,7 @@ export const UserTrainingSlider = () => {
   if (
     !isLoggedIn ||
     isLoadingProfile ||
+    // @ts-expect-error <StrictNullChecks/>
     (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
       completedActions.length === 0) ||
     isAdminSliderVisible // if admin slider is visible, we hide user training slider
@@ -272,6 +277,7 @@ export const UserTrainingSlider = () => {
 
                   markTrainingActionAsComplete(
                     UserTrainingCardTypes.ExploreCommunities,
+                    // @ts-expect-error <StrictNullChecks/>
                     profileId,
                   );
                 }}

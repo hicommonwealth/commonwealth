@@ -6,6 +6,7 @@ import { buildUser } from '../../unit/unitHelpers';
 
 describe('create chain tests', () => {
   it('fails when no eth_chain_id is provided when chain is ethereum', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -28,6 +29,7 @@ describe('create chain tests', () => {
   });
 
   it('fails when eth_chain_id is not a number', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,

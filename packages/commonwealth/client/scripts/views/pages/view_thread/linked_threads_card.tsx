@@ -53,6 +53,7 @@ export const LinkedThreadsCard = ({
             <div className="LinkedThreadsCard">
               {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
+                  {/* @ts-expect-error StrictNullChecks*/}
                   {linkedThreads.map((t) => {
                     const discussionLink = getProposalUrlPath(
                       t.slug,
@@ -88,6 +89,7 @@ export const LinkedThreadsCard = ({
         content={
           <LinkedThreadModal
             thread={thread}
+            // @ts-expect-error <StrictNullChecks/>
             linkedThreads={linkedThreads}
             onModalClose={() => setIsModalOpen(false)}
           />

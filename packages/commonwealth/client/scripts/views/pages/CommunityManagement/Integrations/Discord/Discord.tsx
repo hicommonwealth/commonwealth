@@ -31,6 +31,7 @@ const Discord = () => {
   }, []);
 
   if (queryParams.has('discordConfigId')) {
+    // @ts-expect-error <StrictNullChecks/>
     app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
   }
   const [isDiscordWebhooksEnabled, setIsDiscordWebhooksEnabled] = useState(
@@ -187,6 +188,7 @@ const Discord = () => {
                       };
                     },
                   )}
+                  // @ts-expect-error <StrictNullChecks/>
                   topics={topics.map((topic) => ({
                     name: topic.name,
                     id: `${topic.id}`,

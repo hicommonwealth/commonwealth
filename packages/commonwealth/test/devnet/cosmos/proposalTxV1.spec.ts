@@ -91,6 +91,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+    // @ts-expect-error StrictNullChecks
     const rawLog = JSON.parse(resp.rawLog);
     const submitProposalEvent = rawLog[0]?.events?.find(
       (e) => e['type'] === 'submit_proposal',

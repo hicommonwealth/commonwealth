@@ -48,7 +48,9 @@ const MyCommunityStake = () => {
     (a) => a.value,
   );
 
+  // @ts-expect-error <StrictNullChecks/>
   let addressFilter = [filterOptions.selectedAddress.value];
+  // @ts-expect-error <StrictNullChecks/>
   if (filterOptions.selectedAddress.value === '') {
     addressFilter = possibleAddresses;
   }
@@ -99,6 +101,7 @@ const MyCommunityStake = () => {
                   options={ADDRESS_FILTERS}
                   value={filterOptions.selectedAddress}
                   onChange={(option) =>
+                    // @ts-expect-error <StrictNullChecks/>
                     setFilterOptions((filters) => ({
                       ...filters,
                       selectedAddress: option,
@@ -120,8 +123,10 @@ const MyCommunityStake = () => {
             </CWTabsRow>
 
             {activeTabIndex === 0 ? (
+              // @ts-expect-error <StrictNullChecks/>
               <Stakes transactions={updatedData} />
             ) : (
+              // @ts-expect-error <StrictNullChecks/>
               <Transactions transactions={updatedData} />
             )}
           </>

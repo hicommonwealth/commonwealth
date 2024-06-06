@@ -45,14 +45,17 @@ const getNewProfile = async (
   let profile: ProfileInstance;
 
   if (profileId) {
+    // @ts-expect-error StrictNullChecks
     profile = await models.Profile.findOne({
       where: {
         id: profileId,
       },
     });
   } else {
+    // @ts-expect-error StrictNullChecks
     profile = await models.Profile.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
     });
@@ -77,6 +80,7 @@ const getNewProfile = async (
     },
   });
 
+  // @ts-expect-error StrictNullChecks
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
 
   const totalUpvotes = await models.Reaction.count({
@@ -88,6 +92,7 @@ const getNewProfile = async (
   });
 
   const threads = await models.Thread.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -100,6 +105,7 @@ const getNewProfile = async (
   });
 
   const comments = await models.Comment.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -115,6 +121,7 @@ const getNewProfile = async (
     ...new Set<number>(comments.map((c) => c.thread_id, 10)),
   ];
   const commentThreads = await models.Thread.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       id: {
         [Op.in]: commentThreadIds,

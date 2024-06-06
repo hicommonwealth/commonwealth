@@ -39,6 +39,7 @@ const redirectToNextPage = (navigate) => {
   ) {
     // handle localStorage-based redirect after Github login (callback must occur within 1 day)
     try {
+      // @ts-expect-error <StrictNullChecks/>
       const postAuth = JSON.parse(localStorage.getItem('nearPostAuthRedirect'));
 
       if (
@@ -92,6 +93,7 @@ const FinishNearLogin = () => {
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
+        // @ts-expect-error <StrictNullChecks/>
         null, // no wallet sso source
         community.id,
         sessionPublicAddress,
@@ -109,10 +111,13 @@ const FinishNearLogin = () => {
 
       setIsNewAccount(newAcct.newlyCreated);
       // account = newAcct.account;
+      // @ts-expect-error <StrictNullChecks/>
       acct.setValidationToken(newAcct.account.validationToken);
       acct.setWalletId(WalletId.NearWallet);
+      // @ts-expect-error <StrictNullChecks/>
       acct.setAddressId(newAcct.account.addressId);
       acct.setSessionPublicAddress(sessionPublicAddress);
+      // @ts-expect-error <StrictNullChecks/>
       acct.setValidationBlockInfo(null);
 
       const canvas = await import('@canvas-js/interfaces');
@@ -236,6 +241,7 @@ const FinishNearLogin = () => {
       </>
     );
   } else if (validationCompleted) {
+    // @ts-expect-error <StrictNullChecks/>
     if (validatedAccount.profile.name) {
       redirectToNextPage(navigate);
     } else {
@@ -243,6 +249,7 @@ const FinishNearLogin = () => {
         if (!app.isLoggedIn()) {
           setIsModalOpen(true);
         } else {
+          // @ts-expect-error <StrictNullChecks/>
           completeClientLogin(validatedAccount).then(() => {
             redirectToNextPage(navigate);
           });
@@ -260,6 +267,7 @@ const FinishNearLogin = () => {
           redirectToNextPage(navigate);
         }}
         onSuccess={() => setIsModalOpen(false)}
+        // @ts-expect-error <StrictNullChecks/>
         showWalletsFor={validatedAccount.walletId as any}
       />
     );

@@ -51,7 +51,9 @@ const MembersSection = ({
               <div className="table-cell">
                 {handleCheckboxChange && (
                   <CWCheckbox
+                    // @ts-expect-error <StrictNullChecks/>
                     checked={selectedAccounts.includes(member.address)}
+                    // @ts-expect-error <StrictNullChecks/>
                     onChange={() => handleCheckboxChange(member.address)}
                   />
                 )}
@@ -91,6 +93,7 @@ const MembersSection = ({
               <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
+          // @ts-expect-error <StrictNullChecks/>
           ...extraColumns(member),
         }))}
         onScrollEnd={onLoadMoreMembers}

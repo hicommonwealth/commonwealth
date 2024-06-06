@@ -141,6 +141,7 @@ describe('DatabaseCleaner Tests', async () => {
       hundredDaysAgo.setUTCDate(now.getUTCDate() - 100);
 
       // create old notification
+      // @ts-expect-error StrictNullChecks
       await models.Notification.create({
         notification_data: 'testing',
         created_at: hundredDaysAgo,
@@ -149,6 +150,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new notification
+      // @ts-expect-error StrictNullChecks
       await models.Notification.create({
         notification_data: 'testing',
         community_id: 'ethereum',
@@ -162,6 +164,7 @@ describe('DatabaseCleaner Tests', async () => {
 
       const notifs = await models.Notification.findAll();
       expect(notifs.length).to.equal(1);
+      // @ts-expect-error StrictNullChecks
       expect(notifs[0].created_at.toString()).to.equal(
         eightyEightDaysAgo.toString(),
       );
@@ -177,10 +180,12 @@ describe('DatabaseCleaner Tests', async () => {
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
       // create old user and address
+      // @ts-expect-error StrictNullChecks
       const oldUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
       });
+      // @ts-expect-error StrictNullChecks
       await models.Address.create({
         user_id: oldUser.id,
         address: '0x1234',
@@ -190,10 +195,12 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new user and address
+      // @ts-expect-error StrictNullChecks
       const newUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
       });
+      // @ts-expect-error StrictNullChecks
       await models.Address.create({
         user_id: newUser.id,
         address: '0x2345',
@@ -203,6 +210,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       const newSub = await models.Subscription.create({
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
         community_id: 'ethereum',
@@ -211,6 +219,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       const oldSub = await models.Subscription.create({
+        // @ts-expect-error StrictNullChecks
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
         community_id: 'ethereum',

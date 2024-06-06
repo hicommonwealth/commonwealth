@@ -48,6 +48,7 @@ export const ViewSnapshotProposalPage = ({
     communityId: app.activeChainId(),
     link: {
       source: LinkSource.Snapshot,
+      // @ts-expect-error <StrictNullChecks/>
       identifier: proposal?.id,
     },
     enabled: !!(app.activeChainId() && proposal?.id),
@@ -101,16 +102,19 @@ export const ViewSnapshotProposalPage = ({
       const currentProposal = app.snapshot.proposals.find(
         (p) => p.id === proposalId,
       );
+      // @ts-expect-error <StrictNullChecks/>
       setProposal(currentProposal);
 
       const currentSpace = app.snapshot.space;
       setSpace(currentSpace);
 
+      // @ts-expect-error <StrictNullChecks/>
       const results = await getResults(currentSpace, currentProposal);
       setVoteResults(results);
 
       const powerRes = await getPower(
         currentSpace,
+        // @ts-expect-error <StrictNullChecks/>
         currentProposal,
         activeUserAddress,
       );
@@ -139,8 +143,10 @@ export const ViewSnapshotProposalPage = ({
       <CWContentPage
         showSidebar
         title={proposal.title}
+        // @ts-expect-error <StrictNullChecks/>
         author={proposalAuthor}
         createdAt={proposal.created}
+        // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
         contentBodyLabel="Snapshot"
         subHeader={
@@ -176,6 +182,7 @@ export const ViewSnapshotProposalPage = ({
                 identifier={identifier}
                 proposal={proposal}
                 scores={[]} // unused?
+                // @ts-expect-error <StrictNullChecks/>
                 space={space}
                 symbol={symbol}
                 totals={totals}

@@ -132,9 +132,11 @@ export const ViewUpvotesDrawer = ({
             <div className="upvoted-content-header">
               <AuthorAndPublishInfo
                 authorAddress={author?.address}
+                // @ts-expect-error <StrictNullChecks/>
                 authorCommunityId={getAuthorCommunityId(author)}
                 publishDate={publishDate}
                 showUserAddressWithInfo={false}
+                // @ts-expect-error <StrictNullChecks/>
                 profile={profile}
               />
             </div>
@@ -148,6 +150,7 @@ export const ViewUpvotesDrawer = ({
                 columnInfo={tableState.columns}
                 sortingState={tableState.sorting}
                 setSortingState={tableState.setSorting}
+                // @ts-expect-error <StrictNullChecks/>
                 rowData={getRowData(reactorData)}
               />
               <div className="upvote-totals">

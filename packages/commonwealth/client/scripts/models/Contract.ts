@@ -92,6 +92,7 @@ class Contract {
     this.nickname = nickname;
     this.abi = abi;
     this.ccts = ccts;
+    // @ts-expect-error StrictNullChecks
     this.hasGlobalTemplate = hasGlobalTemplate;
   }
 

@@ -39,6 +39,7 @@ const updateNewProfile = async (
 ) => {
   const profile = await models.Profile.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       user_id: req.user.id,
     },
   });
@@ -60,6 +61,7 @@ const updateNewProfile = async (
   let { bio } = req.body;
   bio = sanitizeQuillText(bio);
 
+  // @ts-expect-error StrictNullChecks
   if (profile.user_id !== req.user.id) {
     return next(new Error(Errors.NotAuthorized));
   }
@@ -80,12 +82,14 @@ const updateNewProfile = async (
     },
     {
       where: {
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
       returning: true,
     },
   );
 
+  // @ts-expect-error StrictNullChecks
   await updateTags(tag_ids, models, profile.id, 'profile_id');
 
   if (!updateStatus || !rows) {

@@ -83,6 +83,7 @@ function processAssociatedReactions(
     tempReactionTimestamps.length === tempReactionWeights.length
   ) {
     for (let i = 0; i < tempReactionIds.length; i++) {
+      // @ts-expect-error StrictNullChecks
       temp.push({
         id: tempReactionIds[i],
         type: tempReactionType[i],
@@ -315,34 +316,46 @@ export class Thread implements IUniqueId {
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
+    // @ts-expect-error StrictNullChecks
     this.body = getDecodedString(body);
+    // @ts-expect-error StrictNullChecks
     this.plaintext = plaintext;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
+    // @ts-expect-error StrictNullChecks
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
+    // @ts-expect-error StrictNullChecks
     this.pinned = pinned;
+    // @ts-expect-error StrictNullChecks
     this.url = url;
     this.communityId = community_id;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
+    // @ts-expect-error StrictNullChecks
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
     this.hasPoll = has_poll;
+    // @ts-expect-error StrictNullChecks
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
       ? this.versionHistory[0].timestamp
       : null;
+    // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
+    // @ts-expect-error StrictNullChecks
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
+    // @ts-expect-error StrictNullChecks
     this.canvasAction = canvasAction;
+    // @ts-expect-error StrictNullChecks
     this.canvasSession = canvasSession;
+    // @ts-expect-error StrictNullChecks
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
@@ -351,6 +364,7 @@ export class Thread implements IUniqueId {
     this.associatedReactions =
       associatedReactions ??
       processAssociatedReactions(
+        // @ts-expect-error StrictNullChecks
         reactions,
         reactionIds,
         reactionType,
