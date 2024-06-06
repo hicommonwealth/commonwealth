@@ -30,6 +30,7 @@ import {
   createCanvasSessionPayload,
 } from '../../shared/canvas';
 import { addressSwapper } from '../../shared/utils';
+import { incrementProfileCount } from './denormalizedCountUtils';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -352,8 +353,22 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        const user = await models.User.createWithProfile({
-          email: null,
+        const user = await models.sequelize.transaction(async (transaction) => {
+          const userEntity = await models.User.createWithProfile(
+            {
+              email: null,
+            },
+            { transaction },
+          );
+
+          await incrementProfileCount(
+            models,
+            addressModel.community_id,
+            userEntity.id,
+            transaction,
+          );
+
+          return userEntity;
         });
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
         await models.Subscription.create({

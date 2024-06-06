@@ -140,31 +140,6 @@ export default (
         withPrivateData: {},
       },
       hooks: {
-        afterCreate: async (
-          address: AddressInstance,
-          options: Sequelize.CreateOptions<AddressAttributes>,
-        ) => {
-          await sequelize.query(
-            `
-            UPDATE "Communities" as c
-            SET profile_count = profile_count + 1
-            WHERE c.id = :community_id
-            AND NOT EXISTS (
-                SELECT 1
-                FROM "Addresses" as a
-                WHERE a.community_id = c.id AND a.user_id = :user_id
-            );
-            `,
-            {
-              replacements: {
-                community_id: address.community_id,
-                user_id: address.user_id,
-              },
-              transaction: options.transaction,
-              logging: true,
-            },
-          );
-        },
         afterDestroy: async (
           address: AddressInstance,
           options: Sequelize.InstanceDestroyOptions,
@@ -186,7 +161,6 @@ export default (
                 user_id: address.user_id,
               },
               transaction: options.transaction,
-              logging: true,
             },
           );
         },
