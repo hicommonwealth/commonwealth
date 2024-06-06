@@ -98,14 +98,24 @@ export async function __getBulkThreads(
   };
 
   const contestStatus = {
-    active: ' AND CON.end_time > NOW()',
-    pastWinners: ' AND CON.end_time <= NOW()',
+    active: ' WHERE CON.end_time > NOW()',
+    pastWinners: ' WHERE CON.end_time <= NOW()',
     all: '',
   };
 
+  const contestJoin =
+    ' JOIN "ContestActions" CA ON CA.thread_id = id' +
+    ' JOIN "Contests" CON ON CON.contest_id = CA.contest_id';
+
   const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
     `
-        WITH top_threads AS (
+        WITH contest_ids as (
+            SELECT DISTINCT(CA.thread_id)
+            FROM "Contests" CON
+            JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+            ${contestStatus[status] || contestStatus.all}
+        ),
+        top_threads AS (
         SELECT id, title, url, body, kind, stage, read_only, discord_meta,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
@@ -120,6 +130,7 @@ export async function __getBulkThreads(
             ${stage ? ' AND stage = :stage' : ''}
             ${fromDate ? ' AND T.created_at > :fromDate' : ''}
             ${toDate ? ' AND T.created_at < :toDate' : ''}
+            ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
         ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'} 
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (
@@ -204,8 +215,6 @@ export async function __getBulkThreads(
           FROM "Contests" CON
           JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
           JOIN top_threads TT ON TT.id = CA.thread_id
-          ${contestAddress ? 'WHERE CA.contest_address = :contestAddress ' : ''}
-          ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
           GROUP BY TT.id
     )${
       withXRecentComments
@@ -257,7 +266,7 @@ export async function __getBulkThreads(
     }
   `,
     {
-      //logging: true,
+      logging: true,
       replacements,
       type: QueryTypes.SELECT,
     },
