@@ -4,6 +4,7 @@ import app from 'client/scripts/state';
 import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
 import AuthButton from 'client/scripts/views/components/AuthButton';
 import {
+  AuthSSOs,
   AuthTypes,
   AuthWallets,
   EVMWallets,
@@ -49,14 +50,24 @@ const MODAL_COPY = {
   },
 };
 
+const SSO_OPTIONS: AuthSSOs[] = [
+  'google',
+  'discord',
+  'x',
+  'apple',
+  'github',
+  'email',
+] as const;
+
 const ModalBase = ({
   onClose,
   onSuccess,
   layoutType,
   hideDescription,
   customBody,
-  showAuthenticationOptionsFor,
   showWalletsFor,
+  showAuthOptionFor,
+  showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
   onChangeModalType,
@@ -65,25 +76,29 @@ const ModalBase = ({
   const copy = MODAL_COPY[layoutType];
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
-    showAuthenticationOptionsFor?.includes('sso') &&
-      showAuthenticationOptionsFor.length === 1
+    showAuthOptionTypesFor?.includes('sso') &&
+      showAuthOptionTypesFor.length === 1
       ? 1
       : 0,
   );
-  useEffect(() => {
-    setActiveTabIndex((prevActiveTab) => {
-      return (showAuthenticationOptionsFor?.includes('sso') &&
-        showAuthenticationOptionsFor.length === 1) ||
-        prevActiveTab === 1
-        ? 1
-        : 0;
-    });
-  }, [showAuthenticationOptionsFor]);
-
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
+
+  useEffect(() => {
+    setActiveTabIndex((prevActiveTab) => {
+      if (showAuthOptionFor) {
+        return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
+      }
+
+      return (showAuthOptionTypesFor?.includes('sso') &&
+        showAuthOptionTypesFor.length === 1) ||
+        prevActiveTab === 1
+        ? 1
+        : 0;
+    });
+  }, [showAuthOptionTypesFor, showAuthOptionFor]);
 
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
@@ -193,7 +208,7 @@ const ModalBase = ({
     },
     {
       name: 'Email or Social',
-      options: ['google', 'discord', 'x', 'apple', 'github', 'email'],
+      options: SSO_OPTIONS,
     },
   ];
 
@@ -231,6 +246,25 @@ const ModalBase = ({
     }
   };
 
+  const renderAuthButton = (option: AuthTypes) => {
+    if (
+      showAuthOptionFor &&
+      option !== showAuthOptionFor &&
+      !(showAuthOptionFor === 'metamask' && option === 'walletconnect')
+    ) {
+      return <></>;
+    }
+
+    return (
+      <AuthButton
+        key={option}
+        type={option}
+        disabled={isMagicLoading}
+        onClick={async () => await onAuthMethodSelect(option)}
+      />
+    );
+  };
+
   return (
     <>
       <section className="ModalBase">
@@ -256,9 +290,9 @@ const ModalBase = ({
         <CWModalBody className={clsx('content', bodyClassName)}>
           {customBody}
 
-          {showAuthenticationOptionsFor?.length > 0 && (
+          {showAuthOptionTypesFor?.length > 0 && (
             <>
-              {showAuthenticationOptionsFor?.length > 1 && (
+              {showAuthOptionTypesFor?.length > 1 && !showAuthOptionFor && (
                 <CWTabsRow className="tabs">
                   {tabsList.map((tab, index) => (
                     <CWTab
@@ -285,14 +319,7 @@ const ModalBase = ({
                 */}
                 {(activeTabIndex === 0 ||
                   (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
-                  tabsList[activeTabIndex].options.map((option, key) => (
-                    <AuthButton
-                      key={key}
-                      type={option}
-                      disabled={isMagicLoading}
-                      onClick={async () => await onAuthMethodSelect(option)}
-                    />
-                  ))}
+                  tabsList[activeTabIndex].options.map(renderAuthButton)}
 
                 {/* If email option is selected from the SSO's list, show email form */}
                 {activeTabIndex === 1 && isAuthenticatingWithEmail && (
@@ -334,9 +361,10 @@ const ModalBase = ({
           [
             ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
             ...evmWallets.filter((x) => x !== 'walletconnect'),
-          ] as EVMWallets[]
+          ].filter((wallet) =>
+            showAuthOptionFor ? wallet === showAuthOptionFor : true,
+          ) as EVMWallets[]
         }
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         isOpen={isEVMWalletsModalVisible}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClose={async () => {
