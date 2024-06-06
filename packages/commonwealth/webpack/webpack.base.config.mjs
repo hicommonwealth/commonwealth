@@ -1,3 +1,4 @@
+import CopyPlugin from 'copy-webpack-plugin';
 import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { createRequire } from 'module';
@@ -26,6 +27,9 @@ const baseConfig = {
     chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [{ from: 'client/firebase-messaging-sw.js', to: 'build' }],
+    }),
     new webpack.DefinePlugin({
       'process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG':
         JSON.stringify(
@@ -178,7 +182,7 @@ const baseConfig = {
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercoppa\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },
