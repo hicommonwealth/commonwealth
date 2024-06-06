@@ -120,10 +120,6 @@ export async function __getBulkThreads(
             ${stage ? ' AND stage = :stage' : ''}
             ${fromDate ? ' AND T.created_at > :fromDate' : ''}
             ${toDate ? ' AND T.created_at < :toDate' : ''}
-            ${
-              contestAddress ? ' AND CA.contest_address = :contestAddress ' : ''
-            }
-            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
         ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'} 
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (
@@ -208,6 +204,8 @@ export async function __getBulkThreads(
           FROM "Contests" CON
           JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
           JOIN top_threads TT ON TT.id = CA.thread_id
+          ${contestAddress ? 'WHERE CA.contest_address = :contestAddress ' : ''}
+          ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
           GROUP BY TT.id
     )${
       withXRecentComments
