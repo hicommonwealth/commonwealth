@@ -36,7 +36,11 @@ export type ModalBaseProps = {
   bodyClassName?: string;
 } & ModalVariantProps;
 
-export type AuthModalProps = {
-  isOpen: boolean;
-  type?: AuthModalType;
-} & ModalVariantProps;
+export type AuthModalProps = Pick<
+  {
+    isOpen: boolean;
+    type?: AuthModalType;
+  } & ModalVariantProps,
+  // only allow these props for external usage of <AuthModal/>
+  'type' | 'isOpen' | 'onClose' | 'onSuccess' | 'showWalletsFor'
+>;

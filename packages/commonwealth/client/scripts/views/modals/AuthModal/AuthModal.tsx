@@ -20,7 +20,6 @@ const AuthModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
-  onSignInClick,
 }: AuthModalProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [modalType, setModalType] = useState(type);
@@ -37,8 +36,6 @@ const AuthModal = ({
     if (modalType === AuthModalType.CreateAccount) {
       setModalType(AuthModalType.SignIn);
     }
-
-    onSignInClick();
   };
 
   const handleSuccess = (isNewlyCreated) => {
@@ -81,7 +78,8 @@ const AuthModal = ({
         return (
           <RevalidateSessionModal
             {...commonVariantProps}
-            // TODO: session keys should support all wallet types, this is broken in master branch
+            // TODO: session keys should support all wallet types, atm they only work with sso
+            // this is broken in master branch
             showAuthOptionFor={sessionKeyValidationError.ssoSource as AuthTypes}
           />
         );
