@@ -22,6 +22,7 @@ export const useCommunityCardPrice = ({
   ethUsdRate: string;
   historicalPrice: string;
 }) => {
+  // @ts-expect-error StrictNullChecks
   const communityStake: StakeInfo = community?.CommunityStakes?.find(
     (s) => s.stakeId === stakeId,
   );
@@ -29,11 +30,13 @@ export const useCommunityCardPrice = ({
 
   // The price of buying one stake
   const { data: buyPriceData, isLoading } = useGetBuyPriceQuery({
+    // @ts-expect-error StrictNullChecks
     namespace: community.namespace,
     stakeId: stakeId,
     amount: 1,
     apiEnabled: stakeEnabled,
     chainRpc: community.ChainNode.url,
+    // @ts-expect-error StrictNullChecks
     ethChainId: community.ChainNode.ethChainId,
   });
 
@@ -45,12 +48,14 @@ export const useCommunityCardPrice = ({
     };
   }
 
+  // @ts-expect-error StrictNullChecks
   const stakeValue = convertEthToUsd(buyPriceData?.price, ethUsdRate);
   const historicalPriceEth = fromWei(historicalPrice);
 
   let stakeChange = 0;
   if (historicalPriceEth) {
     stakeChange =
+      // @ts-expect-error StrictNullChecks
       ((parseFloat(buyPriceData?.price) - historicalPriceEth) /
         historicalPriceEth) *
       100;

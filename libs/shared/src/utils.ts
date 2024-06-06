@@ -48,6 +48,9 @@ export const getThreadUrl = (
     return relativePath;
   }
 
+  // TODO: Should we relocate this?
+  // - cannot use config util in libs/shared
+  // - duplicate found in knock utils
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im${relativePath}`
     : `http://localhost:8080${relativePath}`;

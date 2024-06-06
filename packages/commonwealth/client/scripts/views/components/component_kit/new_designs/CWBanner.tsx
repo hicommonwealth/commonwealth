@@ -25,6 +25,7 @@ import {
 const typeIconLookup: {
   [key in BannerType]: React.ForwardRefExoticComponent<IconProps>;
 } = {
+  // @ts-expect-error <StrictNullChecks/>
   default: null,
   info: Info,
   success: CheckCircle,
@@ -85,8 +86,10 @@ const CWBanner = ({
             </CWText>
           </div>
         )}
+        {/* @ts-expect-error StrictNullChecks*/}
         {buttons?.length > 0 && (
           <div className="actions-row">
+            {/* @ts-expect-error StrictNullChecks*/}
             {buttons.map((buttonProps, index) => {
               const buttonType = getButtonType(index, type);
 

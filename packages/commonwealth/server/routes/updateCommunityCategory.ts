@@ -46,6 +46,7 @@ const updateCommunityCategory = async (
   });
 
   const { tag_ids } = req.body;
+  // @ts-expect-error StrictNullChecks
   await updateTags(tag_ids, models, community.id, 'community_id');
 
   if (

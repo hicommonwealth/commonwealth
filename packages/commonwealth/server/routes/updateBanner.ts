@@ -23,7 +23,9 @@ const updateBanner = async (
 
   const isAdmin = await validateOwner({
     models: models,
+    // @ts-expect-error StrictNullChecks
     user: req.user,
+    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -37,9 +39,11 @@ const updateBanner = async (
   // find or create
   const [banner] = await models.CommunityBanner.findOrCreate({
     where: {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
     },
     defaults: {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       banner_text,
     },

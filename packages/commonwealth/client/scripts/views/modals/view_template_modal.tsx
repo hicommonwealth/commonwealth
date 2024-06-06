@@ -24,6 +24,7 @@ const ViewTemplateModal = ({
   template: Template;
   onClose: () => void;
 }) => {
+  // @ts-expect-error <StrictNullChecks/>
   const creator: Account = template?.createdBy
     ? app.chain.accounts.get(template?.createdBy)
     : null;
@@ -36,6 +37,7 @@ const ViewTemplateModal = ({
           <CWText type="b2">By</CWText>
           <User
             userAddress={creator?.address}
+            // @ts-expect-error <StrictNullChecks/>
             userCommunityId={creator?.community?.id || creator?.profile?.chain}
             shouldShowAsDeleted={
               !creator?.address &&
@@ -46,6 +48,7 @@ const ViewTemplateModal = ({
           <CWText type="b2">•</CWText>
           <CWText type="b2">Created in</CWText>
           <CWCommunityAvatar
+            // @ts-expect-error <StrictNullChecks/>
             community={app.config.chains.getById(template.createdForCommunity)}
             size="small"
           />

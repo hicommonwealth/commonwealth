@@ -22,8 +22,10 @@ export const deleteBotThreadHandler = async (
   }
 
   await controllers.threads.deleteThread({
+    // @ts-expect-error StrictNullChecks
     user,
     messageId: message_id,
+    // @ts-expect-error StrictNullChecks
     address,
   });
 

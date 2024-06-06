@@ -51,6 +51,7 @@ export async function createCommunityContractTemplateAndMetadata(
 
   const isAdmin = await validateOwner({
     models: models,
+    // @ts-expect-error StrictNullChecks
     user: req.user,
     communityId: community_id,
     allowAdmin: true,
@@ -89,6 +90,7 @@ export async function createCommunityContractTemplateAndMetadata(
     const cctmd = await models.CommunityContractTemplateMetadata.findOne({
       where: { id: cct.cctmd_id },
     });
+    // @ts-expect-error StrictNullChecks
     if (cctmd.slug === slug) {
       throw new AppError('Slug already exists');
     }
@@ -96,6 +98,7 @@ export async function createCommunityContractTemplateAndMetadata(
 
   try {
     // TODO: can some kind of transcation happen here to make this atomic?
+    // @ts-expect-error StrictNullChecks
     const newMetadata = await models.CommunityContractTemplateMetadata.create({
       slug,
       nickname,
@@ -105,6 +108,7 @@ export async function createCommunityContractTemplateAndMetadata(
     });
 
     const newCCT = await models.CommunityContractTemplate.create({
+      // @ts-expect-error StrictNullChecks
       community_contract_id: communityContract.id,
       cctmd_id: newMetadata.id,
       template_id,
@@ -196,6 +200,7 @@ export async function updateCommunityContractTemplate(
 
     const isAdmin = await validateOwner({
       models: models,
+      // @ts-expect-error StrictNullChecks
       user: req.user,
       communityId: community_id,
       allowAdmin: true,
@@ -268,6 +273,7 @@ export async function deleteCommunityContractTemplate(
 
     const isAdmin = await validateOwner({
       models: models,
+      // @ts-expect-error StrictNullChecks
       user: req.user,
       communityId: community_id,
       allowAdmin: true,
@@ -284,6 +290,7 @@ export async function deleteCommunityContractTemplate(
       where: { contract_id, community_id },
     });
 
+    // @ts-expect-error StrictNullChecks
     const communityContractId = communityContract.id;
 
     if (shouldDeleteCommunityContract) {
@@ -306,10 +313,13 @@ export async function deleteCommunityContractTemplate(
         await cct.destroy();
       }
 
+      // @ts-expect-error StrictNullChecks
       await communityContract.destroy();
 
       return success(res, {
+        // @ts-expect-error StrictNullChecks
         metadata: null,
+        // @ts-expect-error StrictNullChecks
         cct: null,
         deletedContract: Boolean(shouldDeleteCommunityContract),
       });
@@ -333,7 +343,9 @@ export async function deleteCommunityContractTemplate(
       // this handles the case where the community contract is deleted but the
       // template is not because no template was created for it
       return success(res, {
+        // @ts-expect-error StrictNullChecks
         metadata: null,
+        // @ts-expect-error StrictNullChecks
         cct: null,
         deletedContract: Boolean(shouldDeleteCommunityContract),
       });
@@ -411,6 +423,7 @@ export async function updateCommunityContractTemplateMetadata(
 
     const isAdmin = await validateOwner({
       models: models,
+      // @ts-expect-error StrictNullChecks
       user: req.user,
       communityId: req.body.community_id,
       allowAdmin: true,
@@ -440,6 +453,7 @@ export async function updateCommunityContractTemplateMetadata(
 
     const cct = await models.CommunityContractTemplate.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         cctmd_id: contract.id,
       },
     });
@@ -472,6 +486,7 @@ export async function deleteCommunityContractTemplateMetadata(
 
     const isAdmin = await validateOwner({
       models: models,
+      // @ts-expect-error StrictNullChecks
       user: req.user,
       communityId: req.body.community_id,
       allowAdmin: true,

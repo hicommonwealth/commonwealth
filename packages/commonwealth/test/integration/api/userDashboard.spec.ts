@@ -46,6 +46,7 @@ describe('User Dashboard API', () => {
         group_ids: [],
       },
     });
+    // @ts-expect-error StrictNullChecks
     topicId = topic.id;
 
     const topic2 = await server.models.Topic.create({
@@ -53,6 +54,7 @@ describe('User Dashboard API', () => {
       description: 'A topic made for testing',
       community_id: chain2,
     });
+    // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
 
     // creates 2 ethereum users

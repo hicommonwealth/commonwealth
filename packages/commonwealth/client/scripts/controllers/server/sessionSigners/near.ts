@@ -1,12 +1,12 @@
 import bs58 from 'bs58';
-import { KeyPairEd25519 } from 'near-api-js/lib/utils';
 import { verify as verifyCanvasSessionSignature } from 'canvas';
+import { KeyPairEd25519 } from 'near-api-js/lib/utils';
 
 import type {
   Action,
+  ActionArgument,
   ActionPayload,
   Session,
-  ActionArgument,
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController, InvalidSession } from '.';
@@ -24,7 +24,7 @@ export class NEARSessionController implements ISessionController {
 
   async hasAuthenticatedSession(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<boolean> {
     await this.getOrCreateSigner(chainId, fromAddress);
     return (
@@ -35,7 +35,7 @@ export class NEARSessionController implements ISessionController {
 
   async getOrCreateAddress(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<string> {
     return (await this.getOrCreateSigner(chainId, fromAddress))
       .getPublicKey()
@@ -46,7 +46,7 @@ export class NEARSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     payload: SessionPayload,
-    signature: string
+    signature: string,
   ) {
     const valid = await verifyCanvasSessionSignature({
       session: { type: 'session', payload, signature },
@@ -58,8 +58,8 @@ export class NEARSessionController implements ISessionController {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
           chainId,
-          fromAddress
-        )}`
+          fromAddress,
+        )}`,
       );
     }
     this.auths[chainId][fromAddress] = { payload, signature };
@@ -67,13 +67,13 @@ export class NEARSessionController implements ISessionController {
     const authStorageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(
       authStorageKey,
-      JSON.stringify(this.auths[chainId][fromAddress])
+      JSON.stringify(this.auths[chainId][fromAddress]),
     );
   }
 
   private async getOrCreateSigner(
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<KeyPairEd25519> {
     this.auths[chainId] = this.auths[chainId] ?? {};
     this.signers[chainId] = this.signers[chainId] ?? {};
@@ -87,9 +87,10 @@ export class NEARSessionController implements ISessionController {
     try {
       const nearApiUtils = await import('near-api-js/lib/utils');
       const storage = localStorage.getItem(storageKey);
+      // @ts-expect-error StrictNullChecks
       const { secretKey } = JSON.parse(storage);
       this.signers[chainId][fromAddress] = new nearApiUtils.KeyPairEd25519(
-        secretKey
+        secretKey,
       );
 
       const auth = localStorage.getItem(authStorageKey);
@@ -106,13 +107,13 @@ export class NEARSessionController implements ISessionController {
         if (payload.sessionAddress === this.getAddress(chainId, fromAddress)) {
           console.log(
             'Restored authenticated session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
           console.log(
             'Restored signed-out session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId, fromAddress),
           );
         }
       }
@@ -130,7 +131,7 @@ export class NEARSessionController implements ISessionController {
     chainId: string,
     fromAddress: string,
     call: string,
-    callArgs: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>,
   ): Promise<{
     session: Session;
     action: Action;
@@ -158,7 +159,7 @@ export class NEARSessionController implements ISessionController {
 
     const canvas = await import('@canvas-js/interfaces');
     const message = new TextEncoder().encode(
-      canvas.serializeActionPayload(actionPayload)
+      canvas.serializeActionPayload(actionPayload),
     );
 
     const { signature: signatureBytes } = signer.sign(message); // publicKey?

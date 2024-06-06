@@ -16,6 +16,7 @@ export default class CosmosAccount extends Account {
   //   We should either deprecate this query and replace it with TokenBalanceCache, or create a
   //   workaround specific for Terra.
   public get balance() {
+    // @ts-expect-error StrictNullChecks
     return this.updateBalance().then(() => this._balance);
   }
 
@@ -23,7 +24,7 @@ export default class CosmosAccount extends Account {
     app: IApp,
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    address: string
+    address: string,
   ) {
     super({ community: app.chain.meta, address });
     if (!app.isModuleReady) {
@@ -45,7 +46,7 @@ export default class CosmosAccount extends Account {
     try {
       const bal = await this._Chain.api.bank.balance(
         this.address,
-        this._Chain.denom
+        this._Chain.denom,
       );
       this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {

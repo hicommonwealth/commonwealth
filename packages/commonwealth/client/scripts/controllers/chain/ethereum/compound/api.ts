@@ -176,6 +176,7 @@ export default class CompoundAPI
     }
 
     // query token and determine token capabilities (MPond vs ERC20VotesComp)
+    // @ts-expect-error StrictNullChecks
     if (tokenAddress) {
       this._Token = MPond__factory.connect(
         tokenAddress,

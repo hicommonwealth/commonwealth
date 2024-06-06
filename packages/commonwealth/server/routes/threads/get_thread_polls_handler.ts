@@ -14,12 +14,15 @@ type GetThreadPollsResponse = PollAttributes[];
 
 export async function getThreadPollsHandler(
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<null, null, GetThreadPollsParams>,
   res: TypedResponse<GetThreadPollsResponse>,
 ) {
+  // @ts-expect-error StrictNullChecks
   const { id: threadId } = req.params;
 
   const polls = await controllers.threads.getThreadPolls({
+    // @ts-expect-error StrictNullChecks
     threadId: parseInt(threadId, 10) || undefined,
   });
 

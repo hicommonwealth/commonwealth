@@ -248,6 +248,7 @@ describe.skip('Contests projection lifecycle', () => {
     await handleEvent(Contests(), {
       name: EventNames.ContestStarted,
       payload: {
+        contest_id: 1,
         contest_address: oneoff,
         start_time,
         end_time,

@@ -30,6 +30,7 @@ export const TemplateDisplayTab = ({
   const navigate = useCommonNavigate();
 
   const [viewTemplateModalOpen, setViewTemplateModalOpen] = useState(false);
+  // @ts-expect-error <StrictNullChecks/>
   const [mountedTemplate, setMountedTemplate] = useState<Template>(null);
 
   return (
@@ -41,6 +42,7 @@ export const TemplateDisplayTab = ({
             template={mountedTemplate}
             onClose={() => {
               setViewTemplateModalOpen(false);
+              // @ts-expect-error <StrictNullChecks/>
               setMountedTemplate(null);
             }}
           />
@@ -48,6 +50,7 @@ export const TemplateDisplayTab = ({
         open={viewTemplateModalOpen}
         onClose={() => {
           setViewTemplateModalOpen(false);
+          // @ts-expect-error <StrictNullChecks/>
           setMountedTemplate(null);
         }}
       />
@@ -90,6 +93,7 @@ export const TemplateDisplayTab = ({
         </div>
         {templates.length > 0 ? (
           templates.map((template, index) => {
+            // @ts-expect-error <StrictNullChecks/>
             const creator: Account = template?.createdBy
               ? app.chain.accounts.get(template?.createdBy)
               : null;
@@ -101,6 +105,7 @@ export const TemplateDisplayTab = ({
                 <div className="table-column">
                   <User
                     userAddress={creator?.address}
+                    // @ts-expect-error <StrictNullChecks/>
                     userCommunityId={
                       creator?.community?.id || creator?.profile?.chain
                     }
@@ -115,12 +120,14 @@ export const TemplateDisplayTab = ({
                   <div className="IconGroup">
                     <CWCommunityAvatar
                       community={app.config.chains.getById(
+                        // @ts-expect-error <StrictNullChecks/>
                         template.createdForCommunity,
                       )}
                       size="small"
                     />
                     <CWText type="caption" fontWeight="bold">
                       {
+                        // @ts-expect-error <StrictNullChecks/>
                         app.config.chains.getById(template.createdForCommunity)
                           .name
                       }

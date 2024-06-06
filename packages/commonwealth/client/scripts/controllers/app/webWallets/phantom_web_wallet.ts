@@ -39,6 +39,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }

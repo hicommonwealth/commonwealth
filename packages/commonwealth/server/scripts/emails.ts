@@ -28,6 +28,7 @@ import { config } from '../config';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+// @ts-expect-error StrictNullChecks
 sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 const getForumNotificationCopy = async (
@@ -62,6 +63,7 @@ const getForumNotificationCopy = async (
       : 'New activity on Commonwealth';
 
   // author
+  // @ts-expect-error StrictNullChecks
   const addressWhere: WhereOptions<AddressAttributes> = {
     address: author_address,
     community_id: author_community_id || null,
@@ -82,6 +84,7 @@ const getForumNotificationCopy = async (
     true,
   );
   try {
+    // @ts-expect-error StrictNullChecks
     authorName = authorProfile.profile_name || author_addr_short;
   } catch (e) {
     authorName = author_addr_short;
@@ -113,6 +116,7 @@ const getForumNotificationCopy = async (
   });
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
+    // @ts-expect-error StrictNullChecks
     const text = decodeURIComponent(comment_text);
     try {
       // return rendered quill doc
@@ -157,6 +161,7 @@ export const createImmediateNotificationEmailObject = async (
     const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
+      // @ts-expect-error StrictNullChecks
       blockNumber: ceInstance.block_number,
       data: ceInstance.event_data,
       network: ceInstance.network,

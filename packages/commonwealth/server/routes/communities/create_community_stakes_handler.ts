@@ -40,6 +40,7 @@ export const createCommunityStakeHandler = async (
   const user = req.user;
   const isAdmin = await validateOwner({
     models,
+    // @ts-expect-error StrictNullChecks
     user,
     communityId: community_id,
     allowMod: false,
@@ -66,6 +67,7 @@ export const createCommunityStakeHandler = async (
   });
 
   await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+    // @ts-expect-error StrictNullChecks
     community,
     stake_id,
   );
@@ -77,6 +79,7 @@ export const createCommunityStakeHandler = async (
   }
 
   const results = await controllers.communities.createCommunityStake({
+    // @ts-expect-error StrictNullChecks
     user,
     communityStake: {
       ...paramsValidationResult.data,
@@ -87,8 +90,10 @@ export const createCommunityStakeHandler = async (
   // since the stake is already created, generate group in background
   // so this request doesn't fail
   await command(Community.GenerateStakeholderGroups(), {
+    // @ts-expect-error StrictNullChecks
     id: community.id,
     actor: {
+      // @ts-expect-error StrictNullChecks
       user: undefined,
     },
     payload: {},

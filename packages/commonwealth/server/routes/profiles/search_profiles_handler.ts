@@ -35,10 +35,13 @@ export const searchProfilesHandler = async (
   }
 
   const profileSearchResults = await controllers.profiles.searchProfiles({
+    // @ts-expect-error StrictNullChecks
     community: req.community,
     search: options.search,
     includeRoles: options.include_roles === 'true',
+    // @ts-expect-error StrictNullChecks
     limit: parseInt(options.limit, 10) || 0,
+    // @ts-expect-error StrictNullChecks
     page: parseInt(options.page, 10) || 0,
     orderBy: options.order_by,
     orderDirection: options.order_direction as any,

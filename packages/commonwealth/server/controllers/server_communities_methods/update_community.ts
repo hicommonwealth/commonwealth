@@ -79,6 +79,7 @@ export async function __updateCommunity(
     const userMembership = await findOneRole(
       this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
+      // @ts-expect-error StrictNullChecks
       community.id,
       ['admin'],
     );
@@ -122,7 +123,9 @@ export async function __updateCommunity(
   const invalidSocialLinks = nonEmptySocialLinks?.filter(
     (s) => !urlHasValidHTTPPrefix(s),
   );
+  // @ts-expect-error StrictNullChecks
   if (nonEmptySocialLinks && invalidSocialLinks.length > 0) {
+    // @ts-expect-error StrictNullChecks
     throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     throw new AppError(Errors.InvalidCustomDomain);
@@ -142,6 +145,7 @@ export async function __updateCommunity(
   }
 
   const newSpaces = snapshot.filter((space) => {
+    // @ts-expect-error StrictNullChecks
     return !community.snapshot_spaces.includes(space);
   });
   for (const space of newSpaces) {
@@ -188,6 +192,7 @@ export async function __updateCommunity(
       : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
 
     if (directory_page_enabled) {
+      // @ts-expect-error StrictNullChecks
       communitySelected = await this.models.Community.findOne({
         where: { chain_node_id: directory_page_chain_node_id },
       });
@@ -246,10 +251,12 @@ export async function __updateCommunity(
   };
 
   const analyticsOptions = {
+    // @ts-expect-error StrictNullChecks
     event: mixpanelEvent,
     community: community.id,
     userId: user.id,
     isCustomDomain: null,
+    // @ts-expect-error StrictNullChecks
     ...(communitySelected && { communitySelected: communitySelected.id }),
   };
 
