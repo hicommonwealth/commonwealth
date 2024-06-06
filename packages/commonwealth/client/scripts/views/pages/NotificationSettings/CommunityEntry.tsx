@@ -1,4 +1,5 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
+import { notifySuccess } from 'controllers/app/notifications';
 import type ChainInfo from 'models/ChainInfo';
 import React, { useCallback, useState } from 'react';
 import { trpc } from 'utils/trpcClient';
@@ -30,11 +31,13 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
           id: communityInfo.id,
           community_ids: [communityInfo.id],
         });
+        notifySuccess('Unsubscribed!');
       } else {
         await createCommunityAlert.mutateAsync({
           id: communityInfo.id,
           community_id: communityInfo.id,
         });
+        notifySuccess('Subscribed!');
       }
 
       setSubscribed(!subscribed);
@@ -53,8 +56,8 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
               {communityInfo?.name}
             </CWText>
 
-            <div style={{ marginLeft: 'auto' }} onClick={toggleSubscription}>
-              <CWToggle checked={!!communityAlert} />
+            <div style={{ marginLeft: 'auto' }}>
+              <CWToggle checked={subscribed} onChange={toggleSubscription} />
             </div>
           </div>
         </div>
