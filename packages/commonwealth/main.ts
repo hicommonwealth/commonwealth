@@ -143,7 +143,6 @@ export async function main(
       '/firebase-messaging-sw.js',
       express.static('firebase-messaging-sw.js'),
     );
-    app.use('/manifest.json', express.static('manifest.json'));
     app.use('/robots.txt', express.static('robots.txt'));
     app.use('/static', express.static('static'));
 
