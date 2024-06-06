@@ -103,10 +103,6 @@ export async function __getBulkThreads(
     all: '',
   };
 
-  const contestJoin =
-    ' JOIN "ContestActions" CA ON CA.thread_id = id' +
-    ' JOIN "Contests" CON ON CON.contest_id = CA.contest_id';
-
   const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
     `
         WITH contest_ids as (
@@ -115,7 +111,7 @@ export async function __getBulkThreads(
             JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
             ${
               contestAddress
-                ? ` WHERE CA.contest_address = ${contestAddress} `
+                ? ` WHERE CA.contest_address = '${contestAddress}' `
                 : ''
             }
             ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
