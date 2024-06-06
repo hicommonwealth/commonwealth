@@ -98,8 +98,8 @@ export async function __getBulkThreads(
   };
 
   const contestStatus = {
-    active: ' WHERE CON.end_time > NOW()',
-    pastWinners: ' WHERE CON.end_time <= NOW()',
+    active: ' AND CON.end_time > NOW()',
+    pastWinners: ' AND CON.end_time <= NOW()',
     all: '',
   };
 
@@ -113,7 +113,12 @@ export async function __getBulkThreads(
             SELECT DISTINCT(CA.thread_id)
             FROM "Contests" CON
             JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
-            ${contestStatus[status] || contestStatus.all}
+            ${
+              contestAddress
+                ? ` WHERE CA.contest_address = ${contestAddress} `
+                : ''
+            }
+            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
         ),
         top_threads AS (
         SELECT id, title, url, body, kind, stage, read_only, discord_meta,
@@ -206,7 +211,8 @@ export async function __getBulkThreads(
           SELECT
               TT.id as thread_id,
               json_agg(json_strip_nulls(json_build_object(
-              'id', CON.contest_id,
+              'contest_id', CON.contest_id,
+              'contest_address', CON.contest_address,
               'thread_id', TT.id,
               'content_id', CA.content_id,
               'start_time', CON.start_time,
