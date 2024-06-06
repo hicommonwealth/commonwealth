@@ -635,6 +635,9 @@ importers:
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(sass@1.77.0)(terser@5.31.0)
 
   libs/eslint-plugin:
     dependencies:
