@@ -33,7 +33,7 @@ type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   generatedImageCallback?: CallableFunction;
   defaultImageUrl?: string;
   defaultImageBehavior?: string;
-  uploadCompleteCallback: CallableFunction;
+  uploadCompleteCallback?: CallableFunction;
   canSelectImageBehaviour?: boolean;
   defaultImageBehaviour?: ImageBehavior;
   showUploadAndGenerateText?: boolean;
@@ -59,9 +59,9 @@ export const CWCoverImageUploader = ({
   subheaderText,
   enableGenerativeAI,
   generatedImageCallback,
+  uploadCompleteCallback,
   defaultImageUrl,
   defaultImageBehavior,
-  uploadCompleteCallback,
   canSelectImageBehaviour = true,
   showUploadAndGenerateText,
   defaultImageBehaviour,
@@ -185,7 +185,7 @@ export const CWCoverImageUploader = ({
         }
 
         generatedImageCallback?.(generatedImageURL, currentImageBehavior);
-        uploadCompleteCallback(generatedImageURL, currentImageBehavior);
+        uploadCompleteCallback?.(generatedImageURL, currentImageBehavior);
       }
 
       setIsUploading(false);
@@ -234,7 +234,7 @@ export const CWCoverImageUploader = ({
       if (defaultImageBehaviour !== ImageBehavior.Circle) {
         attachButton.current.style.display = 'none';
       }
-      uploadCompleteCallback(_imageURL, currentImageBehavior);
+      uploadCompleteCallback?.(_imageURL, currentImageBehavior);
     }
   };
 
@@ -482,7 +482,7 @@ export const CWCoverImageUploader = ({
             name="image-behaviour"
             onChange={(e) => {
               setImageBehavior(e.target.value);
-              uploadCompleteCallback(imageURL, e.target.value);
+              uploadCompleteCallback?.(imageURL, e.target.value);
             }}
             toggledOption={imageBehavior}
             options={[
