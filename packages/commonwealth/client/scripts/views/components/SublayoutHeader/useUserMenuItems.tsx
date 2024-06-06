@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 import { WalletId } from '@hicommonwealth/shared';
+import { SessionKeyError } from 'client/scripts/controllers/server/sessions';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -11,7 +12,10 @@ import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
-import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import {
+  useAuthModalStore,
+  useManageCommunityStakeModalStore,
+} from 'state/ui/modals';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
@@ -71,6 +75,8 @@ const useUserMenuItems = ({
   const { selectedAddress, setSelectedAddress } =
     useManageCommunityStakeModalStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   const user = app.user?.addresses?.[0];
   const profileId = user?.profileId || user?.profile.id;
 
@@ -104,9 +110,9 @@ const useUserMenuItems = ({
     (account) => {
       const signed = authenticatedAddresses[account.address];
       const isActive = app.user.activeAccount?.address === account.address;
-      // const walletSsoSource = app.user.addresses.find(
-      //   (address) => address.address === account.address,
-      // )?.walletSsoSource;
+      const walletSsoSource = app.user.addresses.find(
+        (address) => address.address === account.address,
+      )?.walletSsoSource;
 
       return {
         type: 'default',
@@ -124,11 +130,14 @@ const useUserMenuItems = ({
           }
 
           onAddressItemClick?.();
-
-          // onRevalidationModalData({
-          //   walletSsoSource: walletSsoSource,
-          //   walletAddress: account.address,
-          // });
+          checkForSessionKeyRevalidationErrors(
+            new SessionKeyError({
+              name: 'SessionKeyError',
+              message: 'Session Key Expired',
+              ssoSource: walletSsoSource,
+              address: account.address,
+            }),
+          );
         },
       };
     },
