@@ -11,11 +11,14 @@ export const deinitChainOrCommunity = async () => {
     app.chain.deinitServer();
     await app.chain.deinit();
     console.log('Finished deinitializing chain');
+    // @ts-expect-error StrictNullChecks
     app.chain = null;
   }
 
+  // @ts-expect-error StrictNullChecks
   app.user.setSelectedCommunity(null);
   app.user.setActiveAccounts([]);
+  // @ts-expect-error StrictNullChecks
   app.user.ephemerallySetActiveAccount(null);
   document.title = 'Common';
 };
@@ -39,6 +42,7 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Check for valid chain selection, and that we need to switch
   if (app.chain && chain === app.chain.meta) {
+    // @ts-expect-error StrictNullChecks
     return;
   }
 
@@ -114,6 +118,7 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
   if (!finalizeInitialization) {
     console.log('Chain loading aborted');
     app.chainPreloading = false;
+    // @ts-expect-error StrictNullChecks
     app.chain = null;
     return false;
   } else {

@@ -63,6 +63,7 @@ export async function __updateTopic(
     throw new AppError(Errors.DefaultTemplateRequired);
   }
   // sanitize text
+  // @ts-expect-error StrictNullChecks
   default_community_template = sanitizeQuillText(default_community_template);
 
   if (typeof name !== 'undefined') {

@@ -37,6 +37,7 @@ const useManageContestForm = ({
           contestData.interval === 0
             ? ContestRecurringType.No
             : ContestRecurringType.Yes,
+        // @ts-expect-error StrictNullChecks
         prizePercentage: contestData.prize_percentage,
         payoutStructure: contestData.payout_structure,
         toggledTopicList: contestData.topics.map((topic) => ({

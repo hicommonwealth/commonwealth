@@ -17,6 +17,7 @@ export const CWEmptyState = (props: EmptyStateProps) => {
   return (
     <div className="EmptyState">
       <div className="inner-content">
+        {/*@ts-expect-error <StrictNullChecks/>*/}
         <CWIcon iconName={iconName} iconSize="xl" />
         {typeof content === 'string' ? <CWText>{content}</CWText> : content}
       </div>

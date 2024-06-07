@@ -17,12 +17,14 @@ const getWebhooks = async (
   const adminRoles = await findAllRoles(
     models,
     {
+      // @ts-expect-error StrictNullChecks
       where: {
         address_id: addresses
           .filter((addr) => !!addr.verified)
           .map((addr) => addr.id),
       },
     },
+    // @ts-expect-error StrictNullChecks
     community.id,
     ['admin'],
   );
@@ -30,6 +32,7 @@ const getWebhooks = async (
     return next(new AppError(Errors.NotAdmin));
   // fetch webhooks
   const webhooks = await models.Webhook.findAll({
+    // @ts-expect-error StrictNullChecks
     where: { community_id: community.id },
   });
   return res.json({

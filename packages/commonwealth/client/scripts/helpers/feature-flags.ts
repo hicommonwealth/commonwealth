@@ -7,7 +7,7 @@ import { InMemoryProvider } from '@openfeature/web-sdk';
 import { UnleashClient } from 'unleash-proxy-client';
 import { UnleashProvider } from '../../../shared/UnleashProvider';
 
-const buildFlag = (env: string) => {
+const buildFlag = (env: string | undefined) => {
   return {
     variants: {
       on: true,
@@ -31,6 +31,9 @@ const featureFlags = {
     process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
+  knockPushNotifications: buildFlag(
+    process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
+  ),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
@@ -43,5 +46,6 @@ const unleashConfig = {
 };
 
 export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN
-  ? new UnleashProvider(new UnleashClient(unleashConfig))
+  ? // @ts-expect-error StrictNullChecks
+    new UnleashProvider(new UnleashClient(unleashConfig))
   : new InMemoryProvider(featureFlags);

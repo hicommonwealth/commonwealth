@@ -16,7 +16,9 @@ export const deleteCommentHandler = async (
   const { id: commentId } = req.params;
 
   await controllers.comments.deleteComment({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     address,
     commentId: parseInt(commentId, 10),
   });

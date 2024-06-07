@@ -52,6 +52,7 @@ export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
 };
 
 export const proposalSlugToClass = () => {
+  // @ts-expect-error StrictNullChecks
   const mmap = new Map<string, ProposalModule<any, any, any>>([
     [ProposalType.Thread, null],
   ]);
@@ -77,6 +78,7 @@ export const proposalSlugToClass = () => {
  * Slug helpers for routing
  */
 export const proposalSlugToStore = (slug: string): ProposalStore<any> => {
+  // @ts-expect-error StrictNullChecks
   return proposalSlugToClass().get(slug).store;
 };
 

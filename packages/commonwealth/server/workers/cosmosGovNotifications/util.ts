@@ -28,6 +28,7 @@ export async function fetchCosmosNotifCommunities(models: DB) {
   });
 
   const result = await models.Community.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       id: subscriptions.map((c) => c.community_id),
       base: ChainBase.CosmosSDK,
@@ -77,6 +78,7 @@ export function filterProposals(proposals: AllCosmosProposals) {
     const chainProposals = proposals.v1[chainId];
     filteredProposals.v1[chainId] = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
+      // @ts-expect-error StrictNullChecks
       const submitTime = new Date(p.submit_time);
       return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
@@ -125,9 +127,13 @@ export async function emitProposalNotifications(
                 typeUrl: proposal.messages[0].type_url,
                 value: proposal.messages[0].value,
               },
+              // @ts-expect-error StrictNullChecks
               submitTime: formatProposalDates(proposal.submit_time),
+              // @ts-expect-error StrictNullChecks
               depositEndTime: formatProposalDates(proposal.deposit_end_time),
+              // @ts-expect-error StrictNullChecks
               votingStartTime: formatProposalDates(proposal.voting_start_time),
+              // @ts-expect-error StrictNullChecks
               votingEndTime: formatProposalDates(proposal.voting_end_time),
               finalTallyResult: proposal.final_tally_result,
               totalDeposit: coinToCoins(proposal.total_deposit),
@@ -154,12 +160,18 @@ export async function emitProposalNotifications(
               id: proposal.proposalId.toString(10),
               content: {
                 // TODO: multiple typeUrls for v1 proposals? - is this data even needed
+                // @ts-expect-error StrictNullChecks
                 typeUrl: proposal.content.typeUrl,
+                // @ts-expect-error StrictNullChecks
                 value: Buffer.from(proposal.content.value).toString('hex'),
               },
+              // @ts-expect-error StrictNullChecks
               submitTime: proposal.submitTime.seconds.toNumber(),
+              // @ts-expect-error StrictNullChecks
               depositEndTime: proposal.depositEndTime.seconds.toNumber(),
+              // @ts-expect-error StrictNullChecks
               votingStartTime: proposal.votingStartTime.seconds.toNumber(),
+              // @ts-expect-error StrictNullChecks
               votingEndTime: proposal.votingEndTime.seconds.toNumber(),
               finalTallyResult: proposal.finalTallyResult,
               totalDeposit: coinToCoins(proposal.totalDeposit),

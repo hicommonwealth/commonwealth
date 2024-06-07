@@ -7,6 +7,7 @@ export const getClasses = <T>(
   componentType?: string,
 ): string => {
   const type = isNotNil(componentType) ? [componentType] : [];
+  // @ts-expect-error StrictNullChecks
   const classes = Object.entries(styleAttrs)
     .filter(
       // filter out keys with undefined values
@@ -16,11 +17,12 @@ export const getClasses = <T>(
     // return the key if value is bool, otherwise return value
     .map(([key, value]) => (isBoolean(value) ? key : value));
 
+  // @ts-expect-error StrictNullChecks
   return type.concat(classes).join(' ');
 };
 
 export const isWindowLarge = (width: number) =>
-  width > breakpoints.breakpointLargeM;
+  width > breakpoints.breakpointLargeMin;
 
 export const isWindowMediumInclusive = (width: number) =>
   width < breakpoints.breakpointMediumMax;

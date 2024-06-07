@@ -37,6 +37,7 @@ const ContractsPage = () => {
         const templatesForContract =
           await app.contracts.getTemplatesForContract(contract.id);
 
+        // @ts-expect-error <StrictNullChecks/>
         fetchedTemplates.push(...templatesForContract);
       }
 

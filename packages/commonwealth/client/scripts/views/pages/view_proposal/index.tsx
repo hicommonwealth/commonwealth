@@ -52,6 +52,7 @@ const ViewProposalPage = ({
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
+  // @ts-expect-error <StrictNullChecks/>
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [title, setTitle] = useState<string>(proposal?.title);
   const [description, setDescription] = useState<string>(proposal?.description);
@@ -65,12 +66,16 @@ const ViewProposalPage = ({
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
+  // @ts-expect-error <StrictNullChecks/>
   useCosmosProposalVotesQuery(proposal, +poolData);
   useCosmosProposalTallyQuery(proposal);
+  // @ts-expect-error <StrictNullChecks/>
   useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     setProposal(cosmosProposal);
+    // @ts-expect-error <StrictNullChecks/>
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
   }, [cosmosProposal]);
@@ -96,6 +101,7 @@ const ViewProposalPage = ({
     if (!typeProp) {
       resolvedType = chainToProposalSlug(app.chain.meta);
     }
+    // @ts-expect-error <StrictNullChecks/>
     return idToProposal(resolvedType, proposalId);
   };
 
@@ -122,7 +128,9 @@ const ViewProposalPage = ({
       );
 
       if (!foundProposal?.ipfsData) {
+        // @ts-expect-error <StrictNullChecks/>
         foundProposal.ipfsDataReady.once('ready', () =>
+          // @ts-expect-error <StrictNullChecks/>
           setProposal(foundProposal),
         );
       } else {
@@ -132,6 +140,7 @@ const ViewProposalPage = ({
       const foundProposal = cachedCompoundProposals?.find(
         (p) => p.identifier === proposalId,
       );
+      // @ts-expect-error <StrictNullChecks/>
       setProposal(foundProposal);
     }
   }, [
@@ -207,6 +216,7 @@ const ViewProposalPage = ({
         title={proposalTitle}
         author={proposal?.author}
         createdAt={proposal?.createdAt}
+        // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
         subHeader={
           <ProposalSubheader
@@ -245,9 +255,11 @@ const ViewProposalPage = ({
                   title="Community Spend Proposal"
                 />
               )}
+            {/* @ts-expect-error StrictNullChecks*/}
             <VotingResults proposal={proposal} />
             <VotingActions
               onModalClose={onModalClose}
+              // @ts-expect-error <StrictNullChecks/>
               proposal={proposal}
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={votingModalOpen}

@@ -41,6 +41,9 @@ export const getThreadUrl = (
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
   const cId = comment ? `?comment=${comment}` : '';
 
+  // TODO: Should we relocate this?
+  // - cannot use config util in libs/shared
+  // - duplicate found in knock utils
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
     : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;

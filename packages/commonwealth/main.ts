@@ -21,7 +21,7 @@ import prerenderNode from 'prerender-node';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
-import { PRERENDER_TOKEN, config } from './server/config';
+import { config } from './server/config';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
@@ -146,7 +146,7 @@ export async function main(
     app.use(passport.session());
 
     withPrerender &&
-      app.use(prerenderNode.set('prerenderToken', PRERENDER_TOKEN));
+      app.use(prerenderNode.set('prerenderToken', config.PRERENDER_TOKEN));
   };
 
   setupMiddleware();

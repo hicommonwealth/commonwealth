@@ -20,16 +20,25 @@ export default function expressStatsInit() {
     function sendStats() {
       // Status Code
       const statusCode = res.statusCode.toString() || 'unknown_status';
-      const tags = {
-        statusCode,
-        method: req.method,
-        path: req.path,
-        project: ProjectTag.Commonwealth,
-      };
+      let tags: { statusCode: string; method?: string; path?: string };
+      if (res.statusCode >= 400 && res.statusCode < 500) {
+        tags = {
+          statusCode,
+        };
+      } else {
+        tags = {
+          statusCode,
+          method: req.method,
+          path: req.path,
+        };
+      }
 
       // Response Time
       const duration = new Date().getTime() - startTime;
-      stats().timing('express.response_time', duration, tags);
+      stats().timing('express.response_time', duration, {
+        ...tags,
+        project: ProjectTag.Commonwealth,
+      });
 
       // eslint-disable-next-line no-use-before-define
       cleanup();

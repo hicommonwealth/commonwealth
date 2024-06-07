@@ -131,6 +131,7 @@ export const User = ({
     >
       {showAvatar && (
         <Link
+          // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
               ? `/profile/id/${profile?.id}`
@@ -188,6 +189,7 @@ export const User = ({
             {app.chain && app.chain.base === ChainBase.Substrate && (
               <Link
                 className="user-display-name substrate@"
+                // @ts-expect-error <StrictNullChecks/>
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (

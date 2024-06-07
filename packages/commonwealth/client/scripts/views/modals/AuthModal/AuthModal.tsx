@@ -32,6 +32,7 @@ const AuthModal = ({
       setModalType(AuthModalType.SignIn);
     }
 
+    // @ts-expect-error StrictNullChecks
     onSignInClick();
   };
 
