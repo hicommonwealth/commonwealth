@@ -44,7 +44,12 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
     }
 
     doAsync().catch(console.error);
-  }, [subscribed]);
+  }, [
+    communityInfo.id,
+    createCommunityAlert,
+    deleteCommunityAlert,
+    subscribed,
+  ]);
 
   return (
     <div key={communityInfo?.id} className="notification-row">
