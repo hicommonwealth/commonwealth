@@ -184,7 +184,14 @@ export async function main(
     res.sendFile(`${__dirname}/manifest.json`);
   });
 
-  app.use('/assets', express.static(path.join(__dirname, 'assets')));
+  app.use(
+    '/assets',
+    express.static(path.join(__dirname, 'assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
 
   app.get('*', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/index.html`);
