@@ -12,7 +12,6 @@ export const trpcClient = trpc.createClient({
       async headers() {
         return {
           authorization: app.user.jwt,
-          address_id: app?.user?.activeAccount?.address,
         };
       },
     }),
