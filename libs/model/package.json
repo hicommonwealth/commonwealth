@@ -30,8 +30,8 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
-    "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
+    "@solana/spl-token": "^0.4.6",
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",
@@ -43,8 +43,8 @@
     "uuid": "^9.0.1",
     "web3": "^4.7.0",
     "web3-core": "^4.3.2",
-    "web3-eth-abi": "^4.2.1",
     "web3-utils": "^4.2.2",
+    "web3-eth-abi": "^4.2.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

@@ -8,5 +8,4 @@ export * from './GetCommentSubscriptions.query';
 export * from './GetCommunityAlerts.query';
 export * from './GetSubscriptionPreferences.query';
 export * from './GetThreadSubscriptions.query';
-export * from './RegisterClientRegistrationToken.command';
 export * from './UpdateSubscriptionPreferences.command';

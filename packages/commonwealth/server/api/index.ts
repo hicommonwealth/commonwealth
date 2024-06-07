@@ -19,7 +19,6 @@ const artifacts = {
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
-  subscription: subscription.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

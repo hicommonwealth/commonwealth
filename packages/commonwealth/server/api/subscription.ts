@@ -36,8 +36,4 @@ export const trpcRouter = trpc.router({
     Subscription.UpdateSubscriptionPreferences,
     trpc.Tag.Subscription,
   ),
-  registerClientRegistrationToken: trpc.command(
-    Subscription.RegisterClientRegistrationToken,
-    trpc.Tag.Subscription,
-  ),
 });
