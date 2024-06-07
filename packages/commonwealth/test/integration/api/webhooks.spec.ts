@@ -272,6 +272,7 @@ describe('Webhook Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(markdownComment.text),
+        // @ts-expect-error <StrictNullChecks>
         thread_id: thread.id,
         session: loggedInSession.session,
         sign: loggedInSession.sign,
@@ -295,6 +296,7 @@ describe('Webhook Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(richTextComment.text),
+        // @ts-expect-error <StrictNullChecks>
         thread_id: discussion.id,
         session: loggedInSession.session,
         sign: loggedInSession.sign,

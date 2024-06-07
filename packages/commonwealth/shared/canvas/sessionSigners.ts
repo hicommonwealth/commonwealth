@@ -54,6 +54,7 @@ export class CosmosSignerCW extends CosmosSigner {
     };
 
     if (duration !== null) {
+      // @ts-expect-error <StrictNullChecks>
       message.expirationTime = new Date(timestamp + duration).toISOString();
     }
 

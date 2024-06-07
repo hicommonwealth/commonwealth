@@ -30,6 +30,7 @@ export const createCommentReactionHandler = async (
   res: TypedResponse<CreateCommentReactionResponse>,
 ) => {
   const { user, address } = req;
+  // @ts-expect-error <StrictNullChecks>
   const { reaction } = req.body;
 
   if (!reaction) {
@@ -43,7 +44,9 @@ export const createCommentReactionHandler = async (
   }
 
   const commentReactionFields: CreateCommentReactionOptions = {
+    // @ts-expect-error <StrictNullChecks>
     user,
+    // @ts-expect-error <StrictNullChecks>
     address,
     reaction,
     commentId,
@@ -63,9 +66,11 @@ export const createCommentReactionHandler = async (
           'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
+                // @ts-expect-error <StrictNullChecks>
                 address: address.address,
               })
-            : address.address,
+            : // @ts-expect-error <StrictNullChecks>
+              address.address,
         value: reaction,
       });
     }

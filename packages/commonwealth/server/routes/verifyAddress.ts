@@ -220,6 +220,7 @@ const verifyAddress = async (
     community,
     address,
     req.body.wallet_id,
+    // @ts-expect-error <StrictNullChecks>
     req.user,
     decodedSession,
   );

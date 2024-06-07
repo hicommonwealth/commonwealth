@@ -42,6 +42,7 @@ export const createThreadCommentHandler = async (
   const { user, address } = req;
   // @ts-expect-error StrictNullChecks
   const { id: threadId } = req.params;
+  // @ts-expect-error <StrictNullChecks>
   const { parent_id: parentId, text, discord_meta } = req.body;
 
   if (!threadId) {
@@ -52,9 +53,12 @@ export const createThreadCommentHandler = async (
   }
 
   const threadCommentFields: CreateThreadCommentOptions = {
+    // @ts-expect-error <StrictNullChecks>
     user,
+    // @ts-expect-error <StrictNullChecks>
     address,
     parentId,
+    // @ts-expect-error <StrictNullChecks>
     threadId: parseInt(threadId, 10) || undefined,
     text,
     discordMeta: discord_meta,
@@ -74,9 +78,11 @@ export const createThreadCommentHandler = async (
           'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
+                // @ts-expect-error <StrictNullChecks>
                 address: address.address,
               })
-            : address.address,
+            : // @ts-expect-error <StrictNullChecks>
+              address.address,
         parent_comment_id: parentId,
       });
     }

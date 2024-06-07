@@ -172,7 +172,9 @@ export async function __createThreadComment(
     community_id: thread.community_id,
     // @ts-expect-error StrictNullChecks
     parent_id: null,
+    // @ts-expect-error <StrictNullChecks>
     canvas_signed_data: canvasSignedData,
+    // @ts-expect-error <StrictNullChecks>
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,

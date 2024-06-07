@@ -282,6 +282,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         address: walletAddress,
         community_id: chain,
+        // @ts-expect-error <StrictNullChecks>
         chain_id,
         wallet_id,
         session: serializeCanvas(session),

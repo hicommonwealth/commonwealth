@@ -452,6 +452,7 @@ describe('recomputeCounts', () => {
   describe('notification should be correct on recompute count', () => {
     it('add comment from api, notification id is incremented', async () => {
       const before = await getCounts(
+        // @ts-expect-error <StrictNullChecks>
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -482,6 +483,7 @@ describe('recomputeCounts', () => {
 
     it('add reaction to thread from api, notification id is unchanged', async () => {
       const before = await getCounts(
+        // @ts-expect-error <StrictNullChecks>
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -514,6 +516,7 @@ describe('recomputeCounts', () => {
 
     it('add reaction to comment from api, notification id is unchanged', async () => {
       const before = await getCounts(
+        // @ts-expect-error <StrictNullChecks>
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );

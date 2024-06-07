@@ -46,7 +46,6 @@ const verifySessionSignature = async (
 
   addressModel.last_active = new Date();
 
-  // @ts-expect-error StrictNullChecks
   if (isValid && user_id === null) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user
     // @ts-expect-error StrictNullChecks
@@ -85,7 +84,6 @@ const verifySessionSignature = async (
         addressModel.user_id = user.id;
       }
     }
-    // @ts-expect-error StrictNullChecks
   } else if (isValid) {
     // mark the address as verified
     // @ts-expect-error StrictNullChecks
@@ -97,7 +95,6 @@ const verifySessionSignature = async (
     addressModel.profile_id = profile.id;
   }
   await addressModel.save();
-  // @ts-expect-error StrictNullChecks
   return isValid;
 };
 

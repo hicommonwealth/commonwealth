@@ -227,6 +227,7 @@ export async function updateActiveAddresses({
       });
 
       if (session !== null) {
+        // @ts-expect-error <StrictNullChecks>
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }
@@ -583,6 +584,7 @@ export async function handleSocialLoginCallback({
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,
+        // @ts-expect-error <StrictNullChecks>
         session: serializeCanvas(session),
         walletSsoSource,
       },

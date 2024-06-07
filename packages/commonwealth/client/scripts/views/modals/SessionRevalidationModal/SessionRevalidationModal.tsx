@@ -55,6 +55,7 @@ const SessionRevalidationModal = ({
       // expected for session key revalidation
       if (
         signedAddress === walletAddress ||
+        // @ts-expect-error StrictNullChecks
         (app.user.activeAccounts.find((addr) => addr.address === walletAddress)
           .community.ss58Prefix &&
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
@@ -63,7 +64,7 @@ const SessionRevalidationModal = ({
         const updatedAddress = app.user.activeAccounts.find(
           (addr) => addr.address === walletAddress,
         );
-        await setActiveAccount(updatedAddress);
+        await setActiveAccount(updatedAddress!);
       } else {
         openConfirmation({
           title: 'Address switch required',
@@ -71,7 +72,7 @@ const SessionRevalidationModal = ({
             <>
               <p>
                 The wallet you just signed in with has the address{' '}
-                <b>{formatAddress(signedAddress)}</b>, but we were expecting{' '}
+                <b>{formatAddress(signedAddress!)}</b>, but we were expecting{' '}
                 <b>{formatAddress(walletAddress)}</b>.
               </p>
               <p>

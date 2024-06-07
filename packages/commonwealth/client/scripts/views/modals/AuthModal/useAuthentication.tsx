@@ -264,6 +264,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Handle Logged in and joining community of different chain base
     if (app.activeChainId() && app.isLoggedIn()) {
+      // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
       await account.validate(session);
       await onLogInWithAccount(account, true, newlyCreated);
@@ -288,6 +289,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     // Handle receiving and caching wallet signature strings
     if (!newlyCreated && !linking) {
       try {
+        // @ts-expect-error StrictNullChecks
         const session = await getSessionFromWallet(walletToUse);
         await account.validate(session);
         await onLogInWithAccount(account, true, newlyCreated);
@@ -299,6 +301,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (linking) return;
 
       try {
+        // @ts-expect-error StrictNullChecks
         const session = await signSessionWithAccount(walletToUse, account);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
         props.onSuccess?.(account.address, newlyCreated);
@@ -325,7 +328,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       // @ts-expect-error <StrictNullChecks>
       if (walletToUse.chain !== 'near') {
+        // @ts-expect-error StrictNullChecks
         await account.validate(session, false);
+        // @ts-expect-error StrictNullChecks
         await verifySession(session);
       }
       // @ts-expect-error <StrictNullChecks>

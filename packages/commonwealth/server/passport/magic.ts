@@ -515,6 +515,7 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
+    // @ts-expect-error <StrictNullChecks>
     const session: Session = deserializeCanvas(req.body.session);
 
     // @ts-expect-error StrictNullChecks

@@ -140,6 +140,7 @@ const useUserMenuItems = ({
           : account.community.ChainNode?.ethChainId;
       const communityCanvasChainId = chainBaseToCanvasChainId(
         account.community.base,
+        // @ts-expect-error StrictNullChecks
         communityIdOrPrefix,
       );
       const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;

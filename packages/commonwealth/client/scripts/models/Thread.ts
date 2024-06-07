@@ -350,6 +350,7 @@ export class Thread implements IUniqueId {
     this.numberOfComments = numberOfComments || 0;
     // @ts-expect-error StrictNullChecks
     this.canvasSignedData = canvasSignedData;
+    // @ts-expect-error <StrictNullChecks>
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
