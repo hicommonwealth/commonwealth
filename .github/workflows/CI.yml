@@ -264,8 +264,6 @@ jobs:
     strategy:
       matrix:
         node: [ 20 ]
-    env:
-      NO_CLIENT: true
 
     services:
       postgres:

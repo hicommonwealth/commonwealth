@@ -45,14 +45,12 @@ export async function main(
     noGlobalActivityCache = true,
     withLoggingMiddleware = false,
     withStatsMiddleware = false,
-    withFrontendBuild = false,
     withPrerender = false,
   }: {
     port: number;
     noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
     withStatsMiddleware?: boolean;
-    withFrontendBuild?: boolean;
     withPrerender?: boolean;
   },
 ) {

@@ -1,6 +1,5 @@
 import 'Footer.scss';
 import brandAssetUrl from 'assets/brand_assets/512x512.svg';
-import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { isNotUndefined } from '../helpers/typeGuards';
@@ -26,12 +25,6 @@ const footercontents = [
 ];
 
 export const Footer = () => {
-  const navigate = useCommonNavigate();
-
-  const redirectClick = (route) => {
-    navigate(route, {}, null);
-  };
-
   return (
     <div className="Footer">
       <img src={brandAssetUrl} alt="Commonwealth" />

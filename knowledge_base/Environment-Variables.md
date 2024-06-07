@@ -56,7 +56,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [MIXPANEL_PROD_TOKEN](#mixpanel_prod_token)
 - [NEXT_PUBLIC_RSA_PRIVATE_KEY](#next_public_rsa_private_key)
 - [NEXT_PUBLIC_RSA_PUBLIC_KEY](#next_public_rsa_public_key)
-- [NO_CLIENT](#no_client)
 - [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
 - [NO_PRERENDER](#no_prerender)
 - [NO_SSL](#no_ssl)
@@ -290,10 +289,6 @@ Mixpanel analytics tracking token for our live production site.
 ## NEXT_PUBLIC_RSA_PUBLIC_KEY
 
 <!-- Likely deprecated; flagged for removal with closing of #6185. -->
-
-## NO_CLIENT
-
-If `true`, disables the front-end build.
 
 ## NO_GLOBAL_ACTIVITY_CACHE
 
