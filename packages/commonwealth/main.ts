@@ -120,6 +120,8 @@ export async function main(
       next();
     });
 
+    app.use('/static', express.static('static'));
+
     withLoggingMiddleware &&
       app.use(
         pinoHttp({

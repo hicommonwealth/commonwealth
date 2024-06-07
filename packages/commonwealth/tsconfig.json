@@ -8,7 +8,7 @@
     "sourceMap": true,
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
-      "*": ["./*", "shared/*", "client/scripts/*"]
+      "*": ["./*", "shared/*", "client/scripts/*", "client/assets/*"]
     }
   },
   "include": [

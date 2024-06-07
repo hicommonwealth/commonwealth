@@ -27,6 +27,9 @@ export default defineConfig(({ mode }) => {
       }),
       tsconfigPaths(),
     ],
+    build: {
+      outDir: '../dist',
+    },
     server: {
       port: 8080,
       host: 'localhost',
