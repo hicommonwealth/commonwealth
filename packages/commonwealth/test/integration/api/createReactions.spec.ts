@@ -1,4 +1,3 @@
-import { ActionArgument } from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
@@ -21,7 +20,7 @@ describe('createReaction Integration Tests', () => {
   const deleteReaction = async (reactionId, jwtToken, address) => {
     const validRequest = {
       jwt: jwtToken,
-      address,
+      address: address.split(':')[2],
       author_chain: 'ethereum',
       chain: 'ethereum',
     };
@@ -55,7 +54,7 @@ describe('createReaction Integration Tests', () => {
     );
     userAddress = res.address;
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
-      () => ({ [userAddress]: 300 }),
+      () => ({ [userAddress.split(':')[2]]: 300 }),
     );
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
@@ -80,30 +79,8 @@ describe('createReaction Integration Tests', () => {
       stage: 'discussion',
       // @ts-expect-error StrictNullChecks
       topicId: topic.id,
-      session: {
-        type: 'session',
-        signature: '',
-        payload: {
-          app: '',
-          chain: '',
-          from: '',
-          sessionAddress: '',
-          sessionDuration: 0,
-          sessionIssued: 0,
-          block: '',
-        },
-      },
-      sign: function (_actionPayload: {
-        app: string;
-        chain: string;
-        from: string;
-        call: string;
-        callArgs: Record<string, ActionArgument>;
-        timestamp: number;
-        block: string;
-      }): string {
-        return '';
-      },
+      session: userSession.session,
+      sign: userSession.sign,
     });
     // @ts-expect-error StrictNullChecks
     threadId = thread.id;

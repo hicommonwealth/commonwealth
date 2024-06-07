@@ -13,6 +13,7 @@ chai.use(chaiHttp);
 const notif_feed_categories = ['new-thread-creation', 'new-comment-creation'];
 
 let testVerifiedChainAddress;
+const chain = 'alex';
 
 describe('recomputeCounts', () => {
   let server: TestServer;
@@ -233,40 +234,37 @@ describe('recomputeCounts', () => {
   }
 
   async function createCommentRaw() {
-    const chain = server.e2eTestEntities.testThreads[0].community_id;
     await server.models.sequelize.query(
       `
     INSERT INTO "Comments" ("id", "community_id", "address_id", "text", "thread_id", "plaintext", "created_at", "updated_at")
     VALUES
-        (-300, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', '', ${server.e2eTestEntities.testThreads[0].id}, '',now(),now()),
-        (-400, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', '', ${server.e2eTestEntities.testThreads[0].id}, '',now(),now()),
-        (-500, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', '', ${server.e2eTestEntities.testThreads[0].id}, '',now(),now())
+        (-300, '${chain}', '${testVerifiedChainAddress.user_id}', '', ${server.e2eTestEntities.testThreads[0].id}, '',now(),now()),
+        (-400, '${chain}', '${testVerifiedChainAddress.user_id}', '', ${server.e2eTestEntities.testThreads[0].id}, '',now(),now()),
+        (-500, '${chain}', '${testVerifiedChainAddress.user_id}', '', ${server.e2eTestEntities.testThreads[0].id}, '',now(),now())
     `,
     );
   }
 
   async function createThreadReactionRaw() {
-    const chain = server.e2eTestEntities.testThreads[0].community_id;
     const canvas_hash =
       '0x0000000000000000000000000000000000000000000000000000000000000000';
     await server.models.sequelize.query(
       `
-    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
-    VALUES(-300, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
-    (-400, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now()),
-    (-500, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '{}', '${canvas_hash}', '{}', now(), now())
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_hash", "created_at", "updated_at")
+    VALUES(-300, '${chain}', '${testVerifiedChainAddress.user_id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '${canvas_hash}', now(), now()),
+    (-400, '${chain}', '${testVerifiedChainAddress.user_id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '${canvas_hash}', now(), now()),
+    (-500, '${chain}', '${testVerifiedChainAddress.user_id}', 'like', ${server.e2eTestEntities.testThreads[0].id}, null, '${canvas_hash}', now(), now())
     `,
     );
   }
 
   async function createCommentReactionRaw() {
-    const chain = server.e2eTestEntities.testThreads[0].community_id;
     const canvas_hash =
       '0x0000000000000000000000000000000000000000000000000000000000000000';
     await server.models.sequelize.query(
       `
-    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_action", "canvas_hash", "canvas_session", "created_at", "updated_at")
-    VALUES(-3000, '${chain}', '${server.e2eTestEntities.testAddresses[0].id}', 'like', null, ${server.e2eTestEntities.testComments[0].id}, '{}', '${canvas_hash}', '{}', now(), now())
+    INSERT INTO "Reactions" ("id", "community_id", "address_id", "reaction", "thread_id", "comment_id", "canvas_hash", "created_at", "updated_at")
+    VALUES(-3000, '${chain}', '${testVerifiedChainAddress.user_id}', 'like', null, ${server.e2eTestEntities.testComments[0].id}, '${canvas_hash}', now(), now())
     `,
     );
   }
@@ -318,13 +316,13 @@ describe('recomputeCounts', () => {
   before(async () => {
     server = await testServer();
     testVerifiedChainAddress = await server.seeder.createAndVerifyAddress(
-      { chain: 'alex' },
+      { chain },
       'Alice',
     );
     testJwtToken = jwt.sign(
       {
-        id: server.e2eTestEntities.testUsers[0].id,
-        email: server.e2eTestEntities.testUsers[0].email,
+        id: testVerifiedChainAddress.user_id,
+        email: null,
       },
       config.AUTH.JWT_SECRET,
     );
@@ -452,10 +450,15 @@ describe('recomputeCounts', () => {
   });
 
   describe('notification should be correct on recompute count', () => {
-    it('add comment from api, notification id is non zero', async () => {
+    it('add comment from api, notification id is incremented', async () => {
+      const before = await getCounts(
+        server.e2eTestEntities.testThreads[0].id,
+        server.e2eTestEntities.testComments[0].id,
+      );
+
       const cRes = await server.seeder.createComment({
-        chain: server.e2eTestEntities.testThreads[0].community_id,
-        address: server.e2eTestEntities.testAddresses[0].address,
+        chain,
+        address: testVerifiedChainAddress.address,
         jwt: testJwtToken,
         text: 'test comment',
         thread_id: server.e2eTestEntities.testThreads[0].id,
@@ -466,24 +469,31 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      await getCounts(
+      const after = await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      // expect(before.countsFromSourceTable.notification_id).to.be.greaterThan(0);
+      expect(after.countsFromSourceTable.notification_id).to.be.eq(
+        before.countsFromSourceTable.notification_id + 1,
+      );
       await verifyRecomputeCountAll();
     });
 
-    it('add reaction to thread from api, notification id is still zero', async () => {
-      const cRes = await server.seeder.createReaction({
-        chain: server.e2eTestEntities.testThreads[0].community_id,
-        address: server.e2eTestEntities.testAddresses[0].address,
+    it('add reaction to thread from api, notification id is unchanged', async () => {
+      const before = await getCounts(
+        server.e2eTestEntities.testThreads[0].id,
+        server.e2eTestEntities.testComments[0].id,
+      );
+
+      const cRes = await server.seeder.createThreadReaction({
+        chain,
+        address: testVerifiedChainAddress.address,
         jwt: testJwtToken,
         reaction: 'like',
         // @ts-expect-error StrictNullChecks
         thread_id: server.e2eTestEntities.testThreads[0].id,
-        author_chain: server.e2eTestEntities.testAddresses[0].community_id,
+        author_chain: chain,
         session: testVerifiedChainAddress.session,
         sign: testVerifiedChainAddress.sign,
       });
@@ -491,23 +501,30 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(
+      const after = await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
+      expect(after.countsFromSourceTable.notification_id).to.be.eq(
+        before.countsFromSourceTable.notification_id,
+      );
       await verifyRecomputeCountAll();
     });
 
-    it('add reaction to comment from api, notification id is still zero', async () => {
+    it('add reaction to comment from api, notification id is unchanged', async () => {
+      const before = await getCounts(
+        server.e2eTestEntities.testThreads[0].id,
+        server.e2eTestEntities.testComments[0].id,
+      );
+
       const cRes = await server.seeder.createReaction({
-        chain: server.e2eTestEntities.testThreads[0].community_id,
-        address: server.e2eTestEntities.testAddresses[0].address,
+        chain,
+        address: testVerifiedChainAddress.address,
         jwt: testJwtToken,
         reaction: 'like',
         comment_id: server.e2eTestEntities.testComments[0].id,
-        author_chain: server.e2eTestEntities.testAddresses[0].community_id,
+        author_chain: chain,
         session: testVerifiedChainAddress.session,
         sign: testVerifiedChainAddress.sign,
       });
@@ -515,12 +532,14 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(
+      const after = await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
+      expect(after.countsFromSourceTable.notification_id).to.be.eq(
+        before.countsFromSourceTable.notification_id,
+      );
       await verifyRecomputeCountAll();
     });
   });

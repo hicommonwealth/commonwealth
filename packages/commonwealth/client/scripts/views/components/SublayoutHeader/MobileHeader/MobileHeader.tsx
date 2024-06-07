@@ -55,7 +55,7 @@ const MobileHeader = ({
     ? !menuVisible
     : true;
 
-  const userMenuItems = useUserMenuItems({
+  const { RevalidationModal, userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     onRevalidationModalData,
     isMenuOpen: isUserDrawerOpen,
@@ -160,6 +160,7 @@ const MobileHeader = ({
         onClose={() => isSetModalOpen(false)}
         open={isModalOpen}
       />
+      {RevalidationModal}
     </>
   );
 };

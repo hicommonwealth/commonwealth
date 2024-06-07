@@ -1,7 +1,5 @@
-import type { Action, Session } from '@canvas-js/interfaces';
-import { verify } from 'canvas';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 
 import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
@@ -12,6 +10,8 @@ import {
 } from 'client/scripts/views/components/UpvoteDrawer';
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
+import { verify } from 'shared/canvas';
+import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -106,35 +106,28 @@ export const CommentCard = ({
 
   const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
     useState<boolean>(false);
-  const [verifiedAction, setVerifiedAction] = useState<Action>();
-  const [verifiedSession, setVerifiedSession] = useState<Session>();
+  const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
+    useState<CanvasSignedData | null>(null);
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  useEffect(() => {
+  const doVerify = useCallback(async () => {
     try {
-      // suppress "unexpected error while verifying" error message on non-synced comments
-      if (!comment.canvasSession || !comment.canvasAction) return;
-      const session: Session = JSON.parse(comment.canvasSession);
-      const action: Action = JSON.parse(comment.canvasAction);
-      const actionSignerAddress = session?.payload?.sessionAddress;
-      if (
-        !comment.canvasSession ||
-        !comment.canvasAction ||
-        !actionSignerAddress
-      )
-        return;
-      verify({ session })
-        .then(() => setVerifiedSession(session))
-        .catch((err) => console.log('Could not verify session', err.stack));
-      verify({ action, actionSignerAddress })
-        .then(() => setVerifiedAction(action))
-        .catch((err) => console.log('Could not verify action', err.stack));
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        comment.canvasSignedData,
+      );
+      await verify(canvasSignedData);
+      setVerifiedCanvasSignedData(canvasSignedData);
     } catch (err) {
       console.log('Unexpected error while verifying action/session');
       return;
     }
-  }, [comment.canvasAction, comment.canvasSession]);
+  }, [comment.canvasSignedData]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    doVerify();
+  }, [doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
@@ -299,7 +292,7 @@ export const CommentCard = ({
                   open={isCanvasVerifyModalVisible}
                 />
               )}
-              {verifiedAction && verifiedSession && (
+              {verifiedCanvasSignedData && (
                 <CWText
                   type="caption"
                   fontWeight="medium"

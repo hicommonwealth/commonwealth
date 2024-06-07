@@ -1,5 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
+import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
+import {
+  fromCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import { addressSwapper } from 'shared/utils';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -23,9 +29,6 @@ type CreateThreadCommentRequestBody = {
   parent_id;
   thread_id;
   text;
-  canvas_action;
-  canvas_session;
-  canvas_hash;
   discord_meta;
 };
 type CreateThreadCommentResponse = CommentInstance;
@@ -39,20 +42,7 @@ export const createThreadCommentHandler = async (
   const { user, address } = req;
   // @ts-expect-error StrictNullChecks
   const { id: threadId } = req.params;
-  const {
-    // @ts-expect-error StrictNullChecks
-    parent_id: parentId,
-    // @ts-expect-error StrictNullChecks
-    text,
-    // @ts-expect-error StrictNullChecks
-    canvas_action: canvasAction,
-    // @ts-expect-error StrictNullChecks
-    canvas_session: canvasSession,
-    // @ts-expect-error StrictNullChecks
-    canvas_hash: canvasHash,
-    // @ts-expect-error StrictNullChecks
-    discord_meta,
-  } = req.body;
+  const { parent_id: parentId, text, discord_meta } = req.body;
 
   if (!threadId) {
     throw new AppError(Errors.MissingThreadId);
@@ -61,31 +51,39 @@ export const createThreadCommentHandler = async (
     throw new AppError(Errors.MissingText);
   }
 
-  if (config.ENFORCE_SESSION_KEYS) {
-    await verifyComment(canvasAction, canvasSession, canvasHash, {
-      thread_id: parseInt(threadId, 10) || undefined,
-      text,
-      // @ts-expect-error StrictNullChecks
-      address: address.address,
-      parent_comment_id: parentId,
-    });
+  const threadCommentFields: CreateThreadCommentOptions = {
+    user,
+    address,
+    parentId,
+    threadId: parseInt(threadId, 10) || undefined,
+    text,
+    discordMeta: discord_meta,
+  };
+
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    threadCommentFields.canvasSignedData = req.body.canvas_signed_data;
+    threadCommentFields.canvasHash = req.body.canvas_hash;
+
+    if (config.ENFORCE_SESSION_KEYS) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+      await verifyComment(canvasSignedData, {
+        thread_id: parseInt(threadId, 10) || undefined,
+        text,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: address.address,
+              })
+            : address.address,
+        parent_comment_id: parentId,
+      });
+    }
   }
 
   const [comment, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadComment({
-      // @ts-expect-error StrictNullChecks
-      user,
-      // @ts-expect-error StrictNullChecks
-      address,
-      parentId,
-      // @ts-expect-error StrictNullChecks
-      threadId: parseInt(threadId, 10) || undefined,
-      text,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-      discordMeta: discord_meta,
-    });
+    await controllers.threads.createThreadComment(threadCommentFields);
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

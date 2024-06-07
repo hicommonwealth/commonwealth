@@ -5,6 +5,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
+import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
@@ -52,29 +53,36 @@ const SessionRevalidationModal = ({
 
       // if user tries to sign in with different address than
       // expected for session key revalidation
-      if (signedAddress !== walletAddress) {
+      if (
+        signedAddress === walletAddress ||
+        (app.user.activeAccounts.find((addr) => addr.address === walletAddress)
+          .community.ss58Prefix &&
+          addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
+            signedAddress)
+      ) {
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === walletAddress,
+        );
+        await setActiveAccount(updatedAddress);
+      } else {
         openConfirmation({
-          title: 'Address mismatch',
+          title: 'Address switch required',
           description: (
             <>
-              Expected the address <b>{formatAddress(walletAddress)}</b>, but
-              the wallet you signed in with has address{' '}
-              {/* @ts-expect-error StrictNullChecks*/}
-              <b>{formatAddress(signedAddress)}</b>.
-              <br />
-              Please try sign again with expected address.
-              <br />
+              <p>
+                The wallet you just signed in with has the address{' '}
+                <b>{formatAddress(signedAddress)}</b>, but we were expecting{' '}
+                <b>{formatAddress(walletAddress)}</b>.
+              </p>
+              <p>
+                Try switching addresses in your wallet, or link this address by
+                selecting <b>Connect a new address</b> in the user menu.
+              </p>
             </>
           ),
           buttons: [],
           className: 'AddressMismatch',
         });
-      } else {
-        const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === walletAddress,
-        );
-        // @ts-expect-error <StrictNullChecks/>
-        await setActiveAccount(updatedAddress);
       }
     },
   });

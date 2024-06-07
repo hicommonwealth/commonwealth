@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
 
+import { Session } from '@canvas-js/interfaces';
 import { AppError, logger } from '@hicommonwealth/core';
 import type {
   CommunityInstance,
@@ -12,10 +13,10 @@ import {
   DynamicTemplate,
   NotificationCategories,
   WalletId,
-  WalletSsoSource,
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
+import { deserializeCanvas } from 'shared/canvas/types';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -42,15 +43,10 @@ export const Errors = {
 const processAddress = async (
   models: DB,
   community: CommunityInstance,
-  chain_id: string | number,
   address: string,
   wallet_id: WalletId,
-  wallet_sso_source: WalletSsoSource,
-  signature: string,
   user: Express.User,
-  sessionAddress: string | null,
-  sessionIssued: string | null,
-  sessionBlockInfo: string | null,
+  session: Session,
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
@@ -76,15 +72,10 @@ const processAddress = async (
   try {
     const valid = await verifySessionSignature(
       models,
-      community,
-      chain_id,
       addressInstance,
       // @ts-expect-error StrictNullChecks
       user ? user.id : null,
-      signature,
-      sessionAddress,
-      sessionIssued,
-      sessionBlockInfo,
+      session,
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -108,7 +99,7 @@ const processAddress = async (
         email: null,
       });
       addressInstance.profile_id = // @ts-expect-error StrictNullChecks
-      (newUser.Profiles[0] as ProfileAttributes).id;
+        (newUser.Profiles[0] as ProfileAttributes).id;
       await models.Subscription.create({
         // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
@@ -199,18 +190,17 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.community_id || !req.body.chain_id) {
+  if (!req.body.community_id) {
     throw new AppError(Errors.NoChain);
   }
   const community = await models.Community.findOne({
     where: { id: req.body.community_id },
   });
-  const chain_id = req.body.chain_id;
   if (!community) {
     return next(new AppError(Errors.InvalidCommunity));
   }
 
-  if (!req.body.address || !req.body.signature) {
+  if (!req.body.address) {
     throw new AppError(Errors.InvalidArguments);
   }
 
@@ -223,19 +213,15 @@ const verifyAddress = async (
         })
       : req.body.address;
 
+  const decodedSession: Session = deserializeCanvas(req.body.session);
+
   await processAddress(
     models,
     community,
-    chain_id,
     address,
     req.body.wallet_id,
-    req.body.wallet_sso_source,
-    req.body.signature,
-    // @ts-expect-error StrictNullChecks
     req.user,
-    req.body.session_public_address,
-    req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null, // disallow empty strings
+    decodedSession,
   );
 
   // assertion check

@@ -113,14 +113,14 @@ export async function __getBulkThreads(
         SELECT id, title, url, body, kind, stage, read_only, discord_meta,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
-            marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_action as "canvasAction",
-            canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited, address_id
+            marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data as "canvasSignedData",
+            canvas_hash as "canvasHash", plaintext, last_edited, address_id
         FROM "Threads" T
-        ${contestAddress ? contestJoin : ''}
+          ${contestAddress ? contestJoin : ''}
         WHERE
             community_id = :communityId AND
             deleted_at IS NULL AND
-            archived_at IS ${archived ? 'NOT' : ''} NULL 
+            archived_at IS ${archived ? 'NOT' : ''} NULL
             ${topicId ? ' AND topic_id = :topicId' : ''}
             ${stage ? ' AND stage = :stage' : ''}
             ${fromDate ? ' AND T.created_at > :fromDate' : ''}
@@ -129,7 +129,7 @@ export async function __getBulkThreads(
               contestAddress ? ' AND CA.contest_address = :contestAddress ' : ''
             }
             ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
-        ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'} 
+        ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'}
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (
     -- get the thread authors and their profiles
@@ -170,7 +170,7 @@ export async function __getBulkThreads(
                             'avatarUrl', editor_profiles.avatar_url::text
                         ))
                     )
-                ))) 
+                )))
             ELSE '[]'::json
             END AS collaborators
         FROM top_threads TT

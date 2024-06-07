@@ -66,8 +66,7 @@ describe('Reactions lifecycle', () => {
       address_id: addressId,
       thread_id: threadId,
       reaction: 'like',
-      canvas_action: '',
-      canvas_session: '',
+      canvas_signed_data: '',
       canvas_hash: '',
       calculated_voting_weight: 0,
     });

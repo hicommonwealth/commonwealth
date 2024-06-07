@@ -1,5 +1,3 @@
-import { createCanvasSessionPayload } from 'canvas';
-
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
@@ -17,6 +15,7 @@ import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
@@ -83,6 +82,8 @@ const FinishNearLogin = () => {
 
       // create canvas thing
       const chainId = 'mainnet';
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId,
@@ -100,6 +101,8 @@ const FinishNearLogin = () => {
         null,
       );
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const canvasSessionPayload = createCanvasSessionPayload(
         'near' as ChainBase,
         chainId,
@@ -122,18 +125,20 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasSessionPayload),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        canvas.serializeCanvasPayload(canvasSessionPayload),
       );
 
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         chainId,
       );
 
-      app.sessions
-        .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, acct.address, canvasSessionPayload, signature);
+      await verifySession(canvasSessionPayload);
 
       if (!app.isLoggedIn()) {
         await initAppState();

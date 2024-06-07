@@ -1,7 +1,6 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { Awaitable, SessionSigner } from '@canvas-js/interfaces';
 import type { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 
-import type Account from './Account';
 import type BlockInfo from './BlockInfo';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
@@ -19,10 +18,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
 
-  signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string>;
+  getSessionSigner: () => Awaitable<SessionSigner>;
 
   switchNetwork?(chainId?: string): Promise<void>;
 

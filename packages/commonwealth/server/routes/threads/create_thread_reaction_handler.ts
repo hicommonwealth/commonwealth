@@ -1,5 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
+import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
+import {
+  fromCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import { addressSwapper } from 'shared/utils';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -13,9 +19,6 @@ const Errors = {
 type CreateThreadReactionRequestParams = { id: string };
 type CreateThreadReactionRequestBody = {
   reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
 };
 type CreateThreadReactionResponse = ReactionAttributes;
 
@@ -29,16 +32,7 @@ export const createThreadReactionHandler = async (
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    // @ts-expect-error StrictNullChecks
-    reaction,
-    // @ts-expect-error StrictNullChecks
-    canvas_action: canvasAction,
-    // @ts-expect-error StrictNullChecks
-    canvas_session: canvasSession,
-    // @ts-expect-error StrictNullChecks
-    canvas_hash: canvasHash,
-  } = req.body;
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
@@ -50,28 +44,38 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
-  if (config.ENFORCE_SESSION_KEYS) {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
-      thread_id: threadId,
-      // @ts-expect-error StrictNullChecks
-      address: address.address,
-      value: reaction,
-    });
+  const reactionFields: CreateThreadReactionOptions = {
+    user,
+    address,
+    reaction,
+    threadId,
+  };
+
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    // Only save the canvas fields if they are given and they are strings
+    reactionFields.canvasSignedData = req.body.canvas_signed_data;
+    reactionFields.canvasHash = req.body.canvas_hash;
+
+    if (config.ENFORCE_SESSION_KEYS) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+      await verifyReaction(canvasSignedData, {
+        thread_id: threadId,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                address: address.address,
+              })
+            : address.address,
+        value: reaction,
+      });
+    }
   }
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThreadReaction({
-      // @ts-expect-error StrictNullChecks
-      user,
-      // @ts-expect-error StrictNullChecks
-      address,
-      reaction,
-      threadId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-    });
+    await controllers.threads.createThreadReaction(reactionFields);
 
   // update address last active
   // @ts-expect-error StrictNullChecks
