@@ -158,10 +158,10 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
 
         if (!activeContestsWithoutVote?.length) {
-          // throw to trigger retry in case the content is pending creation
-          throw new Error(
-            'ThreadUpvoted: no matching active contests without actions',
+          log.warn(
+            'ThreadCreated: no matching active contests without actions',
           );
+          return;
         }
 
         const chainNodeUrl =
@@ -172,9 +172,8 @@ export function ContestWorker(): Policy<typeof inputs> {
           (c) => c.contest_address,
         );
 
-        log.debug(
-          `ThreadUpvoted addressesToProcess: ${addressesToProcess.join(', ')}`,
-        );
+        console.log('addressesToProcess: ', addressesToProcess);
+        // return;
 
         const promises = await contestHelper.voteContentBatch(
           chainNodeUrl!,
