@@ -180,8 +180,6 @@
     "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "highlight-words-core": "^1.2.2",
-    "html-minifier": "^4.0.0",
-    "https-browserify": "^1.0.0",
     "is-ipfs": "^8.0.1",
     "is-my-json-valid": "^2.20.6",
     "jdenticon": "^2.1.1",
