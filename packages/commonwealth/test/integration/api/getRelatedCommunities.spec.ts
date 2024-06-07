@@ -37,7 +37,7 @@ describe('GetRelatedCommunities Tests', async () => {
     // @ts-expect-error StrictNullChecks
     assert.equal(ethereumCommunity.thread_count, 0);
     // @ts-expect-error StrictNullChecks
-    assert.equal(ethereumCommunity.icon_url, 'assets//img/protocols/eth.png');
+    assert.equal(ethereumCommunity.icon_url, 'assets/img/protocols/eth.png');
     // @ts-expect-error StrictNullChecks
     assert.equal(ethereumCommunity.description, null);
 
@@ -47,7 +47,7 @@ describe('GetRelatedCommunities Tests', async () => {
     // @ts-expect-error StrictNullChecks
     assert.equal(sushiCommunity.thread_count, 0);
     // @ts-expect-error StrictNullChecks
-    assert.equal(sushiCommunity.icon_url, 'assets//img/protocols/eth.png');
+    assert.equal(sushiCommunity.icon_url, 'assets/img/protocols/eth.png');
     // @ts-expect-error StrictNullChecks
     assert.equal(sushiCommunity.description, 'sushi community description');
 
@@ -61,7 +61,7 @@ describe('GetRelatedCommunities Tests', async () => {
     assert.equal(
       // @ts-expect-error StrictNullChecks
       yearnFinanceCommunity.icon_url,
-      'assets//img/protocols/eth.png',
+      'assets/img/protocols/eth.png',
     );
     // @ts-expect-error StrictNullChecks
     assert.equal(yearnFinanceCommunity.description, null);
