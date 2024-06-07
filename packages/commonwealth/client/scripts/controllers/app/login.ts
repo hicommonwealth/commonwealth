@@ -351,6 +351,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
+  // @ts-expect-error StrictNullChecks
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: !isCosmos
       ? [new OAuthExtension()]
@@ -450,7 +451,7 @@ export async function handleSocialLoginCallback({
   walletSsoSource,
   returnEarlyIfNewAddress = false,
 }: {
-  bearer?: string;
+  bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
   returnEarlyIfNewAddress?: boolean;
@@ -474,6 +475,7 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
+      // @ts-expect-error StrictNullChecks
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
