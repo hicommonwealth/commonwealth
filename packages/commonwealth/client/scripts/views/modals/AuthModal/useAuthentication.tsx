@@ -44,7 +44,10 @@ import {
 import { authModal } from '../../../state/ui/modals/authModal';
 
 type UseAuthenticationProps = {
-  onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
+  onSuccess?: (
+    address?: string | null | undefined,
+    isNewlyCreated?: boolean,
+  ) => void;
   onModalClose: () => void;
   onUnrecognizedAddressReceived?: () => boolean;
   useSessionKeyLoginFlow?: boolean;
