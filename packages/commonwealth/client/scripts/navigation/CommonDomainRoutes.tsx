@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
@@ -31,9 +32,14 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
-const NotificationSettingsPage = lazy(
-  () => import('views/pages/NotificationSettings'),
-);
+const NotificationSettingsPage = lazy(() => {
+  const knockInAppNotifications = useFlag('knockInAppNotifications');
+  if (knockInAppNotifications) {
+    return import('views/pages/NotificationSettings');
+  } else {
+    return import('views/pages/NotificationSettingsOld');
+  }
+});
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
