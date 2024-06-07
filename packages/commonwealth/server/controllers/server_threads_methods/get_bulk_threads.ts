@@ -268,7 +268,6 @@ export async function __getBulkThreads(
     }
   `,
     {
-      logging: true,
       replacements,
       type: QueryTypes.SELECT,
     },
