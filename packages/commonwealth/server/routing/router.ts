@@ -26,7 +26,6 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
-import { healthHandler } from '../routes/health';
 import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
@@ -1301,8 +1300,6 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     deleteGroupHandler.bind(this, serverControllers),
   );
-
-  registerRoute(router, 'get', '/health', healthHandler.bind(this));
 
   app.use(endpoint, router);
 

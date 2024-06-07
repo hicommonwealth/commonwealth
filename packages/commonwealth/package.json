@@ -13,7 +13,6 @@
     "archive-outbox": "node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "build-contracts": "npx hardhat compile",
-    "build-vite": "vite build",
     "bundle": "webpack --config webpack/webpack.prod.config.mjs --progress",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "bootstrap-test-db": "NODE_ENV=test tsx ./scripts/bootstrapTestDb.ts",
@@ -39,7 +38,6 @@
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
-    "preview-vite": "concurrently -p '{name}' -c red,green 'PORT=3000 NO_CLIENT=true pnpm run start' 'vite preview'",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
     "publish-rmq-msg": "tsx ./scripts/publishRmqMessageScript.ts",
     "recompute-counts": "tsx ./scripts/recompute-count-job.ts",
@@ -56,7 +54,6 @@
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true tsx server.ts",
     "start-knock": "tsx server/workers/knock/knockWorker.ts",
     "start-message-relayer": "tsx ./server/workers/messageRelayer/messageRelayer.ts",
-    "start-vite": "concurrently -p '{name}' -c red,green 'PORT=3000 NO_CLIENT=true pnpm run start' 'pnpm run vite'",
     "stylelint": "stylelint client/styles/*",
     "test": "pnpm unit-test",
     "test-api": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha --allow-uncaught './test/integration/api/**/*.spec.ts'",
@@ -71,7 +68,6 @@
     "ts-exec": "tsx ",
     "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' mocha ./test/unit/**/*.spec.ts",
     "unit-test:watch": "NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'",
-    "vite": "wait-on http://localhost:3000/api/health && vite --host",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {

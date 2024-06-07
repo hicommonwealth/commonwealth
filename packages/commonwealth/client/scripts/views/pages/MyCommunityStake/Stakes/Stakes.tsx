@@ -5,11 +5,11 @@ import { useCWTableState } from 'client/scripts/views/components/component_kit/n
 import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
 import React from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TransactionsProps } from '../types';
 import './Stakes.scss';
+import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
+import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
 const columns: CWTableColumnInfo[] = [
   {
