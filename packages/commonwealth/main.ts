@@ -15,7 +15,7 @@ import express, {
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import passport from 'passport';
-import { dirname } from 'path';
+import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import expressStatsInit from 'server/scripts/setupExpressStats';
@@ -177,17 +177,16 @@ export async function main(
   setupCosmosProxies(app, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
 
-  app.use(
-    '/build',
-    express.static('build', {
-      setHeaders: (res) => {
-        res.setHeader('Cache-Control', 'public');
-      },
-    }),
-  );
+  app.use('/robots.txt', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/robots.txt`);
+  });
+  app.use('/manifest.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
   app.get('*', (req: Request, res: Response) => {
-    log.info(`setupAppRoutes sendFiles ${req.path}`);
     res.sendFile(`${__dirname}/index.html`);
   });
 
