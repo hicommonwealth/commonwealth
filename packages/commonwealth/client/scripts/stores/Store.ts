@@ -3,7 +3,7 @@ abstract class Store<T> {
 
   public add(
     item: T,
-    options?: { eqFn?: (a: T) => boolean; pushToIndex?: number }
+    options?: { eqFn?: (a: T) => boolean; pushToIndex?: number },
   ): Store<T> {
     // public add(item: T, eqFn?: (a: T) => boolean): Store<T> {
     const index =
@@ -13,8 +13,10 @@ abstract class Store<T> {
 
     // Only add unique elements to store
     if (index === -1) {
+      // @ts-expect-error StrictNullChecks
       options && options.pushToIndex >= 0
-        ? this._store.splice(options.pushToIndex, 0, item)
+        ? // @ts-expect-error StrictNullChecks
+          this._store.splice(options.pushToIndex, 0, item)
         : this._store.push(item);
     } else {
       // if the item is a class instance (e.g. Proposals) this serializes it into an object
@@ -30,7 +32,7 @@ abstract class Store<T> {
       : this._store.indexOf(item);
     if (index === -1) {
       console.log(
-        'Attempting to remove an object that was not found in the store'
+        'Attempting to remove an object that was not found in the store',
       );
       return this;
     }
@@ -44,7 +46,7 @@ abstract class Store<T> {
       : this._store.indexOf(item);
     if (index === -1) {
       console.error(
-        'Attempting to update an object that was not found in the store'
+        'Attempting to update an object that was not found in the store',
       );
       return this;
     }

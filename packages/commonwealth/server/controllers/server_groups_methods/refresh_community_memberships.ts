@@ -9,13 +9,11 @@ import {
   OptionsWithBalances,
   tokenBalanceCache,
 } from '@hicommonwealth/model';
+import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import { fileURLToPath } from 'url';
-import {
-  MEMBERSHIP_REFRESH_BATCH_SIZE,
-  MEMBERSHIP_REFRESH_TTL_SECONDS,
-} from '../../config';
+import { config } from '../../config';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
@@ -119,6 +117,7 @@ async function paginateAddresses(
   callback: (addresses: AddressAttributes[]) => Promise<void>,
 ): Promise<void> {
   const addresses = await models.Address.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       community_id: communityId,
       verified: {
@@ -133,7 +132,7 @@ async function paginateAddresses(
       required: false,
     },
     order: [['id', 'ASC']],
-    limit: MEMBERSHIP_REFRESH_BATCH_SIZE,
+    limit: config.MEMBERSHIP_REFRESH_BATCH_SIZE,
   });
 
   if (addresses.length === 0) {
@@ -142,7 +141,7 @@ async function paginateAddresses(
 
   await callback(addresses);
 
-  if (addresses.length < MEMBERSHIP_REFRESH_BATCH_SIZE) return;
+  if (addresses.length < config.MEMBERSHIP_REFRESH_BATCH_SIZE) return;
 
   return paginateAddresses(
     models,
@@ -166,9 +165,9 @@ async function computeMembership(
   balances: OptionsWithBalances[],
 ): Promise<ComputedMembership> {
   const { requirements } = currentGroup;
-  const { isValid, messages } = await validateGroupMembership(
+  const { isValid, messages } = validateGroupMembership(
     address.address,
-    requirements,
+    requirements as Requirement[],
     balances,
     currentGroup.metadata.required_requirements,
   );
@@ -178,6 +177,7 @@ async function computeMembership(
     reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
+  // @ts-expect-error StrictNullChecks
   return computedMembership;
 }
 
@@ -195,13 +195,14 @@ async function processMemberships(
   for (const currentGroup of groupsToUpdate) {
     for (const address of addresses) {
       // populate toCreate and toUpdate arrays
+      // @ts-expect-error StrictNullChecks
       const existingMembership = address.Memberships.find(
         ({ group_id }) => group_id === currentGroup.id,
       );
       if (existingMembership) {
         // membership exists
         const expiresAt = moment(existingMembership.last_checked).add(
-          MEMBERSHIP_REFRESH_TTL_SECONDS,
+          config.MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
         if (moment().isBefore(expiresAt)) {
@@ -214,6 +215,7 @@ async function processMemberships(
           currentGroup,
           balances,
         );
+        // @ts-expect-error StrictNullChecks
         toUpdate.push(computedMembership);
         continue;
       }
@@ -224,6 +226,7 @@ async function processMemberships(
         currentGroup,
         balances,
       );
+      // @ts-expect-error StrictNullChecks
       toCreate.push(computedMembership);
     }
   }

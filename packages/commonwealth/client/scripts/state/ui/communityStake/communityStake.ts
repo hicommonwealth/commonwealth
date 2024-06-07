@@ -29,6 +29,7 @@ const communityStakeStore = createStore<CommunityStakeStore>()(
         dismissedForAll: false,
         isBannerVisible: (communityId) => {
           const sessionStorageData =
+            // @ts-expect-error StrictNullChecks
             JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY)) || [];
           const dismissedForSession = sessionStorageData.includes(communityId);
 
@@ -50,6 +51,7 @@ const communityStakeStore = createStore<CommunityStakeStore>()(
         }) => {
           if (!communityDismissal && !allCommunitiesDismissal) {
             const data =
+              // @ts-expect-error StrictNullChecks
               JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY)) || [];
 
             sessionStorage.setItem(

@@ -78,6 +78,7 @@ describe('createReaction Integration Tests', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
+      // @ts-expect-error StrictNullChecks
       topicId: topic.id,
       session: {
         type: 'session',
@@ -104,6 +105,7 @@ describe('createReaction Integration Tests', () => {
         return '';
       },
     });
+    // @ts-expect-error StrictNullChecks
     threadId = thread.id;
   });
 
@@ -128,6 +130,7 @@ describe('createReaction Integration Tests', () => {
       where: { text },
     });
 
+    // @ts-expect-error StrictNullChecks
     const beforeReactionCount = comment.reaction_count;
 
     chai.assert.isNotNull(comment);
@@ -173,6 +176,7 @@ describe('createReaction Integration Tests', () => {
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
+      // @ts-expect-error StrictNullChecks
       thread_id: thread.id,
       author_chain: 'ethereum',
       session: userSession.session,

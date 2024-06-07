@@ -74,6 +74,7 @@ export const LinkedThreadModal = ({
         links = updatedThread.links;
       }
       onModalClose();
+      // @ts-expect-error <StrictNullChecks/>
       if (links && onSave) {
         onSave(links);
       }

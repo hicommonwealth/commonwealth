@@ -142,7 +142,9 @@ export const CWTable = ({
             ...(col?.hasCustomSortValue && {
               // implement custom sorting function, if we have custom sorting value.
               sortingFn: (rowA, rowB, columnId) => {
+                // @ts-expect-error <StrictNullChecks/>
                 return rowA.original[columnId].sortValue <
+                  // @ts-expect-error <StrictNullChecks/>
                   rowB.original[columnId].sortValue
                   ? 1
                   : -1;
@@ -291,6 +293,7 @@ export const CWTable = ({
                         {header.column.getCanSort()
                           ? displaySortIcon(
                               header.column.getIsSorted() as string,
+                              // @ts-expect-error <StrictNullChecks/>
                               header.column.getToggleSortingHandler(),
                             ) ?? null
                           : null}
@@ -320,6 +323,7 @@ export const CWTable = ({
             );
           })}
         </tbody>
+        {/* @ts-expect-error StrictNullChecks*/}
         <div ref={tableRef} style={{ height: '1px' }}></div>
       </table>
     </div>

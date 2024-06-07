@@ -70,6 +70,7 @@ export async function __updatePollVote(
     // check token balance threshold if needed
     const { isValid } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       poll.community_id,
       address,
@@ -95,6 +96,7 @@ export async function __updatePollVote(
     });
     // create new vote
     return this.models.Vote.create(
+      // @ts-expect-error StrictNullChecks
       {
         ...voteData,
         option: selectedOption,

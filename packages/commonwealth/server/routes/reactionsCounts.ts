@@ -86,6 +86,7 @@ const reactionsCounts = async (
           if (index > 0) {
             acc[index][reaction] = count;
           } else {
+            // @ts-expect-error StrictNullChecks
             acc.push({
               thread_id,
               comment_id,

@@ -24,6 +24,7 @@ export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
   const deleteInputRow = (index: number) => {
     const newSocials = propSocials.filter((_, i) => i !== index);
     setPropSocials(newSocials);
+    // @ts-expect-error <StrictNullChecks/>
     handleInputChange(newSocials);
   };
 
@@ -76,6 +77,7 @@ export const CWSocials = ({ handleInputChange, socials }: SocialsProps) => {
             const newSocials = [...propSocials];
             newSocials[i] = e.target.value;
             setPropSocials(newSocials);
+            // @ts-expect-error <StrictNullChecks/>
             handleInputChange(newSocials);
           }}
         />

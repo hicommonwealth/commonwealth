@@ -3,7 +3,7 @@ import Permissions from 'client/scripts/utils/Permissions';
 import ChainInfo from 'models/ChainInfo';
 import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
-import { useFetchSelfProfileQuery } from 'state/api/profiles';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -24,8 +24,9 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   const areCommunitiesSuggested = useRef(false);
 
   const { data: profile, isLoading: isLoadingProfile } =
-    useFetchSelfProfileQuery({
+    useFetchProfileByIdQuery({
       apiCallEnabled: true,
+      shouldFetchSelfProfile: true,
     });
 
   useEffect(() => {

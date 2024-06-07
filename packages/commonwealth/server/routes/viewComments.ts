@@ -22,6 +22,7 @@ const viewComments = async (
   }
 
   const comments = await models.Comment.findAll({
+    // @ts-expect-error StrictNullChecks
     where: { community_id: community.id, thread_id: threadId },
     include: [
       {

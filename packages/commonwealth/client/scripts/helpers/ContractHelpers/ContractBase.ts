@@ -35,6 +35,7 @@ abstract class ContractBase {
           if (!this.wallet.api) {
             await this.wallet.enable(chainId);
           }
+          // @ts-expect-error StrictNullChecks
           await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;

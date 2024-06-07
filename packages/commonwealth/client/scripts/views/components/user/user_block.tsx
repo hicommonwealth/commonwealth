@@ -46,9 +46,11 @@ export const UserBlock = ({
     userCommunityId = user.community.id;
   }
   const { data: users } = useFetchProfilesByAddressesQuery({
+    // @ts-expect-error <StrictNullChecks/>
     profileChainIds: [userCommunityId],
     profileAddresses: [user?.address],
     currentChainId: app.activeChainId(),
+    // @ts-expect-error <StrictNullChecks/>
     apiCallEnabled: !!(userCommunityId && user?.address),
   });
   const profile = users?.[0];

@@ -66,6 +66,7 @@ const getCommunityStatus = async (models: DB) => {
   } = {};
   for (const community of communities) {
     if (community.category !== null) {
+      // @ts-expect-error StrictNullChecks
       communityCategories[community.id] =
         community.category as CommunityCategoryType[];
     }
@@ -115,6 +116,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // look up my roles & private communities
+  // @ts-expect-error StrictNullChecks
   const myAddressIds: number[] = Array.from(
     addresses.map((address) => address.id),
   );
@@ -317,7 +319,7 @@ export const status = async (
         notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: config.EVM.ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     } else {
@@ -338,12 +340,13 @@ export const status = async (
         communityCategories,
         threadCountQueryData,
       } = communityStatus;
-      const { roles, user, id, email } = userStatus;
+      const { roles, user, id } = userStatus;
 
-      const jwtToken = jwt.sign({ id, email }, config.AUTH.JWT_SECRET, {
+      const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
         expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
 
+      // @ts-expect-error StrictNullChecks
       const knockJwtToken = await computeKnockJwtToken(user.id);
 
       user.jwt = jwtToken as string;
@@ -354,9 +357,10 @@ export const status = async (
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
+        // @ts-expect-error StrictNullChecks
         user: { ...user, profileId: profileInstance.id },
         evmTestEnv: config.EVM.ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     }
@@ -386,6 +390,7 @@ type CommunityActivity = [communityId: string, timestamp: string | null][];
 function getCommunityActivity(
   addresses: AddressInstance[],
 ): Promise<CommunityActivity> {
+  // @ts-expect-error StrictNullChecks
   return Promise.all(
     addresses.map(async (address) => {
       const { community_id, last_active } = address;

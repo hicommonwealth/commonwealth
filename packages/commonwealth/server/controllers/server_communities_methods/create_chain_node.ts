@@ -68,6 +68,7 @@ export async function __createChainNode(
 
   const newChainNode = await this.models.ChainNode.create({
     url,
+    // @ts-expect-error StrictNullChecks
     name,
     balance_type: balanceType as BalanceType,
     bech32,
@@ -76,5 +77,6 @@ export async function __createChainNode(
     cosmos_chain_id,
   });
 
+  // @ts-expect-error StrictNullChecks
   return { node_id: newChainNode.id };
 }

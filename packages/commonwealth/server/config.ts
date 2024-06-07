@@ -6,18 +6,38 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
+  ENFORCE_SESSION_KEYS,
   SENDGRID_API_KEY,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
   JWT_SECRET,
   SEND_EMAILS: _SEND_EMAILS,
+  SEND_WEBHOOKS_EMAILS,
   NO_CLIENT: _NO_CLIENT,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   LOGIN_RATE_LIMIT_TRIES,
   LOGIN_RATE_LIMIT_MINS,
   SLACK_FEEDBACK_WEBHOOK,
+  PRERENDER_TOKEN,
+  GENERATE_IMAGE_RATE_LIMIT,
+  MAGIC_API_KEY,
+  MAGIC_SUPPORTED_BASES,
+  MAGIC_DEFAULT_CHAIN,
+  ADDRESS_TOKEN_EXPIRES_IN,
+  DEFAULT_COMMONWEALTH_LOGO,
+  MEMBERSHIP_REFRESH_BATCH_SIZE,
+  MEMBERSHIP_REFRESH_TTL_SECONDS,
+  DISCORD_CLIENT_ID,
+  DISCORD_BOT_TOKEN,
+  DISCORD_BOT_SUCCESS_URL,
+  REACTION_WEIGHT_OVERRIDE,
+  CW_BOT_KEY,
+  ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
+  MESSAGE_RELAYER_TIMEOUT_MS,
+  MESSAGE_RELAYER_PREFETCH,
+  EVM_CE_POLL_INTERVAL,
 } = process.env;
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
@@ -27,7 +47,12 @@ const NO_PRERENDER = _NO_PRERENDER || NO_CLIENT;
 export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
   {
+    ENFORCE_SESSION_KEYS: ENFORCE_SESSION_KEYS === 'true',
     SEND_EMAILS,
+    // Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
+    // Risks sending webhooks/emails to real users if incorrectly set to true
+    SEND_WEBHOOKS_EMAILS:
+      model_config.NODE_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
     NO_CLIENT,
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
@@ -36,10 +61,38 @@ export const config = configure(
     LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
     LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
     SLACK_FEEDBACK_WEBHOOK,
+    PRERENDER_TOKEN,
+    GENERATE_IMAGE_RATE_LIMIT: parseInt(GENERATE_IMAGE_RATE_LIMIT ?? '10', 10),
+    DEFAULT_COMMONWEALTH_LOGO:
+      DEFAULT_COMMONWEALTH_LOGO ??
+      'https://commonwealth.im/static/brand_assets/logo_stacked.png',
+    MEMBERSHIP_REFRESH_BATCH_SIZE: parseInt(
+      MEMBERSHIP_REFRESH_BATCH_SIZE ?? '1000',
+      10,
+    ),
+    MEMBERSHIP_REFRESH_TTL_SECONDS: parseInt(
+      MEMBERSHIP_REFRESH_TTL_SECONDS ?? '120',
+      10,
+    ),
+    REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
+      ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
+      : null,
+    CW_BOT_KEY,
+    ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: parseInt(
+      ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS ?? '60',
+      10,
+    ),
     AUTH: {
       SESSION_SECRET: SESSION_SECRET || 'my secret',
       JWT_SECRET: JWT_SECRET || 'my secret',
       SESSION_EXPIRY_MILLIS: 30 * 24 * 60 * 60 * 1000,
+      MAGIC_API_KEY,
+      MAGIC_SUPPORTED_BASES: (MAGIC_SUPPORTED_BASES?.split(
+        ',',
+      ) as ChainBase[]) || [ChainBase.Ethereum],
+      MAGIC_DEFAULT_CHAIN:
+        (MAGIC_DEFAULT_CHAIN as ChainBase) ?? ChainBase.Ethereum,
+      ADDRESS_TOKEN_EXPIRES_IN: parseInt(ADDRESS_TOKEN_EXPIRES_IN ?? '10', 10),
     },
     SENDGRID: {
       API_KEY: SENDGRID_API_KEY,
@@ -50,19 +103,53 @@ export const config = configure(
           ? TELEGRAM_BOT_TOKEN
           : TELEGRAM_BOT_TOKEN_DEV,
     },
+    DISCORD: {
+      CLIENT_ID: DISCORD_CLIENT_ID,
+      BOT_TOKEN: DISCORD_BOT_TOKEN,
+      BOT_SUCCESS_URL: DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000',
+    },
+    WORKERS: {
+      /*
+       * NOTE: (1000 / MESSAGE_RELAYER_TIMEOUT_MS) * MESSAGE_RELAYER_PREFETCH = the upperbound
+       * number of Outbox events (records) that can be processed per second.
+       * Defaults to 1000 events per second.
+       * This calculation does not account for the time it takes for messages to be
+       * fetched + published (hence upperbound assuming fetching + publishing takes 0ms).
+       */
+      MESSAGE_RELAYER_TIMEOUT_MS: parseInt(
+        MESSAGE_RELAYER_TIMEOUT_MS ?? '200',
+        10,
+      ),
+      MESSAGE_RELAYER_PREFETCH: parseInt(MESSAGE_RELAYER_PREFETCH ?? '50', 10),
+      EVM_CE_POLL_INTERVAL_MS: parseInt(EVM_CE_POLL_INTERVAL ?? '120_000', 10),
+    },
   },
   z.object({
+    ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
+    SEND_WEBHOOKS_EMAILS: z.boolean(),
     NO_CLIENT: z.boolean(),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
-    LOGIN_RATE_LIMIT_TRIES: z.number().int(),
-    LOGIN_RATE_LIMIT_MINS: z.number().int(),
+    LOGIN_RATE_LIMIT_TRIES: z.number().int().positive(),
+    LOGIN_RATE_LIMIT_MINS: z.number().int().positive(),
     SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
+    PRERENDER_TOKEN: z.string().optional(),
+    GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
+    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
+    MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
+    MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
+    REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
+    CW_BOT_KEY: z.string().optional(),
+    ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
       SESSION_SECRET: z.string(),
       JWT_SECRET: z.string(),
       SESSION_EXPIRY_MILLIS: z.number().int(),
+      MAGIC_API_KEY: z.string().optional(),
+      MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
+      MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
+      ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
     }),
     SENDGRID: z.object({
       API_KEY: z.string().optional(),
@@ -70,74 +157,15 @@ export const config = configure(
     TELEGRAM: z.object({
       BOT_TOKEN: z.string().optional(),
     }),
+    DISCORD: z.object({
+      CLIENT_ID: z.string().optional(),
+      BOT_TOKEN: z.string().optional(),
+      BOT_SUCCESS_URL: z.string(),
+    }),
+    WORKERS: z.object({
+      MESSAGE_RELAYER_TIMEOUT_MS: z.number().int().positive(),
+      MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
+      EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
+    }),
   }),
 );
-
-export const ADDRESS_TOKEN_EXPIRES_IN = 10;
-
-export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-
-export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
-export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
-  ',',
-) as ChainBase[]) || [ChainBase.Ethereum];
-export const MAGIC_DEFAULT_CHAIN =
-  process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
-
-export const DEFAULT_COMMONWEALTH_LOGO =
-  'https://commonwealth.im/static/brand_assets/logo_stacked.png';
-
-export const DISCORD_BOT_SUCCESS_URL =
-  process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
-
-export const CW_BOT_KEY = process.env.CW_BOT_KEY;
-
-// Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
-// Risks sending webhooks/emails to real users if incorrectly set to true
-export const SEND_WEBHOOKS_EMAILS =
-  process.env.NODE_ENV === 'production' &&
-  process.env.SEND_WEBHOOKS_EMAILS === 'true';
-
-export const MEMBERSHIP_REFRESH_BATCH_SIZE = process.env
-  .MEMBERSHIP_REFRESH_BATCH_SIZE
-  ? parseInt(process.env.MEMBERSHIP_REFRESH_BATCH_SIZE, 10)
-  : 1000;
-
-export const MEMBERSHIP_REFRESH_TTL_SECONDS = process.env
-  .MEMBERSHIP_REFRESH_TTL_SECONDS
-  ? parseInt(process.env.MEMBERSHIP_REFRESH_TTL_SECONDS, 10)
-  : 120;
-
-export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
-  ? parseInt(process.env.TBC_BALANCE_TTL_SECONDS, 10)
-  : 300;
-
-export const PRERENDER_TOKEN = process.env.PRERENDER_TOKEN;
-
-export const REACTION_WEIGHT_OVERRIDE = process.env.REACTION_WEIGHT_OVERRIDE
-  ? parseInt(process.env.REACTION_WEIGHT_OVERRIDE, 10)
-  : null;
-
-export const GENERATE_IMAGE_RATE_LIMIT = process.env.GENERATE_IMAGE_RATE_LIMIT
-  ? parseInt(process.env.GENERATE_IMAGE_RATE_LIMIT, 10)
-  : 10;
-
-export const ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS = process.env
-  .ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS
-  ? parseInt(process.env.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS, 10)
-  : 60;
-
-/*
- * NOTE: (1000 / MESSAGE_RELAYER_TIMEOUT_MS) * MESSAGE_RELAYER_PREFETCH = the upperbound
- * number of Outbox events (records) that can be processed per second.
- * Defaults to 1000 events per second.
- * This calculation does not account for the time it takes for messages to be
- * fetched + published (hence upperbound assuming fetching + publishing takes 0ms).
- */
-export const MESSAGE_RELAYER_TIMEOUT_MS =
-  parseInt(process.env.MESSAGE_RELAYER_TIMEOUT_MS || '') || 200;
-export const MESSAGE_RELAYER_PREFETCH =
-  parseInt(process.env.MESSAGE_RELAYER_PREFETCH || '') || 50;
-
-export const EVM_CE_POLL_INTERVAL_MS =
-  parseInt(process.env.EVM_CE_POLL_INTERVAL || '') || 120_000;

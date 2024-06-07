@@ -200,6 +200,7 @@ describe('validateGroupMembership', () => {
         threshold: '5',
         sourceType: BalanceSourceType.ETHNative,
         chainId: 1,
+        // @ts-expect-error StrictNullChecks
         contractAddress: undefined,
       },
       {
@@ -274,6 +275,7 @@ describe('validateGroupMembership', () => {
         threshold: '5',
         sourceType: BalanceSourceType.ETHNative,
         chainId: 1,
+        // @ts-expect-error StrictNullChecks
         contractAddress: undefined,
       },
       {
@@ -348,6 +350,7 @@ describe('validateGroupMembership', () => {
         threshold: '5',
         sourceType: BalanceSourceType.ETHNative,
         chainId: 1,
+        // @ts-expect-error StrictNullChecks
         contractAddress: undefined,
       },
       {
@@ -420,6 +423,7 @@ describe('validateGroupMembership', () => {
         threshold: '5',
         sourceType: BalanceSourceType.ETHNative,
         chainId: 1,
+        // @ts-expect-error StrictNullChecks
         contractAddress: undefined,
       },
       {
@@ -494,6 +498,7 @@ describe('validateGroupMembership', () => {
         threshold: '5',
         sourceType: BalanceSourceType.ETHNative,
         chainId: 1,
+        // @ts-expect-error StrictNullChecks
         contractAddress: undefined,
       },
       {

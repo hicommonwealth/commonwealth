@@ -21,15 +21,23 @@ const buildFlag = (env: string) => {
 // WARN: for frontend work you MUST define these feature flags in
 // webpack.base.config.mjs or they won't be passed to the frontend.
 const featureFlags = {
+  // @ts-expect-error StrictNullChecks
   allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
+  // @ts-expect-error StrictNullChecks
   contest: buildFlag(process.env.FLAG_CONTEST),
+  // @ts-expect-error StrictNullChecks
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
+  // @ts-expect-error StrictNullChecks
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
+  // @ts-expect-error StrictNullChecks
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
+  // @ts-expect-error StrictNullChecks
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
   knockInAppNotifications: buildFlag(
+    // @ts-expect-error StrictNullChecks
     process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
   ),
+  // @ts-expect-error StrictNullChecks
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
 };
 
@@ -43,5 +51,6 @@ const unleashConfig = {
 };
 
 export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN
-  ? new UnleashProvider(new UnleashClient(unleashConfig))
+  ? // @ts-expect-error StrictNullChecks
+    new UnleashProvider(new UnleashClient(unleashConfig))
   : new InMemoryProvider(featureFlags);

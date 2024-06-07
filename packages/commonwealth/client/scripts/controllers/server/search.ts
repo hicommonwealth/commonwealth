@@ -90,6 +90,7 @@ class SearchController {
       if (scope.includes(SearchScope.Members)) {
         const { profiles } = await this.searchMentionableProfiles(
           searchTerm,
+          // @ts-expect-error StrictNullChecks
           communityScope,
         );
 
@@ -313,10 +314,12 @@ class SearchController {
 
   public getHistory() {
     const rawHistory =
+      // @ts-expect-error StrictNullChecks
       JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
     const history = [];
     // eslint-disable-next-line guard-for-in
     for (const entry of rawHistory) {
+      // @ts-expect-error StrictNullChecks
       history.push(SearchQuery.fromEncodedString(entry));
     }
     return history;
@@ -326,6 +329,7 @@ class SearchController {
     this.removeFromHistory(query); // to refresh duplicates
     if (!this.isValidQuery(query)) return;
     const rawHistory =
+      // @ts-expect-error StrictNullChecks
       JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
     if (rawHistory.length >= SEARCH_HISTORY_SIZE) {
       rawHistory.pop();
@@ -336,6 +340,7 @@ class SearchController {
 
   public removeFromHistory(query: SearchQuery) {
     const rawHistory =
+      // @ts-expect-error StrictNullChecks
       JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
     const index = rawHistory.indexOf(query.toEncodedString());
     if (index > -1) {
