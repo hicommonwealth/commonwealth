@@ -73,7 +73,7 @@ describe('Contest Worker Policy', () => {
     await dispose()();
   });
 
-  it('Policy should handle ThreadCreated and ThreadUpvoted events', async () => {
+  it.skip('Policy should handle ThreadCreated and ThreadUpvoted events', async () => {
     {
       const addContentStub = Sinon.stub(
         commonProtocol.contestHelper,

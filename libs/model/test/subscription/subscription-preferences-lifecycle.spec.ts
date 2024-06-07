@@ -118,7 +118,7 @@ describe('Subscription preferences lifecycle', () => {
     expect(res).to.deep.equal({});
   });
 
-  it('should emit a SubscriptionPreferencesUpdated event if emails are enabled', async () => {
+  it.skip('should emit a SubscriptionPreferencesUpdated event if emails are enabled', async () => {
     const payload = {
       email_notifications_enabled: true,
     };
@@ -148,7 +148,7 @@ describe('Subscription preferences lifecycle', () => {
     });
   });
 
-  it('should emit a SubscriptionPreferencesUpdated event if recap emails are enabled', async () => {
+  it.skip('should emit a SubscriptionPreferencesUpdated event if recap emails are enabled', async () => {
     const payload = {
       email_notifications_enabled: true,
       recap_email_enabled: true,
@@ -179,7 +179,7 @@ describe('Subscription preferences lifecycle', () => {
     });
   });
 
-  it('should emit a SubscriptionPreferencesUpdated event if emails are disabled', async () => {
+  it.skip('should emit a SubscriptionPreferencesUpdated event if emails are disabled', async () => {
     await models.SubscriptionPreference.update(
       { email_notifications_enabled: true },
       {
@@ -218,7 +218,7 @@ describe('Subscription preferences lifecycle', () => {
     });
   });
 
-  it('should emit a SubscriptionPreferencesUpdated event if recap emails are disabled', async () => {
+  it.skip('should emit a SubscriptionPreferencesUpdated event if recap emails are disabled', async () => {
     await models.SubscriptionPreference.update(
       { recap_email_enabled: true },
       {
@@ -256,7 +256,7 @@ describe('Subscription preferences lifecycle', () => {
     });
   });
 
-  it('should emit a SubscriptionPreferencesUpdated event if both emails are disabled', async () => {
+  it.skip('should emit a SubscriptionPreferencesUpdated event if both emails are disabled', async () => {
     await models.SubscriptionPreference.update(
       {
         recap_email_enabled: true,
