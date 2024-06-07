@@ -59,75 +59,40 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
   let initApi; // required for NEAR
 
   if (chain.base === ChainBase.Substrate) {
-    const Substrate = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "substrate-main" */
-        '../controllers/chain/substrate/adapter'
-      )
-    ).default;
+    const Substrate = (await import('../controllers/chain/substrate/adapter'))
+      .default;
     newChain = new Substrate(chain, app);
   } else if (chain.base === ChainBase.CosmosSDK) {
-    const Cosmos = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "cosmos-main" */
-        '../controllers/chain/cosmos/adapter'
-      )
-    ).default;
+    const Cosmos = (await import('../controllers/chain/cosmos/adapter'))
+      .default;
     newChain = new Cosmos(chain, app);
   } else if (
     chain.network === ChainNetwork.NEAR ||
     chain.network === ChainNetwork.NEARTestnet
   ) {
-    const Near = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "near-main" */
-        '../controllers/chain/near/adapter'
-      )
-    ).default;
+    const Near = (await import('../controllers/chain/near/adapter')).default;
     newChain = new Near(chain, app);
     initApi = true;
   } else if (chain.network === ChainNetwork.Sputnik) {
-    const Sputnik = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "sputnik-main" */
-        '../controllers/chain/near/sputnik/adapter'
-      )
-    ).default;
+    const Sputnik = (await import('../controllers/chain/near/sputnik/adapter'))
+      .default;
     newChain = new Sputnik(chain, app);
     initApi = true;
   } else if (chain.network === ChainNetwork.Compound) {
     const Compound = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "compound-main" */
-        '../controllers/chain/ethereum/compound/adapter'
-      )
+      await import('../controllers/chain/ethereum/compound/adapter')
     ).default;
     newChain = new Compound(chain, app);
   } else if (chain.network === ChainNetwork.Aave) {
-    const Aave = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "aave-main" */
-        '../controllers/chain/ethereum/aave/adapter'
-      )
-    ).default;
+    const Aave = (await import('../controllers/chain/ethereum/aave/adapter'))
+      .default;
     newChain = new Aave(chain, app);
   } else if (
     chain.base === ChainBase.Solana ||
     chain.network === ChainNetwork.SPL
   ) {
-    const Solana = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "solana-main" */
-        '../controllers/chain/solana/adapter'
-      )
-    ).default;
+    const Solana = (await import('../controllers/chain/solana/adapter'))
+      .default;
     newChain = new Solana(chain, app);
   } else if (
     (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
@@ -135,13 +100,8 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     chain.network === ChainNetwork.ERC721 ||
     chain.network === ChainNetwork.ERC20
   ) {
-    const Ethereum = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "ethereum-main" */
-        '../controllers/chain/ethereum/adapter'
-      )
-    ).default;
+    const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
+      .default;
     newChain = new Ethereum(chain, app);
   } else {
     throw new Error('Invalid chain');
