@@ -13,7 +13,7 @@
     "archive-outbox": "node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "build-contracts": "npx hardhat compile",
-    "bundle": "vite build",
+    "bundle": "vite -c ./client/vite.config.ts build",
     "bootstrap-test-db": "NODE_ENV=test tsx ./scripts/bootstrapTestDb.ts",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf build",
@@ -37,7 +37,7 @@
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
-    "preview-vite": "concurrently -p '{name}' -c red,green 'PORT=3000 NO_CLIENT=true pnpm run start' 'vite preview'",
+    "preview": "concurrently -p '{name}' -c red,green 'PORT=3000 NO_CLIENT=true pnpm run start' 'vite preview -c ./client/vite.config.ts'",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
     "publish-rmq-msg": "tsx ./scripts/publishRmqMessageScript.ts",
     "recompute-counts": "tsx ./scripts/recompute-count-job.ts",
@@ -68,7 +68,7 @@
     "ts-exec": "tsx ",
     "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' mocha ./test/unit/**/*.spec.ts",
     "unit-test:watch": "NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'",
-    "vite": "wait-on http://localhost:3000/api/health && vite",
+    "vite": "wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {

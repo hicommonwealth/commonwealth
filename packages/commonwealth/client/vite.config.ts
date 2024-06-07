@@ -6,30 +6,24 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 const projectRootDir = path.resolve(__dirname);
 
-function createClientResolver(folder: string): Alias {
+function createScriptsResolver(folder: string): Alias {
   const find = new RegExp(`^${folder}/(.*)$`);
   return {
     find,
-    replacement: path.resolve(
-      projectRootDir,
-      'client',
-      'scripts',
-      folder,
-      '$1',
-    ),
+    replacement: path.resolve(projectRootDir, 'scripts', folder, '$1'),
   };
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    root: './client',
+    root: projectRootDir,
     plugins: [
       react(),
       createHtmlPlugin({
         entry: `./scripts/index.tsx`,
-        template: '.index.html',
+        template: './index.html',
       }),
       tsconfigPaths(),
     ],
@@ -49,25 +43,20 @@ export default defineConfig(({ command, mode }) => {
         {
           // matches only non-relative paths that end with .scss
           find: /^([^.].*)\.scss$/,
-          replacement: path.resolve(
-            projectRootDir,
-            'client',
-            'styles',
-            '$1.scss',
-          ),
+          replacement: path.resolve(projectRootDir, 'styles', '$1.scss'),
         },
         {
           // resolves assets/
           find: /^assets\/(.*)$/,
-          replacement: path.resolve(projectRootDir, 'client', 'assets', '$1'),
+          replacement: path.resolve(projectRootDir, 'assets', '$1'),
         },
-        createClientResolver('hooks'),
-        createClientResolver('navigation'),
-        createClientResolver('state'),
-        createClientResolver('views'),
-        createClientResolver('controllers'),
-        createClientResolver('models'),
-        createClientResolver('helpers'),
+        createScriptsResolver('hooks'),
+        createScriptsResolver('navigation'),
+        createScriptsResolver('state'),
+        createScriptsResolver('views'),
+        createScriptsResolver('controllers'),
+        createScriptsResolver('models'),
+        createScriptsResolver('helpers'),
       ],
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
