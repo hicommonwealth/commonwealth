@@ -10,7 +10,7 @@ module.exports = {
             id: 'yearn',
             symbol: 'YFI',
             name: 'Yearn',
-            icon_url: '/static/img/protocols/yearn.png',
+            icon_url: 'assets/img/protocols/yearn.png',
             type: 'chain',
             network: 'yearn',
             active: true,
@@ -28,7 +28,7 @@ module.exports = {
             id: 'fei',
             symbol: 'FEI',
             name: 'fei',
-            icon_url: '/static/img/protocols/fei.png',
+            icon_url: 'assets/img/protocols/fei.png',
             type: 'chain',
             network: 'fei',
             active: true,
@@ -45,7 +45,7 @@ module.exports = {
             id: 'demo',
             symbol: 'DEMO',
             name: 'demo',
-            icon_url: '/static/img/protocols/eth.png',
+            icon_url: 'assets/img/protocols/eth.png',
             type: 'chain',
             network: 'demo',
             active: true,
@@ -54,7 +54,7 @@ module.exports = {
             snapshot: 'polarcat.eth',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -76,7 +76,7 @@ module.exports = {
             address: '0x89368d67c4fe7aebd22c9503566c3e563a2f586c',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -86,109 +86,109 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'yearn' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'yearn' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'yearn' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'yearn' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'yearn' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'yearn' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['yearn'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'fei' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'fei' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'fei' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'fei' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'fei' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'fei' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['fei'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'demo' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'demo' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'demo' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'demo' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'demo' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'demo' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['demo'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

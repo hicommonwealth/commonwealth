@@ -1,3 +1,4 @@
+import commonUrl from 'assets/img/branding/common.svg';
 import { useAnimation } from 'hooks/useAnimation';
 import React, { useState } from 'react';
 import { CWCheckbox } from '../../component_kit/cw_checkbox';
@@ -6,7 +7,6 @@ import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { HIDE_PROMPT } from '../constants';
 import './AndroidPrompt.scss';
-import commonUrl from '/img/branding/common.svg';
 
 interface AndroidPromptProps {
   hidePromptAction: () => void;

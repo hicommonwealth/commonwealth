@@ -10,7 +10,7 @@ module.exports = {
             id: 'straightedge',
             symbol: 'STR',
             name: 'Straightedge',
-            icon_url: '/static/img/protocols/str.png',
+            icon_url: 'assets/img/protocols/str.png',
             type: 'chain',
             network: 'straightedge',
             active: true,
@@ -20,7 +20,7 @@ module.exports = {
             github: 'https://github.com/heystraightedge/straightedge',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -31,7 +31,7 @@ module.exports = {
             url: 'wss://straightedge.commonwealth.im',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -41,12 +41,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'straightedge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['straightedge'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

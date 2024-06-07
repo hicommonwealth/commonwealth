@@ -11,7 +11,7 @@ const NoTransactionHistory = () => {
     <section className="NoTransactionHistory">
       <div className="container">
         <img
-          src="/static/img/noTransactionHistory.svg"
+          src="assets/img/noTransactionHistory.svg"
           alt="no transaction history icon"
         />
         <div className="labels">

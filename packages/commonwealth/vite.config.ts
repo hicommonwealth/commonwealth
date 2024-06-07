@@ -24,11 +24,12 @@ function createClientResolver(folder: string): Alias {
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
+    root: './client',
     plugins: [
       react(),
       createHtmlPlugin({
-        entry: `./${command === 'serve' ? 'client/' : ''}scripts/index.tsx`,
-        template: './client/index.html',
+        entry: `./scripts/index.tsx`,
+        template: '.index.html',
       }),
       tsconfigPaths(),
     ],
@@ -54,6 +55,11 @@ export default defineConfig(({ command, mode }) => {
             'styles',
             '$1.scss',
           ),
+        },
+        {
+          // resolves assets/
+          find: /^assets\/(.*)$/,
+          replacement: path.resolve(projectRootDir, 'client', 'assets', '$1'),
         },
         createClientResolver('hooks'),
         createClientResolver('navigation'),

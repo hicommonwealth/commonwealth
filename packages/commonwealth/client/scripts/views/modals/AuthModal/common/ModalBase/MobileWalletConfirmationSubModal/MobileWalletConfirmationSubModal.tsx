@@ -31,7 +31,7 @@ const MobileWalletConfirmationSubModal = ({
         <section className="MobileWalletConfirmationSubModal">
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />
 
-          <img src="/static/img/branding/common-logo.svg" className="logo" />
+          <img src="assets/img/branding/common-logo.svg" className="logo" />
 
           <CWText type="h2" className="header" isCentered>
             Please sign to continue

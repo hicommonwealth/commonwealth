@@ -17,7 +17,7 @@ const FundContestFailure = ({
   return (
     <div className="FundContestFailure">
       <img
-        src="/static/img/contestFundsFailure.png"
+        src="assets/img/contestFundsFailure.png"
         alt="success"
         className="img"
       />

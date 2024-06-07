@@ -10,7 +10,7 @@ module.exports = {
             id: 'marlin',
             symbol: 'LIN',
             name: 'Marlin',
-            icon_url: '/static/img/protocols/lin.png',
+            icon_url: 'assets/img/protocols/lin.png',
             type: 'dao',
             network: 'marlin',
             base: 'ethereum',
@@ -21,7 +21,7 @@ module.exports = {
             id: 'marlin-testnet',
             symbol: 'TESTLIN',
             name: 'Marlin Testnet (Ropsten)',
-            icon_url: '/static/img/protocols/lin.png',
+            icon_url: 'assets/img/protocols/lin.png',
             type: 'dao',
             network: 'marlin-testnet',
             base: 'ethereum',
@@ -29,7 +29,7 @@ module.exports = {
             collapsed_on_homepage: true,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -46,7 +46,7 @@ module.exports = {
             address: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // MPOND Contract Address (Not Valid)
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -56,73 +56,73 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'marlin' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'marlin' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'marlin' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'marlin' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'marlin' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'marlin' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['marlin'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'marlin-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'marlin-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'marlin-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'marlin-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'marlin-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'marlin-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['marlin-testnet'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

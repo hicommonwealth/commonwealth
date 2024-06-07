@@ -157,7 +157,7 @@ export const FullUser = ({
           {isGhostAddress && (
             <img
               alt="ghost"
-              src="/static/img/ghost.svg"
+              src="assets/img/ghost.svg"
               width="20px"
               style={{ display: 'inline-block' }}
             />

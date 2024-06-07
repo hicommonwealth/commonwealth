@@ -17,7 +17,7 @@ module.exports = {
             id: 'plasm',
             symbol: 'PLM',
             name: 'Plasm Network',
-            icon_url: '/static/img/protocols/plm.png',
+            icon_url: 'assets/img/protocols/plm.png',
             type: 'chain',
             network: 'plasm',
             active: true,
@@ -30,7 +30,7 @@ module.exports = {
             github: 'https://github.com/staketechnologies/Plasm',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -41,7 +41,7 @@ module.exports = {
             url: 'wss://rpc.plasmnet.io/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       const buildObject = (event_name, chain) => ({
@@ -50,7 +50,7 @@ module.exports = {
         event_name,
       });
       const plasmObjs = Object.values(PlasmFutureEventKinds).map((s) =>
-        buildObject(s, 'plasm')
+        buildObject(s, 'plasm'),
       );
 
       // TODO: somehow switch this on for testing purposes?
@@ -65,37 +65,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['plasm'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

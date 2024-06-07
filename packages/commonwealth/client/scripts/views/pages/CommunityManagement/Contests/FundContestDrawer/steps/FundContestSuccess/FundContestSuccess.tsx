@@ -26,7 +26,7 @@ const FundContestSuccess = ({
     <div className="FundContestSuccess">
       <div className="content">
         <img
-          src="/static/img/contestFundsSuccess.png"
+          src="assets/img/contestFundsSuccess.png"
           alt="success"
           className="img"
         />

@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // add MPond token name for marlin
@@ -24,7 +24,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -36,7 +36,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'Chains',
@@ -48,7 +48,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'Chains',
@@ -60,14 +60,14 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       // turn uniswap into a dao
       await queryInterface.bulkUpdate(
         'Chains',
         {
-          icon_url: '/static/img/protocols/uni.png',
+          icon_url: 'assets/img/protocols/uni.png',
           type: 'dao',
           network: 'compound',
           collapsed_on_homepage: false,
@@ -77,7 +77,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.bulkUpdate(
@@ -92,7 +92,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -113,7 +113,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'Chains',
@@ -125,7 +125,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       // make uniswap a token again
@@ -142,7 +142,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.bulkUpdate(
@@ -156,7 +156,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

@@ -10,7 +10,7 @@ module.exports = {
             id: 'crust',
             symbol: 'CRUST',
             name: 'Crust',
-            icon_url: '/static/img/protocols/dot.png', // @TODO: Add crust
+            icon_url: 'assets/img/protocols/dot.png', // @TODO: Add crust
             type: 'chain',
             network: 'crust',
             base: 'substrate',
@@ -23,7 +23,7 @@ module.exports = {
             github: 'https://github.com/crustio',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -34,7 +34,7 @@ module.exports = {
             url: 'wss://api.crust.network/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -44,37 +44,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'crust' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'crust' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'crust' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'crust' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'crust' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'crust' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['crust'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

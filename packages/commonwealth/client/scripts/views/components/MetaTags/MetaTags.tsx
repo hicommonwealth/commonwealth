@@ -1,7 +1,7 @@
 import 'Layout.scss';
+import commonUrl from 'assets/img/branding/common.png';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import commonUrl from '/img/branding/common.png';
 
 type MetaTagName =
   | 'application-name'

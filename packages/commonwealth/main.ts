@@ -18,7 +18,6 @@ import passport from 'passport';
 import { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
@@ -114,33 +113,12 @@ export async function main(
     // dynamic compression settings used
     app.use(compression());
 
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
       res.set('Content-Security-Policy', "frame-ancestors 'none';");
       next();
     });
-
-    // serve static files
-    app.use(favicon(`${__dirname}/favicon.ico`));
-    app.use('/robots.txt', express.static('robots.txt'));
-    app.use('/static', express.static('static'));
 
     withLoggingMiddleware &&
       app.use(

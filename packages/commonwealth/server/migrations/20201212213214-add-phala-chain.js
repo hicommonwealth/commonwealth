@@ -10,7 +10,7 @@ module.exports = {
             id: 'phala',
             symbol: 'PHA',
             name: 'Phala Network',
-            icon_url: '/static/img/protocols/pha.png',
+            icon_url: 'assets/img/protocols/pha.png',
             type: 'chain',
             network: 'phala',
             active: false,
@@ -23,7 +23,7 @@ module.exports = {
             collapsed_on_homepage: false,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -34,7 +34,7 @@ module.exports = {
             url: 'wss://poc3.phala.network/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -44,37 +44,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['phala'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

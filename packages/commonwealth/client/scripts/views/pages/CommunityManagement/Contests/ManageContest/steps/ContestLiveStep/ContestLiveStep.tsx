@@ -25,7 +25,7 @@ const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
     <>
       <CWPageLayout>
         <div className="ContestLiveStep" style={animationStyles}>
-          <img src="/static/img/contestSuccess.png" alt="" className="img" />
+          <img src="assets/img/contestSuccess.png" alt="" className="img" />
           <CWText type="h4">Your contest is live!</CWText>
           <div className="content-container" style={animationStyles}>
             <CWText type="b1" className="description">

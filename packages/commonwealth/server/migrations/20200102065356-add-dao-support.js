@@ -7,7 +7,7 @@ const molochDAOs = [
     description: 'MolochDAO',
     symbol: 'Moloch',
     network: 'moloch',
-    icon_url: '/static/img/protocols/molochdao.png',
+    icon_url: 'assets/img/protocols/molochdao.png',
     active: true,
     type: 'dao',
   },
@@ -17,7 +17,7 @@ const molochDAOs = [
     description: 'Metacartel',
     symbol: 'Metacartel',
     network: 'metacartel',
-    icon_url: '/static/img/protocols/metacartel.png',
+    icon_url: 'assets/img/protocols/metacartel.png',
     active: true,
     type: 'dao',
   },
@@ -66,12 +66,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'Chains',
         { id: molochDAOs.map((r) => r.id) },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: molochDAOAddresses.map((r) => r.id) },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

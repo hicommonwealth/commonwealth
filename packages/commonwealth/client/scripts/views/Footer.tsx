@@ -1,9 +1,9 @@
 import 'Footer.scss';
+import brandAssetUrl from 'assets/brand_assets/512x512.svg';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { isNotUndefined } from '../helpers/typeGuards';
-import brandAssetUrl from '/brand_assets/512x512.svg';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -54,6 +54,7 @@ export const Footer = () => {
               key={item.text}
               href={item.externalLink}
               target="_blank"
+              rel="noreferrer"
             >
               {item.text}
             </a>

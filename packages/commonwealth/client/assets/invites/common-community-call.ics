@@ -1,0 +1,59 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:America/New_York
+X-LIC-LOCATION:America/New_York
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:19700308T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:19701101T020000
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=America/New_York:20240214T110000
+DTEND;TZID=America/New_York:20240214T120000
+RRULE:FREQ=MONTHLY;BYDAY=2WE
+DTSTAMP:20240207T200456Z
+ORGANIZER;CN=Common Community Calls:mailto:c_296bb058b193669bbe90e7f8ed308f
+ b12d070990c8891ec9dbbc49d17d3ca234@group.calendar.google.com
+UID:3uu9a20asj3b5mcr4kel57jj5b@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=rhys@common.xyz;X-NUM-GUESTS=0:mailto:rhys@common.xyz
+X-GOOGLE-CONFERENCE:https://meet.google.com/djv-pydz-vzv
+X-MICROSOFT-CDO-OWNERAPPTID:1203157814
+CLASS:PUBLIC
+CREATED:20240207T181107Z
+DESCRIPTION:Valentines Day&#39\;s Community Call is going to be stacked! We
+ &#39\;ve got a bunch of special announcements that&#39\;ve been in the work
+ s for awhile including: <br><ul><li>An announcement of a new flagship featu
+ re on Common</li><li>Rewards for Common&#39\;s users (you)</li><li>A presen
+ tation from Common&#39\;s CEO on what to expect from Common in 2024</li><li
+ >&amp\; lots of dots (❌🐮)</li></ul><br>The call will be hosted in the Comm
+ on Discord server Stage. Looking forward to seeing you there!\n\n-::~:~::~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~:
+ :-\nJoin with Google Meet: https://meet.google.com/djv-pydz-vzv\nOr dial: (
+ CA) +1 226-314-7973 PIN: 897489302#\nMore phone numbers: https://tel.meet/d
+ jv-pydz-vzv?pin=2934173653075&hs=7\n\nLearn more about Meet at: https://sup
+ port.google.com/a/users/answer/9282720\n\nPlease do not edit this section.\
+ n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~::~:~::-
+LAST-MODIFIED:20240207T200453Z
+LOCATION:https://discord.com/invite/t9XscHdZrG
+SEQUENCE:2
+STATUS:CONFIRMED
+SUMMARY:Common Community Call
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

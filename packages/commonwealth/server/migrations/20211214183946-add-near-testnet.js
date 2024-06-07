@@ -10,7 +10,7 @@ module.exports = {
             id: 'near-testnet',
             symbol: 'NEAR',
             name: 'NEAR Testnet',
-            icon_url: '/static/img/protocols/near.png',
+            icon_url: 'assets/img/protocols/near.png',
             type: 'chain',
             network: 'near-testnet',
             base: 'near',
@@ -21,7 +21,7 @@ module.exports = {
             github: '',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -32,7 +32,7 @@ module.exports = {
             url: 'https://rpc.testnet.near.org',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -41,12 +41,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'near-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['near-testnet'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

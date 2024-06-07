@@ -10,7 +10,7 @@ module.exports = {
             id: 'centrifuge',
             symbol: 'RAD',
             name: 'Centrifuge',
-            icon_url: '/static/img/protocols/rad.png',
+            icon_url: 'assets/img/protocols/rad.png',
             type: 'chain',
             network: 'centrifuge',
             active: true,
@@ -21,7 +21,7 @@ module.exports = {
             collapsed_on_homepage: false,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -32,7 +32,7 @@ module.exports = {
             url: 'wss://fullnode.centrifuge.io/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -42,37 +42,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['centrifuge'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

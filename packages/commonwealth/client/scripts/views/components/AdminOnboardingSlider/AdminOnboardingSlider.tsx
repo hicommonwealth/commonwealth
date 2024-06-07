@@ -1,4 +1,9 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import shape1Url from 'assets/img/shapes/shape1.svg';
+import shape3Url from 'assets/img/shapes/shape3.svg';
+import shape4Url from 'assets/img/shapes/shape4.svg';
+import shape5Url from 'assets/img/shapes/shape5.svg';
+import shape6Url from 'assets/img/shapes/shape6.svg';
 import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -17,11 +22,6 @@ import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import './AdminOnboardingSlider.scss';
 import { DismissModal } from './DismissModal';
-import shape1Url from '/img/shapes/shape1.svg';
-import shape3Url from '/img/shapes/shape3.svg';
-import shape4Url from '/img/shapes/shape4.svg';
-import shape5Url from '/img/shapes/shape5.svg';
-import shape6Url from '/img/shapes/shape6.svg';
 
 const CARD_TYPES = {
   'launch-contest': {

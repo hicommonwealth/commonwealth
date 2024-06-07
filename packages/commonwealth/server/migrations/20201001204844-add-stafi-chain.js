@@ -49,7 +49,7 @@ module.exports = {
             id: 'stafi',
             symbol: 'FIS',
             name: 'StaFi',
-            icon_url: '/static/img/protocols/fis.png',
+            icon_url: 'assets/img/protocols/fis.png',
             type: 'chain',
             network: 'stafi',
             active: true,
@@ -61,7 +61,7 @@ module.exports = {
             github: 'https://github.com/stafiprotocol/stafi-node',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -72,7 +72,7 @@ module.exports = {
             url: 'wss://scan-rpc.stafi.io/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       const buildObject = (event_name, chain) => ({
@@ -81,7 +81,7 @@ module.exports = {
         event_name,
       });
       const stafiObjs = Object.values(SubstrateEventKinds).map((s) =>
-        buildObject(s, 'stafi')
+        buildObject(s, 'stafi'),
       );
 
       // TODO: somehow switch this on for testing purposes?
@@ -96,37 +96,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['stafi'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

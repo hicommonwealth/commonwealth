@@ -1,10 +1,10 @@
+import commonUrl from 'assets/img/branding/common.svg';
 import { useAnimation } from 'hooks/useAnimation';
 import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './IOSPrompt.scss';
-import commonUrl from '/img/branding/common.svg';
 
 interface IOSPromptProps {
   hidePromptAction: () => void;

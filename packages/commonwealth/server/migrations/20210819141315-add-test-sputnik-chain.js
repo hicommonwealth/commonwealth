@@ -8,7 +8,7 @@ module.exports = {
         id: 'codame.sputnik-dao.near',
         symbol: 'NEAR',
         name: 'Sputnik Dao',
-        icon_url: '/static/img/protocols/near.png',
+        icon_url: 'assets/img/protocols/near.png',
         type: 'dao',
         network: 'sputnik',
         base: 'near',
@@ -33,7 +33,7 @@ module.exports = {
             id: 'hype.sputnik-dao.near',
             symbol: 'NEAR',
             name: 'Hype Dao',
-            icon_url: '/static/img/protocols/near.png',
+            icon_url: 'assets/img/protocols/near.png',
             type: 'dao',
             network: 'sputnik',
             base: 'near',
@@ -44,7 +44,7 @@ module.exports = {
             github: '',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       // TODO: update URL for near mainnet
@@ -57,7 +57,7 @@ module.exports = {
             url: 'https://rpc.mainnet.near.org',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

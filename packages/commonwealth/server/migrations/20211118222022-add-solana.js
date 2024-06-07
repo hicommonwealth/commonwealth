@@ -10,7 +10,7 @@ module.exports = {
             id: 'solana-devnet',
             symbol: 'SOL',
             name: 'Solana Devnet',
-            icon_url: '/static/img/protocols/solana.png',
+            icon_url: 'assets/img/protocols/solana.png',
             type: 'chain',
             network: 'solana-devnet',
             base: 'solana',
@@ -18,7 +18,7 @@ module.exports = {
             decimals: 9,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -29,7 +29,7 @@ module.exports = {
             url: 'devnet',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'Chains',
@@ -38,7 +38,7 @@ module.exports = {
             id: 'solana-testnet',
             symbol: 'SOL',
             name: 'Solana Testnet',
-            icon_url: '/static/img/protocols/solana.png',
+            icon_url: 'assets/img/protocols/solana.png',
             type: 'chain',
             network: 'solana-testnet',
             base: 'solana',
@@ -46,7 +46,7 @@ module.exports = {
             decimals: 9,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -57,7 +57,7 @@ module.exports = {
             url: 'testnet',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'Chains',
@@ -66,7 +66,7 @@ module.exports = {
             id: 'solana',
             symbol: 'SOL',
             name: 'Solana',
-            icon_url: '/static/img/protocols/solana.png',
+            icon_url: 'assets/img/protocols/solana.png',
             type: 'chain',
             network: 'solana',
             base: 'solana',
@@ -74,7 +74,7 @@ module.exports = {
             decimals: 9,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -85,7 +85,7 @@ module.exports = {
             url: 'mainnet-beta',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -95,32 +95,32 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'solana-devnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'solana-devnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'solana-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'solana-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'solana' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'solana' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

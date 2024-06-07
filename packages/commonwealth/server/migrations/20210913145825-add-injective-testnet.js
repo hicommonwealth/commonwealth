@@ -10,7 +10,7 @@ module.exports = {
             id: 'injective-testnet',
             symbol: 'tINJ',
             name: 'Injective Testnet',
-            icon_url: '/static/img/protocols/injective.png',
+            icon_url: 'assets/img/protocols/injective.png',
             type: 'chain',
             network: 'injective-testnet',
             base: 'cosmos',
@@ -18,7 +18,7 @@ module.exports = {
             description: 'Injective testnet.',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -29,7 +29,7 @@ module.exports = {
             url: 'https://injective-rpc-testnet.cw-figment.workers.dev',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -38,12 +38,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'injective-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['injective-testnet'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -10,7 +10,7 @@ module.exports = {
             id: 'osmosis-local',
             symbol: 'tOSMO',
             name: 'Osmosis Local',
-            icon_url: '/static/img/protocols/osm.png',
+            icon_url: 'assets/img/protocols/osm.png',
             type: 'chain',
             network: 'osmosis-local',
             base: 'cosmos',
@@ -19,7 +19,7 @@ module.exports = {
             bech32_prefix: 'osmo',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -30,7 +30,7 @@ module.exports = {
             url: 'localhost:26657',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -39,12 +39,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'osmosis-local' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['osmosis-local'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

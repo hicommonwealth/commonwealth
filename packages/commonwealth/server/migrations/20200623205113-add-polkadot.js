@@ -56,12 +56,12 @@ module.exports = {
             network: 'polkadot',
             symbol: 'DOT',
             name: 'Polkadot',
-            icon_url: '/static/img/protocols/dot.png',
+            icon_url: 'assets/img/protocols/dot.png',
             active: true,
             type: 'chain',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'ChainNodes',
@@ -71,7 +71,7 @@ module.exports = {
             url: 'wss://rpc.polkadot.io',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       const buildObject = (event_name, chain) => ({
@@ -80,7 +80,7 @@ module.exports = {
         event_name,
       });
       const polkadotObjs = Object.values(SubstrateEventKinds).map((s) =>
-        buildObject(s, 'polkadot')
+        buildObject(s, 'polkadot'),
       );
 
       // TODO: somehow switch this on for testing purposes?
@@ -97,21 +97,21 @@ module.exports = {
         {
           chain: 'polkadot',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         {
           chain: 'polkadot',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         {
           id: 'polkadot',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

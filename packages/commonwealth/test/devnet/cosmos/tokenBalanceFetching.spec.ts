@@ -92,7 +92,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
         network: ChainNetwork.Stargaze,
         default_symbol: 'STARS',
         name: 'Stargaze',
-        icon_url: '/static/img/protocols/cosmos.png',
+        icon_url: 'assets/img/protocols/cosmos.png',
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,

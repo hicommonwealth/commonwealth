@@ -39,11 +39,7 @@ export const UserSurveyGrowl = () => {
           className="closeButton"
           onClick={handleExit}
         />
-        <img
-          src="/static/img/userSurveyGrowlImage.svg"
-          alt=""
-          className="img"
-        />
+        <img src="assets/img/userSurveyGrowlImage.svg" alt="" className="img" />
         <div className="container">
           <CWText type="h2" fontWeight="bold" isCentered>
             Complete our survey and get a free NFT!

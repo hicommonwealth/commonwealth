@@ -4,8 +4,8 @@ import { createRoot } from 'react-dom/client';
 import 'index.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import 'shared.scss';
+import '../styles/fonts.css';
 import '../styles/normalize.css'; // reset
-import '/fonts/fonts.css';
 
 import App from './App';
 import { getBrowserInfo } from './helpers/browser';

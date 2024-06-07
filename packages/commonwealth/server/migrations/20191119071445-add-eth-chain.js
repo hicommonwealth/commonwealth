@@ -11,7 +11,7 @@ module.exports = {
               id: 'ethereum',
               network: 'ethereum',
               symbol: 'ETH',
-              icon_url: '/static/img/protocols/eth.png',
+              icon_url: 'assets/img/protocols/eth.png',
               name: 'Ethereum',
               active: true,
             },
@@ -19,12 +19,12 @@ module.exports = {
               id: 'ethereum-local',
               network: 'ethereum',
               symbol: 'ETH',
-              icon_url: '/static/img/protocols/eth.png',
+              icon_url: 'assets/img/protocols/eth.png',
               name: 'Ethereum Local Testnet',
               active: true,
             },
           ],
-          { transaction: t }
+          { transaction: t },
         );
 
         await queryInterface.bulkInsert(
@@ -39,11 +39,11 @@ module.exports = {
               url: 'wss://mainnet.infura.io/ws',
             },
           ],
-          { transaction: t }
+          { transaction: t },
         );
       } catch (e) {
         console.log(
-          'Could not insert Ethereum nodes, maybe they already exist!'
+          'Could not insert Ethereum nodes, maybe they already exist!',
         );
       }
     });
@@ -63,7 +63,7 @@ module.exports = {
               },
             ],
           },
-          { transaction: t }
+          { transaction: t },
         );
 
         await queryInterface.bulkDelete(
@@ -78,7 +78,7 @@ module.exports = {
               },
             ],
           },
-          { transaction: t }
+          { transaction: t },
         );
       } catch (e) {
         console.log('Error removing ETH chain, skipped');
