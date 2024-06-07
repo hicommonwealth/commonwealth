@@ -114,11 +114,11 @@ const NotificationSettings = () => {
 
             {(threadSubscriptions.data || [])
               .filter((current) => current.Thread)
-              .filter((current) => !threadsFilter.includes(current.Thread.id))
+              .filter((current) => !threadsFilter.includes(current.Thread!.id!))
               .map((current) => (
                 <>
                   <SubscriptionEntry
-                    key={current.Thread.id}
+                    key={current.Thread!.id!}
                     subscription={current as z.infer<typeof ThreadSubscription>}
                     onUnsubscribe={handleUnsubscribe}
                   />

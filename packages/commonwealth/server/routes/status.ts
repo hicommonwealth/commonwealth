@@ -346,7 +346,7 @@ export const status = async (
       const knockJwtToken = await computeKnockJwtToken(user.id);
 
       user.jwt = jwtToken as string;
-      user.knockJwtToken = knockJwtToken;
+      user.knockJwtToken = knockJwtToken!;
 
       return success(res, {
         notificationCategories,

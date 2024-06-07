@@ -20,13 +20,13 @@ interface SubscriptionEntryProps {
 
 export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
   const { subscription, onUnsubscribe } = props;
-  const thread = subscription.Thread;
-  const thread_id = thread.id;
+  const thread = subscription.Thread!;
+  const thread_id = thread.id!;
 
   const threadUrl = getThreadUrl(
     {
       chain: thread.community_id,
-      id: thread.id,
+      id: thread.id!,
       title: thread.title,
     },
     undefined,
@@ -80,13 +80,13 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
         <div>
           <User
             userAddress={thread.Address.address}
-            userCommunityId={thread.Community.id}
+            userCommunityId={thread.Community!.id!}
           />
         </div>
 
         <div>•</div>
 
-        <div>{getRelativeTimestamp(thread.created_at.getTime())}</div>
+        <div>{getRelativeTimestamp(thread.created_at!.getTime())}</div>
       </div>
       <div>
         <CWText type="h4" fontWeight="semiBold">
