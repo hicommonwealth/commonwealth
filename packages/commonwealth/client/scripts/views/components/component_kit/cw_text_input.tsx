@@ -66,6 +66,7 @@ export const MessageRow = (props: MessageRowProps) => {
   return (
     <div
       className={getClasses<{ hasFeedback: boolean }>(
+        // @ts-expect-error <StrictNullChecks/>
         { hasFeedback },
         'MessageRow',
       )}
@@ -75,6 +76,7 @@ export const MessageRow = (props: MessageRowProps) => {
         <CWText
           type="caption"
           className={getClasses<{ status: ValidationStatus }>(
+            // @ts-expect-error <StrictNullChecks/>
             { status: validationStatus },
             'feedback-message-text',
           )}

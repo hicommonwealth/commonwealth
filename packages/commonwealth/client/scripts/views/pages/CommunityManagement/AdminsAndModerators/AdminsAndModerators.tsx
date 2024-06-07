@@ -45,6 +45,7 @@ const AdminsAndModerators = () => {
     }
     return searchResults.pages[0].results.map((profile) => {
       return {
+        // @ts-expect-error StrictNullChecks
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
         id: profile.addresses[0].id,
@@ -54,10 +55,14 @@ const AdminsAndModerators = () => {
   }, [searchResults]);
 
   useEffect(() => {
+    // @ts-expect-error StrictNullChecks
     if (!isFetchAdminQueryLoading && returnedAdmins.length > 0) {
+      // @ts-expect-error StrictNullChecks
       setAdmins(returnedAdmins);
     }
+    // @ts-expect-error StrictNullChecks
     if (!isFetchAdminQueryLoading && returnedMods.length > 0) {
+      // @ts-expect-error StrictNullChecks
       setMods(returnedMods);
     }
   }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
@@ -83,9 +88,11 @@ const AdminsAndModerators = () => {
         adminsAndMods.splice(idx, 1);
       }
       if (oldRole.permission === 'admin') {
+        // @ts-expect-error StrictNullChecks
         setAdmins(admins.filter((a) => a.address_id !== oldRole.address_id));
       }
       if (oldRole.permission === 'moderator') {
+        // @ts-expect-error StrictNullChecks
         setMods(mods.filter((a) => a.address_id !== oldRole.address_id));
       }
     }
@@ -105,9 +112,11 @@ const AdminsAndModerators = () => {
       adminsAndMods.push(roleInfo);
 
       if (newRole.permission === 'admin') {
+        // @ts-expect-error StrictNullChecks
         setAdmins([...admins, newRole]);
       }
       if (newRole.permission === 'moderator') {
+        // @ts-expect-error StrictNullChecks
         setMods([...mods, newRole]);
       }
     }

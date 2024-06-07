@@ -55,13 +55,17 @@ export const CompoundProposalForm = () => {
     for (let i = 0; i < tabCount; i++) {
       const aaveProposal = aaveProposalState[i];
       if (aaveProposal.target) {
+        // @ts-expect-error <StrictNullChecks/>
         targets.push(aaveProposal.target);
       } else {
         throw new Error(`No target for Call ${i + 1}`);
       }
 
+      // @ts-expect-error <StrictNullChecks/>
       values.push(aaveProposal.value || '0');
+      // @ts-expect-error <StrictNullChecks/>
       calldatas.push(aaveProposal.calldata || '');
+      // @ts-expect-error <StrictNullChecks/>
       signatures.push(aaveProposal.signature || '');
     }
 
@@ -102,6 +106,7 @@ export const CompoundProposalForm = () => {
         <CWLabel label="Proposer (you)" />
         <User
           userAddress={author?.address}
+          // @ts-expect-error <StrictNullChecks/>
           userCommunityId={author?.community?.id || author?.profile?.chain}
           shouldShowAsDeleted={
             !author?.address &&

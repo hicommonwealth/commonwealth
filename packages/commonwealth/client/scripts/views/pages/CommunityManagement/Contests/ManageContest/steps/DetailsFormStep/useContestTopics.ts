@@ -23,6 +23,7 @@ const useContestTopics = ({
     communityId: app.activeChainId(),
   });
 
+  // @ts-expect-error StrictNullChecks
   const sortedTopics = [...topicsData]?.sort((a, b) => {
     if (!a.order || !b.order) {
       return 1;

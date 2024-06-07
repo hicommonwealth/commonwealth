@@ -16,7 +16,7 @@ export class SubstrateAccount extends Account {
     app: IApp,
     Accounts: SubstrateAccounts,
     address: string,
-    isEd25519 = false
+    isEd25519 = false,
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
@@ -47,6 +47,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
     if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
       throw new Error(`invalid keytype: ${keytype}`);
     }
+    // @ts-expect-error StrictNullChecks
     return this.fromAddress(address, keytype && keytype === 'ed25519');
   }
 
@@ -69,6 +70,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
       decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
+      // @ts-expect-error StrictNullChecks
       return;
     }
     try {

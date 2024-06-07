@@ -62,6 +62,7 @@ const useLaunchCommunityStake = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.LAUNCHED_COMMUNITY_STAKE,
         community: chainId,
+        // @ts-expect-error <StrictNullChecks/>
         userId: app.user.activeAccount.profile.id,
         userAddress: selectedAddress,
       });

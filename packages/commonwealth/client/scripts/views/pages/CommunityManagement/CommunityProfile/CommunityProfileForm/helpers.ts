@@ -7,6 +7,7 @@ type CommunityTags = {
 
 // TODO: this method should be deprecated after https://github.com/hicommonwealth/commonwealth/issues/7835
 export const getCommunityTags = (community: string): CommunityTags => {
+  // @ts-expect-error StrictNullChecks
   const chainToCategoriesMap: {
     [community: string]: CommunityCategoryType[];
   } = app.config.chainCategoryMap;

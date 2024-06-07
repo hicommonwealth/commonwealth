@@ -191,6 +191,7 @@ const CommunityProfileForm = () => {
 
       await editBanner({
         communityId: community.id,
+        // @ts-expect-error <StrictNullChecks/>
         bannerText: values.communityBanner,
       });
 

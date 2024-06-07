@@ -1,9 +1,10 @@
-import React from 'react';
 import clsx from 'clsx';
+import React from 'react';
 
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
+import useSidebarStore from 'state/ui/sidebar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import type {
@@ -11,7 +12,6 @@ import type {
   SidebarSectionAttrs,
   SubSectionAttrs,
 } from './types';
-import useSidebarStore from 'state/ui/sidebar';
 
 const SubSection = (props: SubSectionAttrs) => {
   const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
@@ -65,7 +65,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
 
   const { setMenu, menuName, menuVisible } = useSidebarStore();
   const [toggled, setToggled] = React.useState<boolean>(
-    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
+    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true',
   );
   const [hoverOn, setHoverOn] = React.useState<boolean>(false);
 
@@ -143,6 +143,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
       </div>
       {containsChildren && toggled && (
         <div className="subsections">
+          {/* @ts-expect-error StrictNullChecks*/}
           {displayData.map((subsection, i) => (
             <SubSection key={i} {...subsection} />
           ))}
@@ -163,7 +164,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
   } = props;
 
   const [toggled, setToggled] = React.useState<boolean>(
-    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
+    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true',
   );
   const [hoverColor, setHoverColor] = React.useState<string>();
 
@@ -208,6 +209,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
     >
       <div
         className="section-group-title-container"
+        // @ts-expect-error <StrictNullChecks/>
         onClick={(e) => clickHandler(e, title)}
       >
         {carat}
@@ -215,6 +217,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
       </div>
       {toggled && (
         <div className="sections-container">
+          {/* @ts-expect-error StrictNullChecks*/}
           {displayData.map((sectionGroup, i) => (
             <SubSectionGroup {...sectionGroup} key={i} />
           ))}

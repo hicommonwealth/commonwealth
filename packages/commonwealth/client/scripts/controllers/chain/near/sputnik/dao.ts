@@ -1,10 +1,10 @@
 import BN from 'bn.js';
 import type { NearAccounts } from 'controllers/chain/near/account';
 import type NearChain from 'controllers/chain/near/chain';
-import type { ITXModalData } from '../../../../models/interfaces';
-import ProposalModule from '../../../../models/ProposalModule';
 import type { Near as NearApi } from 'near-api-js';
 import { Account as NearApiAccount } from 'near-api-js';
+import ProposalModule from '../../../../models/ProposalModule';
+import type { ITXModalData } from '../../../../models/interfaces';
 import NearSputnikProposal from './proposal';
 import type {
   INearSputnikProposal,
@@ -39,29 +39,30 @@ export default class NearSputnikDao extends ProposalModule<
     this._policy = await this._Chain.query(
       this.app.activeChainId(),
       'get_policy',
-      {}
+      {},
     );
     const state = await new NearApiAccount(
       this._Chain.api.connection,
-      this.app.activeChainId()
+      this.app.activeChainId(),
     ).state();
     this._tokenSupply = new BN(state.amount);
     const res: NearSputnikGetProposalResponse[] = await this._Chain.query(
       this.app.activeChainId(),
       'get_proposals',
-      { from_index: 0, limit: 100 }
+      { from_index: 0, limit: 100 },
     );
     res.forEach(
       (p) =>
         new NearSputnikProposal(this._Chain, this._Accounts, this, {
           ...p,
           identifier: `${p.id}`,
-        })
+        }),
     );
+    // @ts-expect-error StrictNullChecks
     this._nProposals = +(await this._Chain.query(
       this.app.activeChainId(),
       'get_last_proposal_id',
-      {}
+      {},
     ));
     // TODO: support bounties
     this._initialized = true;
@@ -90,7 +91,7 @@ export default class NearSputnikDao extends ProposalModule<
       methodName,
       args,
       this.policy.proposal_bond,
-      callbackUrl
+      callbackUrl,
     );
   }
 

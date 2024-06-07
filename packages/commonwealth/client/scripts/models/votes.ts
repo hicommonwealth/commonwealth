@@ -21,11 +21,13 @@ export class BinaryVote<C extends Coin> implements IVote<C> {
     account: IBalanceAccount<C>,
     choice: boolean,
     amount?: number,
-    weight?: number
+    weight?: number,
   ) {
     this.account = account;
     this.choice = choice;
+    // @ts-expect-error StrictNullChecks
     this.amount = amount;
+    // @ts-expect-error StrictNullChecks
     this.weight = weight;
   }
 }

@@ -6,7 +6,7 @@ import 'components/component_kit/cw_select_list.scss';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 const CustomOption = (
-  props: OptionProps & { disabledOptionTooltipText?: string }
+  props: OptionProps & { disabledOptionTooltipText?: string },
 ) => {
   if ((props.data as any)?.disabled) {
     return (
@@ -43,9 +43,9 @@ interface SelectListProps {
 export const SelectList = <
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >(
-  props: Props<Option, IsMulti, Group> & SelectListProps
+  props: Props<Option, IsMulti, Group> & SelectListProps,
 ) => {
   return (
     <Select
@@ -53,6 +53,7 @@ export const SelectList = <
       isOptionDisabled={(option) => (option as any)?.disabled}
       components={{
         Option: (optionProps) => (
+          // @ts-expect-error <StrictNullChecks/>
           <CustomOption
             {...optionProps}
             children={optionProps.children}

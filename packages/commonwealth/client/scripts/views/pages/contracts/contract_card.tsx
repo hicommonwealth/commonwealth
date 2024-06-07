@@ -37,6 +37,7 @@ export const ContractCard = ({
   const navigate = useCommonNavigate();
 
   const [manageContractTemplateModalData, setManageContractTemplateModalData] =
+    // @ts-expect-error <StrictNullChecks/>
     useState<ManageContractTemplateModalData>(null);
 
   const globalTemplatesExist =
@@ -176,11 +177,13 @@ export const ContractCard = ({
                 manageContractTemplateModalData?.contractTemplates
               }
               onModalClose={() => {
+                // @ts-expect-error <StrictNullChecks/>
                 setManageContractTemplateModalData(null);
                 onUpdateSuccess();
               }}
             />
           }
+          // @ts-expect-error <StrictNullChecks/>
           onClose={() => setManageContractTemplateModalData(null)}
           open={!!manageContractTemplateModalData}
         />

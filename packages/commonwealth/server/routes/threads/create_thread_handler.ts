@@ -44,7 +44,9 @@ export const createThreadHandler = async (
     await verifyThread(canvasAction, canvasSession, canvasHash, {
       title,
       body,
+      // @ts-expect-error StrictNullChecks
       address: address.address,
+      // @ts-expect-error StrictNullChecks
       community: community.id,
       topic: topicId ? parseInt(topicId, 10) : null,
     });
@@ -52,8 +54,11 @@ export const createThreadHandler = async (
 
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
+      // @ts-expect-error StrictNullChecks
       community,
       title,
       body,

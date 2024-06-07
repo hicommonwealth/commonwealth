@@ -39,7 +39,9 @@ const upgradeMember = async (
 
   const isAdmin = await validateOwner({
     models,
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -51,6 +53,7 @@ const upgradeMember = async (
   // check if address provided exists
   const targetAddress = await models.Address.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       address: address,
     },
@@ -69,6 +72,7 @@ const upgradeMember = async (
   ) {
     const otherExistingAdmin = await models.Address.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         role: 'admin',
         id: {
@@ -77,6 +81,7 @@ const upgradeMember = async (
       },
     });
 
+    // @ts-expect-error StrictNullChecks
     if (!otherExistingAdmin && !req.user.isAdmin) {
       return next(new AppError(Errors.MustHaveAdmin));
     }

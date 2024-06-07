@@ -56,6 +56,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     activeChainId,
   } = useCommunityStake({
     // if user is not a community member but logged in, use an address that matches community chain base
+    // @ts-expect-error <StrictNullChecks/>
     ...(selectedAddress &&
       !app?.user?.activeAccount && { walletAddress: selectedAddress }),
   });
@@ -116,6 +117,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         <CWDivider />
         <DiscussionSection
           isContestAvailable={stakeEnabled && isContestAvailable}
+          // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
@@ -146,11 +148,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         content={
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
             {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setModeOfManageCommunityStakeModal(null)}
         open={!!modeOfManageCommunityStakeModal}
       />

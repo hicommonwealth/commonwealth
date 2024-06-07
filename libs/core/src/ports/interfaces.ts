@@ -368,4 +368,9 @@ export interface NotificationsProvider extends Disposable {
    * @returns A set containing the ids of the schedules that were successfully deleted
    */
   deleteSchedules(options: { schedule_ids: string[] }): Promise<Set<string>>;
+
+  registerClientRegistrationToken(
+    userId: number,
+    token: string,
+  ): Promise<boolean>;
 }

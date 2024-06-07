@@ -108,6 +108,7 @@ export const PollEditorModal = ({
         threadId: thread.id,
         prompt,
         options,
+        // @ts-expect-error <StrictNullChecks/>
         customDuration: customDurationEnabled ? customDuration : null,
         address: app.user.activeAccount.address,
         authorCommunity: app.user.activeAccount.community.id,
@@ -179,6 +180,7 @@ export const PollEditorModal = ({
                 isSearchable={false}
                 options={customDurationOptions}
                 defaultValue={customDurationOptions[0]}
+                // @ts-expect-error <StrictNullChecks/>
                 onChange={({ value }) => setCustomDuration(value)}
               />
             )}

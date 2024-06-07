@@ -37,6 +37,7 @@ export function caip2ToChainBase(caip2: string): ChainBase {
 export function chainBaseToCanvasChainId(
   chainBase: ChainBase,
   idOrPrefix: string | number,
+  // @ts-expect-error StrictNullChecks
 ): string {
   // The Canvas chain id is a stringified ETH chain ID, or Cosmos bech32 prefix, or equivalent.
   if (chainBase === ChainBase.CosmosSDK) {

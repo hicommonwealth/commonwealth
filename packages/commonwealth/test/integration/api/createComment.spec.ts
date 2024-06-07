@@ -18,6 +18,7 @@ describe('createComment Integration Tests', () => {
     const thread = await server.models.Thread.findOne({
       where: { id: threadId },
     });
+    // @ts-expect-error StrictNullChecks
     return thread.comment_count;
   };
 

@@ -59,6 +59,7 @@ export const UserDashboardChainEventRow = ({
   }
 
   return (
+    // @ts-expect-error <StrictNullChecks/>
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!label.linkUrl },
@@ -75,6 +76,7 @@ export const UserDashboardChainEventRow = ({
       <div className="chain-event-text-container">
         <div className="community-title">
           <CWCommunityAvatar community={community} size="small" />
+          {/* @ts-expect-error StrictNullChecks*/}
           <Link
             onClick={(e) => {
               e.stopPropagation();

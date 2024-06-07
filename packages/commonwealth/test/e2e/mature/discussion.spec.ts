@@ -13,6 +13,7 @@ test.describe('Discussion Page Tests', () => {
   let threadId;
 
   test.beforeEach(async ({ page }) => {
+    // @ts-expect-error StrictNullChecks
     threadId = (
       await seeder.testDb.sequelize.query(`
         INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind, created_at, updated_at)
@@ -24,6 +25,7 @@ test.describe('Discussion Page Tests', () => {
     await page.goto(
       `${config.SERVER_URL}/${seeder.testChains[0].id}/discussion/${threadId}`,
     );
+    // @ts-expect-error StrictNullChecks
     await seeder.addAddressIfNone(seeder.testChains[0].id);
     await login(page);
   });
