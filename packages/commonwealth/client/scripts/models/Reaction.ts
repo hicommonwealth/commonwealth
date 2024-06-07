@@ -9,7 +9,7 @@ export type UserProfile = {
   avatarUrl: string;
 };
 
-export function addressToUserProfile(address): UserProfile {
+export function addressToUserProfile(address): UserProfile | undefined {
   const profile = address?.User?.Profiles[0];
   if (!profile) {
     return undefined;
@@ -39,7 +39,7 @@ class Reaction {
   public readonly canvasHash: string;
   public readonly updatedAt: moment.Moment;
 
-  public readonly profile: UserProfile;
+  public readonly profile?: UserProfile;
 
   public calculatedVotingWeight: number;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
