@@ -22,3 +22,18 @@ export const GetAllContests = {
   }),
   output: z.array(ContestResults),
 };
+
+export const GetContestLog = {
+  input: z.object({
+    contest_address: z.string(),
+  }),
+  output: z.object({
+    outbox_events: z.array(
+      z.object({
+        event_name: z.string(),
+        event_payload: z.any(),
+      }),
+    ),
+    actions: z.array(ContestAction),
+  }),
+};
