@@ -120,8 +120,6 @@ export async function main(
       next();
     });
 
-    app.use('/static', express.static('static'));
-
     withLoggingMiddleware &&
       app.use(
         pinoHttp({
@@ -178,6 +176,15 @@ export async function main(
 
   setupCosmosProxies(app, cacheDecorator);
   setupIpfsProxy(app, cacheDecorator);
+
+  app.use(
+    '/build',
+    express.static('build', {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
 
   app.get('*', (req: Request, res: Response) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);

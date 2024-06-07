@@ -1,6 +1,28 @@
 export type ReactionType = 'like';
 import type moment from 'moment';
-import { addressToUserProfile, UserProfile } from './MinimumProfile';
+
+export type UserProfile = {
+  id: number;
+  name: string;
+  address: string;
+  lastActive: string;
+  avatarUrl: string;
+};
+
+export function addressToUserProfile(address): UserProfile {
+  const profile = address?.User?.Profiles[0];
+  if (!profile) {
+    return undefined;
+  }
+
+  return {
+    id: profile.id,
+    avatarUrl: profile?.avatar_url,
+    name: profile?.profile_name || profile?.name,
+    address: address?.address,
+    lastActive: address?.last_active,
+  };
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Reaction {
