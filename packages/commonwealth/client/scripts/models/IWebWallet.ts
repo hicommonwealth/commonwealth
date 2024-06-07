@@ -16,7 +16,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   getChainId(): string | null;
 
-  getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
+  getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo | null>;
 
   getSessionSigner: () => Awaitable<SessionSigner>;
 
