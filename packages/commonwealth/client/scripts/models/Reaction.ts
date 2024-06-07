@@ -9,9 +9,10 @@ export type UserProfile = {
   avatarUrl: string;
 };
 
-export function addressToUserProfile(address): UserProfile | undefined {
+export function addressToUserProfile(address): UserProfile {
   const profile = address?.User?.Profiles[0];
   if (!profile) {
+    // @ts-expect-error <StrictNullChecks/>
     return undefined;
   }
 

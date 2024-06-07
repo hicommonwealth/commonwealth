@@ -221,6 +221,9 @@ importers:
       husky:
         specifier: ^8.0.0
         version: 8.0.3
+      ignore-styles:
+        specifier: ^5.0.1
+        version: 5.0.1
       mocha:
         specifier: ^10.3.0
         version: 10.4.0
@@ -12184,6 +12187,12 @@ packages:
     resolution:
       {
         integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==,
+      }
+
+  ignore-styles@5.0.1:
+    resolution:
+      {
+        integrity: sha512-gQQmIznCETPLEzfg1UH4Cs2oRq+HBPl8quroEUNXT8oybEG7/0lqI3dGgDSRry6B9HcCXw3PVkFFS0FF3CMddg==,
       }
 
   ignore@5.3.1:
@@ -28844,6 +28853,8 @@ snapshots:
   idb@7.1.1: {}
 
   ieee754@1.2.1: {}
+
+  ignore-styles@5.0.1: {}
 
   ignore@5.3.1: {}
 
