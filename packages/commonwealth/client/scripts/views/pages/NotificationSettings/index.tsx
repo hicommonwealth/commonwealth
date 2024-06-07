@@ -1,13 +1,17 @@
 import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
+import { trpc } from 'utils/trpcClient';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
+import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 import { useCommunityAlerts } from 'views/pages/NotificationSettings/useCommunityAlerts';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
@@ -23,6 +27,9 @@ const NotificationSettings = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlerts();
+  const enableKnockPushNotifications = useFlag('knockPushNotifications');
+  const registerClientRegistrationToken =
+    trpc.subscription.registerClientRegistrationToken.useMutation();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     (communityAlerts.data as unknown as ReadonlyArray<
@@ -43,6 +50,22 @@ const NotificationSettings = () => {
     [threadsFilter],
   );
 
+  const handlePushNotificationSubscription = useCallback(() => {
+    async function doAsync() {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+        const token = await getFirebaseMessagingToken();
+        await registerClientRegistrationToken.mutateAsync({
+          id: 'none',
+          token,
+        });
+      }
+    }
+
+    doAsync().catch(console.error);
+  }, [registerClientRegistrationToken]);
+
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
@@ -60,6 +83,19 @@ const NotificationSettings = () => {
         <CWText className="page-subheader-text">
           Manage the emails and alerts you receive about your activity
         </CWText>
+
+        {enableKnockPushNotifications && (
+          <div>
+            <CWText type="h5">Push Notifications</CWText>
+
+            <p>
+              <CWButton
+                label="Subscribe to Push Notifications"
+                onClick={handlePushNotificationSubscription}
+              />
+            </p>
+          </div>
+        )}
 
         <CWTabsRow>
           <CWTab
