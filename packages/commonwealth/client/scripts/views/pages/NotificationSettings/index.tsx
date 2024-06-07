@@ -10,7 +10,7 @@ import {
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { useCommunityAlerts } from 'views/pages/NotificationSettings/useCommunityAlerts';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
+import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
