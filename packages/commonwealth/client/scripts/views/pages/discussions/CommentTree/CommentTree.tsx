@@ -68,13 +68,21 @@ export const CommentTree = ({
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
 
   useEffect(() => {
+    let timeout;
+
     if (focusCommentsParam) {
-      const ele = document.getElementsByClassName('CommentsTree')[0];
-      ele.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+      timeout = setTimeout(() => {
+        const ele = document.getElementsByClassName('CommentsTree')[0];
+        ele.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
     }
+
+    return () => {
+      timeout !== undefined && clearTimeout(timeout);
+    };
     // we only want to run this on first mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
