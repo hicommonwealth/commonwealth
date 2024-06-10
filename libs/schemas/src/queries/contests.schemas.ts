@@ -1,16 +1,17 @@
 import { z } from 'zod';
 import { ContestManager } from '../entities';
-import { Contest, ContestAction } from '../projections';
+import { Contest } from '../projections';
 import { PG_INT, zDate } from '../utils';
 
 export const ContestResults = ContestManager.extend({
   topics: z.array(z.object({ id: z.number(), name: z.string() })),
   contests: z.array(
-    Contest.omit({ contest_address: true }).extend({
-      actions: z.array(
-        ContestAction.omit({ contest_address: true, contest_id: true }),
-      ),
-    }),
+    Contest.omit({ contest_address: true }),
+    // .extend({
+    //   actions: z.array(
+    //     ContestAction.omit({ contest_address: true, contest_id: true }),
+    //   ),
+    // }),
   ),
 });
 

@@ -7,7 +7,7 @@ import { GetDigestEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
 import { generateThreads } from './util';
 
-describe.only('Digest email lifecycle', () => {
+describe('Digest email lifecycle', () => {
   let communityOne: z.infer<typeof Community> | undefined;
   let communityTwo: z.infer<typeof Community> | undefined;
   let communityThree: z.infer<typeof Community> | undefined;
