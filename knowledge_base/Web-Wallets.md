@@ -85,7 +85,7 @@ flowchart LR
 
 ### Sign-in state
 
-A user's active account is stored in `app.user.activeAccount`, and updated in the [login controller](../packages/commonwealth/client/scripts/controllers/app/login.ts).
+A user's active address, for a given community is stored in `app.user.activeAccount`, and is updated in the [login controller](../packages/commonwealth/client/scripts/controllers/app/login.ts). When a user is not on a community-scoped page, `activeAccount` is undefined, and sign-in checks rely on `app.isLoggedIn()`.
 
 ### Flowchart
 

@@ -26,7 +26,7 @@
 - [Notifications](./Notifications.md)
 - [Notifications QA](./Notifications-QA.md)
 - [Stake](./Stake.md)
-- [Web Wallets](./Web-Wallets.md): Sign-in and onboarding flow.
+- [Web Wallets & SSO](./Web-Wallets.md): Sign-in and onboarding flow.
 
 ## Chain Tools
 
