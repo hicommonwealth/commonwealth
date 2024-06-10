@@ -70,8 +70,6 @@ export const Breadcrumbs = ({ topics }: BreadcrumbsProps) => {
     currentDiscussion,
   );
 
-  console.log('pathnames: ', pathnames);
-
   useEffect(() => {
     if (
       topics &&
@@ -89,7 +87,7 @@ export const Breadcrumbs = ({ topics }: BreadcrumbsProps) => {
         navigate('/discussions');
       }
     }
-  }, [topics, pathnames]);
+  }, [topics, pathnames, navigate]);
 
   //Gets the tooltip copy based on the current page.
   const getToolTipCopy = () => {
