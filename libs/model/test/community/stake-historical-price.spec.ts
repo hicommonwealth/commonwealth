@@ -2,9 +2,9 @@ import { Actor, dispose, query } from '@hicommonwealth/core';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';
-import { seed } from '../../src/tester/index';
 
 chai.use(chaiAsPromised);
 
@@ -13,6 +13,7 @@ describe('Stake Historical Price', () => {
   let actor: Actor;
 
   beforeAll(async () => {
+    await bootstrap_testing(true);
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       name: 'Sepolia Testnet',
