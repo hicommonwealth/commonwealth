@@ -1,9 +1,10 @@
 import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
+import { describe, test } from 'vitest';
 
 describe('validateRequirements', () => {
-  it('should pass as valid for ERC20 ContractSource', () => {
+  test('should pass as valid for ERC20 ContractSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -27,7 +28,7 @@ describe('validateRequirements', () => {
     expect(err).to.be.null;
   });
 
-  it('should pass as valid for ERC721 ContractSource', () => {
+  test('should pass as valid for ERC721 ContractSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -52,7 +53,7 @@ describe('validateRequirements', () => {
     expect(err).to.be.null;
   });
 
-  it('should pass as valid for ERC1155 ContractSource', () => {
+  test('should pass as valid for ERC1155 ContractSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -77,7 +78,7 @@ describe('validateRequirements', () => {
     expect(err).to.be.null;
   });
 
-  it('should pass as valid for NativeSource', () => {
+  test('should pass as valid for NativeSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -100,7 +101,7 @@ describe('validateRequirements', () => {
     expect(err).to.be.null;
   });
 
-  it('should pass as valid for CosmosSource', () => {
+  test('should pass as valid for CosmosSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -124,7 +125,7 @@ describe('validateRequirements', () => {
     expect(err).to.be.null;
   });
 
-  it('should fail for invalid threshold type', () => {
+  test('should fail for invalid threshold type', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -149,7 +150,7 @@ describe('validateRequirements', () => {
     expect(err.message).to.not.be.null;
   });
 
-  it('should fail for invalid contract address format', () => {
+  test('should fail for invalid contract address format', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -174,7 +175,7 @@ describe('validateRequirements', () => {
     expect(err.message).to.include('contract_address');
   });
 
-  it('should fail for invalid evm_chain_id', () => {
+  test('should fail for invalid evm_chain_id', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -198,7 +199,7 @@ describe('validateRequirements', () => {
     expect(err.message).to.include('evm_chain_id');
   });
 
-  it('should fail for invalid cosmos_chain_id', () => {
+  test('should fail for invalid cosmos_chain_id', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -223,7 +224,7 @@ describe('validateRequirements', () => {
     expect(err.message).to.include('cosmos_chain_id');
   });
 
-  it('should fail for invalid allow address format', () => {
+  test('should fail for invalid allow address format', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -248,7 +249,7 @@ describe('validateRequirements', () => {
     expect(err.message).to.include('allow');
   });
 
-  it('should fail for invalid source type', () => {
+  test('should fail for invalid source type', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',

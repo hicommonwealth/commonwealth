@@ -14,6 +14,14 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import z from 'zod';
 // eslint-disable-next-line max-len
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
 
 chai.use(chaiAsPromised);
@@ -25,7 +33,7 @@ describe('subscriptionPreferencesUpdated', () => {
     | z.infer<typeof schemas.SubscriptionPreference>
     | undefined;
 
-  before(async () => {
+  beforeAll(async () => {
     [user] = await tester.seed('User', {
       isAdmin: false,
       selected_community_id: null,
@@ -56,11 +64,11 @@ describe('subscriptionPreferencesUpdated', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should delete all exiting email schedules if emails are disabled', async () => {
+  test('should delete all exiting email schedules if emails are disabled', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(
       SpyNotificationsProvider(sandbox, {
@@ -105,7 +113,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
   });
 
-  it('should create schedules if emails are enabled', async () => {
+  test('should create schedules if emails are enabled', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
@@ -167,7 +175,7 @@ describe('subscriptionPreferencesUpdated', () => {
     ).to.equal(RepeatFrequency.Weekly);
   });
 
-  it('should not create a schedule if one already exists', async () => {
+  test('should not create a schedule if one already exists', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
@@ -215,7 +223,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
   });
 
-  it('should delete a single schedule even if emails are enabled', async () => {
+  test('should delete a single schedule even if emails are enabled', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,
@@ -271,7 +279,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
   });
 
-  it('should not throw if attempting to delete a schedule that does not exist', async () => {
+  test('should not throw if attempting to delete a schedule that does not exist', async () => {
     await models.SubscriptionPreference.update(
       {
         email_notifications_enabled: true,

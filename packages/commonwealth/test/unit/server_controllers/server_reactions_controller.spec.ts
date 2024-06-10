@@ -1,8 +1,12 @@
 import { commonProtocol } from '@hicommonwealth/model';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { ServerReactionsController } from 'server/controllers/server_reactions_controller';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
+import { afterEach, beforeEach, describe, test } from 'vitest';
+
+chai.use(chaiAsPromised);
 
 describe('ServerReactionsController', () => {
   beforeEach(() => {
@@ -14,7 +18,7 @@ describe('ServerReactionsController', () => {
     Sinon.restore();
   });
   describe('#deleteReaction', () => {
-    it('should delete a reaction', async () => {
+    test('should delete a reaction', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -65,7 +69,7 @@ describe('ServerReactionsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    it('should throw error (reaction not found)', async () => {
+    test('should throw error (reaction not found)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -96,7 +100,7 @@ describe('ServerReactionsController', () => {
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {

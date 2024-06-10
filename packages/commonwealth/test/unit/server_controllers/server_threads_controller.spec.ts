@@ -1,8 +1,12 @@
 import { commonProtocol } from '@hicommonwealth/model';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
+import { afterEach, beforeEach, describe, test } from 'vitest';
+
+chai.use(chaiAsPromised);
 
 describe('ServerThreadsController', () => {
   beforeEach(() => {
@@ -14,7 +18,7 @@ describe('ServerThreadsController', () => {
     Sinon.restore();
   });
   describe('#createThreadReaction', () => {
-    it('should create a thread reaction (new reaction)', async () => {
+    test('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         // for findAllRoles
@@ -157,7 +161,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    it('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -214,7 +218,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 123');
     });
 
-    it('should throw an error (thread archived)', async () => {
+    test('should throw an error (thread archived)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -277,7 +281,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread is archived');
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -339,7 +343,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    it('should throw error (token balance)', async () => {
+    test('should throw error (token balance)', async () => {
       const sandbox = Sinon.createSandbox();
       const fakeMembershipReject = 'fake membership rejection message';
       const db = {
@@ -471,7 +475,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#createThreadComment', () => {
-    it('should create a thread comment', async () => {
+    test('should create a thread comment', async () => {
       const address = {
         id: 1,
         address: '0x123',
@@ -572,7 +576,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -645,7 +649,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big bad error');
     });
 
-    it('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', async () => {
       const db = {
         Thread: {
           findOne: async () => null,
@@ -716,7 +720,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found');
     });
 
-    it('should throw an error (thread archived)', async () => {
+    test('should throw an error (thread archived)', async () => {
       const user = {};
       const address = {
         id: 1,
@@ -804,7 +808,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread is archived');
     });
 
-    it('should throw error (thread readonly)', async () => {
+    test('should throw error (thread readonly)', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -878,7 +882,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
     });
 
-    it('should throw error (invalid parent)', async () => {
+    test('should throw error (invalid parent)', async () => {
       const parentId = 3;
 
       const db = {
@@ -955,7 +959,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Invalid parent');
     });
 
-    it('should throw error (nesting too deep)', async () => {
+    test('should throw error (nesting too deep)', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1032,7 +1036,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#deleteThread', () => {
-    it('should delete a thread', async () => {
+    test('should delete a thread', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1094,7 +1098,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    it('should should throw error (thread not found)', async () => {
+    test('should should throw error (thread not found)', async () => {
       const db = {
         Thread: {
           findOne: async () => null,
@@ -1134,7 +1138,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 1');
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1180,7 +1184,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: bad');
     });
 
-    it('should throw error (not owned)', async () => {
+    test('should throw error (not owned)', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1228,7 +1232,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#createThread', () => {
-    it('should create a thread', async () => {
+    test('should create a thread', async () => {
       let data = {};
 
       const db = {

@@ -59,7 +59,7 @@
     "start-vite": "concurrently -p '{name}' -c red,green 'PORT=3000 NO_CLIENT=true pnpm run start' 'pnpm run vite'",
     "stylelint": "stylelint client/styles/*",
     "test": "pnpm unit-test",
-    "test-api": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha --allow-uncaught './test/integration/api/**/*.spec.ts'",
+    "test-api": "NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration/api",
     "test-devnet": "chmod +x ./scripts/execute-devnet-tests.sh && ./scripts/execute-devnet-tests.sh",
     "test-e2e": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eRegular/*",
     "test-e2e-mature": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/mature/*",
@@ -69,7 +69,7 @@
     "test-select": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha",
     "test-suite": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'",
     "ts-exec": "tsx ",
-    "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' mocha ./test/unit/**/*.spec.ts",
+    "unit-test": "NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ../../vite.config.ts run test/unit",
     "unit-test:watch": "NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'",
     "vite": "wait-on http://localhost:3000/api/health && vite --host",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"

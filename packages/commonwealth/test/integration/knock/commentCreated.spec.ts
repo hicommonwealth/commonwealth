@@ -15,6 +15,14 @@ import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import z from 'zod';
 import { processCommentCreated } from '../../../server/workers/knock/eventHandlers/commentCreated';
 import { getCommentUrl } from '../../../server/workers/knock/util';
@@ -32,7 +40,7 @@ describe('CommentCreated Event Handler', () => {
     replyComment: z.infer<typeof schemas.Comment> | undefined,
     sandbox: sinon.SinonSandbox;
 
-  before(async () => {
+  beforeAll(async () => {
     const [chainNode] = await tester.seed(
       'ChainNode',
       {
@@ -77,6 +85,9 @@ describe('CommentCreated Event Handler', () => {
       address_id: community.Addresses[1].id,
       topic_id: null,
       deleted_at: null,
+      read_only: false,
+      version_history: [],
+      pinned: false,
     });
     [rootComment] = await tester.seed('Comment', {
       parent_id: null,
@@ -115,11 +126,11 @@ describe('CommentCreated Event Handler', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should not throw if a valid author is not found', async () => {
+  test('should not throw if a valid author is not found', async () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       payload: { address_id: -999999 } as z.infer<typeof CommentCreated>,
@@ -127,7 +138,7 @@ describe('CommentCreated Event Handler', () => {
     expect(res).to.be.false;
   });
 
-  it('should not throw if a valid community is not found', async () => {
+  test('should not throw if a valid community is not found', async () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
       payload: {
@@ -139,7 +150,7 @@ describe('CommentCreated Event Handler', () => {
     expect(res).to.be.false;
   });
 
-  it('should do nothing if there are no relevant subscriptions', async () => {
+  test('should do nothing if there are no relevant subscriptions', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -160,7 +171,7 @@ describe('CommentCreated Event Handler', () => {
     expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
   });
 
-  it('should execute the triggerWorkflow function with appropriate data for a root comment', async () => {
+  test('should execute the triggerWorkflow function with appropriate data for a root comment', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -206,7 +217,7 @@ describe('CommentCreated Event Handler', () => {
     });
   });
 
-  it('should execute the triggerWorkflow function with appropriate data for a reply comment', async () => {
+  test('should execute the triggerWorkflow function with appropriate data for a reply comment', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -252,7 +263,7 @@ describe('CommentCreated Event Handler', () => {
     });
   });
 
-  it('should throw if triggerWorkflow fails', async () => {
+  test('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
