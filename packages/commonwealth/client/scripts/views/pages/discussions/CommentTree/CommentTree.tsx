@@ -64,6 +64,21 @@ export const CommentTree = ({
   commentSortType,
   disabledActionsTooltipText,
 }: CommentsTreeAttrs) => {
+  const urlParams = new URLSearchParams(location.search);
+  const focusCommentsParam = urlParams.get('focusComments') === 'true';
+
+  useEffect(() => {
+    if (focusCommentsParam) {
+      const ele = document.getElementsByClassName('CommentsTree')[0];
+      ele.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+    // we only want to run this on first mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({

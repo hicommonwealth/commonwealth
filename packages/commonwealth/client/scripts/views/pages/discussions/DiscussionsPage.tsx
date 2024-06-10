@@ -180,7 +180,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
+                navigate(`${discussionLink}?focusComments=true`)
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideRecentComments
