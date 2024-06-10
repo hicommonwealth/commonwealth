@@ -38,7 +38,7 @@ export async function validateTopicGroupsMembership(
     return { isValid: false, message: 'Topic not found' };
   }
 
-  if (topic.group_ids.length === 0) {
+  if (topic?.group_ids?.length === 0) {
     return { isValid: true };
   }
 
