@@ -1,11 +1,15 @@
 /// <reference types="vitest" />
 
+import path from 'path';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    globalSetup: './src/tester/vitestDatabaseSetup.ts',
+    globalSetup: path.resolve(
+      __dirname,
+      './libs/model/src/tester/vitestDatabaseSetup.ts',
+    ),
   },
 });

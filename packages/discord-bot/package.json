@@ -12,7 +12,8 @@
     "start-prod-consumer": "node --import=extensionless/register build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node --import=extensionless/register build/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
-    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts run test",
+    "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test"
   },
   "keywords": [],
   "author": "",
