@@ -24,7 +24,7 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
   const deleteCommunityAlert =
     trpc.subscription.deleteCommunityAlert.useMutation();
 
-  const toggleSubscription = useCallback(async () => {
+  const toggleSubscription = useCallback(() => {
     async function doAsync() {
       if (subscribed) {
         await deleteCommunityAlert.mutateAsync({
