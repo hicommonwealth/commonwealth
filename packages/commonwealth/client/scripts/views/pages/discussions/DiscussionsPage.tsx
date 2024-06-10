@@ -137,6 +137,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
         data={isInitialLoading ? [] : filteredThreads}
+        customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
