@@ -17,13 +17,12 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -104,8 +103,6 @@ export const CommentCard = ({
       ? app.chain.accounts.get(comment?.author)
       : null;
 
-  const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
-    useState<boolean>(false);
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
   const [, setOnReaction] = useState<boolean>(false);
@@ -279,27 +276,24 @@ export const CommentCard = ({
                 />
               )}
 
-              {isCanvasVerifyModalVisible && (
-                <CWModal
-                  size="medium"
-                  content={
-                    <CanvasVerifyDataModal
-                      obj={comment}
-                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                    />
-                  }
-                  onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                  open={isCanvasVerifyModalVisible}
-                />
-              )}
               {verifiedCanvasSignedData && (
                 <CWText
                   type="caption"
                   fontWeight="medium"
                   className="verification-icon"
-                  onClick={() => setIsCanvasVerifyDataModalVisible(true)}
                 >
-                  <CWIcon iconName="check" iconSize="xs" />
+                  <CWTooltip
+                    placement="top"
+                    content={'Signed by author'}
+                    renderTrigger={(handleInteraction) => (
+                      <span
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      >
+                        <CWIcon iconName="check" iconSize="xs" />
+                      </span>
+                    )}
+                  ></CWTooltip>
                 </CWText>
               )}
             </div>

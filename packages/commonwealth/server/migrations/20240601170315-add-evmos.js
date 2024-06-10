@@ -3,6 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // Try to add a fully configured evmos community, but do nothing if it already exists.
     try {
       await queryInterface.sequelize.transaction(async (t) => {
         await queryInterface.sequelize.query(
