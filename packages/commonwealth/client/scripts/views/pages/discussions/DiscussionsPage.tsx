@@ -105,7 +105,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
-      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -184,6 +183,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 navigate(`${discussionLink}?focusEditor=true`)
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
+              hideRecentComments
             />
           );
         }}
