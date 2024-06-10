@@ -32,5 +32,7 @@ export default (
       timestamps: true,
       underscored: true,
       tableName: 'Wallets',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     },
   );
