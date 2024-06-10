@@ -27,7 +27,7 @@ const verifySessionSignature = async (
   const expectedAddress = addressModel.address;
   const sessionAddress = session.address.split(':')[2];
   if (sessionAddress !== expectedAddress) {
-    log.error(
+    log.warn(
       `session.address (${sessionAddress}) does not match addressModel.address (${expectedAddress})`,
     );
   }
