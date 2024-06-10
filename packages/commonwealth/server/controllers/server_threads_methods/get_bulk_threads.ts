@@ -116,7 +116,7 @@ export async function __getBulkThreads(
             marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data as "canvasSignedData",
             canvas_hash as "canvasHash", plaintext, last_edited, address_id
         FROM "Threads" T
-          ${contestAddress ? contestJoin : ''}
+        ${contestAddress ? contestJoin : ''}
         WHERE
             community_id = :communityId AND
             deleted_at IS NULL AND
