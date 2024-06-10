@@ -3,13 +3,15 @@ import {
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
-  buildRetryStrategy,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   Broker,
   BrokerSubscriptions,
+  CustomRetryStrategyError,
+  ILogger,
+  InvalidInput,
   broker,
   logger,
   stats,
@@ -44,6 +46,20 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 
+const contestRetryStrategy = (
+  err: Error | InvalidInput | CustomRetryStrategyError,
+  topic: BrokerSubscriptions,
+  content: any,
+  ackOrNackFn: (...args: any[]) => void,
+  _log: ILogger,
+) => {
+  ackOrNackFn(err, [
+    { strategy: 'requeue', attempts: 3, defer: 20 },
+    { strategy: 'nack' },
+  ]);
+  return true;
+};
+
 export async function setupCommonwealthConsumer(): Promise<void> {
   let brokerInstance: Broker;
   try {
@@ -71,12 +87,13 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   const contestWorkerSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ContestWorkerPolicy,
     ContestWorker(),
-    buildRetryStrategy(undefined, 20_000),
+    contestRetryStrategy,
   );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ContestProjection,
     Contest.Contests(),
+    contestRetryStrategy,
   );
 
   if (!chainEventSubRes) {
