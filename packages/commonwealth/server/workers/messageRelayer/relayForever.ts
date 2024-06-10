@@ -37,11 +37,7 @@ export async function relayForever(maxIterations?: number) {
         await new Promise((resolve) => setTimeout(resolve, errorTimeout));
         errorTimeout *= 3;
       } else {
-        console.log(
-          `Pending events decremented from ${numUnrelayedEvents} by ${numRelayedEvents}`,
-        );
         numUnrelayedEvents -= numRelayedEvents;
-        console.log('Final amount', numUnrelayedEvents);
         errorTimeout = INITIAL_ERROR_TIMEOUT;
       }
 
