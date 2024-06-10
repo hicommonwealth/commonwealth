@@ -9,7 +9,8 @@
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
     "start": "tsx watch --max-old-space-size=4096 src/index.ts",
-    "test": "NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts run test",
+    "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test"
   },
   "engines": {
     "node": "20.x"
@@ -21,6 +22,7 @@
     "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
+    "@hicommonwealth/shared": "workspace:*",
     "body-parser": "^1.20.1",
     "express": "^4.18.2",
     "moment": "^2.23.0",
