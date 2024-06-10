@@ -167,6 +167,7 @@ const NotificationSettingsPage = () => {
                       disabled={!emailValidated}
                       onClick={() => {
                         try {
+                          // eslint-disable-next-line @typescript-eslint/no-floating-promises
                           app.user.updateEmail(email);
                           setSentEmail(true);
                           // forceRerender();
@@ -233,12 +234,14 @@ const NotificationSettingsPage = () => {
                     disabled={true}
                     checked={false}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleEmailSubscriptions(false, []);
                     }}
                   />
                   <CWToggle
                     checked={false}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       app.user.notifications
                         .subscribe({
                           categoryId: NotificationCategories.ChainEvent,
@@ -282,12 +285,14 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleEmailSubscriptions(hasSomeEmailSubs, subs);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleSubscriptions(hasSomeInAppSubs, subs);
                     }}
                   />
@@ -360,12 +365,14 @@ const NotificationSettingsPage = () => {
                         label="Receive Emails"
                         checked={hasSomeEmailSubs}
                         onChange={() =>
+                          // eslint-disable-next-line @typescript-eslint/no-misused-promises
                           handleEmailSubscriptions(hasSomeEmailSubs, subs)
                         }
                       />
                       <CWToggle
                         checked={hasSomeInAppSubs}
                         onChange={() =>
+                          // eslint-disable-next-line @typescript-eslint/no-misused-promises
                           handleSubscriptions(hasSomeInAppSubs, subs)
                         }
                       />
@@ -444,6 +451,7 @@ const NotificationSettingsPage = () => {
                               {getUser()}
                               <SubscriptionRowMenu
                                 subscription={sub}
+                                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                                 onUnsubscribe={handleUnsubscribe}
                               />
                             </div>
@@ -454,6 +462,7 @@ const NotificationSettingsPage = () => {
                                 />
                                 <SubscriptionRowMenu
                                   subscription={sub}
+                                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                                   onUnsubscribe={handleUnsubscribe}
                                 />
                               </div>
@@ -551,12 +560,14 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleEmailSubscriptions(hasSomeEmailSubs, subs);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleSubscriptions(hasSomeInAppSubs, subs);
                     }}
                   />
