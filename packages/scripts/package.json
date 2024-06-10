@@ -11,7 +11,8 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build",
     "check-types": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha './test/**/*.spec.ts'",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts run test",
+    "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test",
     "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
