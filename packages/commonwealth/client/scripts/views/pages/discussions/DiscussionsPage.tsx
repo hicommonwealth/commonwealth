@@ -202,7 +202,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
             <>
-              <Breadcrumbs />
+              <Breadcrumbs topics={topics} />
               {userOnboardingEnabled && <UserTrainingSlider />}
               <AdminOnboardingSlider />
               <HeaderWithFilters
