@@ -82,8 +82,6 @@ const ContestsList = ({
             const { end_time, score } =
               sortedContests[sortedContests.length - 1] || {};
 
-            const hasEnded = moment(end_time) < moment();
-
             return (
               <ContestCard
                 key={contest.contest_address}
@@ -100,7 +98,7 @@ const ContestsList = ({
                 decimals={contest.decimals}
                 ticker={contest.ticker}
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
-                isActive={!contest.cancelled && !hasEnded}
+                isCancelled={contest.cancelled!}
                 // @ts-expect-error <StrictNullChecks/>
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
               />

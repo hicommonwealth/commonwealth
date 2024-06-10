@@ -1,6 +1,7 @@
 import moment from 'moment';
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import useForceRerender from 'hooks/useForceRerender';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -35,7 +36,7 @@ interface ContestCardProps {
   decimals?: number;
   ticker?: string;
   isAdmin: boolean;
-  isActive: boolean;
+  isCancelled: boolean;
   onFund: () => void;
 }
 
@@ -49,13 +50,30 @@ const ContestCard = ({
   decimals,
   ticker,
   isAdmin,
-  isActive,
+  isCancelled,
   onFund,
 }: ContestCardProps) => {
+  const forceRerender = useForceRerender();
+
   const navigate = useCommonNavigate();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
+
+  const hasEnded = moment(finishDate) < moment();
+  const isActive = isCancelled ? false : !hasEnded;
+
+  useEffect(() => {
+    if (!isActive) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      forceRerender();
+    }, 6000); // 6s
+
+    return () => clearInterval(interval);
+  }, [forceRerender, isActive]);
 
   const handleCancel = () => {
     cancelContest({
