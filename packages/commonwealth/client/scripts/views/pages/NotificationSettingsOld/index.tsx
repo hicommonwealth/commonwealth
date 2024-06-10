@@ -364,15 +364,15 @@ const NotificationSettingsPage = () => {
                       <CWCheckbox
                         label="Receive Emails"
                         checked={hasSomeEmailSubs}
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         onChange={() =>
-                          // eslint-disable-next-line @typescript-eslint/no-misused-promises
                           handleEmailSubscriptions(hasSomeEmailSubs, subs)
                         }
                       />
                       <CWToggle
                         checked={hasSomeInAppSubs}
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         onChange={() =>
-                          // eslint-disable-next-line @typescript-eslint/no-misused-promises
                           handleSubscriptions(hasSomeInAppSubs, subs)
                         }
                       />
