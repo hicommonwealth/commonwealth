@@ -71,6 +71,7 @@ const threadsUsersCountAndAvatar = async (
           ).filter(({ address }) => address !== authorAddress);
           const addressesCount = uniqueAddresses.length + 1;
           const addresses = uniqueAddresses
+            // @ts-expect-error StrictNullChecks
             .concat({
               thread_id: thread_id,
               address: authorAddress,

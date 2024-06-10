@@ -136,6 +136,7 @@ const createMockedGroupsController = () => {
 };
 
 const createMockParams = () => {
+  // @ts-expect-error StrictNullChecks
   const user = {
     getAddresses: async () => {
       return [];
@@ -166,6 +167,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
+      // @ts-expect-error StrictNullChecks
       communityId: chain.id,
     });
     expect(result).to.have.length(1);

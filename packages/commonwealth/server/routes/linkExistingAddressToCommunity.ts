@@ -6,7 +6,7 @@ import type { Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { addressSwapper, bech32ToHex } from '../../shared/utils';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import { incrementProfileCount } from '../util/denormalizedCountUtils';
@@ -25,6 +25,7 @@ const linkExistingAddressToCommunity = async (
   req: Request,
   res: Response,
 ) => {
+  // @ts-expect-error StrictNullChecks
   const userId = req.user.id;
   const { community_id } = req.body;
 
@@ -48,6 +49,7 @@ const linkExistingAddressToCommunity = async (
   // check if the original address is verified and is owned by the user
   const originalAddress = await models.Address.scope('withPrivateData').findOne(
     {
+      // @ts-expect-error StrictNullChecks
       where: {
         address: req.body.address,
         user_id: userId,
@@ -68,12 +70,13 @@ const linkExistingAddressToCommunity = async (
 
   if (!isOriginalTokenValid) {
     const communities = await models.Community.findAll({
+      // @ts-expect-error StrictNullChecks
       where: { base: community.base },
     });
 
     verificationToken = crypto.randomBytes(18).toString('hex');
     verificationTokenExpires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
+      +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
 
     await models.Address.update(
@@ -82,6 +85,7 @@ const linkExistingAddressToCommunity = async (
         verification_token_expires: verificationTokenExpires,
       },
       {
+        // @ts-expect-error StrictNullChecks
         where: {
           user_id: originalAddress.user_id,
           address: req.body.address,
@@ -92,20 +96,24 @@ const linkExistingAddressToCommunity = async (
   }
 
   const encodedAddress =
+    // @ts-expect-error StrictNullChecks
     community.base === ChainBase.Substrate
       ? addressSwapper({
           address: req.body.address,
+          // @ts-expect-error StrictNullChecks
           currentPrefix: community.ss58_prefix,
         })
       : req.body.address;
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
+      // @ts-expect-error StrictNullChecks
       where: { community_id: community.id, address: encodedAddress },
     },
   );
 
   let hex;
+  // @ts-expect-error StrictNullChecks
   if (community.base === ChainBase.CosmosSDK) {
     hex = await bech32ToHex(req.body.address);
   }
@@ -128,6 +136,7 @@ const linkExistingAddressToCommunity = async (
     existingAddress.verified = originalAddress.verified;
     existingAddress.hex = hex;
     const updatedObj = await existingAddress.save();
+    // @ts-expect-error StrictNullChecks
     addressId = updatedObj.id;
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
@@ -143,6 +152,7 @@ const linkExistingAddressToCommunity = async (
           user_id: originalAddress.user_id,
           profile_id: originalAddress.profile_id,
           address: encodedAddress,
+          // @ts-expect-error StrictNullChecks
           community_id: community.id,
           hex,
           verification_token: verificationToken,
@@ -157,6 +167,7 @@ const linkExistingAddressToCommunity = async (
       );
     });
 
+    // @ts-expect-error StrictNullChecks
     addressId = newObj.id;
   }
 
@@ -170,10 +181,12 @@ const linkExistingAddressToCommunity = async (
   const role = await findOneRole(
     models,
     { where: { address_id: addressId } },
+    // @ts-expect-error StrictNullChecks
     community.id,
   );
 
   if (!role) {
+    // @ts-expect-error StrictNullChecks
     await createRole(models, addressId, community.id, 'member');
   }
 

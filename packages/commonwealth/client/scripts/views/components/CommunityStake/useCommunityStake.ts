@@ -61,27 +61,32 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     isInitialLoading: userStakeBalanceLoading,
     data: userStakeBalanceData,
   } = useGetUserStakeBalanceQuery({
+    // @ts-expect-error StrictNullChecks
     namespace: activeCommunityNamespace,
     stakeId: commonProtocol.STAKE_ID,
     apiEnabled,
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
     keepPreviousData: true,
+    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
     useGetBuyPriceQuery({
+      // @ts-expect-error StrictNullChecks
       namespace: activeCommunityNamespace,
       stakeId: commonProtocol.STAKE_ID,
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
+      // @ts-expect-error StrictNullChecks
       ethChainId,
       keepPreviousData: true,
     });
 
   const currentVoteWeight = commonProtocol.calculateVoteWeight(
+    // @ts-expect-error StrictNullChecks
     userStakeBalanceData,
     stakeData?.vote_weight,
   );

@@ -88,6 +88,7 @@ const UserDashboard = (props: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
+        {/*@ts-expect-error StrictNullChecks*/}
         <div ref={setScrollElement} className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
@@ -127,6 +128,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="Join some communities to see Activity!"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
@@ -135,6 +137,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="No Activity"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
@@ -143,6 +146,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="Join some communities that have governance to see Chain Events!"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                   isChainEventsRow={true}
                 />

@@ -19,10 +19,13 @@ export type CreateThreadPollResponse = PollAttributes;
 
 export const createThreadPollHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<CreateThreadPollBody, null, CreateThreadPollParams>,
   res: TypedResponse<CreateThreadPollResponse>,
 ) => {
+  // @ts-expect-error StrictNullChecks
   const { id: threadId } = req.params;
+  // @ts-expect-error StrictNullChecks
   const { prompt, options, custom_duration } = req.body;
 
   // validate options
@@ -36,7 +39,9 @@ export const createThreadPollHandler = async (
   }
 
   const [poll, analyticsOptions] = await controllers.threads.createThreadPoll({
+    // @ts-expect-error StrictNullChecks
     user: req.user,
+    // @ts-expect-error StrictNullChecks
     threadId: parseInt(threadId, 10) || undefined,
     prompt,
     options,

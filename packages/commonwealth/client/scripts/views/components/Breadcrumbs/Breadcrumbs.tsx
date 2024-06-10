@@ -17,6 +17,7 @@ export const Breadcrumbs = () => {
 
   const { data: linkedThreads } = useGetThreadsByIdQuery({
     communityId: app.activeChainId(),
+    // @ts-expect-error StrictNullChecks
     ids: [getThreadId && Number(getThreadId[1])],
     apiCallEnabled:
       // Only call when in discussion pages prevents unnecessary calls.
@@ -24,11 +25,13 @@ export const Breadcrumbs = () => {
   });
 
   const user = app?.user?.addresses?.[0];
+  // @ts-expect-error StrictNullChecks
   const profileId = user?.profileId || user?.profile.id;
 
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title,
     currentTopic: linkedThreads?.[0]?.topic.name,
+    // @ts-expect-error StrictNullChecks
     topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
   };
 
@@ -57,6 +60,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     profileId,
     navigate,
+    // @ts-expect-error StrictNullChecks
     app.isCustomDomain() ? app.activeChainId() : undefined,
     currentDiscussion,
   );

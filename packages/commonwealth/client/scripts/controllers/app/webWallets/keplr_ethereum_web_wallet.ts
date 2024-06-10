@@ -76,6 +76,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   ): Promise<string> {
     const keplr = await import('@keplr-wallet/types');
     const canvas = await import('@canvas-js/interfaces');
+    // @ts-expect-error StrictNullChecks
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,

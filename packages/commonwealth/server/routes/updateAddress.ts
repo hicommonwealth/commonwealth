@@ -13,12 +13,15 @@ const updateAddress = async (models: DB, req: Request, res: Response) => {
 
   const transaction = await sequelize.transaction();
   try {
+    // @ts-expect-error StrictNullChecks
     if (req.user.id) {
       const { id: ghostAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
           where: {
+            // @ts-expect-error StrictNullChecks
             community_id: community.id,
             ghost_address: true,
+            // @ts-expect-error StrictNullChecks
             user_id: req.user.id,
           },
         })) || {};
@@ -26,8 +29,11 @@ const updateAddress = async (models: DB, req: Request, res: Response) => {
       const { id: newAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
           where: {
+            // @ts-expect-error StrictNullChecks
             community_id: community.id,
+            // @ts-expect-error StrictNullChecks
             user_id: req.user.id,
+            // @ts-expect-error StrictNullChecks
             address: address.address,
           },
         })) || {};

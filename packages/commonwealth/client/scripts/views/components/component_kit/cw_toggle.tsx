@@ -10,6 +10,7 @@ import { ComponentType } from './types';
 export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   setDarkMode(on);
   localStorage.setItem('user-dark-mode-state', on ? 'on' : 'off');
+  // @ts-expect-error <StrictNullChecks/>
   stateFn(on);
 };
 

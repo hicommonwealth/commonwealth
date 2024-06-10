@@ -49,6 +49,7 @@ export const UpgradeRolesForm = ({
   const nonAdminNames: string[] = nonAdmins.map((_role) => {
     const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
     const fullText = `${(_role as any)?.displayName} - ${formatAddressShort(
+      // @ts-expect-error <StrictNullChecks/>
       _role.Address.address,
     )} ${roletext}`;
     return fullText;
@@ -80,6 +81,7 @@ export const UpgradeRolesForm = ({
     try {
       const response = await axios.post(`${app.serverUrl()}/upgradeMember`, {
         new_role: newRole,
+        // @ts-expect-error <StrictNullChecks/>
         address: _user.Address.address,
         community_id: app.activeChainId(),
         jwt: app.user.jwt,

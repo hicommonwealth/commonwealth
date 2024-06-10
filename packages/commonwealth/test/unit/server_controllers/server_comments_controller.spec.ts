@@ -145,6 +145,7 @@ describe('ServerCommentsController', () => {
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
+      // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(allAnalyticsOptions[0]).to.include({
@@ -608,6 +609,7 @@ describe('ServerCommentsController', () => {
       });
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
+      // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
     });
 

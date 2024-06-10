@@ -31,8 +31,11 @@ export const refreshMembershipHandler = async (
   } = validationResult.data;
 
   const result = await controllers.groups.refreshMembership({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     address,
+    // @ts-expect-error StrictNullChecks
     topicId: topic_id,
   });
   return success(res, result);

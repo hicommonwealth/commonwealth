@@ -29,6 +29,7 @@ export const fetchProposalsByStatusV1 = async (
 
     let nextKey = pagination?.next_key;
 
+    // @ts-expect-error StrictNullChecks
     while (nextKey?.length > 0) {
       // TODO: temp fix to handle chains that return nextKey as a string instead of Uint8Array
       // Our v1 API needs to handle this better. To be addressed in #6610
@@ -42,14 +43,18 @@ export const fetchProposalsByStatusV1 = async (
           voter: '',
           depositor: '',
           pagination: {
+            // @ts-expect-error StrictNullChecks
             key: nextKey,
+            // @ts-expect-error StrictNullChecks
             limit: undefined,
+            // @ts-expect-error StrictNullChecks
             offset: undefined,
             countTotal: true,
             reverse: true,
           },
         });
       proposalsByStatus.push(...proposals);
+      // @ts-expect-error StrictNullChecks
       nextKey = nextPage.next_key;
     }
     return proposalsByStatus;
@@ -99,10 +104,14 @@ export const getCompletedProposalsV1 = async (
 export const sortProposalsV1 = (
   proposals: ProposalSDKType[],
 ): ICosmosProposal[] => {
-  return proposals
-    .map((p) => propToIProposal(p))
-    .filter((p) => !!p)
-    .sort((p1, p2) => +p2.identifier - +p1.identifier);
+  // @ts-expect-error StrictNullChecks
+  return (
+    proposals
+      .map((p) => propToIProposal(p))
+      .filter((p) => !!p)
+      // @ts-expect-error StrictNullChecks
+      .sort((p1, p2) => +p2.identifier - +p1.identifier)
+  );
 };
 
 export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
@@ -112,6 +121,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
   let description = '';
   let messages = [];
   if (p.messages?.length > 0) {
+    // @ts-expect-error StrictNullChecks
     messages = p.messages.map((m) => {
       const content = m['content'];
       // get title and description from 1st message if no top-level title/desc
@@ -128,12 +138,17 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
     description,
     messages,
     metadata: p.metadata,
+    // @ts-expect-error StrictNullChecks
     submitTime: moment.unix(new Date(p.submit_time).valueOf() / 1000),
+    // @ts-expect-error StrictNullChecks
     depositEndTime: moment.unix(new Date(p.deposit_end_time).valueOf() / 1000),
+    // @ts-expect-error StrictNullChecks
     votingEndTime: moment.unix(new Date(p.voting_end_time).valueOf() / 1000),
     votingStartTime: moment.unix(
+      // @ts-expect-error StrictNullChecks
       new Date(p.voting_start_time).valueOf() / 1000,
     ),
+    // @ts-expect-error StrictNullChecks
     proposer: null,
     state: {
       identifier,
@@ -146,6 +161,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
           : new BN(0),
       depositors: [],
       voters: [],
+      // @ts-expect-error StrictNullChecks
       tally: p.final_tally_result && marshalTallyV1(p.final_tally_result),
     },
   };
@@ -175,6 +191,7 @@ const stateEnumToStringV1 = (status: string): CosmosProposalState => {
 export const marshalTallyV1 = (
   tally: TallyResultSDKType,
 ): ICosmosProposalTally => {
+  // @ts-expect-error StrictNullChecks
   if (!tally) return null;
   return {
     yes: new BN(tally.yes_count),

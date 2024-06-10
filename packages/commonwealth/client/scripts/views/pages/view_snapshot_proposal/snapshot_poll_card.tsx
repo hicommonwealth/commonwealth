@@ -43,6 +43,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
   } = props;
 
   const [internalHasVoted, setInternalHasVoted] =
+    // @ts-expect-error <StrictNullChecks/>
     React.useState<boolean>(hasVoted);
   const [selectedOptions, setSelectedOptions] = React.useState<Array<string>>(
     [], // is never updated?
@@ -127,6 +128,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
       </div>
       <ResultsSection
         resultString={resultString}
+        // @ts-expect-error <StrictNullChecks/>
         onResultsClick={null}
         tokenSymbol={tokenSymbol}
         voteInformation={internalVoteInformation}
