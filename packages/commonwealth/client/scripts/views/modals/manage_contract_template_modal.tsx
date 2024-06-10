@@ -150,6 +150,7 @@ const ManageContractTemplateModal = ({
     setForm((prevState) => ({
       ...prevState,
       templateId: selectedTemplateId,
+      // @ts-expect-error <StrictNullChecks/>
       displayName: selectedTemplate.name,
     }));
   };
@@ -207,6 +208,7 @@ const ManageContractTemplateModal = ({
             <CWTextInput
               containerClassName="input-label"
               disabled
+              // @ts-expect-error <StrictNullChecks/>
               value={initialTemplateName.label}
               label="Action template"
             />

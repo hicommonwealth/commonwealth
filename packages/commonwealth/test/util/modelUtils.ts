@@ -282,6 +282,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         address: walletAddress,
         community_id: chain,
+        // @ts-expect-error <StrictNullChecks>
         chain_id,
         wallet_id,
         session: serializeCanvas(session),
@@ -332,6 +333,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       args: {
         community: chainId || '',
         title: encodeURIComponent(title),
+        // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         link: url || '',
         topic: topicId || '',
@@ -354,6 +356,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         chain: chainId,
         address: address.split(':')[2],
         title: encodeURIComponent(title),
+        // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
         topic_id: topicId,

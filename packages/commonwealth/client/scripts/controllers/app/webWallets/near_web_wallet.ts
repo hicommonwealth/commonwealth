@@ -22,6 +22,7 @@ class NearWebWalletController implements IWebWallet<any> {
     return 'near';
   }
 
+  // @ts-expect-error StrictNullChecks
   // eslint-disable-next-line @typescript-eslint/require-await
   public async getRecentBlock(_chainIdentifier: string) {
     return null;
@@ -29,6 +30,7 @@ class NearWebWalletController implements IWebWallet<any> {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async getSessionPublicAddress(): Promise<string> {
+    // @ts-expect-error StrictNullChecks
     return null;
   }
 

@@ -48,23 +48,27 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
     findAllRoles(
       models,
       { include: [models.Address], order: [['created_at', 'DESC']] },
+      // @ts-expect-error StrictNullChecks
       community.id,
       ['admin', 'moderator'],
     ),
     models.Thread.count({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         stage: 'voting',
       },
     }),
     models.Thread.count({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         marked_as_spam_at: null,
       },
     }),
     models.CommunityBanner.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
       },
     }),
@@ -72,6 +76,7 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
       try {
         const communityContracts = await models.CommunityContract.findAll({
           where: {
+            // @ts-expect-error StrictNullChecks
             community_id: community.id,
           },
         });
@@ -104,12 +109,14 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
 
           const globalTemplate = await models.Template.findOne({
             where: {
+              // @ts-expect-error StrictNullChecks
               abi_id: contract.abi_id,
             },
           });
 
           const hasGlobalTemplate = !!globalTemplate;
 
+          // @ts-expect-error StrictNullChecks
           contractsWithTemplates.push({ contract, ccts, hasGlobalTemplate });
         }
         resolve(contractsWithTemplates);

@@ -146,6 +146,7 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
+        // @ts-expect-error <StrictNullChecks/>
         authorProfile: app.user.activeAccount.profile,
       });
 
@@ -167,6 +168,7 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
+      // @ts-expect-error <StrictNullChecks/>
       topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
@@ -214,6 +216,7 @@ export const NewThreadForm = () => {
                   onChange={(topic) => {
                     setCanShowGatingBanner(true);
                     setThreadTopic(
+                      // @ts-expect-error <StrictNullChecks/>
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
                     );
                   }}

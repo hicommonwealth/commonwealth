@@ -36,6 +36,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       user_id: user!.id,
     });
     [community] = await tester.seed('Community', {
+      // @ts-expect-error StrictNullChecks
       chain_node_id: null,
       Addresses: [
         {
@@ -106,6 +107,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
     await tester.seed('CommunityAlert', {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       user_id: user!.id,
     });
@@ -135,6 +137,7 @@ describe('snapshotProposalCreated Event Handler', () => {
         community_id: community!.id,
         community_name: community!.name,
         space_name: space,
+        // @ts-expect-error StrictNullChecks
         snapshot_proposal_url: getSnapshotUrl(community!.id, space, proposalId),
       },
     });
@@ -145,6 +148,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 
     await tester.seed('CommunityAlert', {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
       user_id: user!.id,
     });

@@ -32,6 +32,7 @@ export const toCanvasSignedDataApiArgs = (
 ): CanvasSignedDataApiArgs => {
   // ignore undefined data
   if (data === undefined) {
+    // @ts-expect-error <StrictNullChecks>
     return;
   }
 

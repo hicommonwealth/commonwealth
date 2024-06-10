@@ -148,6 +148,7 @@ describe('ServerThreadsController', () => {
 
       expect(notificationOptions).to.have.property('excludeAddresses');
       const { excludeAddresses } = notificationOptions;
+      // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(analyticsOptions).to.include({
@@ -546,6 +547,7 @@ describe('ServerThreadsController', () => {
         await serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -625,6 +627,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -691,6 +694,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -774,6 +778,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -843,6 +848,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -1337,6 +1343,7 @@ describe('ServerThreadsController', () => {
         author_address: '0x123',
         author_community_id: 'ethereum',
       });
+      // @ts-expect-error StrictNullChecks
       expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });

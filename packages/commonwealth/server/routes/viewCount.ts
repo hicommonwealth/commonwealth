@@ -42,6 +42,7 @@ const viewCount = async (
   }
 
   // hit cache to decide whether to add to count
+  // @ts-expect-error StrictNullChecks
   const isNewView = await cache.view(req.ip, req.body.object_id);
 
   // add one to view count if not in cache and not newly created

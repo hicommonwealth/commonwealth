@@ -113,6 +113,7 @@ export default class CompoundGovernance extends ProposalModule<
     if (txReceipt.status !== 1) {
       throw new Error('Failed to execute proposal');
     }
+    // @ts-expect-error StrictNullChecks
     const id = (txReceipt.events[0]?.args[0] as BigNumber).toHexString();
     return id;
   }

@@ -12,6 +12,7 @@ export const getTopicsHandler = async (
 ) => {
   const { community } = req;
 
+  // @ts-expect-error StrictNullChecks
   const topics = await controllers.topics.getTopics({ community });
 
   return success(res, topics);

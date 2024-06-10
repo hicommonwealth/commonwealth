@@ -67,6 +67,7 @@ const ProposalsPage = () => {
 
   // lazy load Cosmos chain params
   const { data: stakingDenom } = useStakingParamsQuery();
+  // @ts-expect-error <StrictNullChecks/>
   useDepositParamsQuery(stakingDenom);
   usePoolParamsQuery();
 
@@ -119,12 +120,14 @@ const ProposalsPage = () => {
   // active proposals
   const activeCompoundProposals =
     onCompound &&
+    // @ts-expect-error <StrictNullChecks/>
     compoundProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
   const activeAaveProposals =
     onAave &&
+    // @ts-expect-error <StrictNullChecks/>
     aaveProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
@@ -139,8 +142,11 @@ const ProposalsPage = () => {
   const activeProposalContent = isLoadingCosmosActiveProposals ? (
     <CWCircleMultiplySpinner />
   ) : !activeCosmosProposals?.length &&
+    // @ts-expect-error <StrictNullChecks/>
     !activeCompoundProposals?.length &&
+    // @ts-expect-error <StrictNullChecks/>
     !activeAaveProposals?.length &&
+    // @ts-expect-error <StrictNullChecks/>
     !activeSputnikProposals?.length ? (
     [
       <div key="no-active" className="no-proposals">
@@ -150,6 +156,7 @@ const ProposalsPage = () => {
   ) : (
     (activeCosmosProposals || [])
       .map((proposal) => (
+        // @ts-expect-error <StrictNullChecks/>
         <ProposalCard key={proposal.identifier} proposal={proposal} />
       ))
       .concat(
@@ -183,12 +190,14 @@ const ProposalsPage = () => {
 
   const inactiveCompoundProposals =
     onCompound &&
+    // @ts-expect-error <StrictNullChecks/>
     compoundProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
   const inactiveAaveProposals =
     onAave &&
+    // @ts-expect-error <StrictNullChecks/>
     aaveProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
@@ -202,9 +211,13 @@ const ProposalsPage = () => {
 
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWCircleMultiplySpinner />
-  ) : !inactiveCosmosProposals?.length &&
+  ) : // @ts-expect-error <StrictNullChecks/>
+  !inactiveCosmosProposals?.length &&
+    // @ts-expect-error <StrictNullChecks/>
     !inactiveCompoundProposals?.length &&
+    // @ts-expect-error <StrictNullChecks/>
     !inactiveAaveProposals?.length &&
+    // @ts-expect-error <StrictNullChecks/>
     !inactiveSputnikProposals?.length ? (
     [
       <div key="no-inactive" className="no-proposals">
@@ -214,16 +227,20 @@ const ProposalsPage = () => {
   ) : (
     []
       .concat(
+        // @ts-expect-error <StrictNullChecks/>
         (inactiveCosmosProposals || []).map((proposal) => (
+          // @ts-expect-error <StrictNullChecks/>
           <ProposalCard key={proposal.identifier} proposal={proposal} />
         )),
       )
       .concat(
+        // @ts-expect-error <StrictNullChecks/>
         (inactiveCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
         )),
       )
       .concat(
+        // @ts-expect-error <StrictNullChecks/>
         (inactiveAaveProposals || []).map((proposal, i) => (
           <ProposalCard
             key={i}
@@ -238,6 +255,7 @@ const ProposalsPage = () => {
         )),
       )
       .concat(
+        // @ts-expect-error <StrictNullChecks/>
         (inactiveSputnikProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
         )),

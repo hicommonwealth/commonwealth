@@ -13,6 +13,7 @@ export class Notification {
   private _isRead?: boolean;
 
   public get isRead(): boolean {
+    // @ts-expect-error StrictNullChecks
     return this._isRead;
   }
 

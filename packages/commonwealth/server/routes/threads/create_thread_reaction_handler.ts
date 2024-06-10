@@ -32,19 +32,23 @@ export const createThreadReactionHandler = async (
   res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
   const { user, address } = req;
+  // @ts-expect-error <StrictNullChecks>
   const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
   }
 
+  // @ts-expect-error StrictNullChecks
   const threadId = parseInt(req.params.id, 10);
   if (!threadId) {
     throw new AppError(Errors.InvalidThreadId);
   }
 
   const reactionFields: CreateThreadReactionOptions = {
+    // @ts-expect-error <StrictNullChecks>
     user,
+    // @ts-expect-error <StrictNullChecks>
     address,
     reaction,
     threadId,
@@ -64,9 +68,11 @@ export const createThreadReactionHandler = async (
           'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
+                // @ts-expect-error <StrictNullChecks>
                 address: address.address,
               })
-            : address.address,
+            : // @ts-expect-error <StrictNullChecks>
+              address.address,
         value: reaction,
       });
     }
@@ -77,7 +83,9 @@ export const createThreadReactionHandler = async (
     await controllers.threads.createThreadReaction(reactionFields);
 
   // update address last active
+  // @ts-expect-error StrictNullChecks
   address.last_active = new Date();
+  // @ts-expect-error StrictNullChecks
   address.save().catch(console.error);
 
   // emit notification

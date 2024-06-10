@@ -81,5 +81,24 @@ export function KnockProvider(): NotificationsProvider {
       const res = await knock.workflows.deleteSchedules(options);
       return new Set(res.map((s) => s.id));
     },
+
+    async registerClientRegistrationToken(
+      userId: number,
+      token: string,
+    ): Promise<boolean> {
+      if (config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID) {
+        await knock.users.setChannelData(
+          `${userId}`,
+          config.PUSH_NOTIFICATIONS.KNOCK_FCM_CHANNEL_ID,
+          {
+            tokens: [token],
+          },
+        );
+        return true;
+      } else {
+        console.warn('Push notifications not enabled');
+        return false;
+      }
+    },
   };
 }

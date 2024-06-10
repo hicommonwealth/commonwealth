@@ -35,6 +35,7 @@ class LeapWebWalletController extends KeplrLikeWebWalletController {
       signer: {
         type: 'arbitrary',
         signArbitrary: (msg) =>
+          // @ts-expect-error <StrictNullChecks>
           window.leap.signArbitrary(
             this.getChainId(),
             this.accounts[0].address,

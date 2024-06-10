@@ -116,6 +116,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       this._web3 = new Web3(ethereum);
 
       this._ethAccounts = await this._web3.eth.getAccounts();
+      // @ts-expect-error StrictNullChecks
       this._provider = this._web3.currentProvider;
       if (this._ethAccounts.length === 0) {
         throw new Error('Could not fetch accounts from Metamask');

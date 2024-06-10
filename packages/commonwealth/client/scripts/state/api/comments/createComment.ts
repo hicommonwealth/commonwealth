@@ -26,6 +26,7 @@ const createComment = async ({
   profile,
   threadId,
   unescapedText,
+  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(profile.address, {
@@ -62,7 +63,9 @@ const useCreateCommentMutation = ({
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
+    // @ts-expect-error StrictNullChecks
     communityId,
+    // @ts-expect-error StrictNullChecks
     threadId,
   });
 
@@ -78,10 +81,12 @@ const useCreateCommentMutation = ({
       queryClient.setQueryData(key, () => {
         return [...comments, newComment];
       });
+      // @ts-expect-error StrictNullChecks
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
       updateThreadInAllCaches(
+        // @ts-expect-error StrictNullChecks
         communityId,
         threadId,
         { recentComments: [newComment] },
@@ -92,6 +97,7 @@ const useCreateCommentMutation = ({
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
+          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

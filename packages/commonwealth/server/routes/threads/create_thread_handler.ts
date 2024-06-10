@@ -41,8 +41,11 @@ export const createThreadHandler = async (
   } = req.body;
 
   const threadFields: CreateThreadOptions = {
+    // @ts-expect-error <StrictNullChecks>
     user,
+    // @ts-expect-error <StrictNullChecks>
     address,
+    // @ts-expect-error <StrictNullChecks>
     community,
     title,
     body,
@@ -69,9 +72,12 @@ export const createThreadHandler = async (
           'polkadot'
             ? addressSwapper({
                 currentPrefix: 42,
+                // @ts-expect-error <StrictNullChecks>
                 address: address.address,
               })
-            : address.address,
+            : // @ts-expect-error <StrictNullChecks>
+              address.address,
+        // @ts-expect-error <StrictNullChecks>
         community: community.id,
         topic: topicId ? parseInt(topicId, 10) : null,
       });

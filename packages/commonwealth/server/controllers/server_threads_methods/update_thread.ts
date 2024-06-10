@@ -129,6 +129,7 @@ export async function __updateThread(
     .map((addr) => addr.id);
   const roles = await findAllRoles(
     this.models,
+    // @ts-expect-error StrictNullChecks
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
     thread.community_id,
     ['moderator', 'admin'],
@@ -164,6 +165,7 @@ export async function __updateThread(
   };
 
   const { latestVersion, versionHistory } = addVersionHistory(
+    // @ts-expect-error StrictNullChecks
     thread.version_history,
     body,
     address,
@@ -175,6 +177,7 @@ export async function __updateThread(
   const community = await this.models.Community.findByPk(thread.community_id);
 
   const previousDraftMentions = parseUserMentions(latestVersion);
+  // @ts-expect-error StrictNullChecks
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
@@ -187,6 +190,7 @@ export async function __updateThread(
     const toUpdate: Partial<ThreadAttributes> = {};
 
     await setThreadAttributes(
+      // @ts-expect-error StrictNullChecks
       permissions,
       thread,
       {
@@ -199,15 +203,20 @@ export async function __updateThread(
       toUpdate,
     );
 
+    // @ts-expect-error StrictNullChecks
     await setThreadPinned(permissions, pinned, toUpdate);
 
+    // @ts-expect-error StrictNullChecks
     await setThreadSpam(permissions, spam, toUpdate);
 
+    // @ts-expect-error StrictNullChecks
     await setThreadLocked(permissions, locked, toUpdate);
 
+    // @ts-expect-error StrictNullChecks
     await setThreadArchived(permissions, archived, toUpdate);
 
     await setThreadStage(
+      // @ts-expect-error StrictNullChecks
       permissions,
       stage,
       community,
@@ -216,6 +225,7 @@ export async function __updateThread(
     );
 
     await setThreadTopic(
+      // @ts-expect-error StrictNullChecks
       permissions,
       community,
       topicId,
@@ -245,6 +255,7 @@ export async function __updateThread(
     }
 
     await updateThreadCollaborators(
+      // @ts-expect-error StrictNullChecks
       permissions,
       thread,
       collaborators,
@@ -253,9 +264,12 @@ export async function __updateThread(
     );
 
     await emitMentions(this.models, transaction, {
+      // @ts-expect-error StrictNullChecks
       authorAddressId: address.id,
+      // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
+      // @ts-expect-error StrictNullChecks
       authorProfileId: address.profile_id,
       mentions: mentionedAddresses,
       thread,
@@ -395,11 +409,16 @@ export async function __updateThread(
       categoryId: NotificationCategories.ThreadEdit,
       data: {
         created_at: now,
+        // @ts-expect-error StrictNullChecks
         thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
+        // @ts-expect-error StrictNullChecks
         root_title: finalThread.title,
+        // @ts-expect-error StrictNullChecks
         community_id: finalThread.community_id,
+        // @ts-expect-error StrictNullChecks
         author_address: finalThread.Address.address,
+        // @ts-expect-error StrictNullChecks
         author_community_id: finalThread.Address.community_id,
       },
     },
@@ -411,6 +430,7 @@ export async function __updateThread(
   );
 
   const updatedThreadWithComments = {
+    // @ts-expect-error StrictNullChecks
     ...finalThread.toJSON(),
   } as ThreadAttributes & {
     Comments?: CommentAttributes[];
@@ -648,16 +668,22 @@ async function setThreadStage(
     try {
       const communityStages = community.custom_stages;
       if (Array.isArray(communityStages)) {
+        // @ts-expect-error StrictNullChecks
         customStages = Array.from(communityStages)
           .map((s) => s.toString())
           .filter((s) => s);
       }
       if (customStages.length === 0) {
         customStages = [
+          // @ts-expect-error StrictNullChecks
           'discussion',
+          // @ts-expect-error StrictNullChecks
           'proposal_in_review',
+          // @ts-expect-error StrictNullChecks
           'voting',
+          // @ts-expect-error StrictNullChecks
           'passed',
+          // @ts-expect-error StrictNullChecks
           'failed',
         ];
       }
@@ -666,6 +692,7 @@ async function setThreadStage(
     }
 
     // validate stage
+    // @ts-expect-error StrictNullChecks
     if (!customStages.includes(stage)) {
       throw new AppError(Errors.InvalidStage);
     }
@@ -757,6 +784,7 @@ async function updateThreadCollaborators(
       await Promise.all(
         collaboratorAddresses.map(async (address) => {
           return models.Collaboration.findOrCreate({
+            // @ts-expect-error StrictNullChecks
             where: {
               thread_id: thread.id,
               address_id: address.id,
@@ -770,6 +798,7 @@ async function updateThreadCollaborators(
     // remove collaborators
     if (toRemoveUnique.length > 0) {
       await models.Collaboration.destroy({
+        // @ts-expect-error StrictNullChecks
         where: {
           thread_id: thread.id,
           address_id: {

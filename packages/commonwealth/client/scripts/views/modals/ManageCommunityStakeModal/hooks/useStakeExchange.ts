@@ -35,24 +35,29 @@ const useStakeExchange = ({
       chainRpc,
       walletAddress: address,
       apiEnabled: !!address,
+      // @ts-expect-error StrictNullChecks
       ethChainId,
     });
 
   const { data: buyPriceData } = useGetBuyPriceQuery({
+    // @ts-expect-error StrictNullChecks
     namespace: activeCommunityNamespace,
     stakeId: commonProtocol.STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy' && !!address,
     chainRpc,
+    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 
   const { data: sellPriceData } = useGetSellPriceQuery({
+    // @ts-expect-error StrictNullChecks
     namespace: activeCommunityNamespace,
     stakeId: commonProtocol.STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'sell',
     chainRpc,
+    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 

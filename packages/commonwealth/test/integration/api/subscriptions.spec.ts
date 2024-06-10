@@ -49,6 +49,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
+      // @ts-expect-error StrictNullChecks
       topicId: topic.id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
@@ -800,6 +801,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body).to.not.be.null;
@@ -810,6 +812,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body.status).to.be.equal('Success');
@@ -822,6 +825,7 @@ describe('Subscriptions Tests', () => {
         NotificationCategories.ChainEvent,
       ]) {
         subscriptions.push(
+          // @ts-expect-error StrictNullChecks
           server.seeder.createSubscription({
             jwt: jwtToken,
             is_active: true,
@@ -831,6 +835,7 @@ describe('Subscriptions Tests', () => {
         );
       }
       const subscriptionIds = (await Promise.all(subscriptions)).map(
+        // @ts-expect-error StrictNullChecks
         (s) => s.id,
       );
       let res = await chai
@@ -955,6 +960,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body).to.not.be.null;
@@ -965,6 +971,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body.status).to.be.equal('Success');

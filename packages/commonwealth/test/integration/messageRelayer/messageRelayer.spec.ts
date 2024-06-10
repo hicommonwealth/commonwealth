@@ -63,6 +63,7 @@ describe('messageRelayer', () => {
     });
     expect(numUnrelayedEvents).to.equal(0);
     expect(events.length).to.equal(3);
+    // @ts-expect-error StrictNullChecks
     await models.Outbox.create(testOutboxEvents);
     await delay(1000);
     events = await models.Outbox.findAll({

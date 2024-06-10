@@ -51,7 +51,9 @@ const useCreateCommentReactionMutation = ({
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
+    // @ts-expect-error StrictNullChecks
     communityId,
+    // @ts-expect-error StrictNullChecks
     threadId,
   });
 
@@ -80,6 +82,7 @@ const useCreateCommentReactionMutation = ({
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
         markTrainingActionAsComplete(
           UserTrainingCardTypes.GiveUpvote,
+          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

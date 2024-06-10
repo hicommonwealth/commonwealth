@@ -108,6 +108,7 @@ export async function __createCommunity(
 
   // TODO: refactor this to use existing nodes rather than always creating one
 
+  // @ts-expect-error StrictNullChecks
   let eth_chain_id: number = null;
   let cosmos_chain_id: string | null = null;
   let url = community.node_url;
@@ -131,6 +132,7 @@ export async function __createCommunity(
     community.type !== ChainType.Offchain
   ) {
     // Warning: this looks like input validation
+    // @ts-expect-error StrictNullChecks
     if (!Web3.utils.isAddress(community.address)) {
       throw new AppError(Errors.InvalidAddress);
     }
@@ -162,6 +164,7 @@ export async function __createCommunity(
         : new Web3.providers.WebsocketProvider(node_url);
 
     const web3 = new Web3(provider);
+    // @ts-expect-error StrictNullChecks
     const code = await web3.eth.getCode(community.address);
     if (provider instanceof Web3.providers.WebsocketProvider)
       provider.disconnect(1000, 'finished');
@@ -176,6 +179,7 @@ export async function __createCommunity(
   ) {
     let pubKey: solw3.PublicKey;
     try {
+      // @ts-expect-error StrictNullChecks
       pubKey = new solw3.PublicKey(community.address);
     } catch (e) {
       throw new AppError(Errors.InvalidAddress);
@@ -333,9 +337,11 @@ export async function __createCommunity(
     defaults: {
       url,
       eth_chain_id,
+      // @ts-expect-error StrictNullChecks
       cosmos_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
+      // @ts-expect-error StrictNullChecks
       balance_type:
         base === ChainBase.CosmosSDK
           ? BalanceType.Cosmos
@@ -366,15 +372,18 @@ export async function __createCommunity(
     id,
     name,
     default_symbol,
+    // @ts-expect-error StrictNullChecks
     icon_url,
     description,
     network: network as ChainNetwork,
     type,
+    // @ts-expect-error StrictNullChecks
     social_links: uniqueLinksArray,
     base,
     bech32_prefix,
     active: true,
     substrate_spec: sanitizedSpec || '',
+    // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
@@ -387,6 +396,7 @@ export async function __createCommunity(
 
   // Warning: looks like state mutations start here, make sure we are using the same transaction
   await this.models.Topic.create({
+    // @ts-expect-error StrictNullChecks
     community_id: createdCommunity.id,
     name: 'General',
     featured_in_sidebar: true,
@@ -398,11 +408,13 @@ export async function __createCommunity(
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (user_address) {
+    // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
       'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
+        // @ts-expect-error StrictNullChecks
         address: selectedUserAddress,
       },
       include: [
@@ -414,6 +426,7 @@ export async function __createCommunity(
       ],
     });
   } else if (createdCommunity.base === ChainBase.Ethereum) {
+    // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
       'withPrivateData',
     ).findOne({
@@ -432,6 +445,7 @@ export async function __createCommunity(
       ],
     });
   } else if (createdCommunity.base === ChainBase.NEAR) {
+    // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
       'withPrivateData',
     ).findOne({
@@ -450,6 +464,7 @@ export async function __createCommunity(
       ],
     });
   } else if (createdCommunity.base === ChainBase.Solana) {
+    // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
       'withPrivateData',
     ).findOne({
@@ -475,6 +490,7 @@ export async function __createCommunity(
     community.type === ChainType.Offchain
   ) {
     // if signed in with Keplr or Magic:
+    // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
       'withPrivateData',
     ).findOne({
@@ -500,6 +516,7 @@ export async function __createCommunity(
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
+      // @ts-expect-error StrictNullChecks
       community_id: createdCommunity.id,
       hex,
       verification_token: addressToBeAdmin.verification_token,
@@ -513,6 +530,7 @@ export async function __createCommunity(
     });
 
     role = new RoleInstanceWithPermission(
+      // @ts-expect-error StrictNullChecks
       { community_role_id: 0, address_id: newAddress.id },
       createdCommunity.id,
       'admin',
@@ -533,7 +551,9 @@ export async function __createCommunity(
   return {
     community: createdCommunity.toJSON(),
     node: nodeJSON,
+    // @ts-expect-error StrictNullChecks
     role: role?.toJSON(),
+    // @ts-expect-error StrictNullChecks
     admin_address: addressToBeAdmin?.address,
   };
 }

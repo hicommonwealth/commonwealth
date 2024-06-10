@@ -167,6 +167,7 @@ describe('chainEventCreated Event Handler', () => {
           community_id: community!.id,
           transaction_type: 'minted',
           community_name: community!.name,
+          // @ts-expect-error StrictNullChecks
           community_stakes_url: getCommunityUrl(community!.id),
         },
       });
@@ -272,6 +273,7 @@ describe('chainEventCreated Event Handler', () => {
           community_id: community!.id,
           community_name: community!.name,
           proposal_kind: 'proposal-created',
+          // @ts-expect-error StrictNullChecks
           proposal_url: getChainProposalUrl(community!.id, proposalId),
         },
       });

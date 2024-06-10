@@ -21,6 +21,7 @@ describe('recomputeCounts', () => {
 
   async function calcAllCountsFromSourceTables() {
     const retCommentCounts = (await server.models.Comment.count({
+      // @ts-expect-error StrictNullChecks
       where: {
         deleted_at: null,
       },
@@ -33,6 +34,7 @@ describe('recomputeCounts', () => {
     }
 
     const retThreadReactionCounts = (await server.models.Reaction.count({
+      // @ts-expect-error StrictNullChecks
       where: {
         thread_id: {
           [Op.not]: null,
@@ -47,6 +49,7 @@ describe('recomputeCounts', () => {
     }
 
     const retCommentReactionCounts = (await server.models.Reaction.count({
+      // @ts-expect-error StrictNullChecks
       where: {
         comment_id: {
           [Op.not]: null,
@@ -97,10 +100,12 @@ describe('recomputeCounts', () => {
     const commentReactionCounts = {};
     for (const thread of threads) {
       if (thread.comment_count) {
+        // @ts-expect-error StrictNullChecks
         commentCounts[thread.id] = thread.comment_count;
       }
 
       if (thread.reaction_count) {
+        // @ts-expect-error StrictNullChecks
         threadReactionCounts[thread.id] = thread.reaction_count;
       }
 
@@ -114,6 +119,7 @@ describe('recomputeCounts', () => {
     const comments = await server.models.Comment.findAll();
     for (const comment of comments) {
       if (!comment.reaction_count) continue;
+      // @ts-expect-error StrictNullChecks
       commentReactionCounts[comment.id] = comment.reaction_count;
     }
 
@@ -130,6 +136,7 @@ describe('recomputeCounts', () => {
     commentId: number,
   ) {
     const commentCount = await server.models.Comment.count({
+      // @ts-expect-error StrictNullChecks
       where: {
         thread_id: threadId,
         deleted_at: null,
@@ -190,9 +197,13 @@ describe('recomputeCounts', () => {
     });
 
     return {
+      // @ts-expect-error StrictNullChecks
       commentCount: thread.comment_count,
+      // @ts-expect-error StrictNullChecks
       threadReactionCount: thread.reaction_count,
+      // @ts-expect-error StrictNullChecks
       commentReactionCount: comment.reaction_count,
+      // @ts-expect-error StrictNullChecks
       notification_id: thread.max_notif_id,
     };
   }
@@ -260,6 +271,7 @@ describe('recomputeCounts', () => {
 
   async function verifyRecomputeCountSingle() {
     const before = await getCounts(
+      // @ts-expect-error StrictNullChecks
       server.e2eTestEntities.testThreads[0].id,
       server.e2eTestEntities.testComments[0].id,
     );
@@ -268,6 +280,7 @@ describe('recomputeCounts', () => {
     );
     await recomputeCounts();
     const after = await getCounts(
+      // @ts-expect-error StrictNullChecks
       server.e2eTestEntities.testThreads[0].id,
       server.e2eTestEntities.testComments[0].id,
     );
@@ -332,6 +345,7 @@ describe('recomputeCounts', () => {
   describe('comment count should be correct on recompute count', () => {
     it('add comment using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -340,6 +354,7 @@ describe('recomputeCounts', () => {
       );
       await createCommentRaw();
       before = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -351,6 +366,7 @@ describe('recomputeCounts', () => {
       );
       await recomputeCounts();
       const after = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -364,6 +380,7 @@ describe('recomputeCounts', () => {
   describe('reaction count should be correct on recompute count', () => {
     it('add reaction to thread using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -372,6 +389,7 @@ describe('recomputeCounts', () => {
       );
       await createThreadReactionRaw();
       before = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -385,6 +403,7 @@ describe('recomputeCounts', () => {
       );
       await recomputeCounts();
       const after = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -396,6 +415,7 @@ describe('recomputeCounts', () => {
 
     it('add reaction to comment using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -404,6 +424,7 @@ describe('recomputeCounts', () => {
       );
       await createCommentReactionRaw();
       before = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -417,6 +438,7 @@ describe('recomputeCounts', () => {
       );
       await recomputeCounts();
       const after = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -430,6 +452,7 @@ describe('recomputeCounts', () => {
   describe('notification should be correct on recompute count', () => {
     it('add comment from api, notification id is incremented', async () => {
       const before = await getCounts(
+        // @ts-expect-error <StrictNullChecks>
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -448,6 +471,7 @@ describe('recomputeCounts', () => {
       expect(cRes.error).not.to.be.null;
 
       const after = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -459,6 +483,7 @@ describe('recomputeCounts', () => {
 
     it('add reaction to thread from api, notification id is unchanged', async () => {
       const before = await getCounts(
+        // @ts-expect-error <StrictNullChecks>
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -468,6 +493,7 @@ describe('recomputeCounts', () => {
         address: testVerifiedChainAddress.address,
         jwt: testJwtToken,
         reaction: 'like',
+        // @ts-expect-error StrictNullChecks
         thread_id: server.e2eTestEntities.testThreads[0].id,
         author_chain: chain,
         session: testVerifiedChainAddress.session,
@@ -478,6 +504,7 @@ describe('recomputeCounts', () => {
       expect(cRes.error).not.to.be.null;
 
       const after = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -489,6 +516,7 @@ describe('recomputeCounts', () => {
 
     it('add reaction to comment from api, notification id is unchanged', async () => {
       const before = await getCounts(
+        // @ts-expect-error <StrictNullChecks>
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
@@ -508,6 +536,7 @@ describe('recomputeCounts', () => {
       expect(cRes.error).not.to.be.null;
 
       const after = await getCounts(
+        // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );

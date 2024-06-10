@@ -1,12 +1,12 @@
+import { notifyError } from 'controllers/app/notifications';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
-import { notifyError } from 'controllers/app/notifications';
 
 export const checkNewThreadErrors = (
   { threadTitle, threadKind, threadTopic, threadUrl }: NewThreadFormType,
   bodyText?: string,
-  hasTopics?: boolean
+  hasTopics?: boolean,
 ) => {
   if (!threadTitle) {
     return notifyError(NewThreadErrors.NoTitle);
@@ -16,6 +16,7 @@ export const checkNewThreadErrors = (
     return notifyError(NewThreadErrors.NoTopic);
   }
 
+  // @ts-expect-error StrictNullChecks
   if (threadKind === ThreadKind.Discussion && !bodyText.length) {
     return notifyError(NewThreadErrors.NoBody);
   } else if (threadKind === ThreadKind.Link && !threadUrl) {

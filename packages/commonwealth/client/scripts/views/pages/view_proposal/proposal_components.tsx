@@ -36,6 +36,7 @@ export const AaveCancelButton = (props: AaveCancelButtonProps) => {
       buttonType="destructive"
       disabled={!proposal.isCancellable || votingModalOpen}
       onClick={(e) =>
+        // @ts-expect-error <StrictNullChecks/>
         cancelProposal(e, toggleVotingModal, proposal, onModalClose)
       }
       label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
@@ -55,6 +56,7 @@ export const CompoundCancelButton = (props: CompoundCancelButtonProps) => {
       buttonType="destructive"
       disabled={proposal.completed || votingModalOpen}
       onClick={(e) =>
+        // @ts-expect-error <StrictNullChecks/>
         cancelProposal(e, toggleVotingModal, proposal, onModalClose)
       }
       label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
@@ -72,6 +74,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
   const forceRerender = useForceRerender();
   const [linkedThreads, setLinkedThreads] =
+    // @ts-expect-error <StrictNullChecks/>
     useState<{ id: number; title: string }[]>(null);
 
   useEffect(() => {

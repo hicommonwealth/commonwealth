@@ -48,10 +48,12 @@ const verifySessionSignature = async (
 
   if (isValid && user_id === null) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user
+    // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     if (!addressModel.user_id) {
       const existingAddress = await models.Address.findOne({
+        // @ts-expect-error StrictNullChecks
         where: {
           address: addressModel.address,
           user_id: { [Sequelize.Op.ne]: null },
@@ -61,16 +63,20 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
+        // @ts-expect-error StrictNullChecks
         const user = await models.User.createWithProfile({
           email: null,
         });
+        // @ts-expect-error StrictNullChecks
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
         await models.Subscription.create({
+          // @ts-expect-error StrictNullChecks
           subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
           is_active: true,
         });
         await models.Subscription.create({
+          // @ts-expect-error StrictNullChecks
           subscriber_id: user.id,
           category_id: NotificationCategories.NewCollaboration,
           is_active: true,
@@ -80,10 +86,12 @@ const verifySessionSignature = async (
     }
   } else if (isValid) {
     // mark the address as verified
+    // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
     addressModel.user_id = user_id;
     const profile = await models.Profile.findOne({ where: { user_id } });
+    // @ts-expect-error StrictNullChecks
     addressModel.profile_id = profile.id;
   }
   await addressModel.save();

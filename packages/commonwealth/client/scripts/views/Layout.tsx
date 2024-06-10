@@ -42,14 +42,18 @@ const LayoutComponent = ({
   // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     const redirectTo = app.config.redirects[selectedScope];
+    // @ts-expect-error <StrictNullChecks/>
     if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
+      // @ts-expect-error <StrictNullChecks/>
       const path = window.location.href.split(selectedScope);
       navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;
     }
   }, [selectedScope]);
 
+  // @ts-expect-error <StrictNullChecks/>
   const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
 
   // If the navigated-to community scope differs from the active chain id at render time,
@@ -82,6 +86,7 @@ const LayoutComponent = ({
       if (shouldDeInitChain) {
         setIsLoading(true);
         await deinitChainOrCommunity();
+        // @ts-expect-error <StrictNullChecks/>
         setScopeToLoad(null);
         setIsLoading(false);
       }
