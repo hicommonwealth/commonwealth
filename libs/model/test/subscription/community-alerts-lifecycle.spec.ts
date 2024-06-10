@@ -63,13 +63,12 @@ describe('Community alerts lifecycle', () => {
   });
 
   it('should delete a single community alert via id', async () => {
-    const [alert] = await seed('CommunityAlert', {
+    await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,
     });
     const payload = {
       community_ids: [community!.id!],
-      ids: [alert!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
@@ -79,17 +78,16 @@ describe('Community alerts lifecycle', () => {
   });
 
   it('should delete multiple community alerts via ids', async () => {
-    const [alertOne] = await seed('CommunityAlert', {
+    await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: community!.id!,
     });
-    const [alertTwo] = await seed('CommunityAlert', {
+    await seed('CommunityAlert', {
       user_id: actor.user.id,
       community_id: communityTwo!.id!,
     });
     const payload = {
       community_ids: [community!.id!, communityTwo!.id!],
-      ids: [alertOne!.id!, alertTwo!.id!],
     };
     const res = await command(DeleteCommunityAlerts(), {
       payload,
