@@ -31,7 +31,7 @@ class LeapWebWalletController extends KeplrLikeWebWalletController {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix,
+      bech32Prefix: app.chain?.meta.bech32Prefix || 'osmo',
       signer: {
         type: 'arbitrary',
         signArbitrary: (msg) =>
@@ -42,7 +42,7 @@ class LeapWebWalletController extends KeplrLikeWebWalletController {
             msg,
           ),
         getAddress: () => this.accounts[0].address,
-        getChainId: () => this.getChainId(),
+        getChainId: () => this.getChainId() || 'osmosis-1',
       },
     });
   }
