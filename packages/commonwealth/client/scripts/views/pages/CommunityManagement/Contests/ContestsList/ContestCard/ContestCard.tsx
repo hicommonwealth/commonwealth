@@ -5,6 +5,7 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -110,7 +111,11 @@ const ContestCard = ({
       <div className="contest-body">
         <div className="header-row">
           <CWText type="h3">{name}</CWText>
-          <ContestCountdown finishTime={finishDate} isActive={isActive} />
+          {finishDate ? (
+            <ContestCountdown finishTime={finishDate} isActive={isActive} />
+          ) : (
+            <Skeleton width="70px" />
+          )}
         </div>
         <CWText className="topics">
           Topics: {topics.map(({ name: topicName }) => topicName).join(', ')}
