@@ -284,7 +284,7 @@ export const CommentCard = ({
                 >
                   <CWTooltip
                     placement="top"
-                    content={'Signed by author'}
+                    content="Signed by author"
                     renderTrigger={(handleInteraction) => (
                       <span
                         onMouseEnter={handleInteraction}
