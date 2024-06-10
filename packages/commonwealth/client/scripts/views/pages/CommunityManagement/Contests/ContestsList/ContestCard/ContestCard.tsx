@@ -11,6 +11,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import ContestCountdown from '../ContestCountdown';
@@ -30,6 +31,8 @@ interface ContestCardProps {
     prize?: string;
     tickerPrize?: number;
   }[];
+  decimals?: number;
+  ticker?: string;
   isAdmin: boolean;
   isActive: boolean;
   onFund: () => void;
@@ -42,6 +45,8 @@ const ContestCard = ({
   finishDate,
   topics,
   score,
+  decimals,
+  ticker,
   isAdmin,
   isActive,
   onFund,
@@ -119,7 +124,9 @@ const ContestCard = ({
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{s.tickerPrize} ETH</CWText>
+              <CWText fontWeight="bold">
+                {capDecimals(s.tickerPrize!.toFixed(decimals))} {ticker}
+              </CWText>
             </div>
           ))}
         </div>

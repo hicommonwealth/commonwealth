@@ -97,6 +97,8 @@ const ContestsList = ({
                 topics={contest.topics}
                 // @ts-expect-error <StrictNullChecks/>
                 score={score}
+                decimals={contest.decimals}
+                ticker={contest.ticker}
                 finishDate={moment(end_time).toISOString()}
                 isActive={!contest.cancelled && !hasEnded}
                 // @ts-expect-error <StrictNullChecks/>
