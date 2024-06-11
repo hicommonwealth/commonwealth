@@ -36,8 +36,7 @@ const compoundVotingPeriodBlocks = 19710;
 
 /*
  * The main objective of these tests is to ensure log processing logic works
- * as expected irrespective of the underlying event type. Most of the tests
- * are interdependent therefore mocha should exit on the first failure.
+ * as expected irrespective of the underlying event type.
  */
 describe('EVM Chain Events Log Processing Tests', () => {
   let propCreatedResult: { block: number; proposalId: string },

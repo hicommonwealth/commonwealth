@@ -6,7 +6,6 @@ static
 *.env
 *node_modules
 libs/chains/src/cosmos-ts
-*.mocharc.json
 *.nycrc
 *.stylelintrc
 *.md
