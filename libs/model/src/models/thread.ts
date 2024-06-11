@@ -13,7 +13,7 @@ import type { ModelInstance } from './types';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
-  version_history_updated: boolean;
+  version_history_updated?: boolean;
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;

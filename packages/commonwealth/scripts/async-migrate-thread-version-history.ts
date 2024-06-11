@@ -1,9 +1,9 @@
 //TODO: This should be deleted after thread version histories are fixed
-import { models } from '@hicommonwealth/model';
+import { models, ThreadVersionHistoryAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
 async function run() {
-  const { count: threadCount } = (
+  const threadCount = (
     await models.sequelize.query(
       `SELECT COUNT(*) FROM "Threads" WHERE version_history_updated = false`,
       {
@@ -13,7 +13,7 @@ async function run() {
     )
   )[0];
 
-  const count = parseInt(threadCount);
+  const count = parseInt(threadCount['count']);
   let i = 0;
   while (i < count) {
     try {
@@ -30,9 +30,9 @@ async function run() {
           },
         )
       ).map((c) => ({
-        id: parseInt(c.id),
-        addressId: parseInt(c.address_id),
-        versionHistories: c.version_history.map((v) => JSON.parse(v)),
+        id: parseInt(c['id']),
+        addressId: parseInt(c['address_id']),
+        versionHistories: c['version_history'].map((v) => JSON.parse(v)),
       }));
 
       if (threadVersionHistory.length === 0) {
@@ -44,7 +44,7 @@ async function run() {
           `${i}/${count} Updating thread version_histories for id ${versionHistory.id}`,
         );
 
-        const formattedValues = await Promise.all(
+        const formattedValues = (await Promise.all(
           versionHistory.versionHistories.map(async (v) => {
             const { author, ...rest } = v;
             let address = author?.['address'];
@@ -69,7 +69,7 @@ async function run() {
               );
 
               if (result.length > 0) {
-                address = result[0].address;
+                address = result[0]['address'];
               }
             }
 
@@ -79,7 +79,7 @@ async function run() {
               address,
             };
           }),
-        );
+        )) as unknown as ThreadVersionHistoryAttributes[];
 
         await models.sequelize.transaction(async (transaction) => {
           await models.sequelize.query(

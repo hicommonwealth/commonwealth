@@ -1,9 +1,9 @@
 //TODO: This should be deleted after comment version histories are fixed
-import { models } from '@hicommonwealth/model';
+import { CommentVersionHistoryInstance, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
 async function run() {
-  const { count: commentCount } = (
+  const commentCount = (
     await models.sequelize.query(
       `SELECT COUNT(*) FROM "Comments" WHERE version_history_updated = false`,
       {
@@ -13,7 +13,7 @@ async function run() {
     )
   )[0];
 
-  const count = parseInt(commentCount);
+  const count = parseInt(commentCount['count']);
   let i = 0;
   while (i < count) {
     try {
@@ -29,8 +29,8 @@ async function run() {
           },
         )
       ).map((c) => ({
-        id: parseInt(c.id),
-        versionHistories: c.version_history.map((v) => JSON.parse(v)),
+        id: parseInt(c['id']),
+        versionHistories: c['version_history'].map((v) => JSON.parse(v)),
       }));
 
       if (commentVersionHistory.length === 0) {
@@ -49,7 +49,7 @@ async function run() {
             ...rest,
             text: body,
           };
-        });
+        }) as unknown as CommentVersionHistoryInstance[];
 
         await models.sequelize.transaction(async (transaction) => {
           await models.sequelize.query(

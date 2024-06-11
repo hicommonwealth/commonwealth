@@ -33,7 +33,7 @@ export type CommentAttributes = {
   deleted_at?: Date;
   marked_as_spam_at?: Date;
   discord_meta?: IDiscordMeta;
-  version_history_updated: boolean;
+  version_history_updated?: boolean;
 
   // associations
   Community?: CommunityAttributes;
