@@ -1,9 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
+import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
+
+let nonceMutex = new Mutex();
 
 export type AddContentResponse = {
   txReceipt: any;
@@ -300,19 +303,21 @@ export const addContentBatch = async (
   creator: string,
   url: string,
 ): Promise<Promise<AddContentResponse>[]> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
-  let currNonce = Number(
-    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-  );
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+    );
 
-  const promises: Promise<AddContentResponse>[] = [];
+    const promises: Promise<AddContentResponse>[] = [];
 
-  contest.forEach((c) => {
-    promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
-    currNonce++;
+    contest.forEach((c) => {
+      promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+      currNonce++;
+    });
+
+    return promises;
   });
-
-  return promises;
 };
 
 export const voteContentBatch = async (
@@ -321,19 +326,21 @@ export const voteContentBatch = async (
   voter: string,
   contentId: string,
 ): Promise<Promise<any>[]> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
-  let currNonce = Number(
-    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-  );
-
-  const promises: Promise<any>[] = [];
-
-  contest.forEach((c) => {
-    promises.push(
-      voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
     );
-    currNonce++;
-  });
 
-  return promises;
+    const promises: Promise<any>[] = [];
+
+    contest.forEach((c) => {
+      promises.push(
+        voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+      );
+      currNonce++;
+    });
+
+    return promises;
+  });
 };
