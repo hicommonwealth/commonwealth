@@ -34,7 +34,7 @@ async function createTestProposal(rpcUrl: string, content: Any) {
   expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 }
 
-describe.only('Cosmos Governance Notification Generator with real proposals', () => {
+describe('Cosmos Governance Notification Generator with real proposals', () => {
   let models: DB;
 
   async function enableCommunities(communities: string[]) {
@@ -96,7 +96,7 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
 
   describe('v1 proposals', () => {
     // eslint-disable-next-line max-len
-    test.only('should generate a single cosmos gov v1 notification when there are no existing notifications', async () => {
+    test('should generate a single cosmos gov v1 notification when there are no existing notifications', async () => {
       await generateCosmosGovNotifications();
       const notifications = await models.Notification.findAll({
         where: {

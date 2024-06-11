@@ -10,7 +10,7 @@ import {
 } from '../../../server/workers/messageRelayer/relayForever';
 import { testOutboxEvents } from './util';
 
-describe.only('messageRelayer', { timeout: 20_000 }, () => {
+describe('messageRelayer', { timeout: 20_000 }, () => {
   let models: DB;
 
   beforeAll(async () => {
@@ -23,7 +23,7 @@ describe.only('messageRelayer', { timeout: 20_000 }, () => {
     await models.Outbox.truncate();
   });
 
-  test.only('should correctly increment number of unrelayed events on startup', async () => {
+  test('should correctly increment number of unrelayed events on startup', async () => {
     await models.Outbox.bulkCreate([
       {
         event_name: EventNames.ChainEventCreated,
