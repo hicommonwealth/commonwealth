@@ -2,13 +2,13 @@
 
 Contests is a new feature, based on contest contracts, available for communities on Common. This document outlines the implementation of Contests on our platform.
 
-A contest contract is an on-chain, repeating game which receives (1) content submissions (2) votes on submitted content. It then determines the winning content based on relative voting power applied.
+A contest contract is an on-chain, repeating game which receives content submissions and votes on submitted content. It then determines the winning content based on relative voting power applied.
 
 Common Contests are an application of contest contracts using Common content. Winners receive a token-denominated prize from a community-designated pool.
 
 ## Basic Rules
 
-Each community may have only one contest running. Contests continue to run even if the prize pool is empty, but no payments will be made to winners in such cases.
+Each community may have at most one contest running. Contests continue to run even if the prize pool is empty, but no payments will be made to winners in such cases.
 
 Admins cannot interfere with the content submission and voting processes. To be able to change constructor variables, admins must deploy a new contest contract with their new desired variables.
 
@@ -24,7 +24,7 @@ Contest project will be able to utilize both ETH and ERC20 tokens. As of 240506,
 
 ### Contest Pool and Prizes
 
-Common content that receives the most votes will be rewarded with the weekly contest prize.
+Common content that receives the most votes will be rewarded with the contest prize.
 
 Prizes will be distributed based on the following variables:
 
