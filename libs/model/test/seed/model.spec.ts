@@ -16,7 +16,7 @@ const generateSchemas = async () => {
 
   // TODO: resolve remaining conflicts!!!
   const model_schema = await get_info_schema(model.sequelize, {
-    ignore_columns: {},
+    ignore_columns: { GroupPermissions: ['allowed_actions'] },
     ignore_constraints: {
       // Removed in production for performance reasons
       Comments: [
@@ -54,6 +54,7 @@ const generateSchemas = async () => {
       Profiles: ['bio_backup', 'profile_name_backup'],
       Threads: ['body_backup', '_search'],
       Topics: ['default_offchain_template_backup'],
+      GroupPermissions: ['allowed_actions'],
     },
     ignore_constraints: {},
   });

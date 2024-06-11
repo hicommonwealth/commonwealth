@@ -15,4 +15,5 @@ export const trpcRouter = trpc.router({
     Contest.CancelContestManagerMetadata,
     trpc.Tag.Community,
   ),
+  getContestLog: trpc.query(Contest.GetContestLog),
 });
