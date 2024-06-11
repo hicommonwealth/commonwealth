@@ -135,7 +135,6 @@ import { ServerTopicsController } from '../controllers/server_topics_controller'
 
 import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
 import { ServerTagsController } from 'server/controllers/server_tags_controller';
-import { ServerWalletController } from 'server/controllers/server_wallet_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
@@ -199,7 +198,6 @@ export type ServerControllers = {
   topics: ServerTopicsController;
   admin: ServerAdminController;
   tags: ServerTagsController;
-  wallet: ServerWalletController;
 };
 
 function setupRouter(
@@ -230,7 +228,6 @@ function setupRouter(
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
     tags: new ServerTagsController(models, banCache), // TOOD: maybe remove banCache?
-    wallet: new ServerWalletController(models, banCache),
   };
 
   // ---
