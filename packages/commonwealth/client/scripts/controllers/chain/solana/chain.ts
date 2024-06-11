@@ -72,15 +72,18 @@ export default class SolanaChain
     return new SolanaToken(this.denom, n, inDollars, this._decimals);
   }
 
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   public createTXModalData(
+    // eslint-disable @typescript-eslint/no-unused-vars
     author: SolanaAccount,
+    // eslint-disable @typescript-eslint/no-unused-vars
     txFunc,
+    // eslint-disable @typescript-eslint/no-unused-vars
     txName: string,
+    // eslint-disable @typescript-eslint/no-unused-vars
     objName: string,
+    // eslint-disable @typescript-eslint/no-unused-vars
     cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');
   }
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 }
