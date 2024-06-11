@@ -7,6 +7,7 @@
     "jsx": "react",
     "sourceMap": true,
     "strictNullChecks": true,
+    "noErrorTruncation": true,
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
       "*": ["./*", "shared/*", "client/scripts/*"]

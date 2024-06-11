@@ -137,7 +137,8 @@ export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
       // if we provide any authorization method we force authentication as well
       if (md.secure !== false || md.auth?.length) await authenticate(ctx.req);
       try {
-        return await core.command(
+        // TODO this might be where the problem is since command isn't typed?
+        return await core.command<Input, Output>(
           md,
           {
             id: input?.id,

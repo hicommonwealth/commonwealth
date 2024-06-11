@@ -17,11 +17,13 @@ export const GetCommunityAlerts = {
 };
 
 export const GetCommentSubscriptions = {
+  // FIXME this could ALSO be the problem and probbably is the issue...
   input: z.object({}),
   output: CommentSubscription.array(),
 };
 
 export const GetThreadSubscriptions = {
+  // FIXME: this is probably the issue with GetThreadSubscriptions...
   input: z.object({}),
   output: ThreadSubscription.array(),
 };

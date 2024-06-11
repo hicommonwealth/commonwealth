@@ -6,6 +6,7 @@ export function GetCommentSubscriptions(): Query<
   typeof schemas.GetCommentSubscriptions
 > {
   return {
+    // FIXME: it could also lose them in this spread
     ...schemas.GetCommentSubscriptions,
     auth: [],
     secure: true,

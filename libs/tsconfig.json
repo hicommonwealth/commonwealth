@@ -17,7 +17,7 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
+    "noErrorTruncation": true,
     "paths": {
       "@hicommonwealth/*": ["*/src"]
     }
