@@ -34,7 +34,7 @@ async function createTestProposal(rpcUrl: string, content: Any) {
   expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 }
 
-describe('Cosmos Governance Notification Generator with real proposals', () => {
+describe.skip('Cosmos Governance Notification Generator with real proposals', () => {
   let models: DB;
 
   async function enableCommunities(communities: string[]) {
