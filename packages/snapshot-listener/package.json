@@ -9,8 +9,7 @@
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
     "start": "tsx watch --max-old-space-size=4096 src/index.ts",
-    "test": "NODE_ENV=test vitest --config ../../vite.config.ts run test",
-    "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test"
+    "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts run test"
   },
   "engines": {
     "node": "20.x"

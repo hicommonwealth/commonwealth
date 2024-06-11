@@ -1,7 +1,4 @@
-import { Sequelize } from 'sequelize';
 import { config } from '../config';
-import { buildDb, syncDb } from '../models';
-import { verify_db } from './bootstrap';
 
 /**
  * A global database setup function for Vitest. This function is executed once before all Vitest test suites.
@@ -9,6 +6,15 @@ import { verify_db } from './bootstrap';
 export default async function setup(): Promise<void> {
   if (config.NODE_ENV !== 'test')
     throw new Error('Seeds only work when testing!');
+
+  if (!config.DB.INIT_TEST_DB) {
+    console.warn('Database not initialized');
+    return;
+  }
+
+  const { Sequelize } = await import('sequelize');
+  const { buildDb, syncDb } = await import('../models');
+  const { verify_db } = await import('./bootstrap');
 
   await verify_db(config.DB.NAME);
   try {
