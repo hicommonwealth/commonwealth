@@ -22,7 +22,9 @@ const communityStats = async (
     .map((addr) => addr.id);
   const adminRoles = await findAllRoles(
     models,
+    // @ts-expect-error StrictNullChecks
     { where: { address_id: { [Op.in]: userAddressIds } } },
+    // @ts-expect-error StrictNullChecks
     community.id,
     ['admin', 'moderator'],
   );
@@ -44,6 +46,7 @@ const communityStats = async (
       ORDER BY seq.date DESC;`,
       {
         type: QueryTypes.SELECT,
+        // @ts-expect-error StrictNullChecks
         replacements: { communityId: community.id },
       },
     );
@@ -58,6 +61,7 @@ const communityStats = async (
       `SELECT COUNT(id) AS new_items FROM ${table} WHERE community_id = :communityId;`,
       {
         type: QueryTypes.SELECT,
+        // @ts-expect-error StrictNullChecks
         replacements: { communityId: community.id },
       },
     );
@@ -87,6 +91,7 @@ ORDER BY seq.date DESC;
 `,
     {
       type: QueryTypes.SELECT,
+      // @ts-expect-error StrictNullChecks
       replacements: { communityId: community.id },
     },
   );

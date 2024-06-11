@@ -17,11 +17,13 @@ type UpdateTopicResponse = TopicAttributes;
 
 export const updateTopicHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<UpdateTopicRequestBody, null, UpdateTopicRequestParams>,
   res: TypedResponse<UpdateTopicResponse>,
 ) => {
   const {
     user,
+    // @ts-expect-error StrictNullChecks
     params: { topicId },
     body,
   } = req;
@@ -48,7 +50,9 @@ export const updateTopicHandler = async (
   }
 
   const [topic, analyticsOptions] = await controllers.topics.updateTopic({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     body: validationResult.data,
   });
 

@@ -75,16 +75,20 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
           <DeleteAddressModal
             profile={profile}
             addresses={addresses}
+            // @ts-expect-error <StrictNullChecks/>
             address={currentAddress?.address}
+            // @ts-expect-error <StrictNullChecks/>
             chain={currentAddress?.community.id}
             closeModal={() => {
               setIsRemoveModalOpen(false);
+              // @ts-expect-error <StrictNullChecks/>
               refreshProfiles(currentAddress.address);
             }}
           />
         }
         onClose={() => {
           setIsRemoveModalOpen(false);
+          // @ts-expect-error <StrictNullChecks/>
           setCurrentAddress(null);
         }}
         open={isRemoveModalOpen}

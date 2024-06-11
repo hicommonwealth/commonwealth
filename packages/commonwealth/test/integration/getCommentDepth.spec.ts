@@ -17,6 +17,7 @@ describe('getCommentDepth', () => {
     });
     const thread = await models.Thread.create({
       community_id,
+      // @ts-expect-error StrictNullChecks
       address_id: address.id,
       title: 'Testing',
       plaintext: '',
@@ -26,8 +27,11 @@ describe('getCommentDepth', () => {
     for (let i = 0; i < maxDepth; i++) {
       const result = await models.Comment.create({
         community_id,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread.id,
+        // @ts-expect-error StrictNullChecks
         parent_id: comment ? String(comment.id) : undefined,
+        // @ts-expect-error StrictNullChecks
         address_id: address.id,
         text: String(i),
       });

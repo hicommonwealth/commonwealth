@@ -55,7 +55,9 @@ export async function processChainNode(
     const currentBlock = await provider.getBlockNumber();
 
     let startBlockNum: number;
+    // @ts-expect-error StrictNullChecks
     if (lastProcessedBlock?.block_number < currentBlock) {
+      // @ts-expect-error StrictNullChecks
       startBlockNum = lastProcessedBlock?.block_number + 1;
     } else if (lastProcessedBlock?.block_number === undefined) {
       startBlockNum = currentBlock - 10;
@@ -67,7 +69,9 @@ export async function processChainNode(
 
     const allEvents: EvmEvent[] = [];
     const migratedData = await migrateEvents(evmSource, startBlockNum);
+    // @ts-expect-error StrictNullChecks
     if (migratedData?.events?.length > 0)
+      // @ts-expect-error StrictNullChecks
       allEvents.push(...migratedData.events);
 
     const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);

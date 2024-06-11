@@ -147,10 +147,12 @@ const Profile = ({ profileId }: ProfileProps) => {
                 : 'ProfilePageContainer smaller-margins'
             }
           >
+            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
+              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>
@@ -162,10 +164,12 @@ const Profile = ({ profileId }: ProfileProps) => {
       <CWPageLayout>
         <div className="Profile">
           <div className="ProfilePageContainer">
+            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
+              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>

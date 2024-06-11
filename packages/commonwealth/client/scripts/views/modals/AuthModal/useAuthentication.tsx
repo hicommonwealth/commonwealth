@@ -57,6 +57,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
+  // @ts-expect-error <StrictNullChecks>
   const [signerAccount, setSignerAccount] = useState<Account>(null);
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
@@ -212,7 +213,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   ) => {
     const profile = account.profile;
 
+    // @ts-expect-error <StrictNullChecks>
     if (profile.name && profile.initialized) {
+      // @ts-expect-error <StrictNullChecks>
       setUsername(profile.name);
     }
 
@@ -259,6 +262,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     if (app.activeChainId() && app.isLoggedIn()) {
       const timestamp = +new Date();
       const { signature, chainId, sessionPayload } =
+        // @ts-expect-error <StrictNullChecks>
         await signSessionWithAccount(walletToUse, account, timestamp);
       await account.validate(signature, timestamp, chainId);
       app.sessions.authSession(
@@ -280,6 +284,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         notifyError("This account doesn't exist");
         return;
       }
+      // @ts-expect-error <StrictNullChecks>
       if (account.address === primaryAccount.address) {
         notifyError("You can't link to the same account");
         return;
@@ -291,9 +296,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       try {
         const timestamp = +new Date();
         const { signature, sessionPayload, chainId } =
+          // @ts-expect-error <StrictNullChecks>
           await signSessionWithAccount(walletToUse, account, timestamp);
         await account.validate(signature, timestamp, chainId);
         app.sessions.authSession(
+          // @ts-expect-error <StrictNullChecks>
           app.chain ? app.chain.base : walletToUse.chain,
           chainId,
           account.address,
@@ -311,6 +318,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       try {
         const timestamp = +new Date();
         const { signature, chainId, sessionPayload } =
+          // @ts-expect-error <StrictNullChecks>
           await signSessionWithAccount(walletToUse, account, timestamp);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
         props.onSuccess?.(account.address, newlyCreated);
@@ -344,34 +352,49 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const walletToUse = wallet || selectedWallet;
 
     try {
+      // @ts-expect-error <StrictNullChecks>
       if (walletToUse.chain !== 'near') {
-        await account.validate(walletSignature, cachedTimestamp, cachedChainId);
-        app.sessions.authSession(
-          walletToUse.chain,
+        // @ts-expect-error <StrictNullChecks>
+        await account.validate(
+          // @ts-expect-error <StrictNullChecks>
+          walletSignature,
+          cachedTimestamp,
           cachedChainId,
+        );
+        app.sessions.authSession(
+          // @ts-expect-error <StrictNullChecks>
+          walletToUse.chain,
+          // @ts-expect-error <StrictNullChecks>
+          cachedChainId,
+          // @ts-expect-error <StrictNullChecks>
           account.address,
           cachedSessionPayload,
           walletSignature,
         );
       }
+      // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true, false);
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
       const updatedProfiles =
         await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
+          // @ts-expect-error <StrictNullChecks>
           account.profile.chain,
+          // @ts-expect-error <StrictNullChecks>
           account.profile.address,
         );
       const currentUserUpdatedProfile = updatedProfiles[0];
       if (!currentUserUpdatedProfile) {
         console.log('No profile yet.');
       } else {
+        // @ts-expect-error <StrictNullChecks>
         account.profile.initialize(
           currentUserUpdatedProfile?.name,
           currentUserUpdatedProfile.address,
           currentUserUpdatedProfile?.avatarUrl,
           currentUserUpdatedProfile.id,
+          // @ts-expect-error <StrictNullChecks>
           account.profile.chain,
           currentUserUpdatedProfile?.lastActive,
         );
@@ -391,13 +414,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       if (username) {
         await updateProfile({
+          // @ts-expect-error <StrictNullChecks>
           address: account.profile.address,
+          // @ts-expect-error <StrictNullChecks>
           chain: account.profile.chain,
           name: username,
         });
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
+      // @ts-expect-error <StrictNullChecks>
       props?.onSuccess?.(account.profile.address, newelyCreated);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
     } catch (e) {
@@ -408,12 +434,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onResetWalletConnect = async () => {
+    // @ts-expect-error <StrictNullChecks>
     const wallet = wallets.find(
       (w) =>
         w instanceof WalletConnectWebWalletController ||
         w instanceof TerraWalletConnectWebWalletController,
     );
 
+    // @ts-expect-error <StrictNullChecks>
     await wallet.reset();
   };
 
@@ -523,6 +551,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
+        // @ts-expect-error <StrictNullChecks>
         wallet.getChainId().toString(),
         address,
       );
@@ -540,6 +569,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       } = await createUserWithAddress(
         address,
         wallet.name,
+        // @ts-expect-error <StrictNullChecks>
         null, // no sso source
         chainIdentifier,
         sessionPublicAddress,
@@ -571,6 +601,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const timestamp = +new Date();
     const sessionAddress = await app.sessions.getOrCreateAddress(
       wallet.chain,
+      // @ts-expect-error <StrictNullChecks>
       wallet.getChainId().toString(),
       address,
     );
@@ -585,12 +616,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const { account } = await createUserWithAddress(
       address,
       wallet.name,
+      // @ts-expect-error <StrictNullChecks>
       null, // no sso source?
       chainIdentifier,
       sessionAddress,
       validationBlockInfo,
     );
     account.setValidationBlockInfo(
+      // @ts-expect-error <StrictNullChecks>
       validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
 

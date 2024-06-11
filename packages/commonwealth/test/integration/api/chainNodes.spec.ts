@@ -17,6 +17,7 @@ describe('ChainNode Tests', () => {
   });
 
   it('Creates new ChainNode when', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -33,9 +34,13 @@ describe('ChainNode Tests', () => {
     const createdNode = await models.ChainNode.findOne({
       where: { id: resp.node_id },
     });
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.url, 'wss://');
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.name, 'asd');
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.balance_type, 'ethereum');
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.eth_chain_id, 123);
   });
 
@@ -175,6 +180,7 @@ describe('ChainNode Tests', () => {
   it('Updates a ChainNode from community controller', async () => {
     it('EVM', async () => {
       const eth_chain_id = 123;
+      // @ts-expect-error StrictNullChecks
       const controller = new ServerCommunitiesController(models, null);
 
       const [createdNode] = await models.ChainNode.findOrCreate({
@@ -192,6 +198,7 @@ describe('ChainNode Tests', () => {
       }) as UserInstance;
 
       await controller.updateChainNode({
+        // @ts-expect-error StrictNullChecks
         id: createdNode.id,
         user,
         url: 'https://eth-mainnet.g.com/3',
@@ -202,14 +209,19 @@ describe('ChainNode Tests', () => {
       const updatedNode = await models.ChainNode.findOne({
         where: { eth_chain_id },
       });
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.url, 'https://eth-mainnet.g.com/3');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.name, 'Ethereum3');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.balance_type, 'ethereum');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.eth_chain_id, 123);
     });
 
     it('Cosmos', async () => {
       const cosmos_chain_id = 'osmosiz';
+      // @ts-expect-error StrictNullChecks
       const controller = new ServerCommunitiesController(models, null);
       const user: UserInstance = buildUser({
         models,
@@ -234,6 +246,7 @@ describe('ChainNode Tests', () => {
       });
 
       await controller.updateChainNode({
+        // @ts-expect-error StrictNullChecks
         id: createdNode.id,
         user,
         url: 'https://cosmos-mainnet.g.com/4',
@@ -245,10 +258,15 @@ describe('ChainNode Tests', () => {
       const updatedNode = await models.ChainNode.findOne({
         where: { cosmos_chain_id },
       });
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.url, 'https://cosmos-mainnet.g.com/4');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.name, 'mmm');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.balance_type, 'cosmos');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.cosmos_chain_id, 'osmosiz');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.slip44, 118);
     });
   });

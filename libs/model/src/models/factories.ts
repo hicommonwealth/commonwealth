@@ -25,6 +25,7 @@ import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
+import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import Membership from './membership';
 import Notification from './notification';
@@ -74,6 +75,7 @@ export const Factories = {
   EmailUpdateToken,
   EvmEventSource,
   Group,
+  GroupPermission,
   LastProcessedEvmBlock,
   Membership,
   Notification,

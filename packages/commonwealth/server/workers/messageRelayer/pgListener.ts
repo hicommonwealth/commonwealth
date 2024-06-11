@@ -1,4 +1,4 @@
-import { logger, stats } from '@hicommonwealth/core';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
 import pg from 'pg';
 import { fileURLToPath } from 'url';
@@ -16,7 +16,7 @@ async function connectListener(client: pg.Client) {
     await client.query(`LISTEN "${OUTBOX_CHANNEL}";`);
   } catch (err) {
     log.fatal('Failed to setup Postgres listener. Exiting...', err);
-    process.exit(1);
+    await dispose()('ERROR', true);
   }
 }
 
@@ -44,7 +44,7 @@ async function reconnect(client: pg.Client) {
     } catch (e) {
       log.error('Failed to close pg client', e);
     }
-    process.exit(1);
+    await dispose()('ERROR', true);
   }
 }
 
@@ -72,9 +72,9 @@ export async function setupListener(): Promise<pg.Client> {
     connected = false;
     reconnect(client)
       .then(() => connectListener(client))
-      .catch((e) => {
+      .catch(async (e) => {
         log.fatal('Failed to reconnect after pg error', e);
-        process.exit(1);
+        await dispose()('ERROR', true);
       });
   });
 

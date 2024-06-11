@@ -1,10 +1,8 @@
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 import {
   handleMappingAbiInputs,
-  processAbiInputsToDataTypes,
   validateAbiInput,
 } from '../../../client/scripts/helpers/abi_form_helpers';
-import { BigNumber, ethers } from 'ethers';
 
 describe('validateAbiInput() unit tests', () => {
   it('should validate correct address args', () => {
@@ -90,6 +88,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
     const functionName = 'testFunction';
     const inputMap = new Map<string, Map<number, string>>();
     handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex), input);
   });
   it('should store correct args with multiple calls', () => {
@@ -101,7 +100,9 @@ describe('handleMappingAbiInputs() unit tests', () => {
     const inputIndex2 = 6;
     const input2 = '456';
     handleMappingAbiInputs(inputIndex2, input2, functionName, inputMap);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex), input);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
   });
   it('should store correct args with multiple calls and multiple functions', () => {
@@ -117,8 +118,11 @@ describe('handleMappingAbiInputs() unit tests', () => {
     const input3 = '789';
     const functionName2 = 'testFunction2';
     handleMappingAbiInputs(inputIndex3, input3, functionName2, inputMap);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex), input);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName2).get(inputIndex3), input3);
   });
 
@@ -131,7 +135,9 @@ describe('handleMappingAbiInputs() unit tests', () => {
     const inputIndex2 = 1;
     const input2 = 'hello-world432x0x0123';
     handleMappingAbiInputs(inputIndex2, input2, functionName, inputMap);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex), input);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
   });
 
@@ -141,6 +147,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
     const functionName = '$$%asdjfkl;12';
     const inputMap = new Map<string, Map<number, string>>();
     handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex), input);
   });
 });

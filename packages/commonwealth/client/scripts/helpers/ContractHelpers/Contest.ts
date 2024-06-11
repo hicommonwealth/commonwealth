@@ -64,9 +64,11 @@ class Contest extends ContractBase {
         feeShare,
         prizeShare,
       );
+      // @ts-expect-error StrictNullChecks
       const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
       const newContestAddress = this.web3.eth.abi.decodeParameters(
         ['address', 'address', 'uint256', 'bool'],
+        // @ts-expect-error StrictNullChecks
         eventLog.data.toString(),
       )['0'] as string;
       this.contractAddress = newContestAddress;
@@ -112,9 +114,11 @@ class Contest extends ContractBase {
         walletAddress,
         exchangeToken,
       );
+      // @ts-expect-error StrictNullChecks
       const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
       const newContestAddress = this.web3.eth.abi.decodeParameters(
         ['address', 'address', 'uint256', 'bool'],
+        // @ts-expect-error StrictNullChecks
         eventLog.data.toString(),
       )['0'] as string;
       this.contractAddress = newContestAddress;

@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { DatabaseCleaner } from '../util/databaseCleaner';
@@ -10,8 +10,11 @@ databaseCleaner.init(models);
 databaseCleaner
   .executeQueries()
   .then(() => {
-    process.exit(0);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('EXIT', true);
   })
   .catch((err) => {
     log.error(`Failed to clean the database.`, err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('EXIT', true);
   });

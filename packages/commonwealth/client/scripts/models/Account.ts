@@ -75,9 +75,11 @@ class Account {
     this._walletId = walletId;
     this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
+    // @ts-expect-error StrictNullChecks
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
+    // @ts-expect-error StrictNullChecks
     this.lastActive = lastActive ? moment(lastActive) : null;
     if (profile) {
       this._profile = profile;

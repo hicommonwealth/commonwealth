@@ -94,9 +94,11 @@ const PersonalInformationStep = ({
 
   const handleGenerateUsername = () => {
     const randomUsername = generateUsername('', 2);
+    // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.setValue('username', randomUsername, {
       shouldDirty: true,
     });
+    // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
   };
@@ -115,7 +117,9 @@ const PersonalInformationStep = ({
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
     await updateProfile({
+      // @ts-expect-error <StrictNullChecks/>
       address: app.user.activeAccount?.profile?.address,
+      // @ts-expect-error <StrictNullChecks/>
       chain: app.user.activeAccount?.profile?.chain,
       name: values.username,
       ...(values.email && {
@@ -141,6 +145,7 @@ const PersonalInformationStep = ({
 
   return (
     <CWForm
+      // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}

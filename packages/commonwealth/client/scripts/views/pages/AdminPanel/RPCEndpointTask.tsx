@@ -27,10 +27,12 @@ const RPCEndpointTask = () => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [rpcEndpointCommunityValue, setRpcEndpointCommunityValue] =
     useState<string>('');
+  // @ts-expect-error <StrictNullChecks/>
   const [communityInfo, setCommunityInfo] = useState<CommunityInfo>(null);
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
   const [communityInfoValueValidated, setCommunityInfoValueValidated] =
     useState<boolean>(false);
+  // @ts-expect-error <StrictNullChecks/>
   const [communityChainNode, setCommunityChainNode] = useState<NodeInfo>(null);
   const [communityChainNodeValidated, setCommunityChainNodeValidated] =
     useState<boolean>(false);
@@ -41,6 +43,7 @@ const RPCEndpointTask = () => {
   );
   const [chainNodeNotCreated, setChainNodeNotCreated] =
     useState<boolean>(false);
+  // @ts-expect-error <StrictNullChecks/>
   const [ethChainId, setEthChainId] = useState<number>(null);
   const [cosmosChainIds, setCosmosChainIds] = useState<DropdownItemType[]>([
     {
@@ -48,6 +51,7 @@ const RPCEndpointTask = () => {
       value: '',
     },
   ]);
+  // @ts-expect-error <StrictNullChecks/>
   const [cosmosChainId, setCosmosChainId] = useState<string>(null);
   const [ethChainIdValueValidated, setEthChainIdValueValidated] =
     useState<boolean>(false);
@@ -177,6 +181,7 @@ const RPCEndpointTask = () => {
           eth_chain_id: ethChainId,
           cosmos_chain_id: cosmosChainId,
         });
+        // @ts-expect-error <StrictNullChecks/>
         nodeId = communityChainNode.id;
       }
 
@@ -189,7 +194,9 @@ const RPCEndpointTask = () => {
 
       setRpcEndpointCommunityValue('');
       setRpcEndpoint('');
+      // @ts-expect-error <StrictNullChecks/>
       setCommunityInfo(null);
+      // @ts-expect-error <StrictNullChecks/>
       setCommunityChainNode(null);
       setCommunityChainNodeValidated(false);
       setBech32('');

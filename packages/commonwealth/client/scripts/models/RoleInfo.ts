@@ -52,6 +52,7 @@ class RoleInfo {
     this.allow = allow;
     this.deny = deny;
     this.is_user_default = is_user_default;
+    // @ts-expect-error StrictNullChecks
     this.lastActive = last_active ? moment(last_active) : null;
     this.Address = Address;
   }

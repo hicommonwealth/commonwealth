@@ -25,14 +25,17 @@ export const AndroidPrompt = ({
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     event.preventDefault();
 
+    // @ts-expect-error StrictNullChecks
     installPromptEvent = event;
   });
 
   const handleInstallClick = () => {
     try {
+      // @ts-expect-error StrictNullChecks
       installPromptEvent.prompt();
 
       // Wait for the user to respond to the prompt
+      // @ts-expect-error StrictNullChecks
       installPromptEvent.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
           // Hide after install prompt is accepted

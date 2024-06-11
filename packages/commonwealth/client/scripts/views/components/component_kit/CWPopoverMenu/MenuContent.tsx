@@ -56,6 +56,7 @@ const MenuContent = ({
         const clickHandler = (e) => {
           e.stopPropagation();
           e.preventDefault();
+          // @ts-expect-error <StrictNullChecks/>
           onClick(e);
 
           if (item.type === 'default' && item.preventClosing) {

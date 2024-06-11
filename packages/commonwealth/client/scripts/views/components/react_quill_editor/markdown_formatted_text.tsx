@@ -68,6 +68,7 @@ export const MarkdownFormattedText = ({
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
+  // @ts-expect-error <StrictNullChecks/>
   const isTruncated: boolean = useMemo(() => {
     if (userExpand) {
       return false;
@@ -125,6 +126,7 @@ export const MarkdownFormattedText = ({
     _.debounce(async () => {
       // walk through rendered markdown DOM elements
       const walker = document.createTreeWalker(
+        // @ts-expect-error <StrictNullChecks/>
         containerRef.current,
         NodeFilter.SHOW_ELEMENT,
       );
@@ -177,6 +179,7 @@ export const MarkdownFormattedText = ({
   return (
     <>
       <div
+        // @ts-expect-error <StrictNullChecks/>
         ref={containerRef}
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },

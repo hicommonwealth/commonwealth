@@ -114,9 +114,11 @@ const CWTextInput = (props: TextInputProps) => {
 
   const formContext = useFormContext();
   const formFieldContext = hookToForm
-    ? formContext.register(name)
+    ? // @ts-expect-error <StrictNullChecks/>
+      formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
+    // @ts-expect-error <StrictNullChecks/>
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   const validateValue = (inputVal: string) => {

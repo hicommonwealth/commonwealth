@@ -28,7 +28,7 @@ import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { verify as verifyCanvas } from '../../shared/canvas/verify';
-import { MAGIC_API_KEY, config } from '../config';
+import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 
@@ -59,6 +59,7 @@ async function createMagicAddressInstances(
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
+  // @ts-expect-error StrictNullChecks
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
 
   for (const { community_id, address } of generatedAddresses) {
@@ -73,6 +74,7 @@ async function createMagicAddressInstances(
         user_id,
         profile_id,
         verification_token: decodedMagicToken.claim.tid, // to prevent re-use
+        // @ts-expect-error StrictNullChecks
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
@@ -121,6 +123,7 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
+    // @ts-expect-error StrictNullChecks
     const newUser = await models.User.createWithProfile(
       {
         // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
@@ -137,6 +140,7 @@ async function createNewMagicUser({
     );
 
     // update profile with metadata if exists
+    // @ts-expect-error StrictNullChecks
     const newProfile = newUser.Profiles[0] as ProfileInstance;
     if (profileMetadata?.username) {
       newProfile.profile_name = profileMetadata.username;
@@ -161,6 +165,7 @@ async function createNewMagicUser({
     // Automatically create subscription to their own mentions
     await models.Subscription.create(
       {
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
@@ -171,6 +176,7 @@ async function createNewMagicUser({
     // Automatically create a subscription to collaborations
     await models.Subscription.create(
       {
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,
@@ -186,6 +192,7 @@ async function createNewMagicUser({
       {
         issuer: decodedMagicToken.issuer,
         issued_at: decodedMagicToken.claim.iat,
+        // @ts-expect-error StrictNullChecks
         address_id: canonicalAddressInstance.id, // always ethereum address
         created_at: new Date(),
         updated_at: new Date(),
@@ -228,6 +235,7 @@ async function loginExistingMagicUser({
     let malformedSsoToken: SsoTokenInstance;
     if (ssoToken) {
       // login user if they registered via magic
+      // @ts-expect-error StrictNullChecks
       if (decodedMagicToken.claim.iat <= ssoToken.issued_at) {
         log.warn('Replay attack detected.');
         throw new Error(
@@ -243,22 +251,26 @@ async function loginExistingMagicUser({
       // - they only have profile_id set, no issuer or address_id
       // we will locate an existing SsoToken by profile_id, and migrate it to use addresses instead.
       // if none exists, we will create it
+      // @ts-expect-error StrictNullChecks
       malformedSsoToken = await models.SsoToken.scope(
         'withPrivateData',
       ).findOne({
         where: {
+          // @ts-expect-error StrictNullChecks
           profile_id: existingUserInstance.Profiles[0].id,
         },
         transaction,
       });
       if (malformedSsoToken) {
         log.trace('DETECTED LEGACY / MALFORMED SSO TOKEN');
+        // @ts-expect-error StrictNullChecks
         if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
           log.warn('Replay attack detected.');
           throw new Error(
             `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
           );
         }
+        // @ts-expect-error StrictNullChecks
         malformedSsoToken.profile_id = null;
         (malformedSsoToken.issuer = decodedMagicToken.issuer),
           (malformedSsoToken.issued_at = decodedMagicToken.claim.iat);
@@ -284,17 +296,21 @@ async function loginExistingMagicUser({
     const canonicalAddressInstance = addressInstances.find(
       (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
     );
+    // @ts-expect-error StrictNullChecks
     if (malformedSsoToken) {
+      // @ts-expect-error StrictNullChecks
       malformedSsoToken.address_id = canonicalAddressInstance.id;
       await malformedSsoToken.save({ transaction });
       log.info(
         `Finished migration of SsoToken for user ${existingUserInstance.id}!`,
       );
+      // @ts-expect-error StrictNullChecks
     } else if (!ssoToken && !malformedSsoToken) {
       await models.SsoToken.create(
         {
           issuer: decodedMagicToken.issuer,
           issued_at: decodedMagicToken.claim.iat,
+          // @ts-expect-error StrictNullChecks
           address_id: canonicalAddressInstance.id, // always ethereum address
           created_at: new Date(),
           updated_at: new Date(),
@@ -317,23 +333,26 @@ async function loginExistingMagicUser({
           !ghost_address && community_id === ghost.community_id,
       );
 
-      // update data objects and delete ghost address
-      await models.Comment.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
-      );
-      await models.Reaction.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
-      );
-      await models.Thread.update(
-        { address_id: replacementAddress.id },
-        { where: { address_id: ghost.id }, transaction },
-      );
-      await models.Address.destroy({
-        where: { id: ghost.id },
-        transaction,
-      });
+      // should always exist, but check for it to avoid null check error
+      if (replacementAddress) {
+        // update data objects and delete ghost address
+        await models.Comment.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Reaction.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Thread.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Address.destroy({
+          where: { id: ghost.id },
+          transaction,
+        });
+      }
     }
     return existingUserInstance;
   });
@@ -350,13 +369,16 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
   // to be owned by currently logged in user
   await models.Address.update(
     {
+      // @ts-expect-error StrictNullChecks
       user_id: loggedInUser.id,
+      // @ts-expect-error StrictNullChecks
       profile_id: loggedInUser.Profiles[0].id,
       verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
       where: {
         wallet_id: WalletId.Magic,
+        // @ts-expect-error StrictNullChecks
         user_id: existingUserInstance.id,
       },
     },
@@ -364,6 +386,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
 
   // TODO: send move email
 
+  // @ts-expect-error StrictNullChecks
   return loggedInUser;
 }
 
@@ -380,6 +403,7 @@ async function addMagicToUser({
   const addressInstances = await createMagicAddressInstances(
     models,
     generatedAddresses,
+    // @ts-expect-error StrictNullChecks
     loggedInUser,
     walletSsoSource,
     decodedMagicToken,
@@ -392,10 +416,12 @@ async function addMagicToUser({
   await models.SsoToken.create({
     issuer: decodedMagicToken.issuer,
     issued_at: decodedMagicToken.claim.iat,
+    // @ts-expect-error StrictNullChecks
     address_id: canonicalAddressInstance.id,
     created_at: new Date(),
     updated_at: new Date(),
   });
+  // @ts-expect-error StrictNullChecks
   return loggedInUser;
 }
 
@@ -464,6 +490,7 @@ async function magicLoginRoute(
       ) as {
         id: number;
       };
+      // @ts-expect-error StrictNullChecks
       loggedInUser = await models.User.findOne({
         where: { id },
         include: [
@@ -483,6 +510,7 @@ async function magicLoginRoute(
     }
   }
 
+  // @ts-expect-error StrictNullChecks
   const isCosmos = communityToJoin?.base === ChainBase.CosmosSDK;
 
   const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
@@ -505,6 +533,7 @@ async function magicLoginRoute(
         : undefined,
     };
 
+    // @ts-expect-error StrictNullChecks
     if (communityToJoin) {
       if (isCosmos) {
         // (magic bug?): magic typing doesn't match data, so we need to cast as any
@@ -520,7 +549,9 @@ async function magicLoginRoute(
         }
 
         generatedAddresses.push({
+          // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
+          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else if (
@@ -528,7 +559,9 @@ async function magicLoginRoute(
         session.payload.chain.startsWith('eip155:')
       ) {
         generatedAddresses.push({
+          // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
+          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else {
@@ -539,7 +572,7 @@ async function magicLoginRoute(
       }
     }
 
-    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    if (config.ENFORCE_SESSION_KEYS) {
       if (
         !session.payload?.from ||
         req.body.magicAddress !== session.payload.from
@@ -629,6 +662,7 @@ async function magicLoginRoute(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );
 
+  // @ts-expect-error StrictNullChecks
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
     // already logged in as existing user, just ensure generated addresses are all linked
     // we don't need to setup a canonical address/SsoToken, that should already be done
@@ -649,7 +683,9 @@ async function magicLoginRoute(
     decodedMagicToken,
     magicUserMetadata,
     generatedAddresses,
+    // @ts-expect-error StrictNullChecks
     existingUserInstance,
+    // @ts-expect-error StrictNullChecks
     loggedInUser,
     profileMetadata: {
       username: req.body.username,
@@ -658,15 +694,18 @@ async function magicLoginRoute(
     walletSsoSource,
   };
   try {
+    // @ts-expect-error StrictNullChecks
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
       // merge the existing magic user with the logged in user
       log.trace('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
       finalUser = await mergeLogins(magicContext);
+      // @ts-expect-error StrictNullChecks
     } else if (!loggedInUser && existingUserInstance) {
       // user is logging in with an existing magic account
       log.trace('CASE 2: LOGGING INTO EXISTING MAGIC USER');
       finalUser = await loginExistingMagicUser(magicContext);
+      // @ts-expect-error StrictNullChecks
     } else if (loggedInUser && !existingUserInstance) {
       // user is already logged in and is linking a new magic login to their account
       log.trace('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
@@ -687,9 +726,9 @@ async function magicLoginRoute(
 
 export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
-  if (MAGIC_API_KEY) {
+  if (config.AUTH.MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
-    const magic = new Magic(MAGIC_API_KEY);
+    const magic = new Magic(config.AUTH.MAGIC_API_KEY);
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         try {

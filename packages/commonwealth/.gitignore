@@ -5,6 +5,7 @@
 .idea
 /venv
 /build
+/dist
 node_modules/
 jsconfig.json
 .vscode

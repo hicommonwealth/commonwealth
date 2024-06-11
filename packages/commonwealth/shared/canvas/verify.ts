@@ -29,6 +29,7 @@ export const verify = async ({
   action?: Action;
   session?: Session;
   actionSignerAddress?: string;
+  // @ts-expect-error StrictNullChecks
 }): Promise<boolean> => {
   // Do some logic so the verification function supports both sessions and actions.
   if (action === undefined && session === undefined) return false;
@@ -47,7 +48,9 @@ export const verify = async ({
     // verify ethereum signature
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
+      // @ts-expect-error StrictNullChecks
       const { domain, types, message } = getEIP712SignableAction(actionPayload);
+      // @ts-expect-error StrictNullChecks
       delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain as any, // domain.salt has incompatible type
@@ -55,6 +58,7 @@ export const verify = async ({
         message,
         signature,
       );
+      // @ts-expect-error StrictNullChecks
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
       const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/;
@@ -66,6 +70,7 @@ export const verify = async ({
       }
       const [_, domain, nonce, signatureData] = signaturePatternMatch;
 
+      // @ts-expect-error StrictNullChecks
       const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
 
       const ethersUtils = (await import('ethers')).utils;
@@ -74,6 +79,7 @@ export const verify = async ({
         signatureData,
       );
 
+      // @ts-expect-error StrictNullChecks
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (chainBase === ChainBase.CosmosSDK) {
@@ -86,10 +92,13 @@ export const verify = async ({
     ]);
     if (
       !action &&
+      // @ts-expect-error StrictNullChecks
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {
+      // @ts-expect-error StrictNullChecks
       const prefix = cosmEncoding.fromBech32(sessionPayload.from).prefix;
       const signDocDigest = new cosmCrypto.Sha256(
+        // @ts-expect-error StrictNullChecks
         Buffer.from(stringify(sessionPayload)),
       ).digest();
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
@@ -117,6 +126,7 @@ export const verify = async ({
     if (!action && signature.startsWith('0x')) {
       const ethUtil = await import('ethereumjs-util');
       const msgHash = ethUtil.hashPersonalMessage(
+        // @ts-expect-error StrictNullChecks
         Buffer.from(stringify(sessionPayload)),
       );
       const ethSignatureParams = ethUtil.fromRpcSig(signature.trim());
@@ -144,6 +154,7 @@ export const verify = async ({
     // verify cosmos actions (base64)
     if (action) {
       const signDocPayload = await getADR036SignableAction(
+        // @ts-expect-error StrictNullChecks
         actionPayload,
         actionSignerAddress,
       );
@@ -179,6 +190,7 @@ export const verify = async ({
         chain_id,
       } = JSON.parse(signature);
       const signDoc = await getADR036SignableSession(
+        // @ts-expect-error StrictNullChecks
         Buffer.from(stringify(sessionPayload)),
         payload.from,
         chain_id, // if undefined, signDoc produces an ADR-036 signature
@@ -219,6 +231,7 @@ export const verify = async ({
     const message = new TextEncoder().encode(stringPayload);
     const signatureBytes = bs58.decode(signature);
     const signerPublicKeyBytes = bs58.decode(
+      // @ts-expect-error StrictNullChecks
       action ? actionSignerAddress : payload.from,
     );
     const valid = nacl.sign.detached.verify(
@@ -235,6 +248,7 @@ export const verify = async ({
     if (action) {
       const stringPayload = stringify(actionPayload);
       const message = new TextEncoder().encode(stringPayload);
+      // @ts-expect-error StrictNullChecks
       const publicKey = nearlib.PublicKey.fromString(actionSignerAddress);
       const signatureBytes = bs58.decode(signature); // encoded in sessionSigners/near.ts
       const valid = nacl.sign.detached.verify(
@@ -278,6 +292,7 @@ export const verify = async ({
     const valid = polkadotUtil.signatureVerify(
       message,
       signatureBytes,
+      // @ts-expect-error StrictNullChecks
       action ? actionSignerAddress : payload.from,
     ).isValid;
     return valid;
