@@ -6,7 +6,7 @@ import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
 
-let nonceMutex = new Mutex();
+const nonceMutex = new Mutex();
 
 export type AddContentResponse = {
   txReceipt: any;
