@@ -113,6 +113,7 @@ export enum Tag {
   Query = 'Query',
   Integration = 'Integration',
   Subscription = 'Subscription',
+  Wallet = 'Wallet',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(

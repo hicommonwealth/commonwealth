@@ -20,6 +20,7 @@ const {
   LOGIN_RATE_LIMIT_TRIES,
   LOGIN_RATE_LIMIT_MINS,
   SLACK_FEEDBACK_WEBHOOK,
+  FLAG_COMMON_WALLET: _FLAG_COMMON_WALLET,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_API_KEY,
@@ -43,6 +44,7 @@ const {
 const SEND_EMAILS = _SEND_EMAILS === 'true';
 const NO_CLIENT = _NO_CLIENT === 'true' || SEND_EMAILS;
 const NO_PRERENDER = _NO_PRERENDER || NO_CLIENT;
+const FLAG_COMMON_WALLET = _FLAG_COMMON_WALLET === ' true';
 
 export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
@@ -61,6 +63,7 @@ export const config = configure(
     LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
     LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
     SLACK_FEEDBACK_WEBHOOK,
+    FLAG_COMMON_WALLET,
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(GENERATE_IMAGE_RATE_LIMIT ?? '10', 10),
     DEFAULT_COMMONWEALTH_LOGO:
@@ -134,6 +137,7 @@ export const config = configure(
     LOGIN_RATE_LIMIT_TRIES: z.number().int().positive(),
     LOGIN_RATE_LIMIT_MINS: z.number().int().positive(),
     SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
+    FLAG_COMMON_WALLET: z.boolean().optional(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
