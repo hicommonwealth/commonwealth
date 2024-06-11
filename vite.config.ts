@@ -11,5 +11,9 @@ export default defineConfig({
       __dirname,
       './libs/model/src/tester/vitestDatabaseSetup.ts',
     ),
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'json', 'html'],
+    },
   },
 });
