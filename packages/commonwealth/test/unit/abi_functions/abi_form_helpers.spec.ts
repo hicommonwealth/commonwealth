@@ -10,42 +10,42 @@ describe('validateAbiInput() unit tests', () => {
     const input = '0x0000000000000000000000000000000000000000';
     const inputType = 'address';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
   test('should validate correct uint args', () => {
     const input = '123';
     const inputType = 'uint256';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
   test('should validate correct bool args', () => {
     const input = 'true';
     const inputType = 'bool';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
   test('should validate correct bytes args', () => {
     const input = '0x0000000000000000000000000000000000000000';
     const inputType = 'bytes32';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
   test('should validate correct string args', () => {
     const input = 'hello world';
     const inputType = 'string';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
   test('should validate correct array args', () => {
     const input = '[1,2,3]';
     const inputType = 'uint256[]';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
 
@@ -54,7 +54,7 @@ describe('validateAbiInput() unit tests', () => {
     const input = '0x000000000000000000000000000000000000000';
     const inputType = 'address';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
 
@@ -62,7 +62,7 @@ describe('validateAbiInput() unit tests', () => {
     const input = '123.5';
     const inputType = 'uint256';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
 
@@ -70,14 +70,14 @@ describe('validateAbiInput() unit tests', () => {
     const input = 'maybe';
     const inputType = 'bool';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
   test('should validate string args with mix of numeric and non-numeric characters', () => {
     const input = '123hello##@4--asdf';
     const inputType = 'string';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
 });

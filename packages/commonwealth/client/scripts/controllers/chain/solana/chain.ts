@@ -34,6 +34,7 @@ export default class SolanaChain
     this._app = app;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async init(chain: ChainInfo, reset = false) {
     // default to 9 decimals
     this._decimals = new BN(10).pow(new BN(chain.decimals || 9));
