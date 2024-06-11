@@ -298,19 +298,19 @@ describe('Cosmos Cache', () => {
       expect(duration).to.be.equal(expectedDuration);
     }
 
-    test('should have 7-day duration for an an individual proposal', async () => {
+    test('should have 7-day duration for an an individual proposal', () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1`;
       lcdTestDuration(60 * 60 * 24 * 7, url);
     });
-    test("should have 6-second duration for an an individual proposal's live votes", async () => {
+    test("should have 6-second duration for an an individual proposal's live votes", () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/votes`;
       lcdTestDuration(6, url);
     });
-    test("should have 6-second duration for an individual proposal's live tally", async () => {
+    test("should have 6-second duration for an individual proposal's live tally", () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/tally`;
       lcdTestDuration(6, url);
     });
-    test("should have 6-second duration for an individual proposal's live deposits", async () => {
+    test("should have 6-second duration for an individual proposal's live deposits", () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/deposits`;
       lcdTestDuration(6, url);
     });

@@ -72,6 +72,7 @@ export default class SolanaChain
     return new SolanaToken(this.denom, n, inDollars, this._decimals);
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   public createTXModalData(
     author: SolanaAccount,
     txFunc,
@@ -81,4 +82,5 @@ export default class SolanaChain
   ): ITXModalData {
     throw new Error('unsupported');
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 }

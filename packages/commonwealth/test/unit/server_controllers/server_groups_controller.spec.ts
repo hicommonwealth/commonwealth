@@ -203,7 +203,7 @@ describe('ServerGroupsController', () => {
     });
   });
 
-  test('#createGroup (invalid requirements)', async () => {
+  test('#createGroup (invalid requirements)', () => {
     const controller = createMockedGroupsController();
     const { user, chain } = createMockParams();
     expect(
@@ -245,7 +245,7 @@ describe('ServerGroupsController', () => {
     });
   });
 
-  test('#updateGroup (invalid requirements)', async () => {
+  test('#updateGroup (invalid requirements)', () => {
     const controller = createMockedGroupsController();
     const { user, address } = createMockParams();
     expect(

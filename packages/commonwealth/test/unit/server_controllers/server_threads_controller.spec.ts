@@ -93,6 +93,7 @@ describe('ServerThreadsController', () => {
           transaction: async (callback) => {
             return callback();
           },
+          query: sandbox.stub().resolves([]),
         },
       };
       const user = {
@@ -161,7 +162,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    test('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -192,6 +193,9 @@ describe('ServerThreadsController', () => {
         Thread: {
           findOne: sandbox.stub().resolves(null),
         },
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
@@ -218,7 +222,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 123');
     });
 
-    test('should throw an error (thread archived)', async () => {
+    test('should throw an error (thread archived)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -281,7 +285,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread is archived');
     });
 
-    test('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -316,6 +320,9 @@ describe('ServerThreadsController', () => {
             community_id: 'ethereum',
           }),
         },
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
@@ -343,9 +350,10 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    test('should throw error (token balance)', async () => {
+    test('should throw error (token balance)', () => {
       const sandbox = Sinon.createSandbox();
-      const fakeMembershipReject = 'fake membership rejection message';
+      const fakeMembershipReject =
+        'User does not have permission to perform action CREATE_THREAD_REACTION';
       const db = {
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -442,6 +450,9 @@ describe('ServerThreadsController', () => {
           ]),
           bulkCreate: sandbox.stub().resolves([]),
         },
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
@@ -514,6 +525,7 @@ describe('ServerThreadsController', () => {
         },
         sequelize: {
           transaction: async (callback: () => any) => callback(),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async (data) => {
@@ -576,7 +588,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    test('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -596,6 +608,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -649,7 +662,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big bad error');
     });
 
-    test('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const db = {
         Thread: {
           findOne: async () => null,
@@ -667,6 +680,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -720,7 +734,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found');
     });
 
-    test('should throw an error (thread archived)', async () => {
+    test('should throw an error (thread archived)', () => {
       const user = {};
       const address = {
         id: 1,
@@ -758,6 +772,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async (data) => ({
@@ -808,7 +823,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread is archived');
     });
 
-    test('should throw error (thread readonly)', async () => {
+    test('should throw error (thread readonly)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -829,6 +844,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -882,7 +898,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
     });
 
-    test('should throw error (invalid parent)', async () => {
+    test('should throw error (invalid parent)', () => {
       const parentId = 3;
 
       const db = {
@@ -904,6 +920,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -959,7 +976,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Invalid parent');
     });
 
-    test('should throw error (nesting too deep)', async () => {
+    test('should throw error (nesting too deep)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1066,6 +1083,7 @@ describe('ServerThreadsController', () => {
         },
         sequelize: {
           transaction: async (callback) => callback({}),
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -1098,7 +1116,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    test('should should throw error (thread not found)', async () => {
+    test('should should throw error (thread not found)', () => {
       const db = {
         Thread: {
           findOne: async () => null,
@@ -1113,6 +1131,9 @@ describe('ServerThreadsController', () => {
         },
         Subscription: {
           destroy: async () => ({}),
+        },
+        sequelize: {
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -1138,7 +1159,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 1');
     });
 
-    test('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1159,6 +1180,9 @@ describe('ServerThreadsController', () => {
         },
         Subscription: {
           destroy: async () => ({}),
+        },
+        sequelize: {
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -1184,7 +1208,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: bad');
     });
 
-    test('should throw error (not owned)', async () => {
+    test('should throw error (not owned)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1204,6 +1228,9 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        sequelize: {
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {

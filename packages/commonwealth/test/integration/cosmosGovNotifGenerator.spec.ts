@@ -272,7 +272,7 @@ describe('Cosmos Governance Notification Generator', () => {
       );
     });
 
-    test('filterProposals: should filter out old proposals', async () => {
+    test('filterProposals: should filter out old proposals', () => {
       const validKyveProposal = createFakeProposal('v1', 3);
       const validOsmosisProposal = createFakeProposal('v1Beta1', 3);
       const oneDayAgo = Date.now() - 60000 * 60 * 24;

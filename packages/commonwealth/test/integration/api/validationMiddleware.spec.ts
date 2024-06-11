@@ -60,7 +60,7 @@ describe('DatabaseValidationService Tests', () => {
   });
 
   describe('validateAuthor', () => {
-    test('should successfully validate author if address exists for user', async () => {
+    test('should successfully validate author if address exists for user', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -81,7 +81,7 @@ describe('DatabaseValidationService Tests', () => {
       ).to.not.throw;
     });
 
-    test('should fail if no user is given', async () => {
+    test('should fail if no user is given', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -101,7 +101,7 @@ describe('DatabaseValidationService Tests', () => {
       expect(request.address).to.be.undefined;
     });
 
-    test('should fail if no address or author chain is given', async () => {
+    test('should fail if no address or author chain is given', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -121,7 +121,7 @@ describe('DatabaseValidationService Tests', () => {
   });
 
   describe('validateCommunity', () => {
-    test('should successfully validate chain id if chain exists', async () => {
+    test('should successfully validate chain id if chain exists', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -142,7 +142,7 @@ describe('DatabaseValidationService Tests', () => {
       ).to.not.throw;
     });
 
-    test('should fail if no chain is given', async () => {
+    test('should fail if no chain is given', () => {
       const request = new MockExpressRequest();
 
       const resBody = {

@@ -978,6 +978,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
+    // eslint-disable-next-line max-len
     test('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
       const result = await server.seeder.createAndVerifyAddress(
         { chain: community_id },

@@ -10,6 +10,7 @@ export async function get(
   expectError = false,
   passedApp,
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res = <any>(
     await chai
       .request(passedApp)
@@ -33,6 +34,7 @@ export async function post(
   expectError = false,
   expectedApp,
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res = <any>(
     await chai
       .request(expectedApp)

@@ -12,8 +12,6 @@ import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import z from 'zod';
-// eslint-disable-next-line max-len
 import {
   afterAll,
   afterEach,
@@ -22,6 +20,8 @@ import {
   describe,
   test,
 } from 'vitest';
+import z from 'zod';
+// eslint-disable-next-line max-len
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
 
 chai.use(chaiAsPromised);

@@ -69,7 +69,7 @@ describe('ServerReactionsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    test('should throw error (reaction not found)', async () => {
+    test('should throw error (reaction not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -100,7 +100,7 @@ describe('ServerReactionsController', () => {
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
 
-    test('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {

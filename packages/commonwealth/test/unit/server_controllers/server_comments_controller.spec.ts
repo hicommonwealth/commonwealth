@@ -24,6 +24,7 @@ describe('ServerCommentsController', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         sequelize: {
+          query: sandbox.stub().resolves([]),
           transaction: async (callback) => {
             return callback();
           },
@@ -158,9 +159,15 @@ describe('ServerCommentsController', () => {
       });
     });
 
-    test('should throw error (comment not found)', async () => {
+    test('should throw error (comment not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -223,9 +230,15 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Comment not found: 123');
     });
 
-    test('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -287,9 +300,15 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Thread not found for comment');
     });
 
-    test('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -354,9 +373,15 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    test('should throw error (token balance)', async () => {
+    test('should throw error (token balance)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+          transaction: async (callback) => {
+            return callback();
+          },
+        },
         Reaction: {
           findOne: sandbox.stub().resolves({
             id: 2,
@@ -567,6 +592,7 @@ describe('ServerCommentsController', () => {
                 commit: () => Promise.resolve({}),
               };
           },
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -617,7 +643,7 @@ describe('ServerCommentsController', () => {
       expect(excludeAddresses[0]).to.equal('0x123');
     });
 
-    test('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const data = {
         id: 123,
         thread_id: 2,
@@ -655,6 +681,7 @@ describe('ServerCommentsController', () => {
                 commit: () => Promise.resolve({}),
               };
           },
+          query: Promise.resolve([]),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -683,7 +710,7 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    test('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const data = {
         id: 123,
         thread_id: 2,
@@ -715,6 +742,7 @@ describe('ServerCommentsController', () => {
                 commit: () => Promise.resolve({}),
               };
           },
+          query: Promise.resolve([]),
         },
       };
       const banCache = {
@@ -750,6 +778,9 @@ describe('ServerCommentsController', () => {
     test('should delete a comment', async () => {
       let didDestroy = false;
       const db = {
+        sequelize: {
+          query: Promise.resolve([]),
+        },
         Address: {
           findAll: async () => [{ address_id: 1 }], // used in findOneRole
         },

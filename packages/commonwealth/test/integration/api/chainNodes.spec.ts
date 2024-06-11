@@ -178,7 +178,7 @@ describe('ChainNode Tests', () => {
     );
   });
 
-  describe('Updates a ChainNode from community controller', async () => {
+  describe('Updates a ChainNode from community controller', () => {
     beforeAll(async () => {
       await tester.bootstrap_testing(true);
     });
