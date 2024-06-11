@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import ghostSvg from 'assets/img/ghost.svg';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -164,7 +165,7 @@ export const User = ({
           {isGhostAddress && (
             <img
               alt="ghost"
-              src="assets/img/ghost.svg"
+              src={ghostSvg}
               width="20px"
               style={{ display: 'inline-block' }}
             />

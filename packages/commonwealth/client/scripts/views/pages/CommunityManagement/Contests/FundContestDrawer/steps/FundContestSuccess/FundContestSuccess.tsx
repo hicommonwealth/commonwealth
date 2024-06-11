@@ -7,6 +7,7 @@ import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils
 
 import CopyAddressInput from '../../../CopyAddressInput';
 
+import contestFundSuccess from 'assets/img/contestFundsSuccess.png';
 import './FundContestSuccess.scss';
 
 interface FundContestSuccessProps {
@@ -25,11 +26,7 @@ const FundContestSuccess = ({
   return (
     <div className="FundContestSuccess">
       <div className="content">
-        <img
-          src="assets/img/contestFundsSuccess.png"
-          alt="success"
-          className="img"
-        />
+        <img src={contestFundSuccess} alt="success" className="img" />
         <CWText type="h4">Your funds transferred successfully!</CWText>
         <CWText type="b1" className="description">
           Your contest is now active at the address below. You can now add funds

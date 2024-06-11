@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import ghostSvg from 'assets/img/ghost.svg';
 import clsx from 'clsx';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
@@ -158,7 +159,7 @@ export const FullUser = ({
           {isGhostAddress && (
             <img
               alt="ghost"
-              src="assets/img/ghost.svg"
+              src={ghostSvg}
               width="20px"
               style={{ display: 'inline-block' }}
             />

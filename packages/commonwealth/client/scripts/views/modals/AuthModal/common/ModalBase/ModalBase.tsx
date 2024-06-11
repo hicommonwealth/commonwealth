@@ -1,4 +1,5 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import commonLogo from 'assets/img/branding/common-logo.svg';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import app from 'client/scripts/state';
 import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
@@ -238,7 +239,7 @@ const ModalBase = ({
       <section className="ModalBase">
         <CWIcon iconName="close" onClick={onClose} className="close-btn" />
 
-        <img src="assets/img/branding/common-logo.svg" className="logo" />
+        <img src={commonLogo} className="logo" />
 
         <CWText type="h2" className="header" isCentered>
           {copy.title}

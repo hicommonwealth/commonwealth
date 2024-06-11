@@ -5,6 +5,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import { FundContestStep } from '../../FundContestDrawer';
 
+import contestFundFailure from 'assets/img/contestFundsFailure.png';
 import './FundContestFailure.scss';
 
 interface FundContestFailureProps {
@@ -16,11 +17,7 @@ const FundContestFailure = ({
 }: FundContestFailureProps) => {
   return (
     <div className="FundContestFailure">
-      <img
-        src="assets/img/contestFundsFailure.png"
-        alt="success"
-        className="img"
-      />
+      <img src={contestFundFailure} alt="success" className="img" />
       <CWText type="h4">Something went wrong</CWText>
       <CWText type="b1" className="description">
         We were unable to complete your transaction because of a network error.
