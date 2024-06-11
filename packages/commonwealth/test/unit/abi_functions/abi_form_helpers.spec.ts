@@ -5,7 +5,7 @@ import {
   validateAbiInput,
 } from '../../../client/scripts/helpers/abi_form_helpers';
 
-describe('validateAbiInput() unit tests', () => {
+describe.only('validateAbiInput() unit tests', () => {
   test('should validate correct address args', () => {
     const input = '0x0000000000000000000000000000000000000000';
     const inputType = 'address';

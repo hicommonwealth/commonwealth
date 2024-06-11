@@ -22,6 +22,7 @@ import {
   ProposalStatus,
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import EthSigner from './utils/eth-signer';
 import { waitOneBlock } from './utils/helpers';
 
@@ -87,7 +88,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
   const rpcUrl = `http://localhost:8080/cosmosAPI/${id}`;
   const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${id}`;
 
-  before(async () => {
+  beforeAll(async () => {
     await tester.seedDb();
     const tm = await getTMClient(rpcUrl);
     rpc = await getRPCClient(tm);
@@ -95,7 +96,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     signerAddr = signerAddress;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -111,7 +112,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
   const parseVoteValue = (rawLog: string) => {
     const rawObject = JSON.parse(rawLog);
     const optionValue = rawObject[0].events[1].attributes[0].value;
-    const vote = optionValue?.split(' ')[0]?.split(':')[1];
+    const vote = optionValue?.spltest(' ')[0]?.spltest(':')[1];
     return vote;
   };
 
@@ -134,7 +135,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     expect(voteValue).to.eql(expectedVoteString);
   };
 
-  it('creates a proposal', async () => {
+  test('creates a proposal', async () => {
     const content = encodeTextProposal(
       `evmos test title`,
       `evmos test description`,
@@ -151,37 +152,37 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     expect(activeProposals.length).to.be.greaterThan(0);
   });
 
-  it('votes NO on an active proposal', async () => {
+  test('votes NO on an active proposal', async () => {
     await voteTest(VoteOption.VOTE_OPTION_NO, 'VOTE_OPTION_NO');
   });
 
-  it('votes NO WITH VETO on an active proposal', async () => {
+  test('votes NO WITH VETO on an active proposal', async () => {
     await voteTest(
       VoteOption.VOTE_OPTION_NO_WITH_VETO,
       'VOTE_OPTION_NO_WITH_VETO',
     );
   });
 
-  it('votes ABSTAIN on an active proposal', async () => {
+  test('votes ABSTAIN on an active proposal', async () => {
     await voteTest(VoteOption.VOTE_OPTION_ABSTAIN, 'VOTE_OPTION_ABSTAIN');
   });
 
-  it('votes YES on an active proposal', async () => {
+  test('votes YES on an active proposal', async () => {
     await voteTest(VoteOption.VOTE_OPTION_YES, 'VOTE_OPTION_YES');
   });
 });
 
 describe('Ethermint Governance v1beta1 util Tests', () => {
   describe('getActiveProposals', () => {
-    before(async () => {
+    beforeAll(async () => {
       await tester.seedDb();
     });
 
-    after(async () => {
+    afterAll(async () => {
       await dispose()();
     });
 
-    it('should fetch active proposals (evmos-dev-local)', async () => {
+    test('should fetch active proposals (evmos-dev-local)', async () => {
       const id = 'evmos-dev-local'; // CI devnet
       const tmClient = await getTMClient(
         `http://localhost:8080/cosmosAPI/${id}`,

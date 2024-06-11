@@ -306,13 +306,10 @@ jobs:
 
       - name: Run unit tests
         # CI:true ensures allowOnly = false so no tests are accidentally skipped
-        run: CI=true pnpm -r test
+        run: CI=true pnpm -r test --allowOnly=false
 
-      - name: Run API tests
-        run: pnpm -F commonwealth test-api --forbid-only
-
-      - name: Run util integration tests
-        run: pnpm -F commonwealth test-integration-util --forbid-only
+      - name: Run integration tests
+        run: pnpm -F commonwealth test-integration --allowOnly=false
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -352,7 +349,7 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Run EVM Devnet tests
-        run: pnpm -F commonwealth test-devnet evm --forbid-only
+        run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
 
   # These tests run slowly, so run them in a separate job
   commonwealth-cosmos-tests:
@@ -427,5 +424,5 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           pnpm -F commonwealth start &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet cosmos --forbid-only)
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
 
