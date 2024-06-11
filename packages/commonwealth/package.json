@@ -9,6 +9,8 @@
   },
   "type": "module",
   "scripts": {
+    "async-migrate-comment-version-history": "tsx ./scripts/async-migrate-comment-version-history.ts",
+    "async-migrate-thread-version-history": "tsx ./scripts/async-migrate-thread-version-history.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",

@@ -17,8 +17,7 @@ module.exports = {
             allowNull: false,
             references: { model: 'Comments', key: 'id' },
           },
-          address: { type: Sequelize.STRING, allowNull: false },
-          text: { type: Sequelize.STRING, allowNull: false },
+          text: { type: Sequelize.TEXT, allowNull: false },
           timestamp: { type: Sequelize.DATE, allowNull: false },
         },
         {
@@ -43,7 +42,7 @@ module.exports = {
             references: { model: 'Threads', key: 'id' },
           },
           address: { type: Sequelize.STRING, allowNull: false },
-          body: { type: Sequelize.STRING, allowNull: false },
+          body: { type: Sequelize.TEXT, allowNull: false },
           timestamp: { type: Sequelize.DATE, allowNull: false },
         },
         {
