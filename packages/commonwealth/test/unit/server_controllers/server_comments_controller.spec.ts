@@ -164,9 +164,7 @@ describe('ServerCommentsController', () => {
       const db = {
         sequelize: {
           query: sandbox.stub().resolves([]),
-          transaction: async (callback) => {
-            return callback();
-          },
+          transaction: (callback) => Promise.resolve(callback()),
         },
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -235,9 +233,7 @@ describe('ServerCommentsController', () => {
       const db = {
         sequelize: {
           query: sandbox.stub().resolves([]),
-          transaction: async (callback) => {
-            return callback();
-          },
+          transaction: (callback) => Promise.resolve(callback()),
         },
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -305,9 +301,7 @@ describe('ServerCommentsController', () => {
       const db = {
         sequelize: {
           query: sandbox.stub().resolves([]),
-          transaction: async (callback) => {
-            return callback();
-          },
+          transaction: (callback) => Promise.resolve(callback()),
         },
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -378,9 +372,7 @@ describe('ServerCommentsController', () => {
       const db = {
         sequelize: {
           query: sandbox.stub().resolves([]),
-          transaction: async (callback) => {
-            return callback();
-          },
+          transaction: (callback) => Promise.resolve(callback()),
         },
         Reaction: {
           findOne: sandbox.stub().resolves({

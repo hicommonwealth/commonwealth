@@ -73,15 +73,15 @@ export default class SolanaChain
   }
 
   public createTXModalData(
-    // eslint-disable @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     author: SolanaAccount,
-    // eslint-disable @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txFunc,
-    // eslint-disable @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txName: string,
-    // eslint-disable @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     objName: string,
-    // eslint-disable @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');
