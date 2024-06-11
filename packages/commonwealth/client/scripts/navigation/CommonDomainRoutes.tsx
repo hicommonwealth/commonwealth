@@ -32,14 +32,22 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
-const NotificationSettingsPage = lazy(() => {
+
+const NotificationSettingsOld = lazy(
+  () => import('views/pages/NotificationSettingsOld'),
+);
+const NotificationSettings = lazy(
+  () => import('views/pages/NotificationSettings'),
+);
+
+const NotificationSettingsPage = () => {
   const knockInAppNotifications = useFlag('knockInAppNotifications');
   if (knockInAppNotifications) {
-    return import('views/pages/NotificationSettings');
+    return <NotificationSettings />;
   } else {
-    return import('views/pages/NotificationSettingsOld');
+    return <NotificationSettingsOld />;
   }
-});
+};
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
