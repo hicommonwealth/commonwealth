@@ -3,7 +3,6 @@ import {
   CommunityInstance,
   ProfileAttributes,
   WebhookInstance,
-  config,
   models,
 } from '@hicommonwealth/model';
 import {
@@ -13,7 +12,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { DEFAULT_COMMONWEALTH_LOGO } from '../../config';
+import { config } from '../../config';
 import { WebhookDestinations } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -95,6 +94,7 @@ export async function getPreviewImageUrl(
     notification.categoryId !== NotificationCategories.ThreadEdit &&
     notification.categoryId !== NotificationCategories.CommentEdit
   ) {
+    // @ts-expect-error StrictNullChecks
     const bodytext = decodeURIComponent(notification.data.comment_text);
     const matches = bodytext.match(REGEX_IMAGE);
     if (matches) {
@@ -113,7 +113,7 @@ export async function getPreviewImageUrl(
 
   // case 3: default commonwealth logo
   return {
-    previewImageUrl: DEFAULT_COMMONWEALTH_LOGO,
+    previewImageUrl: config.DEFAULT_COMMONWEALTH_LOGO,
     previewAltText: 'Commonwealth',
   };
 }

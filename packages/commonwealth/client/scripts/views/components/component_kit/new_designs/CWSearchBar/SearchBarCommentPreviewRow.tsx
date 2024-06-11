@@ -35,6 +35,7 @@ export const SearchBarCommentPreviewRow: FC<
         {moment(searchResult.created_at).format('l')}
       </CWText>
       <CWText type="b2" fontWeight="medium">
+        {/* @ts-expect-error StrictNullChecks*/}
         {renderTruncatedHighlights(searchTerm, title)}
       </CWText>
       <CWText type="caption" className="excerpt-text">

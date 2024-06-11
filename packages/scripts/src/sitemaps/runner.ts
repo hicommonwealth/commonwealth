@@ -1,5 +1,5 @@
 import { HotShotsStats } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import {
   createAsyncWriterS3,
   createDatabasePaginatorDefault,
@@ -34,11 +34,13 @@ async function doExec() {
   ]).exec();
 
   log.info('Sitemap written to: ' + index.location);
-
-  process.exit(0);
 }
 
-doExec().catch((err) => {
-  log.fatal('Unable to process sitemaps: ', err);
-  process.exit(1);
-});
+doExec()
+  .then(() => {
+    dispose()('EXIT', true);
+  })
+  .catch((err) => {
+    log.fatal('Unable to process sitemaps: ', err);
+    dispose()('ERROR', true);
+  });

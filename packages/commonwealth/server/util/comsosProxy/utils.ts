@@ -73,6 +73,7 @@ export async function updateSlip44IfNeeded(
 ): Promise<void> {
   try {
     const slip44 = chainNode?.slip44;
+    // @ts-expect-error StrictNullChecks
     if (slip44 || DEVNET_COSMOS_ID_RE.test(chainNode.cosmos_chain_id)) return;
 
     const registeredChain = await axios.get(

@@ -34,5 +34,6 @@ export function addVersionHistory(
     return { latestVersion, versionHistory: arr };
   }
 
+  // @ts-expect-error StrictNullChecks
   return { latestVersion, versionHistory: null };
 }

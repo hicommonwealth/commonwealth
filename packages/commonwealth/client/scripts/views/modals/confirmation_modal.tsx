@@ -82,6 +82,7 @@ interface OpenConfirmationProps {
 export const openConfirmation = (props: OpenConfirmationProps) => {
   const id = uuidv4();
   const target = document.createElement('div');
+  // @ts-expect-error <StrictNullChecks/>
   let root: Root = null;
 
   target.id = id;

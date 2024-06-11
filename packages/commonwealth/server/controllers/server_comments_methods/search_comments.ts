@@ -42,6 +42,7 @@ export async function __searchComments(
 ): Promise<SearchCommentsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
+    // @ts-expect-error StrictNullChecks
     limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,

@@ -27,6 +27,7 @@ const useFundContestForm = ({
   const [amountEth, setAmountEth] = useState(INITIAL_AMOUNT);
   const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+  // @ts-expect-error StrictNullChecks
   const amountEthInUsd = convertEthToUsd(amountEth, ethUsdRate);
 
   const { data: userEthBalance } = useGetUserEthBalanceQuery({
@@ -51,9 +52,11 @@ const useFundContestForm = ({
 
   const newContestBalanceInUsd = convertEthToUsd(
     newContestBalanceInEth,
+    // @ts-expect-error StrictNullChecks
     ethUsdRate,
   );
 
+  // @ts-expect-error StrictNullChecks
   const amountError = getAmountError(userEthBalance, amountEth);
 
   return {

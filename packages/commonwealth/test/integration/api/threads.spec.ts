@@ -106,6 +106,7 @@ describe.skip('Thread Tests', () => {
     it('should fail to create a thread without a kind', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        // @ts-expect-error StrictNullChecks
         kind: null,
         stage,
         chainId: chain,
@@ -167,6 +168,7 @@ describe.skip('Thread Tests', () => {
         title,
         topicId,
         body,
+        // @ts-expect-error StrictNullChecks
         url: null,
         jwt: userJWT,
         session: userSession.session,
@@ -194,12 +196,14 @@ describe.skip('Thread Tests', () => {
       console.log({ tRes });
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
+      // @ts-expect-error StrictNullChecks
       expect(tRes.result.read_only).to.be.equal(true);
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
+        // @ts-expect-error StrictNullChecks
         thread_id: tRes.result.id,
         session: userSession.session,
         sign: userSession.sign,
@@ -223,9 +227,13 @@ describe.skip('Thread Tests', () => {
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.title).to.equal(encodeURIComponent(title));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.body).to.equal(encodeURIComponent(body));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address.address).to.equal(userAddress);
     });
 
@@ -260,9 +268,13 @@ describe.skip('Thread Tests', () => {
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.title).to.equal(encodeURIComponent(title));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.body).to.equal(encodeURIComponent(bodyWithMentions));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address.address).to.equal(userAddress);
     });
 
@@ -683,6 +695,7 @@ describe.skip('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
+        // @ts-expect-error StrictNullChecks
         thread_id: tRes.result.id,
         session: userSession.session,
         sign: userSession.sign,
@@ -698,6 +711,7 @@ describe.skip('Thread Tests', () => {
       expect(eRes.status).to.be.equal('Success');
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
+      // @ts-expect-error StrictNullChecks
       expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
     });
   });
@@ -716,6 +730,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
+      // @ts-expect-error StrictNullChecks
       const object_id = threadRes.result.id;
       expect(object_id).to.not.be.null;
       // should track first view
@@ -769,6 +784,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
+      // @ts-expect-error StrictNullChecks
       const object_id = threadRes.result.id;
 
       // should track first view
@@ -844,6 +860,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
+      // @ts-expect-error StrictNullChecks
       pinThread = res.result.id;
     });
 

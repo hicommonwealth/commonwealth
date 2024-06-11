@@ -84,6 +84,7 @@ export class EthereumSessionController implements ISessionController {
     try {
       // Get an unauthenticated signer from localStorage.
       const storage = localStorage.getItem(storageKey);
+      // @ts-expect-error StrictNullChecks
       const { privateKey } = JSON.parse(storage);
       this.signers[chainId][fromAddress] = new ethers.Wallet(privateKey);
 
@@ -165,6 +166,7 @@ export class EthereumSessionController implements ISessionController {
     // const [domain, types, value] =
     //   canvasEthereum.getActionSignatureData(actionPayload);
     const { domain, types, message } = getEIP712SignableAction(actionPayload);
+    // @ts-expect-error StrictNullChecks
     delete types.EIP712Domain;
     const signature = await actionSigner._signTypedData(domain, types, message);
     const recoveredAddr = utils.verifyTypedData(

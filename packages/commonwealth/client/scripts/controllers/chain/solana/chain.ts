@@ -53,8 +53,9 @@ export default class SolanaChain
 
     // slots are approx equal to block heights
     this.app.chain.block.height = await this._connection.getSlot();
+    // @ts-expect-error StrictNullChecks
     this.app.chain.block.duration = await this._connection.getBlockTime(
-      this.app.chain.block.height
+      this.app.chain.block.height,
     );
     this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
@@ -63,6 +64,7 @@ export default class SolanaChain
   public async deinit() {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
     // no need to unsubscribe as it's HTTP RPC
+    // @ts-expect-error StrictNullChecks
     this._connection = null;
   }
 
@@ -75,7 +77,7 @@ export default class SolanaChain
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void
+    cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');
   }

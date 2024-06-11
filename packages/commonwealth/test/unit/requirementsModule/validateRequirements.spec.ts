@@ -145,6 +145,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    // @ts-expect-error StrictNullChecks
     expect(err.message).to.not.be.null;
   });
 
@@ -169,6 +170,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    // @ts-expect-error StrictNullChecks
     expect(err.message).to.include('contract_address');
   });
 
@@ -192,6 +194,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    // @ts-expect-error StrictNullChecks
     expect(err.message).to.include('evm_chain_id');
   });
 
@@ -216,6 +219,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    // @ts-expect-error StrictNullChecks
     expect(err.message).to.include('cosmos_chain_id');
   });
 
@@ -240,6 +244,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    // @ts-expect-error StrictNullChecks
     expect(err.message).to.include('allow');
   });
 
@@ -264,6 +269,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
+    // @ts-expect-error StrictNullChecks
     expect(err.message).to.include('source_type');
   });
 });

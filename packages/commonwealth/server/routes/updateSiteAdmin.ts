@@ -22,11 +22,13 @@ const updateSiteAdmin = async (
 ) => {
   const { address, siteAdmin } = req.body;
 
+  // @ts-expect-error StrictNullChecks
   if (!req.user.isAdmin) {
     throw new AppError(PromoteUserErrors.NotAdmin);
   }
 
   const userAddress = await models.Address.findOne({
+    // @ts-expect-error StrictNullChecks
     where: {
       address,
       user_id: {

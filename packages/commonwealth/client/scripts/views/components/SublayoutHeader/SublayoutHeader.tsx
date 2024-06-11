@@ -26,6 +26,7 @@ export const SublayoutHeader = ({
   const [revalidationModalData, setRevalidationModalData] = useState<{
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
+    // @ts-expect-error <StrictNullChecks/>
   }>(null);
 
   useEffect(() => {
@@ -63,11 +64,13 @@ export const SublayoutHeader = ({
         size="medium"
         content={
           <SessionRevalidationModal
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setRevalidationModalData(null)}
             walletSsoSource={revalidationModalData?.walletSsoSource}
             walletAddress={revalidationModalData?.walletAddress}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setRevalidationModalData(null)}
         open={!!revalidationModalData}
       />

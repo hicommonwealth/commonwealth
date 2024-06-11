@@ -116,6 +116,7 @@ const EditProfileComponent = () => {
     if (Object.keys(profileUpdate)?.length > 0) {
       updateProfile({
         ...profileUpdate,
+        // @ts-expect-error <StrictNullChecks/>
         profileId: profile.id,
         address: app.user.activeAccount?.address,
         chain: app.user.activeAccount?.community,
@@ -124,11 +125,14 @@ const EditProfileComponent = () => {
           .map((tag) => tag.item.id),
       })
         .then(() => {
+          // @ts-expect-error <StrictNullChecks/>
           navigate(`/profile/id/${profile.id}`);
 
+          // @ts-expect-error <StrictNullChecks/>
           if (userOnboardingEnabled && socials?.length > 0) {
             markTrainingActionAsComplete(
               UserTrainingCardTypes.FinishProfile,
+              // @ts-expect-error <StrictNullChecks/>
               profile.id,
             );
           }
@@ -138,6 +142,7 @@ const EditProfileComponent = () => {
         });
     } else {
       setTimeout(() => {
+        // @ts-expect-error <StrictNullChecks/>
         navigate(`/profile/id/${profile.id}`);
       }, 1500);
     }
@@ -211,30 +216,39 @@ const EditProfileComponent = () => {
     // need to create an account to pass to AvatarUpload to see last upload
     // not the best solution because address is not always available
     // should refactor AvatarUpload to make it work with new profiles
+    // @ts-expect-error <StrictNullChecks/>
     if (addresses?.length > 0) {
       const oldProfile = new MinimumProfile(
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].community.name,
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].address,
       );
 
       oldProfile.initialize(
         name,
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].address,
         avatarUrl,
+        // @ts-expect-error <StrictNullChecks/>
         profile.id,
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].community.name,
         null,
       );
 
       setAccount(
         new Account({
+          // @ts-expect-error <StrictNullChecks/>
           community: addresses[0].community,
+          // @ts-expect-error <StrictNullChecks/>
           address: addresses[0].address,
           profile: oldProfile,
           ignoreProfile: false,
         }),
       );
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       setAccount(null);
     }
   }, [addresses, avatarUrl, name, profile]);
@@ -267,6 +281,7 @@ const EditProfileComponent = () => {
                     label="Cancel"
                     onClick={() => {
                       setTimeout(() => {
+                        // @ts-expect-error <StrictNullChecks/>
                         navigate(`/profile/id/${profile.id}`);
                       }, 1000);
                     }}
@@ -373,6 +388,7 @@ const EditProfileComponent = () => {
               <div className="socials-section">
                 <CWText type="caption">Social links</CWText>
                 <CWSocials
+                  // @ts-expect-error <StrictNullChecks/>
                   socials={profile?.socials}
                   handleInputChange={(e) => {
                     setSocials(e);
@@ -418,11 +434,14 @@ const EditProfileComponent = () => {
               description="Manage your addresses."
             >
               <LinkedAddresses
+                // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
+                // @ts-expect-error <StrictNullChecks/>
                 profile={profile}
                 refreshProfiles={(address: string) => {
                   refetch().catch(console.error);
                   app.user.removeAddress(
+                    // @ts-expect-error <StrictNullChecks/>
                     addresses.find((a) => a.address === address),
                   );
                 }}

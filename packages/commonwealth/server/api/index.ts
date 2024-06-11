@@ -20,6 +20,7 @@ const artifacts = {
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
+  subscription: subscription.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
@@ -55,6 +56,7 @@ router.get('/v1/openapi.json', (req, res) => {
 router.use('/v1/docs', swaggerUi.serve);
 router.get(
   '/v1/docs',
+  // @ts-expect-error StrictNullChecks
   swaggerUi.setup(null, { swaggerUrl: '../openapi.json' }),
 );
 

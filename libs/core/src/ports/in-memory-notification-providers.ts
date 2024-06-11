@@ -9,6 +9,7 @@ export function SpyNotificationsProvider(
     getSchedulesStub?: sinon.SinonStub;
     createSchedulesStub?: sinon.SinonStub;
     deleteSchedulesStub?: sinon.SinonStub;
+    registerClientRegistrationToken?: sinon.SinonStub;
   },
 ): NotificationsProvider {
   return {
@@ -25,6 +26,9 @@ export function SpyNotificationsProvider(
       stubs?.createSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
     deleteSchedules:
       stubs?.deleteSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+    registerClientRegistrationToken:
+      stubs?.registerClientRegistrationToken ||
+      sandbox.stub().returns(Promise.resolve(true)),
   };
 }
 
@@ -38,6 +42,7 @@ export function ThrowingSpyNotificationsProvider(
     getSchedulesStub?: sinon.SinonStub;
     createSchedulesStub?: sinon.SinonStub;
     deleteSchedulesStub?: sinon.SinonStub;
+    registerClientRegistrationToken?: sinon.SinonStub;
   },
 ): NotificationsProvider {
   return {
@@ -53,5 +58,8 @@ export function ThrowingSpyNotificationsProvider(
       stubs?.createSchedulesStub || sandbox.stub().rejects(ProviderError),
     deleteSchedules:
       stubs?.deleteSchedulesStub || sandbox.stub().rejects(ProviderError),
+    registerClientRegistrationToken:
+      stubs?.registerClientRegistrationToken ||
+      sandbox.stub().rejects(ProviderError),
   };
 }

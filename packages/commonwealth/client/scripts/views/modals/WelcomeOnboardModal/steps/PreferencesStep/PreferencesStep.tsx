@@ -23,7 +23,9 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
     if (isUpdatingProfile) return;
 
     updateProfile({
+      // @ts-expect-error <StrictNullChecks/>
       address: app.user.activeAccount?.profile?.address,
+      // @ts-expect-error <StrictNullChecks/>
       chain: app.user.activeAccount?.profile?.chain,
       tagIds: preferenceTags
         .filter((tag) => tag.isSelected)

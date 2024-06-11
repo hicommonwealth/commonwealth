@@ -32,11 +32,15 @@ export function handleMappingAbiInputs(
   if (!inputMap.has(functionName)) {
     inputMap.set(functionName, new Map<number, string>());
     const inputArgMap = inputMap.get(functionName);
+    // @ts-expect-error StrictNullChecks
     inputArgMap.set(inputIndex, input);
+    // @ts-expect-error StrictNullChecks
     inputMap.set(functionName, inputArgMap);
   } else {
     const inputArgMap = inputMap.get(functionName);
+    // @ts-expect-error StrictNullChecks
     inputArgMap.set(inputIndex, input);
+    // @ts-expect-error StrictNullChecks
     inputMap.set(functionName, inputArgMap);
   }
 }

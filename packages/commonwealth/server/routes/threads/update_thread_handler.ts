@@ -30,25 +30,41 @@ type UpdateThreadResponse = ThreadAttributes;
 
 export const updateThreadHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
   res: TypedResponse<UpdateThreadResponse>,
 ) => {
   const { user, address } = req;
+  // @ts-expect-error StrictNullChecks
   const { id } = req.params;
   const {
+    // @ts-expect-error StrictNullChecks
     title,
+    // @ts-expect-error StrictNullChecks
     body,
+    // @ts-expect-error StrictNullChecks
     stage,
+    // @ts-expect-error StrictNullChecks
     url,
+    // @ts-expect-error StrictNullChecks
     locked,
+    // @ts-expect-error StrictNullChecks
     pinned,
+    // @ts-expect-error StrictNullChecks
     archived,
+    // @ts-expect-error StrictNullChecks
     spam,
+    // @ts-expect-error StrictNullChecks
     topicId,
+    // @ts-expect-error StrictNullChecks
     collaborators,
+    // @ts-expect-error StrictNullChecks
     canvasSession,
+    // @ts-expect-error StrictNullChecks
     canvasAction,
+    // @ts-expect-error StrictNullChecks
     canvasHash,
+    // @ts-expect-error StrictNullChecks
     discord_meta: discordMeta,
   } = req.body;
 
@@ -58,8 +74,11 @@ export const updateThreadHandler = async (
   // `undefined` if they are not intended to be updated
   const [updatedThread, notificationOptions, analyticsOptions] =
     await controllers.threads.updateThread({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
+      // @ts-expect-error StrictNullChecks
       threadId,
       title,
       body,
