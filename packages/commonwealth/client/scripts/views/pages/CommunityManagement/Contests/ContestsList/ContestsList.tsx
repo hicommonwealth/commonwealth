@@ -98,7 +98,7 @@ const ContestsList = ({
                 decimals={contest.decimals}
                 ticker={contest.ticker}
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
-                isCancelled={contest.cancelled!}
+                isCancelled={contest.cancelled}
                 // @ts-expect-error <StrictNullChecks/>
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
               />

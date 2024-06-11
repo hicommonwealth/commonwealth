@@ -1,7 +1,7 @@
 import moment from 'moment';
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import useForceRerender from 'hooks/useForceRerender';
+import useRerender from 'hooks/useRerender';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -36,7 +36,7 @@ interface ContestCardProps {
   decimals?: number;
   ticker?: string;
   isAdmin: boolean;
-  isCancelled: boolean;
+  isCancelled?: boolean;
   onFund: () => void;
 }
 
@@ -53,8 +53,6 @@ const ContestCard = ({
   isCancelled,
   onFund,
 }: ContestCardProps) => {
-  const forceRerender = useForceRerender();
-
   const navigate = useCommonNavigate();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -63,17 +61,7 @@ const ContestCard = ({
   const hasEnded = moment(finishDate) < moment();
   const isActive = isCancelled ? false : !hasEnded;
 
-  useEffect(() => {
-    if (!isActive) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      forceRerender();
-    }, 6000); // 6s
-
-    return () => clearInterval(interval);
-  }, [forceRerender, isActive]);
+  useRerender({ isActive, interval: 6000 });
 
   const handleCancel = () => {
     cancelContest({
@@ -148,7 +136,7 @@ const ContestCard = ({
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
               <CWText fontWeight="bold">
-                {capDecimals(s.tickerPrize!.toFixed(decimals))} {ticker}
+                {capDecimals(s.tickerPrize!.toFixed(decimals || 18))} {ticker}
               </CWText>
             </div>
           ))}
