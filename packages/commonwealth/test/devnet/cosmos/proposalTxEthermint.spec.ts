@@ -112,7 +112,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
   const parseVoteValue = (rawLog: string) => {
     const rawObject = JSON.parse(rawLog);
     const optionValue = rawObject[0].events[1].attributes[0].value;
-    const vote = optionValue?.spltest(' ')[0]?.spltest(':')[1];
+    const vote = optionValue?.split(' ')[0]?.split(':')[1];
     return vote;
   };
 

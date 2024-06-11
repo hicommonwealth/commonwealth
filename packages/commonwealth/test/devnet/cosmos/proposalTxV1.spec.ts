@@ -176,7 +176,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     });
     // TODO: Unsupported. Un-skip this in
     // https://github.com/hicommonwealth/commonwealth/issues/4821
-    it.skip('creates a community spend proposal with legacy amino', async () => {
+    test.skip('creates a community spend proposal with legacy amino', async () => {
       const content = encodeCommunitySpend(
         `v1 spend title amino`,
         `v1 spend description amino`,
