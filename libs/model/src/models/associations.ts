@@ -136,6 +136,8 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'category_id',
   }).withMany(db.Notification, { foreignKey: 'category_id' });
 
+  db.Group.withMany(db.GroupPermission);
+
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
     {
