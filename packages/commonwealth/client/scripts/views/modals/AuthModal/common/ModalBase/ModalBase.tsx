@@ -167,7 +167,7 @@ const ModalBase = ({
         case ChainBase.Solana:
           return solanaWallets;
         case ChainBase.Substrate:
-          return substrateWallets;
+          return [substrateWallets, 'walletconnect'];
         case ChainBase.NEAR:
           return nearWallet ? [nearWallet] : [];
         default:
