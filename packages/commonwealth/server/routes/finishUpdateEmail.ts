@@ -1,6 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import type { NextFunction } from 'express';
 import { TypedRequest, TypedResponse } from 'server/types';
 
 type finishUpdateEmailReq = {
@@ -12,21 +11,23 @@ const finishUpdateEmail = async (
   models: DB,
   req: TypedRequest<finishUpdateEmailReq>,
   res: TypedResponse<void>,
-  next: NextFunction,
 ) => {
   // fetch token and confirm validity
-  const token = req.query.token;
-  const email = req.query.email;
+  // @ts-expect-error StrictNullChecks
+  const { token, email } = req.query;
+  if (!token || !email) {
+    throw new AppError('Invalid arguments');
+  }
   const tokenObj = await models.EmailUpdateToken.findOne({
     where: { token, email },
   });
-  if (!tokenObj) return next(new AppError('Not found'));
+  if (!tokenObj) throw new AppError('Not found');
   const isExpired = +tokenObj.expires <= +new Date();
   const redirectPath = tokenObj.redirect_path || '/';
 
   // always consume token immediately if found
   await tokenObj.destroy();
-  if (isExpired) return next(new AppError('Token expired!'));
+  if (isExpired) throw new AppError('Token expired!');
 
   // update user object if valid
   const user = await models.User.scope('withPrivateData').findOne({
@@ -37,7 +38,7 @@ const finishUpdateEmail = async (
     await user.save();
     return res.redirect(redirectPath);
   } else {
-    return next(new AppError('User not found'));
+    throw new AppError('User not found');
   }
 };
 
