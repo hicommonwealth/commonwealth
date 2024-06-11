@@ -8,7 +8,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import Errors from '../../../server/routes/subscription/errors';
 
 chai.use(chaiHttp);
@@ -30,7 +30,7 @@ describe('Subscriptions Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     userId = +result.user_id;
 
@@ -49,6 +49,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
+      // @ts-expect-error StrictNullChecks
       topicId: topic.id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
@@ -726,7 +727,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
 
       await server.seeder.createSubscription({
@@ -800,6 +801,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body).to.not.be.null;
@@ -810,6 +812,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body.status).to.be.equal('Success');
@@ -822,6 +825,7 @@ describe('Subscriptions Tests', () => {
         NotificationCategories.ChainEvent,
       ]) {
         subscriptions.push(
+          // @ts-expect-error StrictNullChecks
           server.seeder.createSubscription({
             jwt: jwtToken,
             is_active: true,
@@ -831,6 +835,7 @@ describe('Subscriptions Tests', () => {
         );
       }
       const subscriptionIds = (await Promise.all(subscriptions)).map(
+        // @ts-expect-error StrictNullChecks
         (s) => s.id,
       );
       let res = await chai
@@ -857,7 +862,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       let res = await chai
         .request(server.app)
@@ -955,6 +960,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body).to.not.be.null;
@@ -965,6 +971,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body.status).to.be.equal('Success');
@@ -977,7 +984,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       expect(subscription).to.not.be.null;
       let res = await chai

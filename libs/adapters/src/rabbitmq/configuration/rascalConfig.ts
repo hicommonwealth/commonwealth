@@ -102,12 +102,6 @@ export function getAllRascalConfigs(
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
-    [RascalQueues.SnapshotListener]: {
-      ...queueConfig,
-      options: {
-        arguments: queueOptions,
-      },
-    },
     [RascalQueues.DiscordListener]: {
       ...queueConfig,
       options: {
@@ -126,15 +120,21 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.ContestWorkerPolicy]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.ContestProjection]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
-    [RascalBindings.SnapshotListener]: {
-      source: RascalExchanges.MessageRelayer,
-      destination: RascalQueues.SnapshotListener,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.SnapshotListener,
-    },
     [RascalBindings.ChainEvent]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.ChainEvent,
@@ -147,7 +147,81 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.DiscordListener,
     },
-    // TODO: add a binding from the MessageRelayer to NotificationsProvider queue with * binding key
+    [RascalBindings.NotificationsProviderCommentCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderCommentCreated,
+    },
+    [RascalBindings.NotificationsProviderChainEventCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderChainEventCreated,
+    },
+    [RascalBindings.NotificationsProviderSnapshotProposalCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey:
+        RascalRoutingKeys.NotificationsProviderSnapshotProposalCreated,
+    },
+    [RascalBindings.NotificationsProviderUserMentioned]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderUserMentioned,
+    },
+    [RascalBindings.NotificationsProviderPreferencesUpdated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsProvider,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.NotificationsProviderPreferencesUpdated,
+    },
+    [RascalBindings.ContestWorkerPolicyThreadCreated]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestWorkerPolicy,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadCreated,
+    },
+    [RascalBindings.ContestWorkerPolicyThreadUpvoted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestWorkerPolicy,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestWorkerPolicyThreadUpvoted,
+    },
+    [RascalBindings.ContestProjectionRecurringContestManagerDeployed]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey:
+        RascalRoutingKeys.ContestProjectionRecurringContestManagerDeployed,
+    },
+    [RascalBindings.ContestProjectionOneOffContestManagerDeployed]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey:
+        RascalRoutingKeys.ContestProjectionOneOffContestManagerDeployed,
+    },
+    [RascalBindings.ContestProjectionContestStarted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestProjectionContestStarted,
+    },
+    [RascalBindings.ContestProjectionContestContentAdded]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestProjectionContestContentAdded,
+    },
+    [RascalBindings.ContestProjectionContestContentUpvoted]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.ContestProjection,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.ContestProjectionContestContentUpvoted,
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
@@ -163,10 +237,6 @@ export function getAllRascalConfigs(
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
-    [RascalSubscriptions.SnapshotListener]: {
-      queue: RascalQueues.SnapshotListener,
-      ...subscriptionConfig,
-    },
     [RascalSubscriptions.DiscordListener]: {
       queue: RascalQueues.DiscordListener,
       ...subscriptionConfig,
@@ -177,6 +247,14 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.NotificationsProvider]: {
       queue: RascalQueues.NotificationsProvider,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.ContestWorkerPolicy]: {
+      queue: RascalQueues.ContestWorkerPolicy,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.ContestProjection]: {
+      queue: RascalQueues.ContestProjection,
       ...subscriptionConfig,
     },
   };

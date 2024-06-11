@@ -7,7 +7,6 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from 'server/config';
 import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
 import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
@@ -15,6 +14,7 @@ import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
 import { testServer, TestServer } from '../../../server-test';
+import { config } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import type { CommunityArgs } from '../../util/modelUtils';
 
@@ -58,7 +58,10 @@ describe.skip('Thread Tests', () => {
     topicId = await server.seeder.getTopicId({ chain });
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
-    adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    adminJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     const isAdmin = await server.seeder.updateRole({
       address_id: +res.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -71,7 +74,10 @@ describe.skip('Thread Tests', () => {
 
     res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -81,7 +87,10 @@ describe.skip('Thread Tests', () => {
       'Alice',
     );
     userAddress2 = res.address;
-    userJWT2 = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT2 = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession2 = { session: res.session, sign: res.sign };
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
@@ -97,6 +106,7 @@ describe.skip('Thread Tests', () => {
     it('should fail to create a thread without a kind', async () => {
       const tRes = await server.seeder.createThread({
         address: userAddress,
+        // @ts-expect-error StrictNullChecks
         kind: null,
         stage,
         chainId: chain,
@@ -158,6 +168,7 @@ describe.skip('Thread Tests', () => {
         title,
         topicId,
         body,
+        // @ts-expect-error StrictNullChecks
         url: null,
         jwt: userJWT,
         session: userSession.session,
@@ -185,12 +196,14 @@ describe.skip('Thread Tests', () => {
       console.log({ tRes });
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
+      // @ts-expect-error StrictNullChecks
       expect(tRes.result.read_only).to.be.equal(true);
       const cRes = await server.seeder.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
+        // @ts-expect-error StrictNullChecks
         thread_id: tRes.result.id,
         session: userSession.session,
         sign: userSession.sign,
@@ -214,9 +227,13 @@ describe.skip('Thread Tests', () => {
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.title).to.equal(encodeURIComponent(title));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.body).to.equal(encodeURIComponent(body));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address.address).to.equal(userAddress);
     });
 
@@ -251,9 +268,13 @@ describe.skip('Thread Tests', () => {
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.title).to.equal(encodeURIComponent(title));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.body).to.equal(encodeURIComponent(bodyWithMentions));
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(res.result.Address.address).to.equal(userAddress);
     });
 
@@ -623,7 +644,7 @@ describe.skip('Thread Tests', () => {
       );
       const newUserJWT = jwt.sign(
         { id: res.user_id, email: res.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       // try to comment and fail
       const cRes = await server.seeder.createComment({
@@ -674,6 +695,7 @@ describe.skip('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
+        // @ts-expect-error StrictNullChecks
         thread_id: tRes.result.id,
         session: userSession.session,
         sign: userSession.sign,
@@ -689,6 +711,7 @@ describe.skip('Thread Tests', () => {
       expect(eRes.status).to.be.equal('Success');
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
+      // @ts-expect-error StrictNullChecks
       expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
     });
   });
@@ -707,6 +730,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
+      // @ts-expect-error StrictNullChecks
       const object_id = threadRes.result.id;
       expect(object_id).to.not.be.null;
       // should track first view
@@ -760,6 +784,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
+      // @ts-expect-error StrictNullChecks
       const object_id = threadRes.result.id;
 
       // should track first view
@@ -835,6 +860,7 @@ describe.skip('Thread Tests', () => {
         session: userSession.session,
         sign: userSession.sign,
       });
+      // @ts-expect-error StrictNullChecks
       pinThread = res.result.id;
     });
 

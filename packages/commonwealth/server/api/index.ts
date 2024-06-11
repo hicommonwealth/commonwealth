@@ -1,9 +1,10 @@
 import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { NEW_SUBSCRIPTION_API_FLAG } from '../config';
+import { config } from '../config';
 import * as community from './community';
 import * as contest from './contest';
+import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
 import * as subscription from './subscription';
@@ -18,10 +19,12 @@ const artifacts = {
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
+  subscription: subscription.trpcRouter,
 };
 
-if (NEW_SUBSCRIPTION_API_FLAG) {
+if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
   artifacts['subscription'] = subscription.trpcRouter;
+  artifacts['email'] = email.trpcRouter;
 }
 
 const apiV1 = trpc.router(artifacts);
@@ -48,6 +51,7 @@ router.get('/v1/openapi.json', (req, res) => {
 router.use('/v1/docs', swaggerUi.serve);
 router.get(
   '/v1/docs',
+  // @ts-expect-error StrictNullChecks
   swaggerUi.setup(null, { swaggerUrl: '../openapi.json' }),
 );
 

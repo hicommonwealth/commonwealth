@@ -1,11 +1,16 @@
-import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
-import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import {
+  useFetchProfileByIdQuery,
+  useUpdateProfileByAddressMutation,
+} from 'state/api/profiles';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import _ from 'underscore';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -16,6 +21,8 @@ import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
+import { PreferenceTags, usePreferenceTags } from './PreferenceTags';
+import { UserTrainingCardTypes } from './UserTrainingSlider/types';
 import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
@@ -34,7 +41,7 @@ enum EditProfileError {
   NoProfileFound,
 }
 
-const NoProfileFoundError = 'No profile found';
+// const NoProfileFoundError = 'No profile found';
 
 export type Image = {
   url: string;
@@ -42,10 +49,13 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
+  const { isLoggedIn } = useUserLoggedIn();
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<EditProfileError>(EditProfileError.None);
-  const [loading, setLoading] = useState(true);
+  const [errorCode, setErrorCode] = useState<EditProfileError>(
+    EditProfileError.None,
+  );
   const [socials, setSocials] = useState<string[]>();
   const [profile, setProfile] = useState<NewProfile>();
   const [name, setName] = useState('');
@@ -54,59 +64,33 @@ const EditProfileComponent = () => {
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [displayNameValid, setDisplayNameValid] = useState(true);
   const [account, setAccount] = useState<Account>();
+  const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
+  const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
   const backgroundImageRef = useRef<Image>();
 
-  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation({
-    addressesWithChainsToUpdate: addresses?.map((a) => ({
-      address: a.address,
-      chain: a.community.id,
-    })),
+  const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
+    useUpdateProfileByAddressMutation({
+      addressesWithChainsToUpdate: addresses?.map((a) => ({
+        address: a.address,
+        chain: a.community.id,
+      })),
+    });
+
+  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
+    usePreferenceTags();
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
+
+  const {
+    data,
+    isLoading: isLoadingProfile,
+    error,
+    refetch,
+  } = useFetchProfileByIdQuery({
+    apiCallEnabled: isLoggedIn,
+    shouldFetchSelfProfile: true,
   });
-
-  const getProfile = async () => {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
-        params: {
-          jwt: app.user.jwt,
-        },
-      });
-
-      setProfile(new NewProfile(response.data.result.profile));
-      setName(response.data.result.profile.profile_name || '');
-      setEmail(response.data.result.profile.email || '');
-      setSocials(response.data.result.profile.socials);
-      setAvatarUrl(response.data.result.profile.avatar_url);
-      setBio(deserializeDelta(response.data.result.profile.bio));
-      backgroundImageRef.current =
-        response.data.result.profile.background_image;
-      setAddresses(
-        response.data.result.addresses.map((a) => {
-          try {
-            return new AddressInfo({
-              id: a.id,
-              address: a.address,
-              communityId: a.community_id,
-              keytype: a.keytype,
-              walletId: a.wallet_id,
-              walletSsoSource: a.wallet_sso_source,
-              ghostAddress: a.ghost_address,
-            });
-          } catch (err) {
-            console.error(`Could not return AddressInfo: "${err}"`);
-            return null;
-          }
-        }),
-      );
-    } catch (err) {
-      if (
-        err.response?.data?.status === 500 &&
-        err.response?.data?.error === NoProfileFoundError
-      ) {
-        setError(EditProfileError.NoProfileFound);
-      }
-    }
-    setLoading(false);
-  };
 
   const checkForUpdates = () => {
     const profileUpdate: any = {};
@@ -132,31 +116,42 @@ const EditProfileComponent = () => {
     if (Object.keys(profileUpdate)?.length > 0) {
       updateProfile({
         ...profileUpdate,
+        // @ts-expect-error <StrictNullChecks/>
         profileId: profile.id,
         address: app.user.activeAccount?.address,
         chain: app.user.activeAccount?.community,
+        tagIds: preferenceTags
+          .filter((tag) => tag.isSelected)
+          .map((tag) => tag.item.id),
       })
         .then(() => {
+          // @ts-expect-error <StrictNullChecks/>
           navigate(`/profile/id/${profile.id}`);
+
+          // @ts-expect-error <StrictNullChecks/>
+          if (userOnboardingEnabled && socials?.length > 0) {
+            markTrainingActionAsComplete(
+              UserTrainingCardTypes.FinishProfile,
+              // @ts-expect-error <StrictNullChecks/>
+              profile.id,
+            );
+          }
         })
         .catch((err) => {
           notifyError(err?.response?.data?.error || 'Something went wrong.');
         });
     } else {
       setTimeout(() => {
+        // @ts-expect-error <StrictNullChecks/>
         navigate(`/profile/id/${profile.id}`);
       }, 1500);
     }
-
-    setLoading(false);
   };
 
   const handleSaveProfile = () => {
-    setLoading(true);
     if (!name) {
       setDisplayNameValid(false);
       notifyError('Please fill all required fields.');
-      setLoading(false);
       return;
     }
 
@@ -164,42 +159,101 @@ const EditProfileComponent = () => {
   };
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    if (isLoadingProfile) return;
+
+    if (error) {
+      setErrorCode(EditProfileError.NoProfileFound);
+      setProfile(undefined);
+      setName('');
+      setEmail('');
+      setSocials([]);
+      setAvatarUrl(undefined);
+      setPreferenceTags([]);
+      setBio(deserializeDelta(data.profile.bio));
+      setAddresses([]);
+      return;
+    }
+
+    if (data) {
+      setErrorCode(EditProfileError.None);
+      setProfile(new NewProfile(data.profile));
+      setName(data.profile.profile_name || '');
+      setEmail(data.profile.email || '');
+      setSocials(data.profile.socials);
+      setAvatarUrl(data.profile.avatar_url);
+      const profileTags = data.tags;
+      setPreferenceTags((tags) =>
+        [...(tags || [])].map((t) => ({
+          ...t,
+          isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
+        })),
+      );
+      setBio(deserializeDelta(data.profile.bio));
+      backgroundImageRef.current = data.profile.background_image;
+      setAddresses(
+        data.addresses.map((a) => {
+          try {
+            return new AddressInfo({
+              id: a.id,
+              address: a.address,
+              communityId: a.community_id,
+              keytype: a.keytype,
+              walletId: a.wallet_id,
+              walletSsoSource: a.wallet_sso_source,
+              ghostAddress: a.ghost_address,
+            });
+          } catch (err) {
+            console.error(`Could not return AddressInfo: "${err}"`);
+            return null;
+          }
+        }),
+      );
+      return;
+    }
+  }, [data, isLoadingProfile, error, setPreferenceTags]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
     // not the best solution because address is not always available
     // should refactor AvatarUpload to make it work with new profiles
+    // @ts-expect-error <StrictNullChecks/>
     if (addresses?.length > 0) {
       const oldProfile = new MinimumProfile(
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].community.name,
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].address,
       );
 
       oldProfile.initialize(
         name,
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].address,
         avatarUrl,
+        // @ts-expect-error <StrictNullChecks/>
         profile.id,
+        // @ts-expect-error <StrictNullChecks/>
         addresses[0].community.name,
         null,
       );
 
       setAccount(
         new Account({
+          // @ts-expect-error <StrictNullChecks/>
           community: addresses[0].community,
+          // @ts-expect-error <StrictNullChecks/>
           address: addresses[0].address,
           profile: oldProfile,
           ignoreProfile: false,
         }),
       );
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       setAccount(null);
     }
   }, [addresses, avatarUrl, name, profile]);
 
-  if (loading) {
+  if (isLoadingProfile || isUpdatingProfile) {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
@@ -209,11 +263,11 @@ const EditProfileComponent = () => {
     );
   }
 
-  if (error === EditProfileError.NoProfileFound) {
+  if (errorCode === EditProfileError.NoProfileFound) {
     return <PageNotFound message="We cannot find profile." />;
   }
 
-  if (error === EditProfileError.None) {
+  if (errorCode === EditProfileError.None) {
     return (
       <CWPageLayout>
         <div className="EditProfile">
@@ -226,8 +280,8 @@ const EditProfileComponent = () => {
                   <CWButton
                     label="Cancel"
                     onClick={() => {
-                      setLoading(true);
                       setTimeout(() => {
+                        // @ts-expect-error <StrictNullChecks/>
                         navigate(`/profile/id/${profile.id}`);
                       }, 1000);
                     }}
@@ -238,6 +292,7 @@ const EditProfileComponent = () => {
                     label="Save"
                     onClick={() => handleSaveProfile()}
                     className="save-button"
+                    disabled={isUploadingProfileImage || isUploadingCoverImage}
                     buttonType="primary"
                   />
                 </div>
@@ -259,7 +314,11 @@ const EditProfileComponent = () => {
                   <AvatarUpload
                     scope="user"
                     account={account}
+                    uploadStartedCallback={() =>
+                      setIsUploadingProfileImage(true)
+                    }
                     uploadCompleteCallback={(files) => {
+                      setIsUploadingProfileImage(false);
                       files.forEach((f) => {
                         if (!f.uploadURL) return;
                         const url = f.uploadURL.replace(/\?.*/, '').trim();
@@ -329,6 +388,7 @@ const EditProfileComponent = () => {
               <div className="socials-section">
                 <CWText type="caption">Social links</CWText>
                 <CWSocials
+                  // @ts-expect-error <StrictNullChecks/>
                   socials={profile?.socials}
                   handleInputChange={(e) => {
                     setSocials(e);
@@ -366,6 +426,7 @@ const EditProfileComponent = () => {
                 enableGenerativeAI
                 defaultImageUrl={backgroundImageRef.current?.url}
                 defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
+                onImageProcessStatusChange={setIsUploadingCoverImage}
               />
             </CWFormSection>
             <CWFormSection
@@ -373,11 +434,14 @@ const EditProfileComponent = () => {
               description="Manage your addresses."
             >
               <LinkedAddresses
+                // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
+                // @ts-expect-error <StrictNullChecks/>
                 profile={profile}
                 refreshProfiles={(address: string) => {
-                  getProfile();
+                  refetch().catch(console.error);
                   app.user.removeAddress(
+                    // @ts-expect-error <StrictNullChecks/>
                     addresses.find((a) => a.address === address),
                   );
                 }}
@@ -386,6 +450,23 @@ const EditProfileComponent = () => {
                 Link new addresses via the profile dropdown menu
               </CWText>
             </CWFormSection>
+            {userOnboardingEnabled && (
+              <CWFormSection
+                title="Preferences"
+                description="Set your preferences to enhance your experience"
+              >
+                <div className="preferences-header">
+                  <CWText type="h4" fontWeight="semiBold">
+                    What are you interested in?
+                  </CWText>
+                  <CWText type="h5">(Select all that apply)</CWText>
+                </div>
+                <PreferenceTags
+                  preferenceTags={preferenceTags}
+                  onTagClick={toggleTagFromSelection}
+                />
+              </CWFormSection>
+            )}
           </CWForm>
         </div>
       </CWPageLayout>

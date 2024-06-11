@@ -16,6 +16,7 @@ type UpdateGroupResponse = GroupAttributes;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>,
 ) => {
@@ -33,8 +34,9 @@ export const updateGroupHandler = async (
           required_requirements: z.number().optional(),
         })
         .optional(),
-      requirements: z.array(z.any()).optional(), // validated in controller
+      requirements: z.array(z.any()).min(1), // validated in controller
       topics: z.array(z.number()).optional(),
+      allowList: z.array(z.number()).default([]),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -43,20 +45,24 @@ export const updateGroupHandler = async (
   }
   const {
     params: { id: groupId },
-    body: { metadata, requirements, topics },
+    body: { metadata, requirements, topics, allowList },
   } = validationResult.data;
 
+  // @ts-expect-error StrictNullChecks
   const { metadata: oldGroupMetadata } = await models.Group.findByPk(groupId, {
     attributes: ['metadata'],
   });
 
   const [group, analyticsOptions] = await controllers.groups.updateGroup({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
+    allowList,
   });
 
   // refresh memberships in background if requirements or

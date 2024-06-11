@@ -1,6 +1,6 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { AllCosmosProposals } from './types';
 import {
   filterV1GovCommunities,
@@ -34,9 +34,11 @@ export async function fetchUpToLatestCosmosProposals(
   );
   log.info(
     `Fetching up to the latest proposals from ${JSON.stringify(
+      // @ts-expect-error StrictNullChecks
       v1Communities.map((c) => c.id),
     )} v1 gov communities` +
       ` and ${JSON.stringify(
+        // @ts-expect-error StrictNullChecks
         v1Beta1Communities.map((c) => c.id),
       )} v1beta1 gov communities`,
   );
@@ -44,11 +46,13 @@ export async function fetchUpToLatestCosmosProposals(
   const [v1ProposalResults, v1BetaProposalResults] = await Promise.all([
     Promise.allSettled(
       v1Communities.map((c) =>
+        // @ts-expect-error StrictNullChecks
         fetchUpToLatestCosmosProposalV1(latestProposalIds[c.id] + 1, c),
       ),
     ),
     Promise.allSettled(
       v1Beta1Communities.map((c) =>
+        // @ts-expect-error StrictNullChecks
         fetchUpToLatestCosmosProposalV1Beta1(latestProposalIds[c.id] + 1, c),
       ),
     ),
@@ -80,9 +84,11 @@ export async function fetchLatestProposals(
   );
   log.info(
     `Fetching the latest proposals from ${JSON.stringify(
+      // @ts-expect-error StrictNullChecks
       v1Communities.map((c) => c.id),
     )} v1 gov chains` +
       ` and ${JSON.stringify(
+        // @ts-expect-error StrictNullChecks
         v1Beta1Communities.map((c) => c.id),
       )} v1beta1 gov chains`,
   );

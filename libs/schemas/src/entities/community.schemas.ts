@@ -9,6 +9,7 @@ import { PG_INT } from '../utils';
 import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
+import { Tag as CommunityTag } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
@@ -53,8 +54,10 @@ export const Community = z.object({
   updated_at: z.date().optional(),
   Addresses: z.array(Address).optional(),
   CommunityStakes: z.array(CommunityStake).optional(),
+  CommunityTags: z.array(CommunityTag).optional(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
   snapshot_spaces: z.array(z.string().max(255)).default([]).optional(),
+  include_in_digest_email: z.boolean().nullish(),
 });

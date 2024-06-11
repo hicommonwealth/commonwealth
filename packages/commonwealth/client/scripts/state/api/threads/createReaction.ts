@@ -1,6 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import app from 'state';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
@@ -43,6 +46,11 @@ const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
 }: IuseCreateThreadReactionMutation) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
+
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
@@ -59,6 +67,15 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.GiveUpvote,
+          // @ts-expect-error StrictNullChecks
+          profileId,
+        );
+      }
     },
   });
 };

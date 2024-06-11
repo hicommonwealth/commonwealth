@@ -8,7 +8,7 @@ export const communityTypeOptions = [
     title: 'BASE',
     isRecommended: true,
     description:
-      'Base in an Ethereum layer 2 network with high TVL and low transaction fees',
+      'Base is an Ethereum Layer 2 network with high TVL and low transaction fees',
   },
   {
     type: CommunityType.Blast,
@@ -52,7 +52,7 @@ export const communityTypeOptions = [
     chainBase: ChainBase.Solana,
     title: 'Solana',
     isRecommended: false,
-    isHidden: true,
+    isHidden: false,
     description:
       'Solana is a rapidly growing technology due to its speed and scale. ' +
       'Our integration with Solana allows you to create a community for your project with just a click!',

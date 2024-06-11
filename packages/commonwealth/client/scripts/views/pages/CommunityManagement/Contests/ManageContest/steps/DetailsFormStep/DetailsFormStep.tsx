@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
+import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import useUpdateContestMutation from 'state/api/contests/updateContest';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -72,6 +75,8 @@ const DetailsFormStep = ({
     initialToggledTopicList: contestFormData?.toggledTopicList,
   });
 
+  const { mutateAsync: updateContest } = useUpdateContestMutation();
+
   const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
   const totalPayoutPercentage = payoutStructure.reduce(
@@ -124,7 +129,7 @@ const DetailsFormStep = ({
     });
   };
 
-  const handleSubmit = (values: ContestFormValidationSubmitValues) => {
+  const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
     if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
       return;
     }
@@ -141,8 +146,20 @@ const DetailsFormStep = ({
     };
 
     if (editMode) {
-      // TODO save edit API call
-      goBack();
+      try {
+        await updateContest({
+          id: app.activeChainId(),
+          contest_address: contestAddress,
+          name: values.contestName,
+          image_url: values.contestImage,
+          topic_ids: toggledTopicList.filter((t) => t.checked).map((t) => t.id),
+        });
+
+        goBack();
+      } catch (error) {
+        console.log(error);
+        notifyError('Failed to edit contest');
+      }
     } else {
       onSetContestFormData(formData);
       onSetLaunchContestStep('SignTransactions');
@@ -212,7 +229,6 @@ const DetailsFormStep = ({
                   png)
                 </CWText>
                 <CWCoverImageUploader
-                  uploadCompleteCallback={console.log}
                   canSelectImageBehaviour={false}
                   showUploadAndGenerateText
                   onImageProcessStatusChange={setIsProcessingProfileImage}
@@ -250,6 +266,9 @@ const DetailsFormStep = ({
                     name="feeType"
                     hookToForm
                     disabled={editMode}
+                    onChange={() =>
+                      setValue('contestRecurring', ContestRecurringType.No)
+                    }
                   />
                 </div>
                 {watch('feeType') === ContestFeeType.DirectDeposit && (
@@ -262,7 +281,7 @@ const DetailsFormStep = ({
                       containerClassName="funding-token-address-input"
                       name="fundingTokenAddress"
                       hookToForm
-                      placeholder="Enter funding token address"
+                      placeholder="Enter funding token address e.g. 0x0000000000000000000000000000000000000000"
                       fullWidth
                       label="Token Address"
                       disabled={editMode}
@@ -279,9 +298,14 @@ const DetailsFormStep = ({
                   The remaining prize pool will roll over week to week until you
                   end the contest.
                   <br />
-                  {watch('contestRecurring') === ContestRecurringType.Yes && (
+                  {watch('contestRecurring') === ContestRecurringType.Yes ? (
                     <>
                       Contests run using Community Stake funds must be
+                      recurring.
+                    </>
+                  ) : (
+                    <>
+                      Contests run using Direct deposit funds can not be
                       recurring.
                     </>
                   )}
@@ -292,7 +316,10 @@ const DetailsFormStep = ({
                     value={ContestRecurringType.Yes}
                     name="contestRecurring"
                     hookToForm
-                    disabled={editMode}
+                    disabled={
+                      editMode ||
+                      watch('feeType') === ContestFeeType.DirectDeposit
+                    }
                   />
                   <CWRadioButton
                     label="No"

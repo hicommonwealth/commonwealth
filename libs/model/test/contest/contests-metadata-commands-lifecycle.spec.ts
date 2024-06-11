@@ -1,9 +1,9 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { Contest, TopicAttributes } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import z from 'zod';
+import { Contest, TopicAttributes } from '../../src/index';
 import { bootstrap_testing, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -247,7 +247,7 @@ describe('Contests metadata commands lifecycle', () => {
           name: 'xxx',
         },
       });
-      expect(promise).to.be.rejectedWith('ContestManager must exist');
+      expect(promise).to.be.rejectedWith('Contest Manager must exist');
     });
 
     it('should update contest manager metadata', async () => {
@@ -367,7 +367,7 @@ describe('Contests metadata commands lifecycle', () => {
           contest_address: 'does-not-exist',
         },
       });
-      expect(promise).to.be.rejectedWith('ContestManager must exist');
+      expect(promise).to.be.rejectedWith('Contest Manager must exist');
     });
 
     it('should cancel contest manager metadata', async () => {

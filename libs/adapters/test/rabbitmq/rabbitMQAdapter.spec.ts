@@ -1,3 +1,4 @@
+import type { ILogger } from '@hicommonwealth/core';
 import {
   BrokerPublications,
   BrokerSubscriptions,
@@ -7,7 +8,6 @@ import {
   Policy,
   events,
 } from '@hicommonwealth/core';
-import type { ILogger } from '@hicommonwealth/logging';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import { AckOrNack } from 'rascal';
@@ -61,7 +61,7 @@ describe('RabbitMQ', () => {
 
     it('Should fail to subscribe if not initialized', async () => {
       const res = await rmqAdapter.subscribe(
-        BrokerSubscriptions.SnapshotListener,
+        BrokerSubscriptions.NotificationsProvider,
         Snapshot() as any,
       );
       expect(res).to.be.false;
@@ -146,7 +146,7 @@ describe('RabbitMQ', () => {
 
     it('should successfully subscribe, return true, and process a message', async () => {
       const subRes = await rmqAdapter.subscribe(
-        BrokerSubscriptions.SnapshotListener,
+        BrokerSubscriptions.NotificationsProvider,
         Snapshot(),
       );
       expect(subRes).to.be.true;
@@ -184,7 +184,7 @@ describe('RabbitMQ', () => {
 
       let retryExecuted;
       const subRes = await rmqAdapter.subscribe(
-        BrokerSubscriptions.SnapshotListener,
+        BrokerSubscriptions.NotificationsProvider,
         FailingSnapshot(),
         (
           err: any,

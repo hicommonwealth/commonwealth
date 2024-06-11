@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
 
@@ -46,6 +46,7 @@ describe('User Dashboard API', () => {
         group_ids: [],
       },
     });
+    // @ts-expect-error StrictNullChecks
     topicId = topic.id;
 
     const topic2 = await server.models.Topic.create({
@@ -53,6 +54,7 @@ describe('User Dashboard API', () => {
       description: 'A topic made for testing',
       community_id: chain2,
     });
+    // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
 
     // creates 2 ethereum users
@@ -63,7 +65,10 @@ describe('User Dashboard API', () => {
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
-    userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: userId, email: firstUser.email },
+      config.AUTH.JWT_SECRET,
+    );
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -76,7 +81,10 @@ describe('User Dashboard API', () => {
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
-    userJWT2 = jwt.sign({ id: userId2, email: secondUser.email }, JWT_SECRET);
+    userJWT2 = jwt.sign(
+      { id: userId2, email: secondUser.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession2 = { session: secondUser.session, sign: secondUser.sign };
     expect(userId2).to.not.be.null;
     expect(userAddress2).to.not.be.null;
@@ -166,7 +174,7 @@ describe('User Dashboard API', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.result).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const threadIds = res.body.result.map((a) => a.thread.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -202,7 +210,7 @@ describe('User Dashboard API', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.result).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const threadIds = res.body.result.map((a) => a.thread.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -218,6 +226,7 @@ describe('User Dashboard API', () => {
         { community_id: 'ethereum' },
       ]);
     });
+
     it('should return correctly ranked user activity', async () => {
       for (let i = 0; i < 48; i++) {
         const threadArgs: ThreadArgs = {

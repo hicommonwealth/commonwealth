@@ -1,9 +1,9 @@
 import { ProposalSDKType } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
 import { AllCosmosProposals } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,8 +41,10 @@ export async function filterV1GovCommunities(communities: CommunityInstance[]) {
   const promises = communities.map(async (c) => {
     const chainNode = await c.getChainNode();
     if (chainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1) {
+      // @ts-expect-error StrictNullChecks
       v1Communities.push(c);
     } else {
+      // @ts-expect-error StrictNullChecks
       v1Beta1Communities.push(c);
     }
   });
@@ -59,12 +61,14 @@ export function mapCommunitiesToProposals(
 ): AllCosmosProposals {
   return {
     v1: v1Proposals.reduce(
+      // @ts-expect-error StrictNullChecks
       (acc, proposals, i) => ({ ...acc, [v1Communities[i].id]: proposals }),
       {},
     ),
     v1Beta1: v1Beta1Proposals.reduce(
       (acc, proposals, i) => ({
         ...acc,
+        // @ts-expect-error StrictNullChecks
         [v1Beta1Communities[i].id]: proposals,
       }),
       {},

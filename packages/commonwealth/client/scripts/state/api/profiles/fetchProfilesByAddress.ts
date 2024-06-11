@@ -10,21 +10,25 @@ interface FetchProfilesByAddressProps {
   currentChainId: string;
   profileChainIds: string[];
   profileAddresses: string[];
+  initiateProfilesAfterFetch?: boolean;
 }
 
-const fetchProfilesByAddress = async ({
+export const fetchProfilesByAddress = async ({
   currentChainId,
   profileAddresses,
   profileChainIds,
+  initiateProfilesAfterFetch = true,
 }: FetchProfilesByAddressProps) => {
   const response = await axios.post(
-    `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES}`,
+    `${app.serverUrl()}${ApiEndpoints.FETCH_PROFILES_BY_ADDRESS}`,
     {
       addresses: profileAddresses,
       communities: profileChainIds,
-      jwt: app.user.jwt,
+      ...(app?.user?.jwt && { jwt: app.user.jwt }),
     },
   );
+
+  if (!initiateProfilesAfterFetch) return response.data.result;
 
   return response.data.result.map((t) => {
     const profile = new MinimumProfile(t.address, currentChainId);
@@ -48,11 +52,12 @@ const useFetchProfilesByAddressesQuery = ({
   profileChainIds,
   profileAddresses = [],
   apiCallEnabled = true,
+  initiateProfilesAfterFetch = true,
 }: UseFetchProfilesByAddressesQuery) => {
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
-      ApiEndpoints.FETCH_PROFILES,
+      ApiEndpoints.FETCH_PROFILES_BY_ADDRESS,
       // we should not cache by currentChainId as it can break logic for DISCOURAGED_NONREACTIVE_fetchProfilesByAddress
       // currentChainId,
       // sort the chain/address ids by ascending so the keys are always in the same order
@@ -64,6 +69,7 @@ const useFetchProfilesByAddressesQuery = ({
         currentChainId,
         profileAddresses,
         profileChainIds,
+        initiateProfilesAfterFetch,
       }),
     staleTime: PROFILES_STALE_TIME,
     enabled: apiCallEnabled,
@@ -84,7 +90,7 @@ export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
   address: string,
 ) => {
   return queryClient.fetchQuery(
-    [ApiEndpoints.FETCH_PROFILES, chainId, address],
+    [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chainId, address],
     {
       queryFn: () =>
         fetchProfilesByAddress({

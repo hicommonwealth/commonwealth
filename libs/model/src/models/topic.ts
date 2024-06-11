@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type TopicAttributes = {
   id?: number;
@@ -28,10 +28,10 @@ export type TopicInstance = ModelInstance<TopicAttributes> & {
   // no mixins used
 };
 
-export type TopicModelStatic = ModelStatic<TopicInstance>;
-
-export default (sequelize: Sequelize.Sequelize) =>
-  <TopicModelStatic>sequelize.define<TopicInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<TopicInstance> =>
+  sequelize.define<TopicInstance>(
     'Topic',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },

@@ -1,9 +1,10 @@
-import { AppError } from '@hicommonwealth/core';
 import { TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
+const TOPIC_LOG =
+  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 class Contest extends ContractBase {
   namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
@@ -19,7 +20,7 @@ class Contest extends ContractBase {
       this.namespaceFactoryAddress,
       this.rpc,
     );
-    await this.namespaceFactory.initialize();
+    await this.namespaceFactory.initialize(true);
   }
 
   /**
@@ -63,9 +64,13 @@ class Contest extends ContractBase {
         feeShare,
         prizeShare,
       );
-      const newContestAddress = String(
-        txReceipt.events.NewContest.returnValues.contest,
-      );
+      // @ts-expect-error StrictNullChecks
+      const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
+      const newContestAddress = this.web3.eth.abi.decodeParameters(
+        ['address', 'address', 'uint256', 'bool'],
+        // @ts-expect-error StrictNullChecks
+        eventLog.data.toString(),
+      )['0'] as string;
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
@@ -109,9 +114,13 @@ class Contest extends ContractBase {
         walletAddress,
         exchangeToken,
       );
-      const newContestAddress = String(
-        txReceipt.events.NewContest.returnValues.contest,
-      );
+      // @ts-expect-error StrictNullChecks
+      const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
+      const newContestAddress = this.web3.eth.abi.decodeParameters(
+        ['address', 'address', 'uint256', 'bool'],
+        // @ts-expect-error StrictNullChecks
+        eventLog.data.toString(),
+      )['0'] as string;
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
@@ -129,6 +138,10 @@ class Contest extends ContractBase {
     amount: number,
     walletAddress: string,
   ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
     this.reInitContract();
     const tokenAddress = await this.contract.methods.contestToken().call();
 
@@ -144,7 +157,7 @@ class Contest extends ContractBase {
           maxFeePerGas: null,
         });
       } catch {
-        throw new AppError('ETH transfer failed');
+        throw new Error('ETH transfer failed');
       }
     } else {
       const encodedParameters = this.web3.eth.abi.encodeParameters(
@@ -182,6 +195,29 @@ class Contest extends ContractBase {
       return winnerIds.map((x) => Number(x));
     } catch (error) {
       throw Error('Failed to fetch winners' + error);
+    }
+  }
+
+  async getContestBalance(): Promise<number> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    this.reInitContract();
+    const tokenAddress = await this.contract.methods.contestToken().call();
+    if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+      const balance = await this.web3.eth.getBalance(this.contractAddress);
+      return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
+    } else {
+      const calldata =
+        '0x70a08231' +
+        this.web3.eth.abi
+          .encodeParameters(['address'], [this.contractAddress])
+          .substring(2);
+      const returnData = await this.web3.eth.call({
+        to: tokenAddress,
+        data: calldata,
+      });
+      return Number(this.web3.eth.abi.decodeParameter('uint256', returnData));
     }
   }
 }

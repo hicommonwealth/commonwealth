@@ -1,6 +1,6 @@
+import { config } from '@hicommonwealth/core';
 import { expect, test } from '@playwright/test';
-import { PORT } from '../../../server/config';
-import { e2eSeeder, type E2E_Seeder } from '../utils/e2eUtils';
+import { E2E_Seeder, e2eSeeder } from '../utils/e2eUtils';
 
 let seeder: E2E_Seeder;
 
@@ -10,7 +10,13 @@ test.beforeAll(async () => {
 
 test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
-    await page.goto(`http://localhost:${PORT}/`);
+    page.on('response', (response) => {
+      if (response.url().startsWith('http://localhost:8080/api/')) {
+        expect(response.status()).toBeLessThan(400);
+      }
+    });
+
+    await page.goto(`${config.SERVER_URL}/`);
 
     // await login(page);
 

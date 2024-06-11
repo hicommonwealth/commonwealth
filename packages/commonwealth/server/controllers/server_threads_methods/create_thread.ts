@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/core';
@@ -13,6 +14,7 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createThreadMentionNotifications,
+  emitMentions,
   parseUserMentions,
   queryMentionedUsers,
   uniqueMentions,
@@ -141,12 +143,14 @@ export async function __createThread(
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    // @ts-expect-error StrictNullChecks
     topic_id: +topicId,
   };
 
   const isAdmin = await validateOwner({
     models: this.models,
     user,
+    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowAdmin: true,
     allowSuperAdmin: true,
@@ -154,24 +158,43 @@ export async function __createThread(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       topicId,
       community.id,
       address,
+      PermissionEnum.CREATE_THREAD,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
     }
   }
 
+  const bodyText = decodeURIComponent(body);
+  const mentions = uniqueMentions(parseUserMentions(bodyText));
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
   // begin essential database changes within transaction
   const newThreadId = await this.models.sequelize.transaction(
     async (transaction) => {
+      // @ts-expect-error StrictNullChecks
       const thread = await this.models.Thread.create(threadContent, {
         transaction,
       });
 
       address.last_active = new Date();
       await address.save({ transaction });
+
+      await emitMentions(this.models, transaction, {
+        // @ts-expect-error StrictNullChecks
+        authorAddressId: address.id,
+        // @ts-expect-error StrictNullChecks
+        authorUserId: user.id,
+        authorAddress: address.address,
+        // @ts-expect-error StrictNullChecks
+        authorProfileId: address.profile_id,
+        mentions: mentionedAddresses,
+        thread,
+      });
 
       return thread.id;
       // end of transaction
@@ -196,24 +219,24 @@ export async function __createThread(
   // auto-subscribe thread creator to comments & reactions
   await this.models.Subscription.bulkCreate([
     {
+      // @ts-expect-error StrictNullChecks
       subscriber_id: user.id,
       category_id: NotificationCategories.NewComment,
+      // @ts-expect-error StrictNullChecks
       thread_id: finalThread.id,
       community_id: finalThread.community_id,
       is_active: true,
     },
     {
+      // @ts-expect-error StrictNullChecks
       subscriber_id: user.id,
       category_id: NotificationCategories.NewReaction,
+      // @ts-expect-error StrictNullChecks
       thread_id: finalThread.id,
       community_id: finalThread.community_id,
       is_active: true,
     },
   ]);
-
-  const bodyText = decodeURIComponent(body);
-  const mentions = uniqueMentions(parseUserMentions(bodyText));
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   const allNotificationOptions: EmitOptions[] = [];
 
@@ -226,15 +249,20 @@ export async function __createThread(
       categoryId: NotificationCategories.NewThread,
       data: {
         created_at: new Date(),
+        // @ts-expect-error StrictNullChecks
         thread_id: finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
+        // @ts-expect-error StrictNullChecks
         comment_text: finalThread.body,
         community_id: finalThread.community_id,
+        // @ts-expect-error StrictNullChecks
         author_address: finalThread.Address.address,
+        // @ts-expect-error StrictNullChecks
         author_community_id: finalThread.Address.community_id,
       },
     },
+    // @ts-expect-error StrictNullChecks
     excludeAddresses: [finalThread.Address.address],
   });
 

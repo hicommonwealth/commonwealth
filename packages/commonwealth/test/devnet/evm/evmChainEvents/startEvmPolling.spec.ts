@@ -3,8 +3,10 @@ import {
   events as coreEvents,
   dispose,
 } from '@hicommonwealth/core';
+import { getAnvil } from '@hicommonwealth/evm-testing';
 import { tester, type ContractInstance, type DB } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
+import { Anvil } from '@viem/anvil';
 import { expect } from 'chai';
 import { z } from 'zod';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
@@ -18,6 +20,7 @@ import { sdk } from './util';
 
 describe('EVM Chain Events End to End Tests', () => {
   let models: DB;
+  let anvil: Anvil;
 
   let propCreatedResult: { block: number; proposalId: string };
   let contract: ContractInstance;
@@ -38,6 +41,7 @@ describe('EVM Chain Events End to End Tests', () => {
     } else if (!lastBlock && blockNumber !== null) {
       throw new Error('Last processed block not found');
     } else {
+      // @ts-expect-error StrictNullChecks
       lastBlockNum = lastBlock.block_number;
     }
 
@@ -50,8 +54,8 @@ describe('EVM Chain Events End to End Tests', () => {
 
   before(async () => {
     models = await tester.seedDb();
-
-    const currentBlock = (await sdk.getBlock()).number;
+    anvil = await getAnvil();
+    const currentBlock = Number((await sdk.getBlock()).number);
     // advance time to avoid test interaction issues
     await sdk.safeAdvanceTime(currentBlock + 501);
     await models.LastProcessedEvmBlock.destroy({
@@ -63,6 +67,7 @@ describe('EVM Chain Events End to End Tests', () => {
   });
 
   after(async () => {
+    await anvil.stop();
     await dispose()();
   });
 

@@ -23,11 +23,14 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
@@ -36,6 +39,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
@@ -43,6 +47,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
+  // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -53,6 +58,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId,
   });
+  const contestAddress = searchParams.get('contest');
+  const contestStatus = searchParams.get('status');
 
   const containerRef = useRef();
 
@@ -91,8 +98,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
+      // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
+      // @ts-expect-error <StrictNullChecks/>
+      contestAddress,
+      // @ts-expect-error <StrictNullChecks/>
+      contestStatus,
+      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -113,6 +126,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
+    // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
       <DiscussionsFeedDiscovery
         orderBy={featuredFilter}
@@ -123,6 +137,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
         data={isInitialLoading ? [] : filteredThreads}
+        customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -189,7 +204,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => (
             <>
               <Breadcrumbs />
+              {userOnboardingEnabled && <UserTrainingSlider />}
+              <AdminOnboardingSlider />
               <HeaderWithFilters
+                // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}
                 stage={stageName}
                 featuredFilter={featuredFilter}

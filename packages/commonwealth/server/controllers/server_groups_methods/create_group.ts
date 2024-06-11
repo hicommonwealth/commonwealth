@@ -18,7 +18,7 @@ import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_COMMUNITY = 20;
 
-// FIXME: validation errors
+// Warning: validation errors
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
   InvalidRequirements: 'Invalid requirements',
@@ -27,7 +27,7 @@ const Errors = {
   InvalidTopics: 'Invalid topics',
 };
 
-// FIXME: the schema
+// Warning: the schema
 export type CreateGroupOptions = {
   user: UserInstance;
   community: CommunityAttributes;
@@ -38,7 +38,7 @@ export type CreateGroupOptions = {
   transaction?: Transaction;
 };
 
-// FIXME: should be partial of the aggregate
+// Warning: should be partial of the aggregate
 export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
@@ -53,10 +53,11 @@ export async function __createGroup(
     transaction,
   }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
-  // FIXME: authorization
+  // Warning: authorization
   const isAdmin = await validateOwner({
     models: this.models,
     user,
+    // @ts-expect-error StrictNullChecks
     communityId: community.id,
     allowMod: true,
     allowAdmin: true,
@@ -66,13 +67,13 @@ export async function __createGroup(
     throw new AppError(Errors.Unauthorized);
   }
 
-  // FIXME: validation
+  // Warning: validation
   const metadataValidationErr = validateMetadata(metadata);
   if (metadataValidationErr) {
     throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
   }
 
-  // FIXME: validation
+  // Warning: validation
   const requirementsValidationErr = validateRequirements(requirements);
   if (requirementsValidationErr) {
     throw new AppError(
@@ -80,7 +81,7 @@ export async function __createGroup(
     );
   }
 
-  // FIXME: invariant
+  // Warning: invariant
   const numCommunityGroups = await this.models.Group.count({
     where: {
       community_id: community.id,
@@ -98,6 +99,7 @@ export async function __createGroup(
       community_id: community.id,
     },
   });
+  // @ts-expect-error StrictNullChecks
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
     // did not find all specified topics
     throw new AppError(Errors.InvalidTopics);
@@ -106,6 +108,7 @@ export async function __createGroup(
   const createGroupWithTransaction = async (t: Transaction) => {
     const group = await this.models.Group.create(
       {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         metadata,
         requirements,
@@ -124,6 +127,7 @@ export async function __createGroup(
           ),
         },
         {
+          // @ts-expect-error StrictNullChecks
           where: {
             id: {
               [Op.in]: topicsToAssociate.map(({ id }) => id),
@@ -147,7 +151,7 @@ export async function __createGroup(
     });
   }
 
-  // FIXME: move to middleware
+  // Warning: move to middleware
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
     community: community.id,

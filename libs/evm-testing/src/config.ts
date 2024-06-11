@@ -1,9 +1,41 @@
-import dotenv from 'dotenv';
+import { configure, config as target } from '@hicommonwealth/core';
+import { z } from 'zod';
 
-dotenv.config();
+const {
+  ETH_ALCHEMY_API_KEY,
+  PROVIDER_URL,
+  ETHERSCAN_JS_API_KEY,
+  ETH_RPC,
+  COSMOS_GOV_V1,
+  COSMOS_REGISTRY_API,
+} = process.env;
 
-// Port that the chain-testing app should bind to
-export const CHAIN_TEST_APP_PORT = process.env.CHAIN_TEST_APP_PORT ?? 3000;
-
-// URL of the local Ganache, Anvil, or Hardhat chain
-export const PROVIDER_URL = process.env.PROVIDER_URL ?? 'http://chain:8545';
+export const config = configure(
+  target,
+  {
+    EVM: {
+      ETH_RPC: ETH_RPC || 'prod',
+      // URL of the local Ganache, Anvil, or Hardhat chain
+      PROVIDER_URL: PROVIDER_URL ?? 'http://127.0.0.1:8545',
+      ETH_ALCHEMY_API_KEY,
+      ETHERSCAN_JS_API_KEY,
+    },
+    COSMOS: {
+      COSMOS_GOV_V1_CHAIN_IDS: COSMOS_GOV_V1 ? COSMOS_GOV_V1.split(',') : [],
+      COSMOS_REGISTRY_API:
+        COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro',
+    },
+  },
+  z.object({
+    EVM: z.object({
+      ETH_RPC: z.string(),
+      PROVIDER_URL: z.string(),
+      ETH_ALCHEMY_API_KEY: z.string().optional(),
+      ETHERSCAN_JS_API_KEY: z.string().optional(),
+    }),
+    COSMOS: z.object({
+      COSMOS_GOV_V1_CHAIN_IDS: z.array(z.string()),
+      COSMOS_REGISTRY_API: z.string(),
+    }),
+  }),
+);

@@ -10,12 +10,15 @@ import type {
 import type {
   CommunityAttributes,
   DB,
-  Link,
-  LinkSource,
-  Role,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  type Link,
+  type LinkSource,
+  type Role,
+} from '@hicommonwealth/shared';
 import {
   SignTypedDataVersion,
   personalSign,
@@ -406,6 +409,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       callArgs: {
         community: chainId || '',
         title: encodeURIComponent(title),
+        // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         link: url || '',
         topic: topicId || '',
@@ -433,6 +437,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         chain: chainId,
         address,
         title: encodeURIComponent(title),
+        // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
         kind,
         topic_id: topicId,
@@ -561,6 +566,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       app: session.payload.app,
       block: session.payload.block,
       call: 'reactComment',
+      // @ts-expect-error StrictNullChecks
       callArgs: { comment_id, value: reaction },
       chain: 'eip155:1',
       from: session.payload.from,
@@ -612,6 +618,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       app: session.payload.app,
       block: session.payload.block,
       call: 'reactThread',
+      // @ts-expect-error StrictNullChecks
       callArgs: { thread_id, value: reaction },
       chain: 'eip155:1',
       from: session.payload.from,

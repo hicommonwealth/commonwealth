@@ -5,8 +5,8 @@ import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import app from 'state';
 import type Web3 from 'web3';
+import type { TransactionReceipt } from 'web3';
 import { AbiFunctionFragment, Transaction, Web3BaseProvider } from 'web3';
-import type { TransactionReceipt } from 'web3-core/types';
 import WebWalletController from '../../app/web_wallets';
 
 async function sendFunctionCall({
@@ -89,7 +89,9 @@ export async function callContractFunction({
   const web3: Web3 = signingWallet.api;
 
   // handle processing the forms inputs into their proper data types
+  // @ts-expect-error StrictNullChecks
   const processedArgs = processAbiInputsToDataTypes(fn.inputs, inputArgs);
+  // @ts-expect-error StrictNullChecks
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
   const functionConfig: {

@@ -1,9 +1,7 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
-import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { NODE_ENV } from '../../config';
+import { fileURLToPath } from 'url';
 import { incrementNumUnrelayedEvents } from './relayForever';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,7 +16,7 @@ async function connectListener(client: pg.Client) {
     await client.query(`LISTEN "${OUTBOX_CHANNEL}";`);
   } catch (err) {
     log.fatal('Failed to setup Postgres listener. Exiting...', err);
-    process.exit(1);
+    await dispose()('ERROR', true);
   }
 }
 
@@ -46,16 +44,16 @@ async function reconnect(client: pg.Client) {
     } catch (e) {
       log.error('Failed to close pg client', e);
     }
-    process.exit(1);
+    await dispose()('ERROR', true);
   }
 }
 
 export async function setupListener(): Promise<pg.Client> {
   log.info('Setting up listener...');
-  const { DATABASE_URI } = await import('@hicommonwealth/model');
+  const { config } = await import('@hicommonwealth/model');
   const client = new pg.Client({
-    connectionString: DATABASE_URI,
-    ssl: ['test', 'development'].includes(NODE_ENV)
+    connectionString: config.DB.URI,
+    ssl: ['test', 'development'].includes(config.NODE_ENV)
       ? false
       : { rejectUnauthorized: false },
   });
@@ -74,9 +72,9 @@ export async function setupListener(): Promise<pg.Client> {
     connected = false;
     reconnect(client)
       .then(() => connectListener(client))
-      .catch((e) => {
+      .catch(async (e) => {
         log.fatal('Failed to reconnect after pg error', e);
-        process.exit(1);
+        await dispose()('ERROR', true);
       });
   });
 

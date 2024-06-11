@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -16,7 +17,6 @@ import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-import { getUniqueUserAddressesForChainBase } from '../../modals/ManageCommunityStakeModal/utils';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
@@ -28,6 +28,7 @@ const resetWalletConnectSession = async () => {
   const walletConnectWallet = WebWalletController.Instance.getByName(
     WalletId.WalletConnect,
   );
+  // @ts-expect-error <StrictNullChecks/>
   await walletConnectWallet.reset();
 };
 
@@ -45,7 +46,7 @@ export const handleLogout = async () => {
 };
 
 interface UseUserMenuItemsProps {
-  onAuthModalOpen: (open: boolean) => void;
+  onAuthModalOpen: () => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,
@@ -80,11 +81,12 @@ const useUserMenuItems = ({
     useManageCommunityStakeModalStore();
 
   const user = app.user?.addresses?.[0];
+  // @ts-expect-error <StrictNullChecks/>
   const profileId = user?.profileId || user?.profile.id;
 
-  const uniqueChainAddresses = getUniqueUserAddressesForChainBase(
-    app?.chain?.base,
-  );
+  const uniqueChainAddresses = getUniqueUserAddresses({
+    forChain: app?.chain?.base,
+  });
   const shouldShowAddressesSwitcherForNonMember =
     stakeEnabled &&
     app.activeChainId() &&
@@ -134,6 +136,7 @@ const useUserMenuItems = ({
           onAddressItemClick?.();
 
           onRevalidationModalData({
+            // @ts-expect-error <StrictNullChecks/>
             walletSsoSource: walletSsoSource,
             walletAddress: account.address,
           });
@@ -185,7 +188,7 @@ const useUserMenuItems = ({
             type: 'default',
             label: 'Connect a new address',
             onClick: () => {
-              onAuthModalOpen(true);
+              onAuthModalOpen();
               onAddressItemClick?.();
             },
           },

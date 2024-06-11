@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors } from '../../../server/routes/upgradeMember';
 import { post } from './external/appHook.spec';
 
@@ -27,7 +27,7 @@ describe('upgradeMember Integration Tests', () => {
         id: server.e2eTestEntities.testUsers[0].id,
         email: server.e2eTestEntities.testUsers[0].email,
       },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 
@@ -102,6 +102,7 @@ describe('upgradeMember Integration Tests', () => {
       where: { id: server.e2eTestEntities.testAddresses[1].id },
     });
 
+    // @ts-expect-error StrictNullChecks
     chai.assert.equal(address.role, 'admin');
   });
 });

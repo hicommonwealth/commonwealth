@@ -22,6 +22,9 @@ const createGroup = async ({
   requirementsToFulfill,
   requirements = [],
 }: CreateGroupProps) => {
+  const finalRequirementsToFulfill =
+    requirementsToFulfill === 0 ? requirements.length : requirementsToFulfill;
+
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
     community_id: communityId,
@@ -30,8 +33,8 @@ const createGroup = async ({
     metadata: {
       name: groupName,
       description: groupDescription,
-      ...(requirementsToFulfill && {
-        required_requirements: requirementsToFulfill,
+      ...(finalRequirementsToFulfill && {
+        required_requirements: finalRequirementsToFulfill,
       }),
     },
     requirements,

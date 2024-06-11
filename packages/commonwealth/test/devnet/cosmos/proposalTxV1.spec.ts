@@ -20,6 +20,7 @@ import {
   encodeMsgVote,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import Long from 'long';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
@@ -65,7 +66,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
 
       try {
         const proposalResponse = await lcd.cosmos.gov.v1.proposal({
-          proposalId: longify(proposalId),
+          proposalId: longify(proposalId) as Long,
         });
         newProposal = proposalResponse.proposal;
       } catch (e) {
@@ -90,6 +91,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+    // @ts-expect-error StrictNullChecks
     const rawLog = JSON.parse(resp.rawLog);
     const submitProposalEvent = rawLog[0]?.events?.find(
       (e) => e['type'] === 'submit_proposal',

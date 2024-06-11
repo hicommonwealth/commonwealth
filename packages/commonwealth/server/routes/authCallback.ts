@@ -1,8 +1,7 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { fileURLToPath } from 'node:url';
-import { DISCORD_BOT_SUCCESS_URL } from '../config';
+import { fileURLToPath } from 'url';
+import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
@@ -97,7 +96,7 @@ const authCallback = async (
   const encryptedResponse = await encryptWithJWE(responseObject);
 
   // construct callback URL for reply
-  const redirectURL = `${DISCORD_BOT_SUCCESS_URL}/success/${encryptedResponse}`;
+  const redirectURL = `${config.DISCORD.BOT_SUCCESS_URL}/success/${encryptedResponse}`;
 
   // redirect once response received on client
   return success(res, redirectURL);

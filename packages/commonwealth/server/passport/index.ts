@@ -2,9 +2,10 @@ import { stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
-import { JWT_SECRET } from '../config';
+import { config } from '../config';
 import '../types';
 import { initMagicAuth } from './magic';
+// import { initTokenAuth } from './tokenAuth';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -18,7 +19,7 @@ function initDefaultUserAuth(models: DB) {
           ExtractJWT.fromUrlQueryParameter('jwt'),
           ExtractJWT.fromAuthHeaderAsBearerToken(),
         ]),
-        secretOrKey: JWT_SECRET,
+        secretOrKey: config.AUTH.JWT_SECRET,
       },
       async (jwtPayload, done) => {
         try {
@@ -43,6 +44,7 @@ function initDefaultUserAuth(models: DB) {
 export function setupPassport(models: DB) {
   initDefaultUserAuth(models);
   initMagicAuth(models);
+  // initTokenAuth();
 
   passport.serializeUser<any>((user, done) => {
     stats().increment('cw.users.logged_in');
@@ -54,6 +56,7 @@ export function setupPassport(models: DB) {
 
   passport.deserializeUser((userId, done) => {
     models.User.scope('withPrivateData')
+      // @ts-expect-error StrictNullChecks
       .findOne({ where: { id: userId } })
       .then((user) => {
         done(null, user);

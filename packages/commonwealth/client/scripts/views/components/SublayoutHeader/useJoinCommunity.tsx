@@ -10,6 +10,7 @@ import app from 'state';
 import { addressSwapper } from 'utils';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import TOSModal from 'views/modals/TOSModal';
+import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 
@@ -18,6 +19,7 @@ const useJoinCommunity = () => {
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -63,7 +65,9 @@ const useJoinCommunity = () => {
   const uniqueAddresses = [];
   const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
     (addressInfo) => {
+      // @ts-expect-error <StrictNullChecks/>
       if (!uniqueAddresses.includes(addressInfo.address)) {
+        // @ts-expect-error <StrictNullChecks/>
         uniqueAddresses.push(addressInfo.address);
         return true;
       }
@@ -124,12 +128,13 @@ const useJoinCommunity = () => {
         );
 
         // set verification token for the newly created account
-        const account = app.chain.accounts.get(
+        const account = app?.chain?.accounts?.get?.(
           encodedAddress,
+          // @ts-expect-error <StrictNullChecks/>
           addressInfo.keytype,
         );
-        if (app.chain) {
-          account.setValidationToken(verification_token);
+        if (account && app.chain) {
+          account?.setValidationToken?.(verification_token);
         }
 
         // set active address if in a community
@@ -142,15 +147,17 @@ const useJoinCommunity = () => {
             })
           ) {
             await app.roles.createRole({
+              // @ts-expect-error <StrictNullChecks/>
               address: addressInfo,
               community: activeChainId,
             });
           }
 
-          await setActiveAccount(account);
+          account && (await setActiveAccount(account));
 
           // update active accounts
           if (
+            account &&
             app.user.activeAccounts.filter((a) => isSameAccount(a, account))
               .length === 0
           ) {
@@ -183,6 +190,10 @@ const useJoinCommunity = () => {
           communityId: targetCommunity,
           communityChainBase: originAddressInfo.community.id,
           activeChainId: activeCommunityId,
+        });
+
+        await toggleCommunityStar({
+          community: activeCommunityId,
         });
       } catch (err) {
         console.error(err);

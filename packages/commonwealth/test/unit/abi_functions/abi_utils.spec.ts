@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import {
   parseAbiItemsFromABI,
   parseEventFromABI,
@@ -7,7 +7,6 @@ import {
   parseFunctionsFromABI,
   parseWriteFunctionsFromABI,
 } from '../../../shared/abi_utils';
-import { BigNumber, ethers } from 'ethers';
 
 describe('parseAbiItemsFromABI() unit tests', () => {
   it('should properly parse abi items from abi', () => {
@@ -67,14 +66,21 @@ describe('parseAbiItemsFromABI() unit tests', () => {
     expect(abiItems.length).to.equal(3);
     expect(abiItems[0].name).to.equal('deposit');
     expect(abiItems[0].type).to.equal('function');
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[0].inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[0].inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[0].inputs[0].name).to.equal('token');
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[0].inputs[0].type).to.equal('address');
     expect(abiItems[1].name).to.equal('withdraw');
     expect(abiItems[1].type).to.equal('function');
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[1].inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[1].inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiItems[1].inputs[0].name).to.equal('token');
   });
 });
@@ -149,14 +155,21 @@ describe('parseFunctionsFromABI() unit tests', () => {
     expect(abiFunctions.length).to.equal(2);
     expect(abiFunctions[0].name).to.equal('deposit');
     expect(abiFunctions[0].type).to.equal('function');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].name).to.equal('token');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].type).to.equal('address');
     expect(abiFunctions[1].name).to.equal('withdraw');
     expect(abiFunctions[1].type).to.equal('function');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[1].inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[1].inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[1].inputs[0].name).to.equal('token');
   });
   it('should return empty array if no functions in abi', () => {
@@ -233,9 +246,13 @@ describe('parseWriteFunctionsFromABI() unit tests', () => {
     expect(abiFunctions.length).to.equal(1);
     expect(abiFunctions[0].name).to.equal('deposit');
     expect(abiFunctions[0].type).to.equal('function');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].name).to.equal('token');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].type).to.equal('address');
   });
   it('should return empty array if no write functions', () => {
@@ -314,9 +331,13 @@ describe('parseFunctionFromABI() unit tests', () => {
     const abiFunction = parseFunctionFromABI(abi, 'withdraw');
     expect(abiFunction.name).to.equal('withdraw');
     expect(abiFunction.type).to.equal('function');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunction.inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiFunction.inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunction.inputs[0].name).to.equal('token');
+    // @ts-expect-error StrictNullChecks
     expect(abiFunction.inputs[0].type).to.equal('address');
   });
   it('should throw error if function not found', () => {
@@ -354,7 +375,7 @@ describe('parseFunctionFromABI() unit tests', () => {
       },
     ];
     expect(() => parseFunctionFromABI(abi, 'withdraw')).to.throw(
-      'Could not find function withdraw in ABI'
+      'Could not find function withdraw in ABI',
     );
   });
 });
@@ -398,9 +419,13 @@ describe('parseEventsFromABI() unit tests', () => {
     expect(abiEvents.length).to.equal(1);
     expect(abiEvents[0].name).to.equal('withdraw');
     expect(abiEvents[0].type).to.equal('event');
+    // @ts-expect-error StrictNullChecks
     expect(abiEvents[0].inputs.length).to.equal(1);
+    // @ts-expect-error StrictNullChecks
     expect(abiEvents[0].inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiEvents[0].inputs[0].name).to.equal('token');
+    // @ts-expect-error StrictNullChecks
     expect(abiEvents[0].inputs[0].type).to.equal('address');
   });
   it('should return empty array if no events are found', () => {
@@ -498,9 +523,13 @@ describe('parseEventFromABI() unit tests', () => {
     const abiEvent = parseEventFromABI(abi, 'deposit');
     expect(abiEvent.name).to.equal('deposit');
     expect(abiEvent.type).to.equal('event');
+    // @ts-expect-error StrictNullChecks
     expect(abiEvent.inputs.length).to.equal(2);
+    // @ts-expect-error StrictNullChecks
     expect(abiEvent.inputs[0].internalType).to.equal('address');
+    // @ts-expect-error StrictNullChecks
     expect(abiEvent.inputs[0].name).to.equal('token');
+    // @ts-expect-error StrictNullChecks
     expect(abiEvent.inputs[0].type).to.equal('address');
   });
 

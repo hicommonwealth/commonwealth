@@ -28,10 +28,10 @@ export function threadStageToLabel(stage: string) {
   }
 }
 
-export function isDefaultStage(stage: string) {
+export function isDefaultStage(stage: string, customStages?: string[]) {
   return (
     stage === ThreadStage.Discussion ||
-    stage === parseCustomStages(app.chain.meta.customStages)[0]
+    stage === parseCustomStages(customStages || app.chain.meta.customStages)[0]
   );
 }
 
@@ -48,6 +48,7 @@ export function parseCustomStages(customStages?: string[]): string[] {
 
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
+  // @ts-expect-error <StrictNullChecks/>
   return re.exec(url)[1];
 }
 
@@ -318,6 +319,7 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.Solana:
       return ChainNetwork.Solana;
     default:
+      // @ts-expect-error <StrictNullChecks/>
       return null;
   }
 }

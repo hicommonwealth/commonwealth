@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Link, LinkSource, ThreadInstance } from '@hicommonwealth/model';
+import { ThreadInstance } from '@hicommonwealth/model';
+import { LinkSource, type Link } from '@hicommonwealth/shared';
 import type { NextFunction } from 'express';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
@@ -28,12 +29,14 @@ const deleteThreadLinks = async (
 
   const isAuth = await isAuthorOrAdmin(
     models,
+    // @ts-expect-error StrictNullChecks
     await req.user.getAddresses(),
     thread.address_id,
     thread.community_id,
   );
   if (!isAuth) return next(new AppError(Errors.NotAdminOrOwner));
 
+  // @ts-expect-error StrictNullChecks
   const filteredLinks = thread.links.filter((link) => {
     return !links.some(
       (linkToDelete) =>
@@ -41,6 +44,7 @@ const deleteThreadLinks = async (
         linkToDelete.identifier === link.identifier,
     );
   });
+  // @ts-expect-error StrictNullChecks
   if (filteredLinks.length == thread.links.length)
     return next(new AppError(Errors.LinkDeleted));
   thread.links = filteredLinks;
@@ -65,6 +69,7 @@ const deleteThreadLinks = async (
     ],
   });
 
+  // @ts-expect-error StrictNullChecks
   return success(res, finalThread.toJSON());
 };
 

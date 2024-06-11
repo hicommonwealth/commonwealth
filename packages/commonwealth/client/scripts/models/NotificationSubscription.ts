@@ -1,5 +1,6 @@
-import type { SubscriptionAttributes } from '@hicommonwealth/model';
+import { Subscription } from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { z } from 'zod';
 import { Comment as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
@@ -69,14 +70,17 @@ class NotificationSubscription {
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.communityId = communityId;
+    // @ts-expect-error StrictNullChecks
     this.Comment = comment;
+    // @ts-expect-error StrictNullChecks
     this.Thread = thread;
+    // @ts-expect-error StrictNullChecks
     this.snapshotId = snapshotId;
   }
 }
 
 export const modelFromServer = (
-  subscription: SubscriptionAttributes & {
+  subscription: z.infer<typeof Subscription> & {
     Thread?: any;
     Comment?: any;
   },
@@ -122,8 +126,11 @@ export const modelFromServer = (
     is_active,
     created_at,
     immediate_email,
+    // @ts-expect-error StrictNullChecks
     community_id,
+    // @ts-expect-error StrictNullChecks
     modeledComment,
+    // @ts-expect-error StrictNullChecks
     modeledThread,
     snapshot_id,
   );

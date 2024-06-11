@@ -4,7 +4,7 @@ import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 import { get, post } from './external/appHook.spec';
@@ -40,6 +40,7 @@ describe('POST communityStakes Tests', () => {
   });
 
   it('The handler creates and updates community stake', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
       models: server.models,
@@ -92,7 +93,7 @@ describe('POST communityStakes Tests', () => {
     const stake_id = 3;
     const jwtToken = jwt.sign(
       { id: 2, email: server.e2eTestEntities.testUsers[0].email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
 
     const actualPutResponse = (
@@ -119,6 +120,7 @@ describe('POST communityStakes Tests', () => {
     const actualGetResponse = (
       await get(
         `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
+        // @ts-expect-error StrictNullChecks
         null,
         true,
         server.app,
@@ -152,6 +154,7 @@ describe('POST communityStakes Tests', () => {
       attributes: ['namespace', 'namespace_address'],
     });
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      // @ts-expect-error StrictNullChecks
       community,
       2,
     );

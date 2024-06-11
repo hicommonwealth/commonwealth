@@ -1,7 +1,7 @@
-import { logger } from '@hicommonwealth/logging';
+import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { DatabaseCleaner } from 'commonwealth/server/util/databaseCleaner';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'url';
+import { DatabaseCleaner } from '../util/databaseCleaner';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -10,8 +10,11 @@ databaseCleaner.init(models);
 databaseCleaner
   .executeQueries()
   .then(() => {
-    process.exit(0);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('EXIT', true);
   })
   .catch((err) => {
     log.error(`Failed to clean the database.`, err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('EXIT', true);
   });

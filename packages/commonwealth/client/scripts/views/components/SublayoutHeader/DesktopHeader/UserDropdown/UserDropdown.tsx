@@ -12,7 +12,7 @@ import useUserMenuItems from '../../useUserMenuItems';
 import './UserDropdown.scss';
 
 interface UserDropdownProps {
-  onAuthModalOpen: (open: boolean) => void;
+  onAuthModalOpen: () => void;
   onRevalidationModalData: ({
     walletSsoSource,
     walletAddress,

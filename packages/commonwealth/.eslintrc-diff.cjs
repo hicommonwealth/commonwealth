@@ -107,6 +107,7 @@ module.exports = {
     ],
     '@tanstack/query/exhaustive-deps': 'error',
     '@tanstack/query/prefer-query-object-syntax': 'error',
+    '@tanstack/query/no-deprecated-options': 1,
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [
       1,
@@ -119,28 +120,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-unused-vars': 1,
     'react/jsx-key': 'error',
-
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: [
-              '@hicommonwealth/core/**',
-              '@hicommonwealth/adapters/**',
-              '@hicommonwealth/model/**',
-            ],
-            message:
-              "Avoid importing from 'lib' directories. Import from the main entry point instead.",
-          },
-          {
-            group: ['libs/', 'packages/'],
-            message:
-              'Do not import files from outside the root directory of a package',
-          },
-        ],
-      },
-    ],
 
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/require-await': 'error',

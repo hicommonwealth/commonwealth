@@ -20,7 +20,7 @@ export const createGroupHandler = async (
 ) => {
   const { user, community } = req;
 
-  // FIXME: this is the command schema
+  // Warning: this is the command schema
   const schema = z.object({
     body: z.object({
       metadata: z.object({
@@ -28,7 +28,7 @@ export const createGroupHandler = async (
         description: z.string(),
         required_requirements: z.number().optional(),
       }),
-      requirements: z.array(z.any()), // validated in controller
+      requirements: z.array(z.any()).min(1), // validated in controller
       topics: z.array(z.number()).optional(),
     }),
   });
@@ -41,23 +41,26 @@ export const createGroupHandler = async (
   } = validationResult.data;
 
   const [group, analyticsOptions] = await controllers.groups.createGroup({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     community,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
   });
 
-  // FIXME: keep for now, but should be a debounced async integration policy that get's triggered by creation events
+  // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events
   // refresh memberships in background
   controllers.groups
     .refreshCommunityMemberships({
+      // @ts-expect-error StrictNullChecks
       communityId: community.id,
       groupId: group.id,
     })
     .catch(console.error);
 
-  // FIXME: replace with analytics middleware
+  // Warning: replace with analytics middleware
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, group);

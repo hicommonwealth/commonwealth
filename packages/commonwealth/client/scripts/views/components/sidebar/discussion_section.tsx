@@ -44,11 +44,15 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
+interface DiscussionSectionProps {
+  isContestAvailable: boolean;
+  topicIdsIncludedInContest: number[];
+}
+
 export const DiscussionSection = ({
   isContestAvailable,
-}: {
-  isContestAvailable: boolean;
-}) => {
+  topicIdsIncludedInContest,
+}: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -86,6 +90,7 @@ export const DiscussionSection = ({
   const topics = (topicsData || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
+    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
@@ -153,6 +158,7 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
+    // @ts-expect-error <StrictNullChecks/>
     ...(contestsEnabled && isContestAvailable
       ? [
           {
@@ -182,6 +188,7 @@ export const DiscussionSection = ({
           },
         ]
       : []),
+    // @ts-expect-error <StrictNullChecks/>
     {
       title: 'Overview',
       containsChildren: false,
@@ -204,6 +211,7 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
+    // @ts-expect-error <StrictNullChecks/>
     app.activeChainId() === 'near' && {
       title: 'Sputnik Daos',
       containsChildren: false,
@@ -235,7 +243,8 @@ export const DiscussionSection = ({
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
-      const topicInvolvedInActiveContest = false;
+      const topicInvolvedInActiveContest =
+        contestsEnabled && topicIdsIncludedInContest.includes(topic.id);
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,

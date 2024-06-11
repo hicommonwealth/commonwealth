@@ -109,7 +109,6 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
   contestEnabled,
-  existingCommunityStakeIntegrationEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -351,17 +350,13 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
-    ...(existingCommunityStakeIntegrationEnabled
-      ? [
-          <Route
-            key="/manage/integrations/stake"
-            path="/manage/integrations/stake"
-            element={withLayout(CommunityStakeIntegration, {
-              scoped: true,
-            })}
-          />,
-        ]
-      : []),
+    <Route
+      key="/manage/integrations/stake"
+      path="/manage/integrations/stake"
+      element={withLayout(CommunityStakeIntegration, {
+        scoped: true,
+      })}
+    />,
     <Route
       key="/manage/topics"
       path="/manage/topics"

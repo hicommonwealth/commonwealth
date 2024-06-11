@@ -3,10 +3,14 @@ import type {
   CommentAttributes,
   DB,
   ProfileInstance,
+  ProfileTagsAttributes,
+  TagsAttributes,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import { Tag } from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import z from 'zod';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
@@ -20,12 +24,16 @@ type GetNewProfileReq = {
 };
 type GetNewProfileResp = {
   profile: ProfileInstance;
+  totalUpvotes: number;
   addresses: AddressAttributes[];
   threads: ThreadAttributes[];
   comments: CommentAttributes[];
   commentThreads: ThreadAttributes[];
   isOwner: boolean;
+  tags: z.infer<typeof Tag>[];
 };
+
+type ProfileWithTags = ProfileTagsAttributes & { Tag: TagsAttributes };
 
 const getNewProfile = async (
   models: DB,
@@ -37,14 +45,17 @@ const getNewProfile = async (
   let profile: ProfileInstance;
 
   if (profileId) {
+    // @ts-expect-error StrictNullChecks
     profile = await models.Profile.findOne({
       where: {
         id: profileId,
       },
     });
   } else {
+    // @ts-expect-error StrictNullChecks
     profile = await models.Profile.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
     });
@@ -69,8 +80,19 @@ const getNewProfile = async (
     },
   });
 
+  // @ts-expect-error StrictNullChecks
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
+
+  const totalUpvotes = await models.Reaction.count({
+    where: {
+      address_id: {
+        [Op.in]: addressIds,
+      },
+    },
+  });
+
   const threads = await models.Thread.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -83,6 +105,7 @@ const getNewProfile = async (
   });
 
   const comments = await models.Comment.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       address_id: {
         [Op.in]: addressIds,
@@ -98,6 +121,7 @@ const getNewProfile = async (
     ...new Set<number>(comments.map((c) => c.thread_id, 10)),
   ];
   const commentThreads = await models.Thread.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       id: {
         [Op.in]: commentThreadIds,
@@ -108,13 +132,28 @@ const getNewProfile = async (
     },
   });
 
+  const profileTags = await models.ProfileTags.findAll({
+    where: {
+      profile_id: profileId || profile.id,
+    },
+    include: [
+      {
+        model: models.Tags,
+      },
+    ],
+  });
+
   return success(res, {
     profile,
+    totalUpvotes,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
     isOwner: req.user?.id === profile.user_id,
+    tags: profileTags
+      .map((t) => t.toJSON())
+      .map((t) => (t as ProfileWithTags).Tag),
   });
 };
 

@@ -13,7 +13,7 @@ export class Comment<T extends IUniqueId> {
   public readonly Address: AddressInfo;
   public readonly text: string;
   public readonly plaintext: string;
-  public readonly reactions: Reaction[];
+  public reactions: Reaction[];
   public reactionWeightsSum: number;
   public readonly id: number;
   public readonly createdAt: momentType.Moment;
@@ -84,6 +84,7 @@ export class Comment<T extends IUniqueId> {
     this.threadId = thread_id;
     this.id = id;
     this.createdAt = moment(created_at);
+    // @ts-expect-error StrictNullChecks
     this.parentComment = Number(parent_id) || null;
     this.authorChain = Address?.community_id || authorChain;
     this.lastEdited = last_edited
@@ -91,6 +92,7 @@ export class Comment<T extends IUniqueId> {
       : versionHistory && versionHistory?.length > 1
       ? versionHistory[0].timestamp
       : null;
+    // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.deleted = deleted_at?.length > 0 ? true : false;
     this.canvasAction = canvas_action;

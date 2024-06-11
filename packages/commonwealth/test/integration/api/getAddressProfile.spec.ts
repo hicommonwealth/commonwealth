@@ -116,7 +116,9 @@ describe('getAddressProfile tests', () => {
       return results.find(
         (x) =>
           x.profileId === testAddress.profile_id &&
+          // @ts-expect-error StrictNullChecks
           x.name === matchingProfile.profile_name &&
+          // @ts-expect-error StrictNullChecks
           x.avatarUrl === matchingProfile.avatar_url,
       );
     };

@@ -1,11 +1,10 @@
-export * as ContestHelper from './contestHelper';
 export * as newNamespaceValidator from './newNamespaceValidator';
 
-import * as communityStakeConfigValidatorModule from './communityStakeConfigValidator';
-import * as contractHelpersModule from './contractHelpers';
+import * as stake from './communityStakeConfigValidator';
+import * as contest from './contestHelper';
+import * as contract from './contractHelpers';
 
 // export modules as objects so they can be stubbed in tests
-export const contractHelpers = { ...contractHelpersModule };
-export const communityStakeConfigValidator = {
-  ...communityStakeConfigValidatorModule,
-};
+export const communityStakeConfigValidator = { ...stake };
+export const contractHelpers = { ...contract };
+export const contestHelper = { ...contest };

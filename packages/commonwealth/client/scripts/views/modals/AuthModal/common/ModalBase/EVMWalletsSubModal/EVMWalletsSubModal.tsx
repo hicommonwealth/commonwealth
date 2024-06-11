@@ -40,6 +40,7 @@ const EVMWalletsSubModal = ({
           </div>
 
           <section className="evm-wallet-list">
+            {/* @ts-expect-error StrictNullChecks*/}
             {availableWallets.map((wallet) => (
               <React.Fragment key={wallet}>
                 <AuthButton
@@ -47,6 +48,7 @@ const EVMWalletsSubModal = ({
                   rounded
                   variant="dark"
                   showDescription={false}
+                  // @ts-expect-error <StrictNullChecks/>
                   onClick={() => onWalletSelect(wallet)}
                   disabled={disabled}
                 />

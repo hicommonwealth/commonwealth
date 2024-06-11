@@ -37,6 +37,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
 
     e.preventDefault();
 
+    // @ts-expect-error <StrictNullChecks/>
     if (addresses.length === 1) {
       notifyError(
         'You must have at least one address linked to a profile. Please add another address before removing this one.',
@@ -50,9 +51,12 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         jwt: app.user.jwt,
       });
       // remove deleted role from app.roles
+      // @ts-expect-error <StrictNullChecks/>
       const foundAddressInfo = addresses.find((a) => a.address === address);
       app.roles.deleteRole({
+        // @ts-expect-error <StrictNullChecks/>
         address: foundAddressInfo,
+        // @ts-expect-error <StrictNullChecks/>
         community: chain,
       });
 

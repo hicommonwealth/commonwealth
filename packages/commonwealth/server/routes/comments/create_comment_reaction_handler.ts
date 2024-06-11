@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -29,9 +30,13 @@ export const createCommentReactionHandler = async (
 ) => {
   const { user, address } = req;
   const {
+    // @ts-expect-error StrictNullChecks
     reaction,
+    // @ts-expect-error StrictNullChecks
     canvas_action: canvasAction,
+    // @ts-expect-error StrictNullChecks
     canvas_session: canvasSession,
+    // @ts-expect-error StrictNullChecks
     canvas_hash: canvasHash,
   } = req.body;
 
@@ -39,14 +44,16 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidReaction);
   }
 
+  // @ts-expect-error StrictNullChecks
   const commentId = parseInt(req.params.id, 10);
   if (!commentId) {
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       comment_id: commentId,
+      // @ts-expect-error StrictNullChecks
       address: address.address,
       value: reaction,
     });
@@ -55,7 +62,9 @@ export const createCommentReactionHandler = async (
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
       reaction,
       commentId,

@@ -23,6 +23,7 @@ import { propToIProposal } from './utils-v1';
 class CosmosGovernanceV1 extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
+  // @ts-expect-error StrictNullChecks
   CosmosProposalV1
 > {
   private _minDeposit: CosmosToken;
@@ -55,8 +56,10 @@ class CosmosGovernanceV1 extends ProposalModule<
     return this._initProposal(proposalId);
   }
 
+  // @ts-expect-error StrictNullChecks
   private async _initProposal(proposalId: number): Promise<CosmosProposalV1> {
     try {
+      // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
       const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
         proposalId: numberToLong(proposalId),
@@ -65,6 +68,7 @@ class CosmosGovernanceV1 extends ProposalModule<
         this._Chain,
         this._Accounts,
         this,
+        // @ts-expect-error StrictNullChecks
         propToIProposal(proposal),
       );
       await cosmosProposal.init();
@@ -105,6 +109,7 @@ class CosmosGovernanceV1 extends ProposalModule<
     const idAttribute = submitEvent?.attributes.find(
       ({ key }) => key && cosm.fromAscii(key) === 'proposal_id',
     );
+    // @ts-expect-error StrictNullChecks
     const id = +cosm.fromAscii(idAttribute.value);
     await this._initProposal(id);
     return id;

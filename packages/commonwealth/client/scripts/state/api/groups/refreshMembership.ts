@@ -12,7 +12,7 @@ interface RefreshMembershipProps {
   apiEnabled?: boolean;
 }
 
-interface Memberships {
+export interface Memberships {
   groupId: number;
   topicIds: number[];
   isAllowed: boolean;

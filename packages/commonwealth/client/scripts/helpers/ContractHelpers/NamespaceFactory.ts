@@ -1,4 +1,3 @@
-import { String } from 'aws-sdk/clients/apigateway';
 import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
@@ -80,13 +79,14 @@ class NamespaceFactory extends ContractBase {
    * @param name New Namespace name
    * @param walletAddress an active evm wallet addresss to send tx from
    * @param feeManager wallet or contract address to send community fees
+   * @param chainId The id of the EVM chain
    * @returns txReceipt or Error if name is taken or tx fails
    */
   async deployNamespace(
     name: string,
     walletAddress: string,
     feeManager: string,
-    chainId: String,
+    chainId: string,
   ): Promise<any> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
@@ -189,7 +189,7 @@ class NamespaceFactory extends ContractBase {
             maxFeePerGas: null,
           });
       } else {
-        txReceipt = await this.contract
+        txReceipt = await this.contract.methods
           .newSingleContest(
             namespaceName,
             contestInterval,

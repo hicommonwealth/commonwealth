@@ -26,6 +26,7 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
+import { healthHandler } from '../routes/health';
 import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
@@ -90,12 +91,12 @@ import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import createDiscordBotConfig from '../routes/createDiscordBotConfig';
+import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
+import getDiscordChannels from '../routes/discord/getDiscordChannels';
+import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
+import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
-import getDiscordChannels from '../routes/getDiscordChannels';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
-import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
-import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -133,11 +134,12 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
+import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
+import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -165,6 +167,7 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
@@ -195,6 +198,7 @@ export type ServerControllers = {
   groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
+  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -224,6 +228,7 @@ function setupRouter(
     groups: new ServerGroupsController(models, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
+    tags: new ServerTagsController(models, banCache), // TOOD: maybe remove banCache?
   };
 
   // ---
@@ -800,6 +805,14 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models),
   );
 
+  // tags
+  registerRoute(
+    router,
+    'get',
+    '/tags',
+    getTagsHandler.bind(this, serverControllers),
+  );
+
   // roles
   registerRoute(
     router,
@@ -1137,7 +1150,7 @@ function setupRouter(
     '/generateImage',
     rateLimiterMiddleware({
       routerNamespace: 'generateImage',
-      requestsPerMinute: GENERATE_IMAGE_RATE_LIMIT,
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
@@ -1197,6 +1210,7 @@ function setupRouter(
     '/auth/magic',
     passport.authenticate('magic'),
     (req, res) => {
+      // @ts-expect-error StrictNullChecks
       return res.json({ status: 'Success', result: req.user.toJSON() });
     },
   );
@@ -1287,6 +1301,8 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     deleteGroupHandler.bind(this, serverControllers),
   );
+
+  registerRoute(router, 'get', '/health', healthHandler.bind(this));
 
   app.use(endpoint, router);
 

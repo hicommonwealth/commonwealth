@@ -34,6 +34,7 @@ class AddressInfo extends Account {
     super({
       address,
       community: chain,
+      // @ts-expect-error StrictNullChecks
       addressId: id,
       walletId,
       walletSsoSource,
@@ -41,8 +42,11 @@ class AddressInfo extends Account {
       ignoreProfile: false,
       lastActive,
     });
+    // @ts-expect-error StrictNullChecks
     this.id = id;
+    // @ts-expect-error StrictNullChecks
     this.keytype = keytype;
+    // @ts-expect-error StrictNullChecks
     this.profileId = profileId;
   }
 }

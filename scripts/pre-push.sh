@@ -1,6 +1,5 @@
 #!/bin/bash
 
-GRAY='\033[30m'  
 RED='\033[31m' 
 YELLOW='\033[33m'
 NC='\033[0m' 
@@ -12,7 +11,6 @@ then
     echo -e -n $YELLOW
     echo -e "🧹 eslint check before push..."
     echo "-------------------------------"
-    echo -e -n $GRAY
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
     echo -e $NC
 

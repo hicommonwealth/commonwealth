@@ -33,6 +33,7 @@ export type UpdateGroupOptions = {
   metadata?: z.infer<typeof GroupMetadata>;
   requirements?: Requirement[];
   topics?: number[];
+  allowList?: number[];
 };
 
 export type UpdateGroupResult = [GroupAttributes, TrackOptions];
@@ -128,6 +129,7 @@ export async function __updateGroup(
           ),
         },
         {
+          // @ts-expect-error StrictNullChecks
           where: {
             id: {
               [Op.in]: topicsToAssociate.map(({ id }) => id),
@@ -152,6 +154,7 @@ export async function __updateGroup(
           ),
         },
         {
+          // @ts-expect-error StrictNullChecks
           where: {
             id: {
               [Op.notIn]: topicsToAssociate.map(({ id }) => id),

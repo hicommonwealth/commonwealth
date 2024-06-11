@@ -15,6 +15,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
+import { useFlag } from '../../../../../../hooks/useFlag';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
@@ -22,6 +23,7 @@ import {
   conditionTypes,
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
+import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
@@ -86,6 +88,7 @@ const CWRequirementsRadioButton = ({
         options={options}
         value={value}
         onChange={(selectedOption) => {
+          // @ts-expect-error <StrictNullChecks/>
           onInputValueChange(`${selectedOption.value}`);
         }}
       />
@@ -135,7 +138,11 @@ const GroupForm = ({
   onSubmit,
   initialValues = {},
   onDelete = () => {},
+  allowedAddresses,
+  setAllowedAddresses,
 }: GroupFormProps) => {
+  const allowlistEnabled = useFlag('allowlist');
+
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -162,24 +169,28 @@ const GroupForm = ({
     useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
-  >([
-    {
-      defaultValues: {
-        requirementCondition: conditionTypes.find(
-          (x) => x.value === AMOUNT_CONDITIONS.MORE,
-        ),
-      },
-      values: {
-        requirementAmount: '',
-        requirementChain: '',
-        requirementCondition: AMOUNT_CONDITIONS.MORE,
-        requirementContractAddress: '',
-        requirementType: '',
-        requirementTokenId: '',
-      },
-      errors: {},
-    },
-  ]);
+  >(
+    !allowlistEnabled
+      ? [
+          {
+            defaultValues: {
+              requirementCondition: conditionTypes.find(
+                (x) => x.value === AMOUNT_CONDITIONS.MORE,
+              ),
+            },
+            values: {
+              requirementAmount: '',
+              requirementChain: '',
+              requirementCondition: AMOUNT_CONDITIONS.MORE,
+              requirementContractAddress: '',
+              requirementType: '',
+              requirementTokenId: '',
+            },
+            errors: {},
+          },
+        ]
+      : [],
+  );
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -254,11 +265,13 @@ const GroupForm = ({
     // manually using javascript
     const isTokenRequirementTypeAdded =
       !Object.values(TOKENS).includes(
+        // @ts-expect-error <StrictNullChecks/>
         allRequirements[index].values.requirementType,
       ) &&
       val.requirementType &&
       Object.values(TOKENS).includes(val.requirementType);
     if (isTokenRequirementTypeAdded) {
+      // @ts-expect-error <StrictNullChecks/>
       allRequirements[index].errors.requirementContractAddress = '';
     }
 
@@ -274,6 +287,7 @@ const GroupForm = ({
       // HACK ALERT: this type of validation change should be done internally by zod,
       // but we are doing this manually using javascript
       const schema = getRequirementSubFormSchema(
+        // @ts-expect-error <StrictNullChecks/>
         allRequirements[index].values.requirementType,
       );
       schema.pick({ [key]: true }).parse(val);
@@ -302,6 +316,7 @@ const GroupForm = ({
     if (val.requirementContractAddress) {
       const isInvalidEthAddress =
         [...Object.values(ERC_SPECIFICATIONS), TOKENS.EVM_TOKEN].includes(
+          // @ts-expect-error <StrictNullChecks/>
           allRequirements[index].values.requirementType,
         ) && !isValidEthAddress(val.requirementContractAddress);
 
@@ -327,6 +342,7 @@ const GroupForm = ({
         // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
         // manually using javascript
         const schema = getRequirementSubFormSchema(
+          // @ts-expect-error <StrictNullChecks/>
           subForm.values.requirementType,
         );
         if (subForm.values.requirementType === '') {
@@ -355,6 +371,7 @@ const GroupForm = ({
 
     setRequirementSubForms([...updatedSubForms]);
 
+    // @ts-expect-error <StrictNullChecks/>
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
 
@@ -381,6 +398,11 @@ const GroupForm = ({
 
     await onSubmit(formValues);
   };
+
+  // + 1 for allowlists
+  const maxRequirements = allowlistEnabled
+    ? requirementSubForms.length + 1
+    : requirementSubForms.length;
 
   return (
     <CWForm
@@ -461,10 +483,11 @@ const GroupForm = ({
               {requirementSubForms.map((subForm, index) => (
                 <RequirementSubForm
                   key={index}
+                  // @ts-expect-error <StrictNullChecks/>
                   defaultValues={subForm.defaultValues}
                   errors={subForm.errors}
                   onChange={(val) => validateChangedValue(val, index)}
-                  isRemoveable={index > 0}
+                  isRemoveable={allowlistEnabled || index > 0}
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
@@ -476,6 +499,7 @@ const GroupForm = ({
                     ? 'Cannot add more than 10 requirements'
                     : 'Add requirement'
                 }
+                // @ts-expect-error <StrictNullChecks/>
                 iconLeft={
                   requirementSubForms.length === MAX_REQUIREMENTS
                     ? null
@@ -512,8 +536,9 @@ const GroupForm = ({
                 />
 
                 <CWRequirementsRadioButton
-                  maxRequirements={requirementSubForms.length}
+                  maxRequirements={maxRequirements}
                   inputValue={cwRequiremenetsLabelInputValue}
+                  // @ts-expect-error <StrictNullChecks/>
                   isSelected={isSelectedCustomRequirementsToFulfillOption}
                   onSelect={() =>
                     setIsSelectedCustomRequirementsToFulfillOption(true)
@@ -562,9 +587,14 @@ const GroupForm = ({
             </section>
           </section>
 
-          {(formType === 'create' || formType === 'edit') && (
-            <TopicGatingHelpMessage />
+          {allowlistEnabled && (
+            <Allowlist
+              allowedAddresses={allowedAddresses}
+              setAllowedAddresses={setAllowedAddresses}
+            />
           )}
+          {(formType === 'create' || formType === 'edit') &&
+            !allowlistEnabled && <TopicGatingHelpMessage />}
 
           {/* Form action buttons */}
           <div className="action-buttons">
@@ -600,7 +630,11 @@ const GroupForm = ({
             <CWButton
               type="submit"
               buttonWidth="wide"
-              disabled={isNameTaken}
+              disabled={
+                isNameTaken ||
+                (requirementSubForms.length === 0 &&
+                  allowedAddresses.length === 0)
+              }
               label={formType === 'create' ? 'Create group' : 'Save changes'}
             />
           </div>

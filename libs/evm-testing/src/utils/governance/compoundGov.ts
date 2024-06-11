@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { advanceEvmTime } from '../../routes/chain';
+import { advanceTime } from '../chainUtil';
 import { comp_gov, erc20 } from '../contracts';
 import getProvider from '../getProvider';
 import { IGovernor } from './IGovernor';
@@ -51,9 +51,8 @@ export class compoundGovernor implements IGovernor {
     if (advanceDays) {
       const secs = Number(advanceDays) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
-    console.log(proposalId);
 
     return {
       proposalId: String(
@@ -73,7 +72,6 @@ export class compoundGovernor implements IGovernor {
     const cancel = await contract.methods
       .cancel(proposalId)
       .send({ from: accounts[0], gas: '150000' });
-    console.log(cancel);
     return { block: Number(cancel['blockNumber']) };
   }
 
@@ -88,7 +86,6 @@ export class compoundGovernor implements IGovernor {
     const vote = await contract.methods
       .castVote(proposalId, Number(forAgainst))
       .send({ from: accounts, gas: '1000000' });
-    console.log(vote);
     return { block: Number(vote['blockNumber']) };
   }
 
@@ -101,12 +98,12 @@ export class compoundGovernor implements IGovernor {
 
   public async queueProposal(
     proposalId: string | number,
-    advanceTime?: boolean,
+    advanceTimeToo?: boolean,
   ): Promise<any> {
-    if (advanceTime) {
+    if (advanceTimeToo) {
       const secs = Number(3) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -114,18 +111,17 @@ export class compoundGovernor implements IGovernor {
     const queued = await contract.methods
       .queue(proposalId)
       .send({ from: accounts, gas: '500000' });
-    console.log(queued);
     return { block: Number(queued['blockNumber']) };
   }
 
   public async executeProposal(
     proposalId: string | number,
-    advanceTime?: boolean,
+    advanceTimeToo?: boolean,
   ): Promise<any> {
-    if (advanceTime) {
+    if (advanceTimeToo) {
       const secs = Number(5) * 86400;
       const blocks = secs / 12 + 500;
-      await advanceEvmTime(secs, blocks);
+      await advanceTime(secs, blocks);
     }
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
@@ -133,7 +129,6 @@ export class compoundGovernor implements IGovernor {
     const executed = await contract.methods
       .execute(proposalId)
       .send({ from: accounts, value: '0', gas: '1000000' });
-    console.log(executed);
     return { block: Number(executed['blockNumber']) };
   }
 

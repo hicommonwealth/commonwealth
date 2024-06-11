@@ -1,0 +1,23 @@
+name: Setup
+description: Node/pnpm setup with cache + install
+inputs:
+  node-version:
+    description: Node version
+    required: true
+  fetch-depth:
+    description: Number of commits to fetch
+    required: false
+    default: '1'
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+      with:
+        run_install: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+    - name: Install
+      shell: bash
+      run: pnpm i --ignore-scripts

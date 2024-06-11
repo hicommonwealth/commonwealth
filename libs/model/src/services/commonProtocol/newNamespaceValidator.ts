@@ -58,12 +58,12 @@ export const validateNamespace = async (
 
   //validate contract data
   const activeNamespace = await getNamespace(
-    web3,
+    community.ChainNode.url,
     namespace,
     factoryData.factory,
   );
 
-  if (activeNamespace !== txReceipt.logs[0].address) {
+  if (activeNamespace.toLowerCase() !== txReceipt.logs[0].address) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 

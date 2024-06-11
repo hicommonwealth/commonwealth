@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type BanAttributes = {
   id?: number;
@@ -10,10 +10,11 @@ export type BanAttributes = {
 };
 
 export type BanInstance = ModelInstance<BanAttributes>;
-export type BanModelStatic = ModelStatic<BanInstance>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <BanModelStatic>sequelize.define<BanInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<BanInstance> =>
+  sequelize.define<BanInstance>(
     'Bans',
     {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },

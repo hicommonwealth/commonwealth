@@ -3,6 +3,7 @@ import {
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
+  buildRetryStrategy,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
@@ -10,13 +11,13 @@ import {
   Broker,
   BrokerSubscriptions,
   broker,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import { fileURLToPath } from 'node:url';
-import { RABBITMQ_URI } from '../../config';
+import { Contest, ContestWorker } from '@hicommonwealth/model';
+import { fileURLToPath } from 'url';
+import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
-import { SnapshotPolicy } from './policies/snapshotProposalCreatedPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -47,7 +48,10 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -59,14 +63,20 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  const snapshotSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.SnapshotListener,
-    SnapshotPolicy(),
-  );
-
   const chainEventSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ChainEvent,
     ChainEventPolicy(),
+  );
+
+  const contestWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestWorkerPolicy,
+    ContestWorker(),
+    buildRetryStrategy(undefined, 20_000),
+  );
+
+  const contestProjectionsSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestProjection,
+    Contest.Contests(),
   );
 
   if (!chainEventSubRes) {
@@ -79,19 +89,24 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     );
   }
 
-  if (!snapshotSubRes) {
+  if (!contestWorkerSubRes) {
     log.fatal(
-      'Failed to subscribe to snapshot events. Requires restart!',
+      'Failed to subscribe to contest worker events. Requires restart!',
       undefined,
       {
-        topic: BrokerSubscriptions.SnapshotListener,
+        topic: BrokerSubscriptions.ContestWorkerPolicy,
       },
     );
   }
 
-  if (!snapshotSubRes && !chainEventSubRes) {
-    log.fatal('All subscriptions failed. Restarting...');
-    process.exit(1);
+  if (!contestProjectionsSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest projection events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestProjection,
+      },
+    );
   }
 }
 

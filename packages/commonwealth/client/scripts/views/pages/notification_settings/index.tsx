@@ -1,14 +1,15 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { getMultipleSpacesById } from 'helpers/snapshot_utils';
+import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import app from 'state';
+import { trpc } from 'utils/trpcClient';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import NotificationSubscription from '../../../models/NotificationSubscription';
+import { getFirebaseMessagingToken } from 'views/pages/notification_settings/getFirebaseMessagingToken';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -24,7 +25,9 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
-import { bundleSubs, extractSnapshotProposals } from './helpers';
+import useNotificationSettings, {
+  SnapshotInfo,
+} from './useNotificationSettings';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -34,86 +37,51 @@ const emailIntervalFrequencyMap = {
   monthly: 'Once a month',
 };
 
-type SnapshotInfo = {
-  snapshotId: string;
-  space: {
-    avatar: string;
-    name: string;
-  };
-  subs: Array<NotificationSubscription>;
-};
-
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-  const [email, setEmail] = useState('');
-  const [emailValidated, setEmailValidated] = useState(false);
-  const [sentEmail, setSentEmail] = useState(false);
-  const [snapshotsInfo, setSnapshotsInfo] = useState(null);
+  const enableKnockPushNotifications = useFlag('knockPushNotifications');
 
-  const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval,
-  );
+  const {
+    email,
+    setEmail,
+    emailValidated,
+    setEmailValidated,
+    snapshotsInfo,
+    sentEmail,
+    setSentEmail,
+    currentFrequency,
+    setCurrentFrequency,
+    handleSubscriptions,
+    handleEmailSubscriptions,
+    handleUnsubscribe,
+    bundledSubs,
+    chainEventSubs,
+    relevantSubscribedCommunities,
+  } = useNotificationSettings();
+
+  const registerClientRegistrationToken =
+    trpc.subscription.registerClientRegistrationToken.useMutation();
+
+  const handlePushNotificationSubscription = useCallback(() => {
+    async function doAsync() {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+        const token = await getFirebaseMessagingToken();
+        await registerClientRegistrationToken.mutateAsync({
+          id: 'none',
+          token,
+        });
+      }
+    }
+
+    doAsync().catch(console.error);
+  }, [registerClientRegistrationToken]);
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [forceRerender]);
-
-  useEffect(() => {
-    // bundled snapshot subscriptions
-    const bundledSnapshotSubs = extractSnapshotProposals(
-      app.user.notifications.discussionSubscriptions,
-    );
-    const snapshotIds = Object.keys(bundledSnapshotSubs);
-
-    const getSpaces = async () => {
-      try {
-        const getSpaceById = await getMultipleSpacesById(snapshotIds);
-
-        const snapshotsInfoArr = snapshotIds.map((snapshotId) => ({
-          snapshotId,
-          space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
-          subs: bundledSnapshotSubs[snapshotId],
-        }));
-
-        setSnapshotsInfo(snapshotsInfoArr);
-      } catch (err) {
-        console.error(err);
-        return null;
-      }
-    };
-
-    getSpaces();
-  }, []);
-
-  const handleSubscriptions = async (
-    hasSomeInAppSubs: boolean,
-    subs: NotificationSubscription[],
-  ) => {
-    if (hasSomeInAppSubs) {
-      await app.user.notifications.disableSubscriptions(subs);
-    } else {
-      await app.user.notifications.enableSubscriptions(subs);
-    }
-    forceRerender();
-  };
-
-  const handleEmailSubscriptions = async (
-    hasSomeEmailSubs: boolean,
-    subs: NotificationSubscription[],
-  ) => {
-    if (hasSomeEmailSubs) {
-      await app.user.notifications.disableImmediateEmails(subs);
-    } else {
-      await app.user.notifications.enableImmediateEmails(subs);
-    }
-    forceRerender();
-  };
-
-  const handleUnsubscribe = async (subscription: NotificationSubscription) => {
-    await app.user.notifications.deleteSubscription(subscription);
-    forceRerender();
-  };
 
   if (!app.loginStatusLoaded()) {
     return <PageLoading />;
@@ -122,36 +90,31 @@ const NotificationSettingsPage = () => {
     return <PageLoading />;
   }
 
-  // bundled discussion subscriptions
-  const bundledSubs = bundleSubs(
-    app?.user.notifications.discussionSubscriptions,
-  );
-
-  // bundled chain-event subscriptions
-  const chainEventSubs = bundleSubs(
-    app?.user.notifications.chainEventSubscriptions,
-  );
-
-  const subscribedCommunityIds =
-    app?.user.notifications.chainEventSubscribedChainIds;
-
-  // communities the user has addresses for but does not have existing subscriptions for
-  const relevantSubscribedCommunities = app?.user.addresses
-    .map((x) => x.community)
-    .filter(
-      (x) => subscribedCommunityIds.includes(x.id) && !chainEventSubs[x.id],
-    );
-
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage">
         <CWText type="h3" fontWeight="semiBold" className="page-header-text">
           Notification Management
         </CWText>
+
         <CWText className="page-subheader-text">
           Notification settings for all new threads, comments, mentions, likes,
           and chain events in the following communities.
         </CWText>
+
+        {enableKnockPushNotifications && (
+          <div>
+            <CWText type="h5">Push Notifications</CWText>
+
+            <p>
+              <CWButton
+                label="Subscribe to Push Notifications"
+                onClick={handlePushNotificationSubscription}
+              />
+            </p>
+          </div>
+        )}
+
         <div className="email-management-section">
           <div className="text-description">
             <CWText type="h5">Scheduled Email Digest</CWText>
@@ -174,7 +137,7 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Once a week',
                   onClick: () => {
-                    app.user.updateEmailInterval('weekly');
+                    app.user.writeEmailSettings('weekly').catch(console.log);
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -182,7 +145,7 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Never',
                   onClick: () => {
-                    app.user.updateEmailInterval('never');
+                    app.user.writeEmailSettings('never').catch(console.log);
                     setCurrentFrequency('never');
                     forceRerender();
                   },
@@ -591,6 +554,7 @@ const NotificationSettingsPage = () => {
           </div>
         </div>
         {snapshotsInfo &&
+          // @ts-expect-error <StrictNullChecks/>
           snapshotsInfo.map((snapshot: SnapshotInfo) => {
             //destructuring snapshotInfo for readability
             const { snapshotId, space, subs } = snapshot;

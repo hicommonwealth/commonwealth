@@ -1,7 +1,11 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import {
+  PreferenceTags,
+  usePreferenceTags,
+} from 'client/scripts/views/components/PreferenceTags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import getLinkType from 'helpers/linkType';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
@@ -32,6 +36,7 @@ import {
 } from './validation';
 
 const CommunityProfileForm = () => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityStakeEnabled = useFlag('communityStake');
   const communityTagOptions: CommunityTags[] = ['DeFi', 'DAO'];
   const community = app.config.chains.getById(app.activeChainId());
@@ -46,16 +51,9 @@ const CommunityProfileForm = () => {
     isDisabled: true,
     canDisable: true,
   });
-  const [currentCommunityTags, setCurrentCommunityTags] = useState(
-    Object.entries(getCommunityTags(community.id))
-      .filter(({ 1: value }) => value)
-      .map(({ 0: key }) => key) as CommunityTags[],
-  );
   const [isCustomStagesEnabled, setIsCustomStagesEnabled] = useState(
     community.stagesEnabled,
   );
-  const [selectedCommunityTags, setSelectedCommunityTags] =
-    useState<CommunityTags[]>(currentCommunityTags);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,6 +65,71 @@ const CommunityProfileForm = () => {
       error: '',
     })),
   );
+
+  // TODO: this should be removed when /updateCommunityCategory route is updated to
+  // use only the newer tags schema
+  const [deprecatedCurrentCommunityTags, setDeprecatedCurrentCommunityTags] =
+    useState(
+      Object.entries(getCommunityTags(community.id))
+        .filter(({ 1: value }) => value)
+        .map(({ 0: key }, index) => ({ id: index, tag: key })),
+    );
+  const [deprecatedSelectedCommunityTags, setDeprecatedSelectedCommunityTags] =
+    useState(deprecatedCurrentCommunityTags);
+  const areTagsInitiallySet = useRef(false);
+  const {
+    isLoadingTags,
+    preferenceTags,
+    setPreferenceTags,
+    toggleTagFromSelection,
+  } = usePreferenceTags();
+
+  const updatePreferenceTags = useCallback(() => {
+    const isOlderTagSelected = (tag: string, name: string) => {
+      return (
+        tag.toLowerCase() === name &&
+        !!deprecatedCurrentCommunityTags.find(
+          (dct) => dct.tag.toLowerCase() === name,
+        )
+      );
+    };
+
+    const updatedTags = [...preferenceTags].map((tag) => ({
+      ...tag,
+      isSelected:
+        // if `defi` or `dao` is in older tags, mark it selected in newer ones
+        isOlderTagSelected(tag.item.tag, 'defi') ||
+        isOlderTagSelected(tag.item.tag, 'dao') ||
+        !!(community.CommunityTags || []).find((t) => t.id === tag.item.id),
+    }));
+    setPreferenceTags(updatedTags);
+  }, [
+    preferenceTags,
+    setPreferenceTags,
+    community,
+    deprecatedCurrentCommunityTags,
+  ]);
+
+  useEffect(() => {
+    if (
+      !isLoadingTags &&
+      preferenceTags?.length > 0 &&
+      community &&
+      deprecatedCurrentCommunityTags &&
+      !areTagsInitiallySet.current
+    ) {
+      updatePreferenceTags();
+
+      areTagsInitiallySet.current = true;
+    }
+  }, [
+    isLoadingTags,
+    preferenceTags,
+    setPreferenceTags,
+    community,
+    updatePreferenceTags,
+    deprecatedCurrentCommunityTags,
+  ]);
 
   const {
     links,
@@ -97,13 +160,38 @@ const CommunityProfileForm = () => {
       await editTags({
         communityId: community.id,
         selectedTags: {
-          DAO: selectedCommunityTags.includes('DAO'),
-          DeFi: selectedCommunityTags.includes('DeFi'),
+          ...(userOnboardingEnabled
+            ? {
+                DAO: !!preferenceTags.find(
+                  ({ item, isSelected }) =>
+                    item.tag.toLowerCase() === 'dao' && isSelected,
+                ),
+                DeFi: !!preferenceTags.find(
+                  ({ item, isSelected }) =>
+                    item.tag.toLowerCase() === 'defi' && isSelected,
+                ),
+              }
+            : {
+                DAO: !!deprecatedSelectedCommunityTags.find(
+                  ({ tag }) => tag === 'DAO',
+                ),
+                DeFi: !!deprecatedSelectedCommunityTags.find(
+                  ({ tag }) => tag === 'DeFi',
+                ),
+              }),
         },
+        ...(userOnboardingEnabled
+          ? {
+              tagIds: preferenceTags
+                .filter((pt) => pt.isSelected)
+                .map((pt) => pt.item.id),
+            }
+          : {}),
       });
 
       await editBanner({
         communityId: community.id,
+        // @ts-expect-error <StrictNullChecks/>
         bannerText: values.communityBanner,
       });
 
@@ -119,11 +207,30 @@ const CommunityProfileForm = () => {
         defaultOverview: values.defaultPage === DefaultPage.Overview,
       });
 
+      community.updateTags(
+        preferenceTags
+          .filter((t) => t.isSelected)
+          .map((t) => ({
+            id: t.item.id,
+            name: t.item.tag,
+          })),
+      );
+
       setNameFieldDisabledState({
         isDisabled: true,
         canDisable: true,
       });
-      setCurrentCommunityTags([...selectedCommunityTags]);
+      setDeprecatedCurrentCommunityTags(
+        userOnboardingEnabled
+          ? preferenceTags
+              .filter((t) => t.isSelected)
+              .filter((t) => ['defi', 'dao'].includes(t.item.tag.toLowerCase()))
+              .map((t) => ({
+                id: t.item.id,
+                tag: t.item.tag,
+              }))
+          : [...deprecatedSelectedCommunityTags],
+      );
       const updatedLinks = links.map((link) => ({
         value: link.value.trim(),
         canUpdate: true,
@@ -239,7 +346,6 @@ const CommunityProfileForm = () => {
               showUploadAndGenerateText
               name="communityProfileImageURL"
               canSelectImageBehaviour={false}
-              uploadCompleteCallback={console.log}
               defaultImageBehaviour={ImageBehavior.Circle}
               onImageProcessStatusChange={setIsProcessingProfileImage}
               subheaderText="Community Profile Image (Accepts JPG and PNG files)"
@@ -278,34 +384,53 @@ const CommunityProfileForm = () => {
 
           <section className="tags-section">
             <div className="header">
-              <CWText type="h4">Tags</CWText>
+              <CWText type="h4">
+                Tags
+                {userOnboardingEnabled ? (
+                  <>
+                    &nbsp;<CWText type="b1">(select up to 4)</CWText>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </CWText>
               <CWText type="b1">
                 Tags help new members find your community
               </CWText>
             </div>
 
             <div className="controls">
-              {communityTagOptions.map((option) => (
-                <CWButton
-                  key={option}
-                  type="button"
-                  label={option}
-                  buttonWidth="narrow"
-                  buttonType={
-                    selectedCommunityTags.includes(option)
-                      ? 'primary'
-                      : 'secondary'
-                  }
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedCommunityTags((prevTags) =>
-                      prevTags.includes(option)
-                        ? [...prevTags].filter((tag) => tag !== option)
-                        : [...prevTags, option],
-                    );
-                  }}
+              {userOnboardingEnabled ? (
+                <PreferenceTags
+                  preferenceTags={preferenceTags}
+                  onTagClick={toggleTagFromSelection}
+                  maxSelectableTags={4}
                 />
-              ))}
+              ) : (
+                communityTagOptions.map((option) => (
+                  <CWButton
+                    key={option}
+                    type="button"
+                    label={option}
+                    buttonWidth="narrow"
+                    buttonType={
+                      deprecatedSelectedCommunityTags.find(
+                        ({ tag }) => tag === option,
+                      )
+                        ? 'primary'
+                        : 'secondary'
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setDeprecatedSelectedCommunityTags((prevTags) =>
+                        prevTags.find(({ tag }) => tag === option)
+                          ? [...prevTags].filter(({ tag }) => tag !== option)
+                          : [...prevTags, { id: 1, tag: option }],
+                      );
+                    }}
+                  />
+                ))
+              )}
             </div>
           </section>
 
@@ -384,7 +509,11 @@ const CommunityProfileForm = () => {
               type="button"
               disabled={
                 !formState.isDirty &&
-                currentCommunityTags.length === selectedCommunityTags.length &&
+                (userOnboardingEnabled
+                  ? (community.CommunityTags || []).length ===
+                    preferenceTags.filter(({ isSelected }) => isSelected).length
+                  : deprecatedCurrentCommunityTags.length ===
+                    deprecatedSelectedCommunityTags.length) &&
                 links.filter((x) => x.value).length ===
                   (community.socialLinks || []).length &&
                 links.every((x) =>
@@ -398,7 +527,17 @@ const CommunityProfileForm = () => {
                   canDisable: true,
                 });
                 setLinks(initialLinks);
-                setSelectedCommunityTags(currentCommunityTags);
+
+                // TODO: this reset state is a bit buggy for the tags section, update this
+                // when api is updated to use newer tags schema
+                if (userOnboardingEnabled) {
+                  // this reset selected preference tags to original state
+                  updatePreferenceTags();
+                } else {
+                  setDeprecatedSelectedCommunityTags(
+                    deprecatedCurrentCommunityTags,
+                  );
+                }
               }}
             />
             <CWButton

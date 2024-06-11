@@ -46,10 +46,8 @@
     }
 
     .pseudo-input {
-      width: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      max-height: 0;
+      max-width: 0;
     }
 
     .attach-btn {
@@ -78,6 +76,7 @@
 
       .upload-generate-text {
         margin-top: 12px;
+        color: $neutral-500;
       }
 
       .generate-btn {

@@ -6,9 +6,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import Sinon from 'sinon';
 import { TestServer, testServer } from '../../../server-test';
-import * as Config from '../../../server/config';
-
-const { JWT_SECRET } = Config;
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 
@@ -59,7 +57,10 @@ describe('createReaction Integration Tests', () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
       () => ({ [userAddress]: 300 }),
     );
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userSession = { session: res.session, sign: res.sign };
 
     const topic = await server.models.Topic.findOne({
@@ -77,6 +78,7 @@ describe('createReaction Integration Tests', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
+      // @ts-expect-error StrictNullChecks
       topicId: topic.id,
       session: {
         type: 'session',
@@ -103,6 +105,7 @@ describe('createReaction Integration Tests', () => {
         return '';
       },
     });
+    // @ts-expect-error StrictNullChecks
     threadId = thread.id;
   });
 
@@ -127,6 +130,7 @@ describe('createReaction Integration Tests', () => {
       where: { text },
     });
 
+    // @ts-expect-error StrictNullChecks
     const beforeReactionCount = comment.reaction_count;
 
     chai.assert.isNotNull(comment);
@@ -172,6 +176,7 @@ describe('createReaction Integration Tests', () => {
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
+      // @ts-expect-error StrictNullChecks
       thread_id: thread.id,
       author_chain: 'ethereum',
       session: userSession.session,

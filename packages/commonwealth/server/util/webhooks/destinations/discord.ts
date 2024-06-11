@@ -1,7 +1,7 @@
 import { CommunityInstance } from '@hicommonwealth/model';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import request from 'superagent';
-import { DEFAULT_COMMONWEALTH_LOGO } from '../../../config';
+import { config } from '../../../config';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
@@ -38,7 +38,7 @@ function formatDiscordMessage<C extends NotificationCategories>(
     const typedData = data as ChainEventWebhookData;
     return {
       username: 'Commonwealth',
-      avatar_url: DEFAULT_COMMONWEALTH_LOGO,
+      avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
       embeds: [
         {
           author: {
@@ -60,7 +60,7 @@ function formatDiscordMessage<C extends NotificationCategories>(
     const typedData = data as ForumWebhookData;
     return {
       username: 'Commonwealth',
-      avatar_url: DEFAULT_COMMONWEALTH_LOGO,
+      avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
       embeds: [
         {
           author: {

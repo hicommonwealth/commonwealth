@@ -1,3 +1,4 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -33,9 +34,12 @@ const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowExtraSmall } = useBrowserWindow({});
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   useStickyHeader({
     elementId: 'dashboard-header',
     zIndex: 70,
+    // To account for new authentication buttons, shown in small screen sizes
+    top: !isLoggedIn && userOnboardingEnabled ? 68 : 0,
     stickyBehaviourEnabled: !!isWindowExtraSmall,
   });
 
@@ -84,6 +88,7 @@ const UserDashboard = (props: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
+        {/*@ts-expect-error StrictNullChecks*/}
         <div ref={setScrollElement} className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
@@ -123,6 +128,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="Join some communities to see Activity!"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
@@ -131,6 +137,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="No Activity"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
@@ -139,6 +146,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="Join some communities that have governance to see Chain Events!"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                   isChainEventsRow={true}
                 />

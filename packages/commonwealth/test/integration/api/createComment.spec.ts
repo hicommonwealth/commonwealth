@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http';
 import Chance from 'chance';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
 
 chai.use(chaiHttp);
@@ -18,6 +18,7 @@ describe('createComment Integration Tests', () => {
     const thread = await server.models.Thread.findOne({
       where: { id: threadId },
     });
+    // @ts-expect-error StrictNullChecks
     return thread.comment_count;
   };
 
@@ -73,7 +74,7 @@ describe('createComment Integration Tests', () => {
         id: server.e2eTestEntities.testUsers[0].id,
         email: server.e2eTestEntities.testUsers[0].email,
       },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 

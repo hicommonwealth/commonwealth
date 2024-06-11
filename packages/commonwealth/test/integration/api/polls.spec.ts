@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { testServer, TestServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -28,6 +28,7 @@ describe('Polls', () => {
         group_ids: [],
       },
     });
+    // @ts-expect-error StrictNullChecks
     topicId = topic.id;
 
     const userRes = await server.seeder.createAndVerifyAddress(
@@ -37,7 +38,7 @@ describe('Polls', () => {
     userAddress = userRes.address;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -82,10 +83,13 @@ describe('Polls', () => {
 
     const res = await chai.request
       .agent(server.app)
+      // @ts-expect-error StrictNullChecks
       .post(`/api/threads/${thread.id}/polls`)
       .set('Accept', 'application/json')
       .send({
+        // @ts-expect-error StrictNullChecks
         author_chain: thread.community_id,
+        // @ts-expect-error StrictNullChecks
         chain: thread.community_id,
         address: userAddress,
         jwt: userJWT,
@@ -98,6 +102,7 @@ describe('Polls', () => {
       options: JSON.stringify(data.options),
     });
 
+    // @ts-expect-error StrictNullChecks
     threadId = thread.id;
     pollId = res.body.result.id;
   });

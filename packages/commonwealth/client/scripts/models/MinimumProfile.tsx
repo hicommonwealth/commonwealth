@@ -11,13 +11,14 @@ export type UserProfile = {
 export function addressToUserProfile(address): UserProfile {
   const profile = address?.User?.Profiles[0];
   if (!profile) {
+    // @ts-expect-error <StrictNullChecks/>
     return undefined;
   }
 
   return {
     id: profile.id,
     avatarUrl: profile?.avatar_url,
-    name: profile?.profile_name,
+    name: profile?.profile_name || profile?.name,
     address: address?.address,
     lastActive: address?.last_active,
   };

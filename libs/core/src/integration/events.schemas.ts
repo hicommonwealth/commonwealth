@@ -2,21 +2,29 @@ import {
   Comment,
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
+  Reaction,
+  SubscriptionPreference,
   Thread,
+  zDate,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
 export const ThreadCreated = Thread;
+export const ThreadUpvoted = Reaction;
 export const CommentCreated = Comment;
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
 });
 export const UserMentioned = z.object({
-  authorId: z.number(),
-  userMentionedId: z.number(),
-  threadId: z.string().optional(),
-  commentId: z.string().optional(),
+  authorAddressId: z.number(),
+  authorUserId: z.number(),
+  authorAddress: z.string(),
+  authorProfileId: z.number(),
+  mentionedUserId: z.number(),
+  communityId: z.string(),
+  thread: Thread.optional(),
+  comment: Comment.optional(),
 });
 export const CommunityCreated = z.object({
   communityId: z.string(),
@@ -226,7 +234,7 @@ export const ChainEventCreated = z.union([
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({
-  created_at: z.date().describe('When the event was emitted'),
+  created_at: z.date().nullish().describe('When the event was emitted'),
   // TODO: TBD
   // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
   // aggregateId: z.string().describe("Event emitter aggregate id")
@@ -252,24 +260,25 @@ const ContestManagerEvent = EventMetadata.extend({
   contest_id: z
     .number()
     .int()
-    .positive()
+    .gte(0)
     .optional()
     .describe('Recurring contest id'),
 });
 
 export const ContestStarted = ContestManagerEvent.extend({
-  start_time: z.date().describe('Contest start time'),
-  end_time: z.date().describe('Contest end time'),
+  start_time: zDate.describe('Contest start time'),
+  end_time: zDate.describe('Contest end time'),
+  contest_id: z.number().int().gte(1).describe('Recurring contest id'),
 }).describe('When a contest instance gets started');
 
 export const ContestContentAdded = ContestManagerEvent.extend({
-  content_id: z.number().int().positive().describe('New content id'),
+  content_id: z.number().int().gte(0).describe('New content id'),
   creator_address: z.string().describe('Address of content creator'),
   content_url: z.string(),
 }).describe('When new content is added to a running contest');
 
 export const ContestContentUpvoted = ContestManagerEvent.extend({
-  content_id: z.number().int().positive().describe('Content id'),
+  content_id: z.number().int().gte(0).describe('Content id'),
   voter_address: z.string().describe('Address upvoting on content'),
   voting_power: z
     .number()
@@ -277,13 +286,13 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
     .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
 
-export const ContestWinnersRecorded = ContestManagerEvent.extend({
-  winners: z
-    .array(
-      z.object({
-        creator_address: z.string(),
-        prize: z.number().int().positive(),
-      }),
-    )
-    .describe('Contest winners from first to last'),
-}).describe('When contest winners are recorded and contest ends');
+export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
+  email_notifications_enabled: true,
+  digest_email_enabled: true,
+  recap_email_enabled: true,
+  mobile_push_notifications_enabled: true,
+  mobile_push_discussion_activity_enabled: true,
+  mobile_push_admin_alerts_enabled: true,
+  created_at: true,
+  updated_at: true,
+}).merge(SubscriptionPreference.pick({ id: true, user_id: true }));

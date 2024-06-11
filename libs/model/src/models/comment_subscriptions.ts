@@ -1,22 +1,21 @@
 import { CommentSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CommentSubscriptionAttributes = z.infer<typeof CommentSubscription>;
 
 export type CommentSubscriptionInstance =
   ModelInstance<CommentSubscriptionAttributes>;
-export type CommentSubscriptionModelStatic =
-  ModelStatic<CommentSubscriptionInstance>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommentSubscriptionModelStatic>sequelize.define<CommentSubscriptionInstance>(
+export default (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<CommentSubscriptionInstance> =>
+  sequelize.define<CommentSubscriptionInstance>(
     'CommentSubscriptions',
     {
-      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-      user_id: { type: Sequelize.INTEGER, allowNull: false },
-      comment_id: { type: Sequelize.INTEGER, allowNull: false },
+      user_id: { type: Sequelize.INTEGER, primaryKey: true },
+      comment_id: { type: Sequelize.INTEGER, primaryKey: true },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -29,11 +28,11 @@ export default (sequelize: Sequelize.Sequelize) =>
       },
     },
     {
+      tableName: 'CommentSubscriptions',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'CommentSubscriptions',
       underscored: false,
-      indexes: [{ fields: ['user_id', 'comment_id'], unique: true }],
+      indexes: [{ fields: ['comment_id'] }],
     },
   );
