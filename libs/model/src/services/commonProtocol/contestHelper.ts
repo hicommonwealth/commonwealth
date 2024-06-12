@@ -302,7 +302,7 @@ export const addContentBatch = async (
   contest: string[],
   creator: string,
   url: string,
-): Promise<Promise<AddContentResponse>[]> => {
+): Promise<PromiseSettledResult<AddContentResponse>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
     let currNonce = Number(
@@ -316,7 +316,7 @@ export const addContentBatch = async (
       currNonce++;
     });
 
-    return promises;
+    return Promise.allSettled(promises);
   });
 };
 
@@ -325,7 +325,7 @@ export const voteContentBatch = async (
   contest: string[],
   voter: string,
   contentId: string,
-): Promise<Promise<any>[]> => {
+): Promise<PromiseSettledResult<any>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
     let currNonce = Number(
@@ -341,6 +341,6 @@ export const voteContentBatch = async (
       currNonce++;
     });
 
-    return promises;
+    return Promise.allSettled(promises);
   });
 };
