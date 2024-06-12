@@ -5,6 +5,8 @@ import app from '../state/index';
 
 export const trpc = createTRPCReact<ApiV1>();
 
+console.log('FIXME: on the client bro.5');
+
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
@@ -19,3 +21,5 @@ export const trpcClient = trpc.createClient({
   ],
   transformer: undefined,
 });
+
+console.log('FIXME.8: ', trpc.subscription.getCommentSubscriptions.useQuery);

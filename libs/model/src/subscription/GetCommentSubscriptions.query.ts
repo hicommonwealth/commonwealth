@@ -5,6 +5,7 @@ import { models } from '../database';
 export function GetCommentSubscriptions(): Query<
   typeof schemas.GetCommentSubscriptions
 > {
+  console.log('FIXME.2');
   return {
     // FIXME: it could also lose them in this spread
     ...schemas.GetCommentSubscriptions,

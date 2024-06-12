@@ -193,6 +193,8 @@ export const event = <
 export const query = <Input extends ZodSchema, Output extends ZodSchema>(
   factory: () => QueryMetadata<Input, Output>,
 ) => {
+  console.log('FIXME.3');
+
   const md = factory();
   //const input = md.input.extend({ address_id: z.string().optional() });
   return trpc.procedure

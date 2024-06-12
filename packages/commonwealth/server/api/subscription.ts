@@ -42,3 +42,5 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Subscription,
   ),
 });
+
+//console.log("FIXME: on the client bro.2", trpcRouter.getCommentSubscriptions.useQuery)

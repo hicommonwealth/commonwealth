@@ -1,6 +1,7 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { Test } from 'test';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
@@ -117,6 +118,8 @@ const CommonDomainRoutes = ({
   communityHomepageEnabled,
   contestEnabled,
 }: RouteFeatureFlags) => [
+  <Route key="/test" path="/test" element={<Test />} />,
+
   <Route
     key="/"
     path="/"
