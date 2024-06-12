@@ -4,13 +4,13 @@ import { fileURLToPath } from 'url';
 import { logger } from '@hicommonwealth/core';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
+import { getSessionSignerForAddress } from 'shared/canvas/verify';
 
 import type {
   AddressInstance,
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
-import { getSessionSigners } from 'shared/canvas/verify';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,8 +22,6 @@ const verifySessionSignature = async (
   user_id: number,
   session: Session,
 ): Promise<boolean> => {
-  const signers = getSessionSigners();
-
   const expectedAddress = addressModel.address;
   const sessionAddress = session.address.split(':')[2];
   if (sessionAddress !== expectedAddress) {
@@ -32,14 +30,13 @@ const verifySessionSignature = async (
     );
   }
 
-  const matchingSigners = signers.filter((signer) =>
-    signer.match(session.address),
-  );
-  const signer = matchingSigners[0];
+  const signer = getSessionSignerForAddress(session.address);
   let isValid = false;
   try {
-    await signer.verifySession(CANVAS_TOPIC, session);
-    isValid = true;
+    if (signer !== undefined) {
+      await signer.verifySession(CANVAS_TOPIC, session);
+      isValid = true;
+    }
   } catch (e) {
     console.log(e);
   }
