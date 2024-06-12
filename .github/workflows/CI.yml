@@ -317,7 +317,7 @@ jobs:
           chmod -R 755 ./packages/commonwealth/coverage/lcov.info
           chmod -R 755 ./packages/discord-bot/coverage/lcov.info
           chmod -R 755 ./packages/scripts/coverage/lcov.info
-          chmod -R 755 ./packages/snapshot-listener/lcov.info
+          chmod -R 755 ./packages/snapshot-listener/coverage/lcov.info
 
       - name: Coveralls parallel
         uses: coverallsapp/github-action@v2
@@ -332,7 +332,7 @@ jobs:
             ./packages/commonwealth/coverage/lcov.info
             ./packages/discord-bot/coverage/lcov.info
             ./packages/scripts/coverage/lcov.info
-            ./packages/snapshot-listener/lcov.info
+            ./packages/snapshot-listener/coverage/lcov.info
 
       - name: Run integration tests
         run: pnpm -F commonwealth test-integration --allowOnly=false
