@@ -26,11 +26,13 @@ export const seedDb = async () => {
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
+        isWelcomeOnboardFlowComplete: true,
       },
       {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
+        isWelcomeOnboardFlowComplete: true,
       },
     ]);
 
