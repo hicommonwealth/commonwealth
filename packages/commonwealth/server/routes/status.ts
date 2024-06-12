@@ -286,6 +286,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
       promotional_emails_enabled: user.promotional_emails_enabled,
+      isWelcomeOnboardFlowComplete: user.isWelcomeOnboardFlowComplete,
       jwt: '',
       knockJwtToken: '',
       addresses,

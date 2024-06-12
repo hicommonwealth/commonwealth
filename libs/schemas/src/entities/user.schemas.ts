@@ -13,6 +13,7 @@ export const User = z.object({
     .default('never')
     .optional(),
   promotional_emails_enabled: z.boolean().optional(),
+  isWelcomeOnboardFlowComplete: z.boolean().default(false),
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
 });
