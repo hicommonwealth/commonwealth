@@ -308,8 +308,30 @@ jobs:
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
 
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: unit-test-coverage
+          parallel: true
+          files: | 
+            ./libs/adapters/coverage/lcov.info 
+            ./libs/core/coverage/lcov.info 
+            ./libs/model/coverage/lcov.info 
+            ./libs/sitemaps/coverage/lcov.info
+            ./packages/commonwealth/coverage/lcov.info
+            ./packages/discord-bot/coverage/lcov.info
+            ./packages/scripts/coverage/lcov.info
+            ./packages/snapshot-listener/lcov.info
+
       - name: Run integration tests
         run: pnpm -F commonwealth test-integration --allowOnly=false
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: integration-test-coverage
+          parallel: true
+          files: ./packages/commonwealth/coverage/lcov.info
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -351,6 +373,13 @@ jobs:
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
 
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: evm-devnet-test-coverage
+          parallel: true
+          files: ./packages/commonwealth/coverage/lcov.info
+
   # These tests run slowly, so run them in a separate job
   commonwealth-cosmos-tests:
     name: Cosmos Devnet Tests
@@ -379,19 +408,19 @@ jobs:
       cosmos_test_app:
         image: mhagel1/csdk-v1
         ports:
-         - 5051:5051
+          - 5051:5051
       cosmos_beta_test_app:
         image: mhagel1/csdk-beta
         ports:
-         - 5050:5050
+          - 5050:5050
       evmos_test_app:
         image: mhagel1/evmos-dev
         ports:
-         - 5052:5052
+          - 5052:5052
       redis:
         image: redis:latest
         ports:
-         - 6379:6379
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -425,4 +454,28 @@ jobs:
         run: |
           pnpm -F commonwealth start &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: cosmos-devnet-test-coverage
+          parallel: true
+          files: ./packages/commonwealth/coverage/lcov.info
+
+  report-coverage:
+    name: Upload Test Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ commonwealth-cosmos-tests, commonwealth-evm-tests, commonwealth-unit-integration, e2e-tests-serial, e2e-tests-Parallel, e2e-tests-Mature ]
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: "cosmos-devnet-test-coverage"
+
 

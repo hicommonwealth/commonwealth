@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "clean": "rm -rf build",
+    "clean": "rm -rf build && rm -rf coverage",
     "check-types": "tsc --noEmit",
     "dev": "concurrently -n watcher,listener,consumer -c red,green,yellow 'tsc -b -w' 'pnpm start' 'pnpm start-consumer'",
     "start": "tsx src/discord-listener/discordListener.ts",
@@ -12,7 +12,7 @@
     "start-prod-consumer": "node --import=extensionless/register build/discord-consumer/discordConsumer.js",
     "start-prod-listener": "node --import=extensionless/register build/discord-listener/discordListener.js",
     "switch-staging-app": "chmod u+x scripts/switch-discobot-staging-env.sh && ./scripts/switch-discobot-staging-env.sh",
-    "test": "NODE_ENV=test vitest --config ../../vite.config.ts run test",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
     "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test"
   },
   "keywords": [],

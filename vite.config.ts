@@ -13,7 +13,11 @@ export default defineConfig({
     ),
     coverage: {
       provider: 'istanbul',
-      reporter: ['text', 'json', 'html'],
+      reporter:
+        process.env.CI === 'true'
+          ? ['lcovonly']
+          : ['text', ['json', { file: 'coverage.json' }], 'html'],
+      reportsDirectory: './coverage',
     },
   },
 });

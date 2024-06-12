@@ -14,3 +14,4 @@ libs/chains/src/cosmos-ts
 *contractTypes
 *factories
 *.nyc_output
+*coverage.json

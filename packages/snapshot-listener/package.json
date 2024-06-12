@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "clean": "rm -rf build",
+    "clean": "rm -rf build && rm -rf coverage",
     "check-types": "tsc --noEmit",
     "lint-all": "eslint './**/*.ts'",
     "start": "tsx watch --max-old-space-size=4096 src/index.ts",
-    "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts run test"
+    "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test"
   },
   "engines": {
     "node": "20.x"
