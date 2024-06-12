@@ -275,13 +275,14 @@ const DetailsFormStep = ({
                   <>
                     <CWText className="funding-token-address-description">
                       Enter the address of the token you would like to use to
-                      fund your contest
+                      fund your contest (eg: USDT, $degen etc). Leave blank if
+                      using a native token
                     </CWText>
                     <CWTextInput
                       containerClassName="funding-token-address-input"
                       name="fundingTokenAddress"
                       hookToForm
-                      placeholder="Enter funding token address e.g. 0x0000000000000000000000000000000000000000"
+                      placeholder="Enter funding token address"
                       fullWidth
                       label="Token Address"
                       disabled={editMode}

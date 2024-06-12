@@ -36,6 +36,7 @@ interface SignTransactionsStepProps {
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
 const FIVE_MINS_IN_SECONDS = 60 * 5;
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -78,7 +79,7 @@ const SignTransactionsStep = ({
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
-      ? contestFormData?.fundingTokenAddress
+      ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
 
