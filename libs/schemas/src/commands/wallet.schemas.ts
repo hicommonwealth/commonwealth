@@ -10,3 +10,14 @@ export const CreateWallet = {
     isNew: z.boolean(),
   }),
 };
+
+export const SendTransaction = {
+  input: z.object({
+    to: z.string(),
+    value: z.number(),
+    data: z.string(),
+  }),
+  output: z.object({
+    transaction_hash: z.string(),
+  }),
+};
