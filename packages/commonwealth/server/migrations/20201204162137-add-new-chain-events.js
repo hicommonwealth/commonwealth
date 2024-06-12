@@ -19,8 +19,6 @@ const EventKinds = {
 
 const EventChains = [
   'edgeware',
-  // 'edgeware-local',
-  // 'edgeware-testnet',
   'kusama',
   'kusama-local',
   'polkadot',
