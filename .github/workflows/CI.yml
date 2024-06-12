@@ -470,6 +470,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [ commonwealth-cosmos-tests, commonwealth-evm-tests, commonwealth-unit-integration, e2e-tests-serial, e2e-tests-Parallel, e2e-tests-Mature ]
+    if: always()
     strategy:
       matrix:
         node: [ 20 ]
