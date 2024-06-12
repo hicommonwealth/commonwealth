@@ -26,3 +26,6 @@ export const stringify = configure({
   strict: true,
   deterministic: true,
 });
+
+export const caip2AddressEquals = (address1: string, address2: string) =>
+  address1 === address2;

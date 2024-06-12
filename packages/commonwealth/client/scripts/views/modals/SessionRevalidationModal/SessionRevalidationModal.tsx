@@ -53,11 +53,13 @@ const SessionRevalidationModal = ({
 
       // if user tries to sign in with different address than
       // expected for session key revalidation
+      const isSubstrate = app.user.activeAccounts.find(
+        (addr) => addr.address === walletAddress,
+      ).community.ss58Prefix;
       if (
         signedAddress === walletAddress ||
         // @ts-expect-error StrictNullChecks
-        (app.user.activeAccounts.find((addr) => addr.address === walletAddress)
-          .community.ss58Prefix &&
+        (isSubstrate &&
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
