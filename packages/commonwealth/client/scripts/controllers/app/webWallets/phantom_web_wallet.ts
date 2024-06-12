@@ -2,6 +2,7 @@ declare let window: any;
 
 import { SolanaSigner } from '@canvas-js/chain-solana';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import { SOLANA_MAINNET_CHAIN_ID } from 'shared/canvas/chainMappings';
 import IWebWallet from '../../../models/IWebWallet';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -33,7 +34,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
 
   public getChainId() {
     // 5ey... is the solana mainnet genesis hash
-    return '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
+    return SOLANA_MAINNET_CHAIN_ID;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
