@@ -1,7 +1,9 @@
+import inject from '@rollup/plugin-inject';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { Alias, defineConfig, loadEnv } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 const projectRootDir = path.resolve(__dirname);
@@ -27,6 +29,10 @@ export default defineConfig(({ mode }) => {
         template: './index.html',
       }),
       tsconfigPaths(),
+      inject({
+        process: 'process/browser',
+      }),
+      nodePolyfills(),
     ],
     build: {
       outDir: '../build',
@@ -65,7 +71,6 @@ export default defineConfig(({ mode }) => {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
     define: {
-      global: {},
       'process.env.NODE_ENV': JSON.stringify('development'),
       'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
       'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
