@@ -1,0 +1,25 @@
+{
+  "name": "load-testing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b ./tsconfig.json && tsc-alias -p ./tsconfig.json",
+    "test-browser-local": "k6 -e BASE_URL=localhost:9000 run build/test/browser/*.spec.js",
+    "test-api-local": "k6 run build/test/api/*.spec.js",
+    "start": "docker compose -f monitoring.yaml up",
+    "stop": "docker compose -f monitoring.yaml down"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/k6": "^0.51.0"
+  },
+  "dependencies": {
+    "moment": "^2.23.0"
+  }
+}

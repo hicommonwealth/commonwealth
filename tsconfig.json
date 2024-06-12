@@ -11,6 +11,7 @@
     { "path": "packages/commonwealth/tsconfig.build.json" },
     { "path": "packages/discord-bot/tsconfig.build.json" },
     { "path": "packages/scripts/tsconfig.json" },
-    { "path": "packages/snapshot-listener/tsconfig.build.json" }
+    { "path": "packages/snapshot-listener/tsconfig.build.json" },
+    { "path": "packages/load-testing/tsconfig.json" }
   ]
 }

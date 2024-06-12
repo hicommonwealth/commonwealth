@@ -49,7 +49,7 @@ export async function dashboard() {
     page.waitForLoadState('load');
 
     check(page, {
-      'Page title': page.title() == 'Common',
+      'Page title': (page) => page.title() == 'Common',
     });
   } finally {
     page.close();
@@ -64,7 +64,7 @@ export async function layer_zero() {
     page.waitForLoadState('load');
 
     check(page, {
-      'Page title': page.title() == 'Common',
+      'Page title': (page) => page.title() == 'Common',
     });
   } finally {
     page.close();
@@ -77,12 +77,14 @@ export async function search() {
   try {
     await page.goto(`${BASE_URL}dashboard/global`);
     page.waitForLoadState('load');
-    let searchBox = await page.getByPlaceholder('Search Common');
+    let searchBox = page.locator('[placeholder="Search Common"]');
+    searchBox.waitFor();
+
     searchBox.type('Proto');
     searchBox.press('Enter');
     page.waitForLoadState('load');
     check(page, {
-      'Page title': page.title() == 'Common',
+      'Page title': (page) => page.title() == 'Common',
     });
   } finally {
     page.close();

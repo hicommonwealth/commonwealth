@@ -1472,6 +1472,16 @@ importers:
         specifier: ^3.22.4
         version: 3.23.6
 
+  packages/load-testing:
+    dependencies:
+      moment:
+        specifier: ^2.23.0
+        version: 2.30.1
+    devDependencies:
+      '@types/k6':
+        specifier: ^0.51.0
+        version: 0.51.0
+
   packages/scripts:
     dependencies:
       '@hicommonwealth/core':
@@ -7485,6 +7495,12 @@ packages:
     resolution:
       {
         integrity: sha512-tFVMUVXBjPF94/XEB/aShfKnReNpaTthIF0Ut1uDynaEMm6dykyVACaYLd36va8ewZL5jFBclneCppoKdVYKNw==,
+      }
+
+  '@types/k6@0.51.0':
+    resolution:
+      {
+        integrity: sha512-xelcvFGPI4VYrV5ozADmRuFQBKmDqDRzxfHVuCDD1/firZiSQvTP0pntxHuYUSkRyL8I83kvABXUlnLYNT2VuA==,
       }
 
   '@types/lodash@4.17.1':
@@ -27837,6 +27853,8 @@ snapshots:
   '@types/k-bucket@5.0.4':
     dependencies:
       '@types/node': 20.12.10
+
+  '@types/k6@0.51.0': {}
 
   '@types/lodash@4.17.1': {}
 
