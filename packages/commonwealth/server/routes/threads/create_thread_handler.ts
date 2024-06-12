@@ -4,8 +4,8 @@ import {
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
+import { verifyThread } from 'shared/canvas/verify';
 import { addressSwapper } from 'shared/utils';
-import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';

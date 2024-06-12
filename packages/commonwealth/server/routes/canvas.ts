@@ -10,7 +10,7 @@ import {
   verifyComment,
   verifyReaction,
   verifyThread,
-} from '../../shared/canvas/serverVerify';
+} from 'shared/canvas/verify';
 
 type CanvasGetReq = {
   query: {

@@ -5,8 +5,8 @@ import {
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
+import { verifyComment } from 'shared/canvas/verify';
 import { addressSwapper } from 'shared/utils';
-import { verifyComment } from '../../../shared/canvas/serverVerify';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
