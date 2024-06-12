@@ -19,7 +19,7 @@ export function SendTransaction(): Command<typeof schemas.SendTransaction> {
         throw new AppError('User wallet not found');
       }
 
-      const userOpHash = commonProtocol.aaWallet.sendUserOp(
+      const userOpHash = await commonProtocol.aaWallet.sendUserOp(
         existingWallet.wallet_address,
         payload.to,
         payload.value,
