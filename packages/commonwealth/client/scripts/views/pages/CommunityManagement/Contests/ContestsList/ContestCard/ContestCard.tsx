@@ -136,7 +136,10 @@ const ContestCard = ({
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
               <CWText fontWeight="bold">
-                {capDecimals(s.tickerPrize!.toFixed(decimals || 18))} {ticker}
+                {capDecimals(
+                  s.tickerPrize ? s.tickerPrize?.toFixed(decimals || 18) : '',
+                )}
+                {ticker}
               </CWText>
             </div>
           ))}
