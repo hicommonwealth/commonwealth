@@ -14,7 +14,6 @@ import assert from 'assert';
 import { CosmosSignerCW, SubstrateSignerCW } from './sessionSigners';
 import { CanvasSignedData } from './types';
 import { CANVAS_TOPIC, assertMatches, caip2AddressEquals } from './utils';
-import { verify } from './verify';
 
 export const getSessionSigners = () => {
   return [
