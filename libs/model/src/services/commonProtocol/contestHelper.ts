@@ -1,10 +1,14 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, logger } from '@hicommonwealth/core';
 import { Mutex } from 'async-mutex';
+import { fileURLToPath } from 'url';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const nonceMutex = new Mutex();
 
@@ -72,7 +76,7 @@ const addContent = async (
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
-      gas: '200000',
+      gas: '1000000',
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -128,7 +132,7 @@ const voteContent = async (
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
-      gas: '200000',
+      gas: '1000000',
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -206,8 +210,8 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError(
-      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    log.warn(
+      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
   }
 
@@ -320,11 +324,14 @@ export const addContentBatch = async (
   });
 };
 
+export type VoteContentBatchEntry = {
+  contestAddress: string;
+  contentId: string;
+};
 export const voteContentBatch = async (
   rpcNodeUrl: string,
-  contest: string[],
   voter: string,
-  contentId: string,
+  entries: VoteContentBatchEntry[],
 ): Promise<PromiseSettledResult<any>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
@@ -334,9 +341,16 @@ export const voteContentBatch = async (
 
     const promises: Promise<any>[] = [];
 
-    contest.forEach((c) => {
+    entries.forEach(({ contestAddress, contentId }) => {
       promises.push(
-        voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+        voteContent(
+          rpcNodeUrl,
+          contestAddress,
+          voter,
+          contentId,
+          web3,
+          currNonce,
+        ),
       );
       currNonce++;
     });

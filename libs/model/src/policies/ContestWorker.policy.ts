@@ -32,54 +32,49 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload.id!,
         );
 
-        const activeContestsWithoutContent = await models.sequelize.query<{
+        const activeContestManagers = await models.sequelize.query<{
+          contest_address: string;
           url: string;
           private_url: string;
-          contest_address: string;
         }>(
           `
-          SELECT cn.url, cn.private_url, cm.contest_address
-          FROM "Communities" c
-          JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
-          JOIN "ContestManagers" cm ON cm.community_id = c.id
-          JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-          JOIN "Contests" co ON cm.contest_address = co.contest_address
-          LEFT JOIN "ContestActions" ca ON co.contest_address = ca.contest_address
-              AND co.contest_id = ca.contest_id
-              AND ca.content_url = :content_url
-              AND ca.actor_address = :actor_address
-              AND ca.action = 'added'
-          WHERE ct.topic_id = :topic_id
-          AND cm.community_id = :community_id
-          AND cm.cancelled = false
-          AND co.start_time < NOW()
-          AND co.end_time > NOW()
-          AND ca.action IS NULL;
+            SELECT cm.contest_address, cn.url, cn.private_url
+            FROM "Communities" c
+            JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
+            JOIN "ContestManagers" cm ON cm.community_id = c.id
+            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+            WHERE ct.topic_id = :topic_id
+            AND cm.community_id = :community_id
+            AND cm.cancelled = false
         `,
           {
             type: QueryTypes.SELECT,
             replacements: {
-              content_url: contentUrl,
-              actor_address: userAddress,
               topic_id: payload.topic_id!,
               community_id: payload.community_id,
             },
           },
         );
 
-        if (!activeContestsWithoutContent?.length) {
-          log.warn(
-            'ThreadCreated: no matching active contests without actions',
-          );
+        if (!activeContestManagers?.length) {
+          log.warn('ThreadCreated: no contest managers found');
           return;
         }
 
         const chainNodeUrl =
-          activeContestsWithoutContent[0]!.private_url ||
-          activeContestsWithoutContent[0]!.url;
+          activeContestManagers[0]!.private_url ||
+          activeContestManagers[0]!.url;
 
-        const addressesToProcess = activeContestsWithoutContent.map(
+        const addressesToProcess = activeContestManagers.map(
           (c) => c.contest_address,
+        );
+
+        log.debug(
+          `ThreadCreated: addresses to process: ${JSON.stringify(
+            addressesToProcess,
+            null,
+            2,
+          )}`,
         );
 
         const results = await contestHelper.addContentBatch(
@@ -97,8 +92,9 @@ export function ContestWorker(): Policy<typeof inputs> {
           );
 
         if (errors.length > 0) {
+          // TODO: ignore duplicate content error
           throw new Error(
-            `addContent failed ${errors.length} times: ${errors.join(', ')}"`,
+            `addContent failed with errors: ${errors.join(', ')}"`,
           );
         }
       },
@@ -115,7 +111,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload!.address_id,
         ))!;
 
-        const activeContestsWithoutVote = await models.sequelize.query<{
+        const activeContestManagersWithoutVote = await models.sequelize.query<{
           url: string;
           private_url: string;
           contest_address: string;
@@ -140,8 +136,7 @@ export function ContestWorker(): Policy<typeof inputs> {
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
-            AND co.start_time < NOW()
-            AND co.end_time > NOW()
+            AND NOW() > co.start_time
             AND ca.action IS NULL;
         `,
           {
@@ -155,7 +150,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           },
         );
 
-        if (!activeContestsWithoutVote?.length) {
+        if (!activeContestManagersWithoutVote?.length) {
           // throw to trigger retry in case the content is pending creation
           throw new Error(
             'ThreadUpvoted: no matching active contests without actions',
@@ -163,22 +158,24 @@ export function ContestWorker(): Policy<typeof inputs> {
         }
 
         const chainNodeUrl =
-          activeContestsWithoutVote[0]!.private_url ||
-          activeContestsWithoutVote[0]!.url;
-
-        const addressesToProcess = activeContestsWithoutVote.map(
-          (c) => c.contest_address,
-        );
+          activeContestManagersWithoutVote[0]!.private_url ||
+          activeContestManagersWithoutVote[0]!.url;
 
         log.debug(
-          `ThreadUpvoted addressesToProcess: ${addressesToProcess.join(', ')}`,
+          `ThreadUpvoted: contest managers to process: ${JSON.stringify(
+            activeContestManagersWithoutVote,
+            null,
+            2,
+          )}`,
         );
 
         const results = await contestHelper.voteContentBatch(
           chainNodeUrl!,
-          addressesToProcess,
           userAddress,
-          activeContestsWithoutVote[0].content_id.toString(),
+          activeContestManagersWithoutVote.map((m) => ({
+            contestAddress: m.contest_address,
+            contentId: m.content_id.toString(),
+          })),
         );
 
         const errors = results
