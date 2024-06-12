@@ -27,15 +27,15 @@ export const options = {
         },
       },
     },
-  },
-  search: {
-    executor: 'constant-vus',
-    exec: 'search',
-    vus: 3,
-    duration: '1m',
-    options: {
-      browser: {
-        type: 'chromium',
+    search: {
+      executor: 'constant-vus',
+      exec: 'search',
+      vus: 3,
+      duration: '1m',
+      options: {
+        browser: {
+          type: 'chromium',
+        },
       },
     },
   },
@@ -77,10 +77,15 @@ export async function search() {
   try {
     await page.goto(`${BASE_URL}dashboard/global`);
     page.waitForLoadState('load');
-    let searchBox = await page.getByPlaceholder('Search Common');
-    searchBox.type('Proto');
+    let searchParm = ['Proto', 'Common', 'Layer0', 'Discussion', 'Dashboard'];
+    let randomParm = searchParm[Math.floor(Math.random() * searchParm.length)];
+
+    // Random search
+    let searchBox = await page.locator('input[placeholder="Search Common"]');
+    searchBox.type(randomParm);
     searchBox.press('Enter');
     page.waitForLoadState('load');
+    console.log(page.url());
     check(page, {
       'Page title': page.title() == 'Common',
     });
