@@ -75,7 +75,7 @@ const updateEmail = async (
 
   try {
     await sgMail.send(msg);
-    console.log('Sent update email');
+    log.info('Sent update email');
   } catch (e) {
     log.error(`Could not send authentication email: ${loginLink}`);
   }
