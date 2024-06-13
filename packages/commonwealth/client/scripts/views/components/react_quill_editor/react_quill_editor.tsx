@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { nextTick } from 'process';
 import { RangeStatic } from 'quill';
 import MagicUrl from 'quill-magic-url';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -81,7 +80,7 @@ const ReactQuillEditor = ({
 
   const editorRef = useRef<ReactQuill>();
 
-  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [isVisible] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -157,17 +156,6 @@ const ReactQuillEditor = ({
     editorRef,
     setContentDeltaToUse,
   });
-
-  // refreshQuillComponent unmounts and remounts the
-  // React Quill component, as this is the only way
-  // to refresh the component if the 'modules'
-  // prop is changed
-  const refreshQuillComponent = () => {
-    setIsVisible(false);
-    nextTick(() => {
-      setIsVisible(true);
-    });
-  };
 
   const handleChange = (value, delta, source, editor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
