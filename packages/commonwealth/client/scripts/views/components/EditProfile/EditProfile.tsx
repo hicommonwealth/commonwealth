@@ -363,6 +363,7 @@ const EditProfile = () => {
               description="Express yourself through imagery."
             >
               <CWText fontWeight="medium">Add a background image </CWText>
+              {/* TODO: add option to remove existing image */}
               <CWCoverImageUploader
                 name="backgroundImg"
                 hookToForm

@@ -1,3 +1,4 @@
+import { quillValidationSchema } from 'client/scripts/helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 
@@ -13,16 +14,5 @@ export const editProfileValidation = z.object({
     z.literal(''),
     z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
   ]),
-  bio: z.object({
-    ops: z
-      .array(
-        z.object({
-          insert: z
-            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-            .default(''),
-        }),
-      )
-      .length(1),
-    ___isMarkdown: z.boolean(),
-  }),
+  bio: quillValidationSchema,
 });
