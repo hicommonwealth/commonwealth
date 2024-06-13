@@ -14,7 +14,7 @@ export async function getActivityFeed(models: DB, id = 0) {
     : '';
 
   const query = `
-    WITH ranked_thread_notifications AS (
+    WITH ranked_threads AS (
       SELECT 
       T.id AS thread_id,
       T.updated_at as updated_at,
@@ -74,7 +74,7 @@ export async function getActivityFeed(models: DB, id = 0) {
       ))) as "recentComments"
       FROM (
         Select tempC.* FROM "Comments" tempC
-        JOIN ranked_thread_notifications tempRTN ON tempRTN.thread_id = tempC.thread_id
+        JOIN ranked_threads tempRTS ON tempRTS.thread_id = tempC.thread_id
         WHERE deleted_at IS NULL
         ORDER BY created_at DESC
         LIMIT 3 -- Optionally a prop can be added for this
@@ -85,15 +85,15 @@ export async function getActivityFeed(models: DB, id = 0) {
     )
     SELECT 
       N.id as notification_id,
-      RTN."thread" as thread,
+      RTS."thread" as thread,
       RC."recentComments" as recentComments,
       N.category_id as category_id,
       community_id
-    FROM ranked_thread_notifications RTN
-    INNER JOIN "Notifications" N ON RTN.max_notif_id = N.id
-    LEFT JOIN recent_comments RC ON RTN.thread_id = RC.thread_id
+    FROM ranked_threads RTS
+    INNER JOIN "Notifications" N ON RTS.max_notif_id = N.id
+    LEFT JOIN recent_comments RC ON RTS.thread_id = RC.thread_id
     WHERE (category_id = 'new-comment-creation') OR category_id = 'new-thread-creation'
-    ORDER BY RTN.updated_at DESC;
+    ORDER BY RTS.updated_at DESC;
   `;
 
   const notifications: any = await models.sequelize.query(query, {
