@@ -77,12 +77,15 @@ export async function search() {
   try {
     await page.goto(`${BASE_URL}dashboard/global`);
     page.waitForLoadState('load');
-    let searchBox = page.locator('[placeholder="Search Common"]');
-    searchBox.waitFor();
+    let searchParm = ['Proto', 'Common', 'Layer0', 'Discussion', 'Dashboard'];
+    let randomParm = searchParm[Math.floor(Math.random() * searchParm.length)];
 
-    searchBox.type('Proto');
+    // Random search
+    let searchBox = page.locator('input[placeholder="Search Common"]');
+    searchBox.type(randomParm);
     searchBox.press('Enter');
     page.waitForLoadState('load');
+    console.log(page.url());
     check(page, {
       'Page title': (page) => page.title() == 'Common',
     });
