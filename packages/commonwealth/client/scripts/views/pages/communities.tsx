@@ -168,7 +168,6 @@ const CommunitiesPage = () => {
         ? null
         : new Map(
             Object.entries(
-              // @ts-expect-error <StrictNullChecks/>
               historicalPrices?.reduce((acc, { community_id, old_price }) => {
                 acc[community_id] = old_price;
                 return acc;

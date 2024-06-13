@@ -52,6 +52,7 @@ export const QuillFormattedText = ({
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
       return {
+        // @ts-expect-error <StrictNullChecks/>
         ops: [...doc.ops.slice(0, cutoffLines)],
       } as DeltaStatic;
     }

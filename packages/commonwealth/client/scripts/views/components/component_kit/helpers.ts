@@ -22,31 +22,31 @@ export const getClasses = <T>(
 };
 
 export const isWindowLarge = (width: number) =>
-  width > breakpoints.breakpointLargeMin;
+  width > parseInt(breakpoints.breakpointLargeMin);
 
 export const isWindowMediumInclusive = (width: number) =>
-  width < breakpoints.breakpointMediumMax;
+  width < parseInt(breakpoints.breakpointMediumMax);
 
 export const isWindowMedium = (width: number) =>
-  width < breakpoints.breakpointMediumMax &&
-  width > breakpoints.breakpointMediumMin;
+  width < parseInt(breakpoints.breakpointMediumMax) &&
+  width > parseInt(breakpoints.breakpointMediumMin);
 
 export const isWindowMediumSmallInclusive = (width: number) =>
-  width < breakpoints.breakpointMediumSmallMax;
+  width < parseInt(breakpoints.breakpointMediumSmallMax);
 
 export const isWindowMediumSmall = (width: number) =>
-  width < breakpoints.breakpointMediumSmallMax &&
-  width > breakpoints.breakpointMediumSmallMin;
+  width < parseInt(breakpoints.breakpointMediumSmallMax) &&
+  width > parseInt(breakpoints.breakpointMediumSmallMin);
 
 export const isWindowSmallInclusive = (width: number) =>
-  width < breakpoints.breakpointSmallMax;
+  width < parseInt(breakpoints.breakpointSmallMax);
 
 export const isWindowSmall = (width: number) =>
-  width < breakpoints.breakpointSmallMax &&
-  width > breakpoints.breakpointSmallMin;
+  width < parseInt(breakpoints.breakpointSmallMax) &&
+  width > parseInt(breakpoints.breakpointSmallMin);
 
 export const isWindowExtraSmall = (width: number) =>
-  width < breakpoints.breakpointExtraSmallMax;
+  width < parseInt(breakpoints.breakpointExtraSmallMax);
 
 export const breakpointFnValidator = (
   widthState: boolean,
