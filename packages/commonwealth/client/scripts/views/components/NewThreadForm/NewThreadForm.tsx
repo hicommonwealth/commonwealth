@@ -20,6 +20,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -37,6 +38,8 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -147,6 +150,7 @@ export const NewThreadForm = () => {
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
         authorProfile: app.user.activeAccount.profile,
+        isPWA: isAddedToHomeScreen,
       });
 
       setThreadContentDelta(createDeltaFromText(''));

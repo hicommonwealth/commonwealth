@@ -25,6 +25,7 @@ export const makeGroupDataBaseAPIPayload = (
         ? formSubmitValues.requirements.length + extraRequrirements
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
+    isPWA: undefined,
   };
 
   if (allowedAddresses?.length > 0) {

@@ -20,6 +20,7 @@ import { openConfirmation } from './confirmation_modal';
 
 import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import '../../../styles/modals/edit_topic_modal.scss';
+import useAppStatus from '../../hooks/useAppStatus';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -50,6 +51,8 @@ export const EditTopicModal = ({
   );
   const [name, setName] = useState<string>(nameProp);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
@@ -66,7 +69,10 @@ export const EditTopicModal = ({
     };
 
     try {
-      await editTopic({ topic: new Topic(topicInfo) });
+      await editTopic({
+        topic: new Topic(topicInfo),
+        isPWA: isAddedToHomeScreen,
+      });
       if (noRedirect) {
         onModalClose();
         notifySuccess('Topic updated!');

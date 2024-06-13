@@ -184,19 +184,29 @@ class ContractsController {
     chain_node_id,
     address,
     abi,
+    isPWA,
   }: {
     chain_node_id: number;
     address: string;
     abi?: string;
+    isPWA?: boolean;
   }) {
     try {
-      const response = await axios.post(`${app.serverUrl()}/contract`, {
-        community_id: app.activeChainId(),
-        chain_node_id,
-        jwt: app.user.jwt,
-        address,
-        abi,
-      });
+      const response = await axios.post(
+        `${app.serverUrl()}/contract`,
+        {
+          community_id: app.activeChainId(),
+          chain_node_id,
+          jwt: app.user.jwt,
+          address,
+          abi,
+        },
+        {
+          headers: {
+            isPWA: isPWA.toString(),
+          },
+        },
+      );
 
       const responseContract = response.data.result.contract;
       const { id, type, is_factory } = responseContract;

@@ -148,6 +148,10 @@ const BasicInformationForm = ({
     const selectedChainNode = sortedChains.find(
       (chain) => String(chain.value) === values.chain.value,
     );
+    console.log(
+      'isAddedToHomeScreen from BasicInformationForm.tsx',
+      isAddedToHomeScreen,
+    );
 
     try {
       await createCommunityMutation({
@@ -167,6 +171,7 @@ const BasicInformationForm = ({
           cosmosChainId: values.chain.value,
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
+        isPWA: isAddedToHomeScreen,
       });
       onSubmit(communityId, values.communityName);
     } catch (err) {

@@ -25,7 +25,6 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
-  console.log(filteredGroups);
   const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 

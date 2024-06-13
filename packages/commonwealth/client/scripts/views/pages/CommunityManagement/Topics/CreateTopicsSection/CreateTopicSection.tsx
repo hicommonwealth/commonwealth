@@ -19,6 +19,7 @@ import {
 import { DeltaStatic } from 'quill';
 import React, { useMemo, useState } from 'react';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CreateTopicSection.scss';
 import { FormSubmitValues } from './types';
 import { topicCreationValidationSchema } from './validation';
@@ -41,6 +42,8 @@ export const CreateTopicSection = () => {
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const handleCreateTopic = async (values: FormSubmitValues) => {
     try {
       await createTopic({
@@ -49,6 +52,7 @@ export const CreateTopicSection = () => {
         featuredInSidebar,
         featuredInNewPost: false,
         defaultOffchainTemplate: '',
+        isPWA: isAddedToHomeScreen,
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {

@@ -14,6 +14,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
+import useAppStatus from '../../hooks/useAppStatus';
 import type Thread from '../../models/Thread';
 import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
 import { CWText } from '../components/component_kit/cw_text';
@@ -47,6 +48,8 @@ export const LinkedUrlModal = ({
     threadId: thread.id,
   });
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
       tempLinkedUrls,
@@ -65,6 +68,7 @@ export const LinkedUrlModal = ({
             identifier: String(el.identifier),
             title: el.title,
           })),
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;

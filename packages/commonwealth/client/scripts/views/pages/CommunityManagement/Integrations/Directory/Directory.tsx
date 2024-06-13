@@ -1,3 +1,4 @@
+import useAppStatus from 'client/scripts/hooks/useAppStatus';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
@@ -29,6 +30,8 @@ const Directory = () => {
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const defaultChainNodeId = chainNodeId ?? communityDefaultChainNodeId;
   const defaultOption = chainNodeOptionsSorted.find(
     (option) => option.value === String(defaultChainNodeId),
@@ -47,6 +50,7 @@ const Directory = () => {
       await community.updateChainData({
         directory_page_enabled: isEnabled,
         directory_page_chain_node_id: chainNodeId,
+        isPWA: isAddedToHomeScreen,
       });
 
       notifySuccess('Updated community directory');

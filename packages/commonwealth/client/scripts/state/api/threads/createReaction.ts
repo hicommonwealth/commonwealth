@@ -13,12 +13,14 @@ interface IuseCreateThreadReactionMutation {
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
+  isPWA?: boolean;
 }
 
 const createReaction = async ({
   address,
   reactionType = 'like',
   threadId,
+  isPWA,
 }: CreateReactionProps) => {
   const {
     session = null,
@@ -29,17 +31,25 @@ const createReaction = async ({
     like: reactionType === 'like',
   });
 
-  return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
-    author_community_id: app.user.activeAccount.community.id,
-    thread_id: threadId,
-    community_id: app.chain.id,
-    address,
-    reaction: reactionType,
-    jwt: app.user.jwt,
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
-  });
+  return await axios.post(
+    `${app.serverUrl()}/threads/${threadId}/reactions`,
+    {
+      author_community_id: app.user.activeAccount.community.id,
+      thread_id: threadId,
+      community_id: app.chain.id,
+      address,
+      reaction: reactionType,
+      jwt: app.user.jwt,
+      canvas_action: action,
+      canvas_session: session,
+      canvas_hash: hash,
+    },
+    {
+      headers: {
+        isPWA: isPWA.toString(),
+      },
+    },
+  );
 };
 
 const useCreateThreadReactionMutation = ({

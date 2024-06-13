@@ -173,6 +173,7 @@ export const UpdateProposalStatusModal = ({
               title: enrichedSnapshot.title,
             },
           ],
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
@@ -210,6 +211,7 @@ export const UpdateProposalStatusModal = ({
             source: LinkSource.Proposal,
             identifier,
           })),
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
@@ -247,6 +249,7 @@ export const UpdateProposalStatusModal = ({
             identifier: identifier,
             title: title,
           })),
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;

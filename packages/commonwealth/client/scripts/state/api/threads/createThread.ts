@@ -22,6 +22,7 @@ interface CreateThreadProps {
   url?: string;
   readOnly?: boolean;
   authorProfile: MinimumProfile;
+  isPWA?: boolean;
 }
 
 const createThread = async ({
@@ -35,6 +36,7 @@ const createThread = async ({
   url,
   readOnly,
   authorProfile,
+  isPWA,
 }: CreateThreadProps): Promise<Thread> => {
   const {
     action = null,
@@ -48,24 +50,32 @@ const createThread = async ({
     topic: topic.id,
   });
 
-  const response = await axios.post(`${app.serverUrl()}/threads`, {
-    author_community_id: communityId,
-    community_id: communityId,
-    address,
-    author: JSON.stringify(authorProfile),
-    title: encodeURIComponent(title),
-    body: encodeURIComponent(body),
-    kind,
-    stage,
-    topic_name: topic.name,
-    topic_id: topic.id,
-    url,
-    readOnly,
-    jwt: app.user.jwt,
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
-  });
+  const response = await axios.post(
+    `${app.serverUrl()}/threads`,
+    {
+      author_community_id: communityId,
+      community_id: communityId,
+      address,
+      author: JSON.stringify(authorProfile),
+      title: encodeURIComponent(title),
+      body: encodeURIComponent(body),
+      kind,
+      stage,
+      topic_name: topic.name,
+      topic_id: topic.id,
+      url,
+      readOnly,
+      jwt: app.user.jwt,
+      canvas_action: action,
+      canvas_session: session,
+      canvas_hash: hash,
+    },
+    {
+      headers: {
+        isPWA: isPWA.toString(),
+      },
+    },
+  );
 
   return new Thread(response.data.result);
 };

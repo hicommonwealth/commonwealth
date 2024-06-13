@@ -7,6 +7,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -38,6 +39,8 @@ export const CreateComment = ({
 
   const urlParams = new URLSearchParams(location.search);
   const focusEditorParam = urlParams.get('focusEditor') === 'true';
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -101,6 +104,7 @@ export const CreateComment = ({
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
+        isPWA: isAddedToHomeScreen,
       });
 
       setErrorMsg(null);

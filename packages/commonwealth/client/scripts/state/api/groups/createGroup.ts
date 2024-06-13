@@ -11,6 +11,7 @@ interface CreateGroupProps {
   groupDescription?: string;
   requirementsToFulfill: number | undefined;
   requirements?: any[];
+  isPWA?: boolean;
 }
 
 const createGroup = async ({
@@ -21,25 +22,34 @@ const createGroup = async ({
   topicIds,
   requirementsToFulfill,
   requirements = [],
+  isPWA,
 }: CreateGroupProps) => {
   const finalRequirementsToFulfill =
     requirementsToFulfill === 0 ? requirements.length : requirementsToFulfill;
 
-  return await axios.post(`${app.serverUrl()}/groups`, {
-    jwt: app.user.jwt,
-    community_id: communityId,
-    author_community_id: communityId,
-    address,
-    metadata: {
-      name: groupName,
-      description: groupDescription,
-      ...(finalRequirementsToFulfill && {
-        required_requirements: finalRequirementsToFulfill,
-      }),
+  return await axios.post(
+    `${app.serverUrl()}/groups`,
+    {
+      jwt: app.user.jwt,
+      community_id: communityId,
+      author_community_id: communityId,
+      address,
+      metadata: {
+        name: groupName,
+        description: groupDescription,
+        ...(finalRequirementsToFulfill && {
+          required_requirements: finalRequirementsToFulfill,
+        }),
+      },
+      requirements,
+      topics: topicIds,
     },
-    requirements,
-    topics: topicIds,
-  });
+    {
+      headers: {
+        isPWA: isPWA.toString(),
+      },
+    },
+  );
 };
 
 const useCreateGroupMutation = ({ communityId }: { communityId: string }) => {

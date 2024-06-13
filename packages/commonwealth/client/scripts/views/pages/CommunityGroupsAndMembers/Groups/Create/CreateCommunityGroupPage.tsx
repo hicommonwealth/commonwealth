@@ -47,19 +47,18 @@ const CreateCommunityGroupPage = () => {
       }}
       onSubmit={(values) => {
         const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
-
-        createGroup(payload)
-          .then(() => {
-            notifySuccess('Group Created');
-            setShouldShowGroupMutationBannerForCommunity(
-              app.activeChainId(),
-              true,
-            );
-            navigate(`/members?tab=groups`);
-          })
-          .catch(() => {
-            notifyError('Failed to create group');
-          });
+        payload.isPWA = isAddedToHomeScreen;
+        try {
+          createGroup(payload);
+          notifySuccess('Group Created');
+          setShouldShowGroupMutationBannerForCommunity(
+            app.activeChainId(),
+            true,
+          );
+          navigate(`/members?tab=groups`);
+        } catch (error) {
+          notifyError('Failed to create group');
+        }
       }}
       allowedAddresses={allowedAddresses}
       setAllowedAddresses={setAllowedAddresses}

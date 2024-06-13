@@ -15,6 +15,7 @@ import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_th
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { AuthModal } from 'views/modals/AuthModal';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
@@ -34,6 +35,9 @@ export const ReactionButton = ({
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
       (acc, curr) => acc + (curr.voting_weight || 1),
@@ -107,6 +111,7 @@ export const ReactionButton = ({
         address: activeAddress,
         threadId: thread.id,
         reactionType: 'like',
+        isPWA: isAddedToHomeScreen,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;

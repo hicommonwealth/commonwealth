@@ -10,6 +10,7 @@ import app from 'state';
 import { addressSwapper } from 'utils';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import TOSModal from 'views/modals/TOSModal';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -20,6 +21,8 @@ const useJoinCommunity = () => {
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -90,12 +93,15 @@ const useJoinCommunity = () => {
     communityId,
     communityChainBase,
     activeChainId,
+    isPWA,
   }: {
     address: string;
     communityId: string;
     communityChainBase: string;
     activeChainId?: string;
+    isPWA?: boolean;
   }) => {
+    console.log('isPWA: ', isPWA);
     try {
       const res = await linkExistingAddressToChainOrCommunity(
         address,
@@ -180,6 +186,8 @@ const useJoinCommunity = () => {
           activeCommunityId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
+
+        console.log('isAddedToHomeScreen: ', isAddedToHomeScreen);
 
         await linkSpecificAddressToSpecificCommunity({
           address,

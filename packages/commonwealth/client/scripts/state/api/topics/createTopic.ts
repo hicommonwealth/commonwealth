@@ -11,6 +11,7 @@ interface CreateTopicProps {
   featuredInSidebar: boolean;
   featuredInNewPost: boolean;
   defaultOffchainTemplate: string;
+  isPWA?: boolean;
 }
 
 const createTopic = async ({
@@ -20,17 +21,26 @@ const createTopic = async ({
   featuredInSidebar,
   featuredInNewPost,
   defaultOffchainTemplate,
+  isPWA,
 }: CreateTopicProps) => {
-  const response = await axios.post(`${app.serverUrl()}/topics`, {
-    name,
-    description,
-    telegram,
-    featured_in_sidebar: featuredInSidebar,
-    featured_in_new_post: featuredInNewPost,
-    default_offchain_template: defaultOffchainTemplate,
-    jwt: app.user.jwt,
-    community_id: app.activeChainId(),
-  });
+  const response = await axios.post(
+    `${app.serverUrl()}/topics`,
+    {
+      name,
+      description,
+      telegram,
+      featured_in_sidebar: featuredInSidebar,
+      featured_in_new_post: featuredInNewPost,
+      default_offchain_template: defaultOffchainTemplate,
+      jwt: app.user.jwt,
+      community_id: app.activeChainId(),
+    },
+    {
+      headers: {
+        isPWA: isPWA.toString(),
+      },
+    },
+  );
 
   return new Topic(response.data.result);
 };

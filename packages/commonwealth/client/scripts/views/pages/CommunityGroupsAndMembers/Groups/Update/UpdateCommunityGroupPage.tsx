@@ -126,6 +126,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         }}
         onSubmit={(values) => {
           const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
+          payload.isPWA = isAddedToHomeScreen;
           const finalPayload = {
             ...payload,
             groupId: groupId,

@@ -17,6 +17,7 @@ interface CreateCommentProps {
   unescapedText: string;
   parentCommentId: number;
   existingNumberOfComments: number;
+  isPWA?: boolean;
 }
 
 const createComment = async ({
@@ -25,6 +26,7 @@ const createComment = async ({
   threadId,
   unescapedText,
   parentCommentId = null,
+  isPWA,
 }: CreateCommentProps) => {
   const {
     session = null,
@@ -48,6 +50,11 @@ const createComment = async ({
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
+    },
+    {
+      headers: {
+        isPWA: isPWA.toString(),
+      },
     },
   );
 
