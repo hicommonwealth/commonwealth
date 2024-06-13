@@ -345,6 +345,16 @@ export const voteContentBatch = async (
   });
 };
 
+/**
+ * attempts to rollover and payout a provided contest. Returns false and does not attempt
+ * transaction if contest is still active
+ * @param rpcNodeUrl the chain node to use
+ * @param contest the address of the contest
+ * @param oneOff indicate if the contest is oneOff
+ * @returns boolean indicating if contest was rolled over
+ * NOTE: A false return does not indicate an error, rather that the contest was still ongoing
+ * errors will still be throw for other issues
+ */
 export const rollOverContest = async (
   rpcNodeUrl: string,
   contest: string,
