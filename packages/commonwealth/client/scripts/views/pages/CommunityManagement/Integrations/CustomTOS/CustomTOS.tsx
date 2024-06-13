@@ -1,11 +1,11 @@
 import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import { linkValidationSchema } from 'helpers/formValidations/common';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { ZodError } from 'zod';
-import { linkValidationSchema } from '../common/validation';
 import './CustomTOS.scss';
 
 const CustomTOS = () => {

@@ -1,4 +1,5 @@
 import { notifyError } from 'controllers/app/notifications';
+import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -37,7 +38,7 @@ import { LinkedAddresses } from '../linked_addresses';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 import './EditProfile.scss';
-import { editProfileValidation, linkValidationSchema } from './validation';
+import { editProfileValidation } from './validation';
 
 export type Image = {
   url: string;

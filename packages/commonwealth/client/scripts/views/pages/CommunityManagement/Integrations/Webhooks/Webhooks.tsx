@@ -1,6 +1,7 @@
 import { WebhookCategory } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import Webhook from 'models/Webhook';
@@ -19,7 +20,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
-import { linkValidationSchema } from '../common/validation';
 import './Webhooks.scss';
 
 const Webhooks = () => {

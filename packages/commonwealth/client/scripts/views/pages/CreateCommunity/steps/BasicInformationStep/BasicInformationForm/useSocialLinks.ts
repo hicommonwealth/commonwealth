@@ -1,7 +1,7 @@
+import { linkValidationSchema } from 'helpers/formValidations/common';
 import { useState } from 'react';
 import { SocialLinkField } from 'views/pages/CreateCommunity/steps/BasicInformationStep/BasicInformationForm/types';
 import { ZodError } from 'zod';
-import { socialLinkValidation } from './validation';
 
 const useSocialLinks = () => {
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
@@ -30,7 +30,7 @@ const useSocialLinks = () => {
       try {
         // @ts-expect-error StrictNullChecks
         if (link.value.trim() !== '') {
-          socialLinkValidation.parse(link.value);
+          linkValidationSchema.parse(link.value);
         }
 
         updatedSocialLinks[index] = {
@@ -60,7 +60,7 @@ const useSocialLinks = () => {
     try {
       // @ts-expect-error StrictNullChecks
       if (updatedSocialLinks[index].value.trim() !== '') {
-        socialLinkValidation.parse(updatedSocialLinks[index].value);
+        linkValidationSchema.parse(updatedSocialLinks[index].value);
       }
 
       updatedSocialLinks[index] = {
