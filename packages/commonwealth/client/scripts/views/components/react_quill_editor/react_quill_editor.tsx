@@ -23,22 +23,37 @@ import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 import { useQuillPasteText } from './useQuillPasteText';
 
 import 'components/react_quill/react_quill_editor.scss';
+import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
+import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { MarkdownPreview } from './MarkdownPreview';
 
 Quill.register('modules/magicUrl', MagicUrl);
 
+type ReactQuillEditorFormValidationProps =
+  | {
+      name: string;
+      hookToForm: boolean;
+      contentDelta?: never;
+      setContentDelta?: never;
+    }
+  | {
+      name?: never;
+      hookToForm?: never;
+      contentDelta: SerializableDeltaStatic;
+      setContentDelta: (d: SerializableDeltaStatic) => void;
+    };
+
 type ReactQuillEditorProps = {
+  label?: string;
   className?: string;
   placeholder?: string;
   tabIndex?: number;
-  contentDelta: SerializableDeltaStatic;
-  setContentDelta: (d: SerializableDeltaStatic) => void;
   isDisabled?: boolean;
   tooltipLabel?: string;
   shouldFocus?: boolean;
   cancelEditing?: () => void;
-};
+} & ReactQuillEditorFormValidationProps;
 
 const TABS = [
   { label: 'Markdown', iconLeft: 'code' },
@@ -47,6 +62,7 @@ const TABS = [
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
 const ReactQuillEditor = ({
+  label,
   className = '',
   placeholder,
   tabIndex,
@@ -56,6 +72,8 @@ const ReactQuillEditor = ({
   tooltipLabel = 'Join community',
   shouldFocus = false,
   cancelEditing,
+  hookToForm,
+  name,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -70,6 +88,27 @@ const ReactQuillEditor = ({
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedTab, setSelectedTab] = useState(TABS[0].label);
 
+  const formContext = useFormContext();
+  const formFieldContext =
+    hookToForm && name ? formContext.register(name) : undefined;
+  const formFieldErrorMessage =
+    hookToForm &&
+    name &&
+    (formContext?.formState?.errors?.[name] as SerializableDeltaStatic)
+      ?.ops?.[0]?.insert?.message;
+
+  const isHookedToFormProper = hookToForm && name && formContext;
+
+  const contentDeltaToUse = isHookedToFormProper
+    ? formContext.getValues(name)
+    : contentDelta;
+
+  const setContentDeltaToUse = (delta) => {
+    isHookedToFormProper
+      ? formContext.setValue(name, delta)
+      : setContentDelta?.(delta);
+  };
+
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
   const lastSelectionRef = useRef<RangeStatic | null>(null);
@@ -83,15 +122,15 @@ const ReactQuillEditor = ({
   const { handleImageDropAndPaste } = useImageDropAndPaste({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
-    setContentDelta,
+    setContentDeltaToUse,
     setIsUploading,
   });
 
   //Handles the incomplete notion checkbox syntax when pasting
   //We may end up expanding this hook to handle other pasting issues
   const handleTextPaste = useQuillPasteText(
-    setContentDelta,
-    contentDelta,
+    setContentDeltaToUse,
+    contentDeltaToUse,
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
     isFocused || isHovering,
@@ -101,7 +140,7 @@ const ReactQuillEditor = ({
   const { handleImageUploader } = useImageUploader({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
-    setContentDelta,
+    setContentDeltaToUse,
     setIsUploading,
   });
 
@@ -109,14 +148,14 @@ const ReactQuillEditor = ({
   const markdownToolbarHandlers = useMarkdownToolbarHandlers({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
-    setContentDelta,
+    setContentDeltaToUse,
   });
 
   // handle keyboard shortcuts for markdown
   const markdownKeyboardShortcuts = useMarkdownShortcuts({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
-    setContentDelta,
+    setContentDeltaToUse,
   });
 
   // refreshQuillComponent unmounts and remounts the
@@ -133,7 +172,7 @@ const ReactQuillEditor = ({
   const handleChange = (value, delta, source, editor) => {
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
 
-    setContentDelta({
+    setContentDeltaToUse({
       ...newContent,
       ___isMarkdown: true,
     } as SerializableDeltaStatic);
@@ -146,7 +185,7 @@ const ReactQuillEditor = ({
 
     const editor = editorRef.current?.getEditor();
 
-    if (!contentDelta.___isMarkdown) {
+    if (!contentDeltaToUse.___isMarkdown) {
       const isContentAvailable =
         getTextFromDelta(editor.getContents()).length > 0;
 
@@ -169,8 +208,8 @@ const ReactQuillEditor = ({
               buttonType: 'destructive',
               buttonHeight: 'sm',
               onClick: () => {
-                const mdDelta = RTFtoMD(contentDelta);
-                setContentDelta({
+                const mdDelta = RTFtoMD(contentDeltaToUse);
+                setContentDeltaToUse({
                   ...mdDelta,
                   ___isMarkdown: true,
                 });
@@ -194,6 +233,13 @@ const ReactQuillEditor = ({
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (formFieldContext) {
+      formFieldContext.ref(editorRef);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleDragStart = () => setIsDraggingOver(true);
   const handleDragStop = () => setIsDraggingOver(false);
 
@@ -215,106 +261,132 @@ const ReactQuillEditor = ({
   const showTooltip = isDisabled && isHovering;
 
   return (
-    <div className="editor-and-tabs-container">
-      <CWTabsRow boxed>
-        {TABS.map((tab, index) => (
-          <CWTab
-            key={index}
-            label={tab.label}
-            boxed={true}
-            iconLeft={tab.iconLeft as IconName}
-            isSelected={selectedTab === tab.label}
-            onClick={() => {
-              setSelectedTab(tab.label);
-            }}
-          />
-        ))}
-      </CWTabsRow>
-      {selectedTab === TABS[0].label ? (
-        <div
-          className={clsx('QuillEditorContainer', { isDisabled })}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-        >
+    <div className="CWEditor">
+      {label && <MessageRow label={label} />}
+      <div
+        className={clsx('editor-and-tabs-container', {
+          error: !!formFieldErrorMessage,
+        })}
+      >
+        <CWTabsRow boxed>
+          {TABS.map((tab, index) => (
+            <CWTab
+              key={index}
+              label={tab.label}
+              boxed={true}
+              iconLeft={tab.iconLeft as IconName}
+              isSelected={selectedTab === tab.label}
+              onClick={() => {
+                setSelectedTab(tab.label);
+              }}
+            />
+          ))}
+        </CWTabsRow>
+        {selectedTab === TABS[0].label ? (
           <div
-            className={clsx('QuillEditorWrapper', {
-              isFocused,
-              isDisabled,
-              isHovering,
-            })}
+            className={clsx('QuillEditorContainer', { isDisabled })}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           >
-            {showTooltip && <QuillTooltip label={tooltipLabel} />}
-            {isUploading && <LoadingIndicator />}
+            <div
+              className={clsx('QuillEditorWrapper', {
+                isFocused,
+                isDisabled,
+                isHovering,
+              })}
+            >
+              {showTooltip && <QuillTooltip label={tooltipLabel} />}
+              {isUploading && <LoadingIndicator />}
 
-            {isVisible && (
-              <>
-                <CustomQuillToolbar
-                  toolbarId={toolbarId}
-                  isDisabled={isDisabled}
-                />
-                <DragDropContext onDragEnd={handleDragStop}>
-                  <Droppable droppableId="quillEditor">
-                    {(provided) => (
-                      <div
-                        className={`${isDraggingOver ? 'ondragover' : ''}`}
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        onDragOver={handleDragStart}
-                        onDragLeave={handleDragStop}
-                        onDrop={handleDragStop}
-                      >
-                        <div data-text-editor="name">
-                          <ReactQuill
-                            // @ts-expect-error <StrictNullChecks/>
-                            ref={editorRef}
-                            className={`QuillEditor markdownEnabled ${className}`}
-                            scrollingContainer="ql-container"
-                            placeholder={placeholder}
-                            tabIndex={tabIndex}
-                            theme="snow"
-                            bounds={`[data-text-editor="name"]`}
-                            value={contentDelta}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            onChange={handleChange}
-                            onChangeSelection={(selection: RangeStatic) => {
-                              if (!selection) {
-                                return;
-                              }
-                              lastSelectionRef.current = selection;
-                            }}
-                            formats={[]}
-                            modules={{
-                              toolbar: {
-                                container: `#${toolbarId}`,
-                                handlers: markdownToolbarHandlers,
-                              },
-                              imageDropAndPaste: {
-                                handler: handleImageDropAndPaste,
-                              },
-                              clipboard: {
-                                matchVisual: false,
-                                handler: handleTextPaste,
-                              },
-                              mention,
-                              magicUrl: false,
-                              keyboard: markdownKeyboardShortcuts,
-                            }}
-                          />
+              {isVisible && (
+                <>
+                  <CustomQuillToolbar
+                    toolbarId={toolbarId}
+                    isDisabled={isDisabled}
+                  />
+                  <DragDropContext onDragEnd={handleDragStop}>
+                    <Droppable droppableId="quillEditor">
+                      {(provided) => (
+                        <div
+                          className={`${isDraggingOver ? 'ondragover' : ''}`}
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          onDragOver={handleDragStart}
+                          onDragLeave={handleDragStop}
+                          onDrop={handleDragStop}
+                        >
+                          <div data-text-editor="name">
+                            <ReactQuill
+                              // @ts-expect-error <StrictNullChecks/>
+                              ref={editorRef}
+                              className={`QuillEditor markdownEnabled ${className}`}
+                              scrollingContainer="ql-container"
+                              placeholder={placeholder}
+                              tabIndex={tabIndex}
+                              theme="snow"
+                              bounds={`[data-text-editor="name"]`}
+                              value={contentDeltaToUse}
+                              onFocus={() => setIsFocused(true)}
+                              onBlur={() => {
+                                setIsFocused(false);
+                                isHookedToFormProper &&
+                                  formContext
+                                    .trigger(name)
+                                    .catch(console.error);
+                              }}
+                              onChange={handleChange}
+                              onChangeSelection={(selection: RangeStatic) => {
+                                if (!selection) {
+                                  return;
+                                }
+                                lastSelectionRef.current = selection;
+                              }}
+                              formats={[]}
+                              modules={{
+                                toolbar: {
+                                  container: `#${toolbarId}`,
+                                  handlers: markdownToolbarHandlers,
+                                },
+                                imageDropAndPaste: {
+                                  handler: handleImageDropAndPaste,
+                                },
+                                clipboard: {
+                                  matchVisual: false,
+                                  handler: handleTextPaste,
+                                },
+                                mention,
+                                magicUrl: false,
+                                keyboard: markdownKeyboardShortcuts,
+                              }}
+                            />
+                          </div>
+                          {provided.placeholder}
                         </div>
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-                {/* @ts-expect-error StrictNullChecks*/}
-                <CustomQuillFooter handleImageUploader={handleImageUploader} />
-              </>
-            )}
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                  <CustomQuillFooter
+                    // @ts-expect-error <StrictNullChecks/>
+                    handleImageUploader={handleImageUploader}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <MarkdownPreview doc={getTextFromDelta(contentDeltaToUse)} />
+        )}
+      </div>
+      {formFieldErrorMessage && (
+        <div className="form-error-container">
+          <div className="msg">
+            <MessageRow
+              hasFeedback={!!formFieldErrorMessage}
+              statusMessage={formFieldErrorMessage || ''}
+              validationStatus={formFieldErrorMessage ? 'failure' : undefined}
+            />
           </div>
         </div>
-      ) : (
-        <MarkdownPreview doc={getTextFromDelta(contentDelta)} />
       )}
     </div>
   );
