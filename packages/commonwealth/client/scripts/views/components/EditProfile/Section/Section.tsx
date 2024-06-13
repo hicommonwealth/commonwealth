@@ -1,10 +1,8 @@
-import React from 'react';
-
-import 'components/component_kit/cw_form_section.scss';
-
 import clsx from 'clsx';
+import React from 'react';
 import { CWDivider } from '../../component_kit/cw_divider';
 import { CWText } from '../../component_kit/cw_text';
+import './Section.scss';
 
 type FormSectionProps = {
   description: string;

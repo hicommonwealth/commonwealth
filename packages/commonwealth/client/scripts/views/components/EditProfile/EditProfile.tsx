@@ -205,9 +205,15 @@ const EditProfile = () => {
 
       // TODO: fix and add avatarUrl when saving
 
+      const backgroundImage = values.backgroundImg.trim()
+        ? JSON.stringify({
+            url: values.backgroundImg.trim(),
+            imageBehavior: ImageBehavior.Fill, // TODO: add this back in when seleting background image
+          })
+        : null;
       updateProfile({
         name: values.username.trim(),
-        backgroundImage: values.backgroundImg.trim(),
+        ...(backgroundImage && { backgroundImage }),
         email: values.email.trim(),
         socials: JSON.stringify((links || []).map((link) => link.value.trim())),
         bio: serializeDelta(values.bio),
@@ -363,7 +369,7 @@ const EditProfile = () => {
                 hookToForm
                 enableGenerativeAI
                 showUploadAndGenerateText
-                canSelectImageBehaviour={false} // TODO: image behaviour doesnt work, its removed -- remove this comment
+                canSelectImageBehaviour={false}
                 defaultImageBehavior={ImageBehavior.Fill}
                 onImageProcessStatusChange={setIsUploadingCoverImage}
               />
