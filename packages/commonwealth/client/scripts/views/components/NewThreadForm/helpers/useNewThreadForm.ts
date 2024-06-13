@@ -50,8 +50,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    // @ts-expect-error StrictNullChecks
-    restoredDraft?.body,
+    restoredDraft?.body!,
   );
   const [isSaving, setIsSaving] = useState(false);
 

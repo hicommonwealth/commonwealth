@@ -233,10 +233,8 @@ const formatOpsInsert = (currentLine, formattingAttrs) => {
 export const RTFtoMD = (delta: DeltaStatic) => {
   let mdString = '';
 
-  // @ts-expect-error StrictNullChecks
-  delta.ops.forEach((currentLine, index) => {
-    // @ts-expect-error StrictNullChecks
-    const nextLine = delta.ops[index + 1];
+  delta!.ops!.forEach((currentLine, index) => {
+    const nextLine = delta.ops?.[index + 1];
 
     const onlyNewLinesRegex = /^(\n+)$/g;
     const currentIsNewLineInsert = onlyNewLinesRegex.test(currentLine.insert);

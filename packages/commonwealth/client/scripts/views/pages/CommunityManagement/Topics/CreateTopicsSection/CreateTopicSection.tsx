@@ -73,8 +73,7 @@ export const CreateTopicSection = () => {
   };
 
   useMemo(() => {
-    // @ts-expect-error StrictNullChecks
-    if (descriptionDelta?.ops[0]?.insert?.length > 250) {
+    if (descriptionDelta?.ops?.[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
       setDescErrorMsg(null);
@@ -110,8 +109,7 @@ export const CreateTopicSection = () => {
           />
           <div className="description-char-count">
             <CWText type="caption">
-              {/* @ts-expect-error StrictNullChecks */}
-              {descriptionDelta?.ops[0].insert.length} / 250
+              {descriptionDelta.ops?.[0].insert.length} / 250
             </CWText>
           </div>
           <CWText type="caption">
