@@ -9,6 +9,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { generateUsername } from 'unique-username-generator';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
@@ -16,6 +17,11 @@ import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 
 OpenFeature.setProvider(openFeatureProvider);
+
+console.log(generateUsername('', 2));
+console.log(generateUsername('', 2));
+console.log(generateUsername('', 2));
+console.log(generateUsername('', 2));
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
