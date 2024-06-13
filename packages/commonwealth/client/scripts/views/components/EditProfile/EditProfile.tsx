@@ -1,5 +1,4 @@
 import { notifyError } from 'controllers/app/notifications';
-import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
 import getLinkType from 'helpers/linkType';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -38,36 +37,7 @@ import { LinkedAddresses } from '../linked_addresses';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 import './EditProfile.scss';
-
-const linkValidationSchema = z.string().url({
-  message: VALIDATION_MESSAGES.INVALID_INPUT,
-});
-
-const editProfileValidation = z.object({
-  username: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  email: z.union([
-    z.literal(''),
-    z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }).email(),
-  ]),
-  backgroundImg: z.union([
-    z.literal(''),
-    z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
-  ]),
-  bio: z.object({
-    ops: z
-      .array(
-        z.object({
-          insert: z
-            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-            .default(''),
-        }),
-      )
-      .length(1),
-    ___isMarkdown: z.boolean(),
-  }),
-});
+import { editProfileValidation, linkValidationSchema } from './validation';
 
 export type Image = {
   url: string;
