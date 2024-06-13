@@ -146,6 +146,61 @@ export function decodeThreadContentUrl(contentUrl: string): {
 }
 
 /**
+ * This function attempts to safely truncates thread or comment content by not splicing urls
+ * or user mentions e.g. `[@Tim](/profile/id/118532)`. If the body contains only a URL or a user mention,
+ * and it does not fit in the provided length, the function will return '...'
+ * @param body A thread or comment body.
+ * @param length The maximum length of the returned string. Note, the returned string may be shorter than this length.
+ */
+export function safeTruncateBody(body: string, length: number = 500): string {
+  if (body.length <= length) {
+    return body;
+  }
+  // Regular expressions to identify URLs and user mentions
+  const urlRegex = /((https?:\/\/|www\.)[^\s]+)/gi;
+  const mentionRegex = /\[@[^\]]+\]\(\/profile\/id\/\d+\)/g;
+
+  // Function to check if truncation happens within a match
+  let match: RegExpExecArray | null = null;
+
+  function getSplicedMatch(regex: RegExp): number | null {
+    while ((match = regex.exec(body)) !== null) {
+      if (
+        match.index === 0 &&
+        match.index < length &&
+        match.index + match[0].length > length
+      ) {
+        return 0;
+      } else if (
+        match.index < length &&
+        match.index + match[0].length > length
+      ) {
+        return match.index;
+      } else if (match.index < length) {
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  let spliceIndex: number = 0;
+  const urlSpliceIndex = getSplicedMatch(urlRegex);
+  const mentionSpliceIndex = getSplicedMatch(mentionRegex);
+
+  if (urlSpliceIndex !== null) {
+    spliceIndex = urlSpliceIndex;
+  } else if (mentionSpliceIndex !== null) {
+    spliceIndex = mentionSpliceIndex;
+  } else {
+    spliceIndex = length;
+  }
+
+  if (spliceIndex === 0) return '...';
+  return body.substring(0, spliceIndex);
+}
+
+/**
  * Checks whether two Ethereum addresses are equal. Throws if a provided string is not a valid EVM address.
  * Address comparison is done in lowercase to ensure case insensitivity.
  * @param address1 - The first Ethereum address.
