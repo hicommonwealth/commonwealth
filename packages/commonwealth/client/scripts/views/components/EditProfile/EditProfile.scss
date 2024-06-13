@@ -28,72 +28,8 @@
     }
   }
 
-  .FormSection {
-    width: 100%;
-
-    .description {
-      color: $neutral-500;
-    }
-
-    .profile-image-section {
-      .image-upload {
-        position: relative;
-        display: flex;
-        width: 100%;
-        height: 60px;
-        align-items: center;
-        margin: 16px 0;
-
-        .AvatarUpload {
-          background-color: transparent;
-        }
-
-        .TextInput {
-          width: 75%;
-        }
-
-        p {
-          margin: 0 20px;
-          color: #999999;
-        }
-      }
-    }
-
-    .addresses-section {
-      .addresses {
-        display: flex;
-        justify-content: space-between;
-        margin: 0 80px;
-
-        .Tag {
-          margin-right: 8px;
-        }
-
-        .address {
-          display: flex;
-          align-items: center;
-        }
-      }
-
-      .Button {
-        background-color: $neutral-100;
-        margin-top: 24px;
-        width: 100%;
-
-        &:hover {
-          background-color: $neutral-200;
-        }
-
-        svg,
-        .Text {
-          color: $neutral-600;
-        }
-      }
-    }
-
-    .LinkedAddresses {
-      margin-bottom: 32px;
-    }
+  .LinkedAddresses {
+    margin-bottom: 32px;
   }
 
   .link-type {
