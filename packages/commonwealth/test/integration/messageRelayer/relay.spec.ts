@@ -42,6 +42,7 @@ describe('relay', () => {
       ...successfulInMemoryBroker,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
       publish: async (topic: string, event: any) => {
+        // @ts-expect-error StrictNullChecks
         publishedEvents.push(event.name);
         return true;
       },
@@ -67,6 +68,7 @@ describe('relay', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
       publish: async (topic: string, event: any) => {
         if (publishedEvents.length === 1) return false;
+        // @ts-expect-error StrictNullChecks
         publishedEvents.push(event.name);
         return true;
       },

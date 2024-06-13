@@ -1,6 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
 import { verifyComment } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -31,17 +32,25 @@ type CreateThreadCommentResponse = CommentInstance;
 
 export const createThreadCommentHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
   res: TypedResponse<CreateThreadCommentResponse>,
 ) => {
   const { user, address } = req;
+  // @ts-expect-error StrictNullChecks
   const { id: threadId } = req.params;
   const {
+    // @ts-expect-error StrictNullChecks
     parent_id: parentId,
+    // @ts-expect-error StrictNullChecks
     text,
+    // @ts-expect-error StrictNullChecks
     canvas_action: canvasAction,
+    // @ts-expect-error StrictNullChecks
     canvas_session: canvasSession,
+    // @ts-expect-error StrictNullChecks
     canvas_hash: canvasHash,
+    // @ts-expect-error StrictNullChecks
     discord_meta,
   } = req.body;
 
@@ -52,10 +61,11 @@ export const createThreadCommentHandler = async (
     throw new AppError(Errors.MissingText);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyComment(canvasAction, canvasSession, canvasHash, {
       thread_id: parseInt(threadId, 10) || undefined,
       text,
+      // @ts-expect-error StrictNullChecks
       address: address.address,
       parent_comment_id: parentId,
     });
@@ -63,9 +73,12 @@ export const createThreadCommentHandler = async (
 
   const [comment, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadComment({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
       parentId,
+      // @ts-expect-error StrictNullChecks
       threadId: parseInt(threadId, 10) || undefined,
       text,
       canvasAction,

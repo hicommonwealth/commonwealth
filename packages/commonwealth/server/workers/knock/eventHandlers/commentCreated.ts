@@ -83,6 +83,7 @@ export const processCommentCreated: EventHandler<
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
+        // @ts-expect-error StrictNullChecks
         author: author.Profile.profile_name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
@@ -90,6 +91,7 @@ export const processCommentCreated: EventHandler<
         comment_url: getCommentUrl(
           payload.community_id,
           payload.thread_id,
+          // @ts-expect-error StrictNullChecks
           payload.id,
         ),
         comment_created_event: payload,

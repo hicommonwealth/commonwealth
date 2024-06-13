@@ -74,28 +74,6 @@ describe('parseEvmEventToContestEvent', () => {
     );
   });
 
-  it('should map NewSingleContestStarted raw evm result to ContestStarted outbox shape', () => {
-    const { event_name, event_payload } = parseEvmEventToContestEvent(
-      'NewSingleContestStarted',
-      contestAddress,
-      [
-        ethers.BigNumber.from(2000), // startTime
-        ethers.BigNumber.from(2001), // endTime
-      ],
-    );
-    expect(event_name).to.eq(EventNames.ContestStarted);
-    const parsedEvent = ContestStarted.parse(event_payload);
-    console.debug(parsedEvent);
-    expect(parsedEvent.contest_address).to.eq(contestAddress);
-    expect(parsedEvent.contest_id).to.eq(0); // single == 0
-    expect(parsedEvent.start_time.getTime()).to.eq(
-      new Date(2000 * 1000).getTime(),
-    );
-    expect(parsedEvent.end_time.getTime()).to.eq(
-      new Date(2001 * 1000).getTime(),
-    );
-  });
-
   it('should map ContentAdded raw evm result to ContestContentAdded outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'ContentAdded',

@@ -20,6 +20,7 @@ const fetchCosmosTally = async (
   ) {
     return proposal.fetchTally();
   } else {
+    // @ts-expect-error StrictNullChecks
     return null;
   }
 };

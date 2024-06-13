@@ -60,6 +60,7 @@ export const chainTypes = app.config.nodes
     value: chain.ethChainId || chain.cosmosChainId || 'solana',
     label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
     bech32Prefix: chain.bech32,
+    // @ts-expect-error StrictNullChecks
     hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
   }));
 

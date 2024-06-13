@@ -117,6 +117,7 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
+          {/* @ts-expect-error StrictNullChecks*/}
           {app.config.chains.getById(subscription.communityId)?.name}
         </CWText>
       </div>

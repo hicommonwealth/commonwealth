@@ -171,6 +171,7 @@ describe('Cosmos Governance Notification Generator', () => {
         id: proposalId,
       },
     };
+    // @ts-expect-error StrictNullChecks
     await models.Notification.create({
       category_id: 'chain-event',
       community_id: chainId,
@@ -208,6 +209,7 @@ describe('Cosmos Governance Notification Generator', () => {
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
           has_chain_events_listener: true,
+          // @ts-expect-error StrictNullChecks
           chain_node_id: kyveNode.id,
           default_symbol: 'KYVE',
         },
@@ -222,6 +224,7 @@ describe('Cosmos Governance Notification Generator', () => {
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
           has_chain_events_listener: true,
+          // @ts-expect-error StrictNullChecks
           chain_node_id: osmosisNode.id,
           default_symbol: 'OSMO',
         },
@@ -348,6 +351,7 @@ describe('Cosmos Governance Notification Generator', () => {
       const user = await models.User.findOne();
       await models.Subscription.findOrCreate({
         where: {
+          // @ts-expect-error StrictNullChecks
           subscriber_id: user.id,
           community_id: 'osmosis',
           category_id: 'chain-event',
@@ -355,6 +359,7 @@ describe('Cosmos Governance Notification Generator', () => {
       });
       await models.Subscription.findOrCreate({
         where: {
+          // @ts-expect-error StrictNullChecks
           subscriber_id: user.id,
           community_id: 'kyve',
           category_id: 'chain-event',
@@ -393,6 +398,7 @@ describe('Cosmos Governance Notification Generator', () => {
     it('should generate cosmos gov notifications for new proposals given existing notifications', async () => {
       const v1ExistingNotifPropId = 24;
       const v1Beta1ExistingNotifPropId = 36;
+      // @ts-expect-error StrictNullChecks
       await models.Notification.create({
         category_id: 'chain-event',
         community_id: 'kyve',
@@ -403,6 +409,7 @@ describe('Cosmos Governance Notification Generator', () => {
         }),
       });
 
+      // @ts-expect-error StrictNullChecks
       await models.Notification.create({
         category_id: 'chain-event',
         community_id: 'osmosis',

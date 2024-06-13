@@ -118,16 +118,27 @@ export const getThreadsHandler = async (
 
     const bulkThreads = await controllers.threads.getBulkThreads({
       communityId: community_id,
+      // @ts-expect-error StrictNullChecks
       stage,
+      // @ts-expect-error StrictNullChecks
       topicId: topic_id,
+      // @ts-expect-error StrictNullChecks
       includePinnedThreads,
+      // @ts-expect-error StrictNullChecks
       page,
+      // @ts-expect-error StrictNullChecks
       limit,
+      // @ts-expect-error StrictNullChecks
       orderBy,
+      // @ts-expect-error StrictNullChecks
       fromDate: from_date,
+      // @ts-expect-error StrictNullChecks
       toDate: to_date,
+      // @ts-expect-error StrictNullChecks
       archived: archived,
+      // @ts-expect-error StrictNullChecks
       contestAddress,
+      // @ts-expect-error StrictNullChecks
       status,
       withXRecentComments,
     });
@@ -161,7 +172,9 @@ export const getThreadsHandler = async (
       communityId: community_id,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
+      // @ts-expect-error StrictNullChecks
       limit: parseInt(limit, 10) || 0,
+      // @ts-expect-error StrictNullChecks
       page: parseInt(page, 10) || 0,
       orderBy: order_by,
       orderDirection: order_direction as any,

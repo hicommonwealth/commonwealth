@@ -29,11 +29,11 @@ const SputnikDaoRow = (props: SputnikDaoRowProps) => {
     .inDollars.toFixed(2);
 
   const periodSeconds = new BN(dao.proposalPeriod).div(
-    new BN(10).pow(new BN(9))
+    new BN(10).pow(new BN(9)),
   );
 
   const periodDuration = moment.duration(
-    moment.unix(+periodSeconds).diff(moment.unix(0))
+    moment.unix(+periodSeconds).diff(moment.unix(0)),
   );
 
   const periodString = formatDuration(periodDuration);
@@ -42,7 +42,7 @@ const SputnikDaoRow = (props: SputnikDaoRowProps) => {
     <div
       className={getClasses<{ clickable?: boolean }>(
         { clickable },
-        'sputnik-row'
+        'sputnik-row',
       )}
       onClick={(e) => {
         if (clickable) {
@@ -90,17 +90,18 @@ const SputnikDAOsPage = () => {
 
       setDaosList(daos);
 
+      // @ts-expect-error <StrictNullChecks/>
       daosList.sort((d1, d2) => {
         const d1Exist = allCommunities.filter((c) =>
           isMainnet
             ? c.id === `${d1.name}.sputnik-dao.near`
-            : c.id === `${d1.name}.sputnikv2.testnet`
+            : c.id === `${d1.name}.sputnikv2.testnet`,
         ).length;
 
         const d2Exist = allCommunities.filter((c) =>
           isMainnet
             ? c.id === `${d2.name}.sputnik-dao.near`
-            : c.id === `${d1.name}.sputnikv2.testnet`
+            : c.id === `${d1.name}.sputnikv2.testnet`,
         ).length;
 
         if (d1Exist !== d2Exist) {

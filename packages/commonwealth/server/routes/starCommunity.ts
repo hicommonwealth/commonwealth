@@ -21,7 +21,9 @@ const starCommunity = async (
   try {
     const [star, created] = await models.StarredCommunity.findOrCreate({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
     });

@@ -41,6 +41,7 @@ describe('EVM Chain Events End to End Tests', () => {
     } else if (!lastBlock && blockNumber !== null) {
       throw new Error('Last processed block not found');
     } else {
+      // @ts-expect-error StrictNullChecks
       lastBlockNum = lastBlock.block_number;
     }
 

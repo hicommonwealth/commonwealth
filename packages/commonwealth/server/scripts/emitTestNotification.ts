@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import {
   NotificationInstance,
   SubscriptionInstance,
@@ -191,6 +191,7 @@ async function setupNotification(
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   if (!existingNotifications) {
     existingNotifications = await getExistingNotifications(
       transaction,
@@ -336,8 +337,9 @@ async function main() {
           'Wallet address not found. ' +
             'Make sure the given address is an address you have used to sign in before.',
         );
-        process.exit(1);
+        await dispose()('ERROR', true);
       } else {
+        // @ts-expect-error StrictNullChecks
         userId = address.user_id;
       }
     }
@@ -346,7 +348,7 @@ async function main() {
     if (argv.chain_id) {
       result = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: userId,
+          subscriber_id: userId!,
           community_id: argv.chain_id,
           category_id: NotificationCategories.ChainEvent,
         },
@@ -355,7 +357,7 @@ async function main() {
     } else {
       result = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: userId,
+          subscriber_id: userId!,
           snapshot_id: argv.snapshot_id,
           category_id: NotificationCategories.SnapshotProposal,
         },
@@ -413,10 +415,12 @@ async function main() {
 if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
-      process.exit(0);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
     })
     .catch((err) => {
       console.log('Failed to emit a notification:', err);
-      process.exit(1);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }

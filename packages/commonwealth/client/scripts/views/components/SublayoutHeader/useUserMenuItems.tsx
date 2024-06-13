@@ -28,6 +28,7 @@ const resetWalletConnectSession = async () => {
   const walletConnectWallet = WebWalletController.Instance.getByName(
     WalletId.WalletConnect,
   );
+  // @ts-expect-error <StrictNullChecks/>
   await walletConnectWallet.reset();
 };
 
@@ -80,6 +81,7 @@ const useUserMenuItems = ({
     useManageCommunityStakeModalStore();
 
   const user = app.user?.addresses?.[0];
+  // @ts-expect-error <StrictNullChecks/>
   const profileId = user?.profileId || user?.profile.id;
 
   const uniqueChainAddresses = getUniqueUserAddresses({
@@ -134,6 +136,7 @@ const useUserMenuItems = ({
           onAddressItemClick?.();
 
           onRevalidationModalData({
+            // @ts-expect-error <StrictNullChecks/>
             walletSsoSource: walletSsoSource,
             walletAddress: account.address,
           });

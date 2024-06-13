@@ -250,6 +250,7 @@ describe('Webhook Tests', () => {
       const webhookUrl = config.SLACK_FEEDBACK_WEBHOOK;
       await server.seeder.createWebhook({
         chain,
+        // @ts-expect-error StrictNullChecks
         webhookUrl,
         jwt: jwtToken,
       });

@@ -79,6 +79,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
+    // @ts-expect-error <StrictNullChecks/>
     Permissions.isCommunityAdmin(null, thread.communityId);
 
   const account = app?.user?.addresses?.find(
@@ -87,6 +88,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: thread.communityId,
+    // @ts-expect-error <StrictNullChecks/>
     address: account?.address,
     apiEnabled: !!account?.address,
   });
@@ -185,6 +187,7 @@ export const Feed = ({
                   network: notif.eventNetwork,
                   data: notif.eventData,
                 };
+                // @ts-expect-error <StrictNullChecks/>
                 const label = ChainEventLabel(notif.communityId, chainEvent);
                 filteredNotifs.push(notif);
                 labelsArr.push(label);
@@ -205,12 +208,15 @@ export const Feed = ({
               new Thread({
                 id: x.thread.id,
                 profile_id: x.thread.profile_id,
+                // @ts-expect-error <StrictNullChecks/>
                 avatar_url: x.thread.profile_avatar_url,
                 profile_name: x.thread.profile_name,
                 community_id: x.community_id,
                 kind: x.thread.kind,
                 last_edited: x.thread.updated_at,
+                // @ts-expect-error <StrictNullChecks/>
                 marked_as_spam_at: x.thread.marked_as_spam_at,
+                // @ts-expect-error <StrictNullChecks/>
                 recentComments: x.recentcomments,
                 stage: x.thread.stage,
                 title: x.thread.title,
@@ -222,6 +228,7 @@ export const Feed = ({
                 plaintext: x.thread.plaintext,
                 read_only: x.thread.read_only,
                 archived_at: x.thread.archived_at,
+                // @ts-expect-error <StrictNullChecks/>
                 locked_at: x.thread.locked_at,
                 has_poll: x.thread.has_poll,
                 Address: {
@@ -230,6 +237,7 @@ export const Feed = ({
                 },
                 topic: x?.thread?.topic,
                 // filler values
+                // @ts-expect-error <StrictNullChecks/>
                 version_history: null,
                 last_commented_on: '',
                 address_last_active: '',
@@ -294,6 +302,7 @@ export const Feed = ({
               <UserDashboardRow
                 key={i}
                 notification={data[i]}
+                // @ts-expect-error <StrictNullChecks/>
                 label={labels[i]}
                 isLoggedIn={isLoggedIn}
               />

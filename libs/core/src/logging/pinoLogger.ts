@@ -1,17 +1,10 @@
 import pino, { DestinationStream } from 'pino';
-import Rollbar from 'rollbar';
 import { config } from '../config';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
+import { rollbar } from './rollbar';
 
 let logLevel: 'info' | 'debug';
 let transport: DestinationStream;
-
-const rollbar = new Rollbar({
-  accessToken: config.LOGGING.ROLLBAR_SERVER_TOKEN,
-  environment: config.LOGGING.ROLLBAR_ENV,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
 
 const formatFilename = (name: string) => {
   const t = name.split('/');

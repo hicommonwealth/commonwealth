@@ -1,6 +1,5 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import useWallets from 'client/scripts/hooks/useWallets';
 import app from 'client/scripts/state';
 import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
 import AuthButton from 'client/scripts/views/components/AuthButton';
@@ -23,6 +22,7 @@ import {
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
+import useAuthentication from '../../useAuthentication';
 import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
@@ -102,6 +102,7 @@ const ModalBase = ({
     // if this is the `layoutType == SignIn` modal, and we get an unrecognized
     // address, then change modal type to `AccountTypeGuidance`
     if (layoutType === AuthModalType.SignIn) {
+      // @ts-expect-error <StrictNullChecks/>
       onChangeModalType(AuthModalType.AccountTypeGuidance);
       return false;
     }
@@ -122,7 +123,7 @@ const ModalBase = ({
     onWalletSelect,
     onSocialLogin,
     onVerifyMobileWalletSignature,
-  } = useWallets({
+  } = useAuthentication({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -215,6 +216,7 @@ const ModalBase = ({
         return;
       }
 
+      // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
 
@@ -256,8 +258,10 @@ const ModalBase = ({
         <CWModalBody className={clsx('content', bodyClassName)}>
           {customBody}
 
+          {/* @ts-expect-error StrictNullChecks*/}
           {showAuthenticationOptionsFor?.length > 0 && (
             <>
+              {/* @ts-expect-error StrictNullChecks*/}
               {showAuthenticationOptionsFor?.length > 1 && (
                 <CWTabsRow className="tabs">
                   {tabsList.map((tab, index) => (
