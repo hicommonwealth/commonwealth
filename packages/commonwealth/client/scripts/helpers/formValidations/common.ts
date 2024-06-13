@@ -5,6 +5,11 @@ export const linkValidationSchema = z.string().url({
   message: VALIDATION_MESSAGES.INVALID_INPUT,
 });
 
+export const emailValidationSchema = z.union([
+  z.literal(''),
+  z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }).email(),
+]);
+
 export const quillValidationSchema = z.object({
   ops: z
     .array(
