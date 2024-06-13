@@ -1,4 +1,4 @@
-import type { Image } from '../views/components/edit_profile';
+import type { Image } from '../views/components/EditProfile/EditProfile';
 
 class NewProfile {
   private _name: string;

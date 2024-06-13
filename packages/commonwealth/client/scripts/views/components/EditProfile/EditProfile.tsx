@@ -1,9 +1,12 @@
-import getLinkType from 'client/scripts/helpers/linkType';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
 import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
+import getLinkType from 'helpers/linkType';
+import { useFlag } from 'hooks/useFlag';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import Account from 'models/Account';
+import AddressInfo from 'models/AddressInfo';
+import MinimumProfile from 'models/MinimumProfile';
+import NewProfile from 'models/NewProfile';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
@@ -14,30 +17,27 @@ import {
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
-import Account from '../../models/Account';
-import AddressInfo from '../../models/AddressInfo';
-import MinimumProfile from '../../models/MinimumProfile';
-import NewProfile from '../../models/NewProfile';
-import { PageNotFound } from '../pages/404';
-import { AvatarUpload } from './Avatar';
-import { LinksArray, useLinksArray } from './LinksArray';
-import { PreferenceTags, usePreferenceTags } from './PreferenceTags';
-import { UserTrainingCardTypes } from './UserTrainingSlider/types';
+import { PageNotFound } from '../../pages/404';
+import { AvatarUpload } from '../Avatar';
+import { LinksArray, useLinksArray } from '../LinksArray';
+import { PreferenceTags, usePreferenceTags } from '../PreferenceTags';
+import { UserTrainingCardTypes } from '../UserTrainingSlider/types';
 import {
   CWCoverImageUploader,
   ImageBehavior,
-} from './component_kit/cw_cover_image_uploader';
-import { CWDivider } from './component_kit/cw_divider';
-import { CWFormSection } from './component_kit/cw_form_section';
-import { CWText } from './component_kit/cw_text';
-import { CWButton } from './component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from './component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWForm } from './component_kit/new_designs/CWForm';
-import { CWTag } from './component_kit/new_designs/CWTag';
-import { CWTextInput } from './component_kit/new_designs/CWTextInput';
-import { LinkedAddresses } from './linked_addresses';
-import { ReactQuillEditor } from './react_quill_editor';
-import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
+} from '../component_kit/cw_cover_image_uploader';
+import { CWDivider } from '../component_kit/cw_divider';
+import { CWFormSection } from '../component_kit/cw_form_section';
+import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWForm } from '../component_kit/new_designs/CWForm';
+import { CWTag } from '../component_kit/new_designs/CWTag';
+import { CWTextInput } from '../component_kit/new_designs/CWTextInput';
+import { LinkedAddresses } from '../linked_addresses';
+import { ReactQuillEditor } from '../react_quill_editor';
+import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
+import './EditProfile.scss';
 
 const linkValidationSchema = z.string().url({
   message: VALIDATION_MESSAGES.INVALID_INPUT,
