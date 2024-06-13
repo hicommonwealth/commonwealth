@@ -96,14 +96,18 @@ flowchart LR
 
     SignIn --> KnownSignInInfo
     SignIn --> UnknownSignInInfo
+    
     KnownSignInInfo --> SignInFlow
     UnknownSignInInfo --> CreateAccount
 
     CreateAccount --> ExistingWallet
     CreateAccount --> NewWallet
 
-    ExistingWallet --> Username
-    NewWallet --> Username
+    ExistingWallet --> WalletsList
+    NewWallet --> SSOList
+
+    WalletsList --> Username
+    SSOList --> Username
 
     Username --> TypeName
     Username --> GenerateName
