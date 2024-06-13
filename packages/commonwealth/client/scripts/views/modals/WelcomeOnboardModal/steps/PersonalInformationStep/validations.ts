@@ -1,4 +1,4 @@
-import { VALIDATION_MESSAGES } from 'client/scripts/helpers/formValidationMessages';
+import { VALIDATION_MESSAGES } from 'client/scripts/helpers/formValidations/messages';
 import z from 'zod';
 
 export const personalInformationFormValidation = z.object({
