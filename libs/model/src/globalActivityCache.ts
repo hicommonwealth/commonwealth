@@ -40,9 +40,9 @@ export async function getActivityFeed(models: DB, id = 0) {
         'profile_avatar_url', P.avatar_url,
         'user_id', P.user_id,
         'user_address', A.address,
-        'topic', Tp
-      ) as thread,
-      T.max_notif_id
+        'topic', Tp,
+        'community_id', T.community_id,
+      ) as thread
       FROM "Threads" T
       JOIN "Addresses" A on 
       ${filterByCommunityForUsers} 
@@ -50,7 +50,7 @@ export async function getActivityFeed(models: DB, id = 0) {
       JOIN "Profiles" P ON P.user_id = A.user_id
       JOIN "Topics" Tp ON Tp.id = T.topic_id
       WHERE T.deleted_at IS NULL
-      ORDER BY T.max_notif_id DESC
+      ORDER BY T.created_at DESC
       LIMIT 50
     ),
     recent_comments AS (
@@ -84,15 +84,10 @@ export async function getActivityFeed(models: DB, id = 0) {
       GROUP BY C.thread_id
     )
     SELECT 
-      N.id as notification_id,
       RTS."thread" as thread,
-      RC."recentComments" as recentComments,
-      N.category_id as category_id,
-      community_id
+      RC."recentComments" as recentComments
     FROM ranked_threads RTS
-    INNER JOIN "Notifications" N ON RTS.max_notif_id = N.id
     LEFT JOIN recent_comments RC ON RTS.thread_id = RC.thread_id
-    WHERE (category_id = 'new-comment-creation') OR category_id = 'new-thread-creation'
     ORDER BY RTS.updated_at DESC;
   `;
 
