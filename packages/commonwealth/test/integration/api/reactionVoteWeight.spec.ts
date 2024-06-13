@@ -12,6 +12,7 @@ import { ServerCommentsController } from 'server/controllers/server_comments_con
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import BanCache from 'server/util/banCheckCache';
 import Sinon from 'sinon';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
@@ -30,7 +31,7 @@ describe('Reaction vote weight', () => {
   let threadsController, commentsController;
   let createThread, createComment;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     threadsController = new ServerThreadsController(
@@ -101,7 +102,7 @@ describe('Reaction vote weight', () => {
     );
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -109,7 +110,7 @@ describe('Reaction vote weight', () => {
     Sinon.restore();
   });
 
-  it('should set thread reaction vote weight and thread vote sum correctly', async () => {
+  test('should set thread reaction vote weight and thread vote sum correctly', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
       [address.address]: '50',
@@ -128,7 +129,7 @@ describe('Reaction vote weight', () => {
     expect(t.reaction_weights_sum).to.eq(expectedWeight);
   });
 
-  it('should set comment reaction vote weight and comment vote sum correctly', async () => {
+  test('should set comment reaction vote weight and comment vote sum correctly', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
       [address.address]: '50',
@@ -148,7 +149,7 @@ describe('Reaction vote weight', () => {
     expect(c.reaction_weights_sum).to.eq(expectedWeight);
   });
 
-  it('should set thread reaction vote weight to min 1', async () => {
+  test('should set thread reaction vote weight to min 1', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
       [address.address]: '0',
@@ -164,7 +165,7 @@ describe('Reaction vote weight', () => {
     expect(reaction.calculated_voting_weight).to.eq(expectedWeight);
   });
 
-  it('should set comment reaction vote weight to min 1', async () => {
+  test('should set comment reaction vote weight to min 1', async () => {
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').resolves({
       // @ts-expect-error StrictNullChecks
       [address.address]: '0',

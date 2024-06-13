@@ -2,6 +2,7 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { ApiEndpoints } from 'state/api/config';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { testServer, TestServer } from '../../../server-test';
 
 chai.use(chaiHttp);
@@ -14,16 +15,16 @@ describe('Topic Tests', () => {
 
   let server: TestServer;
 
-  before('reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('Bulk Topics', () => {
-    it('Should pass /bulkTopics', async () => {
+    test('Should pass /bulkTopics', async () => {
       const res = await chai.request
         .agent(server.app)
         .get(`/api${ApiEndpoints.BULK_TOPICS}`)
