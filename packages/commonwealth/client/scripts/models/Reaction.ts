@@ -1,29 +1,6 @@
 export type ReactionType = 'like';
 import type moment from 'moment';
-
-export type UserProfile = {
-  id: number;
-  name: string;
-  address: string;
-  lastActive: string;
-  avatarUrl: string;
-};
-
-export function addressToUserProfile(address): UserProfile {
-  const profile = address?.User?.Profiles[0];
-  if (!profile) {
-    // @ts-expect-error <StrictNullChecks/>
-    return undefined;
-  }
-
-  return {
-    id: profile.id,
-    avatarUrl: profile?.avatar_url,
-    name: profile?.profile_name || profile?.name,
-    address: address?.address,
-    lastActive: address?.last_active,
-  };
-}
+import { addressToUserProfile, UserProfile } from './MinimumProfile';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Reaction {
@@ -40,7 +17,7 @@ class Reaction {
   public readonly canvasHash: string;
   public readonly updatedAt: moment.Moment;
 
-  public readonly profile?: UserProfile;
+  public readonly profile: UserProfile;
 
   public calculatedVotingWeight: number;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
