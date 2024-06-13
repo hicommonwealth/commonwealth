@@ -6,15 +6,21 @@ import { DB } from './models/index';
 
 export async function getActivityFeed(models: DB, id = 0) {
   /**
-   * Last 50 updated threads
+   * Last 50 created threads
    */
-
-  const filterByCommunityForUsers = id
-    ? 'A.community_id = T.community_id and'
-    : '';
-
   const query = `
-    WITH ranked_threads AS (
+    ${
+      id > 0
+        ? `
+      WITH user_communities AS (
+        SELECT community_id
+        FROM "Addresses"
+        WHERE user_id = :id
+      ),
+    `
+        : 'WITH '
+    }
+    ranked_threads AS (
       SELECT 
       T.id AS thread_id,
       T.updated_at as updated_at,
@@ -41,14 +47,17 @@ export async function getActivityFeed(models: DB, id = 0) {
         'user_id', P.user_id,
         'user_address', A.address,
         'topic', Tp,
-        'community_id', T.community_id,
+        'community_id', T.community_id
       ) as thread
       FROM "Threads" T
-      JOIN "Addresses" A on 
-      ${filterByCommunityForUsers} 
-      ${id ? 'A.user_id = ?' : `A.id = T.address_id`}
+      JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
       JOIN "Profiles" P ON P.user_id = A.user_id
       JOIN "Topics" Tp ON Tp.id = T.topic_id
+      ${
+        id > 0
+          ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
+          : ''
+      }
       WHERE T.deleted_at IS NULL
       ORDER BY T.created_at DESC
       LIMIT 50
@@ -91,13 +100,13 @@ export async function getActivityFeed(models: DB, id = 0) {
     ORDER BY RTS.updated_at DESC;
   `;
 
-  const notifications: any = await models.sequelize.query(query, {
+  const threads: any = await models.sequelize.query(query, {
     type: QueryTypes.SELECT,
     raw: true,
-    replacements: [id],
+    replacements: { id },
   });
 
-  return notifications;
+  return threads;
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -141,10 +150,7 @@ export class GlobalActivityCache {
     return JSON.parse(activity);
   }
 
-  public async deleteActivityFromCache(
-    threadId: number,
-    commentId?: number,
-  ): Promise<void> {
+  public async deleteActivityFromCache(threadId: number): Promise<void> {
     const errorMsg = 'Failed to update global activity in Redis';
 
     try {
@@ -161,16 +167,11 @@ export class GlobalActivityCache {
       let activity = JSON.parse(res);
       let updated = false;
       activity = activity.filter((a: any) => {
-        let shouldKeep: boolean;
-        if (commentId) {
-          const notifData = JSON.parse(a.notification_data);
-          shouldKeep =
-            a.thread_id !== threadId && notifData.commentId !== commentId;
-        } else {
-          shouldKeep = a.thread_id !== threadId;
+        let shouldKeep = true;
+        if (a.thread_id === threadId) {
+          updated = true;
+          shouldKeep = false;
         }
-
-        if (!shouldKeep) updated = true;
         return shouldKeep;
       });
 
