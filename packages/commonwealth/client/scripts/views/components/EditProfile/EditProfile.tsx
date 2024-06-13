@@ -203,7 +203,7 @@ const EditProfile = () => {
         return;
       }
 
-      // TODO: fix and add avatarUrl when saving
+      // TODO: fix and add avatarUrl when saving - https://github.com/hicommonwealth/commonwealth/issues/8151
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
@@ -319,7 +319,9 @@ const EditProfile = () => {
                 fullWidth
                 placeholder="Enter your user name"
                 label="Username"
-                name="username" // TODO: unique username
+                // TODO: unique username?
+                // TODO: username generator?
+                name="username"
                 hookToForm
               />
               <CWTextInput
