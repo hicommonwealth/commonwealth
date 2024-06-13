@@ -48,6 +48,7 @@ export const ThreadPollCard = ({
         disableVoteButton={
           !app.user.activeAccount || isTopicMembershipRestricted
         }
+        // @ts-expect-error <StrictNullChecks/>
         votedFor={
           poll.getUserVote(
             app.user.activeAccount?.community?.id,
@@ -71,6 +72,7 @@ export const ThreadPollCard = ({
         isPreview={false}
         tooltipErrorMessage={getTooltipErrorMessage()}
         onVoteCast={(option, isSelected) => {
+          // @ts-expect-error <StrictNullChecks/>
           handlePollVote(poll, option, isSelected, onVote);
         }}
         onResultsClick={(e) => {

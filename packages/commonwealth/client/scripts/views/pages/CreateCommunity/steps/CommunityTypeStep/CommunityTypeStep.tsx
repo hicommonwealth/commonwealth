@@ -78,6 +78,7 @@ const CommunityTypeStep = ({
     const pickedAddress = app.user.addresses.find(
       ({ addressId }) => String(addressId) === address,
     );
+    // @ts-expect-error <StrictNullChecks/>
     setSelectedAddress(pickedAddress);
     handleContinue();
   };

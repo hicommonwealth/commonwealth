@@ -129,6 +129,7 @@ export async function completeClientLogin(account: Account) {
           })
         ) {
           await app.roles.createRole({
+            // @ts-expect-error StrictNullChecks
             address: addressInfo,
             community: app.activeChainId(),
           });
@@ -163,6 +164,7 @@ export async function updateActiveAddresses({
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
+      // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
       .map((addr) => {
         const tempAddr = app.chain?.accounts.get(
@@ -180,6 +182,7 @@ export async function updateActiveAddresses({
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
+    // @ts-expect-error StrictNullChecks
     return app.roles.isMember({ community: chain.id, account });
   });
 
@@ -191,7 +194,9 @@ export async function updateActiveAddresses({
   } else {
     // Find all addresses in the current community for this account, sorted by last used date/time
     const communityAddressesSortedByLastUsed = [
+      // @ts-expect-error StrictNullChecks
       ...(app.user.addresses.filter((a) => a.community.id === chain.id) || []),
+      // @ts-expect-error StrictNullChecks
     ].sort((a, b) => b.lastActive?.diff(a.lastActive));
 
     // From the sorted adddress in the current community, find an address which has an active session key
@@ -200,6 +205,7 @@ export async function updateActiveAddresses({
       chainBase === ChainBase.CosmosSDK
         ? app.chain?.meta.bech32Prefix
         : app.chain?.meta.node?.ethChainId;
+    // @ts-expect-error StrictNullChecks
     const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
     let foundAddressWithActiveSessionKey = null;
     for (const communityAccount of communityAddressesSortedByLastUsed) {
@@ -208,6 +214,7 @@ export async function updateActiveAddresses({
         .hasAuthenticatedSession(canvasChainId, communityAccount.address);
 
       if (isAuth) {
+        // @ts-expect-error StrictNullChecks
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }
@@ -233,11 +240,17 @@ export async function updateActiveAddresses({
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     app.user.setId(0);
+    // @ts-expect-error StrictNullChecks
     app.user.setEmail(null);
+    // @ts-expect-error StrictNullChecks
     app.user.setEmailInterval(null);
+    // @ts-expect-error StrictNullChecks
     app.user.setEmailVerified(null);
+    // @ts-expect-error StrictNullChecks
     app.user.setPromotionalEmailsEnabled(null);
+    // @ts-expect-error StrictNullChecks
     app.user.setKnockJWT(null);
+    // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
@@ -246,6 +259,7 @@ export function updateActiveUser(data) {
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
+    // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);
   } else {
     app.user.setId(data.id);
@@ -434,6 +448,7 @@ export async function handleSocialLoginCallback({
 }): Promise<{ address: string; isAddressNew: boolean }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
+  // @ts-expect-error StrictNullChecks
   const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -612,13 +627,16 @@ export async function handleSocialLoginCallback({
 
       // if account is created in last few minutes and has a single
       // profile and address (no account linking) then open the welcome modal.
+      const profileId = profiles?.[0]?.id;
       const isCreatedInLast5Minutes =
         accountCreatedTime &&
         moment().diff(moment(accountCreatedTime), 'minutes') < 5;
       if (
         isCreatedInLast5Minutes &&
         profiles?.length === 1 &&
-        userUniqueAddresses.length === 1
+        userUniqueAddresses.length === 1 &&
+        profileId &&
+        !welcomeOnboardModal?.getState?.()?.onboardedProfiles?.[profileId]
       ) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);

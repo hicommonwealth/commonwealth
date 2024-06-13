@@ -1,8 +1,9 @@
 import { EventNames, events, logger } from '@hicommonwealth/core';
-import type { AbiType } from '@hicommonwealth/shared';
+import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
 import { hasher } from 'node-object-hash';
 import { Model, ModelStatic, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
+import { isAddress } from 'web3-validator';
 import { z } from 'zod';
 import { config } from './config';
 import { OutboxAttributes } from './models';
@@ -65,6 +66,10 @@ type EmitEventValues =
   | {
       event_name: EventNames.ContestContentUpvoted;
       event_payload: z.infer<typeof events.ContestContentUpvoted>;
+    }
+  | {
+      event_name: EventNames.SubscriptionPreferencesUpdated;
+      event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
     };
 
 /**
@@ -112,4 +117,58 @@ export function formatS3Url(
   return (
     `https://${bucketName}/` + uploadLocation.split('amazonaws.com/').pop()
   );
+}
+
+export function buildThreadContentUrl(communityId: string, threadId: number) {
+  const fullContentUrl = getThreadUrl({
+    chain: communityId,
+    id: threadId,
+  });
+  // content url only contains path
+  return new URL(fullContentUrl).pathname;
+}
+
+// returns community ID and thread ID from content url
+export function decodeThreadContentUrl(contentUrl: string): {
+  communityId: string;
+  threadId: number;
+} {
+  if (!contentUrl.includes('/discussion/')) {
+    throw new Error(`invalid content url: ${contentUrl}`);
+  }
+  const [communityId, threadId] = contentUrl
+    .split('/discussion/')
+    .map((part) => part.replaceAll('/', ''));
+  return {
+    communityId,
+    threadId: parseInt(threadId, 10),
+  };
+}
+
+/**
+ * Checks whether two Ethereum addresses are equal. Throws if a provided string is not a valid EVM address.
+ * Address comparison is done in lowercase to ensure case insensitivity.
+ * @param address1 - The first Ethereum address.
+ * @param address2 - The second Ethereum address.
+ * @returns True if the strings are equal, valid EVM addresses - false otherwise.
+ */
+export function equalEvmAddresses(
+  address1: string | unknown,
+  address2: string | unknown,
+): boolean {
+  const isRealAddress = (address: string | unknown) => {
+    if (!address || typeof address !== 'string' || !isAddress(address)) {
+      throw new Error(`Invalid address ${address}`);
+    }
+    return address;
+  };
+
+  const validAddress1 = isRealAddress(address1);
+  const validAddress2 = isRealAddress(address2);
+
+  // Convert addresses to lowercase and compare
+  const normalizedAddress1 = validAddress1.toLowerCase();
+  const normalizedAddress2 = validAddress2.toLowerCase();
+
+  return normalizedAddress1 === normalizedAddress2;
 }

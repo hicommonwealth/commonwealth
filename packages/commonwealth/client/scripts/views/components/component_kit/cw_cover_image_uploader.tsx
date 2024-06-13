@@ -33,7 +33,7 @@ type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   generatedImageCallback?: CallableFunction;
   defaultImageUrl?: string;
   defaultImageBehavior?: string;
-  uploadCompleteCallback: CallableFunction;
+  uploadCompleteCallback?: CallableFunction;
   canSelectImageBehaviour?: boolean;
   defaultImageBehaviour?: ImageBehavior;
   showUploadAndGenerateText?: boolean;
@@ -59,9 +59,9 @@ export const CWCoverImageUploader = ({
   subheaderText,
   enableGenerativeAI,
   generatedImageCallback,
+  uploadCompleteCallback,
   defaultImageUrl,
   defaultImageBehavior,
-  uploadCompleteCallback,
   canSelectImageBehaviour = true,
   showUploadAndGenerateText,
   defaultImageBehaviour,
@@ -73,6 +73,7 @@ export const CWCoverImageUploader = ({
     ValidationStatus | undefined
   >();
   const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>(
+    // @ts-expect-error <StrictNullChecks/>
     defaultImageBehaviour,
   );
   const [prompt, setPrompt] = React.useState<string>();
@@ -100,6 +101,7 @@ export const CWCoverImageUploader = ({
   useNecessaryEffect(() => {
     if (defaultFormContext.value && !defaultFormContext.isSet) {
       canResetValue.current = false;
+      // @ts-expect-error <StrictNullChecks/>
       attachButton.current.style.display = 'flex';
 
       setImageURL(defaultFormContext.value);
@@ -109,7 +111,9 @@ export const CWCoverImageUploader = ({
         value: defaultFormContext.value,
       });
 
+      // @ts-expect-error <StrictNullChecks/>
       formContext.setValue(name, defaultFormContext.value);
+      // @ts-expect-error <StrictNullChecks/>
       formContext.setError(name, null);
       setTimeout(() => {
         canResetValue.current = true;
@@ -118,6 +122,7 @@ export const CWCoverImageUploader = ({
   }, [defaultFormContext, imageBehavior, formContext]);
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     onImageProcessStatusChange(isUploading || isGenerating);
   }, [isUploading, isGenerating, onImageProcessStatusChange]);
 
@@ -155,6 +160,7 @@ export const CWCoverImageUploader = ({
 
       return [replaceBucketWithCDN(trimmedImageURL), 'success'];
     } catch (e) {
+      // @ts-expect-error <StrictNullChecks/>
       return [null, 'failure'];
     }
   };
@@ -173,6 +179,7 @@ export const CWCoverImageUploader = ({
         setImageURL(generatedImageURL);
         if (hookToForm && name && formContext) {
           formContext.setValue(name, generatedImageURL);
+          // @ts-expect-error <StrictNullChecks/>
           formContext.setError(name, null);
         }
         const currentImageBehavior = !imageBehavior
@@ -181,11 +188,12 @@ export const CWCoverImageUploader = ({
         setImageBehavior(currentImageBehavior);
         setUploadStatus('success');
         if (defaultImageBehaviour !== ImageBehavior.Circle) {
+          // @ts-expect-error <StrictNullChecks/>
           attachButton.current.style.display = 'none';
         }
 
         generatedImageCallback?.(generatedImageURL, currentImageBehavior);
-        uploadCompleteCallback(generatedImageURL, currentImageBehavior);
+        uploadCompleteCallback?.(generatedImageURL, currentImageBehavior);
       }
 
       setIsUploading(false);
@@ -209,6 +217,7 @@ export const CWCoverImageUploader = ({
 
     if (isUploading) return;
 
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.classList[hoverAttachZone ? 'add' : 'remove']('hovered');
   };
 
@@ -225,6 +234,7 @@ export const CWCoverImageUploader = ({
       setImageURL(_imageURL);
       if (hookToForm && name && formContext) {
         formContext.setValue(name, _imageURL);
+        // @ts-expect-error <StrictNullChecks/>
         formContext.setError(name, null);
       }
       const currentImageBehavior = !imageBehavior
@@ -232,9 +242,10 @@ export const CWCoverImageUploader = ({
         : imageBehavior;
       setImageBehavior(currentImageBehavior);
       if (defaultImageBehaviour !== ImageBehavior.Circle) {
+        // @ts-expect-error <StrictNullChecks/>
         attachButton.current.style.display = 'none';
       }
-      uploadCompleteCallback(_imageURL, currentImageBehavior);
+      uploadCompleteCallback?.(_imageURL, currentImageBehavior);
     }
   };
 
@@ -258,12 +269,14 @@ export const CWCoverImageUploader = ({
 
     setUploadStatus(undefined);
 
+    // @ts-expect-error <StrictNullChecks/>
     const { files } = dropEvent.dataTransfer;
     handleUpload(files[0]);
   };
 
   // On-click support
   const pseudoInputHandler = (inputEvent: InputEvent) => {
+    // @ts-expect-error <StrictNullChecks/>
     handleUpload((inputEvent.target as HTMLInputElement).files[0]);
   };
 
@@ -278,14 +291,21 @@ export const CWCoverImageUploader = ({
     setImageBehavior(defaultImageBehavior as ImageBehavior);
     setIsPrompting(false);
 
+    // @ts-expect-error <StrictNullChecks/>
     pseudoInput.current.addEventListener('change', pseudoInputHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('click', (e: any) => {
+      if (e.target.classList.contains('attach-btn')) clickHandler(e);
       if (e.target.classList.contains('attach-zone')) clickHandler(e);
     });
 
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('dragenter', dragEnterHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('dragleave', dragLeaveHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('dragover', dragOverHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('drop', dropHandler);
 
     return () => {
@@ -326,6 +346,7 @@ export const CWCoverImageUploader = ({
       <MessageRow
         label={subheaderText || 'Accepts JPG and PNG files.'}
         hasFeedback={true}
+        // @ts-expect-error <StrictNullChecks/>
         statusMessage={
           uploadStatus === 'success'
             ? 'Image upload succeeded.'
@@ -342,7 +363,9 @@ export const CWCoverImageUploader = ({
           validationStatus: 'failure' | undefined;
         }>(
           {
+            // @ts-expect-error <StrictNullChecks/>
             isUploading,
+            // @ts-expect-error <StrictNullChecks/>
             uploadStatus,
             validationStatus: formFieldErrorMessage ? 'failure' : undefined,
           },
@@ -405,6 +428,7 @@ export const CWCoverImageUploader = ({
                   buttonHeight="sm"
                   className="generate-btn"
                   onClick={async () => {
+                    // @ts-expect-error <StrictNullChecks/>
                     if (prompt.length < 1) return;
                     setIsGenerating(true);
                     try {
@@ -465,6 +489,7 @@ export const CWCoverImageUploader = ({
       </div>
       <NewMessageRow
         hasFeedback={!!formFieldErrorMessage}
+        // @ts-expect-error <StrictNullChecks/>
         statusMessage={formFieldErrorMessage}
         validationStatus={formFieldErrorMessage ? 'failure' : undefined}
       />
@@ -481,7 +506,7 @@ export const CWCoverImageUploader = ({
             name="image-behaviour"
             onChange={(e) => {
               setImageBehavior(e.target.value);
-              uploadCompleteCallback(imageURL, e.target.value);
+              uploadCompleteCallback?.(imageURL, e.target.value);
             }}
             toggledOption={imageBehavior}
             options={[

@@ -54,6 +54,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
       <CWModalBody>
         <CWTextArea
           placeholder="Report a bug, or suggest an improvement"
+          // @ts-expect-error <StrictNullChecks/>
           value={feedbackText}
           onInput={(e) => {
             setFeedbackText(e.target.value);
@@ -61,6 +62,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
         />
       </CWModalBody>
       <CWModalFooter>
+        {/* @ts-expect-error StrictNullChecks*/}
         {message && <CWValidationText message={message} status={status} />}
         <CWButton
           buttonType="primary"

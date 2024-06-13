@@ -33,7 +33,9 @@ export const LinkedUrlModal = ({
   onModalClose,
   onSave,
 }: LinkedUrlModalProps) => {
+  // @ts-expect-error <StrictNullChecks/>
   const [newTitle, setNewTitle] = useState<string>(null);
+  // @ts-expect-error <StrictNullChecks/>
   const [newUrl, setNewUrl] = useState<string>(null);
   const [tempLinkedUrls, setTempLinkedUrls] =
     useState<Array<Link>>(initialUrlLinks);
@@ -88,6 +90,7 @@ export const LinkedUrlModal = ({
 
       onModalClose();
 
+      // @ts-expect-error <StrictNullChecks/>
       if (links && onSave) {
         onSave(links);
       }

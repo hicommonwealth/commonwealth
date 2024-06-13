@@ -84,6 +84,7 @@ const Directory = () => {
             <CWLabel label="Enter or select your community's chain" />
             <CWTypeaheadSelectList
               options={chainNodeOptionsSorted}
+              // @ts-expect-error <StrictNullChecks/>
               defaultValue={defaultOption}
               placeholder="Select community's chain"
               onChange={(selectedOption) =>

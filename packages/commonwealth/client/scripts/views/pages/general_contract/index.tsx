@@ -75,6 +75,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
       const inputArgsArray = [];
       if (inputArgs && inputArgs.size > 0) {
         for (let i = 0; i < inputArgs.size; i++) {
+          // @ts-expect-error <StrictNullChecks/>
           inputArgsArray.push(inputArgs.get(i));
         }
       }
@@ -85,6 +86,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
         inputArgs: inputArgsArray,
       });
 
+      // @ts-expect-error <StrictNullChecks/>
       const ethersInterface = new ethers.utils.Interface(contract.abi);
 
       functionNameToFunctionOutput.current.set(
@@ -101,6 +103,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   };
 
   const loadContractAbi = async (): Promise<AbiItem[]> => {
+    // @ts-expect-error <StrictNullChecks/>
     const _contract: Contract = app.contracts.getByAddress(contractAddress);
     setContract(_contract);
 
@@ -144,6 +147,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
               <CWText>{fn.name}</CWText>
               <CWText>{fn.stateMutability}</CWText>
               <div className="functions-input-container">
+                {/* @ts-expect-error StrictNullChecks*/}
                 {fn.inputs.map((input: AbiParameter, inputIdx: number) => {
                   return (
                     <div>
@@ -176,6 +180,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                 })}
               </div>
               <div className="functions-output-container">
+                {/* @ts-expect-error StrictNullChecks*/}
                 {fn.outputs.map((output: AbiOutput, i) => {
                   const fnOutputArray =
                     functionNameToFunctionOutput.current.get(fn.name);
@@ -207,6 +212,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                     setSaving(true);
 
                     try {
+                      // @ts-expect-error <StrictNullChecks/>
                       callFunction(contractAddress, fn);
                     } catch (err) {
                       notifyError(

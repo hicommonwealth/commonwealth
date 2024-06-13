@@ -23,10 +23,15 @@ export class RolesController {
   public setRoles(roles = []): void {
     const roleIds = this.roles.map((r) => r.id);
     roles.forEach((role) => {
+      // @ts-expect-error StrictNullChecks
       if (!roleIds.includes(role.id)) {
+        // @ts-expect-error StrictNullChecks
         role.address = role.Address.address;
+        // @ts-expect-error StrictNullChecks
         role.address_chain = role.Address.community_id;
+        // @ts-expect-error StrictNullChecks
         role.last_active = role.Address.last_active;
+        // @ts-expect-error StrictNullChecks
         delete role.Address;
         this._roles.push(role);
       }
@@ -79,6 +84,7 @@ export class RolesController {
     community?: string;
   }): RoleInfo {
     const account = options.account || this.User.activeAccount;
+    // @ts-expect-error StrictNullChecks
     if (!account) return;
 
     const address_id = this.User.addresses.find((a) => {
@@ -87,6 +93,7 @@ export class RolesController {
       );
     })?.id;
 
+    // @ts-expect-error StrictNullChecks
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
       const communityMatches = r.community_id === options.community;
@@ -109,7 +116,9 @@ export class RolesController {
       this.User.addresses.length === 0 ||
       this.roles.length === 0
     )
+      // @ts-expect-error StrictNullChecks
       return;
+    // @ts-expect-error StrictNullChecks
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
       const referencedAddress = this.User.addresses.find(
@@ -117,7 +126,7 @@ export class RolesController {
       );
       if (!referencedAddress) return;
       const isSame =
-        this.User.activeAccount.address === referencedAddress.address;
+        this.User?.activeAccount?.address === referencedAddress.address;
       const ofCommunity = r.community_id === options.community;
       return permission && referencedAddress && isSame && ofCommunity;
     });
@@ -220,7 +229,9 @@ export class RolesController {
       options.account instanceof Account
         ? this.User.addresses.find(
             (a) =>
+              // @ts-expect-error StrictNullChecks
               options.account.address === a.address &&
+              // @ts-expect-error StrictNullChecks
               options.account.community.id === a.community.id,
           )
         : options.account;

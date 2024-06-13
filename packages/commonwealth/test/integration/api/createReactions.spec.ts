@@ -5,6 +5,7 @@ import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import Sinon from 'sinon';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -46,7 +47,7 @@ describe('createReaction Integration Tests', () => {
     return text;
   };
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     const res = await server.seeder.createAndVerifyAddress(
@@ -78,6 +79,7 @@ describe('createReaction Integration Tests', () => {
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
+      // @ts-expect-error StrictNullChecks
       topicId: topic.id,
       session: {
         type: 'session',
@@ -104,15 +106,16 @@ describe('createReaction Integration Tests', () => {
         return '';
       },
     });
+    // @ts-expect-error StrictNullChecks
     threadId = thread.id;
   });
 
-  after(async () => {
+  afterAll(async () => {
     Sinon.restore();
     await dispose()();
   });
 
-  it('should create comment reactions and verify comment reaction count', async () => {
+  test('should create comment reactions and verify comment reaction count', async () => {
     const text = await getUniqueCommentText();
     const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
@@ -128,6 +131,7 @@ describe('createReaction Integration Tests', () => {
       where: { text },
     });
 
+    // @ts-expect-error StrictNullChecks
     const beforeReactionCount = comment.reaction_count;
 
     chai.assert.isNotNull(comment);
@@ -161,7 +165,7 @@ describe('createReaction Integration Tests', () => {
     chai.assert.equal(comment.reaction_count, beforeReactionCount);
   });
 
-  it('should create thread reactions and verify thread reaction count', async () => {
+  test('should create thread reactions and verify thread reaction count', async () => {
     const thread = await server.models.Thread.findOne({
       where: { id: threadId },
     });
@@ -173,6 +177,7 @@ describe('createReaction Integration Tests', () => {
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
+      // @ts-expect-error StrictNullChecks
       thread_id: thread.id,
       author_chain: 'ethereum',
       session: userSession.session,

@@ -27,13 +27,16 @@ export const useMemberData = ({
     ? `in-group:${groupFilter}`
     : groupFilter;
 
+  // @ts-expect-error StrictNullChecks
   const membershipsFilter = ['all-community'].includes(groupFilter?.toString())
     ? undefined
     : parseMembership;
 
   const { data: members, isLoading: isLoadingMembers } = useGetMembersQuery({
     limit: membersPerPage,
+    // @ts-expect-error StrictNullChecks
     order_by: tableState.orderBy,
+    // @ts-expect-error StrictNullChecks
     order_direction: tableState.orderDirection as 'ASC' | 'DESC',
     search: debouncedSearchTerm,
     community_id: app.activeChainId(),

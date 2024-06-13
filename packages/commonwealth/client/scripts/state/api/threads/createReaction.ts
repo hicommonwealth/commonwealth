@@ -82,6 +82,7 @@ const useCreateThreadReactionMutation = ({
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
         markTrainingActionAsComplete(
           UserTrainingCardTypes.GiveUpvote,
+          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

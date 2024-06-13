@@ -89,14 +89,19 @@ export const AaveProposalForm = () => {
       const aaveProposal = aaveProposalState[i];
 
       if (aaveProposal.target) {
+        // @ts-expect-error StrictNullChecks
         targets.push(aaveProposal.target);
       } else {
         throw new Error(`No target for Call ${i + 1}`);
       }
 
+      // @ts-expect-error StrictNullChecks
       values.push(aaveProposal.value || '0');
+      // @ts-expect-error StrictNullChecks
       calldatas.push(aaveProposal.calldata || '');
+      // @ts-expect-error StrictNullChecks
       withDelegateCalls.push(aaveProposal.withDelegateCall || false);
+      // @ts-expect-error StrictNullChecks
       signatures.push(aaveProposal.signature || '');
     }
 
@@ -130,6 +135,7 @@ export const AaveProposalForm = () => {
         <CWLabel label="Proposer (you)" />
         <User
           userAddress={author?.address}
+          // @ts-expect-error StrictNullChecks
           userCommunityId={author?.community?.id || author?.profile?.chain}
           shouldShowAsDeleted={
             !author?.address &&
@@ -264,6 +270,7 @@ export const AaveProposalForm = () => {
           updateAaveProposalState(
             activeTabIndex,
             'withDelegateCall',
+            // @ts-expect-error StrictNullChecks
             e.target.checked,
           );
         }}

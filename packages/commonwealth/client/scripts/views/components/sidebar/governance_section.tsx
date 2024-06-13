@@ -172,6 +172,7 @@ export const GovernanceSection = () => {
           e,
           '/multiple-snapshots?action=select-space',
           app.activeChainId(),
+          // @ts-expect-error <StrictNullChecks/>
           null,
         );
       } else {
@@ -183,6 +184,7 @@ export const GovernanceSection = () => {
               .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
               .trim()}`,
             app.activeChainId(),
+            // @ts-expect-error <StrictNullChecks/>
             null,
           );
         } else {
@@ -191,6 +193,7 @@ export const GovernanceSection = () => {
             e,
             `/snapshot/${snapshotSpaces}`,
             app.activeChainId(),
+            // @ts-expect-error <StrictNullChecks/>
             null,
           );
         }

@@ -131,6 +131,7 @@ const Allowlist = ({
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
+        // @ts-expect-error StrictNullChecks
         role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
@@ -138,6 +139,7 @@ const Allowlist = ({
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
+          // @ts-expect-error StrictNullChecks
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         address: p.addresses[0].address,
@@ -161,6 +163,7 @@ const Allowlist = ({
         sortValue: member.address,
         customElement: (
           <div className="table-cell">
+            {/*@ts-expect-error StrictNullChecks*/}
             {formatAddressShort(member.address, 5, 6)}
           </div>
         ),

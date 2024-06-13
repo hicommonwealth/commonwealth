@@ -47,6 +47,7 @@ export const EditTopicModal = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
+    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
@@ -61,6 +62,7 @@ export const EditTopicModal = ({
       description: description,
       name: name,
       community_id: app.activeChainId(),
+      // @ts-expect-error <StrictNullChecks/>
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: false,

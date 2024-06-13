@@ -34,6 +34,7 @@ export default class SolanaChain
     this._app = app;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async init(chain: ChainInfo, reset = false) {
     // default to 9 decimals
     this._decimals = new BN(10).pow(new BN(chain.decimals || 9));
@@ -53,8 +54,9 @@ export default class SolanaChain
 
     // slots are approx equal to block heights
     this.app.chain.block.height = await this._connection.getSlot();
+    // @ts-expect-error StrictNullChecks
     this.app.chain.block.duration = await this._connection.getBlockTime(
-      this.app.chain.block.height
+      this.app.chain.block.height,
     );
     this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
@@ -63,6 +65,7 @@ export default class SolanaChain
   public async deinit() {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
     // no need to unsubscribe as it's HTTP RPC
+    // @ts-expect-error StrictNullChecks
     this._connection = null;
   }
 
@@ -71,11 +74,16 @@ export default class SolanaChain
   }
 
   public createTXModalData(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     author: SolanaAccount,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txFunc,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     objName: string,
-    cb?: (success: boolean) => void
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('unsupported');
   }

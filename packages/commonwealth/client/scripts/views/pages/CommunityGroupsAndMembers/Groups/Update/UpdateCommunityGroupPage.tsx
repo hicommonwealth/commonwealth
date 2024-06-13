@@ -32,6 +32,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     communityId: app.activeChainId(),
     includeTopics: true,
   });
+  // @ts-expect-error <StrictNullChecks/>
   const foundGroup: Group = groups.find(
     (group) => group.id === parseInt(`${groupId}`),
   );
@@ -79,6 +80,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
+          // @ts-expect-error <StrictNullChecks/>
           requirements: foundGroup.requirements
             .filter((r) => r?.data?.source) // filter erc groups
             .map((requirement) => ({

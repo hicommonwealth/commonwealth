@@ -47,6 +47,7 @@ interface FetchBulkThreadsProps extends CommonProps {
     | 'mostLikes'
     | 'mostComments'
     | 'latestActivity';
+  withXRecentComments?: number;
 }
 
 interface FetchThreadCountProps extends CommonProps {
@@ -57,6 +58,7 @@ interface FetchThreadCountProps extends CommonProps {
 interface FetchActiveThreadsProps extends CommonProps {
   queryType: typeof QueryTypes.ACTIVE; // discriminating union
   topicsPerThread?: number;
+  withXRecentComments?: number;
 }
 
 const useDateCursor = ({
@@ -72,7 +74,9 @@ const useDateCursor = ({
   useEffect(() => {
     const updater = () => {
       const { toDate, fromDate } =
+        // @ts-expect-error StrictNullChecks
         getToAndFromDatesRangesForThreadsTimelines(dateRange);
+      // @ts-expect-error StrictNullChecks
       setDateCursor({ toDate, fromDate });
     };
 
@@ -111,6 +115,7 @@ const getFetchThreadsQueryKey = (props) => {
       props.orderBy,
       props.contestAddress,
       props.contestStatus,
+      props.withXRecentComments,
     ];
 
     // remove milliseconds from cache key
@@ -127,6 +132,7 @@ const getFetchThreadsQueryKey = (props) => {
       props.communityId,
       props.queryType,
       props.topicsPerThread,
+      props.withXRecentComments,
     ];
   }
   if (isFetchThreadCountProps(props)) {
@@ -169,6 +175,9 @@ const fetchBulkThreads = (props) => {
           ...(props.contestStatus && {
             status: props.contestStatus,
           }),
+          ...(props.withXRecentComments && {
+            withXRecentComments: props.withXRecentComments,
+          }),
         },
       },
     );
@@ -195,6 +204,9 @@ const fetchActiveThreads = (props) => {
           active: true,
           community_id: props.communityId,
           threads_per_topic: props.topicsPerThread || 3,
+          ...(props.withXRecentComments && {
+            withXRecentComments: props.withXRecentComments,
+          }),
         },
       },
     );

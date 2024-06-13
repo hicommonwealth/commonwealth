@@ -125,6 +125,7 @@ class ChainInfo {
     this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
+    // @ts-expect-error StrictNullChecks
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;

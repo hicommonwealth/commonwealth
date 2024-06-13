@@ -7,6 +7,7 @@ import { Anvil } from '@viem/anvil';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getTestAbi } from 'test/integration/evmChainEvents/util';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import Web3 from 'web3';
 import {
   getEvents,
@@ -35,8 +36,7 @@ const compoundVotingPeriodBlocks = 19710;
 
 /*
  * The main objective of these tests is to ensure log processing logic works
- * as expected irrespective of the underlying event type. Most of the tests
- * are interdependent therefore mocha should exit on the first failure.
+ * as expected irrespective of the underlying event type.
  */
 describe('EVM Chain Events Log Processing Tests', () => {
   let propCreatedResult: { block: number; proposalId: string },
@@ -46,10 +46,8 @@ describe('EVM Chain Events Log Processing Tests', () => {
     propQueuedLog: Log,
     anvil: Anvil;
 
-  before(async function () {
+  beforeAll(async function () {
     anvil = await getAnvil();
-    this.timeout(80_000);
-
     await tester.seedDb();
     abi = (await getTestAbi()).abi;
 
@@ -57,9 +55,9 @@ describe('EVM Chain Events Log Processing Tests', () => {
     propCreatedResult = await sdk.createProposal(1);
     await sdk.mineBlocks(compoundVotingDelayBlocks + 1);
     expect(propCreatedResult.block).to.not.be.undefined;
-  });
+  }, 80_000);
 
-  after(async () => {
+  afterAll(async () => {
     await anvil.stop();
     await dispose()();
   });
@@ -67,7 +65,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
   const expectAbi = () => expect(abi, 'ABI must be defined to run this test');
 
   describe('fetching logs', () => {
-    it('should not return any logs if no contract addresses are given', async () => {
+    test('should not return any logs if no contract addresses are given', async () => {
       const provider = getProvider(localRpc);
       const currentBlockNum = await provider.getBlockNumber();
       const { logs } = await getLogs({
@@ -78,7 +76,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(logs).to.be.empty;
     });
 
-    it('should throw if the provider cannot be connected to', async () => {
+    test('should throw if the provider cannot be connected to', async () => {
       await expect(
         getLogs({
           rpc: 'http://fake',
@@ -93,7 +91,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         );
     });
 
-    it('should not throw if the starting block number is greater than the current block number', async () => {
+    test('should not throw if the starting block number is greater than the current block number', async () => {
       const provider = getProvider(localRpc);
       const currentBlockNum = await provider.getBlockNumber();
       await expect(
@@ -105,52 +103,64 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ).to.not.be.rejected;
     });
 
-    it('should fetch logs from the specified range', async () => {
-      expectAbi();
-      expect(propCreatedResult, 'Must have created a proposal to run this test')
-        .to.not.be.undefined;
+    test(
+      'should fetch logs from the specified range',
+      { timeout: 360_000 },
+      async () => {
+        expectAbi();
+        expect(
+          propCreatedResult,
+          'Must have created a proposal to run this test',
+        ).to.not.be.undefined;
 
-      await sdk.castVote(propCreatedResult.proposalId, 1, true);
-      await sdk.mineBlocks(compoundVotingPeriodBlocks + 1);
+        await sdk.castVote(propCreatedResult.proposalId, 1, true);
+        await sdk.mineBlocks(compoundVotingPeriodBlocks + 1);
 
-      propQueuedResult = await sdk.queueProposal(propCreatedResult.proposalId);
+        propQueuedResult = await sdk.queueProposal(
+          propCreatedResult.proposalId,
+        );
 
-      const propCreatedLogs = await getLogs({
-        rpc: localRpc,
-        contractAddresses: [sdk.contractAddrs.compound.governance],
-        startingBlockNum: propCreatedResult.block,
-        endingBlockNum: propCreatedResult.block + 1,
-      });
-      expect(propCreatedLogs.logs.length).to.equal(1);
-      propCreatedLog = propCreatedLogs.logs[0];
+        const propCreatedLogs = await getLogs({
+          rpc: localRpc,
+          contractAddresses: [sdk.contractAddrs.compound.governance],
+          startingBlockNum: propCreatedResult.block,
+          endingBlockNum: propCreatedResult.block + 1,
+        });
+        expect(propCreatedLogs.logs.length).to.equal(1);
+        propCreatedLog = propCreatedLogs.logs[0];
 
-      const propQueuedLogs = await getLogs({
-        rpc: localRpc,
-        contractAddresses: [sdk.contractAddrs.compound.governance],
-        startingBlockNum: propQueuedResult.block,
-        endingBlockNum: propQueuedResult.block + 1,
-      });
-      expect(propQueuedLogs.logs.length).to.equal(1);
-      propQueuedLog = propQueuedLogs.logs[0];
-    }).timeout(360_000);
+        const propQueuedLogs = await getLogs({
+          rpc: localRpc,
+          contractAddresses: [sdk.contractAddrs.compound.governance],
+          startingBlockNum: propQueuedResult.block,
+          endingBlockNum: propQueuedResult.block + 1,
+        });
+        expect(propQueuedLogs.logs.length).to.equal(1);
+        propQueuedLog = propQueuedLogs.logs[0];
+      },
+    );
 
-    it('should restrict the maximum block range fetched to 500 blocks', async () => {
-      expectAbi();
+    test(
+      'should restrict the maximum block range fetched to 500 blocks',
+      { timeout: 80_000 },
+      async () => {
+        expectAbi();
 
-      expect(propQueuedResult.block).to.not.be.undefined;
-      await sdk.mineBlocks(501);
+        expect(propQueuedResult.block).to.not.be.undefined;
+        await sdk.mineBlocks(501);
 
-      const { logs } = await getLogs({
-        rpc: localRpc,
-        contractAddresses: [sdk.contractAddrs.compound.governance],
-        startingBlockNum: propQueuedResult.block - 1,
-      });
-      expect(logs).to.be.empty;
-    }).timeout(80_000);
+        const { logs } = await getLogs({
+          rpc: localRpc,
+          contractAddresses: [sdk.contractAddrs.compound.governance],
+          startingBlockNum: propQueuedResult.block - 1,
+        });
+        expect(logs).to.be.empty;
+      },
+    );
   });
 
   describe('parsing logs', () => {
-    before(() => {
+    beforeAll(() => {
       expect(
         propCreatedLog,
         'Must have fetched the proposal created log to run this test',
@@ -161,7 +171,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       ).to.not.be.undefined;
     });
 
-    it('should not throw if an invalid ABI is given for a contract address', async () => {
+    test('should not throw if an invalid ABI is given for a contract address', async () => {
       let evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
@@ -225,7 +235,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(result.length).to.equal(0);
     });
 
-    it.skip('should not throw if a log cannot be parsed', async () => {
+    test.skip('should not throw if a log cannot be parsed', async () => {
       expectAbi();
 
       const evmSource: EvmSource = {
@@ -279,7 +289,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
       expect(events[0].parsedArgs).to.exist;
     });
 
-    it('should only parse logs with a matching signature', async () => {
+    test('should only parse logs with a matching signature', async () => {
       expectAbi();
 
       const evmSource: EvmSource = {
@@ -317,7 +327,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
   // since all error handling tests are performed above there is no need to repeat these
   // tests here - as such this is a simple test to ensure normal functionality
   describe('getEvents', () => {
-    before(() => {
+    beforeAll(() => {
       expectAbi();
       expect(
         propCreatedResult,
@@ -327,7 +337,7 @@ describe('EVM Chain Events Log Processing Tests', () => {
         .to.not.be.undefined;
     });
 
-    it('should return all fetched and parsed logs', async () => {
+    test('should return all fetched and parsed logs', async () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
         contracts: {
@@ -374,12 +384,16 @@ describe('EVM Chain Events Log Processing Tests', () => {
       );
       expect(propCreatedEvent).to.exist;
       expect(
+        // @ts-expect-error StrictNullChecks
         web3.utils.toChecksumAddress(propCreatedEvent.rawLog.address),
       ).to.equal(sdk.contractAddrs.compound.governance);
+      // @ts-expect-error StrictNullChecks
       expect(propCreatedEvent.eventSource.kind).to.equal('proposal-created');
+      // @ts-expect-error StrictNullChecks
       expect(propCreatedEvent.rawLog.blockNumber).to.equal(
         propCreatedLog.blockNumber,
       );
+      // @ts-expect-error StrictNullChecks
       expect(propCreatedEvent.parsedArgs).to.exist;
 
       const propQueuedEvent = events.find(
@@ -387,16 +401,17 @@ describe('EVM Chain Events Log Processing Tests', () => {
       );
       expect(propQueuedEvent).to.exist;
       expect(
+        // @ts-expect-error StrictNullChecks
         web3.utils.toChecksumAddress(propQueuedEvent.rawLog.address),
       ).to.equal(sdk.contractAddrs.compound.governance);
+      // @ts-expect-error StrictNullChecks
       expect(propQueuedEvent.eventSource.kind).to.equal('proposal-queued');
+      // @ts-expect-error StrictNullChecks
       expect(propQueuedEvent.rawLog.blockNumber).to.equal(
         propQueuedLog.blockNumber,
       );
+      // @ts-expect-error StrictNullChecks
       expect(propQueuedEvent.parsedArgs).to.exist;
     });
   });
-
-  // this cleans up the proposal cycle by executing the proposal
-  // and advancing the chain 501 blocks past the max EVM CE range
 });

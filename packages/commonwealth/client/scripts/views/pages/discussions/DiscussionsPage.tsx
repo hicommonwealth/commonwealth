@@ -47,6 +47,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
+  // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -97,10 +98,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
+      // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
+      // @ts-expect-error <StrictNullChecks/>
       contestAddress,
+      // @ts-expect-error <StrictNullChecks/>
       contestStatus,
+      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -121,6 +126,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
+    // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
       <DiscussionsFeedDiscovery
         orderBy={featuredFilter}
@@ -131,6 +137,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
         data={isInitialLoading ? [] : filteredThreads}
+        customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -200,6 +207,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               {userOnboardingEnabled && <UserTrainingSlider />}
               <AdminOnboardingSlider />
               <HeaderWithFilters
+                // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}
                 stage={stageName}
                 featuredFilter={featuredFilter}

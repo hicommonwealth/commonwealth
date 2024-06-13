@@ -2,6 +2,7 @@ import { ProposalType } from '@hicommonwealth/shared';
 import type MinimumProfile from 'models/MinimumProfile';
 import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
+import Comment from './Comment';
 import type { IUniqueId } from './interfaces';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
@@ -82,6 +83,7 @@ function processAssociatedReactions(
     tempReactionTimestamps.length === tempReactionWeights.length
   ) {
     for (let i = 0; i < tempReactionIds.length; i++) {
+      // @ts-expect-error StrictNullChecks
       temp.push({
         id: tempReactionIds[i],
         type: tempReactionType[i],
@@ -130,6 +132,22 @@ type AssociatedContest = {
   content_id: number;
   start_time: string;
   end_time: string;
+};
+
+type RecentComment = {
+  id: number;
+  address: string;
+  text: string;
+  plainText: string;
+  created_at: string;
+  updated_at: string;
+  marked_as_spam_at?: string;
+  deleted_at?: string;
+  discord_meta?: string;
+  profile_id: number;
+  profile_name?: string;
+  profile_avatar_url?: string;
+  user_id: string;
 };
 
 export enum LinkSource {
@@ -191,6 +209,7 @@ export class Thread implements IUniqueId {
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public associatedContests?: AssociatedContest[];
+  public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: number;
   public links: Link[];
   public readonly discord_meta: any;
@@ -247,6 +266,7 @@ export class Thread implements IUniqueId {
     address_last_active,
     associatedReactions,
     associatedContests,
+    recentComments,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -292,37 +312,50 @@ export class Thread implements IUniqueId {
     address_last_active: string;
     associatedReactions?: AssociatedReaction[];
     associatedContests?: AssociatedContest[];
+    recentComments: RecentComment[];
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
+    // @ts-expect-error StrictNullChecks
     this.body = getDecodedString(body);
+    // @ts-expect-error StrictNullChecks
     this.plaintext = plaintext;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
+    // @ts-expect-error StrictNullChecks
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
+    // @ts-expect-error StrictNullChecks
     this.pinned = pinned;
+    // @ts-expect-error StrictNullChecks
     this.url = url;
     this.communityId = community_id;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
+    // @ts-expect-error StrictNullChecks
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
     this.hasPoll = has_poll;
+    // @ts-expect-error StrictNullChecks
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
       ? this.versionHistory[0].timestamp
       : null;
+    // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
+    // @ts-expect-error StrictNullChecks
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
+    // @ts-expect-error StrictNullChecks
     this.canvasAction = canvasAction;
+    // @ts-expect-error StrictNullChecks
     this.canvasSession = canvasSession;
+    // @ts-expect-error StrictNullChecks
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
@@ -331,6 +364,7 @@ export class Thread implements IUniqueId {
     this.associatedReactions =
       associatedReactions ??
       processAssociatedReactions(
+        // @ts-expect-error StrictNullChecks
         reactions,
         reactionIds,
         reactionType,
@@ -342,6 +376,44 @@ export class Thread implements IUniqueId {
         reactedAddressLastActive,
       );
     this.associatedContests = associatedContests || [];
+    this.recentComments = (recentComments || []).map(
+      (rc) =>
+        new Comment({
+          authorChain: this.authorCommunity,
+          community_id: this.authorCommunity,
+          id: rc?.id,
+          thread_id: id,
+          author: rc?.address,
+          last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
+          created_at: rc?.created_at ? moment(rc?.created_at) : null,
+          plaintext: rc?.plainText,
+          text: rc?.text,
+          Address: {
+            address: rc?.address,
+            User: {
+              Profiles: [
+                {
+                  id: rc?.profile_id,
+                  profile_name: rc?.profile_name,
+                  avatar_url: rc?.profile_avatar_url,
+                },
+              ],
+            },
+          },
+          discord_meta: rc?.discord_meta,
+          marked_as_spam_at: rc?.marked_as_spam_at,
+          deleted_at: rc?.deleted_at,
+          // fallback, we are not using this in display for thread preview
+          // and these should not be added here unless needed.
+          parent_id: null,
+          reactions: [],
+          version_history: [],
+          reaction_weights_sum: 0,
+          canvas_action: null,
+          canvas_hash: null,
+          canvas_session: null,
+        }),
+    );
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)
       : moment(created_at);

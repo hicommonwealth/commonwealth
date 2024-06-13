@@ -49,8 +49,10 @@ export const CWRelatedCommunityCard = ({
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
     community: community,
+    // @ts-expect-error <StrictNullChecks/>
     ethUsdRate,
     stakeId: 2,
+    // @ts-expect-error <StrictNullChecks/>
     historicalPrice,
   });
 

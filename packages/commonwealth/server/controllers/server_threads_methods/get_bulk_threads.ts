@@ -18,6 +18,7 @@ export type GetBulkThreadsOptions = {
   archived: boolean;
   contestAddress: string;
   status: string;
+  withXRecentComments?: number;
 };
 
 export type AssociatedReaction = {
@@ -54,6 +55,7 @@ export async function __getBulkThreads(
     archived,
     contestAddress,
     status,
+    withXRecentComments = 0,
   }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   if (stage && status) {
@@ -82,6 +84,7 @@ export async function __getBulkThreads(
       topicId,
       contestAddress,
       status,
+      withXRecentComments: withXRecentComments > 10 ? 10 : withXRecentComments, // cap to 10
     };
   })();
 
@@ -100,20 +103,26 @@ export async function __getBulkThreads(
     all: '',
   };
 
-  const contestJoin =
-    ' JOIN "ContestActions" CA ON CA.thread_id = id' +
-    ' JOIN "Contests" CON ON CON.contest_id = CA.contest_id';
-
   const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
     `
-        WITH top_threads AS (
-        SELECT id, title, url, body, version_history, kind, stage, read_only, discord_meta,
+        WITH contest_ids as (
+            SELECT DISTINCT(CA.thread_id)
+            FROM "Contests" CON
+            JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+            ${
+              contestAddress
+                ? ` WHERE CA.contest_address = '${contestAddress}' `
+                : ''
+            }
+            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
+        ),
+        top_threads AS (
+        SELECT id, title, url, body, kind, stage, read_only, discord_meta,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
             marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_action as "canvasAction",
             canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited, address_id
         FROM "Threads" T
-        ${contestAddress ? contestJoin : ''}
         WHERE
             community_id = :communityId AND
             deleted_at IS NULL AND
@@ -122,10 +131,7 @@ export async function __getBulkThreads(
             ${stage ? ' AND stage = :stage' : ''}
             ${fromDate ? ' AND T.created_at > :fromDate' : ''}
             ${toDate ? ' AND T.created_at < :toDate' : ''}
-            ${
-              contestAddress ? ' AND CA.contest_address = :contestAddress ' : ''
-            }
-            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
+            ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
         ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'} 
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (
@@ -197,31 +203,71 @@ export async function __getBulkThreads(
         WHERE R.community_id = :communityId AND R.thread_id = TT.id
         GROUP BY TT.id
     ), contest_data AS (
-    -- get the contest data associated with the thread
-        SELECT
-            TT.id as thread_id,
-            json_agg(json_strip_nulls(json_build_object(
-            'id', CON.contest_id,
-            'thread_id', TT.id,
-            'content_id', CA.content_id,
-            'start_time', CON.start_time,
-            'end_time', CON.end_time
-        ))) as "associatedContests"
-        FROM "Contests" CON
-        JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
-        JOIN top_threads TT ON TT.id = CA.thread_id
-        GROUP BY TT.id
-    )
+      -- get the contest data associated with the thread
+          SELECT
+              TT.id as thread_id,
+              json_agg(json_strip_nulls(json_build_object(
+              'contest_id', CON.contest_id,
+              'contest_address', CON.contest_address,
+              'thread_id', TT.id,
+              'content_id', CA.content_id,
+              'start_time', CON.start_time,
+              'end_time', CON.end_time
+          ))) as "associatedContests"
+          FROM "Contests" CON
+          JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
+          JOIN top_threads TT ON TT.id = CA.thread_id
+          GROUP BY TT.id
+    )${
+      withXRecentComments
+        ? `, recent_comments AS (
+      -- get the recent comments data associated with the thread
+          SELECT
+              TT.id as thread_id,
+              json_agg(json_strip_nulls(json_build_object(
+              'id', COM.id,
+              'address', A.address,
+              'text', COM.text,
+              'plainText', COM.plainText,
+              'created_at', COM.created_at::text,
+              'updated_at', COM.updated_at::text,
+              'deleted_at', COM.deleted_at::text,
+              'marked_as_spam_at', COM.marked_as_spam_at::text,
+              'discord_meta', COM.discord_meta,
+              'profile_id', P.id,
+              'profile_name', P.profile_name,
+              'profile_avatar_url', P.avatar_url,
+              'user_id', P.user_id
+          ))) as "recentComments"
+          FROM (
+            Select tempC.* FROM "Comments" tempC
+	          JOIN top_threads tempTT ON tempTT.id = tempC.thread_id
+            WHERE deleted_at IS NULL
+            ORDER BY created_at DESC
+            LIMIT :withXRecentComments
+          ) COM
+          JOIN top_threads TT ON TT.id = COM.thread_id
+          JOIN "Addresses" A ON A.id = COM.address_id
+          JOIN "Profiles" P ON P.user_id = A.user_id
+          GROUP BY TT.id
+      )`
+        : ''
+    }
     SELECT
         TT.*, TM.*, CD.*, RD.*, COND.*
+        ${withXRecentComments ? `, RC.*` : ''}
     FROM top_threads TT
     LEFT JOIN thread_metadata TM ON TT.id = TM.thread_id
     LEFT JOIN collaborator_data CD ON TT.id = CD.thread_id
     LEFT JOIN reaction_data RD ON TT.id = RD.thread_id
-    LEFT JOIN contest_data COND ON TT.id = COND.thread_id;
+    LEFT JOIN contest_data COND ON TT.id = COND.thread_id
+    ${
+      withXRecentComments
+        ? `LEFT JOIN recent_comments RC ON TT.id = RC.thread_id;`
+        : ''
+    }
   `,
     {
-      //logging: true,
       replacements,
       type: QueryTypes.SELECT,
     },

@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
 import { AppError, ServerError } from '@hicommonwealth/core';
@@ -70,9 +71,11 @@ export async function __updatePollVote(
     // check token balance threshold if needed
     const { isValid } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       poll.community_id,
       address,
+      PermissionEnum.UPDATE_POLL,
     );
     if (!isValid) {
       throw new AppError(Errors.InsufficientTokenBalance);
@@ -95,6 +98,7 @@ export async function __updatePollVote(
     });
     // create new vote
     return this.models.Vote.create(
+      // @ts-expect-error StrictNullChecks
       {
         ...voteData,
         option: selectedOption,

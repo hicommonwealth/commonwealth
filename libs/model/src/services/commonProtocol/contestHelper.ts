@@ -1,9 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
-import Web3 from 'web3';
+import { Mutex } from 'async-mutex';
+import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
+
+const nonceMutex = new Mutex();
 
 export type AddContentResponse = {
   txReceipt: any;
@@ -48,24 +51,35 @@ const createWeb3Provider = async (rpc: string): Promise<Web3> => {
  * @param contest the address of the contest
  * @param creator the address of the user to create content on behalf of
  * @param url the common/commonwealth url of the content
- * @returns txReceipt and contentId of new content(NOTE: this should be saved for future voting)
+ * @returns txReceipt and contentId of new content (NOTE: this should be saved for future voting)
  */
-export const addContent = async (
+const addContent = async (
   rpcNodeUrl: string,
   contest: string,
   creator: string,
   url: string,
+  web3?: Web3,
+  nonce?: number,
 ): Promise<AddContentResponse> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
+  if (!web3) {
+    web3 = await createWeb3Provider(rpcNodeUrl);
+  }
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
   let txReceipt;
   try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '200000',
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
     txReceipt = await contestInstance.methods
       .addContent(creator, url, [])
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send(txDetails);
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -94,13 +108,17 @@ export const addContent = async (
  * @param contentId The contentId on the contest to vote
  * @returns a tx receipt
  */
-export const voteContent = async (
+const voteContent = async (
   rpcNodeUrl: string,
   contest: string,
   voter: string,
   contentId: string,
+  web3?: Web3,
+  nonce?: number,
 ): Promise<any> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
+  if (!web3) {
+    web3 = await createWeb3Provider(rpcNodeUrl);
+  }
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
@@ -108,9 +126,16 @@ export const voteContent = async (
 
   let txReceipt;
   try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '200000',
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
     txReceipt = await contestInstance.methods
       .voteContent(voter, contentId)
-      .send({ from: web3.eth.defaultAccount, gas: '200000' });
+      .send(txDetails);
   } catch (error) {
     throw new AppError('Failed to push content to chain: ' + error);
   }
@@ -127,6 +152,7 @@ export const voteContent = async (
 export const getContestStatus = async (
   rpcNodeUrl: string,
   contest: string,
+  oneOff?: boolean,
 ): Promise<ContestStatus> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
@@ -137,7 +163,9 @@ export const getContestStatus = async (
   const promise = await Promise.all([
     contestInstance.methods.startTime().call(),
     contestInstance.methods.endTime().call(),
-    contestInstance.methods.contestInterval().call(),
+    oneOff
+      ? contestInstance.methods.contestLength().call()
+      : contestInstance.methods.contestInterval().call(),
     contestInstance.methods.currentContentId().call(),
   ]);
 
@@ -160,6 +188,7 @@ export const getContestScore = async (
   rpcNodeUrl: string,
   contest: string,
   contestId?: number,
+  oneOff?: boolean,
 ): Promise<ContestScores> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
@@ -171,13 +200,15 @@ export const getContestScore = async (
     contestId
       ? contestInstance.methods.getPastWinners(contestId).call()
       : contestInstance.methods.getWinnerIds().call(),
-    getContestBalance(rpcNodeUrl, contest),
+    getContestBalance(rpcNodeUrl, contest, oneOff),
   ]);
 
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError('Contest Id not found on Contest address');
+    throw new AppError(
+      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    );
   }
 
   const votePromises: any[] = [];
@@ -208,6 +239,7 @@ export const getContestScore = async (
 export const getContestBalance = async (
   rpcNodeUrl: string,
   contest: string,
+  oneOff?: boolean,
 ): Promise<number> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
@@ -215,19 +247,25 @@ export const getContestBalance = async (
     contest,
   );
 
-  const promises = [
-    contestInstance.methods.contestToken().call(),
-    contestInstance.methods.FeeManagerAddress().call(),
-  ];
+  const promises = [contestInstance.methods.contestToken().call()];
+
+  if (!oneOff) {
+    promises.push(contestInstance.methods.FeeMangerAddress().call());
+  }
 
   const results = await Promise.all(promises);
-  const feeManager = new web3.eth.Contract(
-    feeManagerABI as AbiItem[],
-    String(results[1]),
-  );
-  const balancePromises: Promise<number>[] = [
-    feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
-  ];
+
+  const balancePromises: Promise<number>[] = [];
+
+  if (!oneOff) {
+    const feeManager = new web3.eth.Contract(
+      feeManagerABI as AbiItem[],
+      String(results[1]),
+    );
+    balancePromises.push(
+      feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
+    );
+  }
   if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
@@ -252,5 +290,98 @@ export const getContestBalance = async (
 
   const balanceResults = await Promise.all(balancePromises);
 
-  return balanceResults[0] + balanceResults[1];
+  return Number(
+    balanceResults.length === 2
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]),
+  );
+};
+
+export const addContentBatch = async (
+  rpcNodeUrl: string,
+  contest: string[],
+  creator: string,
+  url: string,
+): Promise<PromiseSettledResult<AddContentResponse>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+    );
+
+    const promises: Promise<AddContentResponse>[] = [];
+
+    contest.forEach((c) => {
+      promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
+  });
+};
+
+export const voteContentBatch = async (
+  rpcNodeUrl: string,
+  contest: string[],
+  voter: string,
+  contentId: string,
+): Promise<PromiseSettledResult<any>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+    );
+
+    const promises: Promise<any>[] = [];
+
+    contest.forEach((c) => {
+      promises.push(
+        voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+      );
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
+  });
+};
+
+/**
+ * attempts to rollover and payout a provided contest. Returns false and does not attempt
+ * transaction if contest is still active
+ * @param rpcNodeUrl the chain node to use
+ * @param contest the address of the contest
+ * @param oneOff indicate if the contest is oneOff
+ * @returns boolean indicating if contest was rolled over
+ * NOTE: A false return does not indicate an error, rather that the contest was still ongoing
+ * errors will still be throw for other issues
+ */
+export const rollOverContest = async (
+  rpcNodeUrl: string,
+  contest: string,
+  oneOff: boolean,
+): Promise<boolean> => {
+  const web3 = await createWeb3Provider(rpcNodeUrl);
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
+  );
+
+  const contractCall = oneOff
+    ? contestInstance.methods.endContest()
+    : contestInstance.methods.newContest();
+
+  let gasResult;
+  try {
+    gasResult = await contractCall.estimateGas({
+      from: web3.eth.defaultAccount,
+    });
+  } catch {
+    return false;
+  }
+
+  await contractCall.send({
+    from: web3.eth.defaultAccount,
+    gas: gasResult.toString(),
+  });
+  return true;
 };

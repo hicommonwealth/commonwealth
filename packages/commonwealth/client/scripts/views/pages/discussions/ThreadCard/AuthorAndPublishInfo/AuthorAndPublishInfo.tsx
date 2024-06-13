@@ -1,8 +1,9 @@
 import { PopperPlacementType } from '@mui/base/Popper';
+import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
 import { threadStageToLabel } from 'helpers';
-import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
+import app from 'state';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -29,6 +30,7 @@ export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
   authorAddress: string;
   authorCommunityId: string;
+  layoutType?: 'author-first' | 'community-first';
   discord_meta?: {
     user: { id: string; username: string };
     channel_id: string;
@@ -58,6 +60,7 @@ export const AuthorAndPublishInfo = ({
   isHot,
   authorAddress,
   authorCommunityId,
+  layoutType = 'author-first',
   isLocked,
   lockedAt,
   lastUpdated,
@@ -80,6 +83,7 @@ export const AuthorAndPublishInfo = ({
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
+  // @ts-expect-error <StrictNullChecks>
   useAuthorMetadataCustomWrap(containerRef);
 
   const dotIndicator = showSplitDotIndicator && (
@@ -97,25 +101,45 @@ export const AuthorAndPublishInfo = ({
     value: v.body,
     label: formatVersionText(
       v.timestamp,
+      // @ts-expect-error <StrictNullChecks>
       v.author?.address,
       profile,
       collaboratorLookupInfo,
     ),
   }));
 
+  const isCommunityFirstLayout = layoutType === 'community-first';
+  const communtyInfo = app.config.chains.getById(authorCommunityId);
+
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
+      {isCommunityFirstLayout && (
+        <>
+          <CommunityInfo
+            name={communtyInfo.name}
+            iconUrl={communtyInfo.iconUrl}
+            iconSize="regular"
+            communityId={authorCommunityId}
+          />
+          {dotIndicator}
+        </>
+      )}
       <FullUser
+        className={isCommunityFirstLayout ? 'community-user-info' : ''}
         avatarSize={24}
         userAddress={authorAddress}
         userCommunityId={authorCommunityId}
         shouldShowPopover
         shouldLinkProfile
+        shouldHideAvatar={isCommunityFirstLayout}
         shouldShowAsDeleted={!authorAddress && !authorCommunityId}
         shouldShowAddressWithDisplayName={
-          fromDiscordBot ? false : showUserAddressWithInfo
+          fromDiscordBot || isCommunityFirstLayout
+            ? false
+            : showUserAddressWithInfo
         }
         popoverPlacement={popoverPlacement}
+        // @ts-expect-error <StrictNullChecks>
         profile={profile}
       />
 
@@ -134,6 +158,7 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
+      {/*@ts-expect-error <StrictNullChecks>*/}
       {collaboratorsInfo?.length > 0 && (
         <>
           <CWText type="caption">and</CWText>
@@ -143,12 +168,15 @@ export const AuthorAndPublishInfo = ({
             onMouseEnter={popoverProps.handleInteraction}
             onMouseLeave={popoverProps.handleInteraction}
           >
+            {/*@ts-expect-error <StrictNullChecks>*/}
             {`${collaboratorsInfo.length} other${
+              // @ts-expect-error <StrictNullChecks>
               collaboratorsInfo.length > 1 ? 's' : ''
             }`}
             <CWPopover
               content={
                 <div className="collaborators">
+                  {/*@ts-expect-error <StrictNullChecks>*/}
                   {collaboratorsInfo.map(({ address, community_id, User }) => {
                     return (
                       <FullUser
@@ -171,14 +199,18 @@ export const AuthorAndPublishInfo = ({
       {publishDate && (
         <>
           {dotIndicator}
+          {/*@ts-expect-error <StrictNullChecks>*/}
           {versionHistoryOptions?.length > 1 ? (
             <div className="version-history">
               <CWSelectList
                 options={versionHistoryOptions}
-                placeholder={`Edited ${getRelativeTimestamp(
-                  publishDate?.toISOString(),
-                )}`}
+                placeholder={`Edited ${publishDate
+                  ?.utc?.()
+                  ?.local?.()
+                  ?.format('DD/MM/YYYY')}`}
+                // @ts-expect-error <StrictNullChecks>
                 onChange={({ value }) => {
+                  // @ts-expect-error <StrictNullChecks>
                   changeContentText(value);
                 }}
                 formatOptionLabel={(option) => {
@@ -192,8 +224,9 @@ export const AuthorAndPublishInfo = ({
               placement="top"
               content={
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
-                  {publishDate.format('h:mm A')}
+                  {publishDate?.utc?.()?.local?.()?.format('MMMM Do, YYYY')}{' '}
+                  {dotIndicator}{' '}
+                  {publishDate?.utc?.()?.local?.()?.format('h:mm A')}
                 </div>
               }
               renderTrigger={(handleInteraction) => (
@@ -206,7 +239,7 @@ export const AuthorAndPublishInfo = ({
                 >
                   {showPublishLabelWithDate ? 'Published ' : ''}
                   {showEditedLabelWithDate ? 'Edited ' : ''}
-                  {getRelativeTimestamp(publishDate?.toISOString())}
+                  {publishDate?.utc?.()?.local?.()?.format('DD/MM/YYYY')}
                 </CWText>
               )}
             />
@@ -214,10 +247,12 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
+      {/*@ts-expect-error <StrictNullChecks>*/}
       {viewsCount !== null && viewsCount >= 0 && (
         <>
           {dotIndicator}
           <CWText type="caption" className="section-text">
+            {/*@ts-expect-error <StrictNullChecks>*/}
             {`${viewsCount} view${viewsCount > 1 ? 's' : ''}`}
           </CWText>
         </>
@@ -237,6 +272,7 @@ export const AuthorAndPublishInfo = ({
               },
               'proposal-stage-text',
             )}
+            // @ts-expect-error <StrictNullChecks>
             onClick={async () => await onThreadStageLabelClick(threadStage)}
           >
             {threadStageToLabel(threadStage)}

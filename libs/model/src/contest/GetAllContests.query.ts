@@ -8,6 +8,7 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
   return {
     ...schemas.GetAllContests,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
@@ -42,28 +43,29 @@ from
       'start_time', c.start_time,
       'end_time', c.end_time,
       'score_updated_at', c.score_updated_at,
-      'score', c.score,
-      'actions', coalesce(ca.actions, '[]'::jsonb)
+      'score', c.score --,
+--      'actions', coalesce(ca.actions, '[]'::jsonb)
 		) order by c.contest_id desc) as contests
-	from "Contests" c left join (
-		select
-			a.contest_id,
-			jsonb_agg(jsonb_build_object(
-        'content_id', a.content_id,
-        'actor_address', a.actor_address,
-        'action', a.action,
-        'content_url', a.content_url,
-        'thread_id', a.thread_id,
-        'thread_title', tr.title,
-        'voting_power', a.voting_power,
-        'created_at', a.created_at
-      ) order by a.created_at) as actions
-    from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
-		group by a.contest_id
-  ) as ca on c.contest_id = ca.contest_id
-  ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
-	group by c.contest_address
-) as c on cm.contest_address = c.contest_address
+	from "Contests" c 
+--    left join (
+--      select
+--        a.contest_id,
+--        jsonb_agg(jsonb_build_object(
+--          'content_id', a.content_id,
+--          'actor_address', a.actor_address,
+--          'action', a.action,
+--          'content_url', a.content_url,
+--          'thread_id', a.thread_id,
+--          'thread_title', tr.title,
+--          'voting_power', a.voting_power,
+--          'created_at', a.created_at
+--        ) order by a.created_at) as actions
+--      from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
+--      group by a.contest_id
+--    ) as ca on c.contest_id = ca.contest_id 
+    ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
+	  group by c.contest_address
+  ) as c on cm.contest_address = c.contest_address
 where
   cm.community_id = :community_id
   ${
@@ -103,7 +105,7 @@ order by
           c.end_time = new Date(c.end_time);
           c.score_updated_at =
             c.score_updated_at && new Date(c.score_updated_at);
-          c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
+          // c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
         }),
       );
       return results;

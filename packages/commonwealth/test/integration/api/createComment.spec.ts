@@ -3,6 +3,7 @@ import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import Chance from 'chance';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
@@ -18,6 +19,7 @@ describe('createComment Integration Tests', () => {
     const thread = await server.models.Thread.findOne({
       where: { id: threadId },
     });
+    // @ts-expect-error StrictNullChecks
     return thread.comment_count;
   };
 
@@ -59,11 +61,11 @@ describe('createComment Integration Tests', () => {
       .send(validRequest);
   };
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -77,7 +79,7 @@ describe('createComment Integration Tests', () => {
     );
   });
 
-  it('should return an error response if no text is specified', async () => {
+  test('should return an error response if no text is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -93,7 +95,7 @@ describe('createComment Integration Tests', () => {
     expect(response.text).to.include(Errors.MissingText);
   });
 
-  it('should return an error response if an invalid parent id is specified', async () => {
+  test('should return an error response if an invalid parent id is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -111,7 +113,7 @@ describe('createComment Integration Tests', () => {
     expect(response.text).to.include(Errors.InvalidParent);
   });
 
-  it('should create comment and return a success response', async () => {
+  test('should create comment and return a success response', async () => {
     const text = await getUniqueCommentText();
     const response = await createValidComment(
       server.e2eTestEntities.testThreads[0].id,
@@ -125,7 +127,7 @@ describe('createComment Integration Tests', () => {
     chai.assert.isNotNull(comment);
   });
 
-  it('should create and delete comment and verify thread comment counts', async () => {
+  test('should create and delete comment and verify thread comment counts', async () => {
     const text = await getUniqueCommentText();
     const beforeCommentCount = await getThreadCommentCount(
       server.e2eTestEntities.testThreads[0].id,

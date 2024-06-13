@@ -27,6 +27,7 @@ const OverviewPage = () => {
     queryType: 'active',
     communityId: app.activeChainId(),
     topicsPerThread: 3,
+    withXRecentComments: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
 
@@ -49,7 +50,8 @@ const OverviewPage = () => {
     : topics;
 
   const topicsSorted = anyTopicsFeatured
-    ? topicsFiltered.sort((a, b) => a.order - b.order)
+    ? // @ts-expect-error <StrictNullChecks/>
+      topicsFiltered.sort((a, b) => a.order - b.order)
     : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
   const topicSummaryRows: Array<{

@@ -135,6 +135,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
+        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
         ...(community?.ChainNode?.ethChainId && {
           chainId: `${community.ChainNode.ethChainId}`,
@@ -186,6 +187,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
+        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
       });
 
@@ -238,7 +240,8 @@ const StakeExchangeForm = ({
   };
 
   const insufficientFunds = isBuyMode
-    ? parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
+    ? // @ts-expect-error <StrictNullChecks/>
+      parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
     : numberOfStakeToExchange > stakeBalance;
 
   const ctaDisabled = isBuyMode
@@ -254,24 +257,31 @@ const StakeExchangeForm = ({
     : sellPriceData?.price;
 
   const pricePerUnitUsd = isBuyMode
-    ? convertEthToUsd(buyPriceData?.price, ethUsdRate)
-    : convertEthToUsd(sellPriceData?.price, ethUsdRate);
+    ? // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(buyPriceData?.price, ethUsdRate)
+    : // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(sellPriceData?.price, ethUsdRate);
 
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
-    : String(Math.abs(parseFloat(sellPriceData?.fees)));
+    : // @ts-expect-error <StrictNullChecks/>
+      String(Math.abs(parseFloat(sellPriceData?.fees)));
 
   const feesPriceUsd = isBuyMode
-    ? convertEthToUsd(buyPriceData?.fees, ethUsdRate)
-    : convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
+    ? // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(buyPriceData?.fees, ethUsdRate)
+    : // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
 
   const totalPriceEth = isBuyMode
     ? buyPriceData?.totalPrice
     : sellPriceData?.totalPrice;
 
   const totalPriceUsd = isBuyMode
-    ? convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
-    : convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
+    ? // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
+    : // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
 
   const minusDisabled = numberOfStakeToExchange <= 1;
 
@@ -318,6 +328,7 @@ const StakeExchangeForm = ({
               fontWeight="medium"
               className={clsx({ error: insufficientFunds })}
             >
+              {/* @ts-expect-error StrictNullChecks*/}
               {capDecimals(userEthBalance)} {denomination}
             </CWText>
           )}
@@ -370,6 +381,7 @@ const StakeExchangeForm = ({
               <Skeleton className="price-skeleton" />
             ) : (
               <CWText type="caption" fontWeight="medium">
+                {/* @ts-expect-error StrictNullChecks*/}
                 {capDecimals(pricePerUnitEth)} {denomination}• ~$
                 {pricePerUnitUsd} USD
               </CWText>
@@ -443,6 +455,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
+              {/* @ts-expect-error StrictNullChecks*/}
               {capDecimals(feesPriceEth)} {denomination}• ~$
               {feesPriceUsd} USD
             </CWText>
@@ -457,6 +470,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
+              {/* @ts-expect-error StrictNullChecks*/}
               {capDecimals(totalPriceEth)} {denomination}• ~$
               {totalPriceUsd} USD
             </CWText>

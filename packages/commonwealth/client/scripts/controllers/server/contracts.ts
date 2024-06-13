@@ -150,6 +150,7 @@ class ContractsController {
 
     // Update the cctmd in the ccts array
     if (!isNewCCT) {
+      // @ts-expect-error StrictNullChecks
       let ccts = currentContractInStore.ccts.map((cct) => {
         if (cct.id === cct_id) {
           return {
@@ -173,6 +174,7 @@ class ContractsController {
       ccts.push({
         id: cct_id,
         communityContractId: contract_id,
+        // @ts-expect-error StrictNullChecks
         templateId: template_id,
         cctmd: { ...cctmd },
       });
@@ -216,6 +218,7 @@ class ContractsController {
         address,
         chainNodeId: chain_node_id,
         type,
+        // @ts-expect-error StrictNullChecks
         abi: JSON.parse(abi),
         isFactory: is_factory,
         hasGlobalTemplate: response.data.result.hasGlobalTemplate,
@@ -431,10 +434,14 @@ class ContractsController {
             enabled_by: string;
           };
         }>;
+        // @ts-expect-error StrictNullChecks
         if (contractWithTemplate.contract.ContractAbi) {
+          // @ts-expect-error StrictNullChecks
           abiJson = contractWithTemplate.contract.ContractAbi.abi;
         }
+        // @ts-expect-error StrictNullChecks
         if (contractWithTemplate.ccts) {
+          // @ts-expect-error StrictNullChecks
           ccts = contractWithTemplate.ccts.map((cct) => {
             return {
               id: cct.id,
@@ -447,9 +454,13 @@ class ContractsController {
 
         this._store.add(
           Contract.fromJSON({
+            // @ts-expect-error StrictNullChecks
             ...contractWithTemplate.contract,
+            // @ts-expect-error StrictNullChecks
             abi: abiJson,
+            // @ts-expect-error StrictNullChecks
             ccts: ccts,
+            // @ts-expect-error StrictNullChecks
             hasGlobalTemplate: contractWithTemplate.hasGlobalTemplate,
           }),
         );

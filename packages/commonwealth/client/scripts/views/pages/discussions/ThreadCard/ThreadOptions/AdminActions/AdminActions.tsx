@@ -203,9 +203,7 @@ export const AdminActions = ({
     })
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
-        if (onLockToggle) {
-          onLockToggle(!thread?.readOnly);
-        }
+        onLockToggle?.(!thread?.readOnly);
       })
       .catch((e) => {
         console.log(e);
@@ -222,7 +220,7 @@ export const AdminActions = ({
     })
       .then(() => {
         notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
-        onPinToggle && onPinToggle(!thread.pinned);
+        onPinToggle?.(!thread.pinned);
       })
       .catch(() => {
         notifyError('Could not update pinned state');
@@ -382,6 +380,7 @@ export const AdminActions = ({
                           iconLeftWeight: 'bold' as const,
                           onClick: () => {
                             const snapshotSpaces = app.chain.meta.snapshot;
+                            // @ts-expect-error StrictNullChecks
                             onSnapshotProposalFromThread();
                             navigate(
                               snapshotSpaces.length > 1
@@ -462,6 +461,7 @@ export const AdminActions = ({
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
+            // @ts-expect-error StrictNullChecks
             onCollaboratorsUpdated={onCollaboratorsEdit}
           />
         }

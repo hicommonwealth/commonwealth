@@ -25,11 +25,13 @@ class NearWebWalletController implements IWebWallet<any> {
     return 'near';
   }
 
+  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
 
   public async getSessionPublicAddress(): Promise<string> {
+    // @ts-expect-error StrictNullChecks
     return null;
   }
 

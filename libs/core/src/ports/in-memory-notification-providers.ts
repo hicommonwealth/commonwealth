@@ -6,6 +6,10 @@ export function SpyNotificationsProvider(
   stubs?: {
     triggerWorkflowStub?: sinon.SinonStub;
     getMessagesStub?: sinon.SinonStub;
+    getSchedulesStub?: sinon.SinonStub;
+    createSchedulesStub?: sinon.SinonStub;
+    deleteSchedulesStub?: sinon.SinonStub;
+    registerClientRegistrationToken?: sinon.SinonStub;
   },
 ): NotificationsProvider {
   return {
@@ -16,6 +20,15 @@ export function SpyNotificationsProvider(
       sandbox.stub().returns(Promise.resolve(true)),
     getMessages:
       stubs?.getMessagesStub || sandbox.stub().returns(Promise.resolve([])),
+    getSchedules:
+      stubs?.getSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+    createSchedules:
+      stubs?.createSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+    deleteSchedules:
+      stubs?.deleteSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+    registerClientRegistrationToken:
+      stubs?.registerClientRegistrationToken ||
+      sandbox.stub().returns(Promise.resolve(true)),
   };
 }
 
@@ -26,6 +39,10 @@ export function ThrowingSpyNotificationsProvider(
   stubs?: {
     triggerWorkflowStub?: sinon.SinonStub;
     getMessagesStub?: sinon.SinonStub;
+    getSchedulesStub?: sinon.SinonStub;
+    createSchedulesStub?: sinon.SinonStub;
+    deleteSchedulesStub?: sinon.SinonStub;
+    registerClientRegistrationToken?: sinon.SinonStub;
   },
 ): NotificationsProvider {
   return {
@@ -35,5 +52,14 @@ export function ThrowingSpyNotificationsProvider(
       stubs?.triggerWorkflowStub || sandbox.stub().rejects(ProviderError),
     getMessages:
       stubs?.getMessagesStub || sandbox.stub().rejects(ProviderError),
+    getSchedules:
+      stubs?.getSchedulesStub || sandbox.stub().rejects(ProviderError),
+    createSchedules:
+      stubs?.createSchedulesStub || sandbox.stub().rejects(ProviderError),
+    deleteSchedules:
+      stubs?.deleteSchedulesStub || sandbox.stub().rejects(ProviderError),
+    registerClientRegistrationToken:
+      stubs?.registerClientRegistrationToken ||
+      sandbox.stub().rejects(ProviderError),
   };
 }

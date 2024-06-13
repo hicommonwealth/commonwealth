@@ -1,5 +1,6 @@
 import type { DB } from '@hicommonwealth/model';
 import axios from 'axios';
+import { config } from '../../config';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 
@@ -31,6 +32,7 @@ const getDiscordChannels = async (
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       community_id: community.id,
     },
   });
@@ -47,7 +49,7 @@ const getDiscordChannels = async (
 
   try {
     const headers = {
-      Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      Authorization: `Bot ${config.DISCORD.BOT_TOKEN}`,
     };
     const response = await axios.get(url, { headers });
 

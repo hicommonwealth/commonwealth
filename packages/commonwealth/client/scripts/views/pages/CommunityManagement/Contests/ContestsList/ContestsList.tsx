@@ -88,13 +88,18 @@ const ContestsList = ({
               <ContestCard
                 key={contest.contest_address}
                 isAdmin={isAdmin}
+                // @ts-expect-error <StrictNullChecks/>
                 address={contest.contest_address}
+                // @ts-expect-error <StrictNullChecks/>
                 name={contest.name}
                 imageUrl={contest.image_url}
+                // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
+                // @ts-expect-error <StrictNullChecks/>
                 score={score}
                 finishDate={moment(end_time).toISOString()}
                 isActive={!contest.cancelled && !hasEnded}
+                // @ts-expect-error <StrictNullChecks/>
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
               />
             );

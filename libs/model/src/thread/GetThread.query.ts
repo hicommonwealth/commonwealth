@@ -7,6 +7,7 @@ export const GetThreadsParamsSchema = z.object({
   active: z.string().optional(),
   search: z.string().optional(),
   count: z.coerce.boolean().optional().default(false),
+  include_count: z.coerce.boolean().default(false),
 });
 
 export const GetBulkThreadsParamsSchema = z.object({
@@ -21,6 +22,7 @@ export const GetBulkThreadsParamsSchema = z.object({
   to_date: z.string().optional(),
   contestAddress: z.string().optional(),
   status: z.string().optional(),
+  withXRecentComments: z.coerce.number().optional(),
 });
 
 export type GetThreadsParams = z.infer<typeof GetThreadsParamsSchema>;

@@ -7,6 +7,7 @@ import {
   useDeployRecurringContestOnchainMutation,
   useDeploySingleContestOnchainMutation,
 } from 'state/api/contests';
+import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -24,6 +25,7 @@ import {
   LaunchContestStep,
 } from '../../types';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
@@ -33,6 +35,7 @@ interface SignTransactionsStepProps {
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
+const FIVE_MINS_IN_SECONDS = 60 * 5;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -44,6 +47,7 @@ const SignTransactionsStep = ({
     errorText: '',
   });
 
+  const { stakeData } = useCommunityStake();
   const { mutateAsync: deploySingleContestOnchainMutation } =
     useDeploySingleContestOnchainMutation();
   const { mutateAsync: deployRecurringContestOnchainMutation } =
@@ -55,21 +59,27 @@ const SignTransactionsStep = ({
   const isDirectDepositSelected =
     contestFormData.feeType === ContestFeeType.DirectDeposit;
 
+  const devContest = useFlag('contestDev');
+
   const signTransaction = async () => {
     const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
     const chainRpc = app?.chain?.meta?.ChainNode?.url;
     const namespaceName = app?.chain?.meta?.namespace;
-    const contestLength = SEVEN_DAYS_IN_SECONDS;
-    const stakeId = app?.chain?.meta?.CommunityStakes?.[0]?.stakeId;
+    const contestLength = devContest
+      ? FIVE_MINS_IN_SECONDS
+      : SEVEN_DAYS_IN_SECONDS;
+    const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = Number(app?.chain?.meta?.CommunityStakes?.[0]?.voteWeight);
-    const contestInterval = SEVEN_DAYS_IN_SECONDS;
+    const weight = stakeData?.vote_weight;
+    const contestInterval = devContest
+      ? FIVE_MINS_IN_SECONDS
+      : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress
-      : app?.chain?.meta?.CommunityStakes?.[0]?.stakeToken;
+      : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
 
     const single = {
@@ -109,9 +119,11 @@ const SignTransactionsStep = ({
 
       isContestRecurring
         ? (contestAddress = await deployRecurringContestOnchainMutation(
+            // @ts-expect-error <StrictNullChecks/>
             recurring,
           ))
-        : (contestAddress = await deploySingleContestOnchainMutation(single));
+        : // @ts-expect-error <StrictNullChecks/>
+          (contestAddress = await deploySingleContestOnchainMutation(single));
 
       await createContestMutation({
         contest_address: contestAddress,

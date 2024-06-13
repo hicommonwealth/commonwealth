@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
@@ -44,7 +45,7 @@ type CommentsTreeAttrs = {
   canReply?: boolean;
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
 };
 
 export const CommentTree = ({
@@ -144,6 +145,7 @@ export const CommentTree = ({
     includeSpams,
     commentSortType,
     isLocked,
+    // @ts-expect-error <StrictNullChecks/>
     fromDiscordBot,
     isLoggedIn,
   });
@@ -152,6 +154,7 @@ export const CommentTree = ({
 
   const scrollToElement = () => {
     if (scrollToRef.current) {
+      // @ts-expect-error <StrictNullChecks/>
       scrollToRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -162,9 +165,11 @@ export const CommentTree = ({
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
     if (isReplying) {
+      // @ts-expect-error <StrictNullChecks/>
       setParentCommentId(id);
       setIsReplying(true);
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       setParentCommentId(undefined);
       setIsReplying(false);
     }
@@ -223,11 +228,13 @@ export const CommentTree = ({
               setEdits((p) => ({
                 ...p,
                 [comment.id]: {
+                  // @ts-expect-error <StrictNullChecks/>
                   ...(p[comment.id] || {}),
                   isEditing: false,
                   editDraft: '',
                 },
               }));
+              // @ts-expect-error <StrictNullChecks/>
               setIsGloballyEditing(false);
               clearEditingLocalStorage(comment.id, ContentType.Comment);
             },
@@ -243,11 +250,13 @@ export const CommentTree = ({
       setEdits((p) => ({
         ...p,
         [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
           ...(p[comment.id] || {}),
           isEditing: false,
           editDraft: '',
         },
       }));
+      // @ts-expect-error <StrictNullChecks/>
       setIsGloballyEditing(false);
     }
   };
@@ -278,6 +287,7 @@ export const CommentTree = ({
                   contentDelta: body,
                 },
               }));
+              // @ts-expect-error <StrictNullChecks/>
               setIsGloballyEditing(true);
             },
           },
@@ -295,6 +305,7 @@ export const CommentTree = ({
                   contentDelta: body,
                 },
               }));
+              // @ts-expect-error <StrictNullChecks/>
               setIsGloballyEditing(true);
             },
           },
@@ -310,6 +321,7 @@ export const CommentTree = ({
           contentDelta: deserializeDelta(comment.text),
         },
       }));
+      // @ts-expect-error <StrictNullChecks/>
       setIsGloballyEditing(true);
     }
   };
@@ -322,6 +334,7 @@ export const CommentTree = ({
       setEdits((p) => ({
         ...p,
         [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
           ...(p[comment.id] || {}),
           isSavingEdit: true,
         },
@@ -335,21 +348,27 @@ export const CommentTree = ({
           parentCommentId: comment.parentComment,
           communityId: app.activeChainId(),
           profile: {
+            // @ts-expect-error <StrictNullChecks/>
             id: app.user.activeAccount.profile.id,
             address: app.user.activeAccount.address,
+            // @ts-expect-error <StrictNullChecks/>
             avatarUrl: app.user.activeAccount.profile.avatarUrl,
+            // @ts-expect-error <StrictNullChecks/>
             name: app.user.activeAccount.profile.name,
+            // @ts-expect-error <StrictNullChecks/>
             lastActive: app.user.activeAccount.profile.lastActive?.toString(),
           },
         });
         setEdits((p) => ({
           ...p,
           [comment.id]: {
+            // @ts-expect-error <StrictNullChecks/>
             ...(p[comment.id] || {}),
             isEditing: false,
           },
         }));
 
+        // @ts-expect-error <StrictNullChecks/>
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {
@@ -362,6 +381,7 @@ export const CommentTree = ({
         setEdits((p) => ({
           ...p,
           [comment.id]: {
+            // @ts-expect-error <StrictNullChecks/>
             ...(p[comment.id] || {}),
             isSavingEdit: false,
           },
@@ -464,7 +484,10 @@ export const CommentTree = ({
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
-                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                    !!hasJoinedCommunity &&
+                    !thread.archivedAt &&
+                    !thread.lockedAt &&
+                    canReply
                   }
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
@@ -501,6 +524,7 @@ export const CommentTree = ({
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)
                   }
                   comment={comment}
+                  shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
                 />
               </div>
               <div ref={scrollToRef}></div>

@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'url';
 import { config } from '../config';
-import { logger } from '../logging';
+import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
 import { successfulInMemoryBroker } from './in-memory-brokers';
 import {
@@ -11,6 +11,7 @@ import {
   Disposable,
   Disposer,
   NotificationsProvider,
+  NotificationsProviderSchedulesReturn,
   Stats,
 } from './interfaces';
 
@@ -47,10 +48,15 @@ const disposers: Disposer[] = [];
 /**
  * Internal disposer and process killer
  * @param code exit code, defaults to unit testing
+ * @param forceExit Forces exit in production if set to true
  */
-const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
+const disposeAndExit = async (
+  code: ExitCode = 'UNIT_TEST',
+  forceExit: boolean = false,
+): Promise<void> => {
   // don't kill process when errors are caught in production
-  if (code === 'ERROR' && config.NODE_ENV === 'production') return;
+  if (code === 'ERROR' && config.NODE_ENV === 'production' && !forceExit)
+    return;
 
   // call disposers
   await Promise.all(disposers.map((disposer) => disposer()));
@@ -62,10 +68,13 @@ const disposeAndExit = async (code: ExitCode = 'UNIT_TEST'): Promise<void> => {
   );
   adapters.clear();
 
-  // exit when not unit testing
-  config.NODE_ENV !== 'test' &&
-    code !== 'UNIT_TEST' &&
-    process.exit(code === 'ERROR' ? 1 : 0);
+  if (config.NODE_ENV !== 'test' && code !== 'UNIT_TEST') {
+    rollbar.wait(() => {
+      log.info('Rollbar logs flushed');
+      // eslint-disable-next-line n/no-process-exit
+      process.exit(code === 'ERROR' ? 1 : 0);
+    });
+  }
 };
 
 export const disposeAdapter = (name: string): void => {
@@ -79,9 +88,7 @@ export const disposeAdapter = (name: string): void => {
  * @param disposer the disposer function
  * @returns a function that triggers all registered disposers and terminates the process
  */
-export const dispose = (
-  disposer?: Disposer,
-): ((code?: ExitCode) => Promise<void>) => {
+export const dispose = (disposer?: Disposer): typeof disposeAndExit => {
   disposer && disposers.push(disposer);
   return disposeAndExit;
 };
@@ -183,6 +190,13 @@ export const notificationsProvider = port(function notificationsProvider(
       dispose: () => Promise.resolve(),
       triggerWorkflow: () => Promise.resolve(true),
       getMessages: () => Promise.resolve([]),
+      getSchedules: () =>
+        Promise.resolve([] as NotificationsProviderSchedulesReturn),
+      createSchedules: () =>
+        Promise.resolve([] as NotificationsProviderSchedulesReturn),
+      deleteSchedules: ({ schedule_ids }) =>
+        Promise.resolve(new Set(schedule_ids)),
+      registerClientRegistrationToken: () => Promise.resolve(false),
     }
   );
 });

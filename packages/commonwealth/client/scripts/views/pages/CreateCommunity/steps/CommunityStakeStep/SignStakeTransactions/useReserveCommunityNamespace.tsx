@@ -66,6 +66,7 @@ const useReserveCommunityNamespace = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
         community: chainId,
+        // @ts-expect-error <StrictNullChecks/>
         userId: app.user.activeAccount.profile.id,
         userAddress: userAddress,
         isPWA: isAddedToHomeScreen,

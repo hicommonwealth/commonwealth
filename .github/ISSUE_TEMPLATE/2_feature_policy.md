@@ -1,5 +1,5 @@
 ---
-name: Policy Feature Request
+name: "Platform: Policy Feature Request"
 about: Use this template for requesting a policy feature within a user story.
 labels: policy, enhancement, needs estimate
 ---

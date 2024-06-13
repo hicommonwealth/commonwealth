@@ -68,7 +68,9 @@ const useJoinCommunity = () => {
   const uniqueAddresses = [];
   const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
     (addressInfo) => {
+      // @ts-expect-error <StrictNullChecks/>
       if (!uniqueAddresses.includes(addressInfo.address)) {
+        // @ts-expect-error <StrictNullChecks/>
         uniqueAddresses.push(addressInfo.address);
         return true;
       }
@@ -134,6 +136,7 @@ const useJoinCommunity = () => {
         // set verification token for the newly created account
         const account = app?.chain?.accounts?.get?.(
           encodedAddress,
+          // @ts-expect-error <StrictNullChecks/>
           addressInfo.keytype,
         );
         if (account && app.chain) {
@@ -150,6 +153,7 @@ const useJoinCommunity = () => {
             })
           ) {
             await app.roles.createRole({
+              // @ts-expect-error <StrictNullChecks/>
               address: addressInfo,
               community: activeChainId,
             });

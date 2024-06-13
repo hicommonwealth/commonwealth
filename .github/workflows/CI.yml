@@ -1,11 +1,19 @@
 name: CI
 
 env:
-  ROLLBAR_ENV: 'GitHubCI'
+  IS_CI: true
+  CI: true # ensures Vitest allowOnly option is false so no tests are accidentally skipped
   NODE_ENV: 'test'
+  ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted'
+  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted,SubscriptionPreferencesUpdated,CommentCreated,UserMentioned'
   PRIVATE_KEY: 'web3-pk'
+  USES_DOCKER_PGSQL: true
+  PORT: 8080
+  REDIS_URL: redis://localhost:6379
+  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+  ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+  GITHUB_BASE_REF: ${{ github.base_ref }}
 
 on:
   pull_request:
@@ -55,12 +63,6 @@ jobs:
       - uses: ./.github/actions/e2e
 
       - name: Run e2e tests
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
           pnpm -F commonwealth e2e-start-server --forbid-only &
@@ -121,12 +123,6 @@ jobs:
       - uses: ./.github/actions/e2e
 
       - name: Run e2e tests
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
           pnpm -F commonwealth e2e-start-server --forbid-only &
@@ -159,7 +155,7 @@ jobs:
         image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -188,16 +184,9 @@ jobs:
 
       - name: Run serial e2e tests
         run: |
-          (cd packages/commonwealth && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
-
-        env:
-          SERVER_URL: http://localhost:8080
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-          DATABASE_URL: postgresql://commonwealth:edgeware@localhost/commonwealth # required in production
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
@@ -223,8 +212,6 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
         run: pnpm lint-branch-warnings
 
   # Lint and Typecheck
@@ -257,17 +244,18 @@ jobs:
       - name: check-types
         run: pnpm -r check-types
 
-      - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: pnpm lint-branch
-
       # To disable eslint-diff just comment the following two lines
       - name: Run eslint-diff
         run: pnpm -F commonwealth run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
         run: pnpm -F commonwealth run lint-diff-canary
+
+      # fun the *old* linter last because I want to try to migrate away from
+      # this and JUST to eslint-diff but if this fails we still might be able
+      # to salvage the branch
+      - name: Run linter
+        run: pnpm lint-branch
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
@@ -277,6 +265,8 @@ jobs:
     strategy:
       matrix:
         node: [ 20 ]
+    env:
+      NO_CLIENT: true
 
     services:
       postgres:
@@ -316,17 +306,35 @@ jobs:
         run: pnpm -r build
 
       - name: Run unit tests
-        run: pnpm -r test
+        run: pnpm -r test -- --allowOnly=false
 
-      - name: Run API tests
-        run: pnpm -F commonwealth test-api --forbid-only
-        env:
-          NO_CLIENT: true
+      - name: Change permissions of coverage files
+        run: |
+          chmod -R 755 ./libs/adapters/coverage/lcov.info
+          chmod -R 755 ./libs/core/coverage/lcov.info
+          chmod -R 755 ./libs/model/coverage/lcov.info
+          chmod -R 755 ./libs/sitemaps/coverage/lcov.info
+          chmod -R 755 ./packages/commonwealth/coverage/lcov.info
+          chmod -R 755 ./packages/discord-bot/coverage/lcov.info
+          chmod -R 755 ./packages/scripts/coverage/lcov.info
+          chmod -R 755 ./packages/snapshot-listener/coverage/lcov.info
 
-      - name: Run util integration tests
-        run: pnpm -F commonwealth test-integration-util --forbid-only
-        env:
-          NO_CLIENT: true
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: unit-test-coverage
+          parallel: true
+          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/discord-bot/coverage/lcov.info packages/scripts/coverage/lcov.info packages/snapshot-listener/coverage/lcov.info
+
+      - name: Run integration tests
+        run: pnpm -F commonwealth test-integration --allowOnly=false
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: integration-test-coverage
+          parallel: true
+          files: ./packages/commonwealth/coverage/lcov.info
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -366,9 +374,14 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Run EVM Devnet tests
-        run: pnpm -F commonwealth test-devnet evm --forbid-only
-        env:
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+        run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: evm-devnet-test-coverage
+          parallel: true
+          files: packages/commonwealth/coverage/lcov.info
 
   # These tests run slowly, so run them in a separate job
   commonwealth-cosmos-tests:
@@ -398,19 +411,19 @@ jobs:
       cosmos_test_app:
         image: mhagel1/csdk-v1
         ports:
-         - 5051:5051
+          - 5051:5051
       cosmos_beta_test_app:
         image: mhagel1/csdk-beta
         ports:
-         - 5050:5050
+          - 5050:5050
       evmos_test_app:
         image: mhagel1/evmos-dev
         ports:
-         - 5052:5052
+          - 5052:5052
       redis:
         image: redis:latest
         ports:
-         - 6379:6379
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -443,8 +456,30 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           pnpm -F commonwealth start &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet cosmos --forbid-only)
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-          REDIS_URL: redis://localhost:6379
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: cosmos-devnet-test-coverage
+          parallel: true
+          files: packages/commonwealth/coverage/lcov.info
+
+  report-coverage:
+    name: Upload Test Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ commonwealth-cosmos-tests, commonwealth-evm-tests, commonwealth-unit-integration, e2e-tests-serial, e2e-tests-Parallel, e2e-tests-Mature ]
+    if: always()
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: "cosmos-devnet-test-coverage"
+
+

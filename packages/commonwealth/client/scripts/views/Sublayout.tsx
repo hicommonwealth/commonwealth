@@ -42,6 +42,7 @@ const Sublayout = ({
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const [authModalType, setAuthModalType] = useState<AuthModalType>();
+  const [profileId, setProfileId] = useState(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: userOnboardingEnabled,
@@ -56,11 +57,10 @@ const Sublayout = ({
   useEffect(() => {
     if (triggerOpenModalType) {
       setAuthModalType(triggerOpenModalType);
+      // @ts-expect-error StrictNullChecks
       setTriggerOpenModalType(undefined);
     }
   }, [triggerOpenModalType, setTriggerOpenModalType]);
-
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
 
   const {
     onboardedProfiles,
@@ -68,6 +68,23 @@ const Sublayout = ({
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
   } = useWelcomeOnboardModal();
+
+  useEffect(() => {
+    let timeout = null;
+    if (isLoggedIn) {
+      // @ts-expect-error StrictNullChecks
+      timeout = setTimeout(() => {
+        // @ts-expect-error StrictNullChecks
+        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
+      }, 100);
+    } else {
+      setProfileId(null);
+    }
+
+    return () => {
+      if (timeout !== null) clearTimeout(timeout);
+    };
+  }, [isLoggedIn]);
 
   useNecessaryEffect(() => {
     if (
@@ -107,6 +124,7 @@ const Sublayout = ({
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
+    setProfileAsOnboarded,
     isLoggedIn,
   ]);
 
@@ -159,7 +177,9 @@ const Sublayout = ({
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
+  // @ts-expect-error StrictNullChecks
   const terms = app.chain ? chain.terms : null;
+  // @ts-expect-error StrictNullChecks
   const banner = app.chain ? chain.communityBanner : null;
 
   return (
@@ -167,11 +187,13 @@ const Sublayout = ({
       {!isWindowSmallInclusive && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
         />
       )}
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
+        // @ts-expect-error StrictNullChecks
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
           setAuthModalType(modalType || AuthModalType.SignIn)
@@ -184,6 +206,7 @@ const Sublayout = ({
       />
       <div className="sidebar-and-body-container">
         <Sidebar
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
           onMobile={isWindowExtraSmall}
         />
@@ -201,6 +224,7 @@ const Sublayout = ({
             resizing,
           )}
         >
+          {/* @ts-expect-error StrictNullChecks */}
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">

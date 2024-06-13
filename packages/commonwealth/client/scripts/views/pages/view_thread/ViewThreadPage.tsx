@@ -85,6 +85,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
+  // @ts-expect-error <StrictNullChecks/>
   const [viewCount, setViewCount] = useState<number>(null);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
@@ -92,6 +93,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [commentSortType, setCommentSortType] =
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
+  // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
@@ -142,11 +144,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
+    // @ts-expect-error <StrictNullChecks/>
     membership.topicIds.includes(thread?.topic?.id),
   );
 
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
+      // @ts-expect-error <StrictNullChecks/>
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
@@ -281,6 +285,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
+    // @ts-expect-error <StrictNullChecks/>
     thread.communityId !== app.activeChainId()
   ) {
     return <PageNotFound />;
@@ -288,12 +293,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
+  // @ts-expect-error <StrictNullChecks/>
   const isAuthor = Permissions.isThreadAuthor(thread);
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
+  // @ts-expect-error <StrictNullChecks/>
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  // @ts-expect-error <StrictNullChecks/>
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  // @ts-expect-error <StrictNullChecks/>
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  // @ts-expect-error <StrictNullChecks/>
   const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
@@ -314,8 +324,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedTemplateOptions =
     proposalTemplatesEnabled && linkedTemplates.length > 0;
 
+  // @ts-expect-error <StrictNullChecks/>
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
+  // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
   const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
@@ -338,6 +350,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       try {
         await addThreadLinks({
           communityId: app.activeChainId(),
+          // @ts-expect-error <StrictNullChecks/>
           threadId: thread.id,
           links: toAdd,
         });
@@ -349,8 +362,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const editsToSave = localStorage.getItem(
+    // @ts-expect-error <StrictNullChecks/>
     `${app.activeChainId()}-edit-thread-${thread.id}-storedText`,
   );
+  // @ts-expect-error <StrictNullChecks/>
   const isStageDefault = isDefaultStage(thread.stage);
 
   const tabsShouldBePresent =
@@ -362,9 +377,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
+    // @ts-expect-error <StrictNullChecks/>
     thread.discord_meta !== null && thread.discord_meta !== undefined;
 
   const showLocked =
+    // @ts-expect-error <StrictNullChecks/>
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
   const canUpdateThread =
@@ -372,7 +389,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     (Permissions.isSiteAdmin() ||
       Permissions.isCommunityAdmin() ||
       Permissions.isCommunityModerator() ||
+      // @ts-expect-error <StrictNullChecks/>
       Permissions.isThreadAuthor(thread) ||
+      // @ts-expect-error <StrictNullChecks/>
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
@@ -385,7 +404,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
-    action: 'comment',
   });
 
   const getMetaDescription = (meta: string) => {
@@ -402,10 +420,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const ogTitle =
+    // @ts-expect-error <StrictNullChecks/>
     thread?.title?.length > 60
       ? `${thread?.title?.slice?.(0, 52)}...`
       : thread?.title;
   const ogDescription =
+    // @ts-expect-error <StrictNullChecks/>
     getMetaDescription(thread?.body || '')?.length > 155
       ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
       : getMetaDescription(thread?.body || '');
@@ -418,14 +438,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         customMeta={[
           {
             name: 'title',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogTitle,
           },
           {
             name: 'description',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogDescription,
           },
           {
             name: 'author',
+            // @ts-expect-error <StrictNullChecks/>
             content: thread?.author,
           },
           {
@@ -434,10 +457,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'twitter:title',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogTitle,
           },
           {
             name: 'twitter:description',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogDescription,
           },
           {
@@ -450,10 +475,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'og:title',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogTitle,
           },
           {
             name: 'og:description',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogDescription,
           },
           {
@@ -481,6 +508,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
+          // @ts-expect-error <StrictNullChecks/>
           isSpamThread={!!thread.markedAsSpamAt}
           title={
             isEditingBody ? (
@@ -488,27 +516,39 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 onInput={(e) => {
                   setDraftTitle(e.target.value);
                 }}
+                // @ts-expect-error <StrictNullChecks/>
                 value={draftTitle || thread.title}
               />
             ) : (
+              // @ts-expect-error <StrictNullChecks/>
               thread.title
             )
           }
           isEditing={isEditingBody}
+          // @ts-expect-error <StrictNullChecks/>
           author={
             thread?.author ? app.chain.accounts.get(thread?.author) : null
           }
+          // @ts-expect-error <StrictNullChecks/>
           discord_meta={thread.discord_meta}
+          // @ts-expect-error <StrictNullChecks/>
           collaborators={thread.collaborators}
+          // @ts-expect-error <StrictNullChecks/>
           createdAt={thread.createdAt}
+          // @ts-expect-error <StrictNullChecks/>
           updatedAt={thread.updatedAt}
+          // @ts-expect-error <StrictNullChecks/>
           lastEdited={thread.lastEdited}
           viewCount={viewCount}
           canUpdateThread={canUpdateThread}
+          // @ts-expect-error <StrictNullChecks/>
           stageLabel={!isStageDefault && thread.stage}
           subHeader={
+            // @ts-expect-error <StrictNullChecks/>
             !!thread.url && (
+              // @ts-expect-error <StrictNullChecks/>
               <ExternalLink url={thread.url}>
+                {/* @ts-expect-error StrictNullChecks*/}
                 {extractDomain(thread.url)}
               </ExternalLink>
             )
@@ -530,6 +570,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           }}
           onEditStart={() => {
             if (editsToSave) {
+              // @ts-expect-error <StrictNullChecks/>
               clearEditingLocalStorage(thread.id, ContentType.Thread);
 
               setSavedEdits(editsToSave || '');
@@ -551,6 +592,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   {/*// TODO editing thread */}
                   <EditBody
                     title={draftTitle}
+                    // @ts-expect-error <StrictNullChecks/>
                     thread={thread}
                     savedEdits={savedEdits}
                     shouldRestoreEdits={shouldRestoreEdits}
@@ -568,6 +610,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               ) : (
                 <>
                   <QuillRenderer
+                    // @ts-expect-error <StrictNullChecks/>
                     doc={threadBody ?? thread?.body}
                     cutoffLines={50}
                   />
@@ -578,13 +621,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           linkedTemplates[0]?.identifier.split('/')[1]
                         }
                         slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                        // @ts-expect-error <StrictNullChecks/>
                         setTemplateNickname={null}
                         isForm
                       />
                     )}
+                  {/* @ts-expect-error StrictNullChecks*/}
                   {thread.readOnly || fromDiscordBot ? (
                     <>
                       {threadOptionsComp}
+                      {/* @ts-expect-error StrictNullChecks*/}
                       {!thread.readOnly && thread.markedAsSpamAt && (
                         <div className="callout-text">
                           <CWIcon
@@ -594,6 +640,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                           <CWText type="h5">
                             This thread was flagged as spam on{' '}
+                            {/* @ts-expect-error StrictNullChecks*/}
                             {moment(thread.createdAt).format('DD/MM/YYYY')},
                             meaning it can no longer be edited or commented on.
                           </CWText>
@@ -601,7 +648,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       )}
                       {showLocked && (
                         <LockMessage
+                          // @ts-expect-error <StrictNullChecks/>
                           lockedAt={thread.lockedAt}
+                          // @ts-expect-error <StrictNullChecks/>
                           updatedAt={thread.updatedAt}
                           fromDiscordBot={fromDiscordBot}
                         />
@@ -611,9 +660,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <>
                       {threadOptionsComp}
                       <CreateComment
+                        // @ts-expect-error <StrictNullChecks/>
                         rootThread={thread}
                         canComment={canComment}
-                        tooltipText={disabledActionsTooltipText}
+                        tooltipText={
+                          typeof disabledActionsTooltipText === 'function'
+                            ? disabledActionsTooltipText?.('comment')
+                            : disabledActionsTooltipText
+                        }
                       />
                       {foundGatedTopic &&
                         !hideGatingBanner &&
@@ -666,6 +720,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   <CWCheckbox
                     checked={includeSpamThreads}
                     label="Include comments flagged as spam"
+                    // @ts-expect-error <StrictNullChecks/>
                     onChange={(e) => setIncludeSpamThreads(e.target.checked)}
                   />
                 </div>
@@ -673,6 +728,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <CommentTree
                 comments={sortedComments}
                 includeSpams={includeSpamThreads}
+                // @ts-expect-error <StrictNullChecks/>
                 thread={thread}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isReplying={isReplying}
@@ -698,12 +754,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <div className="cards-column">
                           {showLinkedProposalOptions && (
                             <LinkedProposalsCard
+                              // @ts-expect-error <StrictNullChecks/>
                               thread={thread}
                               showAddProposalButton={isAuthor || isAdminOrMod}
                             />
                           )}
                           {showLinkedThreadOptions && (
                             <LinkedThreadsCard
+                              // @ts-expect-error <StrictNullChecks/>
                               thread={thread}
                               allowLinking={isAuthor || isAdminOrMod}
                             />
@@ -720,6 +778,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       item: (
                         <div className="cards-column">
                           <LinkedUrlCard
+                            // @ts-expect-error <StrictNullChecks/>
                             thread={thread}
                             allowLinking={isAuthor || isAdminOrMod}
                           />
@@ -735,6 +794,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       item: (
                         <div className="cards-column">
                           <SnapshotCreationCard
+                            // @ts-expect-error <StrictNullChecks/>
                             thread={thread}
                             allowSnapshotCreation={isAuthor || isAdminOrMod}
                             onChangeHandler={handleNewSnapshotChange}
@@ -774,6 +834,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           {isAuthor &&
                             (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
                               <ThreadPollEditorCard
+                                // @ts-expect-error <StrictNullChecks/>
                                 thread={thread}
                                 threadAlreadyHasPolling={!polls?.length}
                                 onPollCreate={() => setInitializedPolls(false)}
@@ -808,6 +869,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       label: 'Template',
                       item: (
                         <div className="cards-column">
+                          {/* @ts-expect-error StrictNullChecks*/}
                           <TemplateActionCard thread={thread} />
                         </div>
                       ),

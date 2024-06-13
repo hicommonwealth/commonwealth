@@ -30,6 +30,7 @@ export const createCommunityHandler = async (
   }
 
   const community = await controllers.communities.createCommunity({
+    // @ts-expect-error StrictNullChecks
     user: req.user,
     community: validationResult.data,
   });
@@ -39,6 +40,7 @@ export const createCommunityHandler = async (
       chainBase: community.community.base,
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+      // @ts-expect-error StrictNullChecks
       userId: req.user.id,
       community: community.community.id,
     },

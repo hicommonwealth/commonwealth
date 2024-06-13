@@ -135,6 +135,7 @@ const CommunityMembersPage = () => {
     {
       limit: 30,
       order_by: tableState.orderBy,
+      // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
@@ -201,6 +202,7 @@ const CommunityMembersPage = () => {
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
+        // @ts-expect-error <StrictNullChecks/>
         role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
@@ -208,6 +210,7 @@ const CommunityMembersPage = () => {
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
+          // @ts-expect-error <StrictNullChecks/>
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
@@ -215,6 +218,7 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
+              // @ts-expect-error <StrictNullChecks/>
               g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
@@ -408,6 +412,7 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
+                      // @ts-expect-error <StrictNullChecks/>
                       groupFilter: option.value as string,
                     }));
                   }}
@@ -434,8 +439,10 @@ const CommunityMembersPage = () => {
           />
         ) : (
           <MembersSection
+            // @ts-expect-error <StrictNullChecks/>
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
+              // @ts-expect-error <StrictNullChecks/>
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
                 fetchNextPage?.().catch(console.error);
               }

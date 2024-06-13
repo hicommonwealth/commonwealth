@@ -58,6 +58,7 @@ const createThread = async ({
       address,
       author: JSON.stringify(authorProfile),
       title: encodeURIComponent(title),
+      // @ts-expect-error StrictNullChecks
       body: encodeURIComponent(body),
       kind,
       stage,
@@ -72,7 +73,7 @@ const createThread = async ({
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );
@@ -90,6 +91,7 @@ const useCreateThreadMutation = ({
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
+      // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
@@ -106,6 +108,7 @@ const useCreateThreadMutation = ({
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
         markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
+          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

@@ -7,6 +7,7 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { config } from 'server/config';
 import { Errors } from 'server/util/linkingValidationHelper';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
@@ -47,7 +48,7 @@ describe('Linking Tests', () => {
   const link4 = { source: LinkSource.Thread, identifier: '3' };
   const link5 = { source: LinkSource.Proposal, identifier: '4' };
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
@@ -56,6 +57,7 @@ describe('Linking Tests', () => {
         group_ids: [],
       },
     });
+    // @ts-expect-error StrictNullChecks
     topicId = topic.id;
 
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
@@ -84,6 +86,7 @@ describe('Linking Tests', () => {
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
+    // @ts-expect-error StrictNullChecks
     thread1 = (
       await server.seeder.createThread({
         address: userAddress,
@@ -99,6 +102,7 @@ describe('Linking Tests', () => {
       })
     ).result;
 
+    // @ts-expect-error StrictNullChecks
     thread2 = (
       await server.seeder.createThread({
         address: adminAddress,
@@ -115,14 +119,15 @@ describe('Linking Tests', () => {
     ).result;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('/linking/addThreadLinks', () => {
-    it('should add first new link to exising thread', async () => {
+    test('should add first new link to exising thread', async () => {
       const result = await server.seeder.createLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link1],
       });
@@ -132,9 +137,10 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
       expect(result.result.links[0].title).to.equal('my snapshot');
     });
-    it('should add multiple links to existing links', async () => {
+    test('should add multiple links to existing links', async () => {
       const result = await server.seeder.createLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link2, link3],
       });
@@ -147,9 +153,10 @@ describe('Linking Tests', () => {
       expect(result.result.links[2].source).to.equal(link3.source.toString());
       expect(result.result.links[2].identifier).to.equal(link3.identifier);
     });
-    it('should revert adding existing link', async () => {
+    test('should revert adding existing link', async () => {
       const result = await server.seeder.createLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link2],
       });
@@ -157,9 +164,10 @@ describe('Linking Tests', () => {
       expect(result.error).to.not.be.null;
       expect(result.error).to.be.equal(Errors.LinksExist);
     });
-    it('should access control adding links', async () => {
+    test('should access control adding links', async () => {
       const result2 = await server.seeder.createLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread2.id,
         links: [link3],
       });
@@ -168,15 +176,17 @@ describe('Linking Tests', () => {
       expect(result2.error).to.be.equal(Errors.NotAdminOrOwner);
       const result = await server.seeder.createLink({
         jwt: adminJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread2.id,
         links: [link3],
       });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
     });
-    it('should filter duplicate links and add new', async () => {
+    test('should filter duplicate links and add new', async () => {
       const result = await server.seeder.createLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link2, link4],
       });
@@ -186,9 +196,10 @@ describe('Linking Tests', () => {
       expect(result.result.links[3].source).to.equal(link4.source.toString());
       expect(result.result.links[3].identifier).to.equal(link4.identifier);
     });
-    it('should allow admin to link any Thread', async () => {
+    test('should allow admin to link any Thread', async () => {
       const result = await server.seeder.createLink({
         jwt: adminJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link5],
       });
@@ -197,6 +208,7 @@ describe('Linking Tests', () => {
       expect(result.result.links.length).to.equal(5);
       const result2 = await server.seeder.deleteLink({
         jwt: adminJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link5],
       });
@@ -207,8 +219,9 @@ describe('Linking Tests', () => {
   });
 
   describe('/linking/getLinks', () => {
-    it('Can get all links for thread', async () => {
+    test('Can get all links for thread', async () => {
       const result = await server.seeder.getLinks({
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         jwt: userJWT,
       });
@@ -221,8 +234,9 @@ describe('Linking Tests', () => {
       expect(result.result.links[2].source).to.equal(link3.source.toString());
       expect(result.result.links[2].identifier).to.equal(link3.identifier);
     });
-    it('Can get filtered links', async () => {
+    test('Can get filtered links', async () => {
       const result = await server.seeder.getLinks({
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         linkType: [LinkSource.Snapshot],
         jwt: userJWT,
@@ -232,6 +246,7 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
       const result2 = await server.seeder.getLinks({
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         linkType: [LinkSource.Snapshot, LinkSource.Proposal],
         jwt: userJWT,
@@ -242,7 +257,7 @@ describe('Linking Tests', () => {
       expect(result2.result.links[0].source).to.equal(link1.source.toString());
       expect(result2.result.links[1].source).to.equal(link3.source.toString());
     });
-    it('Can get all threads linked to a link', async () => {
+    test('Can get all threads linked to a link', async () => {
       const result = await server.seeder.getLinks({
         link: link3,
         jwt: userJWT,
@@ -260,9 +275,10 @@ describe('Linking Tests', () => {
   });
 
   describe('/linking/deleteLinks', () => {
-    it('Does access control delete links', async () => {
+    test('Does access control delete links', async () => {
       const result = await server.seeder.deleteLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread2.id,
         links: [link3],
       });
@@ -270,9 +286,10 @@ describe('Linking Tests', () => {
       expect(result.error).to.not.be.null;
       expect(result.error).to.be.equal(Errors.NotAdminOrOwner);
     });
-    it('Does delete single Link', async () => {
+    test('Does delete single Link', async () => {
       const result = await server.seeder.deleteLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link4],
       });
@@ -282,9 +299,10 @@ describe('Linking Tests', () => {
       expect(result.result.links[2].source).to.equal(link3.source.toString());
       expect(result.result.links[2].identifier).to.equal(link3.identifier);
     });
-    it('Does delete multiple links', async () => {
+    test('Does delete multiple links', async () => {
       const result = await server.seeder.deleteLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link3, link2],
       });
@@ -294,9 +312,10 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
     });
-    it('Reverts when trying to delete non-existant links', async () => {
+    test('Reverts when trying to delete non-existant links', async () => {
       const result = await server.seeder.deleteLink({
         jwt: userJWT,
+        // @ts-expect-error StrictNullChecks
         thread_id: thread1.id,
         links: [link3, link2],
       });

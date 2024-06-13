@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useDropzone } from 'react-dropzone';
 import 'components/Avatar/AvatarUpload.scss';
+import React, { useEffect, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 
+import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
+import { compressImage } from 'utils/ImageCompression';
+import { Avatar } from 'views/components/Avatar/Avatar';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import Account from '../../../models/Account';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
-import { notifyError } from 'controllers/app/notifications';
-import { Avatar } from 'views/components/Avatar/Avatar';
-import { compressImage } from 'utils/ImageCompression';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {
   const options = {
@@ -61,11 +61,12 @@ export const AvatarUpload = ({
       }
 
       setFiles(
+        // @ts-expect-error StrictNullChecks
         acceptedFiles.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
-          })
-        )
+          }),
+        ),
       );
     },
     onDropAccepted: async (acceptedFiles: any) => {
@@ -77,7 +78,7 @@ export const AvatarUpload = ({
             mimetype: acceptedFiles[0].type, // image/png
             auth: true,
             jwt: app.user.jwt,
-          }
+          },
         );
         if (response.data.status !== 'Success') throw new Error();
 
@@ -100,6 +101,7 @@ export const AvatarUpload = ({
   });
 
   useEffect(() => {
+    // @ts-expect-error StrictNullChecks
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, []);
 
@@ -116,14 +118,14 @@ export const AvatarUpload = ({
       {...getRootProps({
         className: getClasses<AvatarUploadStyleProps>(
           { size },
-          ComponentType.AvatarUpload
+          ComponentType.AvatarUpload,
         ),
       })}
     >
       <div
         className={getClasses<{ darkMode?: boolean } & AvatarUploadStyleProps>(
           { darkMode, size },
-          'icon-button-container'
+          'icon-button-container',
         )}
       >
         <CWIconButton
@@ -137,13 +139,16 @@ export const AvatarUpload = ({
 
         {files.length === 1 ? (
           <img
+            // @ts-expect-error StrictNullChecks
             src={files[0].preview}
             onLoad={() => {
+              // @ts-expect-error StrictNullChecks
               URL.revokeObjectURL(files[0].preview);
             }}
           />
         ) : (
           showAvatar && (
+            // @ts-expect-error StrictNullChecks
             <Avatar address={address} url={avatarUrl} size={avatarSize} />
           )
         )}
