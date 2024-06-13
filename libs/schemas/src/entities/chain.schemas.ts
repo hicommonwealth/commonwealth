@@ -30,6 +30,7 @@ export const ChainNode = z.object({
   health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).optional(),
   contracts: z.array(Contract).optional(),
   block_explorer: z.string().optional(),
+  max_ce_block_range: z.number().gte(-1).nullish(),
 });
 
 // aliases
