@@ -4,16 +4,18 @@ import 'components/component_kit/cw_form_section.scss';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
 
+import clsx from 'clsx';
 import { ComponentType } from './types';
 
 type FormSectionProps = {
   description: string;
   title: string;
   topRightElement?: React.ReactNode;
+  className?: string;
 } & React.PropsWithChildren;
 
 export const CWFormSection = (props: FormSectionProps) => {
-  const { description, title, topRightElement } = props;
+  const { description, title, topRightElement, className } = props;
 
   return (
     <div className={ComponentType.FormSection}>
@@ -27,7 +29,7 @@ export const CWFormSection = (props: FormSectionProps) => {
         <div className="left-side">
           <CWText type="b1">{description}</CWText>
         </div>
-        <div className="right-side">{props.children}</div>
+        <div className={clsx('right-side', className)}>{props.children}</div>
       </div>
       <CWDivider />
     </div>

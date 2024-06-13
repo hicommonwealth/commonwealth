@@ -1,9 +1,10 @@
+import getLinkType from 'client/scripts/helpers/linkType';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import 'components/edit_profile.scss';
 import { notifyError } from 'controllers/app/notifications';
-import type { DeltaStatic } from 'quill';
-import React, { useEffect, useRef, useState } from 'react';
+import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import {
@@ -11,8 +12,6 @@ import {
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
-import _ from 'underscore';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import Account from '../../models/Account';
@@ -21,27 +20,54 @@ import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
 import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
+import { LinksArray, useLinksArray } from './LinksArray';
 import { PreferenceTags, usePreferenceTags } from './PreferenceTags';
 import { UserTrainingCardTypes } from './UserTrainingSlider/types';
-import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
-import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
+import {
+  CWCoverImageUploader,
+  ImageBehavior,
+} from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
-import { CWForm } from './component_kit/cw_form';
 import { CWFormSection } from './component_kit/cw_form_section';
-import { CWSocials } from './component_kit/cw_socials';
 import { CWText } from './component_kit/cw_text';
-import { CWTextInput } from './component_kit/cw_text_input';
+import { CWButton } from './component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from './component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWForm } from './component_kit/new_designs/CWForm';
+import { CWTag } from './component_kit/new_designs/CWTag';
+import { CWTextInput } from './component_kit/new_designs/CWTextInput';
 import { LinkedAddresses } from './linked_addresses';
-import { ReactQuillEditor, createDeltaFromText } from './react_quill_editor';
+import { ReactQuillEditor } from './react_quill_editor';
 import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
 
-enum EditProfileError {
-  None,
-  NoProfileFound,
-}
+const linkValidationSchema = z.string().url({
+  message: VALIDATION_MESSAGES.INVALID_INPUT,
+});
 
-// const NoProfileFoundError = 'No profile found';
+const editProfileValidation = z.object({
+  username: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  email: z.union([
+    z.literal(''),
+    z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }).email(),
+  ]),
+  backgroundImg: z.union([
+    z.literal(''),
+    z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
+  ]),
+  bio: z.object({
+    ops: z
+      .array(
+        z.object({
+          insert: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .default(''),
+        }),
+      )
+      .length(1),
+    ___isMarkdown: z.boolean(),
+  }),
+});
 
 export type Image = {
   url: string;
@@ -49,24 +75,33 @@ export type Image = {
 };
 
 const EditProfileComponent = () => {
-  const { isLoggedIn } = useUserLoggedIn();
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [errorCode, setErrorCode] = useState<EditProfileError>(
-    EditProfileError.None,
-  );
-  const [socials, setSocials] = useState<string[]>();
+  const { isLoggedIn } = useUserLoggedIn();
   const [profile, setProfile] = useState<NewProfile>();
-  const [name, setName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState();
-  const [bio, setBio] = React.useState<DeltaStatic>(createDeltaFromText(''));
   const [addresses, setAddresses] = useState<AddressInfo[]>();
-  const [displayNameValid, setDisplayNameValid] = useState(true);
   const [account, setAccount] = useState<Account>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
-  const backgroundImageRef = useRef<Image>();
+
+  const {
+    areLinksValid,
+    links,
+    onLinkAdd,
+    onLinkRemovedAtIndex,
+    onLinkUpdatedAtIndex,
+    setLinks,
+  } = useLinksArray({
+    initialLinks: [],
+    linkValidation: linkValidationSchema,
+  });
+
+  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
+    usePreferenceTags();
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation({
@@ -75,12 +110,6 @@ const EditProfileComponent = () => {
         chain: a.community.id,
       })),
     });
-
-  const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
-    usePreferenceTags();
-
-  const { markTrainingActionAsComplete } =
-    useUserOnboardingSliderMutationStore();
 
   const {
     data,
@@ -92,104 +121,33 @@ const EditProfileComponent = () => {
     shouldFetchSelfProfile: true,
   });
 
-  const checkForUpdates = () => {
-    const profileUpdate: any = {};
-
-    if (!_.isEqual(name, profile?.name) && name !== '')
-      profileUpdate.name = name;
-
-    if (!_.isEqual(email, profile?.email)) profileUpdate.email = email;
-
-    profileUpdate.bio = serializeDelta(bio);
-
-    if (!_.isEqual(avatarUrl, profile?.avatarUrl))
-      profileUpdate.avatarUrl = avatarUrl;
-
-    if (!_.isEqual(socials, profile?.socials))
-      profileUpdate.socials = JSON.stringify(socials);
-
-    if (!_.isEqual(backgroundImageRef, profile?.backgroundImage))
-      profileUpdate.backgroundImage = JSON.stringify(
-        backgroundImageRef.current,
-      );
-
-    if (Object.keys(profileUpdate)?.length > 0) {
-      updateProfile({
-        ...profileUpdate,
-        // @ts-expect-error <StrictNullChecks/>
-        profileId: profile.id,
-        address: app.user.activeAccount?.address,
-        chain: app.user.activeAccount?.community,
-        tagIds: preferenceTags
-          .filter((tag) => tag.isSelected)
-          .map((tag) => tag.item.id),
-      })
-        .then(() => {
-          // @ts-expect-error <StrictNullChecks/>
-          navigate(`/profile/id/${profile.id}`);
-
-          // @ts-expect-error <StrictNullChecks/>
-          if (userOnboardingEnabled && socials?.length > 0) {
-            markTrainingActionAsComplete(
-              UserTrainingCardTypes.FinishProfile,
-              // @ts-expect-error <StrictNullChecks/>
-              profile.id,
-            );
-          }
-        })
-        .catch((err) => {
-          notifyError(err?.response?.data?.error || 'Something went wrong.');
-        });
-    } else {
-      setTimeout(() => {
-        // @ts-expect-error <StrictNullChecks/>
-        navigate(`/profile/id/${profile.id}`);
-      }, 1500);
-    }
-  };
-
-  const handleSaveProfile = () => {
-    if (!name) {
-      setDisplayNameValid(false);
-      notifyError('Please fill all required fields.');
-      return;
-    }
-
-    checkForUpdates();
-  };
-
   useEffect(() => {
     if (isLoadingProfile) return;
 
     if (error) {
-      setErrorCode(EditProfileError.NoProfileFound);
       setProfile(undefined);
-      setName('');
-      setEmail('');
-      setSocials([]);
       setAvatarUrl(undefined);
       setPreferenceTags([]);
-      setBio(deserializeDelta(data.profile.bio));
       setAddresses([]);
       return;
     }
 
     if (data) {
-      setErrorCode(EditProfileError.None);
       setProfile(new NewProfile(data.profile));
-      setName(data.profile.profile_name || '');
-      setEmail(data.profile.email || '');
-      setSocials(data.profile.socials);
       setAvatarUrl(data.profile.avatar_url);
-      const profileTags = data.tags;
       setPreferenceTags((tags) =>
         [...(tags || [])].map((t) => ({
           ...t,
-          isSelected: !!profileTags.find((pt) => pt.id === t.item.id),
+          isSelected: !!data.tags.find((pt) => pt.id === t.item.id),
         })),
       );
-      setBio(deserializeDelta(data.profile.bio));
-      backgroundImageRef.current = data.profile.background_image;
+      setLinks(
+        (data.profile?.socials || []).map((link) => ({
+          value: link,
+          canUpdate: true,
+          canDelete: true,
+        })),
+      );
       setAddresses(
         data.addresses.map((a) => {
           try {
@@ -210,7 +168,7 @@ const EditProfileComponent = () => {
       );
       return;
     }
-  }, [data, isLoadingProfile, error, setPreferenceTags]);
+  }, [data, isLoadingProfile, error, setPreferenceTags, setLinks]);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
@@ -251,9 +209,9 @@ const EditProfileComponent = () => {
       // @ts-expect-error <StrictNullChecks/>
       setAccount(null);
     }
-  }, [addresses, avatarUrl, name, profile]);
+  }, [addresses, avatarUrl, profile]);
 
-  if (isLoadingProfile || isUpdatingProfile) {
+  if (isLoadingProfile || isUpdatingProfile || !profile?.id) {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
@@ -263,45 +221,98 @@ const EditProfileComponent = () => {
     );
   }
 
-  if (errorCode === EditProfileError.NoProfileFound) {
+  if (error || !profile) {
     return <PageNotFound message="We cannot find profile." />;
   }
 
-  if (errorCode === EditProfileError.None) {
+  if (!error && profile) {
+    const handleSubmit = (values: z.infer<typeof editProfileValidation>) => {
+      if (links.filter((x) => x.value).length > 0 ? !areLinksValid() : false) {
+        // TODO: fix empty link condition
+        return;
+      }
+
+      // TODO: fix and add avatarUrl when saving
+
+      updateProfile({
+        name: values.username.trim(),
+        backgroundImage: values.backgroundImg.trim(),
+        email: values.email.trim(),
+        socials: JSON.stringify((links || []).map((link) => link.value.trim())),
+        bio: serializeDelta(values.bio),
+        tagIds: preferenceTags
+          .filter((tag) => tag.isSelected)
+          .map((tag) => tag.item.id),
+        profileId: profile?.id,
+        address: app.user?.activeAccount?.address,
+        chain: app.user?.activeAccount?.community?.id,
+      })
+        .then(() => {
+          navigate(`/profile/id/${profile.id}`);
+
+          if (userOnboardingEnabled && links?.length > 0) {
+            markTrainingActionAsComplete(
+              UserTrainingCardTypes.FinishProfile,
+              profile.id,
+            );
+          }
+        })
+        .catch((err) => {
+          notifyError(err?.response?.data?.error || 'Something went wrong.');
+        });
+    };
+
+    const actionButtons = (
+      <div className="buttons-container">
+        <div className="buttons">
+          <CWButton
+            type="button"
+            label="Cancel"
+            buttonType="secondary"
+            buttonWidth="wide"
+            disabled={isUploadingProfileImage || isUploadingCoverImage}
+            onClick={() => navigate(`/profile/id/${profile.id}`)}
+          />
+          <CWButton
+            type="submit"
+            label="Save"
+            buttonType="primary"
+            buttonWidth="wide"
+            disabled={isUploadingProfileImage || isUploadingCoverImage}
+          />
+        </div>
+      </div>
+    );
+
     return (
       <CWPageLayout>
         <div className="EditProfile">
           <CWForm
-            title="Edit Profile"
-            description="Add or change your general info and customize your profile."
-            actions={
-              <div className="buttons-container">
-                <div className="buttons">
-                  <CWButton
-                    label="Cancel"
-                    onClick={() => {
-                      setTimeout(() => {
-                        // @ts-expect-error <StrictNullChecks/>
-                        navigate(`/profile/id/${profile.id}`);
-                      }, 1000);
-                    }}
-                    className="save-button"
-                    buttonType="secondary"
-                  />
-                  <CWButton
-                    label="Save"
-                    onClick={() => handleSaveProfile()}
-                    className="save-button"
-                    disabled={isUploadingProfileImage || isUploadingCoverImage}
-                    buttonType="primary"
-                  />
-                </div>
-              </div>
-            }
+            initialValues={{
+              username: data.profile.profile_name || '',
+              email: data.profile.email || '',
+              backgroundImg: data.profile.background_image || '',
+              bio: deserializeDelta(data?.profile?.bio),
+            }}
+            onSubmit={handleSubmit}
+            validationSchema={editProfileValidation}
           >
+            <div>
+              <div>
+                <CWText type="h3" fontWeight="medium">
+                  Edit Profile
+                </CWText>
+                <CWText type="b1">
+                  Add or change your general info and customize your profile.
+                </CWText>
+              </div>
+              {actionButtons}
+            </div>
+            <CWDivider />
             <CWFormSection
               title="General Info"
               description="Let your community and others get to know you by sharing a bit about yourself."
+              className="input-controls"
             >
               <div className="profile-image-section">
                 <CWText type="caption" fontWeight="medium">
@@ -328,104 +339,61 @@ const EditProfileComponent = () => {
                   />
                 </div>
               </div>
-              <div className="info-section">
-                <CWTextInput
-                  name="name-form-field"
-                  inputValidationFn={(val: string) => {
-                    if (val.match(/[^A-Za-z0-9]/)) {
-                      return ['failure', 'Must enter characters A-Z, 0-9'];
-                    } else {
-                      return ['success', 'Input validated'];
-                    }
-                  }}
-                  label={
-                    <>
-                      <CWText type="caption" className="display-name-label">
-                        Display name
-                      </CWText>
-                      <div className="blue-star">*</div>
-                    </>
-                  }
-                  value={name}
-                  placeholder="display name"
-                  onInput={(e) => {
-                    setDisplayNameValid(true);
-                    setName(e.target.value);
-                  }}
-                  inputClassName={displayNameValid ? '' : 'failure'}
-                  manualStatusMessage={displayNameValid ? '' : 'No input'}
-                  manualValidationStatus={
-                    displayNameValid ? 'success' : 'failure'
-                  }
-                />
-                <CWTextInput
-                  name="email-form-field"
-                  inputValidationFn={(val: string) => {
-                    try {
-                      z.string().email().parse(val.trim());
-                      return ['success', 'Input validated'];
-                    } catch {
-                      return ['failure', 'Must enter valid email'];
-                    }
-                  }}
-                  label="Email"
-                  value={email}
-                  placeholder="email"
-                  onInput={(e) => {
-                    setEmail(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="bio-section">
-                <CWText type="caption">Bio</CWText>
-                <ReactQuillEditor
-                  className="editor"
-                  contentDelta={bio}
-                  setContentDelta={setBio}
-                />
-              </div>
+              <CWTextInput
+                fullWidth
+                placeholder="Enter your user name"
+                label="Username"
+                name="username" // TODO: unique username
+                hookToForm
+              />
+              <CWTextInput
+                fullWidth
+                placeholder="Add an email address"
+                label="Email"
+                name="email"
+                hookToForm
+              />
+              <ReactQuillEditor
+                label="Bio"
+                className="editor"
+                hookToForm
+                name="bio"
+              />
               <CWDivider />
-              <div className="socials-section">
-                <CWText type="caption">Social links</CWText>
-                <CWSocials
-                  // @ts-expect-error <StrictNullChecks/>
-                  socials={profile?.socials}
-                  handleInputChange={(e) => {
-                    setSocials(e);
-                  }}
-                />
-              </div>
+              <LinksArray
+                label="Social links"
+                addLinkButtonCTA="+ Add social link"
+                links={links.map((link) => ({
+                  ...link,
+                  customElementAfterLink:
+                    link.value && getLinkType(link.value, 'website') ? (
+                      <CWTag
+                        label={getLinkType(link.value, 'website')}
+                        type="group"
+                        classNames="link-type"
+                      />
+                    ) : (
+                      <></>
+                    ),
+                }))}
+                onLinkAdd={onLinkAdd}
+                onLinkUpdatedAtIndex={onLinkUpdatedAtIndex}
+                onLinkRemovedAtIndex={onLinkRemovedAtIndex}
+                canAddLinks={links.length <= 5}
+              />
             </CWFormSection>
             <CWFormSection
               title="Personalize Your Profile"
               description="Express yourself through imagery."
             >
-              <CWText fontWeight="medium">Image upload</CWText>
-              <CWText type="caption" className="description">
-                Add a background image.
-              </CWText>
+              <CWText fontWeight="medium">Add a background image </CWText>
               <CWCoverImageUploader
-                uploadCompleteCallback={(
-                  url: string,
-                  imageBehavior: ImageBehavior,
-                ) => {
-                  backgroundImageRef.current = {
-                    url,
-                    imageBehavior,
-                  };
-                }}
-                generatedImageCallback={(
-                  url: string,
-                  imageBehavior: ImageBehavior,
-                ) => {
-                  backgroundImageRef.current = {
-                    url,
-                    imageBehavior,
-                  };
-                }}
+                name="backgroundImg"
+                hookToForm
                 enableGenerativeAI
-                defaultImageUrl={backgroundImageRef.current?.url}
-                defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
+                showUploadAndGenerateText
+                canSelectImageBehaviour={false} // TODO: image behaviour doesnt work, its removed -- remove this comment
+                defaultImageBehavior={ImageBehavior.Fill}
                 onImageProcessStatusChange={setIsUploadingCoverImage}
               />
             </CWFormSection>
@@ -436,7 +404,6 @@ const EditProfileComponent = () => {
               <LinkedAddresses
                 // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
-                // @ts-expect-error <StrictNullChecks/>
                 profile={profile}
                 refreshProfiles={(address: string) => {
                   refetch().catch(console.error);
@@ -447,7 +414,8 @@ const EditProfileComponent = () => {
                 }}
               />
               <CWText type="caption" fontWeight="medium">
-                Link new addresses via the profile dropdown menu
+                Link new addresses via the profile dropdown menu within a
+                community
               </CWText>
             </CWFormSection>
             {userOnboardingEnabled && (
@@ -467,6 +435,7 @@ const EditProfileComponent = () => {
                 />
               </CWFormSection>
             )}
+            {actionButtons}
           </CWForm>
         </div>
       </CWPageLayout>

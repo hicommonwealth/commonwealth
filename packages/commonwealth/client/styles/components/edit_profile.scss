@@ -15,16 +15,12 @@
   .buttons-container {
     display: flex;
     justify-content: flex-end;
+    margin-top: 16px;
 
     .buttons {
       display: flex;
       gap: 16px;
       align-items: center;
-
-      .Button {
-        height: 32px;
-        padding: 0 24px;
-      }
 
       .tertiary-black {
         padding-left: 0;
@@ -35,17 +31,7 @@
   .FormSection {
     width: 100%;
 
-    .bio-section {
-      margin-bottom: 36px;
-
-      .caption {
-        color: $neutral-500;
-        margin-bottom: 4px;
-      }
-    }
-
     .description {
-      margin-top: 8px;
       color: $neutral-500;
     }
 
@@ -70,39 +56,6 @@
           margin: 0 20px;
           color: #999999;
         }
-      }
-    }
-
-    .info-section {
-      .TextInput {
-        margin-bottom: 16px;
-
-        .display-name-label {
-          color: $neutral-500;
-        }
-
-        .blue-star {
-          color: $primary-500;
-        }
-      }
-    }
-
-    .socials-section {
-      margin-top: 24px;
-
-      .b1 {
-        color: $neutral-600;
-      }
-
-      .caption {
-        color: $neutral-500;
-        margin: 4px 0 16px 0;
-      }
-
-      .input-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
       }
     }
 
@@ -138,53 +91,44 @@
       }
     }
 
-    .preferences-header {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      width: 100%;
-      padding-bottom: 16px;
-
-      .h4 {
-        color: $neutral-600;
-      }
-
-      .h5 {
-        color: $neutral-500;
-      }
-    }
-
-    .Divider {
-      margin-bottom: 16px;
-    }
-
-    .CoverImageUploader {
-      margin: 16px 0;
-    }
-
     .LinkedAddresses {
       margin-bottom: 32px;
     }
+  }
 
-    .connect-address-button {
-      display: flex;
-      align-items: center;
+  .link-type {
+    min-width: 80px;
+    text-align: center;
+    text-transform: capitalize;
+  }
 
-      .caption {
-        color: $neutral-800;
-        margin-left: 4px;
+  .input-controls {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+  }
 
-        &:hover {
-          color: $neutral-600;
-        }
-      }
+  .preferences-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 16px;
 
-      &:hover {
-        color: $neutral-600;
-        cursor: pointer;
-      }
+    .h4 {
+      color: $neutral-600;
     }
+
+    .h5 {
+      color: $neutral-500;
+    }
+  }
+
+  .Divider {
+    margin-top: 16px;
+    margin-bottom: 16px;
   }
 }
