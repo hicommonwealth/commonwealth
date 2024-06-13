@@ -10,7 +10,7 @@ module.exports = {
             id: 'hydradx',
             symbol: 'HDX',
             name: 'HydraDX',
-            icon_url: 'assets/img/protocols/hydradx.png',
+            icon_url: '/static/img/protocols/hydradx.png',
             type: 'chain',
             network: 'hydradx',
             base: 'substrate',

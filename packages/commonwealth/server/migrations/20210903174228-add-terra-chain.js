@@ -10,7 +10,7 @@ module.exports = {
             id: 'terra',
             symbol: 'LUNA',
             name: 'Terra',
-            icon_url: 'assets/img/protocols/terra.png',
+            icon_url: '/static/img/protocols/terra.png',
             type: 'chain',
             network: 'terra',
             base: 'cosmos',

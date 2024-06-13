@@ -160,7 +160,7 @@ module.exports = {
       //   network: 'edgeware',
       //   symbol: 'EDG',
       //   name: 'Edgeware Local',
-      //   icon_url: 'assets/img/protocols/edg.png',
+      //   icon_url: '/static/img/protocols/edg.png',
       //   active: true,
       //   type: 'chain',
       // }], { transaction: t });

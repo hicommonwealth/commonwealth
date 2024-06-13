@@ -10,7 +10,7 @@ module.exports = {
             id: 'near-testnet',
             symbol: 'NEAR',
             name: 'NEAR Testnet',
-            icon_url: 'assets/img/protocols/near.png',
+            icon_url: '/static/img/protocols/near.png',
             type: 'chain',
             network: 'near-testnet',
             base: 'near',

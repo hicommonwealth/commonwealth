@@ -10,7 +10,7 @@ module.exports = {
             id: 'osmosis',
             symbol: 'OSMO',
             name: 'Osmosis',
-            icon_url: 'assets/img/protocols/osm.png',
+            icon_url: '/static/img/protocols/osm.png',
             type: 'chain',
             network: 'osmosis',
             base: 'cosmos',

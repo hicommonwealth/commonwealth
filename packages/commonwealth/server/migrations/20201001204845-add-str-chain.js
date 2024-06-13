@@ -10,7 +10,7 @@ module.exports = {
             id: 'straightedge',
             symbol: 'STR',
             name: 'Straightedge',
-            icon_url: 'assets/img/protocols/str.png',
+            icon_url: '/static/img/protocols/str.png',
             type: 'chain',
             network: 'straightedge',
             active: true,

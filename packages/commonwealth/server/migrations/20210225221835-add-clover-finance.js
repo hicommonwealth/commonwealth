@@ -11,7 +11,7 @@ module.exports = {
             id: 'clover',
             symbol: 'CLV',
             name: 'Clover Finance',
-            icon_url: 'assets/img/protocols/clover.png',
+            icon_url: '/static/img/protocols/clover.png',
             type: 'chain',
             network: 'clover',
             active: true,

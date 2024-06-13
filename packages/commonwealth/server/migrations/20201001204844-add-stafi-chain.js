@@ -49,7 +49,7 @@ module.exports = {
             id: 'stafi',
             symbol: 'FIS',
             name: 'StaFi',
-            icon_url: 'assets/img/protocols/fis.png',
+            icon_url: '/static/img/protocols/fis.png',
             type: 'chain',
             network: 'stafi',
             active: true,

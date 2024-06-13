@@ -10,7 +10,7 @@ module.exports = {
             id: 'darwinia',
             symbol: 'RING',
             name: 'Darwinia',
-            icon_url: 'assets/img/protocols/ring.png',
+            icon_url: '/static/img/protocols/ring.png',
             type: 'chain',
             network: 'darwinia',
             active: true,

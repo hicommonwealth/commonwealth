@@ -67,7 +67,7 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'Chains',
         {
-          icon_url: 'assets/img/protocols/uni.png',
+          icon_url: '/static/img/protocols/uni.png',
           type: 'dao',
           network: 'compound',
           collapsed_on_homepage: false,

@@ -10,7 +10,7 @@ module.exports = {
             id: 'agoric',
             symbol: 'RUN',
             name: 'Agoric',
-            icon_url: 'assets/img/protocols/agoric.png',
+            icon_url: '/static/img/protocols/agoric.png',
             type: 'chain',
             network: 'agoric',
             base: 'cosmos',

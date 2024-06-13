@@ -17,7 +17,7 @@ module.exports = {
             id: 'plasm',
             symbol: 'PLM',
             name: 'Plasm Network',
-            icon_url: 'assets/img/protocols/plm.png',
+            icon_url: '/static/img/protocols/plm.png',
             type: 'chain',
             network: 'plasm',
             active: true,

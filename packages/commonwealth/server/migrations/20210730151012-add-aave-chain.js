@@ -7,7 +7,7 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'Chains',
         {
-          icon_url: 'assets/img/protocols/aave.png',
+          icon_url: '/static/img/protocols/aave.png',
           type: 'dao',
           network: 'aave',
           collapsed_on_homepage: false,

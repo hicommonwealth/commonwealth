@@ -10,7 +10,7 @@ module.exports = {
             id: 'crust',
             symbol: 'CRUST',
             name: 'Crust',
-            icon_url: 'assets/img/protocols/dot.png', // @TODO: Add crust
+            icon_url: '/static/img/protocols/dot.png', // @TODO: Add crust
             type: 'chain',
             network: 'crust',
             base: 'substrate',

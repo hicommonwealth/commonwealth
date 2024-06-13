@@ -10,7 +10,7 @@ module.exports = {
             id: 'injective-testnet',
             symbol: 'tINJ',
             name: 'Injective Testnet',
-            icon_url: 'assets/img/protocols/injective.png',
+            icon_url: '/static/img/protocols/injective.png',
             type: 'chain',
             network: 'injective-testnet',
             base: 'cosmos',

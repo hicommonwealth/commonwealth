@@ -10,7 +10,7 @@ module.exports = {
             id: 'phala',
             symbol: 'PHA',
             name: 'Phala Network',
-            icon_url: 'assets/img/protocols/pha.png',
+            icon_url: '/static/img/protocols/pha.png',
             type: 'chain',
             network: 'phala',
             active: false,

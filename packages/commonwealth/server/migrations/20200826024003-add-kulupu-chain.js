@@ -58,7 +58,7 @@ module.exports = {
             name: 'Kulupu',
             description:
               'A proof of work blockchain with on-chain governance, online upgrade, and signed mining.',
-            icon_url: 'assets/img/protocols/klp.png',
+            icon_url: '/static/img/protocols/klp.png',
             active: true,
             type: 'chain',
           },

@@ -10,7 +10,7 @@ module.exports = {
             id: 'injective',
             symbol: 'INJ',
             name: 'Injective',
-            icon_url: 'assets/img/protocols/injective.png',
+            icon_url: '/static/img/protocols/injective.png',
             type: 'chain',
             network: 'injective',
             base: 'cosmos',

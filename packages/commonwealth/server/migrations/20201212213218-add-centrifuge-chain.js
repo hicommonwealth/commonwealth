@@ -10,7 +10,7 @@ module.exports = {
             id: 'centrifuge',
             symbol: 'RAD',
             name: 'Centrifuge',
-            icon_url: 'assets/img/protocols/rad.png',
+            icon_url: '/static/img/protocols/rad.png',
             type: 'chain',
             network: 'centrifuge',
             active: true,

@@ -2,6 +2,7 @@
   "timeout": 20000,
   "require": [
     "tsconfig-paths/register",
+    "@babel/register",
     "source-map-support/register",
     "ignore-styles"
   ],

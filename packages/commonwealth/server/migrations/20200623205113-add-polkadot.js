@@ -56,7 +56,7 @@ module.exports = {
             network: 'polkadot',
             symbol: 'DOT',
             name: 'Polkadot',
-            icon_url: 'assets/img/protocols/dot.png',
+            icon_url: '/static/img/protocols/dot.png',
             active: true,
             type: 'chain',
           },
