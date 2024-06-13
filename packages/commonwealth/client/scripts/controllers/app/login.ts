@@ -586,8 +586,7 @@ export async function handleSocialLoginCallback({
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,
-        // @ts-expect-error <StrictNullChecks>
-        session: serializeCanvas(session),
+        session: session && serializeCanvas(session),
         walletSsoSource,
       },
     },
