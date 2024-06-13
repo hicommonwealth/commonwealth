@@ -204,7 +204,6 @@ const EditProfile = () => {
       }
 
       // TODO: fix and add avatarUrl when saving
-
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
@@ -268,7 +267,7 @@ const EditProfile = () => {
             initialValues={{
               username: data.profile.profile_name || '',
               email: data.profile.email || '',
-              backgroundImg: data.profile.background_image || '',
+              backgroundImg: data.profile.background_image.url || '',
               bio: deserializeDelta(data?.profile?.bio),
             }}
             onSubmit={handleSubmit}
