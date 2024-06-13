@@ -1,11 +1,10 @@
 import React from 'react';
 
 import 'components/component_kit/cw_form_section.scss';
-import { CWDivider } from './cw_divider';
-import { CWText } from './cw_text';
 
 import clsx from 'clsx';
-import { ComponentType } from './types';
+import { CWDivider } from '../../component_kit/cw_divider';
+import { CWText } from '../../component_kit/cw_text';
 
 type FormSectionProps = {
   description: string;
@@ -14,11 +13,15 @@ type FormSectionProps = {
   className?: string;
 } & React.PropsWithChildren;
 
-export const CWFormSection = (props: FormSectionProps) => {
-  const { description, title, topRightElement, className } = props;
-
+const Section = ({
+  description,
+  title,
+  topRightElement,
+  className,
+  children,
+}: FormSectionProps) => {
   return (
-    <div className={ComponentType.FormSection}>
+    <div className="ProfileSection">
       <div className="title">
         <CWText type="h4">{title}</CWText>
         {topRightElement && (
@@ -29,9 +32,11 @@ export const CWFormSection = (props: FormSectionProps) => {
         <div className="left-side">
           <CWText type="b1">{description}</CWText>
         </div>
-        <div className={clsx('right-side', className)}>{props.children}</div>
+        <div className={clsx('right-side', className)}>{children}</div>
       </div>
       <CWDivider />
     </div>
   );
 };
+
+export default Section;

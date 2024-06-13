@@ -27,7 +27,6 @@ import {
   ImageBehavior,
 } from '../component_kit/cw_cover_image_uploader';
 import { CWDivider } from '../component_kit/cw_divider';
-import { CWFormSection } from '../component_kit/cw_form_section';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
@@ -38,6 +37,7 @@ import { LinkedAddresses } from '../linked_addresses';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 import './EditProfile.scss';
+import ProfileSection from './Section';
 import { editProfileValidation } from './validation';
 
 export type Image = {
@@ -45,7 +45,7 @@ export type Image = {
   imageBehavior: ImageBehavior;
 };
 
-const EditProfileComponent = () => {
+const EditProfile = () => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -280,7 +280,7 @@ const EditProfileComponent = () => {
               {actionButtons}
             </div>
             <CWDivider />
-            <CWFormSection
+            <ProfileSection
               title="General Info"
               description="Let your community and others get to know you by sharing a bit about yourself."
               className="input-controls"
@@ -352,8 +352,8 @@ const EditProfileComponent = () => {
                 onLinkRemovedAtIndex={onLinkRemovedAtIndex}
                 canAddLinks={links.length <= 5}
               />
-            </CWFormSection>
-            <CWFormSection
+            </ProfileSection>
+            <ProfileSection
               title="Personalize Your Profile"
               description="Express yourself through imagery."
             >
@@ -367,8 +367,8 @@ const EditProfileComponent = () => {
                 defaultImageBehavior={ImageBehavior.Fill}
                 onImageProcessStatusChange={setIsUploadingCoverImage}
               />
-            </CWFormSection>
-            <CWFormSection
+            </ProfileSection>
+            <ProfileSection
               title="Linked addresses"
               description="Manage your addresses."
             >
@@ -388,9 +388,9 @@ const EditProfileComponent = () => {
                 Link new addresses via the profile dropdown menu within a
                 community
               </CWText>
-            </CWFormSection>
+            </ProfileSection>
             {userOnboardingEnabled && (
-              <CWFormSection
+              <ProfileSection
                 title="Preferences"
                 description="Set your preferences to enhance your experience"
               >
@@ -404,7 +404,7 @@ const EditProfileComponent = () => {
                   preferenceTags={preferenceTags}
                   onTagClick={toggleTagFromSelection}
                 />
-              </CWFormSection>
+              </ProfileSection>
             )}
             {actionButtons}
           </CWForm>
@@ -414,4 +414,4 @@ const EditProfileComponent = () => {
   }
 };
 
-export default EditProfileComponent;
+export default EditProfile;

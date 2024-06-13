@@ -21,7 +21,6 @@ export enum ComponentType {
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
   Drawer = 'Drawer',
-  FormSection = 'FormSection',
   FormSteps = 'FormSteps',
   FilterMenu = 'FilterMenu',
   Growl = 'Growl',
