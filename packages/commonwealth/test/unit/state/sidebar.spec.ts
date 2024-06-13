@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { sidebarStore } from 'state/ui/sidebar';
+import { beforeEach, describe, test } from 'vitest';
 
 describe('sidebar store', () => {
   const initialStore = sidebarStore.getState();
@@ -9,7 +10,7 @@ describe('sidebar store', () => {
   });
 
   describe('sidebar menu', () => {
-    it('should set menuName and menuVisible', () => {
+    test('should set menuName and menuVisible', () => {
       sidebarStore
         .getState()
         .setMenu({ name: 'exploreCommunities', isVisible: true });
@@ -17,7 +18,7 @@ describe('sidebar store', () => {
       expect(sidebarStore.getState().menuVisible).to.be.true;
     });
 
-    it('should retain menuVisible if isVisible is not provided', () => {
+    test('should retain menuVisible if isVisible is not provided', () => {
       const previousVisibility = sidebarStore.getState().menuVisible;
       sidebarStore.getState().setMenu({ name: 'createContent' });
       expect(sidebarStore.getState().menuVisible).to.equal(previousVisibility);

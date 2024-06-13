@@ -2,6 +2,7 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { testServer, TestServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -19,7 +20,7 @@ describe('Polls', () => {
 
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
@@ -44,11 +45,11 @@ describe('Polls', () => {
     expect(userJWT).to.not.be.null;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should create a poll for a thread', async () => {
+  test('should create a poll for a thread', async () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: 'ethereum',
       address: userAddress,
@@ -107,7 +108,7 @@ describe('Polls', () => {
     pollId = res.body.result.id;
   });
 
-  it('should fail to cast a vote with invalid option', async () => {
+  test('should fail to cast a vote with invalid option', async () => {
     const data = {
       option: 'optionC',
     };
@@ -127,7 +128,7 @@ describe('Polls', () => {
     expect(res.status).to.equal(400);
   });
 
-  it('should cast a vote', async () => {
+  test('should cast a vote', async () => {
     const data = {
       option: 'optionA',
     };
@@ -150,7 +151,7 @@ describe('Polls', () => {
     });
   });
 
-  it('should get thread polls, response shows poll and vote', async () => {
+  test('should get thread polls, response shows poll and vote', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/threads/${threadId}/polls`)
@@ -169,7 +170,7 @@ describe('Polls', () => {
     );
   });
 
-  it('should recast vote', async () => {
+  test('should recast vote', async () => {
     const data = {
       option: 'optionB',
     };
@@ -192,7 +193,7 @@ describe('Polls', () => {
     });
   });
 
-  it('should get thread polls, response shows updated poll and vote', async () => {
+  test('should get thread polls, response shows updated poll and vote', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/threads/${threadId}/polls`)
@@ -209,7 +210,7 @@ describe('Polls', () => {
     );
   });
 
-  it('should get thread poll votes', async () => {
+  test('should get thread poll votes', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/polls/${pollId}/votes`)
@@ -223,7 +224,7 @@ describe('Polls', () => {
     expect(res.body.result[0]).to.have.property('address', userAddress);
   });
 
-  it('should delete poll', async () => {
+  test('should delete poll', async () => {
     const res = await chai.request
       .agent(server.app)
       .delete(`/api/polls/${pollId}`)
@@ -238,7 +239,7 @@ describe('Polls', () => {
     expect(res.status).to.equal(200);
   });
 
-  it('should get thread polls, response shows no results', async () => {
+  test('should get thread polls, response shows no results', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/threads/${threadId}/polls`)
