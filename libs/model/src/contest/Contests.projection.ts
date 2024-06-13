@@ -249,8 +249,25 @@ async function updateEndedContests(
         score_updated_at: { [Op.lte]: sequelize.col('end_time') },
       },
     });
-    for (const contest of outdated) {
-      await updateScore(contest_address, contest.contest_id);
+    const promises = outdated.map((contest) =>
+      updateScore(contest_address, contest.contest_id).then(() => contest),
+    );
+    const results = await Promise.allSettled(promises);
+    for (const r of results) {
+      if (r.status === 'fulfilled') {
+        log.debug(
+          `successfully updated score for contest address ${contest_address} at contest ID ${r.value.contest_id}`,
+        );
+      }
+    }
+    const errors = results
+      .filter(({ status }) => status === 'rejected')
+      .map(
+        (result) =>
+          (result as PromiseRejectedResult).reason || '<unknown reason>',
+      );
+    if (errors.length > 0) {
+      throw new Error(`updateScore failed with errors: ${errors.join(', ')}"`);
     }
   } catch (err) {
     err instanceof Error
