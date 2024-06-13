@@ -6,7 +6,7 @@ import { DB } from './models/index';
 
 export async function getActivityFeed(models: DB, id = 0) {
   /**
-   * Last 50 created threads
+   * Last 50 updated threads and their comments
    */
   const query = `
     ${
@@ -59,7 +59,7 @@ export async function getActivityFeed(models: DB, id = 0) {
           : ''
       }
       WHERE T.deleted_at IS NULL
-      ORDER BY T.created_at DESC
+      ORDER BY T.updated_at DESC
       LIMIT 50
     ),
     recent_comments AS (
