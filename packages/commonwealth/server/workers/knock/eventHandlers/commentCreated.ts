@@ -4,7 +4,7 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, safeTruncateBody } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
 import z from 'zod';
@@ -87,7 +87,7 @@ export const processCommentCreated: EventHandler<
         author: author.Profile.profile_name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        comment_body: decodeURIComponent(payload.text).substring(0, 255),
+        comment_body: safeTruncateBody(decodeURIComponent(payload.text), 255),
         comment_url: getCommentUrl(
           payload.community_id,
           payload.thread_id,
