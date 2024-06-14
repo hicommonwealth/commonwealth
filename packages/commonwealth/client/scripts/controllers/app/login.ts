@@ -523,7 +523,7 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let session: Session;
+  let session: Session | null = null;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
