@@ -210,7 +210,7 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    log.warn(
+    throw new Error(
       `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
   }
