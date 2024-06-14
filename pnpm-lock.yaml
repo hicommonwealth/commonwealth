@@ -53,6 +53,9 @@ importers:
       '@babel/register':
         specifier: ^7.4.0
         version: 7.23.7(@babel/core@7.24.5)
+      '@hicommonwealth/eslint-plugin':
+        specifier: workspace:*
+        version: link:libs/eslint-plugin
       '@istanbuljs/nyc-config-typescript':
         specifier: ^0.1.3
         version: 0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.24)(@types/node@20.12.10)(typescript@5.4.5))
