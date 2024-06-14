@@ -19,7 +19,7 @@ export class ServerAnalyticsController {
         ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
       };
     }
-    const reqIsPWA = req.headers['ispwa'] === 'true';
+    const reqIsPWA = req?.headers?.['ispwa'] === 'true';
     const { event, ...payload } = newOptions;
     payload.isPWA = reqIsPWA;
     analytics().track(event, payload);
