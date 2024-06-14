@@ -28,7 +28,6 @@ import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LoginToken from './login_token';
 import Membership from './membership';
-import Notification from './notification';
 import NotificationCategory from './notification_category';
 import NotificationsRead from './notifications_read';
 import Outbox from './outbox';
@@ -78,7 +77,6 @@ export const Factories = {
   LastProcessedEvmBlock,
   LoginToken,
   Membership,
-  Notification,
   NotificationCategory,
   NotificationsRead,
   Outbox,

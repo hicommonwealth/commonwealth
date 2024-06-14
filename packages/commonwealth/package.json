@@ -28,7 +28,6 @@
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
     "dump-db": "chmod u+x scripts/dump-db.sh && ./scripts/dump-db.sh",
     "e2e-start-server": "pnpm bootstrap-test-db && NODE_ENV=test ETH_RPC=e2e-test pnpm start",
-    "emit-notification": "tsx server/scripts/emitTestNotification.ts",
     "emit-webhook": "tsx server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",

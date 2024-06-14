@@ -57,9 +57,6 @@ import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
-import viewNotifications, {
-  RouteNotificationCategories,
-} from '../routes/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
@@ -119,7 +116,6 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
-import viewChainActivity from '../routes/viewChainActivity';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -956,29 +952,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewDiscussionNotifications',
-    passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(
-      this,
-      models,
-      RouteNotificationCategories.Discussion,
-    ),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/viewChainEventNotifications',
-    passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(
-      this,
-      models,
-      RouteNotificationCategories.ChainEvents,
-    ),
-  );
-
-  registerRoute(
-    router,
-    'post',
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models),
@@ -994,12 +967,6 @@ function setupRouter(
     'post',
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/viewChainActivity',
-    viewChainActivity.bind(this, models),
   );
 
   registerRoute(

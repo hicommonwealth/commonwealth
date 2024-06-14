@@ -40,7 +40,6 @@ If you add a script to the `package.json` file, please add documentation for it 
   + [style-lint](#style-lint)
 * [Playwright](#playwright)
   + [e2e-start-server](#e2e-start-server)
-  + [emit-notification](#emit-notification)
   + [test-e2e](#test-e2e)
   + [test-e2e-serial](#test-e2e-serial)
 * [Testing](#testing)
@@ -258,14 +257,6 @@ Definition: `ETH_RPC=e2e-test pnpm start`
 Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
 
 Contributor: Kurtis Assad
-
-### emit-notification
-
-Definition: `tsx  server/scripts/emitTestNotification.ts`
-
-Description: Emits a chain-event or snapshot notification. Run `pnpm emit-notification --help` to see options.
-
-Contributor: Timothee Legros
 
 ### test-e2e
 

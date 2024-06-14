@@ -136,48 +136,6 @@ describe('DatabaseCleaner Tests', async () => {
       clock.restore();
     });
 
-    test('Should only delete notifications older than 3 months', async () => {
-      const currentNotifLength = (await models.Notification.findAll()).length;
-      expect(currentNotifLength).to.equal(0);
-
-      const now = new Date();
-
-      const eightyEightDaysAgo = new Date(now);
-      eightyEightDaysAgo.setUTCDate(now.getUTCDate() - 88);
-
-      const hundredDaysAgo = new Date(now);
-      hundredDaysAgo.setUTCDate(now.getUTCDate() - 100);
-
-      // create old notification
-      // @ts-expect-error StrictNullChecks
-      await models.Notification.create({
-        notification_data: 'testing',
-        created_at: hundredDaysAgo,
-        community_id: 'ethereum',
-        category_id: 'new-thread-creation',
-      });
-
-      // create new notification
-      // @ts-expect-error StrictNullChecks
-      await models.Notification.create({
-        notification_data: 'testing',
-        community_id: 'ethereum',
-        created_at: eightyEightDaysAgo,
-        category_id: 'new-thread-creation',
-      });
-
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.init(models);
-      await dbCleaner.executeQueries();
-
-      const notifs = await models.Notification.findAll();
-      expect(notifs.length).to.equal(1);
-      // @ts-expect-error StrictNullChecks
-      expect(notifs[0].created_at.toString()).to.equal(
-        eightyEightDaysAgo.toString(),
-      );
-    });
-
     test('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {
       const now = new Date();
 

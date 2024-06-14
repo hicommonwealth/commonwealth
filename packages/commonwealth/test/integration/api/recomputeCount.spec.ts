@@ -155,28 +155,10 @@ describe('recomputeCounts', () => {
       },
     });
 
-    // sort notification by id to get the latest notification for test thread limit 1
-    const notifications = await server.models.Notification.findAll({
-      where: {
-        thread_id: threadId,
-        category_id: {
-          [Op.in]: notif_feed_categories,
-        },
-      },
-      order: [['id', 'DESC']],
-      limit: 1,
-    });
-
-    let notification_id = 0;
-    if (notifications.length > 0) {
-      notification_id = notifications[0].id;
-    }
-
     return {
       commentCount,
       threadReactionCount,
       commentReactionCount,
-      notification_id,
     };
   }
 
@@ -492,12 +474,11 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(
+      await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
       await verifyRecomputeCountAll();
     });
 
@@ -516,12 +497,11 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const before = await getCounts(
+      await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
         server.e2eTestEntities.testComments[0].id,
       );
-      expect(before.countsFromSourceTable.notification_id).to.be.gt(0);
       await verifyRecomputeCountAll();
     });
   });

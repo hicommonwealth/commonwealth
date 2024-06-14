@@ -61,7 +61,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Notification)
     .withMany(db.Webhook)
     .withMany(db.Ban)
     .withMany(db.CommunityBanner)
@@ -100,8 +99,7 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Reaction, {
       asMany: 'reactions',
     })
-    .withMany(db.Comment)
-    .withMany(db.Notification);
+    .withMany(db.Comment);
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
@@ -134,7 +132,7 @@ export const buildAssociations = (db: DB) => {
 
   db.NotificationCategory.withMany(db.Subscription, {
     foreignKey: 'category_id',
-  }).withMany(db.Notification, { foreignKey: 'category_id' });
+  });
 
   db.Group.withMany(db.GroupPermission);
 
@@ -198,14 +196,6 @@ export const buildAssociations = (db: DB) => {
       model: db.User,
       as: 'commentSubscriptions',
       onDelete: 'CASCADE',
-    },
-  );
-  db.NotificationsRead.withManyToMany(
-    { model: db.Subscription, onDelete: 'CASCADE' },
-    {
-      model: db.Notification,
-      onDelete: 'CASCADE',
-      hooks: true,
     },
   );
 

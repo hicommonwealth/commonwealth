@@ -147,7 +147,6 @@ export async function __deleteCommunity(
             this.models.StarredCommunity,
             // @ts-expect-error StrictNullChecks
             this.models.CommunityBanner,
-            this.models.Notification,
             // @ts-expect-error StrictNullChecks
             this.models.Group,
             // @ts-expect-error StrictNullChecks

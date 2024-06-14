@@ -1,5 +1,4 @@
 import Sequelize from 'sequelize';
-import type { NotificationAttributes } from './notification';
 import type { SubscriptionAttributes } from './subscription';
 import type { ModelInstance } from './types';
 
@@ -9,7 +8,6 @@ export type NotificationsReadAttributes = {
   is_read: boolean;
   user_id: number;
   Subscription?: SubscriptionAttributes;
-  Notification?: NotificationAttributes;
 };
 
 export type NotificationsReadInstance =

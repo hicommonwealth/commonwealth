@@ -83,7 +83,6 @@ export async function __updateCommunityId(
       this.models.Topic,
       // @ts-expect-error StrictNullChecks
       this.models.Thread,
-      this.models.Notification,
       // @ts-expect-error StrictNullChecks
       this.models.Poll,
       // @ts-expect-error StrictNullChecks
