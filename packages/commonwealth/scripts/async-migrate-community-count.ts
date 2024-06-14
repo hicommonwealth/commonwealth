@@ -11,7 +11,7 @@ async function run() {
           type: QueryTypes.SELECT,
         },
       )
-    ).map((c) => c['id']);
+    ).map((c) => c.id);
 
     for (const community_id of communityIds) {
       console.log(`Updating thread/profile counts for ${community_id}`);
