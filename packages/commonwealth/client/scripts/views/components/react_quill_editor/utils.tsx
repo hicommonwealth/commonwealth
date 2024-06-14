@@ -232,8 +232,7 @@ const formatOpsInsert = (currentLine, formattingAttrs) => {
 
 export const RTFtoMD = (delta: DeltaStatic) => {
   let mdString = '';
-
-  delta!.ops!.forEach((currentLine, index) => {
+  (delta?.ops || []).forEach((currentLine, index) => {
     const nextLine = delta.ops?.[index + 1];
 
     const onlyNewLinesRegex = /^(\n+)$/g;
