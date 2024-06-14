@@ -4,7 +4,7 @@ import { QueryTypes } from 'sequelize';
 async function run() {
   try {
     const communityIds = (
-      await models.sequelize.query(
+      await models.sequelize.query<{ id: string }>(
         `SELECT id FROM "Communities" where count_updated = false`,
         {
           raw: true,
