@@ -27,7 +27,7 @@ export const makeGroupDataBaseAPIPayload = (
           formSubmitValues.requirements.length + extraRequrirements
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
-    isPWA: null as boolean | null,
+    isPWA: undefined as boolean | undefined,
   };
 
   // @ts-expect-error StrictNullChecks
