@@ -179,7 +179,11 @@ async function getContestDetails(
 /**
  * Updates contest score (eventually winners)
  */
-async function updateScore(contest_address: string, contest_id: number) {
+async function updateScore(
+  contest_address: string,
+  contest_id: number,
+  is_current_contest: boolean,
+) {
   try {
     const contestManager = await models.ContestManager.findOne({
       where: {
@@ -194,13 +198,21 @@ async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
+    log.debug(
+      `updateScore: contest details: ${JSON.stringify(details, null, 2)}`,
+    );
+
     const { scores, contestBalance } =
       await protocol.contestHelper.getContestScore(
         details.url,
         contest_address,
-        contest_id,
+        is_current_contest ? undefined : contest_id,
         oneOff,
       );
+
+    // log.debug(`updateScore scores: ${JSON.stringify(scores, null, 2)}`);
+    // log.debug(`updateScore contestBalance: ${Number(contestBalance)}`);
+
     const prizePool =
       (Number(contestBalance) * Number(details.prize_percentage)) / 100;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
@@ -210,8 +222,8 @@ async function updateScore(contest_address: string, contest_id: number) {
       prize:
         i < Number(details.payout_structure.length)
           ? (
-              (BigInt(prizePool) * BigInt(details.payout_structure[i])) /
-              100n
+              (Number(prizePool) * Number(details.payout_structure[i])) /
+              100
             ).toString()
           : '0',
     }));
@@ -246,11 +258,22 @@ async function updateEndedContests(
       where: {
         contest_address: contest_address,
         contest_id: { [Op.lt]: contest_id },
-        score_updated_at: { [Op.lte]: sequelize.col('end_time') },
+        [Op.or]: [
+          { score_updated_at: { [Op.is]: null } },
+          { score_updated_at: { [Op.lte]: sequelize.col('end_time') } },
+        ],
       },
     });
+    log.debug(
+      `updateEndedContests: found ${outdated.length} contests to process`,
+    );
+    if (outdated.length === 0) {
+      return;
+    }
     const promises = outdated.map((contest) =>
-      updateScore(contest_address, contest.contest_id).then(() => contest),
+      updateScore(contest_address, contest.contest_id, false).then(
+        () => contest,
+      ),
     );
     const results = await Promise.allSettled(promises);
     for (const r of results) {
@@ -269,6 +292,9 @@ async function updateEndedContests(
     if (errors.length > 0) {
       throw new Error(`updateScore failed with errors: ${errors.join(', ')}"`);
     }
+    log.debug(
+      `updateEndedContests: successfully updated score for ${results.length} contests`,
+    );
   } catch (err) {
     err instanceof Error
       ? log.error(err.message, err)
@@ -308,10 +334,9 @@ export function Contests(): Projection<typeof inputs> {
           ...payload,
           contest_id,
         });
-        contest_id > 0 &&
-          setImmediate(() =>
-            updateEndedContests(payload.contest_address, contest_id),
-          );
+        setImmediate(() =>
+          updateScore(payload.contest_address, contest_id, true),
+        );
       },
 
       ContestContentAdded: async ({ payload }) => {
@@ -348,8 +373,9 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action?.thread_id,
           created_at: new Date(),
         });
-        // update score if vote is less than 1hr old
-        setImmediate(() => updateScore(payload.contest_address, contest_id));
+        setImmediate(() =>
+          updateScore(payload.contest_address, contest_id, true),
+        );
       },
     },
   };
