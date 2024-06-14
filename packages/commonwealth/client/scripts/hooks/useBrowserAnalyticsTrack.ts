@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef } from 'react';
 import app from 'state';
 import { clientAnalyticsTrack } from '../../../shared/analytics/client-track';
 import { AnalyticsPayload } from '../../../shared/analytics/types';
-import useAppStatus from '../hooks/useAppStatus';
 
 /**
  * Hook to capture analytics events on the browser
@@ -18,9 +17,6 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
   onAction?: boolean;
 }) {
   const hasFiredRef = useRef(false);
-
-  const { isAddedToHomeScreen } = useAppStatus();
-  console.log('testing shit', isAddedToHomeScreen);
 
   // Fire once on component mount
   useEffect(() => {
