@@ -60,7 +60,7 @@ const Directory = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [community, isEnabled, chainNodeId, isSaving]);
+  }, [community, isEnabled, chainNodeId, isSaving, isAddedToHomeScreen]);
 
   return (
     <section className="Directory">
