@@ -330,7 +330,7 @@ class ChainInfo {
       },
       {
         headers: {
-          isPWA: isPWA.toString(),
+          isPWA: isPWA?.toString(),
         },
       },
     );

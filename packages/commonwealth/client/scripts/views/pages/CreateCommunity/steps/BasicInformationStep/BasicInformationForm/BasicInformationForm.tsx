@@ -149,10 +149,6 @@ const BasicInformationForm = ({
     const selectedChainNode = sortedChains.find(
       (chain) => String(chain.value) === values.chain.value,
     );
-    console.log(
-      'isAddedToHomeScreen from BasicInformationForm.tsx',
-      isAddedToHomeScreen,
-    );
 
     try {
       await createCommunityMutation({

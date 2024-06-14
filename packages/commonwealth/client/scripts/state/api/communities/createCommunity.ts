@@ -65,7 +65,7 @@ const createCommunity = async ({
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );

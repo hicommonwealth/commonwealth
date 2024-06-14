@@ -28,7 +28,7 @@ const editTopic = async ({ topic, featuredOrder, isPWA }: EditTopicProps) => {
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );

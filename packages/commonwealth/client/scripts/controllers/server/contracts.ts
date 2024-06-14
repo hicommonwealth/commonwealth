@@ -205,7 +205,7 @@ class ContractsController {
         },
         {
           headers: {
-            isPWA: isPWA.toString(),
+            isPWA: isPWA?.toString(),
           },
         },
       );

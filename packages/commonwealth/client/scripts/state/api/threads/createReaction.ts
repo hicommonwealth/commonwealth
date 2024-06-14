@@ -46,7 +46,7 @@ const createReaction = async ({
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );

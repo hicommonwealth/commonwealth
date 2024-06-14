@@ -25,7 +25,7 @@ const addThreadLinks = async ({
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );

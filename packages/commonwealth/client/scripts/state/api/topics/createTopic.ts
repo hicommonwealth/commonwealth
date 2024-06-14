@@ -37,7 +37,7 @@ const createTopic = async ({
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );

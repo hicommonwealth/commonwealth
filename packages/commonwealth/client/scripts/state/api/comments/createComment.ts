@@ -54,7 +54,7 @@ const createComment = async ({
     },
     {
       headers: {
-        isPWA: isPWA.toString(),
+        isPWA: isPWA?.toString(),
       },
     },
   );

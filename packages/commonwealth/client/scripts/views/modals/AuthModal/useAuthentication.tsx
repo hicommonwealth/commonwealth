@@ -125,6 +125,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isSocialLogin: isSocialLogin,
       loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
       isMobile,
+      isPWA: isAddedToHomeScreen,
     });
   };
 
