@@ -13,7 +13,6 @@ import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/typ
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
 import {
-  createCommentMentionNotifications,
   emitMentions,
   parseUserMentions,
   queryMentionedUsers,
@@ -22,7 +21,6 @@ import {
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
@@ -236,13 +234,6 @@ export async function __createThreadComment(
   } catch (e) {
     throw new ServerError('Failed to create comment', e);
   }
-
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push(
-    // @ts-expect-error StrictNullChecks
-    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
-  );
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(address.address);

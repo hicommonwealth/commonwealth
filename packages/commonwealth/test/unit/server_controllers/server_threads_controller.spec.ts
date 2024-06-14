@@ -115,7 +115,7 @@ describe('ServerThreadsController', () => {
         banCache as any,
       );
 
-      const [newReaction, notificationOptions, analyticsOptions] =
+      const [newReaction, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
@@ -136,25 +136,6 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
-
-      expect(notificationOptions).to.have.property('notification');
-      const { notification } = notificationOptions;
-      expect(notification).to.have.property('categoryId', 'new-reaction');
-
-      expect(notification.data).to.have.property('created_at');
-      expect(notification.data).to.include({
-        thread_id: 4,
-        root_title: 'Big Thread!',
-        root_type: 'discussion',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-
-      expect(notificationOptions).to.have.property('excludeAddresses');
-      const { excludeAddresses } = notificationOptions;
-      // @ts-expect-error StrictNullChecks
-      expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
@@ -562,7 +543,7 @@ describe('ServerThreadsController', () => {
         banCache as any,
       );
 
-      const [newComment, notificationOptions, analyticsOptions] =
+      const [newComment, analyticsOptions] =
         await serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
@@ -581,7 +562,6 @@ describe('ServerThreadsController', () => {
         address_id: address.id,
         community_id: 'ethereum',
       });
-      expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
         event: 'Create New Comment',
         community: 'ethereum',
@@ -1407,7 +1387,6 @@ describe('ServerThreadsController', () => {
         author_address: '0x123',
         author_community_id: 'ethereum',
       });
-      // @ts-expect-error StrictNullChecks
       expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });

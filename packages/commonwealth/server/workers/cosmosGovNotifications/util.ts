@@ -1,14 +1,8 @@
 import { Timestamp, fromTimestamp } from '@hicommonwealth/chains';
 import { logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import {
-  ChainBase,
-  NotificationCategories,
-  SupportedNetwork,
-} from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
-import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
-import emitNotifications from '../../util/emitNotifications';
 import { AllCosmosProposals } from './proposalFetching/types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -114,32 +108,7 @@ export async function emitProposalNotifications(
     const chainProposals = proposals.v1[chainId];
     for (const proposal of chainProposals) {
       try {
-        await emitNotifications(models, {
-          categoryId: NotificationCategories.ChainEvent,
-          data: {
-            community_id: chainId,
-            network: SupportedNetwork.Cosmos,
-            event_data: {
-              kind: EventKind.SubmitProposal,
-              id: proposal.id,
-              content: {
-                // TODO: multiple typeUrls for v1 proposals? - is this data even needed
-                typeUrl: proposal.messages[0].type_url,
-                value: proposal.messages[0].value,
-              },
-              // @ts-expect-error StrictNullChecks
-              submitTime: formatProposalDates(proposal.submit_time),
-              // @ts-expect-error StrictNullChecks
-              depositEndTime: formatProposalDates(proposal.deposit_end_time),
-              // @ts-expect-error StrictNullChecks
-              votingStartTime: formatProposalDates(proposal.voting_start_time),
-              // @ts-expect-error StrictNullChecks
-              votingEndTime: formatProposalDates(proposal.voting_end_time),
-              finalTallyResult: proposal.final_tally_result,
-              totalDeposit: coinToCoins(proposal.total_deposit),
-            },
-          },
-        });
+        log.warn('Notification emission not supported');
       } catch (e) {
         log.error('Error emitting v1 proposal notification', e);
       }
@@ -150,34 +119,7 @@ export async function emitProposalNotifications(
     const chainProposals = proposals.v1Beta1[chainId];
     for (const proposal of chainProposals) {
       try {
-        await emitNotifications(models, {
-          categoryId: NotificationCategories.ChainEvent,
-          data: {
-            community_id: chainId,
-            network: SupportedNetwork.Cosmos,
-            event_data: {
-              kind: EventKind.SubmitProposal,
-              id: proposal.proposalId.toString(10),
-              content: {
-                // TODO: multiple typeUrls for v1 proposals? - is this data even needed
-                // @ts-expect-error StrictNullChecks
-                typeUrl: proposal.content.typeUrl,
-                // @ts-expect-error StrictNullChecks
-                value: Buffer.from(proposal.content.value).toString('hex'),
-              },
-              // @ts-expect-error StrictNullChecks
-              submitTime: proposal.submitTime.seconds.toNumber(),
-              // @ts-expect-error StrictNullChecks
-              depositEndTime: proposal.depositEndTime.seconds.toNumber(),
-              // @ts-expect-error StrictNullChecks
-              votingStartTime: proposal.votingStartTime.seconds.toNumber(),
-              // @ts-expect-error StrictNullChecks
-              votingEndTime: proposal.votingEndTime.seconds.toNumber(),
-              finalTallyResult: proposal.finalTallyResult,
-              totalDeposit: coinToCoins(proposal.totalDeposit),
-            },
-          },
-        });
+        log.warn('Notification emission not supported');
       } catch (e) {
         log.error('Error emitting v1beta1 proposal notification', e);
       }

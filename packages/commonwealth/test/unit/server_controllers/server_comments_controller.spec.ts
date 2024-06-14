@@ -1,5 +1,4 @@
 import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
-import { NotificationCategories } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
@@ -107,7 +106,7 @@ describe('ServerCommentsController', () => {
         banCache as any,
       );
 
-      const [newReaction, allNotificationOptions, allAnalyticsOptions] =
+      const [newReaction, allAnalyticsOptions] =
         await serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
@@ -128,31 +127,6 @@ describe('ServerCommentsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
-
-      expect(allNotificationOptions[0]).to.have.property('notification');
-      const { notification } = allNotificationOptions[0];
-      expect(notification).to.have.property(
-        'categoryId',
-        NotificationCategories.NewReaction,
-      );
-
-      expect(notification.data).to.have.property('created_at');
-      expect(notification.data).to.include({
-        thread_id: 4,
-        comment_id: 3,
-        comment_text: 'my comment body',
-        root_title: 'Big Thread!',
-        root_type: null,
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-
-      expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
-      const { excludeAddresses } = allNotificationOptions[0];
-      // @ts-expect-error StrictNullChecks
-      expect(excludeAddresses[0]).to.equal('0x123');
-
       expect(allAnalyticsOptions[0]).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
@@ -605,34 +579,16 @@ describe('ServerCommentsController', () => {
       };
       const commentId = 123;
       const commentBody = 'Hello';
-      const [updatedComment, allNotificationOptions] =
-        await serverCommentsController.updateComment({
-          user: user as any,
-          address: address as any,
-          commentId,
-          commentBody,
-        });
+      const [updatedComment] = await serverCommentsController.updateComment({
+        user: user as any,
+        address: address as any,
+        commentId,
+        commentBody,
+      });
       expect(updatedComment).to.include({
         id: 123,
         text: 'Hello',
       });
-      expect(allNotificationOptions[0]).to.have.property('notification');
-      const { notification } = allNotificationOptions[0];
-      expect(notification).to.have.property('categoryId', 'comment-edit');
-      expect(notification.data).to.have.property('created_at');
-      expect(notification.data).to.include({
-        thread_id: 2,
-        comment_id: 123,
-        comment_text: 'Hello',
-        root_title: 'Big Thread!',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-      expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
-      const { excludeAddresses } = allNotificationOptions[0];
-      // @ts-expect-error StrictNullChecks
-      expect(excludeAddresses[0]).to.equal('0x123');
     });
 
     test('should throw error (banned)', () => {

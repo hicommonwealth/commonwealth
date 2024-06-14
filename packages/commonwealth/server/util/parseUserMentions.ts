@@ -1,10 +1,8 @@
 import { EventNames, events, ServerError } from '@hicommonwealth/core';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { Comment, Thread } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import { QueryTypes, Transaction } from 'sequelize';
 import z from 'zod';
-import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
 export type UserMention = {
   profileId: string;
@@ -116,58 +114,6 @@ export const queryMentionedUsers = async (
   } catch (e) {
     throw new ServerError('Failed to query mentioned users', e);
   }
-};
-
-export const createCommentMentionNotifications = (
-  mentions: UserMentionQuery,
-  comment,
-  address,
-): EmitOptions[] => {
-  return mentions.map(({ user_id }) => {
-    return {
-      notification: {
-        categoryId: NotificationCategories.NewMention,
-        data: {
-          mentioned_user_id: user_id,
-          created_at: new Date(),
-          thread_id: +comment.thread_id,
-          root_title: comment.root_title,
-          root_type: ProposalType.Thread,
-          comment_id: +comment.id,
-          comment_text: comment.text,
-          community_id: comment.community_id,
-          author_address: address.address,
-          author_community_id: address.community_id,
-        },
-      },
-      excludeAddresses: [address.address],
-    };
-  }) as EmitOptions[];
-};
-
-export const createThreadMentionNotifications = (
-  mentions: UserMentionQuery,
-  finalThread,
-): EmitOptions[] => {
-  return mentions.map(({ user_id }) => {
-    return {
-      notification: {
-        categoryId: NotificationCategories.NewMention,
-        data: {
-          mentioned_user_id: user_id,
-          created_at: new Date(),
-          thread_id: finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          community_id: finalThread.community_id,
-          author_address: finalThread.Address.address,
-          author_community_id: finalThread.Address.community_id,
-        },
-      },
-      excludeAddresses: [finalThread.Address.address],
-    };
-  }) as EmitOptions[];
 };
 
 type EmitMentionsData = {
