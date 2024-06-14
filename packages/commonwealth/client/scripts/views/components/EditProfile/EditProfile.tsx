@@ -55,6 +55,8 @@ const EditProfile = () => {
   const [account, setAccount] = useState<Account>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
+  const [backgroundImageBehaviour, setBackgroundImageBehaviour] =
+    useState<ImageBehavior>();
 
   const {
     areLinksValid,
@@ -207,7 +209,7 @@ const EditProfile = () => {
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
-            imageBehavior: ImageBehavior.Fill, // TODO: add this back in when seleting background image
+            imageBehavior: backgroundImageBehaviour,
           })
         : null;
       updateProfile({
@@ -319,8 +321,8 @@ const EditProfile = () => {
                 fullWidth
                 placeholder="Enter your user name"
                 label="Username"
-                // TODO: unique username?
-                // TODO: username generator?
+                // TODO: unique username like in PersonalInformationStep?
+                // TODO: username generator like in PersonalInformationStep?
                 name="username"
                 hookToForm
               />
@@ -371,9 +373,12 @@ const EditProfile = () => {
                 hookToForm
                 enableGenerativeAI
                 showUploadAndGenerateText
-                canSelectImageBehaviour={false}
-                defaultImageBehavior={ImageBehavior.Fill}
+                defaultImageBehaviour={
+                  (data?.profile?.background_image
+                    ?.imageBehavior as ImageBehavior) || ImageBehavior.Fill
+                }
                 onImageProcessStatusChange={setIsUploadingCoverImage}
+                onImageBehaviourChange={setBackgroundImageBehaviour}
               />
             </ProfileSection>
             <ProfileSection
