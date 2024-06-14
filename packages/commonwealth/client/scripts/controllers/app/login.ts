@@ -560,7 +560,6 @@ export async function handleSocialLoginCallback({
         signer,
         chainId: app.chain?.meta.node?.ethChainId || 1,
       });
-      // TODO: provide blockhash
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {
         sessionObject = await sessionSigner.newSession(CANVAS_TOPIC);
