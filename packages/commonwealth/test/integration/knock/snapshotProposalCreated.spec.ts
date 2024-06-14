@@ -15,6 +15,14 @@ import { SnapshotEventType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
 import { getSnapshotUrl } from '../../../server/workers/knock/util';
@@ -30,7 +38,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   let userProfile: z.infer<typeof schemas.Profile> | undefined,
     sandbox: sinon.SinonSandbox;
 
-  before(async () => {
+  beforeAll(async () => {
     [user] = await tester.seed('User', {});
     [userProfile] = await tester.seed('Profile', {
       user_id: user!.id,
@@ -62,11 +70,11 @@ describe('snapshotProposalCreated Event Handler', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should not throw if the proposal event is not supported', async () => {
+  test('should not throw if the proposal event is not supported', async () => {
     const res = await processSnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: { event: 'ranndommmm' } as z.infer<
@@ -76,7 +84,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     expect(res).to.be.false;
   });
 
-  it('should not throw if the proposal space or id is not provided', async () => {
+  test('should not throw if the proposal space or id is not provided', async () => {
     const res = await processSnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
@@ -86,7 +94,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     expect(res).to.be.false;
   });
 
-  it('should do nothing if there are no relevant community alert subscriptions', async () => {
+  test('should do nothing if there are no relevant community alert subscriptions', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -102,7 +110,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
   });
 
-  it('should execute triggerWorkflow with the appropriate data', async () => {
+  test('should execute triggerWorkflow with the appropriate data', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -143,7 +151,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
   });
 
-  it('should throw if triggerWorkflow fails', async () => {
+  test('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 

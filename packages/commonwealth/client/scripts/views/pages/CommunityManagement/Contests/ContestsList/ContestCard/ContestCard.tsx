@@ -1,16 +1,19 @@
 import moment from 'moment';
 import React from 'react';
 
+import useRerender from 'hooks/useRerender';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import ContestCountdown from '../ContestCountdown';
@@ -30,8 +33,10 @@ interface ContestCardProps {
     prize?: string;
     tickerPrize?: number;
   }[];
+  decimals?: number;
+  ticker?: string;
   isAdmin: boolean;
-  isActive: boolean;
+  isCancelled?: boolean;
   onFund: () => void;
 }
 
@@ -42,14 +47,21 @@ const ContestCard = ({
   finishDate,
   topics,
   score,
+  decimals,
+  ticker,
   isAdmin,
-  isActive,
+  isCancelled,
   onFund,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
+
+  const hasEnded = moment(finishDate) < moment();
+  const isActive = isCancelled ? false : !hasEnded;
+
+  useRerender({ isActive, interval: 6000 });
 
   const handleCancel = () => {
     cancelContest({
@@ -105,7 +117,11 @@ const ContestCard = ({
       <div className="contest-body">
         <div className="header-row">
           <CWText type="h3">{name}</CWText>
-          <ContestCountdown finishTime={finishDate} isActive={isActive} />
+          {finishDate ? (
+            <ContestCountdown finishTime={finishDate} isActive={isActive} />
+          ) : (
+            <Skeleton width="70px" />
+          )}
         </div>
         <CWText className="topics">
           Topics: {topics.map(({ name: topicName }) => topicName).join(', ')}
@@ -119,7 +135,12 @@ const ContestCard = ({
               <CWText className="label">
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
-              <CWText fontWeight="bold">{s.tickerPrize} ETH</CWText>
+              <CWText fontWeight="bold">
+                {capDecimals(
+                  s.tickerPrize ? s.tickerPrize?.toFixed(decimals || 18) : '',
+                )}
+                {ticker}
+              </CWText>
             </div>
           ))}
         </div>

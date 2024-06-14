@@ -21,6 +21,7 @@ export type Aggregates = Extract<
   | 'ThreadSubscription'
   | 'Contract'
   | 'CommunityContract'
+  | 'GroupPermission'
 >;
 
 export * from './commands';
