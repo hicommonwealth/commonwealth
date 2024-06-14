@@ -1,3 +1,4 @@
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -8,7 +9,6 @@ import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import {
   useFetchProfileByIdQuery,
@@ -47,7 +47,7 @@ export type Image = {
 
 const EditProfile = () => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState();
@@ -207,9 +207,9 @@ const EditProfile = () => {
       // TODO: fix and add avatarUrl when saving - https://github.com/hicommonwealth/commonwealth/issues/8151
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
-            url: values.backgroundImg.trim(),
-            imageBehavior: backgroundImageBehaviour,
-          })
+          url: values.backgroundImg.trim(),
+          imageBehavior: backgroundImageBehaviour,
+        })
         : null;
       updateProfile({
         name: values.username.trim(),

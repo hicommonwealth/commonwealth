@@ -1,6 +1,6 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import React from 'react';
-import EditProfileComponent from '../components/EditProfile/EditProfile';
+import EditProfileComponent from '../components/EditProfile';
 import { PageNotFound } from '../pages/404';
 
 const EditNewProfile = () => {
