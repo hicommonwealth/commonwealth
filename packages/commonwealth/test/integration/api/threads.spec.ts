@@ -14,7 +14,7 @@ import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
-import { testServer, TestServer } from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import type { CommunityArgs } from '../../util/modelUtils';

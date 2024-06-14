@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { ApiEndpoints } from 'state/api/config';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { testServer, TestServer } from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;

@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { testServer, TestServer } from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
