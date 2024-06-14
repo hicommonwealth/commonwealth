@@ -82,14 +82,12 @@ export function ContestWorker(): Policy<typeof inputs> {
           (c) => c.contest_address,
         );
 
-        const promises = await contestHelper.addContentBatch(
+        const results = await contestHelper.addContentBatch(
           chainNodeUrl!,
           addressesToProcess,
           userAddress,
           contentUrl,
         );
-
-        const results = await Promise.allSettled(promises);
 
         const errors = results
           .filter(({ status }) => status === 'rejected')
@@ -176,14 +174,12 @@ export function ContestWorker(): Policy<typeof inputs> {
           `ThreadUpvoted addressesToProcess: ${addressesToProcess.join(', ')}`,
         );
 
-        const promises = await contestHelper.voteContentBatch(
+        const results = await contestHelper.voteContentBatch(
           chainNodeUrl!,
           addressesToProcess,
           userAddress,
           activeContestsWithoutVote[0].content_id.toString(),
         );
-
-        const results = await Promise.allSettled(promises);
 
         const errors = results
           .filter(({ status }) => status === 'rejected')

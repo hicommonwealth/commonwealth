@@ -1,9 +1,0 @@
-{
-  "timeout": 20000,
-  "require": [
-    "tsconfig-paths/register",
-    "source-map-support/register",
-    "ignore-styles"
-  ],
-  "exit": true
-}
