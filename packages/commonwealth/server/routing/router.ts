@@ -84,7 +84,6 @@ import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import updateAddress from '../routes/updateAddress';
-import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -955,12 +954,6 @@ function setupRouter(
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/viewChainIcons',
-    viewCommunityIcons.bind(this, models),
   );
   registerRoute(
     router,
