@@ -142,7 +142,7 @@ const linkExistingAddressToCommunity = async (
     const newObj = await models.sequelize.transaction(async (transaction) => {
       await incrementProfileCount(
         models,
-        community.id,
+        community!.id!,
         originalAddress.user_id,
         transaction,
       );

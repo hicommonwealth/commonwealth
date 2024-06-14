@@ -1,4 +1,4 @@
-import { dispose } from '@hicommonwealth/core/src/index';
+import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
