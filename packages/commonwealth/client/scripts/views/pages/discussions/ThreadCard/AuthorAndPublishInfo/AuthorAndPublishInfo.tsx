@@ -224,7 +224,7 @@ export const AuthorAndPublishInfo = ({
               placement="top"
               content={
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {publishDate?.utc?.()?.local?.()?.format('MMMM Do, YYYY')}{' '}
+                  {publishDate?.utc?.()?.local?.()?.format('Do MMMM, YYYY')}{' '}
                   {dotIndicator}{' '}
                   {publishDate?.utc?.()?.local?.()?.format('h:mm A')}
                 </div>
