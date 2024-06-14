@@ -9,6 +9,7 @@ const {
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   ALLOWED_EVENTS,
+  INIT_TEST_DB,
 } = process.env;
 
 const NAME =
@@ -27,6 +28,7 @@ export const config = configure(
       CLEAN_HOUR: DATABASE_CLEAN_HOUR
         ? parseInt(DATABASE_CLEAN_HOUR, 10)
         : undefined,
+      INIT_TEST_DB: INIT_TEST_DB === 'true',
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
@@ -46,6 +48,7 @@ export const config = configure(
       NAME: z.string(),
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
+      INIT_TEST_DB: z.boolean(),
     }),
     WEB3: z.object({
       PRIVATE_KEY: z.string(),

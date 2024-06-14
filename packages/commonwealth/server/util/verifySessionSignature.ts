@@ -16,11 +16,12 @@ import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
 
-import type {
-  AddressInstance,
-  CommunityInstance,
-  DB,
-  ProfileAttributes,
+import {
+  equalEvmAddresses,
+  type AddressInstance,
+  type CommunityInstance,
+  type DB,
+  type ProfileAttributes,
 } from '@hicommonwealth/model';
 
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
@@ -285,7 +286,7 @@ const verifySessionSignature = async (
 
       const address = verifyMessage(siweMessage, signatureData);
 
-      isValid = addressModel.address.toLowerCase() === address.toLowerCase();
+      isValid = equalEvmAddresses(addressModel.address, address);
       if (!isValid) {
         log.info(
           `Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`,

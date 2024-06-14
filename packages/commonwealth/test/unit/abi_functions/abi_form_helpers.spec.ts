@@ -1,88 +1,89 @@
 import { assert } from 'chai';
+import { describe, test } from 'vitest';
 import {
   handleMappingAbiInputs,
   validateAbiInput,
 } from '../../../client/scripts/helpers/abi_form_helpers';
 
 describe('validateAbiInput() unit tests', () => {
-  it('should validate correct address args', () => {
+  test('should validate correct address args', () => {
     const input = '0x0000000000000000000000000000000000000000';
     const inputType = 'address';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
-  it('should validate correct uint args', () => {
+  test('should validate correct uint args', () => {
     const input = '123';
     const inputType = 'uint256';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
-  it('should validate correct bool args', () => {
+  test('should validate correct bool args', () => {
     const input = 'true';
     const inputType = 'bool';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
-  it('should validate correct bytes args', () => {
+  test('should validate correct bytes args', () => {
     const input = '0x0000000000000000000000000000000000000000';
     const inputType = 'bytes32';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
-  it('should validate correct string args', () => {
+  test('should validate correct string args', () => {
     const input = 'hello world';
     const inputType = 'string';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
-  it('should validate correct array args', () => {
+  test('should validate correct array args', () => {
     const input = '[1,2,3]';
     const inputType = 'uint256[]';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
 
-  it('should fail to validate incorrect address args', () => {
+  test('should fail to validate incorrect address args', () => {
     // Incorrect address length
     const input = '0x000000000000000000000000000000000000000';
     const inputType = 'address';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
 
-  it('should fail to validate incorrect uint args', () => {
+  test('should fail to validate incorrect uint args', () => {
     const input = '123.5';
     const inputType = 'uint256';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
 
-  it('should fail to validate incorrect bool args', () => {
+  test('should fail to validate incorrect bool args', () => {
     const input = 'maybe';
     const inputType = 'bool';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
-  it('should validate string args with mix of numeric and non-numeric characters', () => {
+  test('should validate string args with mix of numeric and non-numeric characters', () => {
     const input = '123hello##@4--asdf';
     const inputType = 'string';
 
-    const [validation_status, message] = validateAbiInput(input, inputType);
+    const [validation_status] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
 });
 
 describe('handleMappingAbiInputs() unit tests', () => {
-  it('should store correct address args', () => {
+  test('should store correct address args', () => {
     const inputIndex = 5;
     const input = '0x0000000000000000000000000000000000000000';
     const functionName = 'testFunction';
@@ -91,7 +92,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
     // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex), input);
   });
-  it('should store correct args with multiple calls', () => {
+  test('should store correct args with multiple calls', () => {
     const inputIndex = 5;
     const input = '123';
     const functionName = 'testFunction';
@@ -105,7 +106,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
     // @ts-expect-error StrictNullChecks
     assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
   });
-  it('should store correct args with multiple calls and multiple functions', () => {
+  test('should store correct args with multiple calls and multiple functions', () => {
     const inputIndex = 5;
     const input = '123';
     const functionName = 'testFunction';
@@ -126,7 +127,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
     assert.equal(inputMap.get(functionName2).get(inputIndex3), input3);
   });
 
-  it('should handle abi inputs that are a mix of numeric and string types', () => {
+  test('should handle abi inputs that are a mix of numeric and string types', () => {
     const inputIndex = 0;
     const input = '123hello';
     const functionName = 'testFunction';
@@ -141,7 +142,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
     assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
   });
 
-  it('should handle abi input that is a special characters with multiple calls', () => {
+  test('should handle abi input that is a special characters with multiple calls', () => {
     const inputIndex = 0;
     const input = '123';
     const functionName = '$$%asdjfkl;12';
@@ -153,7 +154,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
 });
 
 // describe('processAbiInputsToDataTypes() unit tests', () => {
-//   it('should properly parse bytes type', () => {
+//   test('should properly parse bytes type', () => {
 //     const inputIndex = 0;
 //     const input = '123';
 //     const functionName = 'testFunction';
@@ -174,7 +175,7 @@ describe('handleMappingAbiInputs() unit tests', () => {
 //     expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
 //   });
 
-//   it('should return empty array if inputs array is empty', () => {
+//   test('should return empty array if inputs array is empty', () => {
 //     const inputIndex = 0;
 //     const input = '123';
 //     const functionName = 'testFunction';

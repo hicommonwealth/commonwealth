@@ -9,8 +9,8 @@ import {
 } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { step } from 'mocha-steps';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
+import { afterAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
@@ -47,17 +47,21 @@ async function testSeed<T extends schemas.Aggregates>(
 }
 
 describe('Seed functions', () => {
-  after(async () => {
+  let shouldExit = true;
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('User', () => {
-    step('Should seed with defaults', async () => {
+    test('Should seed with defaults', async () => {
       await testSeed('User', { selected_community_id: null });
       await testSeed('User', { selected_community_id: null });
+      shouldExit = false;
     });
 
-    step('Should seed with overrides', async () => {
+    test('Should seed with overrides', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       const values = {
         email: 'temp@gmail.com',
         emailVerified: true,
@@ -67,16 +71,22 @@ describe('Seed functions', () => {
       // are explicitly excluded via sequelize model config
       const result = await testSeed('User', values);
       expect(result).contains(values);
+      shouldExit = false;
     });
   });
 
   describe('ChainNode', () => {
-    step('Should seed with defaults', async () => {
+    test('Should seed with defaults', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       await testSeed('ChainNode', { contracts: undefined });
       await testSeed('ChainNode', { contracts: undefined });
+      shouldExit = false;
     });
 
-    step('Should seed with overrides', async () => {
+    test('Should seed with overrides', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       await testSeed('ChainNode', {
         url: 'mainnet1.edgewa.re',
         name: 'Edgeware Mainnet',
@@ -92,11 +102,14 @@ describe('Seed functions', () => {
           },
         ],
       });
+      shouldExit = false;
     });
   });
 
   describe('Community', () => {
-    step('Should seed with overrides', async () => {
+    test('Should seed with overrides', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       const node = await testSeed('ChainNode', { contracts: undefined });
       const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
@@ -173,12 +186,16 @@ describe('Seed functions', () => {
         thread_id: undefined,
         comment_id: undefined,
       });
+      shouldExit = false;
     });
 
-    step('Should not mock data', async () => {
+    test('Should not mock data', async () => {
+      expect(shouldExit).to.be.false;
+      shouldExit = true;
       expect(
         seed('Community', {}, { mock: false }),
       ).to.eventually.be.rejectedWith(ValidationError);
+      shouldExit = false;
     });
   });
 });

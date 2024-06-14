@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PG_INT } from '..';
+import { PG_INT } from '../utils';
 
 export const Topic = z.object({
   id: PG_INT.optional(),

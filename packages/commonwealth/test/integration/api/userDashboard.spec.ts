@@ -4,6 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
@@ -37,7 +38,7 @@ describe('User Dashboard API', () => {
   let topicId2: number;
   let server: TestServer;
 
-  before('Reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
@@ -145,14 +146,12 @@ describe('User Dashboard API', () => {
     expect(threadTwo.result).to.not.be.null;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('/viewUserActivity', () => {
-    before('create threads', async () => {});
-
-    it('should fail without JWT', async () => {
+    test('should fail without JWT', async () => {
       const res = await chai.request
         .agent(server.app)
         .post('/api/viewUserActivity')
@@ -162,7 +161,7 @@ describe('User Dashboard API', () => {
       expect(res.error).to.not.be.null;
     });
 
-    it('should return user activity for joined communities only', async () => {
+    test('should return user activity for joined communities only', async () => {
       const res = await chai.request
         .agent(server.app)
         .post('/api/viewUserActivity')
@@ -187,7 +186,7 @@ describe('User Dashboard API', () => {
       expect(chains).to.deep.equal([{ community_id: 'ethereum' }]);
     });
 
-    it('should return user activity for newly joined communities', async () => {
+    test('should return user activity for newly joined communities', async () => {
       // make second user join alex community
       const communityArgs: JoinCommunityArgs = {
         jwt: userJWT,
@@ -227,7 +226,7 @@ describe('User Dashboard API', () => {
       ]);
     });
 
-    it('should return correctly ranked user activity', async () => {
+    test('should return correctly ranked user activity', async () => {
       for (let i = 0; i < 48; i++) {
         const threadArgs: ThreadArgs = {
           chainId: chain,
@@ -273,5 +272,5 @@ describe('User Dashboard API', () => {
     });
   });
 
-  describe('/viewGlobalActivity', () => {});
+  describe.todo('/viewGlobalActivity', () => {});
 });

@@ -32,7 +32,8 @@
     "start-redis": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh redis",
     "start-rmq": "chmod u+x scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh rmq",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
-    "test-api": "pnpm -F commonwealth test-api"
+    "test-api": "pnpm -F commonwealth test-api",
+    "merge-coverage": "chmod u+x scripts/mergeCoverageReports.sh && ./scripts/mergeCoverageReports.sh"
   },
   "resolutions": {
     "js-sha3": "^0.8.0",
@@ -79,7 +80,6 @@
     "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.123",
     "@types/marked": "^4.0.1",
-    "@types/mocha": "^10.0.1",
     "@types/moment": "^2.13.0",
     "@types/morgan": "^1.9.4",
     "@types/node": "^20.11.25",
@@ -101,6 +101,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "@vitejs/plugin-react-swc": "^3.7.0",
+    "@vitest/coverage-istanbul": "^1.6.0",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.4",
     "babel-plugin-transform-scss": "^1.2.0",
@@ -134,7 +135,6 @@
     "husky": "^8.0.0",
     "ignore-loader": "^0.1.2",
     "ignore-styles": "^5.0.1",
-    "mocha": "^10.3.0",
     "mock-express-request": "^0.2.2",
     "nyc": "^15.1.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
@@ -161,6 +161,7 @@
     "vite": "^5.2.12",
     "vite-plugin-html": "^3.2.2",
     "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0",
     "wait-on": "^7.2.0",
     "webpack": "^5.75.0",
     "webpack-bundle-analyzer": "^4.4.0",
