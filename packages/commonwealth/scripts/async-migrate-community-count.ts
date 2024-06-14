@@ -1,3 +1,4 @@
+import { dispose } from '@hicommonwealth/core/src/index';
 import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
@@ -38,6 +39,10 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  console.error('Failed to migrate community counts:', error);
-});
+run()
+  .then(() => {
+    dispose()('EXIT', true);
+  })
+  .catch((error) => {
+    console.error('Failed to migrate community counts:', error);
+  });

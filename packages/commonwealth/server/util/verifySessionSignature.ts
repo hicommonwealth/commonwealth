@@ -361,8 +361,7 @@ const verifySessionSignature = async (
         addressModel.profile_id = existingAddress.profile_id;
       } else {
         const user = await models.sequelize.transaction(async (transaction) => {
-          // @ts-expect-error StrictNullChecks
-          const userEntity = await models.User.createWithProfile(
+          const userEntity = await models.User.createWithProfile!(
             {
               email: null,
             },
