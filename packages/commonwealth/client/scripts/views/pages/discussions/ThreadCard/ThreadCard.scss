@@ -111,6 +111,10 @@
             font-size: 16px !important;
           }
 
+          img {
+            display: none;
+          }
+
           &.collapsed {
             div :last-child {
               color: $neutral-300;
