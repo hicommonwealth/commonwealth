@@ -3,7 +3,6 @@ export * as Comment from './comment';
 export * as Community from './community';
 export * as Contest from './contest';
 export * as Email from './emails';
-export * as Feed from './feed';
 export * as Reaction from './reaction';
 export * as Subscription from './subscription';
 export * as Thread from './thread';
