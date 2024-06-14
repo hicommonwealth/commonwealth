@@ -207,9 +207,9 @@ const EditProfile = () => {
       // TODO: fix and add avatarUrl when saving - https://github.com/hicommonwealth/commonwealth/issues/8151
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
-          url: values.backgroundImg.trim(),
-          imageBehavior: backgroundImageBehaviour,
-        })
+            url: values.backgroundImg.trim(),
+            imageBehavior: backgroundImageBehaviour,
+          })
         : null;
       updateProfile({
         name: values.username.trim(),
@@ -270,9 +270,9 @@ const EditProfile = () => {
         <div className="EditProfile">
           <CWForm
             initialValues={{
-              username: data.profile.profile_name || '',
-              email: data.profile.email || '',
-              backgroundImg: data.profile.background_image.url || '',
+              username: data?.profile?.profile_name || '',
+              email: data?.profile?.email || '',
+              backgroundImg: data?.profile?.background_image?.url || '',
               bio: deserializeDelta(data?.profile?.bio),
             }}
             onSubmit={handleSubmit}
