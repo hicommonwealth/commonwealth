@@ -6,7 +6,7 @@ import {
   UserInstance,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -52,11 +52,7 @@ export type CreateThreadCommentOptions = {
   discordMeta?: any;
 };
 
-export type CreateThreadCommentResult = [
-  CommentAttributes,
-  EmitOptions[],
-  TrackOptions,
-];
+export type CreateThreadCommentResult = [CommentAttributes, TrackOptions];
 
 export async function __createThreadComment(
   this: ServerThreadsController,
@@ -258,54 +254,6 @@ export async function __createThreadComment(
 
   const root_title = thread.title || '';
 
-  // build notification for root thread
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.NewComment,
-      data: {
-        created_at: new Date(),
-        thread_id: threadId,
-        root_title,
-        root_type: ProposalType.Thread,
-        // @ts-expect-error StrictNullChecks
-        comment_id: +comment.id,
-        // @ts-expect-error StrictNullChecks
-        comment_text: comment.text,
-        // @ts-expect-error StrictNullChecks
-        community_id: comment.community_id,
-        author_address: address.address,
-        author_community_id: address.community_id,
-      },
-    },
-    excludeAddresses: rootNotifExcludeAddresses,
-  });
-
-  // if child comment, build notification for parent author
-  if (parentId && parentComment) {
-    allNotificationOptions.push({
-      notification: {
-        categoryId: NotificationCategories.NewComment,
-        data: {
-          created_at: new Date(),
-          thread_id: +threadId,
-          root_title,
-          root_type: ProposalType.Thread,
-          // @ts-expect-error StrictNullChecks
-          comment_id: +comment.id,
-          // @ts-expect-error StrictNullChecks
-          comment_text: comment.text,
-          parent_comment_id: +parentId,
-          parent_comment_text: parentComment.text,
-          // @ts-expect-error StrictNullChecks
-          community_id: comment.community_id,
-          author_address: address.address,
-          author_community_id: address.community_id,
-        },
-      },
-      excludeAddresses: excludedAddrs,
-    });
-  }
-
   // update author last saved (in background)
   address.last_active = new Date();
   address.save();
@@ -323,5 +271,5 @@ export async function __createThreadComment(
   // @ts-expect-error StrictNullChecks
   const commentJson = comment.toJSON();
   commentJson.Address = address.toJSON();
-  return [commentJson, allNotificationOptions, analyticsOptions];
+  return [commentJson, analyticsOptions];
 }

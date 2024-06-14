@@ -60,7 +60,7 @@ export const createCommentReactionHandler = async (
   }
 
   // create comment reaction
-  const [newReaction, notificationOptions, analyticsOptions] =
+  const [newReaction, analyticsOptions] =
     await controllers.comments.createCommentReaction({
       // @ts-expect-error StrictNullChecks
       user,
@@ -72,11 +72,6 @@ export const createCommentReactionHandler = async (
       canvasSession,
       canvasHash,
     });
-
-  // emit notifications
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
 
   // track analytics events
   for (const a of analyticsOptions) {

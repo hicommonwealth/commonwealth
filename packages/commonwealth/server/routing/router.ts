@@ -126,7 +126,6 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerPollsController } from '../controllers/server_polls_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
@@ -189,7 +188,6 @@ export type ServerControllers = {
   threads: ServerThreadsController;
   comments: ServerCommentsController;
   reactions: ServerReactionsController;
-  notifications: ServerNotificationsController;
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
   communities: ServerCommunitiesController;
@@ -219,7 +217,6 @@ function setupRouter(
       globalActivityCache,
     ),
     reactions: new ServerReactionsController(models, banCache),
-    notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models, banCache),

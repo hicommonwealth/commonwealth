@@ -6,14 +6,13 @@ import {
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_controller';
 import { ServerCommentsController } from '../server_comments_controller';
-import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -35,11 +34,7 @@ export type CreateCommentReactionOptions = {
   canvasHash?: any;
 };
 
-export type CreateCommentReactionResult = [
-  ReactionAttributes,
-  EmitOptions[],
-  TrackOptions[],
-];
+export type CreateCommentReactionResult = [ReactionAttributes, TrackOptions[]];
 
 export async function __createCommentReaction(
   this: ServerCommentsController,
@@ -166,29 +161,6 @@ export async function __createCommentReaction(
     // @ts-expect-error StrictNullChecks
     defaults: reactionData,
   });
-  // build notification options
-  const allNotificationOptions: EmitOptions[] = [];
-
-  allNotificationOptions.push({
-    notification: {
-      categoryId: NotificationCategories.NewReaction,
-      data: {
-        created_at: new Date(),
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread.id,
-        // @ts-expect-error StrictNullChecks
-        comment_id: comment.id,
-        comment_text: comment.text,
-        root_title: thread.title,
-        // @ts-expect-error StrictNullChecks
-        root_type: null, // What is this for?
-        community_id: thread.community_id,
-        author_address: address.address,
-        author_community_id: address.community_id,
-      },
-    },
-    excludeAddresses: [address.address],
-  });
 
   // build analytics options
   const allAnalyticsOptions: TrackOptions[] = [];
@@ -208,9 +180,5 @@ export async function __createCommentReaction(
     Address: address,
   };
 
-  return [
-    finalReactionWithAddress,
-    allNotificationOptions,
-    allAnalyticsOptions,
-  ];
+  return [finalReactionWithAddress, allAnalyticsOptions];
 }

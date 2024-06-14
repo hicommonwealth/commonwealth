@@ -71,7 +71,7 @@ export const createThreadCommentHandler = async (
     });
   }
 
-  const [comment, notificationOptions, analyticsOptions] =
+  const [comment, analyticsOptions] =
     await controllers.threads.createThreadComment({
       // @ts-expect-error StrictNullChecks
       user,
@@ -86,10 +86,6 @@ export const createThreadCommentHandler = async (
       canvasHash,
       discordMeta: discord_meta,
     });
-
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 

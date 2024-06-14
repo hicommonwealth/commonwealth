@@ -52,30 +52,25 @@ export const createThreadHandler = async (
     });
   }
 
-  const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread({
-      // @ts-expect-error StrictNullChecks
-      user,
-      // @ts-expect-error StrictNullChecks
-      address,
-      // @ts-expect-error StrictNullChecks
-      community,
-      title,
-      body,
-      kind,
-      readOnly,
-      topicId: parseInt(topicId, 10) || undefined,
-      stage,
-      url,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-      discordMeta: discord_meta,
-    });
-
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
+  const [thread, analyticsOptions] = await controllers.threads.createThread({
+    // @ts-expect-error StrictNullChecks
+    user,
+    // @ts-expect-error StrictNullChecks
+    address,
+    // @ts-expect-error StrictNullChecks
+    community,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId: parseInt(topicId, 10) || undefined,
+    stage,
+    url,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discordMeta: discord_meta,
+  });
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
