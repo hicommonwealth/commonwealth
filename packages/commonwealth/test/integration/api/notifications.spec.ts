@@ -4,6 +4,7 @@ import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
@@ -22,7 +23,7 @@ describe('Notification Routes Tests', () => {
   const community_id = 'ethereum';
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     // get logged in address/user with JWT
@@ -93,12 +94,12 @@ describe('Notification Routes Tests', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('/viewNotifications: return notifications to user', () => {
-    it('should return a users discussion notifications', async () => {
+    test('should return a users discussion notifications', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewDiscussionNotifications')
@@ -132,7 +133,7 @@ describe('Notification Routes Tests', () => {
       ).to.not.be.null;
     });
 
-    it('should return only unread notifications', async () => {
+    test('should return only unread notifications', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewDiscussionNotifications')
@@ -152,7 +153,7 @@ describe('Notification Routes Tests', () => {
       expect(NR.is_read).to.be.false;
     });
 
-    it('should return only notifications with active_only turned on', async () => {
+    test('should return only notifications with active_only turned on', async () => {
       await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: false,
@@ -172,7 +173,7 @@ describe('Notification Routes Tests', () => {
   });
 
   describe('/markNotificationsRead', async () => {
-    it('should mark multiple notifications as read', async () => {
+    test('should mark multiple notifications as read', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/markNotificationsRead')
@@ -195,7 +196,7 @@ describe('Notification Routes Tests', () => {
       expect(nrTwo.is_read).to.be.true;
     });
 
-    it('should pass when notification id is a string instead of an array', async () => {
+    test('should pass when notification id is a string instead of an array', async () => {
       // @ts-expect-error StrictNullChecks
       const notif = await server.models.Notification.create({
         category_id: NotificationCategories.NewThread,
@@ -227,7 +228,7 @@ describe('Notification Routes Tests', () => {
       expect(nr.is_read).to.be.true;
     });
 
-    it('should fail when no notifications are passed', async () => {
+    test('should fail when no notifications are passed', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/markNotificationsRead')
@@ -240,7 +241,7 @@ describe('Notification Routes Tests', () => {
   });
 
   describe('/clearReadNotifications', async () => {
-    it('should pass when query formatted correctly', async () => {
+    test('should pass when query formatted correctly', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/clearReadNotifications')

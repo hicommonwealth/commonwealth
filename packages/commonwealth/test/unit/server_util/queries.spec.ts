@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { describe, test } from 'vitest';
 import {
   PaginationSqlOptions,
   PaginationSqlResult,
@@ -7,7 +8,7 @@ import {
 
 describe('queries', () => {
   describe('buildPaginationSql', () => {
-    it('should handle base case DESC', () => {
+    test('should handle base case DESC', () => {
       const input: PaginationSqlOptions = {
         limit: 15,
         page: 3,
@@ -25,7 +26,7 @@ describe('queries', () => {
       expect(result).deep.equals(expectedOutput);
     });
 
-    it('should handle base case ASC', () => {
+    test('should handle base case ASC', () => {
       const input: PaginationSqlOptions = {
         limit: 15,
         page: 3,

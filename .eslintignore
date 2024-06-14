@@ -6,7 +6,6 @@ static
 *.env
 *node_modules
 libs/chains/src/cosmos-ts
-*.mocharc.json
 *.nycrc
 *.stylelintrc
 *.md
@@ -15,3 +14,4 @@ libs/chains/src/cosmos-ts
 *contractTypes
 *factories
 *.nyc_output
+*coverage.json

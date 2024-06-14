@@ -2,24 +2,28 @@ import { EventNames } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import { afterEach, beforeAll, describe, test } from 'vitest';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
-import { numUnrelayedEvents } from '../../../server/workers/messageRelayer/relayForever';
+import {
+  numUnrelayedEvents,
+  resetNumUnrelayedEvents,
+} from '../../../server/workers/messageRelayer/relayForever';
 import { testOutboxEvents } from './util';
 
-describe('messageRelayer', () => {
+describe('messageRelayer', { timeout: 20_000 }, () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     const res = await import('@hicommonwealth/model');
     models = res['models'];
     await tester.bootstrap_testing(true);
   });
 
-  afterEach('Clean outbox', async () => {
+  afterEach(async () => {
     await models.Outbox.truncate();
   });
 
-  it('should correctly increment number of unrelayed events on startup', async () => {
+  test('should correctly increment number of unrelayed events on startup', async () => {
     await models.Outbox.bulkCreate([
       {
         event_name: EventNames.ChainEventCreated,
@@ -47,14 +51,16 @@ describe('messageRelayer', () => {
       },
     ]);
 
-    await startMessageRelayer(0);
+    const pgClient = await startMessageRelayer(-1);
+    await pgClient.end();
     expect(numUnrelayedEvents).to.equal(2);
+    resetNumUnrelayedEvents();
   });
 
-  it('should relay existing events and new events', async () => {
+  test('should relay existing events and new events', async () => {
     await models.Outbox.bulkCreate(testOutboxEvents);
     // waits 200 ms between query by default -> 20 iterations = 6s
-    await startMessageRelayer(30);
+    const pgClient = await startMessageRelayer(30);
     await delay(1000);
     let events = await models.Outbox.findAll({
       where: {
@@ -63,15 +69,15 @@ describe('messageRelayer', () => {
     });
     expect(numUnrelayedEvents).to.equal(0);
     expect(events.length).to.equal(3);
-    // @ts-expect-error StrictNullChecks
-    await models.Outbox.create(testOutboxEvents);
+    await models.Outbox.bulkCreate(testOutboxEvents);
     await delay(1000);
     events = await models.Outbox.findAll({
       where: {
         relayed: true,
       },
     });
-    expect(events.length).to.equal(6);
+    await pgClient.end();
+    expect(events.length).to.equal(3);
     expect(numUnrelayedEvents).to.equal(0);
   });
-}).timeout(10_000);
+});

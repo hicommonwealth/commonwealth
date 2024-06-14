@@ -4,6 +4,7 @@ import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { recomputeCounts } from '../../../scripts/recompute-count-job';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
@@ -315,7 +316,7 @@ describe('recomputeCounts', () => {
     );
   }
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
     testVerifiedChainAddress = await server.seeder.createAndVerifyAddress(
       { chain: 'alex' },
@@ -330,22 +331,22 @@ describe('recomputeCounts', () => {
     );
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('counts ', () => {
-    it('recompute counts, check single thread-comment', async () => {
+    test('recompute counts, check single thread-comment', async () => {
       await verifyRecomputeCountSingle();
     });
 
-    it('recompute counts,for all thread-comment', async () => {
+    test('recompute counts,for all thread-comment', async () => {
       await verifyRecomputeCountAll();
     });
   });
 
   describe('comment count should be correct on recompute count', () => {
-    it('add comment using raw query, count corrected by recompute count', async () => {
+    test('add comment using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
@@ -380,7 +381,7 @@ describe('recomputeCounts', () => {
   });
 
   describe('reaction count should be correct on recompute count', () => {
-    it('add reaction to thread using raw query, count corrected by recompute count', async () => {
+    test('add reaction to thread using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
@@ -415,7 +416,7 @@ describe('recomputeCounts', () => {
       await verifyRecomputeCountAll();
     });
 
-    it('add reaction to comment using raw query, count corrected by recompute count', async () => {
+    test('add reaction to comment using raw query, count corrected by recompute count', async () => {
       let before = await getCounts(
         // @ts-expect-error StrictNullChecks
         server.e2eTestEntities.testThreads[0].id,
@@ -452,7 +453,7 @@ describe('recomputeCounts', () => {
   });
 
   describe('notification should be correct on recompute count', () => {
-    it('add comment from api, notification id is non zero', async () => {
+    test('add comment from api, notification id is non zero', async () => {
       const cRes = await server.seeder.createComment({
         chain: server.e2eTestEntities.testThreads[0].community_id,
         address: server.e2eTestEntities.testAddresses[0].address,
@@ -475,7 +476,7 @@ describe('recomputeCounts', () => {
       await verifyRecomputeCountAll();
     });
 
-    it('add reaction to thread from api, notification id is still zero', async () => {
+    test('add reaction to thread from api, notification id is still zero', async () => {
       const cRes = await server.seeder.createReaction({
         chain: server.e2eTestEntities.testThreads[0].community_id,
         address: server.e2eTestEntities.testAddresses[0].address,
@@ -500,7 +501,7 @@ describe('recomputeCounts', () => {
       await verifyRecomputeCountAll();
     });
 
-    it('add reaction to comment from api, notification id is still zero', async () => {
+    test('add reaction to comment from api, notification id is still zero', async () => {
       const cRes = await server.seeder.createReaction({
         chain: server.e2eTestEntities.testThreads[0].community_id,
         address: server.e2eTestEntities.testAddresses[0].address,

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { describe, test } from 'vitest';
 import {
   parseAbiItemsFromABI,
   parseEventFromABI,
@@ -9,7 +10,7 @@ import {
 } from '../../../shared/abi_utils';
 
 describe('parseAbiItemsFromABI() unit tests', () => {
-  it('should properly parse abi items from abi', () => {
+  test('should properly parse abi items from abi', () => {
     const abi = [
       {
         inputs: [
@@ -85,7 +86,7 @@ describe('parseAbiItemsFromABI() unit tests', () => {
   });
 });
 describe('parseFunctionsFromABI() unit tests', () => {
-  it('should properly parse abi functions from abi', () => {
+  test('should properly parse abi functions from abi', () => {
     const abi = [
       {
         inputs: [
@@ -172,7 +173,7 @@ describe('parseFunctionsFromABI() unit tests', () => {
     // @ts-expect-error StrictNullChecks
     expect(abiFunctions[1].inputs[0].name).to.equal('token');
   });
-  it('should return empty array if no functions in abi', () => {
+  test('should return empty array if no functions in abi', () => {
     const abi = [
       {
         inputs: [
@@ -208,7 +209,7 @@ describe('parseFunctionsFromABI() unit tests', () => {
 });
 
 describe('parseWriteFunctionsFromABI() unit tests', () => {
-  it('should properly parse abi functions from abi', () => {
+  test('should properly parse abi functions from abi', () => {
     const abi = [
       {
         inputs: [
@@ -255,7 +256,7 @@ describe('parseWriteFunctionsFromABI() unit tests', () => {
     // @ts-expect-error StrictNullChecks
     expect(abiFunctions[0].inputs[0].type).to.equal('address');
   });
-  it('should return empty array if no write functions', () => {
+  test('should return empty array if no write functions', () => {
     const abi = [
       {
         inputs: [
@@ -276,7 +277,7 @@ describe('parseWriteFunctionsFromABI() unit tests', () => {
   });
 });
 describe('parseFunctionFromABI() unit tests', () => {
-  it('should properly parse withdraw functions from abi', () => {
+  test('should properly parse withdraw functions from abi', () => {
     const abi = [
       {
         inputs: [
@@ -340,7 +341,7 @@ describe('parseFunctionFromABI() unit tests', () => {
     // @ts-expect-error StrictNullChecks
     expect(abiFunction.inputs[0].type).to.equal('address');
   });
-  it('should throw error if function not found', () => {
+  test('should throw error if function not found', () => {
     const abi = [
       {
         inputs: [
@@ -381,7 +382,7 @@ describe('parseFunctionFromABI() unit tests', () => {
 });
 
 describe('parseEventsFromABI() unit tests', () => {
-  it('should properly parse abi events from abi', () => {
+  test('should properly parse abi events from abi', () => {
     const abi = [
       {
         inputs: [
@@ -428,7 +429,7 @@ describe('parseEventsFromABI() unit tests', () => {
     // @ts-expect-error StrictNullChecks
     expect(abiEvents[0].inputs[0].type).to.equal('address');
   });
-  it('should return empty array if no events are found', () => {
+  test('should return empty array if no events are found', () => {
     const abi = [
       {
         inputs: [
@@ -468,7 +469,7 @@ describe('parseEventsFromABI() unit tests', () => {
 });
 
 describe('parseEventFromABI() unit tests', () => {
-  it('should properly parse withdraw event from abi', () => {
+  test('should properly parse withdraw event from abi', () => {
     const abi = [
       {
         inputs: [
@@ -533,7 +534,7 @@ describe('parseEventFromABI() unit tests', () => {
     expect(abiEvent.inputs[0].type).to.equal('address');
   });
 
-  it('should throw error if event not found', () => {
+  test('should throw error if event not found', () => {
     const abi = [
       {
         inputs: [

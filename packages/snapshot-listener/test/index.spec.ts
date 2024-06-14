@@ -2,12 +2,13 @@ import { models, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
+import { afterEach, beforeAll, describe, test } from 'vitest';
 import { app } from '../src';
 
 chai.use(chaiHttp);
 
-describe('Snapshot Listener API', () => {
-  before(async () => {
+describe('Snapshot Listener API', { timeout: 5_000 }, () => {
+  beforeAll(async () => {
     await tester.bootstrap_testing(true);
     const [chainNode] = await tester.seed(
       'ChainNode',
@@ -29,7 +30,7 @@ describe('Snapshot Listener API', () => {
     });
   });
 
-  afterEach('Clean outbox', async () => {
+  afterEach(async () => {
     await models.Outbox.truncate();
   });
 
@@ -46,13 +47,13 @@ describe('Snapshot Listener API', () => {
     secret: 'a88a91630b95e5e7ae9cd8610aff862d2b70383926b7236c973eedec46e0de65',
   };
 
-  it('/ should return OK', async () => {
+  test('/ should return OK', async () => {
     const res = await chai.request(app).get('/');
     expect(res).to.have.status(200);
     expect(res.text).to.equal('OK!');
   });
 
-  it('/snapshot should return 200 when valid JSON is sent', async () => {
+  test('/snapshot should return 200 when valid JSON is sent', async () => {
     const res = await chai
       .request(app)
       .post('/snapshot')
@@ -72,8 +73,8 @@ describe('Snapshot Listener API', () => {
     });
   });
 
-  it('/snapshot should return 400 with invalid data', async () => {
+  test('/snapshot should return 400 with invalid data', async () => {
     const res = await chai.request(app).post('/snapshot').send(undefined);
     expect(res).to.have.status(400);
   });
-}).timeout(5000);
+});

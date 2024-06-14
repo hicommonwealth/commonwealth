@@ -12,14 +12,14 @@ export const ContestManager = z
     image_url: z.string().optional(),
     funding_token_address: z
       .string()
-      .optional()
+      .nullish()
       .describe('Provided by admin on creation when stake funds are not used'),
     prize_percentage: z
       .number()
       .int()
       .min(0)
       .max(100)
-      .optional()
+      .nullish()
       .describe('Percentage of pool used for prizes in recurring contests'),
     payout_structure: z
       .array(z.number().int().min(0).max(100))
@@ -37,7 +37,7 @@ export const ContestManager = z
     created_at: z.date(),
     cancelled: z
       .boolean()
-      .optional()
+      .nullish()
       .describe('Flags when contest policy is cancelled by admin'),
     topics: z.array(Topic).optional(),
     contests: z.array(Contest).optional(),

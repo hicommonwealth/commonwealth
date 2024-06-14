@@ -1,21 +1,21 @@
-// import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { Daemons } from '../../src/daemon';
 
 describe('Daemon', () => {
   let clock: sinon.SinonFakeTimers;
 
-  before(function () {
+  beforeAll(function () {
     clock = sinon.useFakeTimers();
   });
 
-  after(function () {
+  afterAll(function () {
     clock.restore();
   });
 
   describe('startTask', () => {
-    it('should call fn immediately', () => {
+    test('should call fn immediately', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       daemons.startTask('test', fn, 60);
@@ -23,7 +23,7 @@ describe('Daemon', () => {
       daemons.cancelTask('test');
     });
 
-    it('should call fn every 60 seconds', () => {
+    test('should call fn every 60 seconds', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       daemons.startTask('test', fn, 60);
@@ -33,7 +33,7 @@ describe('Daemon', () => {
       daemons.cancelTask('test');
     });
 
-    it('should call async fn every 60 seconds', () => {
+    test('should call async fn every 60 seconds', () => {
       const daemons = new Daemons();
       const fn = sinon.spy(async () => {
         await Promise.resolve('abc');
@@ -45,7 +45,7 @@ describe('Daemon', () => {
       daemons.cancelTask('test');
     });
 
-    it('should not call fn if ms < 60*1000', () => {
+    test('should not call fn if ms < 60*1000', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       const jobId = daemons.startTask('test', fn, 59);
@@ -55,7 +55,7 @@ describe('Daemon', () => {
       expect(fn.calledTwice).to.be.false;
     });
 
-    it('should cancel old task if it exists', () => {
+    test('should cancel old task if it exists', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       const fn2 = sinon.spy();
@@ -83,7 +83,7 @@ describe('Daemon', () => {
       expect(daemons['tasks'].size).to.equal(0);
     });
 
-    it('call fn with binded this and params', () => {
+    test('call fn with binded this and params', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       const obj = { a: 1 };
@@ -98,7 +98,7 @@ describe('Daemon', () => {
       daemons.cancelTask('test');
     });
 
-    it('should not call fn if it throws error', () => {
+    test('should not call fn if it throws error', () => {
       const daemons = new Daemons();
       const fn = sinon.spy(() => {
         throw new Error('test');
@@ -113,7 +113,7 @@ describe('Daemon', () => {
       expect(fn.threw()).to.be.true;
     });
 
-    it('should cancel fn if it throws error', () => {
+    test('should cancel fn if it throws error', () => {
       const daemons = new Daemons();
       let timesCalled = 0;
       const fn = sinon.spy(() => {
@@ -141,7 +141,7 @@ describe('Daemon', () => {
   });
 
   describe('cancelTask', () => {
-    it('should cancel task', () => {
+    test('should cancel task', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       daemons.startTask('test', fn, 120);
@@ -152,7 +152,7 @@ describe('Daemon', () => {
       expect(daemons['tasks'].size).to.equal(0);
     });
 
-    it('should not cancel task if it does not exist', () => {
+    test('should not cancel task if it does not exist', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       daemons.startTask('test', fn, 60);
@@ -163,7 +163,7 @@ describe('Daemon', () => {
       expect(daemons['tasks'].size).to.equal(1);
     });
 
-    it('task cancel from outside, should not throw error', () => {
+    test('task cancel from outside, should not throw error', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       const jobId = daemons.startTask('test', fn, 60);
@@ -181,7 +181,7 @@ describe('Daemon', () => {
   });
 
   describe('backgroundJob', () => {
-    it('should not accept to run jobs more often than 1 minute', () => {
+    test('should not accept to run jobs more often than 1 minute', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       const jobId = daemons.backgroundJob('test', fn, 59 * 1000);
@@ -189,7 +189,7 @@ describe('Daemon', () => {
       clearInterval(jobId!);
     });
 
-    it('should accept to run jobs more often than 1 minute', () => {
+    test('should accept to run jobs more often than 1 minute', () => {
       const daemons = new Daemons();
       const fn = sinon.spy();
       const jobId = daemons.backgroundJob('test', fn, 60 * 1000);
@@ -197,7 +197,7 @@ describe('Daemon', () => {
       clearInterval(jobId!);
     });
 
-    it('should clear interval, if fn throw error', () => {
+    test('should clear interval, if fn throw error', () => {
       const daemons = new Daemons();
       const fn = sinon.spy(() => {
         throw new Error('test');

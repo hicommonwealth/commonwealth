@@ -293,73 +293,51 @@ Open considerations:
   - See e.g. [test-select](#test-select)
 - Any test scripts we remove, we should ensure their respective invocations in `CI.yml` are replaced with appropriate definitions.
 
-### integration-test
-
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha  './test/integration/**/*.spec.ts'`
-
-Description: Runs all tests in our integration folder and its subdirectories.
-
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested. We should also keep an eye on similar integration-scoped test scripts; there may be redundancies.
-
 ### test
 
-See `unit-test`.
+See `test-unit`.
 
 ### test-api
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha --allow-uncaught './test/integration/api/**/*.spec.ts'`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration/api`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-### test-devnet
+### test-integration
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/devnet/**/*.spec.ts`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration`
 
-Description: Runs all tests in our `/devnet` folder. If `cosmos` is given as the first argument then run only the tests in `./test/devnet/cosmos/**/*.spec.ts`. If `evm` is given as the first argument then run only the tests in `./test/devnet/evm/**/*.spec.ts`.
+Description: Runs all tests in the /test/integration folder (includes API tests).
 
-### test-integration-util
+### test-devnet:evm
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha ./test/integration/*.spec.ts`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/evm`
 
-Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
+Description: Runs all tests in our `/devnet/evm` folder.
 
-Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
+### test-devnet:cosmos
 
-Contributor: Timothee Legros
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/cosmos`
+
+Description: Runs all tests in our `/devnet/cosmos` folder.
 
 ### test-select
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run`
 
 Description: Append a path to run specific test files or folders.
 
-### test-suite
+### test-unit
 
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/**/*.spec.ts'`
-
-Description: Runs all tests in our /test directory.
-
-Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions? **Flagged for possible removal.**
-
-### unit-test
-
-Definition: `NODE_OPTIONS='--import tsx/esm' NODE_ENV=test mocha './test/unit/seed_hack.spec.ts' && NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true mocha './test/unit/**/*.spec.ts'`
+Definition: `NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ../../vite.config.ts run test/unit`
 
 Description: Tests all .spec files within the `./test/unit` sub-directory of test folder.
 
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
+### test-select:watch
 
-Contributor: Ryan Bennett
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false`
 
-### unit-test:watch
-
-Definition: `NODE_OPTIONS='--import tsx/esm --experimental-loader esm-loader-css' NODE_ENV=test mocha --timeout 10000 './test/unit/**/*.spec.ts' --watch-files '**/*.ts'`
-
-Description: Watches for changes to any .spec files within `./test/unit` and automatically runs test when they are updated.
-
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
-
-Contributor: Ryan Bennett
+Description: Watches for changes to any .spec files within the given path and automatically runs test when they are updated.
 
 ## TypeScript
 

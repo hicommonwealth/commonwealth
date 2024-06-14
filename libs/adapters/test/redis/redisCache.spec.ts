@@ -4,6 +4,7 @@
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { RedisCache } from '../../src';
 const expect = chai.expect;
 
@@ -41,13 +42,13 @@ export async function testExpiry(test_namespace: CacheNamespaces) {
 describe('RedisCache', () => {
   const test_namespace: CacheNamespaces = CacheNamespaces.Test_Redis;
 
-  before(async () => {
+  beforeAll(async () => {
     cache(new RedisCache('redis://localhost:6379'));
     await cache().ready();
     await cache().deleteNamespaceKeys(test_namespace);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -55,7 +56,7 @@ describe('RedisCache', () => {
     await cache().deleteNamespaceKeys(test_namespace);
   });
 
-  it('should set and get a key with namespace', async () => {
+  test('should set and get a key with namespace', async () => {
     const random = Math.random();
     const key = `testKey${random}`;
     const value = `testValue${random}`;
@@ -64,17 +65,17 @@ describe('RedisCache', () => {
     expect(result).to.equal(value);
   });
 
-  it('test key expiry', async () => {
+  test('test key expiry', { timeout: 5_000 }, async () => {
     await testExpiry(test_namespace);
-  }).timeout(5000);
+  });
 
-  it('should get multiple keys with namespace', async () => {
+  test('should get multiple keys with namespace', async () => {
     const data = await addRandomKeys(test_namespace);
     const result = await cache().getNamespaceKeys(test_namespace);
     expect(result).to.deep.equal(data);
   });
 
-  it('should delete multiple keys with namespace', async () => {
+  test('should delete multiple keys with namespace', async () => {
     await addRandomKeys(test_namespace);
     const records = await cache().deleteNamespaceKeys(test_namespace);
     expect(records).to.equal(3);

@@ -1,16 +1,15 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   createAsyncWriterMock,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '../../src';
 
-describe('createSitemapGenerator', function () {
-  this.timeout(10000);
-
-  before(async () => {
+describe('createSitemapGenerator', { timeout: 10_000 }, function () {
+  beforeAll(async () => {
     const [user] = await tester.seed('User', {
       isAdmin: true,
     });
@@ -76,11 +75,11 @@ describe('createSitemapGenerator', function () {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  xit('basic', async () => {
+  test.skip('basic', async () => {
     const writer = createAsyncWriterMock();
     const paginator = createDatabasePaginatorDefault(50);
 

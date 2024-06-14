@@ -108,7 +108,7 @@ const processAddress = async (
         email: null,
       });
       addressInstance.profile_id = // @ts-expect-error StrictNullChecks
-      (newUser.Profiles[0] as ProfileAttributes).id;
+        (newUser.Profiles[0] as ProfileAttributes).id;
       await models.Subscription.create({
         // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,

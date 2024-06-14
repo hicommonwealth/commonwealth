@@ -1,6 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { AddressInstance, models } from '@hicommonwealth/model';
 import chai from 'chai';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import getAddressProfiles, {
   GetAddressProfileReq,
@@ -10,15 +11,15 @@ import { postReq, res } from '../../unit/unitHelpers';
 describe('getAddressProfile tests', () => {
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should return profile of a single address', async () => {
+  test('should return profile of a single address', async () => {
     const r: GetAddressProfileReq = {
       communities: [server.e2eTestEntities.testAddresses[0].community_id],
       addresses: [server.e2eTestEntities.testAddresses[0].address],
@@ -42,7 +43,7 @@ describe('getAddressProfile tests', () => {
     );
   });
 
-  it('should return profile of multiple addresses of the same profile', async () => {
+  test('should return profile of multiple addresses of the same profile', async () => {
     chai.assert.equal(
       server.e2eTestEntities.testAddresses[0].profile_id,
       server.e2eTestEntities.testAddresses[1].profile_id,
@@ -84,7 +85,7 @@ describe('getAddressProfile tests', () => {
     );
   });
 
-  it('should return profiles of multiple addresses of the different profiles', async () => {
+  test('should return profiles of multiple addresses of the different profiles', async () => {
     chai.assert.equal(
       server.e2eTestEntities.testAddresses[0].profile_id,
       server.e2eTestEntities.testAddresses[1].profile_id,

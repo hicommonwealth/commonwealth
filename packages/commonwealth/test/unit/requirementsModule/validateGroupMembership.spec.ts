@@ -2,6 +2,7 @@ import { OptionsWithBalances } from '@hicommonwealth/model';
 import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import validateGroupMembership from 'server/util/requirementsModule/validateGroupMembership';
+import { describe, test } from 'vitest';
 
 type MockRequirementOptions = {
   threshold: string;
@@ -48,7 +49,7 @@ function createMockThresholdRequirements(
 }
 
 describe('validateGroupMembership', () => {
-  it('erc20 check', async () => {
+  test('erc20 check', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '1',
@@ -85,7 +86,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(1);
   });
 
-  it('erc721 check', async () => {
+  test('erc721 check', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '1',
@@ -122,7 +123,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(1);
   });
 
-  it('eth native check', async () => {
+  test('eth native check', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '1',
@@ -158,7 +159,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(1);
   });
 
-  it('cosmos native check', async () => {
+  test('cosmos native check', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '1',
@@ -194,7 +195,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(1);
   });
 
-  it('should fail if 0 of 3 requirements met with 3 required', async () => {
+  test('should fail if 0 of 3 requirements met with 3 required', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '5',
@@ -269,7 +270,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(0);
   });
 
-  it('should succeed if 2 of 3 requirements met with 2 required', async () => {
+  test('should succeed if 2 of 3 requirements met with 2 required', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '5',
@@ -344,7 +345,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(2);
   });
 
-  it('should fail if 2 of 3 requirements met with no num requirements set', async () => {
+  test('should fail if 2 of 3 requirements met with no num requirements set', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '5',
@@ -417,7 +418,7 @@ describe('validateGroupMembership', () => {
     expect(result.isValid).to.be.false;
   });
 
-  it('should succeed if 3 of 3 requirements met with no num requirements set', async () => {
+  test('should succeed if 3 of 3 requirements met with no num requirements set', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '5',
@@ -492,7 +493,7 @@ describe('validateGroupMembership', () => {
     expect(result.numRequirementsMet).to.equal(3);
   });
 
-  it('should fail if balances are equal to threshold', async () => {
+  test('should fail if balances are equal to threshold', async () => {
     const requirements = createMockThresholdRequirements([
       {
         threshold: '5',

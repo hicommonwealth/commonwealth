@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
+import { describe, test } from 'vitest';
 
 const encode = (input: { ops: any }): string =>
   encodeURIComponent(JSON.stringify(input));
@@ -8,7 +9,7 @@ const decode = (input: string): { ops: any } =>
   JSON.parse(decodeURIComponent(input));
 
 describe('sanitizeQuillText', () => {
-  it('should sanitize text with invalid video embed (not whitelisted)', () => {
+  test('should sanitize text with invalid video embed (not whitelisted)', () => {
     const input = {
       ops: [
         { attributes: { list: 'bullet' }, insert: '\\n' },
@@ -46,7 +47,7 @@ describe('sanitizeQuillText', () => {
     );
   });
 
-  it('should sanitize text with invalid video embed (invalid URL)', () => {
+  test('should sanitize text with invalid video embed (invalid URL)', () => {
     const input = {
       ops: [
         {
@@ -72,7 +73,7 @@ describe('sanitizeQuillText', () => {
     );
   });
 
-  it('should sanitize text with valid youtube video embed', () => {
+  test('should sanitize text with valid youtube video embed', () => {
     const input = {
       ops: [
         {
@@ -97,7 +98,7 @@ describe('sanitizeQuillText', () => {
     );
   });
 
-  it('should sanitize text with valid vimeo video embed', () => {
+  test('should sanitize text with valid vimeo video embed', () => {
     const input = {
       ops: [
         {

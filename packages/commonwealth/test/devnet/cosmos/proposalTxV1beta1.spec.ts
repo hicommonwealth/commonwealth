@@ -18,6 +18,7 @@ import {
   ProposalStatus,
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   deposit,
   sendTx,
@@ -34,7 +35,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
   const betaId = 'csdk-beta-local';
   const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
 
-  before(async () => {
+  beforeAll(async () => {
     await tester.seedDb();
     const tm = await getTMClient(rpcUrlBeta);
     rpc = await getRPCClient(tm);
@@ -42,7 +43,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
     signer = signerAddress;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -107,26 +108,26 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
   };
 
   describe('Direct signer', () => {
-    it('creates a text proposal', async () => {
+    test('creates a text proposal', async () => {
       const content = encodeTextProposal(
         `beta text title`,
         `beta text description`,
       );
       await proposalTest(content, 'Text');
     });
-    it('votes NO on an active proposal', async () => {
+    test('votes NO on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO);
     });
-    it('votes NO WITH VETO on an active proposal', async () => {
+    test('votes NO WITH VETO on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO_WITH_VETO);
     });
-    it('votes ABSTAIN on an active proposal', async () => {
+    test('votes ABSTAIN on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_ABSTAIN);
     });
-    it('votes YES on an active proposal', async () => {
+    test('votes YES on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_YES);
     });
-    it('creates a community spend proposal', async () => {
+    test('creates a community spend proposal', async () => {
       await waitOneBlock(rpcUrlBeta);
       const content = encodeCommunitySpend(
         `beta spend title`,
@@ -140,7 +141,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
   });
 
   describe('Amino signing', () => {
-    it('creates a text proposal with legacy amino', async () => {
+    test('creates a text proposal with legacy amino', async () => {
       await waitOneBlock(rpcUrlBeta);
       const content = encodeTextProposal(
         `beta text title`,
@@ -148,19 +149,19 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
       );
       await proposalTest(content, 'Text', true);
     });
-    it('votes NO on an active proposal with legacy amino', async () => {
+    test('votes NO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO, true);
     });
-    it('votes NO WITH VETO on an active proposal with legacy amino', async () => {
+    test('votes NO WITH VETO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO_WITH_VETO, true);
     });
-    it('votes ABSTAIN on an active proposal with legacy amino', async () => {
+    test('votes ABSTAIN on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_ABSTAIN, true);
     });
-    it('votes YES on an active proposal with legacy amino', async () => {
+    test('votes YES on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_YES, true);
     });
-    it('creates a community spend proposal with legacy amino', async () => {
+    test('creates a community spend proposal with legacy amino', async () => {
       await waitOneBlock(rpcUrlBeta);
       const content = encodeCommunitySpend(
         `beta spend title amino`,
@@ -175,16 +176,16 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
 });
 
 describe('Cosmos Governance v1beta1 util Tests', () => {
-  before(async () => {
+  beforeAll(async () => {
     await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('getActiveProposals', () => {
-    it('should fetch active proposals (csdk-beta-local)', async () => {
+    test('should fetch active proposals (csdk-beta-local)', async () => {
       const id = 'csdk-beta-local'; // CI devnet for v1beta1
       const tmClient = await getTMClient(
         `http://localhost:8080/cosmosAPI/${id}`,

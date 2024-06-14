@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
   "files": [],
   "references": [
     { "path": "libs/adapters/tsconfig.build.json" },

@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
@@ -28,7 +29,7 @@ class NamespaceFactory extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     const addr = await this.contract.methods.reservationHook().call();
-    if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
+    if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
         reservationHookAbi as AbiItem[],
         addr,
@@ -63,7 +64,7 @@ class NamespaceFactory extends ContractBase {
       await this.initialize();
     }
     const activeNamespace = await this.getNamespaceAddress(name);
-    if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
+    if (activeNamespace !== ZERO_ADDRESS) {
       return false;
     }
     if (this.reservationHook) {
@@ -139,7 +140,7 @@ class NamespaceFactory extends ContractBase {
           name,
           name + ' Community Stake',
           stakesId,
-          '0x0000000000000000000000000000000000000000',
+          ZERO_ADDRESS,
           2000000,
           0,
         )

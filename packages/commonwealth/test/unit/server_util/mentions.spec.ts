@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { describe, test } from 'vitest';
 import {
   findMentionDiff,
   parseUserMentions,
@@ -6,7 +7,7 @@ import {
 } from '../../../server/util/parseUserMentions';
 
 describe('User mention utils', () => {
-  it('parseUserMentions', () => {
+  test('parseUserMentions', () => {
     let userMentions = parseUserMentions('[@user](/profile/id/10)');
     expect(userMentions).deep.equal([{ profileId: '10', profileName: 'user' }]);
 
@@ -52,7 +53,7 @@ describe('User mention utils', () => {
     expect(userMentions).deep.equal([]);
   });
 
-  it('findMentionDiff', () => {
+  test('findMentionDiff', () => {
     const userMentionsBefore = [{ profileId: '10', profileName: 'user' }];
     const newUserMention = { profileId: '11', profileName: 'user2' };
     const mentionDiff = findMentionDiff(userMentionsBefore, [
@@ -63,7 +64,7 @@ describe('User mention utils', () => {
     expect(mentionDiff).deep.equal([newUserMention]);
   });
 
-  it('uniqueMentions', () => {
+  test('uniqueMentions', () => {
     const userMentions = [{ profileId: '10', profileName: 'user' }];
 
     expect(

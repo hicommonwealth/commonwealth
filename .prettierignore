@@ -3,7 +3,6 @@
 **/.github
 **/*.env
 **/node_modules
-**/.mocharc.json
 **/.nyc_output
 **/.nycrc
 **/.stylelintrc

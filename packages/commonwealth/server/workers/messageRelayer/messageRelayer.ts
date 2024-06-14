@@ -53,10 +53,17 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
   });
   incrementNumUnrelayedEvents(count);
 
-  await setupListener();
+  const pgClient = await setupListener();
 
   isServiceHealthy = true;
-  return relayForever(maxRelayIterations);
+  relayForever(maxRelayIterations).catch((err) => {
+    log.fatal(
+      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
+      err,
+    );
+  });
+
+  return pgClient;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

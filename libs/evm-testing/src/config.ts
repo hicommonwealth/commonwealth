@@ -32,6 +32,7 @@ export const config = configure(
       PROVIDER_URL: z.string(),
       ETH_ALCHEMY_API_KEY: z.string().optional(),
       ETHERSCAN_JS_API_KEY: z.string().optional(),
+      BASESEP_ALCHEMY_API_KEY: z.string().optional(),
     }),
     COSMOS: z.object({
       COSMOS_GOV_V1_CHAIN_IDS: z.array(z.string()),
