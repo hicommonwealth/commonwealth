@@ -38,7 +38,7 @@ const verifySessionSignature = async (
       isValid = true;
     }
   } catch (e) {
-    console.log(e);
+    log.error(e);
   }
 
   addressModel.last_active = new Date();
