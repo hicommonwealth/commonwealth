@@ -102,9 +102,9 @@ const updateNewProfile = async (
       name !== DEFAULT_NAME &&
       isProfileNameUnset &&
       req.user &&
-      !req.user.isWelcomeOnboardFlowComplete
+      !req.user.is_welcome_onboard_flow_complete
     ) {
-      req.user.isWelcomeOnboardFlowComplete = true;
+      req.user.is_welcome_onboard_flow_complete = true;
       await req.user.save();
     }
   }

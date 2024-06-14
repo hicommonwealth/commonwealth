@@ -266,7 +266,9 @@ export function updateActiveUser(data) {
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
     app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
-    app.user.setIsWelcomeOnboardFlowComplete(data.isWelcomeOnboardFlowComplete);
+    app.user.setIsWelcomeOnboardFlowComplete(
+      data.is_welcome_onboard_flow_complete,
+    );
     app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 

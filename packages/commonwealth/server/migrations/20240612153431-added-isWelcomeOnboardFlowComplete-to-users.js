@@ -6,7 +6,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'Users',
-        'isWelcomeOnboardFlowComplete',
+        'is_welcome_onboard_flow_complete',
         {
           type: Sequelize.BOOLEAN,
           defaultValue: true, // true for all existing users
@@ -21,7 +21,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn(
         'Users',
-        'isWelcomeOnboardFlowComplete',
+        'is_welcome_onboard_flow_complete',
         {
           transaction: t,
         },
