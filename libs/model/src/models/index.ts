@@ -63,7 +63,6 @@ export * from './lastProcessedEvmBlock';
 export * from './login_token';
 export * from './membership';
 export * from './notification_category';
-export * from './notifications_read';
 export * from './outbox';
 export * from './poll';
 export * from './profile';

@@ -29,7 +29,6 @@ import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LoginToken from './login_token';
 import Membership from './membership';
 import NotificationCategory from './notification_category';
-import NotificationsRead from './notifications_read';
 import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
@@ -78,7 +77,6 @@ export const Factories = {
   LoginToken,
   Membership,
   NotificationCategory,
-  NotificationsRead,
   Outbox,
   Poll,
   Profile,

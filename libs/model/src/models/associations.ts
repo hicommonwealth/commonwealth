@@ -7,7 +7,6 @@ export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.Profile, { onUpdate: 'CASCADE' })
     .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
-    .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',

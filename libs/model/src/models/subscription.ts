@@ -6,10 +6,6 @@ import Sequelize from 'sequelize';
 import type { CommentAttributes } from './comment';
 import type { CommunityAttributes } from './community';
 import type { NotificationCategoryAttributes } from './notification_category';
-import type {
-  NotificationsReadAttributes,
-  NotificationsReadInstance,
-} from './notifications_read';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 import type { UserAttributes } from './user';
@@ -37,14 +33,12 @@ export type SubscriptionAttributes = {
 
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
-  NotificationsRead?: NotificationsReadAttributes[];
   Community?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
-  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
   emitNotification?: EmitNotification<SubscriptionInstance>;
 };
 
