@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import app from 'state';
 import {
   useCreateContestMutation,
@@ -78,7 +78,7 @@ const SignTransactionsStep = ({
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = app.user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
-      ? contestFormData?.fundingTokenAddress
+      ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
 

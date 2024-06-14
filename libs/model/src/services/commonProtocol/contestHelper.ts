@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -266,7 +267,7 @@ export const getContestBalance = async (
       feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
     );
   }
-  if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
+  if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
         return Number(v);

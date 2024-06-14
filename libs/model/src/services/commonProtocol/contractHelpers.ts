@@ -1,8 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
-import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  commonProtocol,
+  ZERO_ADDRESS,
+} from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
+import { Balances, getBalances, TokenAttributes } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
 
 export const getNamespace = async (
@@ -93,7 +97,7 @@ export const getTokenAttributes = async (
   );
   const contestToken: string = await contest.methods.contestToken().call();
 
-  if (contestToken === '0x0000000000000000000000000000000000000000') {
+  if (contestToken === ZERO_ADDRESS) {
     return Promise.resolve({
       ticker: commonProtocol.Denominations.ETH,
       decimals: commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
