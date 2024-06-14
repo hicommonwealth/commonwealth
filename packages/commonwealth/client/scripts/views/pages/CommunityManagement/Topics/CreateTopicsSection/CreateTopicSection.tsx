@@ -109,7 +109,7 @@ export const CreateTopicSection = () => {
           />
           <div className="description-char-count">
             <CWText type="caption">
-              {descriptionDelta.ops?.[0].insert.length} / 250
+              {descriptionDelta?.ops?.[0].insert.length / 250 || 0}
             </CWText>
           </div>
           <CWText type="caption">
