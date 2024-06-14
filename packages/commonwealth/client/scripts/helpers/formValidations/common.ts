@@ -1,9 +1,17 @@
 import { z } from 'zod';
 import { VALIDATION_MESSAGES } from './messages';
 
-export const linkValidationSchema = z.string().url({
-  message: VALIDATION_MESSAGES.INVALID_INPUT,
-});
+export const linkValidationSchema = {
+  required: z.string().url({
+    message: VALIDATION_MESSAGES.INVALID_INPUT,
+  }),
+  optional: z.union([
+    z.literal(''),
+    z.string().url({
+      message: VALIDATION_MESSAGES.INVALID_INPUT,
+    }),
+  ]),
+};
 
 export const emailValidationSchema = z.union([
   z.literal(''),

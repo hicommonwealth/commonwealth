@@ -67,7 +67,7 @@ const EditProfile = () => {
     setLinks,
   } = useLinksArray({
     initialLinks: [],
-    linkValidation: linkValidationSchema,
+    linkValidation: linkValidationSchema.optional,
   });
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
@@ -201,7 +201,6 @@ const EditProfile = () => {
   if (!error && profile) {
     const handleSubmit = (values: z.infer<typeof editProfileValidation>) => {
       if (links.filter((x) => x.value).length > 0 ? !areLinksValid() : false) {
-        // TODO: fix empty link condition
         return;
       }
 
@@ -216,7 +215,11 @@ const EditProfile = () => {
         name: values.username.trim(),
         ...(backgroundImage && { backgroundImage }),
         email: values.email.trim(),
-        socials: JSON.stringify((links || []).map((link) => link.value.trim())),
+        socials: JSON.stringify(
+          (links || [])
+            .filter((link) => link.value.trim())
+            .map((link) => link.value.trim()),
+        ),
         bio: serializeDelta(values.bio),
         tagIds: preferenceTags
           .filter((tag) => tag.isSelected)

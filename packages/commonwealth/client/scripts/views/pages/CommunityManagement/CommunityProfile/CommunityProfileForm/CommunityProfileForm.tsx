@@ -138,7 +138,7 @@ const CommunityProfileForm = () => {
     areLinksValid,
   } = useLinksArray({
     initialLinks: initialLinks,
-    linkValidation: linkValidationSchema,
+    linkValidation: linkValidationSchema.required,
   });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();

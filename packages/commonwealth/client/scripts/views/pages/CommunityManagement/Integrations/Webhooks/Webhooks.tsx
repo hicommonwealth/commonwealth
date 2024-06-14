@@ -37,7 +37,7 @@ const Webhooks = () => {
     areLinksValid,
   } = useLinksArray({
     initialLinks: [],
-    linkValidation: linkValidationSchema,
+    linkValidation: linkValidationSchema.required,
   });
 
   const { mutateAsync: createWebhook, isLoading: isCreatingWebhook } =

@@ -22,7 +22,7 @@ const CustomTOS = () => {
 
     if (value) {
       try {
-        linkValidationSchema.parse(value);
+        linkValidationSchema.required.parse(value);
       } catch (e: any) {
         const zodError = e as ZodError;
         error = zodError.errors[0].message;
