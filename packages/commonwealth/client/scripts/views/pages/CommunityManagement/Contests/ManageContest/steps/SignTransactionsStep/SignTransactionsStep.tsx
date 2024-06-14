@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import app from 'state';
 import {
   useCreateContestMutation,
@@ -36,7 +36,6 @@ interface SignTransactionsStepProps {
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
 const FIVE_MINS_IN_SECONDS = 60 * 5;
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
