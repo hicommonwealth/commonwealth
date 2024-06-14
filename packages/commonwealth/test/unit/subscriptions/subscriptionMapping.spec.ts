@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { describe, test } from 'vitest';
 import { mapNotificationsDataToSubscriptions } from '../../../server/util/subscriptionMapping';
 
 chai.use(chaiHttp);
@@ -26,7 +27,7 @@ describe('Subscription Mapping Tests', () => {
       author_community_id: chain,
     };
 
-    it('should map a new thread notification to subscriptions', () => {
+    test('should map a new thread notification to subscriptions', () => {
       const notification: NotificationDataAndCategory = {
         categoryId: NotificationCategories.NewThread,
         data: {
@@ -41,7 +42,7 @@ describe('Subscription Mapping Tests', () => {
       });
     });
 
-    it('should map a new comment notification to subscriptions', () => {
+    test('should map a new comment notification to subscriptions', () => {
       const rootCommentNotif: NotificationDataAndCategory = {
         categoryId: NotificationCategories.NewComment,
         data: {
@@ -77,7 +78,7 @@ describe('Subscription Mapping Tests', () => {
       });
     });
 
-    it('should map a new reaction notification to subscriptions', () => {
+    test('should map a new reaction notification to subscriptions', () => {
       const threadReactionNotif: NotificationDataAndCategory = {
         categoryId: NotificationCategories.NewReaction,
         data: {
@@ -107,7 +108,7 @@ describe('Subscription Mapping Tests', () => {
       });
     });
 
-    it('should map a new mention notification to subscriptions', () => {
+    test('should map a new mention notification to subscriptions', () => {
       const userId = 1;
       const threadMentionNotif: NotificationDataAndCategory = {
         categoryId: NotificationCategories.NewMention,
@@ -141,7 +142,7 @@ describe('Subscription Mapping Tests', () => {
       });
     });
 
-    it('should map a new collaboration notification to subscriptions', () => {
+    test('should map a new collaboration notification to subscriptions', () => {
       const userId = 1;
       const threadCollabNotif: NotificationDataAndCategory = {
         categoryId: NotificationCategories.NewCollaboration,
@@ -159,7 +160,7 @@ describe('Subscription Mapping Tests', () => {
       });
     });
 
-    it('should map a chain event notification to subscriptions', () => {
+    test('should map a chain event notification to subscriptions', () => {
       const notification: NotificationDataAndCategory = {
         categoryId: NotificationCategories.ChainEvent,
         data: {
@@ -177,7 +178,7 @@ describe('Subscription Mapping Tests', () => {
       });
     });
 
-    it('should map a snapshot proposal notification to subscriptions', () => {
+    test('should map a snapshot proposal notification to subscriptions', () => {
       const snapshotSpace = 'test';
       const notification: NotificationDataAndCategory = {
         categoryId: NotificationCategories.SnapshotProposal,

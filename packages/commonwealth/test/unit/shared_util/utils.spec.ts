@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { describe, test } from 'vitest';
 import {
   bech32ToHex,
   minimalToNaturalDenom,
@@ -6,7 +7,7 @@ import {
 } from '../../../shared/utils';
 
 describe('shared utils unit tests', () => {
-  it('minimalToNaturalDenom() should convert large numbers in minimal format to natural denom format', () => {
+  test('minimalToNaturalDenom() should convert large numbers in minimal format to natural denom format', () => {
     const tests = [
       {
         input: '123456789012345678901234567890',
@@ -75,7 +76,7 @@ describe('shared utils unit tests', () => {
       expect(minimalToNaturalDenom(input, decimals)).to.equal(expected);
     });
   });
-  it('naturalDenomToMinimal() should convert large numbers in natural format to minimal denom format', () => {
+  test('naturalDenomToMinimal() should convert large numbers in natural format to minimal denom format', () => {
     const tests = [
       {
         input: '123456789012.345678901234567890',
@@ -126,13 +127,13 @@ describe('shared utils unit tests', () => {
       expect(naturalDenomToMinimal(input, decimals)).to.equal(expected);
     });
   });
-  it('bech32toHex should convert bech32 addresses to hex', async () => {
+  test('bech32toHex should convert bech32 addresses to hex', async () => {
     const address = 'osmo1g98znshl3dh49x402fj3tdwjj5ysf9f0akl8zf';
     const expectedHex = '414e29c2ff8b6f529aaf526515b5d2950904952f';
     const hex = await bech32ToHex(address);
     expect(hex).to.equal(expectedHex);
   });
-  it('bech32toHex should create same hex for sibling chain addresses', async () => {
+  test('bech32toHex should create same hex for sibling chain addresses', async () => {
     const address1 = 'osmo1g98znshl3dh49x402fj3tdwjj5ysf9f0akl8zf';
     const address2 = 'juno1g98znshl3dh49x402fj3tdwjj5ysf9f0rl0vn8';
     const expectedHex = '414e29c2ff8b6f529aaf526515b5d2950904952f';
@@ -141,7 +142,7 @@ describe('shared utils unit tests', () => {
     expect(hex1).to.equal(expectedHex);
     expect(hex2).to.equal(hex1);
   });
-  it(`bech32toHex should create same hex for sibling ethermint chain addresses, 
+  test(`bech32toHex should create same hex for sibling ethermint chain addresses, 
     but different from regular cosmos hex`, async () => {
     const ethermintAddress1 = 'evmos1f5hr3wk6vkd5lqvd70tqzrqp6w3qwgvd7nyd65';
     const ethermintAddress2 = 'inj1f5hr3wk6vkd5lqvd70tqzrqp6w3qwgvdkmz8jy';

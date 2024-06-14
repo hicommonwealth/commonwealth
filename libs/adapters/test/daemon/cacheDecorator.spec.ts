@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// import { describe, it, beforeEach, afterEach } from 'mocha';
 import { Cache, CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { Activity } from '../../src/daemon';
 import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
@@ -14,11 +14,11 @@ describe('CacheDecorator', () => {
   let cacheDecorator: CacheDecorator;
   let mockCache: sinon.SinonStubbedInstance<Cache>;
 
-  before(async () => {
+  beforeAll(async () => {
     cacheDecorator = new CacheDecorator();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -38,7 +38,7 @@ describe('CacheDecorator', () => {
         },
       ];
       keys.forEach((key) => {
-        it('should cache the function result and return it', async () => {
+        test('should cache the function result and return it', async () => {
           const fn = async () => 'test-result';
           const duration = 60;
 
@@ -58,7 +58,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.calledOnce).to.be.true;
         });
 
-        it('should return the cached result if it exists', async () => {
+        test('should return the cached result if it exists', async () => {
           const fn = async () => 'new-result';
           const key = 'test-key';
           const duration = 60;
@@ -79,7 +79,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.false;
         });
 
-        it('should call the function if redis cache not initialized', async () => {
+        test('should call the function if redis cache not initialized', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = 60;
@@ -100,7 +100,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.false;
         });
 
-        it('if override is true skip lookup and still set cache', async () => {
+        test('if override is true skip lookup and still set cache', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = 60;
@@ -121,7 +121,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.true;
         });
 
-        it('duration null skip caching', async () => {
+        test('duration null skip caching', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = null;
@@ -140,7 +140,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.false;
         });
 
-        it('duration 0 dont skip caching', async () => {
+        test('duration 0 dont skip caching', async () => {
           const fn = async () => 'test-result';
           const key = 'test-key';
           const duration = 0;
@@ -159,7 +159,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.true;
         });
 
-        it('result null skip caching', async () => {
+        test('result null skip caching', async () => {
           const fn = async () => null;
           const key = 'test-key';
           const duration = 60;
@@ -178,7 +178,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.false;
         });
 
-        it('response 0 from wrapped function allowed to get from cache', async () => {
+        test('response 0 from wrapped function allowed to get from cache', async () => {
           const fn = async () => 0;
           const key = 'test-key';
           const duration = 60;
@@ -198,7 +198,7 @@ describe('CacheDecorator', () => {
           expect(mockCache.setKey.called).to.be.false;
         });
 
-        it('response 0 from wrapped function allowed to set in cache', async () => {
+        test('response 0 from wrapped function allowed to set in cache', async () => {
           const fn = async () => 0;
           const key = 'test-key';
           const duration = 60;
@@ -219,7 +219,7 @@ describe('CacheDecorator', () => {
       });
 
       [null, () => null].forEach((key) => {
-        it('key null skip caching', async () => {
+        test('key null skip caching', async () => {
           const fn = async () => 'test-result';
           const duration = 60;
 
@@ -240,7 +240,7 @@ describe('CacheDecorator', () => {
     });
 
     describe('verify function returning CacheKeyDuration', () => {
-      it('key function if returns object with no cacheKey, skip caching', async () => {
+      test('key function if returns object with no cacheKey, skip caching', async () => {
         const fn = async () => 'test-result';
         const duration = 60;
         const keyfn = () => {
@@ -261,7 +261,7 @@ describe('CacheDecorator', () => {
         expect(mockCache.setKey.called).to.be.false;
       });
 
-      it('key function if returns object with only cacheKey, skip caching', async () => {
+      test('key function if returns object with only cacheKey, skip caching', async () => {
         const fn = async () => 'test-result';
         const duration = 60;
         const key = () => {
@@ -282,7 +282,7 @@ describe('CacheDecorator', () => {
         expect(mockCache.setKey.called).to.be.false;
       });
 
-      it('key function if returns object with cacheKey, cacheDuration do caching', async () => {
+      test('key function if returns object with cacheKey, cacheDuration do caching', async () => {
         const fn = async () => 'new-result';
         const duration = 60;
         const key = () => {
@@ -313,7 +313,7 @@ describe('CacheDecorator', () => {
         expect(mockCache.setKey.called).to.be.false;
       });
 
-      it('key function if returns object with cacheKey, cacheDuration do caching', async () => {
+      test('key function if returns object with cacheKey, cacheDuration do caching', async () => {
         const fn = async () => 'new-result';
         const duration = 60;
         const key = () => {
@@ -354,7 +354,7 @@ describe('CacheDecorator', () => {
     });
 
     describe('verify error handling', () => {
-      it('should run function if getKey throws error', async () => {
+      test('should run function if getKey throws error', async () => {
         const fn = sinon.stub().resolves('test-result');
         const duration = 60;
         const key = 'test-key';
@@ -377,7 +377,7 @@ describe('CacheDecorator', () => {
         expect(fn.calledOnce).to.be.true;
       });
 
-      it('should run function if setKey throws error', async () => {
+      test('should run function if setKey throws error', async () => {
         const fn = sinon.stub().resolves('test-result');
         const duration = 60;
         const key = 'test-key';
@@ -400,7 +400,7 @@ describe('CacheDecorator', () => {
         expect(fn.calledOnce).to.be.true;
       });
 
-      it('if function throws error, dont run function again', async () => {
+      test('if function throws error, dont run function again', async () => {
         const err = new Error('test-error');
         const fn = sinon.stub().rejects(err); //() => {throw err};
         const duration = 60;
@@ -448,7 +448,7 @@ describe('CacheDecorator', () => {
 
       const keyGenerator3 = 'test-key';
 
-      it('should cache the function result and return it', async () => {
+      test('should cache the function result and return it', async () => {
         mockCache.getKey.resolves(undefined);
         mockCache.setKey.resolves(true);
 
@@ -481,7 +481,7 @@ describe('CacheDecorator', () => {
         ).to.be.true;
       });
 
-      it('should return the cached result if it exists', async () => {
+      test('should return the cached result if it exists', async () => {
         mockCache.getKey.resolves(JSON.stringify(8));
         mockCache.setKey.resolves(true);
 
@@ -506,7 +506,7 @@ describe('CacheDecorator', () => {
         expect(mockCache.setKey.called).to.be.false;
       });
 
-      it('should not lookup cache, and override the cache', async () => {
+      test('should not lookup cache, and override the cache', async () => {
         mockCache.setKey.resolves(true);
 
         const activityWrapper = new Activity(
