@@ -6,10 +6,10 @@ import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { getSessionSignerForAddress } from 'shared/canvas/verify';
 
-import type {
-  AddressInstance,
-  DB,
-  ProfileAttributes,
+import {
+  type AddressInstance,
+  type DB,
+  type ProfileAttributes,
 } from '@hicommonwealth/model';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 

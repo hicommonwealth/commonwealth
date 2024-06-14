@@ -20,11 +20,9 @@ import { CANVAS_TOPIC } from 'shared/canvas';
 import { serializeCanvas } from 'shared/canvas/types';
 
 import axios from 'axios';
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
-import moment from 'moment';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -263,6 +261,7 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(null);
     // @ts-expect-error StrictNullChecks
     app.user.setPromotionalEmailsEnabled(null);
+    app.user.setIsWelcomeOnboardFlowComplete(false);
     // @ts-expect-error StrictNullChecks
     app.user.setKnockJWT(null);
     // @ts-expect-error StrictNullChecks
@@ -282,6 +281,9 @@ export function updateActiveUser(data) {
     app.user.setEmailInterval(data.emailInterval);
     app.user.setEmailVerified(data.emailVerified);
     app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
+    app.user.setIsWelcomeOnboardFlowComplete(
+      data.is_welcome_onboard_flow_complete,
+    );
     app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 
@@ -609,11 +611,7 @@ export async function handleSocialLoginCallback({
     }
 
     if (userOnboardingEnabled) {
-      const {
-        created_at: accountCreatedTime,
-        Profiles: profiles,
-        email: ssoEmail,
-      } = response.data.result;
+      const { Profiles: profiles, email: ssoEmail } = response.data.result;
 
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
@@ -621,21 +619,10 @@ export async function handleSocialLoginCallback({
         await app.user.updateEmail(ssoEmail, false);
       }
 
-      const userUniqueAddresses = getUniqueUserAddresses({});
-
-      // if account is created in last few minutes and has a single
-      // profile and address (no account linking) then open the welcome modal.
+      // if account is newly created and user has not completed onboarding flow
+      // then open the welcome modal.
       const profileId = profiles?.[0]?.id;
-      const isCreatedInLast5Minutes =
-        accountCreatedTime &&
-        moment().diff(moment(accountCreatedTime), 'minutes') < 5;
-      if (
-        isCreatedInLast5Minutes &&
-        profiles?.length === 1 &&
-        userUniqueAddresses.length === 1 &&
-        profileId &&
-        !welcomeOnboardModal?.getState?.()?.onboardedProfiles?.[profileId]
-      ) {
+      if (profileId && !app.user.isWelcomeOnboardFlowComplete) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
         }, 1000);

@@ -1,6 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { bootstrap_testing, seed } from 'model/src/tester';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { models } from '../../src/database';
 
 describe('Reactions lifecycle', () => {
@@ -8,7 +9,7 @@ describe('Reactions lifecycle', () => {
   const communityId = 'eee';
   const threadId = 999;
 
-  before(async () => {
+  beforeAll(async () => {
     await bootstrap_testing();
     const [chain] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
@@ -56,11 +57,11 @@ describe('Reactions lifecycle', () => {
       //{ mock: true, log: true },
     );
   });
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should create an outbox entry when a thread is liked', async () => {
+  test('should create an outbox entry when a thread is liked', async () => {
     await models.Reaction.create({
       community_id: communityId,
       address_id: addressId,
