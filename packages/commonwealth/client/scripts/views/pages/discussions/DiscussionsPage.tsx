@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -27,8 +27,10 @@ import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { generateBreadcrumbs } from '../../../../scripts/views/components/Breadcrumbs/utils';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -69,17 +71,68 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
+  const getThreadId = location.pathname.match(/\/(\d+)-/);
+
+  const { data: linkedThreads } = useGetThreadsByIdQuery({
+    communityId: app.activeChainId(),
+    // @ts-expect-error StrictNullChecks
+    ids: [getThreadId && Number(getThreadId[1])],
+    apiCallEnabled:
+      // Only call when in discussion pages prevents unnecessary calls.
+      location.pathname.split('/')[1].toLowerCase() === 'discussion',
+  });
+
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
+  const user = app?.user?.addresses?.[0];
+  // @ts-expect-error StrictNullChecks
+  const profileId = user?.profileId || user?.profile.id;
+
+  const currentDiscussion = {
+    currentThreadName: linkedThreads?.[0]?.title,
+    currentTopic: linkedThreads?.[0]?.topic.name,
+    // @ts-expect-error StrictNullChecks
+    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
+  };
+
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
+
+  const pathnames = generateBreadcrumbs(
+    location.pathname,
+    profileId,
+    navigate,
+    // @ts-expect-error StrictNullChecks
+    app.isCustomDomain() ? app.activeChainId() : undefined,
+    currentDiscussion,
+  );
+
+  //redirects users to discussions if they try to access a topic that doesn't exist
+  useEffect(() => {
+    if (
+      topics &&
+      pathnames &&
+      topics.length > 0 &&
+      pathnames.length > 0 &&
+      pathnames[0].label === 'Discussions' &&
+      pathnames[1].label !== 'Overview' &&
+      pathnames[1].label !== 'archived'
+    ) {
+      const validTopics = topics.some(
+        (topic) => topic.name === pathnames[1].label,
+      );
+      if (!validTopics) {
+        navigate('/discussions');
+      }
+    }
+  }, [topics, pathnames, navigate]);
 
   const isOnArchivePage =
     location.pathname ===
@@ -202,9 +255,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
             <>
-              <Breadcrumbs topics={topics} />
+              <Breadcrumbs />
               {userOnboardingEnabled && <UserTrainingSlider />}
               <AdminOnboardingSlider />
+
               <HeaderWithFilters
                 // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}

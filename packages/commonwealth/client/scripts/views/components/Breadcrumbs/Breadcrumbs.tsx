@@ -1,20 +1,15 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import Topic from '../../../models/Topic';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
 import { breadCrumbURLS } from './data';
 import { generateBreadcrumbs } from './utils';
 
-type BreadcrumbsProps = {
-  topics?: Topic[];
-};
-
-export const Breadcrumbs = ({ topics }: BreadcrumbsProps) => {
+export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
 
@@ -69,25 +64,6 @@ export const Breadcrumbs = ({ topics }: BreadcrumbsProps) => {
     app.isCustomDomain() ? app.activeChainId() : undefined,
     currentDiscussion,
   );
-
-  useEffect(() => {
-    if (
-      topics &&
-      pathnames &&
-      topics.length > 0 &&
-      pathnames.length > 0 &&
-      pathnames[0].label === 'Discussions' &&
-      pathnames[1].label !== 'Overview' &&
-      pathnames[1].label !== 'archived'
-    ) {
-      const validTopics = topics.some(
-        (topic) => topic.name === pathnames[1].label,
-      );
-      if (!validTopics) {
-        navigate('/discussions');
-      }
-    }
-  }, [topics, pathnames, navigate]);
 
   //Gets the tooltip copy based on the current page.
   const getToolTipCopy = () => {
