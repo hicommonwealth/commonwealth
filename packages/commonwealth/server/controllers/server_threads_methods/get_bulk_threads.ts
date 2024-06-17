@@ -1,9 +1,10 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
-import type { ReactionType } from 'models/Reaction';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
+
+type ReactionType = 'like';
 
 export type GetBulkThreadsOptions = {
   communityId: string;

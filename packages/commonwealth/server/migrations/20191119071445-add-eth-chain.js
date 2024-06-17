@@ -24,7 +24,7 @@ module.exports = {
               active: true,
             },
           ],
-          { transaction: t }
+          { transaction: t },
         );
 
         await queryInterface.bulkInsert(
@@ -39,11 +39,11 @@ module.exports = {
               url: 'wss://mainnet.infura.io/ws',
             },
           ],
-          { transaction: t }
+          { transaction: t },
         );
       } catch (e) {
         console.log(
-          'Could not insert Ethereum nodes, maybe they already exist!'
+          'Could not insert Ethereum nodes, maybe they already exist!',
         );
       }
     });
@@ -63,7 +63,7 @@ module.exports = {
               },
             ],
           },
-          { transaction: t }
+          { transaction: t },
         );
 
         await queryInterface.bulkDelete(
@@ -78,7 +78,7 @@ module.exports = {
               },
             ],
           },
-          { transaction: t }
+          { transaction: t },
         );
       } catch (e) {
         console.log('Error removing ETH chain, skipped');

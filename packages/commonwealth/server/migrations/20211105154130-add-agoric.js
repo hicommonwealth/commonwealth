@@ -20,7 +20,7 @@ module.exports = {
             bech32_prefix: 'agoric',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -31,7 +31,7 @@ module.exports = {
             url: 'https://main.rpc.agoric.net:443/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -40,12 +40,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'agoric' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['agoric'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

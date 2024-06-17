@@ -1,3 +1,4 @@
+import commonUrl from 'assets/img/branding/common.svg';
 import { useAnimation } from 'hooks/useAnimation';
 import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
@@ -21,7 +22,7 @@ export const IOSPrompt = ({ hidePromptAction }: IOSPromptProps) => {
       <div className="prompt-content" style={animationStyles}>
         <div className="header">
           <div className="icon">
-            <img src="/static/img/branding/common.svg" alt="Commonwealth" />
+            <img src={commonUrl} alt="Commonwealth" />
           </div>
           <CWText className="title">Add to Home Screen</CWText>
         </div>
