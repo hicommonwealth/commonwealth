@@ -14,13 +14,17 @@ export function incrementNumUnrelayedEvents(numEvents: number) {
   stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
 }
 
+export function resetNumUnrelayedEvents() {
+  numUnrelayedEvents = 0;
+}
+
 export async function relayForever(maxIterations?: number) {
   const { models } = await import('@hicommonwealth/model');
   const brokerInstance = broker();
   let iteration = 0;
   let errorTimeout = INITIAL_ERROR_TIMEOUT;
   while (true) {
-    if (maxIterations && iteration >= maxIterations) {
+    if (typeof maxIterations === 'number' && iteration >= maxIterations) {
       break;
     }
 

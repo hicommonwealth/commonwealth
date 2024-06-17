@@ -5,6 +5,7 @@ import {
   ChainType,
   CosmosGovernanceVersion,
   NotificationCategories,
+  ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { bootstrap_testing } from './bootstrap';
 
@@ -26,11 +27,13 @@ export const seedDb = async () => {
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
+        is_welcome_onboard_flow_complete: true,
       },
       {
         email: 'temp@gmail.com',
         emailVerified: true,
         isAdmin: true,
+        is_welcome_onboard_flow_complete: true,
       },
     ]);
 
@@ -238,7 +241,7 @@ export const seedDb = async () => {
         has_chain_events_listener: false,
         chain_node_id: 1263,
         namespace: 'IanSpace',
-        namespace_address: '0x0000000000000000000000000000000000000000',
+        namespace_address: ZERO_ADDRESS,
       },
       {
         id: 'csdk-beta-local',

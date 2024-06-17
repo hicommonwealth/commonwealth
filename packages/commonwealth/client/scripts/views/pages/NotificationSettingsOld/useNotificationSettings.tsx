@@ -122,7 +122,7 @@ const useNotificationSettings = () => {
       subIds.push(...(subs || [])),
     );
     // @ts-expect-error StrictNullChecks
-    snapshotsInfo.map(({ snapshotId, subs }: SnapshotInfo) => {
+    snapshotsInfo?.map(({ snapshotId, subs }: SnapshotInfo) => {
       // @ts-expect-error StrictNullChecks
       if (snapshotId) subIds.push(...(subs || []));
     });
