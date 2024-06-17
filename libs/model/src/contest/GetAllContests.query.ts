@@ -4,10 +4,67 @@ import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models } from '../database';
-import { updateScore } from './Contests.projection';
+import { rollOverContest } from '../services/commonProtocol/contestHelper';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
+
+async function performContestRollovers(communityId: string) {
+  // find community contests that are ended and trigger rollover
+  const contestRolloverPromises = (
+    await models.ContestManager.findAll({
+      where: {
+        community_id: communityId,
+      },
+      include: [
+        {
+          model: models.Contest,
+          as: 'contests',
+          order: [['contest_id', 'DESC']], // most recent contest
+          limit: 1,
+        },
+        {
+          model: models.Community,
+          as: 'community',
+          include: [
+            {
+              model: models.ChainNode,
+              as: 'chainNode',
+            },
+          ],
+        },
+      ],
+    })
+  )
+    .map((contestManager) => {
+      const { private_url, url } = (contestManager as any).community.chainNode;
+      return {
+        is_one_off: contestManager.interval === 0,
+        rpc_node_url: (private_url || url) as string,
+        contest_address: contestManager.contest_address,
+        contest: (contestManager as any).contests[0],
+      };
+    })
+    .filter(({ contest }) => Date.now() > contest.end_time.valueOf()) // check if ended
+    .map(async ({ is_one_off, rpc_node_url, contest_address }) => {
+      await rollOverContest(rpc_node_url, contest_address, is_one_off);
+    });
+
+  const promiseResults = await Promise.allSettled(contestRolloverPromises);
+
+  const errors = promiseResults
+    .filter(({ status }) => status === 'rejected')
+    .map(
+      (result) =>
+        (result as PromiseRejectedResult).reason || '<unknown reason>',
+    );
+
+  if (errors.length > 0) {
+    log.warn(
+      `GetAllContests updateScore: failed with errors: ${errors.join(', ')}"`,
+    );
+  }
+}
 
 export function GetAllContests(): Query<typeof schemas.GetAllContests> {
   return {
@@ -15,65 +72,7 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      // find community contests that are ended and trigger rollover
-      const contestRolloverPromises = (
-        await models.ContestManager.findAll({
-          where: {
-            community_id: payload.community_id,
-          },
-          include: [
-            {
-              model: models.Contest,
-              as: 'contests',
-              order: [['contest_id', 'DESC']], // most recent contest
-              limit: 1,
-            },
-          ],
-        })
-      )
-        .map((contestManager) => ({
-          contest_address: contestManager.contest_address,
-          contest: (contestManager as any).contests[0],
-        }))
-        .filter(
-          ({ contest }) =>
-            Date.now() > contest.end_time.valueOf() &&
-            (!contest.score_updated_at ||
-              contest.score_updated_at < contest.end_time),
-        )
-        .map(async ({ contest_address, contest }) => {
-          // update score timestamp beforehand to prevent
-          // more calls after failure
-          await models.Contest.update(
-            {
-              score_updated_at: new Date(),
-            },
-            {
-              where: {
-                contest_address: contest_address,
-                contest_id: contest.contest_id,
-              },
-            },
-          );
-          await updateScore(contest_address, contest.contest_id);
-        });
-
-      const promiseResults = await Promise.allSettled(contestRolloverPromises);
-
-      const errors = promiseResults
-        .filter(({ status }) => status === 'rejected')
-        .map(
-          (result) =>
-            (result as PromiseRejectedResult).reason || '<unknown reason>',
-        );
-
-      if (errors.length > 0) {
-        log.warn(
-          `GetAllContests updateScore: failed with errors: ${errors.join(
-            ', ',
-          )}"`,
-        );
-      }
+      // await performContestRollovers(payload.community_id);
 
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
