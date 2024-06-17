@@ -101,7 +101,6 @@ export async function __updateCommunityId(
       this.models.DiscordBotConfig,
       // @ts-expect-error StrictNullChecks
       this.models.Group,
-      this.models.Subscription,
     ];
     for (const model of models) {
       await model.update(
