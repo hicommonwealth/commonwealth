@@ -177,6 +177,7 @@ export const seedDb = async () => {
       },
       {
         id: 'ethereum',
+        address_count: 2,
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
         name: 'Ethereum',
