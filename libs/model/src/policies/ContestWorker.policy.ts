@@ -38,7 +38,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           private_url: string;
         }>(
           `
-            SELECT coalesce(cn.private_url, cn.url) as url, cn.private_url
+            SELECT COALESCE(cn.private_url, cn.url) as url, cm.contest_address
             FROM "Communities" c
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
