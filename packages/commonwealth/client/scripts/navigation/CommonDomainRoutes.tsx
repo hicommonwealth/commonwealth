@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
@@ -39,15 +38,6 @@ const NotificationSettingsOld = lazy(
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
-
-const NotificationSettingsPage = () => {
-  const knockInAppNotifications = useFlag('knockInAppNotifications');
-  if (knockInAppNotifications) {
-    return <NotificationSettings />;
-  } else {
-    return <NotificationSettingsOld />;
-  }
-};
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
@@ -130,6 +120,7 @@ const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   communityHomepageEnabled,
   contestEnabled,
+  knockInAppNotifications,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -254,7 +245,10 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(NotificationSettingsPage, { type: 'common' })}
+    element={withLayout(
+      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
+      { type: 'common' },
+    )}
   />,
   <Route
     key="/:scope/notification-settings"
