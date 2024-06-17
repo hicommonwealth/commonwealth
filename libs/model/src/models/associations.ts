@@ -6,7 +6,6 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.Profile, { onUpdate: 'CASCADE' })
-    .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
@@ -127,10 +126,6 @@ export const buildAssociations = (db: DB) => {
     asOne: 'poll',
     asMany: 'votes',
     onDelete: 'CASCADE',
-  });
-
-  db.NotificationCategory.withMany(db.Subscription, {
-    foreignKey: 'category_id',
   });
 
   db.Group.withMany(db.GroupPermission);

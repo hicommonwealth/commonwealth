@@ -37,7 +37,6 @@ import Reaction from './reaction';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
-import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Template from './template';
@@ -85,7 +84,6 @@ export const Factories = {
   SsoToken,
   StakeTransaction,
   StarredCommunity,
-  Subscription,
   Tags,
   SubscriptionPreference,
   Template,

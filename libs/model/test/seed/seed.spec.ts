@@ -177,15 +177,6 @@ describe('Seed functions', () => {
         name: NotificationCategories.NewThread,
         description: 'someone makes a new thread',
       });
-
-      await testSeed('Subscription', {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewThread,
-        is_active: true,
-        community_id: community!.id,
-        thread_id: undefined,
-        comment_id: undefined,
-      });
       shouldExit = false;
     });
 

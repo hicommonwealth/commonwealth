@@ -41,18 +41,8 @@ import verifyAddress from '../routes/verifyAddress';
 import viewComments from '../routes/viewComments';
 import viewCount from '../routes/viewCount';
 
-import clearNotifications from '../routes/clearNotifications';
-import clearReadNotifications from '../routes/clearReadNotifications';
 import getProfileNew from '../routes/getNewProfile';
-import markNotificationsRead from '../routes/markNotificationsRead';
 import setDefaultRole from '../routes/setDefaultRole';
-import createSubscription from '../routes/subscription/createSubscription';
-import deleteSubscription from '../routes/subscription/deleteSubscription';
-import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
-import disableSubscriptions from '../routes/subscription/disableSubscriptions';
-import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
-import enableSubscriptions from '../routes/subscription/enableSubscriptions';
-import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
@@ -911,43 +901,6 @@ function setupRouter(
     getUploadSignature.bind(this, models),
   );
 
-  // notifications
-  registerRoute(
-    router,
-    'get',
-    '/viewSubscriptions',
-    passport.authenticate('jwt', { session: false }),
-    viewSubscriptions.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/createSubscription',
-    passport.authenticate('jwt', { session: false }),
-    createSubscription.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteSubscription',
-    passport.authenticate('jwt', { session: false }),
-    deleteSubscription.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/enableSubscriptions',
-    passport.authenticate('jwt', { session: false }),
-    enableSubscriptions.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/disableSubscriptions',
-    passport.authenticate('jwt', { session: false }),
-    disableSubscriptions.bind(this, models),
-  );
-
   registerRoute(
     router,
     'post',
@@ -962,41 +915,6 @@ function setupRouter(
     viewGlobalActivity.bind(this, models, globalActivityCache),
   );
 
-  registerRoute(
-    router,
-    'post',
-    '/markNotificationsRead',
-    passport.authenticate('jwt', { session: false }),
-    markNotificationsRead.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/clearReadNotifications',
-    passport.authenticate('jwt', { session: false }),
-    clearReadNotifications.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/clearNotifications',
-    passport.authenticate('jwt', { session: false }),
-    clearNotifications.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/enableImmediateEmails',
-    passport.authenticate('jwt', { session: false }),
-    enableImmediateEmails.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/disableImmediateEmails',
-    passport.authenticate('jwt', { session: false }),
-    disableImmediateEmails.bind(this, models),
-  );
   registerRoute(
     router,
     'post',

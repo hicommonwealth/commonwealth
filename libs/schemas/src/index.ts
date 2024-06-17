@@ -7,7 +7,6 @@ export type Aggregates = Extract<
   | 'Comment'
   | 'Community'
   | 'NotificationCategory'
-  | 'Subscription'
   | 'Thread'
   | 'Reaction'
   | 'User'

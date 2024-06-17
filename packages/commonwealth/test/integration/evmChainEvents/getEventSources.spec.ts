@@ -7,10 +7,10 @@ import { getEventSources } from '../../../server/workers/evmChainEvents/getEvent
 import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 import {
   getTestAbi,
+  getTestChain,
   getTestCommunityContract,
   getTestContract,
   getTestSignatures,
-  getTestSubscription,
 } from './util';
 
 describe('getEventSources', () => {
@@ -32,7 +32,7 @@ describe('getEventSources', () => {
   });
 
   test("should not return sources that don't have a community contract", async () => {
-    await getTestSubscription();
+    await getTestChain();
     const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });

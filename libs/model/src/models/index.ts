@@ -73,7 +73,6 @@ export * from './role_assignment';
 export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';
-export * from './subscription';
 export * from './tags';
 export * from './template';
 export * from './thread';
