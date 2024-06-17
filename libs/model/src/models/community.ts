@@ -23,6 +23,8 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   Contract?: ContractInstance;
   thread_count?: number;
   address_count?: number;
+  profile_count?: number;
+  count_updated?: boolean;
   communityAlerts?: CommunityAlertAttributes[];
 };
 
