@@ -15,7 +15,6 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import { Contest, ContestWorker } from '@hicommonwealth/model';
-import { performContestRollovers } from 'node_modules/@hicommonwealth/model/src/contest';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
@@ -114,7 +113,7 @@ export async function setupCommonwealthConsumer(): Promise<void> {
 function startRolloverLoop() {
   log.info('Starting rollover loop');
   setInterval(() => {
-    performContestRollovers().catch(console.error);
+    Contest.performContestRollovers().catch(console.error);
   }, 1_000 * 60);
 }
 
