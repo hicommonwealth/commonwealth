@@ -177,13 +177,9 @@ async function getContestDetails(
 }
 
 /**
- * Updates contest score
+ * Updates contest score (only works if contest_id is currently active!)
  */
-async function updateScore(
-  contest_address: string,
-  contest_id: number,
-  is_current_contest: boolean,
-) {
+export async function updateScore(contest_address: string, contest_id: number) {
   try {
     const contestManager = await models.ContestManager.findOne({
       where: {
@@ -202,7 +198,7 @@ async function updateScore(
       await protocol.contestHelper.getContestScore(
         details.url,
         contest_address,
-        is_current_contest ? undefined : contest_id,
+        undefined,
         oneOff,
       );
 
@@ -271,9 +267,7 @@ export function Contests(): Projection<typeof inputs> {
           ...payload,
           contest_id,
         });
-        setImmediate(() =>
-          updateScore(payload.contest_address, contest_id, true),
-        );
+        setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
 
       ContestContentAdded: async ({ payload }) => {
@@ -310,9 +304,7 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action?.thread_id,
           created_at: new Date(),
         });
-        setImmediate(() =>
-          updateScore(payload.contest_address, contest_id, true),
-        );
+        setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },
   };

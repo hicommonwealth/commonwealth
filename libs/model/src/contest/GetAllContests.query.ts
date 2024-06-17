@@ -1,8 +1,13 @@
-import { Query } from '@hicommonwealth/core';
+import { Query, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models } from '../database';
+import { updateScore } from './Contests.projection';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export function GetAllContests(): Query<typeof schemas.GetAllContests> {
   return {
@@ -10,6 +15,66 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
+      // find community contests that are ended and trigger rollover
+      const contestRolloverPromises = (
+        await models.ContestManager.findAll({
+          where: {
+            community_id: payload.community_id,
+          },
+          include: [
+            {
+              model: models.Contest,
+              as: 'contests',
+              order: [['contest_id', 'DESC']], // most recent contest
+              limit: 1,
+            },
+          ],
+        })
+      )
+        .map((contestManager) => ({
+          contest_address: contestManager.contest_address,
+          contest: (contestManager as any).contests[0],
+        }))
+        .filter(
+          ({ contest }) =>
+            Date.now() > contest.end_time.valueOf() &&
+            (!contest.score_updated_at ||
+              contest.score_updated_at < contest.end_time),
+        )
+        .map(async ({ contest_address, contest }) => {
+          // update score timestamp beforehand to prevent
+          // more calls after failure
+          await models.Contest.update(
+            {
+              score_updated_at: new Date(),
+            },
+            {
+              where: {
+                contest_address: contest_address,
+                contest_id: contest.contest_id,
+              },
+            },
+          );
+          await updateScore(contest_address, contest.contest_id);
+        });
+
+      const promiseResults = await Promise.allSettled(contestRolloverPromises);
+
+      const errors = promiseResults
+        .filter(({ status }) => status === 'rejected')
+        .map(
+          (result) =>
+            (result as PromiseRejectedResult).reason || '<unknown reason>',
+        );
+
+      if (errors.length > 0) {
+        log.warn(
+          `GetAllContests updateScore: failed with errors: ${errors.join(
+            ', ',
+          )}"`,
+        );
+      }
+
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
       >(
@@ -29,7 +94,7 @@ select
   cm.cancelled,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
-    from "ContestTopics" ct 
+    from "ContestTopics" ct
     left join "Topics" t on ct.topic_id = t.id
     where cm.contest_address = ct.contest_address
   ), '[]'::jsonb) as topics,
@@ -46,7 +111,7 @@ from
       'score', c.score --,
 --      'actions', coalesce(ca.actions, '[]'::jsonb)
 		) order by c.contest_id desc) as contests
-	from "Contests" c 
+	from "Contests" c
 --    left join (
 --      select
 --        a.contest_id,
@@ -62,7 +127,7 @@ from
 --        ) order by a.created_at) as actions
 --      from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
 --      group by a.contest_id
---    ) as ca on c.contest_id = ca.contest_id 
+--    ) as ca on c.contest_id = ca.contest_id
     ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
@@ -99,7 +164,7 @@ order by
       results.forEach((r) =>
         r.contests.forEach((c) => {
           c.score?.forEach((w) => {
-            w.tickerPrize = Number(BigInt(w.prize)) / 10 ** r.decimals;
+            w.tickerPrize = Number(w.prize) / 10 ** r.decimals;
           });
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);
@@ -108,6 +173,7 @@ order by
           // c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
         }),
       );
+
       return results;
     },
   };
