@@ -21,10 +21,10 @@ export default (
     'ThreadVersionHistory',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      thread_id: { type: Sequelize.INTEGER, primaryKey: true },
-      address: { type: Sequelize.STRING, allowNull: true },
-      body: { type: Sequelize.STRING, allowNull: true },
-      timestamp: { type: Sequelize.DATE, allowNull: true },
+      thread_id: { type: Sequelize.INTEGER, allowNull: false },
+      address: { type: Sequelize.STRING, allowNull: false },
+      body: { type: Sequelize.STRING, allowNull: false },
+      timestamp: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'ThreadVersionHistories',
