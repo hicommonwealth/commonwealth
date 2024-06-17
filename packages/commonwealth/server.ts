@@ -20,6 +20,7 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
+import { performContestRollovers } from 'node_modules/@hicommonwealth/model/src/contest';
 
 // bootstrap production adapters
 const __filename = fileURLToPath(import.meta.url);
@@ -74,6 +75,10 @@ const start = async () => {
         const databaseCleaner = new DatabaseCleaner();
         databaseCleaner.initLoop(models, config.DB.CLEAN_HOUR);
       }
+
+      setInterval(() => {
+        performContestRollovers().catch(console.error);
+      }, 1_000 * 60);
     })
     .catch((e) => log.error(e.message, e));
 };

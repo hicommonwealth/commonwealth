@@ -9,8 +9,9 @@ import { rollOverContest } from '../services/commonProtocol/contestHelper';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+// TODO: replace with proper scheduled solution
 // find community contests that are ended and trigger rollover
-async function performContestRollovers(communityId: string) {
+export async function performContestRollovers() {
   const contestManagersWithEndedContest = await models.sequelize.query<{
     contest_address: string;
     interval: number;
@@ -28,13 +29,12 @@ async function performContestRollovers(communityId: string) {
             GROUP BY contest_address
         )
     ) co ON co.contest_address = cm.contest_address AND NOW() > co.end_time
-    JOIN "Communities" cu ON cm.community_id = cu.id AND cu.id = :community_id
+    JOIN "Communities" cu ON cm.community_id = cu.id
     JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
   `,
     {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: { community_id: communityId },
     },
   );
 
@@ -69,9 +69,6 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      // do in background
-      performContestRollovers(payload.community_id);
-
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
       >(
