@@ -1,5 +1,5 @@
 //TODO: This should be deleted after comment version histories are fixed
-import { dispose } from '@hicommonwealth/core/src/index';
+import { dispose } from '@hicommonwealth/core';
 import { CommentVersionHistoryInstance, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 

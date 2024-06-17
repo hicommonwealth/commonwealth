@@ -236,10 +236,10 @@ export async function __updateThread(
 
     await this.models.ThreadVersionHistory.create(
       {
-        thread_id: updatedThread.id,
-        address: address.address,
-        body: toUpdate.body,
-        timestamp: updatedThread.created_at,
+        thread_id: updatedThread.id!,
+        address: address.address!,
+        body: toUpdate.body!,
+        timestamp: updatedThread.created_at!,
       },
       {
         transaction,
