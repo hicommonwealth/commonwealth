@@ -97,6 +97,7 @@ export class CosmosSDKSessionController implements ISessionController {
     const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}-auth`;
     try {
       const storage = localStorage.getItem(storageKey);
+      // @ts-expect-error StrictNullChecks
       const { privkey } = JSON.parse(storage);
       const signer = await cosm.Secp256k1Wallet.fromKey(
         Buffer.from(privkey, 'hex'),

@@ -25,6 +25,7 @@ import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
+import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LoginToken from './login_token';
 import Membership from './membership';
@@ -76,6 +77,7 @@ export const Factories = {
   DiscordBotConfig,
   EvmEventSource,
   Group,
+  GroupPermission,
   LastProcessedEvmBlock,
   LoginToken,
   Membership,

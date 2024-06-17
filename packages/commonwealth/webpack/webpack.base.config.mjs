@@ -1,3 +1,4 @@
+import CopyPlugin from 'copy-webpack-plugin';
 import HtmlWebpackInjectAttributesPlugin from 'html-webpack-inject-attributes-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { createRequire } from 'module';
@@ -26,6 +27,31 @@ const baseConfig = {
     chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: `${__dirname}/../client/firebase-messaging-sw.js`,
+          to: `${__dirname}/../build`,
+        },
+      ],
+    }),
+    new webpack.DefinePlugin({
+      'process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG':
+        JSON.stringify(
+          process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG,
+        ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY': JSON.stringify(
+        process.env.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
+        process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
+      ),
+    }),
+
     new webpack.DefinePlugin({
       'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
         process.env.KNOCK_PUBLIC_API_KEY,
@@ -161,7 +187,7 @@ const baseConfig = {
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercoppa\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },

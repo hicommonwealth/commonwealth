@@ -138,6 +138,7 @@ class CommunityStakes extends ContractBase {
           maxFeePerGas: null,
         });
       try {
+        // @ts-expect-error StrictNullChecks
         await this.web3.currentProvider.request({
           method: 'wallet_watchAsset',
           params: {
@@ -213,6 +214,7 @@ class CommunityStakes extends ContractBase {
       to: namespaceAddress,
       data: calldata,
     });
+    // @ts-expect-error StrictNullChecks
     return this.web3.eth.abi.decodeParameter('uint256', result).toString();
   }
 
@@ -234,6 +236,7 @@ class CommunityStakes extends ContractBase {
       to: namespaceAddress,
       data: calldata,
     });
+    // @ts-expect-error StrictNullChecks
     return this.web3.eth.abi.decodeParameter('uint256', result).toString();
   }
 

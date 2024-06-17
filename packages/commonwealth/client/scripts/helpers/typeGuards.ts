@@ -24,7 +24,7 @@ export const isUndefined = (x: unknown): x is undefined => x === undefined;
  * Tests whether or not an argument is not undefined (type guard)
  */
 export const isNotUndefined = <T>(
-  x: Undefinedable<T>
+  x: Undefinedable<T>,
 ): x is Exclude<T, undefined> => !isUndefined(x);
 
 /**
@@ -89,8 +89,9 @@ export const isFunction = (x: unknown): x is Function => x instanceof Function;
  */
 export function hasKey<O, K extends string | number | symbol>(
   obj: O,
-  key: K
+  key: K,
 ): obj is O & { [k in K]: unknown } {
+  // @ts-expect-error StrictNullChecks
   if (typeof obj === 'object') return key in obj;
   else return false;
 }

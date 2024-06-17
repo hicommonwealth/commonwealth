@@ -46,12 +46,14 @@ export const UserTrainingSlider = () => {
       UserTrainingCardTypes.CreateContent,
       UserTrainingCardTypes.FinishProfile,
       UserTrainingCardTypes.ExploreCommunities,
+      // @ts-expect-error <StrictNullChecks/>
     ].map((card) => markTrainingActionAsPermanentlyHidden(card, profileId));
   };
 
   const isCardVisible = (cardName: UserTrainingCardTypes) => {
     return (
       completedActions.includes(cardName) ||
+      // @ts-expect-error <StrictNullChecks/>
       !trainingActionPermanentlyHidden?.[profileId]?.includes(cardName)
     );
   };
@@ -75,6 +77,7 @@ export const UserTrainingSlider = () => {
     if (cardToDismiss === 'all') {
       hideAllCards();
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       markTrainingActionAsPermanentlyHidden(cardToDismiss, profileId);
     }
     setCardToDismiss(undefined);
@@ -141,6 +144,7 @@ export const UserTrainingSlider = () => {
   ]);
 
   if (
+    !profileId ||
     !isLoggedIn ||
     isLoadingProfile ||
     (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&

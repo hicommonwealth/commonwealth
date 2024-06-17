@@ -10,6 +10,7 @@ import {
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { GetCommunityStake, SetCommunityStake } from '../../src/community';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
@@ -29,7 +30,7 @@ describe('Stake lifecycle', () => {
     stake_enabled: true,
   };
 
-  before(async () => {
+  beforeAll(async () => {
     const [node] = await seed('ChainNode', {});
     const [user] = await seed('User', { isAdmin: true });
     const [community_with_stake] = await seed('Community', {
@@ -86,17 +87,17 @@ describe('Stake lifecycle', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
     Sinon.restore();
   });
 
-  it('should fail set when community namespace not configured', () => {
+  test('should fail set when community namespace not configured', () => {
     expect(command(SetCommunityStake(), { id: id_with_stake, actor, payload }))
       .to.eventually.be.rejected;
   });
 
-  it('should set and get community stake', async () => {
+  test('should set and get community stake', async () => {
     const cr = await command(SetCommunityStake(), {
       id: id_without_stake_to_set,
       actor,
@@ -120,13 +121,13 @@ describe('Stake lifecycle', () => {
     expect(qr).to.deep.include({ ...payload });
   });
 
-  it('should fail set when community not found', async () => {
+  test('should fail set when community not found', async () => {
     expect(
       command(SetCommunityStake(), { actor, payload, id: 'does-not-exist' }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
 
-  it('should fail set when community stake has been configured', () => {
+  test('should fail set when community stake has been configured', () => {
     expect(
       command(SetCommunityStake(), {
         id: id_with_stake,
@@ -139,7 +140,7 @@ describe('Stake lifecycle', () => {
     );
   });
 
-  it('should get empty result when community stake not configured', async () => {
+  test('should get empty result when community stake not configured', async () => {
     const qr = await query(GetCommunityStake(), {
       actor,
       payload: { community_id: id_without_stake },

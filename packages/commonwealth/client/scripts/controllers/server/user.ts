@@ -67,8 +67,17 @@ export class UserController {
     return this._promotionalEmailsEnabled;
   }
 
+  private _isWelcomeOnboardFlowComplete: boolean;
+  public get isWelcomeOnboardFlowComplete(): boolean {
+    return this._isWelcomeOnboardFlowComplete;
+  }
+
   private _setPromotionalEmailsEnabled(enabled: boolean): void {
     this._promotionalEmailsEnabled = enabled;
+  }
+
+  private _setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
+    this._isWelcomeOnboardFlowComplete = enabled;
   }
 
   private _knockJWT: string;
@@ -173,6 +182,10 @@ export class UserController {
 
   public setPromotionalEmailsEnabled(enabled: boolean): void {
     this._setPromotionalEmailsEnabled(enabled);
+  }
+
+  public setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
+    this._setIsWelcomeOnboardFlowComplete(enabled);
   }
 
   public async updateEmail(

@@ -78,9 +78,11 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
     if (typeof node.insert === 'string') {
       const matches = node.insert.match(/[^\n]+\n?|\n/g);
       (matches || []).forEach((line) => {
+        // @ts-expect-error StrictNullChecks
         lines.push({ attributes: node.attributes, insert: line });
       });
     } else {
+      // @ts-expect-error StrictNullChecks
       lines.push(node);
     }
   }
@@ -88,22 +90,31 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
   const result = [];
   let parent = { children: [], attributes: undefined };
   for (const node of lines) {
+    // @ts-expect-error StrictNullChecks
     if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
+      // @ts-expect-error StrictNullChecks
       parent.attributes = node.attributes;
       // concatenate code-block node parents together, keeping newlines
       if (
         result.length > 0 &&
+        // @ts-expect-error StrictNullChecks
         result[result.length - 1].attributes &&
         parent.attributes &&
         parent.attributes['code-block'] &&
+        // @ts-expect-error StrictNullChecks
         result[result.length - 1].attributes['code-block']
       ) {
+        // @ts-expect-error StrictNullChecks
         parent.children.push({ insert: node.insert });
+        // @ts-expect-error StrictNullChecks
         result[result.length - 1].children = result[
           result.length - 1
+          // @ts-expect-error StrictNullChecks
         ].children.concat(parent.children);
       } else {
+        // @ts-expect-error StrictNullChecks
         parent.children.push({ insert: node.insert });
+        // @ts-expect-error StrictNullChecks
         result.push(parent);
       }
       parent = { children: [], attributes: undefined };
@@ -114,15 +125,20 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
   // If there was no \n at the end of the document, we need to push whatever remains in `parent`
   // onto the result. This may happen if we are rendering a truncated Quill document
   if (parent.children.length > 0) {
+    // @ts-expect-error StrictNullChecks
     result.push(parent);
   }
 
   // trim empty newlines at end of document
   while (
     result.length &&
+    // @ts-expect-error StrictNullChecks
     result[result.length - 1].children.length === 1 &&
+    // @ts-expect-error StrictNullChecks
     typeof result[result.length - 1].children[0].insert === 'string' &&
+    // @ts-expect-error StrictNullChecks
     result[result.length - 1].children[0].insert === '\n' &&
+    // @ts-expect-error StrictNullChecks
     result[result.length - 1].children[0].attributes === undefined
   ) {
     result.pop();
@@ -134,6 +150,7 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
 export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
   return preprocessQuillDeltaForRendering(delta.ops)
     .map((parent) => {
+      // @ts-expect-error StrictNullChecks
       return parent.children
         .map((child) => {
           if (typeof child.insert === 'string')

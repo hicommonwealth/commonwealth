@@ -9,7 +9,6 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { getUniqueUserAddresses } from '../helpers/user';
 import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -57,21 +56,20 @@ const Sublayout = ({
   useEffect(() => {
     if (triggerOpenModalType) {
       setAuthModalType(triggerOpenModalType);
+      // @ts-expect-error StrictNullChecks
       setTriggerOpenModalType(undefined);
     }
   }, [triggerOpenModalType, setTriggerOpenModalType]);
 
-  const {
-    onboardedProfiles,
-    setProfileAsOnboarded,
-    isWelcomeOnboardModalOpen,
-    setIsWelcomeOnboardModalOpen,
-  } = useWelcomeOnboardModal();
+  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
+    useWelcomeOnboardModal();
 
   useEffect(() => {
     let timeout = null;
     if (isLoggedIn) {
+      // @ts-expect-error StrictNullChecks
       timeout = setTimeout(() => {
+        // @ts-expect-error StrictNullChecks
         setProfileId(app?.user?.addresses?.[0]?.profile?.id);
       }, 100);
     } else {
@@ -88,28 +86,10 @@ const Sublayout = ({
       isLoggedIn &&
       userOnboardingEnabled &&
       !isWelcomeOnboardModalOpen &&
-      profileId
+      profileId &&
+      !app.user.isWelcomeOnboardFlowComplete
     ) {
-      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
-      const hasUsername = app?.user?.addresses?.find(
-        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
-      );
-
-      const userUniqueAddresses = getUniqueUserAddresses({});
-
-      // open welcome modal if user is not onboarded and there is a single connected address
-      if (
-        !hasUsername &&
-        !onboardedProfiles[profileId] &&
-        userUniqueAddresses.length === 1
-      ) {
-        setIsWelcomeOnboardModalOpen(true);
-      }
-
-      // if the user has a set username, mark as onboarded
-      if (hasUsername && !onboardedProfiles[profileId]) {
-        setProfileAsOnboarded(profileId);
-      }
+      setIsWelcomeOnboardModalOpen(true);
     }
 
     if (!isLoggedIn && isWelcomeOnboardModalOpen) {
@@ -117,11 +97,9 @@ const Sublayout = ({
     }
   }, [
     profileId,
-    onboardedProfiles,
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
-    setProfileAsOnboarded,
     isLoggedIn,
   ]);
 
@@ -174,7 +152,9 @@ const Sublayout = ({
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
+  // @ts-expect-error StrictNullChecks
   const terms = app.chain ? chain.terms : null;
+  // @ts-expect-error StrictNullChecks
   const banner = app.chain ? chain.communityBanner : null;
 
   return (
@@ -182,11 +162,13 @@ const Sublayout = ({
       {!isWindowSmallInclusive && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
         />
       )}
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
+        // @ts-expect-error StrictNullChecks
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
           setAuthModalType(modalType || AuthModalType.SignIn)
@@ -199,6 +181,7 @@ const Sublayout = ({
       />
       <div className="sidebar-and-body-container">
         <Sidebar
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
           onMobile={isWindowExtraSmall}
         />
@@ -216,6 +199,7 @@ const Sublayout = ({
             resizing,
           )}
         >
+          {/* @ts-expect-error StrictNullChecks */}
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">

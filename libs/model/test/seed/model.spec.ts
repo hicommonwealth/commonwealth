@@ -1,6 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { Factories } from '../../src/models/factories';
 import {
   bootstrap_testing,
@@ -15,7 +16,7 @@ const generateSchemas = async () => {
 
   // TODO: resolve remaining conflicts!!!
   const model_schema = await get_info_schema(model.sequelize, {
-    ignore_columns: {},
+    ignore_columns: { GroupPermissions: ['allowed_actions'] },
     ignore_constraints: {
       // Removed in production for performance reasons
       Comments: [
@@ -53,6 +54,7 @@ const generateSchemas = async () => {
       Profiles: ['bio_backup', 'profile_name_backup'],
       Threads: ['body_backup', '_search'],
       Topics: ['default_offchain_template_backup'],
+      GroupPermissions: ['allowed_actions'],
     },
     ignore_constraints: {},
   });
@@ -72,11 +74,11 @@ const generateSchemas = async () => {
 describe('Model schema', () => {
   let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
-  before(async () => {
+  beforeAll(async () => {
     schemas = await generateSchemas();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -88,7 +90,7 @@ describe('Model schema', () => {
   });
   Object.values(Factories).forEach((factory) => {
     const m = factory(s);
-    it(`Should match ${m.tableName}`, async () => {
+    test(`Should match ${m.tableName}`, async () => {
       const { model, migration } = schemas[m.tableName];
 
       //console.log(model.columns, migration.columns);

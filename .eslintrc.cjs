@@ -4,7 +4,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'n'],
   parser: '@typescript-eslint/parser',
   // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
   root: true,
@@ -29,5 +29,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'n/no-process-exit': 'error',
   },
 };

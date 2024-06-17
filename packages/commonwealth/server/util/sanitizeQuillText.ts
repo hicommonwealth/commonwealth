@@ -50,6 +50,7 @@ export function sanitizeQuillText(input: string, noEncode?: boolean): string {
       return input;
     }
   }
+  // @ts-expect-error StrictNullChecks
   const { ops } = parsedObject;
 
   if (!ops) {

@@ -53,6 +53,7 @@ export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
     setInitialTemplates(initLinks);
     if (initLinks.length > 0) {
       setSelectedDisplay(
+        // @ts-expect-error <StrictNullChecks/>
         dropdownOptions.find((o) => o.value === initLinks[0].display),
       );
     }

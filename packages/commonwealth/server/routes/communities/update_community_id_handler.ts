@@ -18,6 +18,7 @@ export const updateCommunityIdHandler = async (
   req: TypedRequestBody<UpdateCommunityIdParams>,
   res: TypedResponse<UpdateCommunityIdResponse>,
 ) => {
+  // @ts-expect-error StrictNullChecks
   if (!req.user.isAdmin) {
     throw new AppError('Must be a super admin to update community id');
   }

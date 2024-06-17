@@ -48,15 +48,18 @@ const getAddressProfiles = async (
   const profiles = addressEntities.map((address) => {
     return {
       profileId: address.profile_id,
+      // @ts-expect-error StrictNullChecks
       name: address.Profile.profile_name,
       address: address.address,
       lastActive: address.last_active,
+      // @ts-expect-error StrictNullChecks
       avatarUrl: address.Profile.avatar_url,
     };
   });
 
   return res.json({
     status: 'Success',
+    // @ts-expect-error StrictNullChecks
     result: profiles,
   });
 };

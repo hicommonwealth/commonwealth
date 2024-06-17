@@ -62,6 +62,7 @@ class PolkadotWebWalletController
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
@@ -82,6 +83,7 @@ class PolkadotWebWalletController
       data: message,
       type: 'bytes',
     };
+    // @ts-expect-error StrictNullChecks
     const signature = (await signer.signRaw(payload)).signature;
     return signature;
   }

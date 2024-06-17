@@ -5,7 +5,7 @@ function getLocalStorageKey(
   prefix: string,
   chain: string,
   name: string,
-  id: string
+  id: string,
 ) {
   return `${prefix}_${chain}_${name}_${id}`;
 }
@@ -20,7 +20,7 @@ interface IStorageItem<T> {
 //   removes items from localStorage -- for safety, only run this function before stores are queried.
 export function clearLocalStorage(
   prefix = 'cwstore',
-  maxAge: number = 10 * 60 * 1000
+  maxAge: number = 10 * 60 * 1000,
 ) {
   if (!localStorage) {
     throw new Error('cannot clear localStorage, not found!');
@@ -29,7 +29,7 @@ export function clearLocalStorage(
   console.log(
     `Clearing localStorage of items with prefix "${prefix}", older than ${
       maxAge / (60 * 1000)
-    } minutes...`
+    } minutes...`,
   );
   const now = Date.now();
   let nCleared = 0;
@@ -38,7 +38,8 @@ export function clearLocalStorage(
     const key = localStorage.key(i);
     if (key && key.startsWith(prefix)) {
       const storageItem: IStorageItem<any> = JSON.parse(
-        localStorage.getItem(key)
+        // @ts-expect-error StrictNullChecks
+        localStorage.getItem(key),
       );
       if (now - storageItem.timestamp > maxAge) {
         localStorage.removeItem(key);
@@ -50,7 +51,7 @@ export function clearLocalStorage(
     }
   }
   console.log(
-    `Viewed ${nItems} items in localStorage and cleared ${nCleared}.`
+    `Viewed ${nItems} items in localStorage and cleared ${nCleared}.`,
   );
 }
 
@@ -58,12 +59,12 @@ export function clearLocalStorage(
 // that can be used to reconstruct T via the constructorFunc.
 class PersistentStore<
   SerializedT extends IHasId,
-  T extends IHasId & ISerializable<SerializedT>
+  T extends IHasId & ISerializable<SerializedT>,
 > extends IdStore<T> {
   constructor(
     public readonly chain: string,
     public readonly name: string,
-    private readonly _constructorFunc: (s: SerializedT) => T
+    private readonly _constructorFunc: (s: SerializedT) => T,
   ) {
     super();
     if (!localStorage) {
@@ -83,7 +84,7 @@ class PersistentStore<
     };
     localStorage.setItem(
       this._getKey(n.id.toString()),
-      JSON.stringify(storageItem)
+      JSON.stringify(storageItem),
     );
     return this;
   }
@@ -102,7 +103,7 @@ class PersistentStore<
     };
     localStorage.setItem(
       this._getKey(n.id.toString()),
-      JSON.stringify(storageItem)
+      JSON.stringify(storageItem),
     );
     return this;
   }
@@ -128,6 +129,7 @@ class PersistentStore<
       this.add(revivedItem);
       return revivedItem;
     } else {
+      // @ts-expect-error StrictNullChecks
       return null;
     }
   }

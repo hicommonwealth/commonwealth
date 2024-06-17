@@ -82,6 +82,7 @@ async function resizeChains() {
 
   const getNthChain = async (n) =>
     await models.Community.findAll({
+      // @ts-expect-error StrictNullChecks
       where: {
         icon_url: {
           [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
@@ -111,6 +112,7 @@ async function resizeProfiles() {
 
   const getNthProfile = async (n) =>
     await models.Profile.findAll({
+      // @ts-expect-error StrictNullChecks
       where: {
         avatar_url: {
           [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
@@ -198,6 +200,7 @@ async function uploadToS3AndReplace(
 
     // although it gets added to the assets.commonwealth.im bucket, the location of the newImage object points
     // to the bucket directly. We want to swap this out with the cloudflare url.
+    // @ts-expect-error StrictNullChecks
     const newLocation = formatS3Url(newImage.Location);
 
     console.log(

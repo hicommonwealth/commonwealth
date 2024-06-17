@@ -44,6 +44,7 @@ const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
     case 'VOTE_OPTION_NO_WITH_VETO':
       return 'NoWithVeto';
     default:
+      // @ts-expect-error StrictNullChecks
       return null;
   }
 };
@@ -70,6 +71,7 @@ export class CosmosProposalV1 extends Proposal<
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   public get author() {
     return this.data.proposer
       ? this._Accounts.fromAddress(this.data.proposer)
@@ -145,6 +147,7 @@ export class CosmosProposalV1 extends Proposal<
       this._initialized = true;
     }
     if (this.data.state.completed) {
+      // @ts-expect-error StrictNullChecks
       super.complete(this._Governance.store);
     }
   }
