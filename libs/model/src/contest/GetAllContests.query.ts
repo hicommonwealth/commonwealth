@@ -28,7 +28,7 @@ export async function performContestRollovers() {
             FROM "Contests"
             GROUP BY contest_address
         )
-    ) co ON co.contest_address = cm.contest_address AND NOW() > co.end_time
+    ) co ON co.contest_address = cm.contest_address AND NOW() > co.end_time AND cm.interval > 0 AND cm.cancelled = false
     JOIN "Communities" cu ON cm.community_id = cu.id
     JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
   `,
