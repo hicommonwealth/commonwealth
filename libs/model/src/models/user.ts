@@ -69,6 +69,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
         allowNull: false,
       },
       promotional_emails_enabled: { type: Sequelize.BOOLEAN, allowNull: true },
+      is_welcome_onboard_flow_complete: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       isAdmin: { type: Sequelize.BOOLEAN, defaultValue: false },
       disableRichText: {
         type: Sequelize.BOOLEAN,

@@ -1,9 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
+
+const nonceMutex = new Mutex();
 
 export type AddContentResponse = {
   txReceipt: any;
@@ -263,7 +267,7 @@ export const getContestBalance = async (
       feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
     );
   }
-  if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
+  if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
         return Number(v);
@@ -299,20 +303,22 @@ export const addContentBatch = async (
   contest: string[],
   creator: string,
   url: string,
-): Promise<Promise<AddContentResponse>[]> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
-  let currNonce = Number(
-    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-  );
+): Promise<PromiseSettledResult<AddContentResponse>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+    );
 
-  const promises: Promise<AddContentResponse>[] = [];
+    const promises: Promise<AddContentResponse>[] = [];
 
-  contest.forEach((c) => {
-    promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
-    currNonce++;
+    contest.forEach((c) => {
+      promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
   });
-
-  return promises;
 };
 
 export const voteContentBatch = async (
@@ -320,20 +326,63 @@ export const voteContentBatch = async (
   contest: string[],
   voter: string,
   contentId: string,
-): Promise<Promise<any>[]> => {
+): Promise<PromiseSettledResult<any>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    let currNonce = Number(
+      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+    );
+
+    const promises: Promise<any>[] = [];
+
+    contest.forEach((c) => {
+      promises.push(
+        voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+      );
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
+  });
+};
+
+/**
+ * attempts to rollover and payout a provided contest. Returns false and does not attempt
+ * transaction if contest is still active
+ * @param rpcNodeUrl the chain node to use
+ * @param contest the address of the contest
+ * @param oneOff indicate if the contest is oneOff
+ * @returns boolean indicating if contest was rolled over
+ * NOTE: A false return does not indicate an error, rather that the contest was still ongoing
+ * errors will still be throw for other issues
+ */
+export const rollOverContest = async (
+  rpcNodeUrl: string,
+  contest: string,
+  oneOff: boolean,
+): Promise<boolean> => {
   const web3 = await createWeb3Provider(rpcNodeUrl);
-  let currNonce = Number(
-    await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
+  const contestInstance = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contest,
   );
 
-  const promises: Promise<any>[] = [];
+  const contractCall = oneOff
+    ? contestInstance.methods.endContest()
+    : contestInstance.methods.newContest();
 
-  contest.forEach((c) => {
-    promises.push(
-      voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
-    );
-    currNonce++;
+  let gasResult;
+  try {
+    gasResult = await contractCall.estimateGas({
+      from: web3.eth.defaultAccount,
+    });
+  } catch {
+    return false;
+  }
+
+  await contractCall.send({
+    from: web3.eth.defaultAccount,
+    gas: gasResult.toString(),
   });
-
-  return promises;
+  return true;
 };

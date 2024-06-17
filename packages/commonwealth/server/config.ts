@@ -14,7 +14,6 @@ const {
   JWT_SECRET,
   SEND_EMAILS: _SEND_EMAILS,
   SEND_WEBHOOKS_EMAILS,
-  NO_CLIENT: _NO_CLIENT,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   LOGIN_RATE_LIMIT_TRIES,
@@ -42,8 +41,7 @@ const {
 } = process.env;
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
-const NO_CLIENT = _NO_CLIENT === 'true' || SEND_EMAILS;
-const NO_PRERENDER = _NO_PRERENDER || NO_CLIENT;
+const NO_PRERENDER = _NO_PRERENDER;
 const FLAG_COMMON_WALLET = _FLAG_COMMON_WALLET === ' true';
 
 export const config = configure(
@@ -55,7 +53,6 @@ export const config = configure(
     // Risks sending webhooks/emails to real users if incorrectly set to true
     SEND_WEBHOOKS_EMAILS:
       model_config.NODE_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
-    NO_CLIENT,
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     // limit logins in the last 5 minutes
@@ -131,7 +128,6 @@ export const config = configure(
     ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
     SEND_WEBHOOKS_EMAILS: z.boolean(),
-    NO_CLIENT: z.boolean(),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     LOGIN_RATE_LIMIT_TRIES: z.number().int().positive(),

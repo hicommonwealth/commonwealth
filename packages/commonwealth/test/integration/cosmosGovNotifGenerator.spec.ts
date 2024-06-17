@@ -27,6 +27,7 @@ import {
   QueryProposalResponse,
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
 import {
@@ -233,16 +234,16 @@ describe('Cosmos Governance Notification Generator', () => {
     });
   }
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('Utility function tests', () => {
-    it('fetchLatestNotifProposalIds: should fetch the latest proposal ids', async () => {
+    test('fetchLatestNotifProposalIds: should fetch the latest proposal ids', async () => {
       await createFakeProposalNotification('1', 'edgeware');
       const latestEdgewareProposal = await createFakeProposalNotification(
         '2',
@@ -271,7 +272,7 @@ describe('Cosmos Governance Notification Generator', () => {
       );
     });
 
-    it('filterProposals: should filter out old proposals', async () => {
+    test('filterProposals: should filter out old proposals', () => {
       const validKyveProposal = createFakeProposal('v1', 3);
       const validOsmosisProposal = createFakeProposal('v1Beta1', 3);
       const oneDayAgo = Date.now() - 60000 * 60 * 24;
@@ -305,25 +306,23 @@ describe('Cosmos Governance Notification Generator', () => {
   });
 
   describe('generateCosmosGovNotifications tests', () => {
-    beforeEach(
-      'Reset Cosmos clients and delete chain-event notifications',
-      async () => {
-        for (const key in CosmosClients) {
-          delete CosmosClients[key];
-        }
+    beforeEach(async () => {
+      for (const key in CosmosClients) {
+        delete CosmosClients[key];
+      }
 
-        await models.sequelize.query(`
-          DELETE FROM "NotificationsRead";
+      await models.sequelize.query(`
+            DELETE
+            FROM "NotificationsRead";
         `);
-        await models.Notification.destroy({
-          where: {
-            category_id: 'chain-event',
-          },
-        });
-      },
-    );
+      await models.Notification.destroy({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+    });
 
-    it('should not generate notifications if there are no cosmos chains', async () => {
+    test('should not generate notifications if there are no cosmos chains', async () => {
       await models.Community.destroy({
         where: {
           base: ChainBase.CosmosSDK,
@@ -346,7 +345,7 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(notifications.length).to.equal(0);
     });
 
-    it('should not generate notifications if there are no new proposals', async () => {
+    test('should not generate notifications if there are no new proposals', async () => {
       await createCosmosChains();
       const user = await models.User.findOne();
       await models.Subscription.findOrCreate({
@@ -378,7 +377,7 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(notifications.length).to.equal(0);
     });
 
-    it('should generate notifications for recent proposals even if there are no existing notifications', async () => {
+    test('should generate notifications for recent proposals even if there are no existing notifications', async () => {
       createMockClients(
         [createFakeProposal('v1', 4), createFakeProposal('v1', 5)],
         [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)],
@@ -395,7 +394,7 @@ describe('Cosmos Governance Notification Generator', () => {
       expect(notifications.length).to.equal(2);
     });
 
-    it('should generate cosmos gov notifications for new proposals given existing notifications', async () => {
+    test('should generate cosmos gov notifications for new proposals given existing notifications', async () => {
       const v1ExistingNotifPropId = 24;
       const v1Beta1ExistingNotifPropId = 36;
       // @ts-expect-error StrictNullChecks

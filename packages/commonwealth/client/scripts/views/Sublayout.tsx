@@ -9,13 +9,11 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import { getUniqueUserAddresses } from '../helpers/user';
 import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
-import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
@@ -31,11 +29,7 @@ type SublayoutProps = {
   isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
-const Sublayout = ({
-  children,
-  hideFooter = true,
-  isInsideCommunity,
-}: SublayoutProps) => {
+const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
@@ -62,12 +56,8 @@ const Sublayout = ({
     }
   }, [triggerOpenModalType, setTriggerOpenModalType]);
 
-  const {
-    onboardedProfiles,
-    setProfileAsOnboarded,
-    isWelcomeOnboardModalOpen,
-    setIsWelcomeOnboardModalOpen,
-  } = useWelcomeOnboardModal();
+  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
+    useWelcomeOnboardModal();
 
   useEffect(() => {
     let timeout = null;
@@ -91,28 +81,10 @@ const Sublayout = ({
       isLoggedIn &&
       userOnboardingEnabled &&
       !isWelcomeOnboardModalOpen &&
-      profileId
+      profileId &&
+      !app.user.isWelcomeOnboardFlowComplete
     ) {
-      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
-      const hasUsername = app?.user?.addresses?.find(
-        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
-      );
-
-      const userUniqueAddresses = getUniqueUserAddresses({});
-
-      // open welcome modal if user is not onboarded and there is a single connected address
-      if (
-        !hasUsername &&
-        !onboardedProfiles[profileId] &&
-        userUniqueAddresses.length === 1
-      ) {
-        setIsWelcomeOnboardModalOpen(true);
-      }
-
-      // if the user has a set username, mark as onboarded
-      if (hasUsername && !onboardedProfiles[profileId]) {
-        setProfileAsOnboarded(profileId);
-      }
+      setIsWelcomeOnboardModalOpen(true);
     }
 
     if (!isLoggedIn && isWelcomeOnboardModalOpen) {
@@ -120,11 +92,9 @@ const Sublayout = ({
     }
   }, [
     profileId,
-    onboardedProfiles,
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
-    setProfileAsOnboarded,
     isLoggedIn,
   ]);
 
@@ -248,7 +218,6 @@ const Sublayout = ({
               <AdminOnboardingSlider />
             )}
             {children}
-            {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
         </div>
         {userOnboardingEnabled && (

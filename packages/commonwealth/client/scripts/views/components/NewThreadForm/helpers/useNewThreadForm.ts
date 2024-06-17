@@ -50,7 +50,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    restoredDraft?.body,
+    restoredDraft!.body,
   );
   const [isSaving, setIsSaving] = useState(false);
 

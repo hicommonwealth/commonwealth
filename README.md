@@ -1,3 +1,7 @@
+[![Coverage Status](https://coveralls.io/repos/github/hicommonwealth/commonwealth/badge.svg?branch=master)](https://coveralls.io/github/hicommonwealth/commonwealth?branch=master)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/hicommonwealth/commonwealth/CI.yml?branch=master&label=CI)
+![GitHub repo size](https://img.shields.io/github/repo-size/hicommonwealth/commonwealth)
+
 # Scripts
 - `pnpm start-all`
   - Starts ALL the microservices in different processes. Requires a RabbitMQ instance/connection to function properly.
