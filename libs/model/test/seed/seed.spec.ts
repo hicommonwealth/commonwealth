@@ -5,7 +5,6 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
-  NotificationCategories,
 } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -138,7 +137,7 @@ describe('Seed functions', () => {
         ],
       });
 
-      const community = await testSeed('Community', {
+      await testSeed('Community', {
         id: 'superEth',
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
@@ -171,11 +170,6 @@ describe('Seed functions', () => {
           },
         ],
         topics: [{}, {}],
-      });
-
-      await testSeed('NotificationCategory', {
-        name: NotificationCategories.NewThread,
-        description: 'someone makes a new thread',
       });
       shouldExit = false;
     });

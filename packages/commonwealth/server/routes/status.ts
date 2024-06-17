@@ -4,7 +4,6 @@ import type {
   CommunityInstance,
   DB,
   EmailNotificationInterval,
-  NotificationCategoryInstance,
   StarredCommunityAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
@@ -29,7 +28,6 @@ type ThreadCountQueryData = {
 };
 
 type StatusResp = {
-  notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
   loggedIn?: boolean;
@@ -54,12 +52,9 @@ type StatusResp = {
 };
 
 const getCommunityStatus = async (models: DB) => {
-  const [communities, notificationCategories] = await Promise.all([
-    models.Community.findAll({
-      where: { active: true },
-    }),
-    models.NotificationCategory.findAll(),
-  ]);
+  const communities = await models.Community.findAll({
+    where: { active: true },
+  });
 
   const communityCategories: {
     [communityId: string]: CommunityCategoryType[];
@@ -89,7 +84,6 @@ const getCommunityStatus = async (models: DB) => {
     );
 
   return {
-    notificationCategories,
     communityCategories,
     threadCountQueryData,
   };
@@ -309,14 +303,10 @@ export const status = async (
     const communityStatusPromise = getCommunityStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const {
-        notificationCategories,
-        communityCategories,
-        threadCountQueryData,
-      } = await communityStatusPromise;
+      const { communityCategories, threadCountQueryData } =
+        await communityStatusPromise;
 
       return success(res, {
-        notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: config.EVM.ETH_RPC,
         enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
@@ -335,11 +325,7 @@ export const status = async (
         userStatusPromise,
         profilePromise,
       ]);
-      const {
-        notificationCategories,
-        communityCategories,
-        threadCountQueryData,
-      } = communityStatus;
+      const { communityCategories, threadCountQueryData } = communityStatus;
       const { roles, user, id } = userStatus;
 
       const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
@@ -353,7 +339,6 @@ export const status = async (
       user.knockJwtToken = knockJwtToken;
 
       return success(res, {
-        notificationCategories,
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,

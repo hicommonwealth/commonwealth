@@ -6,7 +6,6 @@ export type Aggregates = Extract<
   | 'ChainNode'
   | 'Comment'
   | 'Community'
-  | 'NotificationCategory'
   | 'Thread'
   | 'Reaction'
   | 'User'

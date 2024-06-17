@@ -4,7 +4,6 @@ import {
   ChainNetwork,
   ChainType,
   CosmosGovernanceVersion,
-  NotificationCategories,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { bootstrap_testing } from './bootstrap';
@@ -454,45 +453,6 @@ export const seedDb = async () => {
         keytype: 'sr25519',
         role: 'admin',
         is_user_default: false,
-      },
-    ]);
-
-    await models.NotificationCategory.bulkCreate([
-      {
-        name: NotificationCategories.NewThread,
-        description: 'someone makes a new thread',
-      },
-      {
-        name: NotificationCategories.NewComment,
-        description: 'someone makes a new comment',
-      },
-      {
-        name: NotificationCategories.NewMention,
-        description: 'someone @ mentions a user',
-      },
-      {
-        name: NotificationCategories.NewCollaboration,
-        description: 'someone collaborates with a user',
-      },
-      {
-        name: NotificationCategories.ChainEvent,
-        description: 'a chain event occurs',
-      },
-      {
-        name: NotificationCategories.NewReaction,
-        description: 'someone reacts to a post',
-      },
-      {
-        name: NotificationCategories.ThreadEdit,
-        description: 'someone edited a thread',
-      },
-      {
-        name: NotificationCategories.CommentEdit,
-        description: 'someone edited a comment',
-      },
-      {
-        name: NotificationCategories.SnapshotProposal,
-        description: 'Snapshot proposal notifications',
       },
     ]);
 
