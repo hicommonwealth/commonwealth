@@ -22,7 +22,7 @@ export default (
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       comment_id: { type: Sequelize.INTEGER, allowNull: false },
-      text: { type: Sequelize.STRING, allowNull: false },
+      text: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
     },
     {

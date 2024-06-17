@@ -23,7 +23,7 @@ export default (
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: Sequelize.INTEGER, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
-      body: { type: Sequelize.STRING, allowNull: false },
+      body: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
     },
     {
