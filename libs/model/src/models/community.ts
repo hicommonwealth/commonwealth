@@ -133,6 +133,11 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      profile_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       namespace: { type: Sequelize.STRING, allowNull: true },
       namespace_address: {
         type: Sequelize.STRING,
@@ -149,6 +154,11 @@ export default (
       include_in_digest_email: {
         type: Sequelize.BOOLEAN,
         allowNull: true,
+      },
+      count_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
       },
     },
     {
