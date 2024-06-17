@@ -41,7 +41,7 @@ async function run() {
 
 run()
   .then(() => {
-    dispose()('EXIT', true);
+    void dispose()('EXIT', true);
   })
   .catch((error) => {
     console.error('Failed to migrate community counts:', error);
