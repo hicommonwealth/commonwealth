@@ -1,4 +1,4 @@
-import { checkNewThreadErrors } from './helpers';
+import { checkIsTopicInContest, checkNewThreadErrors } from './helpers';
 import useNewThreadForm from './useNewThreadForm';
 
-export { checkNewThreadErrors, useNewThreadForm };
+export { checkIsTopicInContest, checkNewThreadErrors, useNewThreadForm };

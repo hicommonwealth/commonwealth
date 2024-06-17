@@ -2,10 +2,11 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
@@ -20,6 +21,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -31,16 +33,26 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import ContestThreadBanner from './ContestThreadBanner';
 import './NewThreadForm.scss';
-import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import {
+  checkIsTopicInContest,
+  checkNewThreadErrors,
+  useNewThreadForm,
+} from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const contestsEnabled = useFlag('contest');
+
+  const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+
+  const { contestsData, isContestAvailable } = useCommunityContests();
 
   const communityId = app.chain.id;
   const hasTopics = topics?.length;
@@ -64,6 +76,8 @@ export const NewThreadForm = () => {
     canShowGatingBanner,
     setCanShowGatingBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
+
+  const isTopicInContest = checkIsTopicInContest(contestsData, threadTopic.id);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -180,6 +194,11 @@ export const NewThreadForm = () => {
     isThreadTopicGated: isRestrictedMembership,
   });
 
+  const contestThreadBannerVisible =
+    contestsEnabled && isContestAvailable && isTopicInContest;
+  const isDisabledBecauseOfContestsConsent =
+    contestThreadBannerVisible && !submitEntryChecked;
+
   return (
     <>
       <CWPageLayout>
@@ -244,6 +263,13 @@ export const NewThreadForm = () => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
+              {contestThreadBannerVisible && (
+                <ContestThreadBanner
+                  submitEntryChecked={submitEntryChecked}
+                  onSetSubmitEntryChecked={setSubmitEntryChecked}
+                />
+              )}
+
               <div className="buttons-row">
                 {isPopulated && hasJoinedCommunity && (
                   <CWButton
@@ -256,7 +282,11 @@ export const NewThreadForm = () => {
                 )}
                 <CWButton
                   label="Create thread"
-                  disabled={isDisabled || !hasJoinedCommunity}
+                  disabled={
+                    isDisabled ||
+                    !hasJoinedCommunity ||
+                    isDisabledBecauseOfContestsConsent
+                  }
                   onClick={handleNewThreadCreation}
                   tabIndex={4}
                   containerClassName="no-pad"
