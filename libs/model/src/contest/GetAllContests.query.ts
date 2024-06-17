@@ -9,46 +9,41 @@ import { rollOverContest } from '../services/commonProtocol/contestHelper';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+// find community contests that are ended and trigger rollover
 async function performContestRollovers(communityId: string) {
-  // find community contests that are ended and trigger rollover
-  const contestRolloverPromises = (
-    await models.ContestManager.findAll({
-      where: {
-        community_id: communityId,
-      },
-      include: [
-        {
-          model: models.Contest,
-          as: 'contests',
-          order: [['contest_id', 'DESC']], // most recent contest
-          limit: 1,
-        },
-        {
-          model: models.Community,
-          as: 'community',
-          include: [
-            {
-              model: models.ChainNode,
-              as: 'chainNode',
-            },
-          ],
-        },
-      ],
-    })
-  )
-    .map((contestManager) => {
-      const { private_url, url } = (contestManager as any).community.chainNode;
-      return {
-        is_one_off: contestManager.interval === 0,
-        rpc_node_url: (private_url || url) as string,
-        contest_address: contestManager.contest_address,
-        contest: (contestManager as any).contests[0],
-      };
-    })
-    .filter(({ contest }) => Date.now() > contest.end_time.valueOf()) // check if ended
-    .map(async ({ is_one_off, rpc_node_url, contest_address }) => {
-      await rollOverContest(rpc_node_url, contest_address, is_one_off);
-    });
+  const contestManagersWithEndedContest = await models.sequelize.query<{
+    contest_address: string;
+    interval: number;
+    url: string;
+  }>(
+    `
+    SELECT cm.contest_address, cm.interval, co.contest_id, co.end_time, COALESCE(cn.private_url, cn.url) as url
+    FROM "ContestManagers" cm
+    JOIN (
+        SELECT *
+        FROM "Contests"
+        WHERE (contest_address, contest_id) IN (
+            SELECT contest_address, MAX(contest_id) AS contest_id
+            FROM "Contests"
+            GROUP BY contest_address
+        )
+    ) co ON co.contest_address = cm.contest_address AND NOW() > co.end_time
+    JOIN "Communities" cu ON cm.community_id = cu.id AND cu.id = :community_id
+    JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
+  `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { community_id: communityId },
+    },
+  );
+
+  const contestRolloverPromises = contestManagersWithEndedContest.map(
+    async ({ url, contest_address, interval }) => {
+      log.debug(`ROLLOVER: ${contest_address}`);
+      return rollOverContest(url, contest_address, interval === 0);
+    },
+  );
 
   const promiseResults = await Promise.allSettled(contestRolloverPromises);
 
@@ -72,7 +67,8 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      // await performContestRollovers(payload.community_id);
+      // do in background
+      performContestRollovers(payload.community_id);
 
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
