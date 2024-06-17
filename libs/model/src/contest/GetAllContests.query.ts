@@ -56,7 +56,9 @@ async function performContestRollovers(communityId: string) {
 
   if (errors.length > 0) {
     log.warn(
-      `GetAllContests updateScore: failed with errors: ${errors.join(', ')}"`,
+      `GetAllContests performContestRollovers: failed with errors: ${errors.join(
+        ', ',
+      )}"`,
     );
   }
 }
