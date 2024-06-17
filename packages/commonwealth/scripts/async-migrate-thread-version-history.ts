@@ -1,4 +1,5 @@
 //TODO: This should be deleted after thread version histories are fixed
+import { dispose } from '@hicommonwealth/core/src/index';
 import { models, ThreadVersionHistoryAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
@@ -96,14 +97,19 @@ async function run() {
       }
     } catch (error) {
       console.error('Error:', error.message);
-      process.exit(1);
+      throw error;
     }
 
     i += 1;
   }
 
   console.log('Finished migration');
-  process.exit(0);
 }
 
-run();
+run()
+  .then(() => {
+    void dispose()('EXIT', true);
+  })
+  .catch((error) => {
+    console.error('Failed to migrate community counts:', error);
+  });
