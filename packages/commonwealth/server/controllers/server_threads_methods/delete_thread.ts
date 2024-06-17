@@ -74,7 +74,7 @@ export async function __deleteThread(
   }
 
   await this.models.sequelize.transaction(async (transaction) => {
-    await deleteThreadFromDb(this.models, thread, transaction);
+    await deleteThreadFromDb(thread, transaction);
   });
 
   // use callbacks so route returns and this completes in the background

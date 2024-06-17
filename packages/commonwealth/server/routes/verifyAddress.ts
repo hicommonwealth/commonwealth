@@ -10,7 +10,6 @@ import type {
 import {
   ChainBase,
   DynamicTemplate,
-  NotificationCategories,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
@@ -109,18 +108,6 @@ const processAddress = async (
       });
       addressInstance.profile_id = // @ts-expect-error StrictNullChecks
         (newUser.Profiles[0] as ProfileAttributes).id;
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      });
       addressInstance.user_id = newUser.id;
     }
   } else {

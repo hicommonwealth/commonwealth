@@ -8,7 +8,6 @@ import {
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
-import { NotificationCategories } from '@hicommonwealth/shared';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
@@ -208,29 +207,10 @@ export async function __createThread(
     throw new AppError(Errors.FailedCreateThread);
   }
 
-  // -----
-
-  // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.bulkCreate([
-    {
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewComment,
-      // @ts-expect-error StrictNullChecks
-      thread_id: finalThread.id,
-      community_id: finalThread.community_id,
-      is_active: true,
-    },
-    {
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewReaction,
-      // @ts-expect-error StrictNullChecks
-      thread_id: finalThread.id,
-      community_id: finalThread.community_id,
-      is_active: true,
-    },
-  ]);
+  await this.models.ThreadSubscription.create({
+    user_id: user.id!,
+    thread_id: finalThread.id!,
+  });
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,

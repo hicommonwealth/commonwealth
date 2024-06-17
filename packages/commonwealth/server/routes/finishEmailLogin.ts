@@ -1,6 +1,5 @@
 import { stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { NotificationCategories } from '@hicommonwealth/shared';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -119,22 +118,6 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
     const newUser = await models.User.createWithProfile({
       email: email as string,
       emailVerified: true,
-    });
-
-    // Automatically create subscription to their own mentions
-    await models.Subscription.create({
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: newUser.id,
-      category_id: NotificationCategories.NewMention,
-      is_active: true,
-    });
-
-    // Automatically create a subscription to collaborations
-    await models.Subscription.create({
-      // @ts-expect-error StrictNullChecks
-      subscriber_id: newUser.id,
-      category_id: NotificationCategories.NewCollaboration,
-      is_active: true,
     });
 
     req.login(newUser, (err) => {

@@ -1,9 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester, type DB } from '@hicommonwealth/model';
-import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
 import {
   afterAll,
@@ -113,99 +111,6 @@ describe('DatabaseCleaner Tests', async () => {
       dbCleaner.initLoop(models, -1, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
-    });
-  });
-
-  describe('Tests what the cleaner cleans', () => {
-    let clock: sinon.SinonFakeTimers;
-
-    beforeAll(function () {
-      const now = new Date();
-      now.setUTCHours(8);
-      now.setUTCMinutes(0);
-      now.setUTCMilliseconds(0);
-      // set clock to 8 AM UTC current year, month, and day
-      // clock = sinon.useFakeTimers(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 8)));
-      clock = sinon.useFakeTimers({
-        now,
-        shouldAdvanceTime: true,
-      });
-    });
-
-    afterAll(function () {
-      clock.restore();
-    });
-
-    test('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {
-      const now = new Date();
-
-      const oneYearAndTwoDaysAgo = new Date(now);
-      oneYearAndTwoDaysAgo.setUTCFullYear(
-        oneYearAndTwoDaysAgo.getUTCFullYear() - 1,
-      );
-      oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
-
-      // create old user and address
-      // @ts-expect-error StrictNullChecks
-      const oldUser = await models.User.createWithProfile({
-        email: 'dbCleanerTest@old.com',
-        emailVerified: true,
-      });
-      // @ts-expect-error StrictNullChecks
-      await models.Address.create({
-        user_id: oldUser.id,
-        address: '0x1234',
-        community_id: 'ethereum',
-        verification_token: 'blah',
-        last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
-      });
-
-      // create new user and address
-      // @ts-expect-error StrictNullChecks
-      const newUser = await models.User.createWithProfile({
-        email: 'dbCleanerTest@new.com',
-        emailVerified: true,
-      });
-      // @ts-expect-error StrictNullChecks
-      await models.Address.create({
-        user_id: newUser.id,
-        address: '0x2345',
-        community_id: 'ethereum',
-        verification_token: 'blah',
-        last_active: Sequelize.literal(`NOW()`) as any,
-      });
-
-      const newSub = await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewThread,
-        community_id: 'ethereum',
-        is_active: true,
-        immediate_email: false,
-      });
-
-      const oldSub = await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: oldUser.id,
-        category_id: NotificationCategories.NewThread,
-        community_id: 'ethereum',
-        is_active: true,
-        immediate_email: false,
-      });
-
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.init(models);
-      await dbCleaner.executeQueries();
-
-      const subs = await models.Subscription.findAll();
-      let newUserSub;
-      for (const sub of subs) {
-        if (sub.subscriber_id === newUser.id && sub.id === newSub.id)
-          newUserSub = sub;
-        if (sub.subscriber_id === oldUser.id && sub.id === oldSub.id)
-          throw new Error('Old user subscription not deleted');
-      }
-      expect(newUserSub.id).to.equal(newSub.id);
     });
   });
 });

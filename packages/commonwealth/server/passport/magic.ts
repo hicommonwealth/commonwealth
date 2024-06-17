@@ -15,12 +15,7 @@ import {
   UserInstance,
   sequelize,
 } from '@hicommonwealth/model';
-import {
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-  WalletSsoSource,
-} from '@hicommonwealth/shared';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
@@ -176,28 +171,6 @@ async function createNewMagicUser({
         decodedMagicToken,
         transaction,
       );
-
-    // Automatically create subscription to their own mentions
-    await models.Subscription.create(
-      {
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      },
-      { transaction },
-    );
-
-    // Automatically create a subscription to collaborations
-    await models.Subscription.create(
-      {
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      },
-      { transaction },
-    );
 
     // create token with provided user/address
     const canonicalAddressInstance = addressInstances.find(

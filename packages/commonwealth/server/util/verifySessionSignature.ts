@@ -7,11 +7,7 @@ import { verifyMessage } from 'ethers/lib/utils';
 import { fileURLToPath } from 'url';
 
 import { logger } from '@hicommonwealth/core';
-import {
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-} from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';
@@ -365,18 +361,6 @@ const verifySessionSignature = async (
         });
         // @ts-expect-error StrictNullChecks
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
-        await models.Subscription.create({
-          // @ts-expect-error StrictNullChecks
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewMention,
-          is_active: true,
-        });
-        await models.Subscription.create({
-          // @ts-expect-error StrictNullChecks
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewCollaboration,
-          is_active: true,
-        });
         addressModel.user_id = user.id;
       }
     }

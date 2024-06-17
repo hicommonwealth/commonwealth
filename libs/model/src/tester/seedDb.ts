@@ -496,20 +496,6 @@ export const seedDb = async () => {
       },
     ]);
 
-    // Admins need to be subscribed to mentions and collaborations
-    await models.Subscription.bulkCreate([
-      {
-        subscriber_id: drew.id!,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      },
-      {
-        subscriber_id: drew.id!,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      },
-    ]);
-
     return models;
   } catch (error) {
     console.error('seedDB', error);
