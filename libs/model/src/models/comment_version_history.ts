@@ -21,7 +21,14 @@ export default (
     'CommentVersionHistory',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      comment_id: { type: Sequelize.INTEGER, allowNull: false },
+      comment_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Comments',
+          key: 'id',
+        },
+      },
       text: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
     },

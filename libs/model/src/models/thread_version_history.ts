@@ -21,7 +21,14 @@ export default (
     'ThreadVersionHistory',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      thread_id: { type: Sequelize.INTEGER, allowNull: false },
+      thread_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Threads',
+          key: 'id',
+        },
+      },
       address: { type: Sequelize.STRING, allowNull: false },
       body: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
