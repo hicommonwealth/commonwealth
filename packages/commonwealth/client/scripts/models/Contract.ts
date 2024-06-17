@@ -1,4 +1,4 @@
-import { AbiType } from '@hicommonwealth/core';
+import { AbiType } from '@hicommonwealth/shared';
 import type moment from 'moment';
 
 class Contract {
@@ -92,6 +92,7 @@ class Contract {
     this.nickname = nickname;
     this.abi = abi;
     this.ccts = ccts;
+    // @ts-expect-error StrictNullChecks
     this.hasGlobalTemplate = hasGlobalTemplate;
   }
 

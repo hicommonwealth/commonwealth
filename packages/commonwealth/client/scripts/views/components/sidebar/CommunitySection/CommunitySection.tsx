@@ -1,4 +1,5 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
+import { findDenominationString } from 'helpers/findDenomination';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -11,8 +12,10 @@ import {
 } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { getUniqueTopicIdsIncludedInContest } from 'views/components/sidebar/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { useFlag } from '../../../../hooks/useFlag';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
@@ -39,18 +42,32 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount } = useUserActiveAccount();
   const {
+    selectedAddress,
+    selectedCommunity,
+    modeOfManageCommunityStakeModal,
+    setModeOfManageCommunityStakeModal,
+  } = useManageCommunityStakeModalStore();
+  const {
     stakeEnabled,
     stakeBalance,
     currentVoteWeight,
     stakeValue,
     isLoading,
-  } = useCommunityStake();
-  const {
-    modeOfManageCommunityStakeModal,
-    setModeOfManageCommunityStakeModal,
-  } = useManageCommunityStakeModalStore();
+    activeChainId,
+  } = useCommunityStake({
+    // if user is not a community member but logged in, use an address that matches community chain base
+    // @ts-expect-error <StrictNullChecks/>
+    ...(selectedAddress &&
+      !app?.user?.activeAccount && { walletAddress: selectedAddress }),
+  });
+  const { isContestAvailable, isContestDataLoading, contestsData } =
+    useCommunityContests();
 
-  if (showSkeleton || isLoading) return <CommunitySectionSkeleton />;
+  const topicIdsIncludedInContest =
+    getUniqueTopicIdsIncludedInContest(contestsData);
+
+  if (showSkeleton || isLoading || isContestDataLoading)
+    return <CommunitySectionSkeleton />;
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -72,7 +89,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
                 voteWeight={currentVoteWeight}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
-                denomination="ETH"
+                denomination={findDenominationString(activeChainId) || 'ETH'}
                 onOpenStakeModal={setModeOfManageCommunityStakeModal}
               />
             )}
@@ -98,7 +115,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         )}
 
         <CWDivider />
-        <DiscussionSection />
+        <DiscussionSection
+          isContestAvailable={stakeEnabled && isContestAvailable}
+          // @ts-expect-error <StrictNullChecks/>
+          topicIdsIncludedInContest={topicIdsIncludedInContest}
+        />
         <CWDivider />
         <GovernanceSection />
         <CWDivider />
@@ -127,9 +148,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         content={
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+            denomination={findDenominationString(activeChainId) || 'ETH'}
+            {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setModeOfManageCommunityStakeModal(null)}
         open={!!modeOfManageCommunityStakeModal}
       />

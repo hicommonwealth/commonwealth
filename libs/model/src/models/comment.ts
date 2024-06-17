@@ -1,15 +1,20 @@
-import { IDiscordMeta, logger, stats } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
+import Sequelize from 'sequelize';
+import { fileURLToPath } from 'url';
+import { IDiscordMeta } from '../types';
+import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
+import { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes } from './community';
-import { ThreadAttributes } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ReactionAttributes } from './reaction';
+import type { ThreadAttributes } from './thread';
+import type { ModelInstance } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export type CommentAttributes = {
-  thread_id: string;
+  thread_id: number;
   address_id: number;
   text: string;
   plaintext: string;
@@ -22,6 +27,7 @@ export type CommentAttributes = {
   canvas_session: string;
   canvas_hash: string;
 
+  created_by: string;
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -29,9 +35,11 @@ export type CommentAttributes = {
   discord_meta?: IDiscordMeta;
 
   // associations
-  Chain?: CommunityAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
   Thread?: ThreadAttributes;
+  reactions?: ReactionAttributes[];
+  subscriptions?: CommentSubscriptionAttributes[];
 
   //counts
   reaction_count: number;
@@ -40,54 +48,51 @@ export type CommentAttributes = {
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
 
-export type CommentModelStatic = ModelStatic<CommentInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): CommentModelStatic => {
-  const Comment = <CommentModelStatic>sequelize.define(
+): Sequelize.ModelStatic<CommentInstance> =>
+  sequelize.define<CommentInstance>(
     'Comment',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      community_id: { type: Sequelize.STRING, allowNull: false },
       thread_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'Threads',
           key: 'id',
         },
       },
-      parent_id: { type: dataTypes.STRING, allowNull: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: true },
-      created_by: { type: dataTypes.STRING, allowNull: true },
-      text: { type: dataTypes.TEXT, allowNull: false },
-      plaintext: { type: dataTypes.TEXT, allowNull: true },
+      parent_id: { type: Sequelize.STRING, allowNull: true },
+      address_id: { type: Sequelize.INTEGER, allowNull: true },
+      created_by: { type: Sequelize.STRING, allowNull: true },
+      text: { type: Sequelize.TEXT, allowNull: false },
+      plaintext: { type: Sequelize.TEXT, allowNull: true },
       version_history: {
-        type: dataTypes.ARRAY(dataTypes.TEXT),
+        type: Sequelize.ARRAY(Sequelize.TEXT),
         defaultValue: [],
         allowNull: false,
       },
       // signed data
-      canvas_action: { type: dataTypes.JSONB, allowNull: true },
-      canvas_session: { type: dataTypes.JSONB, allowNull: true },
-      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      canvas_action: { type: Sequelize.JSONB, allowNull: true },
+      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      canvas_hash: { type: Sequelize.STRING, allowNull: true },
       // timestamps
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
-      discord_meta: { type: dataTypes.JSONB, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
+      marked_as_spam_at: { type: Sequelize.DATE, allowNull: true },
+      discord_meta: { type: Sequelize.JSONB, allowNull: true },
 
       //counts
       reaction_count: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
@@ -95,7 +100,7 @@ export default (
     {
       hooks: {
         afterCreate: async (comment: CommentInstance, options) => {
-          const { Thread } = sequelize.models;
+          const { Thread, Outbox } = sequelize.models;
           const thread_id = comment.thread_id;
           try {
             const thread = await Thread.findOne({
@@ -106,7 +111,7 @@ export default (
                 transaction: options.transaction,
               });
               stats().increment('cw.hook.comment-count', {
-                thread_id,
+                thread_id: String(thread_id),
               });
             }
           } catch (error) {
@@ -114,6 +119,17 @@ export default (
               `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
             );
           }
+
+          await emitEvent(
+            Outbox,
+            [
+              {
+                event_name: EventNames.CommentCreated,
+                event_payload: comment.get({ plain: true }),
+              },
+            ],
+            options.transaction,
+          );
         },
         afterDestroy: async (comment: CommentInstance, options) => {
           const { Thread } = sequelize.models;
@@ -127,7 +143,7 @@ export default (
                 transaction: options.transaction,
               });
               stats().decrement('cw.hook.comment-count', {
-                thread_id,
+                thread_id: String(thread_id),
               });
             }
           } catch (error) {
@@ -135,7 +151,7 @@ export default (
               `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
             );
             stats().increment('cw.hook.comment-count-error', {
-              thread_id,
+              thread_id: String(thread_id),
             });
           }
         },
@@ -156,26 +172,3 @@ export default (
       ],
     },
   );
-
-  Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Community, {
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
-    models.Comment.belongsTo(models.Address, {
-      foreignKey: 'address_id',
-      targetKey: 'id',
-    });
-    models.Comment.belongsTo(models.Thread, {
-      foreignKey: 'thread_id',
-      constraints: false,
-      targetKey: 'id',
-    });
-    models.Comment.hasMany(models.Reaction, {
-      foreignKey: 'comment_id',
-      as: 'reactions',
-    });
-  };
-
-  return Comment;
-};

@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import Near from '../controllers/chain/near/adapter';
 import IWebWallet from '../models/IWebWallet';
 

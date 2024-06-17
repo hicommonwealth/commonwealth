@@ -10,6 +10,7 @@ import {
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { GetCommunityStake, SetCommunityStake } from '../../src/community';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
@@ -17,9 +18,9 @@ import { seed } from '../../src/tester';
 chai.use(chaiAsPromised);
 
 describe('Stake lifecycle', () => {
-  let id_with_stake;
-  let id_without_stake_to_set;
-  let id_without_stake;
+  let id_with_stake: string;
+  let id_without_stake_to_set: string;
+  let id_without_stake: string;
   let actor: Actor;
 
   const payload = {
@@ -29,78 +30,44 @@ describe('Stake lifecycle', () => {
     stake_enabled: true,
   };
 
-  before(async () => {
-    const [node] = await seed(
-      'ChainNode',
-      { contracts: [] },
-      // { mock: true, log: true },
-    );
-    const [user] = await seed(
-      'User',
-      { isAdmin: true, selected_community_id: null },
-      // { mock: true, log: true },
-    );
-    const [community_with_stake] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            role: 'admin',
-            user_id: user!.id,
-            profile_id: undefined,
-          },
-        ],
-        CommunityStakes: [
-          {
-            stake_id: 1,
-            stake_token: 'token',
-            vote_weight: 1,
-            stake_enabled: true,
-          },
-        ],
-        topics: [],
-        groups: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
-    const [community_without_stake_to_set] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            ...community_with_stake!.Addresses!.at(0)!,
-            id: undefined,
-            community_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
-    const [community_without_stake] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            ...community_with_stake!.Addresses!.at(0)!,
-            id: undefined,
-            community_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
+  beforeAll(async () => {
+    const [node] = await seed('ChainNode', {});
+    const [user] = await seed('User', { isAdmin: true });
+    const [community_with_stake] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: user!.id,
+        },
+      ],
+      CommunityStakes: [
+        {
+          stake_id: 1,
+          stake_token: 'token',
+          vote_weight: 1,
+          stake_enabled: true,
+        },
+      ],
+    });
+    const [community_without_stake_to_set] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          ...community_with_stake!.Addresses!.at(0)!,
+          id: undefined,
+        },
+      ],
+    });
+    const [community_without_stake] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          ...community_with_stake!.Addresses!.at(0)!,
+          id: undefined,
+        },
+      ],
+    });
 
     id_with_stake = community_with_stake!.id!;
     id_without_stake_to_set = community_without_stake_to_set!.id!;
@@ -120,17 +87,17 @@ describe('Stake lifecycle', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
     Sinon.restore();
   });
 
-  it('should fail set when community namespace not configured', () => {
+  test('should fail set when community namespace not configured', () => {
     expect(command(SetCommunityStake(), { id: id_with_stake, actor, payload }))
       .to.eventually.be.rejected;
   });
 
-  it('should set and get community stake', async () => {
+  test('should set and get community stake', async () => {
     const cr = await command(SetCommunityStake(), {
       id: id_without_stake_to_set,
       actor,
@@ -154,13 +121,13 @@ describe('Stake lifecycle', () => {
     expect(qr).to.deep.include({ ...payload });
   });
 
-  it('should fail set when community not found', async () => {
+  test('should fail set when community not found', async () => {
     expect(
       command(SetCommunityStake(), { actor, payload, id: 'does-not-exist' }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
 
-  it('should fail set when community stake has been configured', () => {
+  test('should fail set when community stake has been configured', () => {
     expect(
       command(SetCommunityStake(), {
         id: id_with_stake,
@@ -173,7 +140,7 @@ describe('Stake lifecycle', () => {
     );
   });
 
-  it('should get empty result when community stake not configured', async () => {
+  test('should get empty result when community stake not configured', async () => {
     const qr = await query(GetCommunityStake(), {
       actor,
       payload: { community_id: id_without_stake },

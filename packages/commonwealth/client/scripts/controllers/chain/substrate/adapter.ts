@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateAccounts from 'controllers/chain/substrate/account';
 import type { IApp } from 'state';

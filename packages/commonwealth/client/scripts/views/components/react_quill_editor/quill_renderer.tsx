@@ -1,5 +1,5 @@
 import { DeltaStatic } from 'quill';
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { QuillFormattedText } from './quill_formatted_text';
 import { SerializableDeltaStatic, getTextFromDelta } from './utils';
@@ -12,6 +12,8 @@ export type QuillRendererProps = {
   cutoffLines?: number;
   containerClass?: string;
   markdownCutoffLength?: number; // Sometimes necessary to prevent large markdown docs from slowing down pages
+  customClass?: string;
+  customShowMoreButton?: ReactNode;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -27,6 +29,8 @@ export const QuillRenderer = ({
   cutoffLines,
   containerClass,
   markdownCutoffLength,
+  customClass,
+  customShowMoreButton = null,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -82,6 +86,7 @@ export const QuillRenderer = ({
             doc={docInfo.content}
             searchTerm={searchTerm}
             cutoffLines={cutoffLines}
+            customShowMoreButton={customShowMoreButton}
           />
         );
       case 'markdown':
@@ -95,6 +100,8 @@ export const QuillRenderer = ({
             }
             searchTerm={searchTerm}
             cutoffLines={cutoffLines}
+            customClass={customClass}
+            customShowMoreButton={customShowMoreButton}
           />
         );
       default:
@@ -107,6 +114,8 @@ export const QuillRenderer = ({
     docInfo.content,
     docInfo.format,
     markdownCutoffLength,
+    customClass,
+    customShowMoreButton,
   ]);
 
   if (containerClass) {

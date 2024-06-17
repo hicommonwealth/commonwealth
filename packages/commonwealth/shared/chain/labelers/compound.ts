@@ -1,4 +1,4 @@
-import { SupportedNetwork } from '@hicommonwealth/core';
+import { SupportedNetwork } from '@hicommonwealth/shared';
 import type { IEventData } from '../types/compound';
 import { EventKind } from '../types/compound';
 import { IEventLabel, LabelerFilter } from './util';
@@ -17,6 +17,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Canceled',
         label: `Proposal ${data.id} was cancelled.`,
+        // @ts-expect-error StrictNullChecks
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,
@@ -26,6 +27,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Created',
         label: `Proposal ${data.id} was created.`,
+        // @ts-expect-error StrictNullChecks
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,
@@ -35,6 +37,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Executed',
         label: `Proposal ${data.id} was executed.`,
+        // @ts-expect-error StrictNullChecks
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,
@@ -44,6 +47,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Proposal Queued',
         label: `Proposal ${data.id} queued up. ETA: Block ${data.eta}.`,
+        // @ts-expect-error StrictNullChecks
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,
@@ -55,6 +59,7 @@ export const Label: LabelerFilter = (
         label: `Voter (${data.voter}) cast ${data.votes} votes ${
           data.support ? 'not' : null
         } in support of proposal ${data.id}.`,
+        // @ts-expect-error StrictNullChecks
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,

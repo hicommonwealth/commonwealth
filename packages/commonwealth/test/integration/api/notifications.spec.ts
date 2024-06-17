@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NotificationCategories, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 
 chai.use(chaiHttp);
@@ -21,7 +23,7 @@ describe('Notification Routes Tests', () => {
   const community_id = 'ethereum';
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     // get logged in address/user with JWT
@@ -32,7 +34,7 @@ describe('Notification Routes Tests', () => {
     userId = result.user_id;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
 
     newThreadSub = await server.seeder.createSubscription({
@@ -49,18 +51,21 @@ describe('Notification Routes Tests', () => {
       community_id,
     });
 
+    // @ts-expect-error StrictNullChecks
     notification = await server.models.Notification.create({
       category_id: NotificationCategories.NewThread,
       community_id,
       notification_data: '',
     });
 
+    // @ts-expect-error StrictNullChecks
     notificationTwo = await server.models.Notification.create({
       category_id: NotificationCategories.NewThread,
       community_id,
       notification_data: '',
     });
 
+    // @ts-expect-error StrictNullChecks
     notificationThree = await server.models.Notification.create({
       category_id: NotificationCategories.ChainEvent,
       community_id,
@@ -89,12 +94,12 @@ describe('Notification Routes Tests', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('/viewNotifications: return notifications to user', () => {
-    it('should return a users discussion notifications', async () => {
+    test('should return a users discussion notifications', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewDiscussionNotifications')
@@ -128,7 +133,7 @@ describe('Notification Routes Tests', () => {
       ).to.not.be.null;
     });
 
-    it('should return only unread notifications', async () => {
+    test('should return only unread notifications', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/viewDiscussionNotifications')
@@ -148,7 +153,7 @@ describe('Notification Routes Tests', () => {
       expect(NR.is_read).to.be.false;
     });
 
-    it('should return only notifications with active_only turned on', async () => {
+    test('should return only notifications with active_only turned on', async () => {
       await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: false,
@@ -168,7 +173,7 @@ describe('Notification Routes Tests', () => {
   });
 
   describe('/markNotificationsRead', async () => {
-    it('should mark multiple notifications as read', async () => {
+    test('should mark multiple notifications as read', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/markNotificationsRead')
@@ -182,14 +187,17 @@ describe('Notification Routes Tests', () => {
       const nrOne = await server.models.NotificationsRead.findOne({
         where: { notification_id: notification.id, user_id: userId },
       });
+      // @ts-expect-error StrictNullChecks
       expect(nrOne.is_read).to.be.true;
       const nrTwo = await server.models.NotificationsRead.findOne({
         where: { notification_id: notificationThree.id, user_id: userId },
       });
+      // @ts-expect-error StrictNullChecks
       expect(nrTwo.is_read).to.be.true;
     });
 
-    it('should pass when notification id is a string instead of an array', async () => {
+    test('should pass when notification id is a string instead of an array', async () => {
+      // @ts-expect-error StrictNullChecks
       const notif = await server.models.Notification.create({
         category_id: NotificationCategories.NewThread,
         community_id: community_id,
@@ -216,10 +224,11 @@ describe('Notification Routes Tests', () => {
       const nr = await server.models.NotificationsRead.findOne({
         where: { notification_id: notif.id, user_id: userId },
       });
+      // @ts-expect-error StrictNullChecks
       expect(nr.is_read).to.be.true;
     });
 
-    it('should fail when no notifications are passed', async () => {
+    test('should fail when no notifications are passed', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/markNotificationsRead')
@@ -232,7 +241,7 @@ describe('Notification Routes Tests', () => {
   });
 
   describe('/clearReadNotifications', async () => {
-    it('should pass when query formatted correctly', async () => {
+    test('should pass when query formatted correctly', async () => {
       const res = await chai
         .request(server.app)
         .post('/api/clearReadNotifications')

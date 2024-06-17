@@ -1,14 +1,17 @@
 import { ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export default async function assertAddressOwnership(
   models: DB,
   address: string,
 ) {
   const addressUsers = await models.Address.findAll({
+    // @ts-expect-error StrictNullChecks
     where: {
       address,
       verified: { [Op.ne]: null },

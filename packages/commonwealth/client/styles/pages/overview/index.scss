@@ -6,8 +6,6 @@
   flex-direction: column;
   width: 100%;
 
-  @include contentPadding;
-
   .header-row {
     align-items: center;
     display: flex;

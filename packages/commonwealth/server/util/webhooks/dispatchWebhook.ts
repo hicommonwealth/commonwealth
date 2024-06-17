@@ -1,14 +1,14 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+} from '@hicommonwealth/shared';
+import { fileURLToPath } from 'url';
 import { sendDiscordWebhook } from './destinations/discord';
 import { sendSlackWebhook } from './destinations/slack';
 import { sendTelegramWebhook } from './destinations/telegram';
@@ -17,7 +17,8 @@ import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
 import { fetchWebhooks, getWebhookDestination } from './util';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
@@ -50,6 +51,7 @@ export async function dispatchWebhooks(
 
   // const communityId =
 
+  // @ts-expect-error StrictNullChecks
   const community: CommunityInstance | undefined =
     await models.Community.findOne({
       where: {
@@ -66,6 +68,7 @@ export async function dispatchWebhooks(
     switch (getWebhookDestination(webhook.url)) {
       case WebhookDestinations.Discord:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendDiscordWebhook(
             webhook.url,
             notification.categoryId,
@@ -78,6 +81,7 @@ export async function dispatchWebhooks(
         break;
       case WebhookDestinations.Slack:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendSlackWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           }),
@@ -85,6 +89,7 @@ export async function dispatchWebhooks(
         break;
       case WebhookDestinations.Telegram:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendTelegramWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           }),
@@ -92,6 +97,7 @@ export async function dispatchWebhooks(
         break;
       case WebhookDestinations.Zapier:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendZapierWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           }),

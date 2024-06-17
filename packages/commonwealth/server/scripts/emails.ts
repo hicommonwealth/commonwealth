@@ -1,32 +1,35 @@
+import { logger } from '@hicommonwealth/core';
 import type {
+  AddressAttributes,
+  DB,
+  UserAttributes,
+} from '@hicommonwealth/model';
+import {
+  DynamicTemplate,
   IChainEventNotificationData,
   IForumNotificationData,
   ISnapshotNotificationData,
-} from '@hicommonwealth/core';
-import {
-  DynamicTemplate,
   NotificationCategories,
-  logger,
-} from '@hicommonwealth/core';
-import type { UserAttributes } from '@hicommonwealth/model';
-import { AddressAttributes, DB } from '@hicommonwealth/model';
-import { capitalize } from 'lodash';
+  getThreadUrl,
+} from '@hicommonwealth/shared';
+import sgMail from '@sendgrid/mail';
+import _ from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 import type { CWEvent } from '../../shared/chain/types/types';
 import {
   formatAddressShort,
-  getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
+import { config } from '../config';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(SENDGRID_API_KEY);
+// @ts-expect-error StrictNullChecks
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 const getForumNotificationCopy = async (
   models: DB,
@@ -60,6 +63,7 @@ const getForumNotificationCopy = async (
       : 'New activity on Commonwealth';
 
   // author
+  // @ts-expect-error StrictNullChecks
   const addressWhere: WhereOptions<AddressAttributes> = {
     address: author_address,
     community_id: author_community_id || null,
@@ -80,6 +84,7 @@ const getForumNotificationCopy = async (
     true,
   );
   try {
+    // @ts-expect-error StrictNullChecks
     authorName = authorProfile.profile_name || author_addr_short;
   } catch (e) {
     authorName = author_addr_short;
@@ -111,6 +116,7 @@ const getForumNotificationCopy = async (
   });
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
+    // @ts-expect-error StrictNullChecks
     const text = decodeURIComponent(comment_text);
     try {
       // return rendered quill doc
@@ -155,6 +161,7 @@ export const createImmediateNotificationEmailObject = async (
     const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
+      // @ts-expect-error StrictNullChecks
       blockNumber: ceInstance.block_number,
       data: ceInstance.event_data,
       network: ceInstance.network,
@@ -166,7 +173,7 @@ export const createImmediateNotificationEmailObject = async (
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(
+      }${chainEventLabel.heading} event on ${_.capitalize(
         ceInstance.community_id,
       )}`;
 

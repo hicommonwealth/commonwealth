@@ -100,8 +100,10 @@ export const ContractTemplateCard = ({
     });
   };
 
-  const enabler = app.chain.accounts.get(templateInfo.enabledBy);
-  const enabledOn = moment(templateInfo.enabledAt).format('MM/DD/YY');
+  const enabler = templateInfo?.enabledBy
+    ? app.chain.accounts.get(templateInfo?.enabledBy)
+    : null;
+  const enabledOn = moment(templateInfo.enabledAt).format('DD/MM/YYYY');
 
   return (
     <CWCard fullWidth className="ContractTemplateCard">
@@ -141,9 +143,15 @@ export const ContractTemplateCard = ({
                 </CWText>
                 <div className="enabledby-row">
                   <User
-                    userAddress={enabler.address}
+                    // @ts-expect-error <StrictNullChecks/>
+                    userAddress={enabler?.address}
+                    // @ts-expect-error <StrictNullChecks/>
                     userCommunityId={
-                      enabler.community?.id || enabler?.profile?.chain
+                      enabler?.community?.id || enabler?.profile?.chain
+                    }
+                    shouldShowAsDeleted={
+                      !enabler?.address &&
+                      !(enabler?.community?.id || enabler?.profile?.chain)
                     }
                     shouldShowAddressWithDisplayName
                   />

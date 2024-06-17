@@ -94,6 +94,7 @@ export async function getCompoundProposals(
     allProposalData.push({
       rawProposal: proposals[i],
       proposalState: proposalStates[i],
+      // @ts-expect-error StrictNullChecks
       proposalCreatedEvent: proposalCreatedEvents.find((p) =>
         p.id.eq(proposals[i].id),
       ),

@@ -1,12 +1,11 @@
+import { CommunityInstance, config } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
-} from '@hicommonwealth/core';
-import { CommunityInstance } from '@hicommonwealth/model';
-import { capitalize } from 'lodash';
+} from '@hicommonwealth/shared';
+import _ from 'lodash';
 import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
-import { SERVER_URL } from '../../config';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,
@@ -35,11 +34,11 @@ export async function getWebhookData(
     const previewImage = await getPreviewImageUrl(notification, community);
 
     return {
-      title: `${eventLabel.heading} on ${capitalize(
+      title: `${eventLabel.heading} on ${_.capitalize(
         notification.data.community_id,
       )}`,
       description: eventLabel.label,
-      url: SERVER_URL + eventLabel.linkUrl,
+      url: config.SERVER_URL + eventLabel.linkUrl,
       previewImageUrl: previewImage.previewImageUrl,
       previewImageAltText: previewImage.previewAltText,
     };
@@ -93,8 +92,13 @@ export async function getWebhookData(
       previewImageUrl: previewImage.previewImageUrl,
       previewImageAltText: previewImage.previewAltText,
 
+      // @ts-expect-error StrictNullChecks
       profileName: profile?.profile_name,
-      profileUrl: profile ? `${SERVER_URL}/profile/id/${profile.id}` : null,
+      // @ts-expect-error StrictNullChecks
+      profileUrl: profile
+        ? `${config.SERVER_URL}/profile/id/${profile.id}`
+        : null,
+      // @ts-expect-error StrictNullChecks
       profileAvatarUrl: profile?.avatar_url,
 
       objectTitle: title,

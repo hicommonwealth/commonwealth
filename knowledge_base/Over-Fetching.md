@@ -1,33 +1,23 @@
-**Contents**
+# Over-Fetching
 
-- [Data Over-Fetching](#data-over-fetching)
-  * [Changes Made](#changes-made)
-  * [Examples](#examples)
-    + [Scenario 1: Accidentally pulling all attributes using Sequelize](#scenario-1-accidentally-pulling-all-attributes-using-sequelize)
-    + [Scenario 2: Response format doesn't allow pagination](#scenario-2-response-format-doesnt-allow-pagination)
-    + [Scenario 3: Grabbing unused data](#scenario-3-grabbing-unused-data)
-- [Change Log](#change-log)
+This document pertains to situations where we retrieve more data than required. This is commonly observed when Sequelize queries behind endpoints extract excessive information.
 
-# Data Over-Fetching
+## Contents
 
-This pertains to situations where we retrieve more data than required. This is commonly observed when Sequelize queries behind endpoints extract excessive information.
+- [Examples in our Routes of Over-Fetching](#examples-in-our-routes-of-over-fetching)
+- [Common Scenarios](#common-scenarios)
+  * [Scenario 1: Accidentally pulling all attributes using Sequelize](#scenario-1-accidentally-pulling-all-attributes-using-sequelize)
+  * [Scenario 2: Response format doesn't allow pagination](#scenario-2-response-format-doesnt-allow-pagination)
+  * [Scenario 3: Grabbing unused data](#scenario-3-grabbing-unused-data)
+  * [Change Log](#change-log)
 
-**Few Example(s):**
+## Examples in our Routes of Over-Fetching
 
 - **User Profile** - Our primary need is the user's name and avatar URL. Despite this, we are also pulling in extra data like the user's biography and all corresponding addresses.
 - **Comment Text** - We're primarily interested in the text content of the comments. However, we're presently extracting the full version history as well.
 - **Threaded Discussions with Comments** - While our main goal is to extract only the threads, we're currently compiling all related comments along with their extensive version histories. A more efficient approach would be to limit the export to the 50 most recent comments.
 
-**Process Improvement:**
-
-- **Regular Audit and Clean-up:** Regularly reviewing your data needs, ensuring that you're only fetching the data that you need.
-- **Close Collaboration Between Teams:** The backend team and the frontend team should have good communication to ensure the backend is providing exactly what the frontend needs.
-
-## Changes Made
-
-Check out the changes in this [pull request](https://github.com/hicommonwealth/commonwealth/pull/3966).
-
-## Examples
+## Common Scenarios
 
 ### Scenario 1: Accidentally pulling all attributes using Sequelize
 
@@ -235,6 +225,6 @@ A new query for `viewUserActivity` and `viewGlobalActivity` has been proposed in
 
 Additionally, this update also addresses code duplication between `viewUserActivity` and `viewGlobalActivity`. The redundant code has been consolidated into a single 'activity' query. When this query is passed a user_id, it returns user-specific activity; otherwise, it delivers global activity. This change enhances the code's maintainability and readability while still retaining its functionality.
 
-## Change Log
+### Change Log
 
 - 230629: Authored by Nakul Manchanda.

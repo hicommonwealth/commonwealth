@@ -6,8 +6,9 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import MockExpressRequest from 'mock-express-request';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import DatabaseValidationService from '../../../server/middleware/databaseValidationService';
 
 chai.use(chaiHttp);
@@ -29,32 +30,37 @@ describe('DatabaseValidationService Tests', () => {
   let databaseValidationService;
   let server: TestServer;
 
-  before(async function () {
-    this.timeout(300000);
+  beforeAll(async function () {
     server = await testServer();
     console.log('Database reset');
     databaseValidationService = new DatabaseValidationService(server.models);
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     user2Address = res.address;
-    user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    user2JWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     user2Id = res.user_id;
     expect(user2Address).to.not.be.null;
     expect(user2JWT).to.not.be.null;
 
     res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: res.user_id, email: res.email },
+      config.AUTH.JWT_SECRET,
+    );
     userId = res.user_id;
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
-  });
+  }, 300_000);
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('validateAuthor', () => {
-    it('should successfully validate author if address exists for user', async () => {
+    test('should successfully validate author if address exists for user', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -75,7 +81,7 @@ describe('DatabaseValidationService Tests', () => {
       ).to.not.throw;
     });
 
-    it('should fail if no user is given', async () => {
+    test('should fail if no user is given', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -95,7 +101,7 @@ describe('DatabaseValidationService Tests', () => {
       expect(request.address).to.be.undefined;
     });
 
-    it('should fail if no address or author chain is given', async () => {
+    test('should fail if no address or author chain is given', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -115,7 +121,7 @@ describe('DatabaseValidationService Tests', () => {
   });
 
   describe('validateCommunity', () => {
-    it('should successfully validate chain id if chain exists', async () => {
+    test('should successfully validate chain id if chain exists', () => {
       const request = new MockExpressRequest();
 
       const resBody = {
@@ -136,7 +142,7 @@ describe('DatabaseValidationService Tests', () => {
       ).to.not.throw;
     });
 
-    it('should fail if no chain is given', async () => {
+    test('should fail if no chain is given', () => {
       const request = new MockExpressRequest();
 
       const resBody = {

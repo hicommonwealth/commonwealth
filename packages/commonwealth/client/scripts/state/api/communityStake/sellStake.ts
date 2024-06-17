@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import { ContractMethods, queryClient } from 'state/api/config';
 import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';

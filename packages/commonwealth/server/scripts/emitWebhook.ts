@@ -1,11 +1,12 @@
+import { dispose } from '@hicommonwealth/core';
+import { WebhookInstance, models } from '@hicommonwealth/model';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
   ProposalType,
   SupportedNetwork,
   WebhookCategory,
-} from '@hicommonwealth/core';
-import { WebhookInstance, models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
@@ -74,34 +75,42 @@ async function main() {
   let url: string;
   const webhooks: WebhookInstance[] = [];
   const genericWebhookOptions = {
+    // @ts-expect-error StrictNullChecks
     community_id: community.id,
     categories: [argv.notificationCategory as WebhookCategory],
   };
   if (argv.url) {
     url = argv.url;
   } else if (argv.destination === WebhookDestinations.Discord) {
+    // @ts-expect-error StrictNullChecks
     url = process.env.DISCORD_WEBHOOK_URL_DEV;
   } else if (argv.destination === WebhookDestinations.Slack) {
+    // @ts-expect-error StrictNullChecks
     url = process.env.SLACK_WEBHOOK_URL_DEV;
   } else if (argv.destination === WebhookDestinations.Telegram) {
     url = 'api.telegram.org/@-1001509073772';
   } else if (argv.destination === WebhookDestinations.Zapier) {
+    // @ts-expect-error StrictNullChecks
     url = process.env.ZAPIER_WEBHOOK_URL_DEV;
   } else if (argv.destination === 'all') {
     webhooks.push(
       models.Webhook.build({
+        // @ts-expect-error StrictNullChecks
         url: process.env.DISCORD_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
       }),
       models.Webhook.build({
+        // @ts-expect-error StrictNullChecks
         url: process.env.SLACK_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
       }),
+      // @ts-expect-error StrictNullChecks
       models.Webhook.build({
         url: 'api.telegram.org/@-1001509073772',
         ...genericWebhookOptions,
       }),
       models.Webhook.build({
+        // @ts-expect-error StrictNullChecks
         url: process.env.ZAPIER_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
       }),
@@ -112,7 +121,9 @@ async function main() {
 
   if (webhooks.length === 0) {
     webhooks.push(
+      // @ts-expect-error StrictNullChecks
       models.Webhook.build({
+        // @ts-expect-error StrictNullChecks
         url,
         ...genericWebhookOptions,
       }),
@@ -129,12 +140,14 @@ async function main() {
           kind: 'proposal-created',
         },
         network: SupportedNetwork.Aave,
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
       },
     };
   } else {
     const thread = await models.Thread.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
       },
       include: {
@@ -145,12 +158,18 @@ async function main() {
     });
 
     const baseNotifData = {
+      // @ts-expect-error StrictNullChecks
       created_at: thread.created_at,
+      // @ts-expect-error StrictNullChecks
       thread_id: thread.id,
+      // @ts-expect-error StrictNullChecks
       root_title: thread.title,
       root_type: ProposalType.Thread,
+      // @ts-expect-error StrictNullChecks
       community_id: thread.community_id,
+      // @ts-expect-error StrictNullChecks
       author_address: thread.Address.address,
+      // @ts-expect-error StrictNullChecks
       author_community_id: thread.Address.community_id,
     };
 
@@ -159,6 +178,7 @@ async function main() {
         categoryId: NotificationCategories.NewThread,
         data: {
           ...baseNotifData,
+          // @ts-expect-error StrictNullChecks
           comment_text: thread.body,
         },
       };
@@ -166,11 +186,16 @@ async function main() {
       argv.notificationCategory === NotificationCategories.NewComment
     ) {
       const [comment] = await models.Comment.findOrCreate({
+        // @ts-expect-error StrictNullChecks
         where: {
+          // @ts-expect-error StrictNullChecks
           community_id: community.id,
+          // @ts-expect-error StrictNullChecks
           thread_id: thread.id,
         },
+        // @ts-expect-error StrictNullChecks
         defaults: {
+          // @ts-expect-error StrictNullChecks
           address_id: thread.address_id,
           text: 'This is a comment',
         },
@@ -181,6 +206,7 @@ async function main() {
         data: {
           ...baseNotifData,
           comment_text: comment.text,
+          // @ts-expect-error StrictNullChecks
           comment_id: comment.id,
         },
       };
@@ -189,13 +215,18 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
+          // @ts-expect-error StrictNullChecks
           community_id: community.id,
         },
       });
       await models.Reaction.findOrCreate({
+        // @ts-expect-error StrictNullChecks
         where: {
+          // @ts-expect-error StrictNullChecks
           community_id: community.id,
+          // @ts-expect-error StrictNullChecks
           thread_id: thread.id,
+          // @ts-expect-error StrictNullChecks
           address_id: anotherAddress.id,
           reaction: 'like',
         },
@@ -203,6 +234,7 @@ async function main() {
 
       notification = {
         categoryId: NotificationCategories.NewReaction,
+        // @ts-expect-error StrictNullChecks
         data: {
           ...baseNotifData,
         },
@@ -210,17 +242,19 @@ async function main() {
     }
   }
 
+  // @ts-expect-error StrictNullChecks
   await dispatchWebhooks(notification, webhooks);
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
     .then(() => {
-      // note this stops rollbar errors reports from completing in the `dispatchWebhooks` function
-      process.exit(0);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
     })
     .catch((err) => {
       console.log('Failed to emit a notification:', err);
-      process.exit(1);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }

@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -83,8 +83,8 @@ export const e2eTestEntities = async function (
         (
           await testDb.ChainNode.findOrCreate({
             where: {
-              id: -1,
-              eth_chain_id: -1,
+              id: 9999,
+              eth_chain_id: 9999,
               url: 'test1',
               balance_type: 'ethereum',
               name: 'TestName1',
@@ -94,8 +94,8 @@ export const e2eTestEntities = async function (
         (
           await testDb.ChainNode.findOrCreate({
             where: {
-              id: -2,
-              eth_chain_id: -2,
+              id: 99999,
+              eth_chain_id: 99999,
               url: 'test2',
               balance_type: 'ethereum',
               name: 'TestName2',
@@ -109,7 +109,7 @@ export const e2eTestEntities = async function (
       ...(await testDb.Community.bulkCreate([
         {
           id: 'cmntest',
-          chain_node_id: -1,
+          chain_node_id: 9999,
           name: 'cmntest',
           network: ChainNetwork.Ethereum,
           type: ChainType.Offchain,
@@ -123,7 +123,7 @@ export const e2eTestEntities = async function (
         },
         {
           id: 'cmntest2',
-          chain_node_id: -2,
+          chain_node_id: 99999,
           name: 'cmntest2',
           network: ChainNetwork.Ethereum,
           type: ChainType.Offchain,
@@ -325,6 +325,33 @@ export const e2eTestEntities = async function (
         ),
       )),
     );
+
+    const notificationCategories: [string, string][] = [
+      ['new-thread-creation', 'someone makes a new thread'],
+      ['new-comment-creation', 'someone makes a new comment'],
+      ['new-mention', 'someone @ mentions a user'],
+      ['new-reaction', 'someone reacts to a post'],
+      ['chain-event', 'a chain event occurs'],
+      ['new-collaboration', 'someone collaborates with a user'],
+      ['thread-edit', 'A thread is edited'],
+      ['comment-edit', 'A comment is edited'],
+      ['snapshot-proposal', 'Snapshot proposal notifications'],
+    ];
+
+    try {
+      await Promise.all(
+        notificationCategories.map(async (n) => {
+          await testDb.NotificationCategory.findOrCreate({
+            where: {
+              name: n[0],
+              description: n[1],
+            },
+          });
+        }),
+      );
+    } catch (e) {
+      console.log(e);
+    }
 
     return {
       testThreads,

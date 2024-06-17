@@ -35,11 +35,13 @@ export const QuillFormattedText = ({
   cutoffLines,
   openLinksInNewTab,
   searchTerm,
+  customShowMoreButton,
 }: QuillFormattedTextProps) => {
   const navigate = useCommonNavigate();
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
+  // @ts-expect-error <StrictNullChecks/>
   const isTruncated: boolean = useMemo(() => {
     if (userExpand) {
       return false;
@@ -50,7 +52,7 @@ export const QuillFormattedText = ({
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
       return {
-        ops: [...doc.ops.slice(0, cutoffLines)],
+        ops: [...(doc?.ops || []).slice(0, cutoffLines)],
       } as DeltaStatic;
     }
     return doc;
@@ -72,7 +74,7 @@ export const QuillFormattedText = ({
      * Type guard function to check if a React element is a TextWithHighlights element.
      *
      * @param {React.ReactElement} child - The React element to check.
-     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - True if the element is a TextWithHighlights element, false otherwise.
+     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - Only true when element is TextWithHighlights.
      */
     const isTextWithHighlights = (
       child: React.ReactElement,
@@ -133,6 +135,7 @@ export const QuillFormattedText = ({
           const processedChildren = processElements(
             child.props.children as TextWithHighlightsArray,
           );
+          // @ts-expect-error <StrictNullChecks/>
           return React.cloneElement(child, null, processedChildren);
         }
       }
@@ -155,12 +158,16 @@ export const QuillFormattedText = ({
         {finalDoc}
       </div>
       {isTruncated && (
-        <div className="show-more-button-wrapper">
-          <div className="show-more-button" onClick={toggleDisplay}>
-            <CWIcon iconName="plus" iconSize="small" />
-            <div className="show-more-text">Show More</div>
-          </div>
-        </div>
+        <>
+          {customShowMoreButton || (
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div className="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   );

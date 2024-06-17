@@ -1,0 +1,30 @@
+@import '../../../../../../styles/shared';
+
+.Status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: $neutral-50;
+  gap: 8px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 6px;
+
+  .b1 {
+    color: $neutral-800;
+  }
+
+  .Icon {
+    color: $green-500;
+  }
+
+  .Text {
+    width: fit-content;
+  }
+
+  .description {
+    color: $neutral-700;
+  }
+}

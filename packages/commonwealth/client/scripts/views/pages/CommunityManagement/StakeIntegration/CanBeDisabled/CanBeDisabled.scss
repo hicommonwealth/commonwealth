@@ -1,0 +1,12 @@
+@import '../../../../../../styles/shared';
+
+.CanBeDisabled {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  .b2 {
+    color: $neutral-500;
+  }
+}

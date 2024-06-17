@@ -35,7 +35,7 @@ export class NearAccount extends Account {
     app: IApp,
     Chain: NearChain,
     Accounts: NearAccounts,
-    address: string
+    address: string,
   ) {
     super({ community: app.chain.meta, address });
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
@@ -56,7 +56,7 @@ export class NearAccount extends Account {
     }
     const kp = await this._Accounts.keyStore.getKey(
       this._Chain.isMainnet ? 'mainnet' : 'testnet',
-      this.address
+      this.address,
     );
     const { publicKey, signature } = kp.sign(Buffer.from(message));
     return JSON.stringify({
@@ -91,6 +91,7 @@ export class NearAccounts implements IAccountsModule<NearAccount> {
   }
 
   public get(address: string): NearAccount {
+    // @ts-expect-error StrictNullChecks
     if (!this._Chain) return null; // We can't construct accounts if the NEAR chain isn't loaded
     return this.fromAddress(address);
   }

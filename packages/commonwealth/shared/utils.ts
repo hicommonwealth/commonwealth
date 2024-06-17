@@ -1,4 +1,4 @@
-import { AccessLevel, RoleObject } from '@hicommonwealth/core';
+import { AccessLevel, RoleObject } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -6,18 +6,6 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-
-export const slugify = (str: string): string => {
-  // Remove any character that isn't a alphanumeric character or a
-  // space, and then replace any sequence of spaces with dashes.
-  if (!str) return '';
-
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
-};
 
 export const slugifyPreserveDashes = (str: string): string => {
   // Remove any character that isn't a alphanumeric character, a
@@ -35,26 +23,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .toLowerCase();
 };
 
-/* eslint-disable */
-export const getThreadUrl = (
-  thread: {
-    chain: string;
-    type_id?: string | number;
-    id?: string | number;
-    title?: string;
-  },
-  comment?: string | number,
-): string => {
-  const aId = thread.chain;
-  const tId = thread.type_id || thread.id;
-  const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
-  const cId = comment ? `?comment=${comment}` : '';
-
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
-};
-
 export const getThreadUrlWithoutObject = (
   proposalCommunity,
   proposalId,
@@ -69,6 +37,7 @@ export const getThreadUrlWithoutObject = (
     : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
+// WARN: Using process.env to avoid webpack failures
 export const getCommunityUrl = (community: string): string => {
   return process.env.NODE_ENV === 'production'
     ? `https://commonwealth.im/${community}`
@@ -109,9 +78,11 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
     if (typeof node.insert === 'string') {
       const matches = node.insert.match(/[^\n]+\n?|\n/g);
       (matches || []).forEach((line) => {
+        // @ts-expect-error StrictNullChecks
         lines.push({ attributes: node.attributes, insert: line });
       });
     } else {
+      // @ts-expect-error StrictNullChecks
       lines.push(node);
     }
   }
@@ -119,22 +90,31 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
   const result = [];
   let parent = { children: [], attributes: undefined };
   for (const node of lines) {
+    // @ts-expect-error StrictNullChecks
     if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
+      // @ts-expect-error StrictNullChecks
       parent.attributes = node.attributes;
       // concatenate code-block node parents together, keeping newlines
       if (
         result.length > 0 &&
+        // @ts-expect-error StrictNullChecks
         result[result.length - 1].attributes &&
         parent.attributes &&
         parent.attributes['code-block'] &&
+        // @ts-expect-error StrictNullChecks
         result[result.length - 1].attributes['code-block']
       ) {
+        // @ts-expect-error StrictNullChecks
         parent.children.push({ insert: node.insert });
+        // @ts-expect-error StrictNullChecks
         result[result.length - 1].children = result[
           result.length - 1
+          // @ts-expect-error StrictNullChecks
         ].children.concat(parent.children);
       } else {
+        // @ts-expect-error StrictNullChecks
         parent.children.push({ insert: node.insert });
+        // @ts-expect-error StrictNullChecks
         result.push(parent);
       }
       parent = { children: [], attributes: undefined };
@@ -145,15 +125,20 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
   // If there was no \n at the end of the document, we need to push whatever remains in `parent`
   // onto the result. This may happen if we are rendering a truncated Quill document
   if (parent.children.length > 0) {
+    // @ts-expect-error StrictNullChecks
     result.push(parent);
   }
 
   // trim empty newlines at end of document
   while (
     result.length &&
+    // @ts-expect-error StrictNullChecks
     result[result.length - 1].children.length === 1 &&
+    // @ts-expect-error StrictNullChecks
     typeof result[result.length - 1].children[0].insert === 'string' &&
+    // @ts-expect-error StrictNullChecks
     result[result.length - 1].children[0].insert === '\n' &&
+    // @ts-expect-error StrictNullChecks
     result[result.length - 1].children[0].attributes === undefined
   ) {
     result.pop();
@@ -165,6 +150,7 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
 export const renderQuillDeltaToText = (delta, paragraphSeparator = '\n\n') => {
   return preprocessQuillDeltaForRendering(delta.ops)
     .map((parent) => {
+      // @ts-expect-error StrictNullChecks
       return parent.children
         .map((child) => {
           if (typeof child.insert === 'string')
@@ -228,10 +214,7 @@ export const addressSwapper = (options: {
   }
 
   // check if it is valid with the current prefix & reencode if needed
-  const [valid, errorMsg] = checkAddress(
-    options.address,
-    options.currentPrefix,
-  );
+  const [valid] = checkAddress(options.address, options.currentPrefix);
 
   if (!valid) {
     try {

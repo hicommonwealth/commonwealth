@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { parseFunctionsFromABI } from 'abi_utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
@@ -13,10 +13,11 @@ import {
 import 'pages/general_contract/index.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { AbiFunctionFragment, AbiOutput, AbiParameter } from 'web3';
+import { AbiItem } from 'web3-utils';
 import type Contract from '../../../models/Contract';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from '../404';
@@ -58,7 +59,10 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
     loadContractAbi().then(setAbiItems);
   }, [contractAddress, app.contracts]);
 
-  const callFunction = async (_contractAddress: string, fn: AbiItem) => {
+  const callFunction = async (
+    _contractAddress: string,
+    fn: AbiFunctionFragment,
+  ) => {
     try {
       setLoading(true);
 
@@ -71,6 +75,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
       const inputArgsArray = [];
       if (inputArgs && inputArgs.size > 0) {
         for (let i = 0; i < inputArgs.size; i++) {
+          // @ts-expect-error <StrictNullChecks/>
           inputArgsArray.push(inputArgs.get(i));
         }
       }
@@ -81,6 +86,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
         inputArgs: inputArgsArray,
       });
 
+      // @ts-expect-error <StrictNullChecks/>
       const ethersInterface = new ethers.utils.Interface(contract.abi);
 
       functionNameToFunctionOutput.current.set(
@@ -97,6 +103,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   };
 
   const loadContractAbi = async (): Promise<AbiItem[]> => {
+    // @ts-expect-error <StrictNullChecks/>
     const _contract: Contract = app.contracts.getByAddress(contractAddress);
     setContract(_contract);
 
@@ -134,13 +141,14 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
           <CWText>Outputs</CWText>
           <CWText>Call Function</CWText>
         </div>
-        {abiItems.map((fn: AbiItem) => {
+        {abiItems.map((fn: AbiFunctionFragment) => {
           return (
             <div className="function-row">
               <CWText>{fn.name}</CWText>
               <CWText>{fn.stateMutability}</CWText>
               <div className="functions-input-container">
-                {fn.inputs.map((input: AbiInput, inputIdx: number) => {
+                {/* @ts-expect-error StrictNullChecks*/}
+                {fn.inputs.map((input: AbiParameter, inputIdx: number) => {
                   return (
                     <div>
                       <div className="function-inputs">
@@ -172,6 +180,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                 })}
               </div>
               <div className="functions-output-container">
+                {/* @ts-expect-error StrictNullChecks*/}
                 {fn.outputs.map((output: AbiOutput, i) => {
                   const fnOutputArray =
                     functionNameToFunctionOutput.current.get(fn.name);
@@ -203,6 +212,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                     setSaving(true);
 
                     try {
+                      // @ts-expect-error <StrictNullChecks/>
                       callFunction(contractAddress, fn);
                     } catch (err) {
                       notifyError(

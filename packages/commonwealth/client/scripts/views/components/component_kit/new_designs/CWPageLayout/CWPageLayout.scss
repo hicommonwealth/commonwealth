@@ -3,11 +3,12 @@
 .PageLayout {
   width: 100%;
   padding-inline: 56px;
-  padding-top: 20px;
+  padding-top: 68px;
   padding-bottom: 20px;
 
-  @include smallInclusive {
+  @include extraSmall {
     padding-inline: 16px;
+    padding-top: 0; // because of the breadcrumbs being in static position on mobile
   }
 
   .layout-container {

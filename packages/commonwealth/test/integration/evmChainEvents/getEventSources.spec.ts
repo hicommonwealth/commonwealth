@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 import {
@@ -13,45 +14,49 @@ import {
 } from './util';
 
 describe('getEventSources', () => {
-  before(async () => {
+  let models: DB;
+
+  beforeAll(async () => {
+    const res = await import('@hicommonwealth/model');
+    models = res['models'];
     await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should not return sources that are not subscribed to', async () => {
-    const result = await getEventSources();
+  test('should not return sources that are not subscribed to', async () => {
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
-  it("should not return sources that don't have a community contract", async () => {
+  test("should not return sources that don't have a community contract", async () => {
     await getTestSubscription();
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
-  it("should not return sources that don't have an ABI", async () => {
+  test("should not return sources that don't have an ABI", async () => {
     await getTestCommunityContract();
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
-  it("should not return sources that don't have event signatures", async () => {
+  test("should not return sources that don't have event signatures", async () => {
     const abi = await getTestAbi();
     const contract = await getTestContract();
     contract.abi_id = abi.id;
     await contract.save();
 
-    const result = await getEventSources();
+    const result = await getEventSources(models);
     expect(result).to.deep.equal({});
   });
 
-  it('should return event sources organized by chain node', async () => {
+  test('should return event sources organized by chain node', async () => {
     const signatures = await getTestSignatures();
     const abi = await getTestAbi();
-    const result = await getEventSources();
+    const result = await getEventSources(models);
 
     const chainNodeId = String(signatures[0].chain_node_id);
     const contractAddress = signatures[0].contract_address;

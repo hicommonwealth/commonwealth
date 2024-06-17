@@ -6,12 +6,12 @@ import app from '../../state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { User } from '../components/user/user';
 
 import '../../../styles/modals/view_template_modal.scss';
@@ -24,7 +24,10 @@ const ViewTemplateModal = ({
   template: Template;
   onClose: () => void;
 }) => {
-  const creator: Account = app.chain.accounts.get(template.createdBy);
+  // @ts-expect-error <StrictNullChecks/>
+  const creator: Account = template?.createdBy
+    ? app.chain.accounts.get(template?.createdBy)
+    : null;
 
   return (
     <div className="ViewTemplateModal">
@@ -33,13 +36,19 @@ const ViewTemplateModal = ({
         <div className="CreationRow">
           <CWText type="b2">By</CWText>
           <User
-            userAddress={creator.address}
-            userCommunityId={creator.community?.id || creator?.profile?.chain}
+            userAddress={creator?.address}
+            // @ts-expect-error <StrictNullChecks/>
+            userCommunityId={creator?.community?.id || creator?.profile?.chain}
+            shouldShowAsDeleted={
+              !creator?.address &&
+              !(creator?.community?.id || creator?.profile?.chain)
+            }
             shouldShowAddressWithDisplayName
           />
           <CWText type="b2">•</CWText>
           <CWText type="b2">Created in</CWText>
           <CWCommunityAvatar
+            // @ts-expect-error <StrictNullChecks/>
             community={app.config.chains.getById(template.createdForCommunity)}
             size="small"
           />

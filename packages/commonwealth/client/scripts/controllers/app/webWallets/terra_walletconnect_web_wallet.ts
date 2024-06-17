@@ -4,7 +4,7 @@ import type {
   WalletController,
 } from '@terra-money/wallet-provider';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -77,6 +77,7 @@ class TerraWalletConnectWebWalletController
       return JSON.stringify({
         pub_key: {
           type: 'tendermint/PubKeySecp256k1',
+          // @ts-expect-error StrictNullChecks
           value: result.result.public_key.toAmino().value,
         },
         signature: Buffer.from(result.result.signature).toString('base64'),

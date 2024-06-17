@@ -8,10 +8,11 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import { NotificationCategories } from '@hicommonwealth/core';
-import type { SubscriptionInstance } from '@hicommonwealth/model';
+import { Subscription } from '@hicommonwealth/schemas';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
+import { z } from 'zod';
 import Notification from '../../models/Notification';
 
 const post = async (route, args, callback) => {
@@ -130,7 +131,7 @@ class NotificationsController {
           is_active: true,
           ...requestData,
         },
-        (result: SubscriptionInstance) => {
+        (result: z.infer<typeof Subscription>) => {
           const newSubscription = modelFromServer(result);
           this._subscriptions.push(newSubscription);
         },
@@ -164,6 +165,7 @@ class NotificationsController {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.disable();
+          // @ts-expect-error StrictNullChecks
           if (s.category === 'chain-event') ceSubs.push(s);
         }
       },
@@ -321,6 +323,7 @@ class NotificationsController {
       throw new Error('must be signed in to refresh notifications');
     }
 
+    // @ts-expect-error StrictNullChecks
     const options: NotifOptions = app.isCustomDomain()
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };
@@ -337,6 +340,7 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
+    // @ts-expect-error StrictNullChecks
     const options: NotifOptions = app.isCustomDomain()
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };

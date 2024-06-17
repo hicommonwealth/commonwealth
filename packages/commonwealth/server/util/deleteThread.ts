@@ -7,6 +7,7 @@ export default async function deleteThread(
   transaction: Transaction,
 ): Promise<void> {
   models.Subscription.destroy({
+    // @ts-expect-error StrictNullChecks
     where: {
       thread_id: thread.id,
     },

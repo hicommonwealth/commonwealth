@@ -1,7 +1,15 @@
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
 import {
   getTestAbi,
@@ -16,12 +24,15 @@ describe('scheduleNodeProcessing', () => {
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
   let singleSourceSuccess = false;
+  let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     await tester.seedDb();
+    const res = await import('@hicommonwealth/model');
+    models = res['models'];
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -34,13 +45,13 @@ describe('scheduleNodeProcessing', () => {
     sandbox.restore();
   });
 
-  it('should not schedule anything if there are no event sources', async () => {
-    await scheduleNodeProcessing(1000, processChainStub);
+  test('should not schedule anything if there are no event sources', async () => {
+    await scheduleNodeProcessing(models, 1000, processChainStub);
     clock.tick(1001);
     expect(processChainStub.called).to.be.false;
   });
 
-  it('should schedule processing for a single source', async () => {
+  test('should schedule processing for a single source', async () => {
     await getTestCommunityContract();
     await getTestSubscription();
     const abi = await getTestAbi();
@@ -49,7 +60,7 @@ describe('scheduleNodeProcessing', () => {
     await getTestSignatures();
 
     const interval = 10_000;
-    await scheduleNodeProcessing(interval, processChainStub);
+    await scheduleNodeProcessing(models, interval, processChainStub);
 
     expect(processChainStub.calledOnce).to.be.false;
 
@@ -58,7 +69,7 @@ describe('scheduleNodeProcessing', () => {
     singleSourceSuccess = true;
   });
 
-  it('should evenly schedule 2 sources per interval', async () => {
+  test('should evenly schedule 2 sources per interval', async () => {
     expect(singleSourceSuccess).to.be.true;
     await getTestCommunityContract('v2');
     await getTestSubscription('v2');
@@ -68,7 +79,7 @@ describe('scheduleNodeProcessing', () => {
     await getTestSignatures('v2');
 
     const interval = 10_000;
-    await scheduleNodeProcessing(interval, processChainStub);
+    await scheduleNodeProcessing(models, interval, processChainStub);
 
     expect(processChainStub.calledOnce).to.be.false;
     clock.tick(1);

@@ -1,4 +1,4 @@
-import type { ProposalType } from '@hicommonwealth/core';
+import type { ProposalType } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import type { IIdentifiable } from 'adapters/shared';
 import { EventEmitter } from 'events';

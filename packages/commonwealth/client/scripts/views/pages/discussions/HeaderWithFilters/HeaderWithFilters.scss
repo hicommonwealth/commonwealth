@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 16px;
 
   .header-row {
     display: flex;
@@ -21,7 +22,8 @@
     }
   }
 
-  .subheader-text.Text {
+  .subheader-text {
+    @include b1;
     color: $neutral-600;
   }
 
@@ -52,6 +54,8 @@
     display: flex;
     flex-direction: column;
     align-items: end;
+    padding-right: 4px;
+    padding-bottom: 4px;
   }
 
   @include smallInclusive {
@@ -63,6 +67,8 @@
   }
 
   @include extraSmall {
+    margin-top: 0;
+
     .filter-section-right {
       flex-direction: column;
       align-items: flex-start;

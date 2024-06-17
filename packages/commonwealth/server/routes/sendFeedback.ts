@@ -2,14 +2,16 @@ import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';
-import { SLACK_FEEDBACK_WEBHOOK } from '../config';
+import { fileURLToPath } from 'url';
+import { config } from '../config';
 
 export const Errors = {
   NotSent: 'Please enter the feedback message.',
   SlackWebhookError: 'SLACK_FEEDBACK_WEBHOOK missing.',
 };
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 const sendFeedback = async (
   models: DB,
@@ -21,7 +23,7 @@ const sendFeedback = async (
     return next(new AppError(Errors.NotSent));
   }
 
-  if (!SLACK_FEEDBACK_WEBHOOK) {
+  if (!config.SLACK_FEEDBACK_WEBHOOK) {
     log.error('No slack webhook found');
     return next(new ServerError(Errors.SlackWebhookError));
   }
@@ -38,7 +40,7 @@ const sendFeedback = async (
     text: `${userText} @ ${urlText}:\n${req.body.text}`,
   });
   request
-    .post(SLACK_FEEDBACK_WEBHOOK)
+    .post(config.SLACK_FEEDBACK_WEBHOOK)
     .send(data)
     .end((err) => {
       if (err) {

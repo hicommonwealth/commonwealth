@@ -1,20 +1,22 @@
-import {
-  NotificationCategories,
-  NotificationDataAndCategory,
-  logger,
-} from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   ProfileAttributes,
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
+import {
+  NotificationCategories,
+  NotificationDataAndCategory,
+  slugify,
+} from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { slugify } from '../../../shared/utils';
-import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import { fileURLToPath } from 'url';
+import { config } from '../../config';
 import { WebhookDestinations } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export const REGEX_IMAGE =
   /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
@@ -92,6 +94,7 @@ export async function getPreviewImageUrl(
     notification.categoryId !== NotificationCategories.ThreadEdit &&
     notification.categoryId !== NotificationCategories.CommentEdit
   ) {
+    // @ts-expect-error StrictNullChecks
     const bodytext = decodeURIComponent(notification.data.comment_text);
     const matches = bodytext.match(REGEX_IMAGE);
     if (matches) {
@@ -110,7 +113,7 @@ export async function getPreviewImageUrl(
 
   // case 3: default commonwealth logo
   return {
-    previewImageUrl: DEFAULT_COMMONWEALTH_LOGO,
+    previewImageUrl: config.DEFAULT_COMMONWEALTH_LOGO,
     previewAltText: 'Commonwealth',
   };
 }
@@ -130,7 +133,7 @@ export function getThreadUrlFromNotification(
   }
 
   const data = notification.data;
-  return `${SERVER_URL}/${data.community_id}/discussion/${
+  return `${config.SERVER_URL}/${data.community_id}/discussion/${
     data.thread_id
   }-${slugify(data.root_title)}${commentId}`;
 }

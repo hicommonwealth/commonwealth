@@ -5,24 +5,6 @@
   flex-direction: column;
   width: 100%;
   gap: 16px;
-  padding: 24px 56px;
-
-  @include medium {
-    padding: 20px 40px;
-  }
-
-  @include mediumSmall {
-    padding: 16px 32px;
-  }
-
-  @include smallInclusive {
-    padding: 16px;
-  }
-
-  @include extraSmall {
-    padding: 16px;
-    padding-top: 0px;
-  }
 
   .header {
     margin-bottom: 8px;

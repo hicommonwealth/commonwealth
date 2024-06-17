@@ -16,8 +16,8 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import Web3 from 'web3';
 import isValidJson from '../../../../../shared/validateJson';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 
 export enum TemplateComponents {
   DIVIDER = 'divider',
@@ -57,6 +57,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
   const params = formData;
   const [formState, setFormState] = useState({});
+  // @ts-expect-error <StrictNullChecks/>
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [templateNickname, setTemplateNickname] = useState('');
@@ -64,6 +65,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
 
   const loadData = useCallback(() => {
+    // @ts-expect-error <StrictNullChecks/>
     const { contract_address, slug } = params;
 
     if (Object.keys(app.contracts.store._storeAddress).length < 1) {
@@ -76,16 +78,21 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
     });
 
     if (!contractInStore || !templateMetadata) {
+      // @ts-expect-error <StrictNullChecks/>
       if (formData.isForm) return <div>No Contract Available</div>;
       navigate('/404', {}, null);
     }
 
     setCurrentContract(contractInStore);
+    // @ts-expect-error <StrictNullChecks/>
     setTemplateNickname(templateMetadata.cctmd.nickname);
     if (
+      // @ts-expect-error <StrictNullChecks/>
       params.setTemplateNickname &&
+      // @ts-expect-error <StrictNullChecks/>
       typeof params.setTemplateNickname === 'function'
     ) {
+      // @ts-expect-error <StrictNullChecks/>
       params.setTemplateNickname(templateMetadata.cctmd.nickname);
     }
 
@@ -93,6 +100,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
       .getTemplatesForContract(contractInStore.id)
       .then((templates) => {
         const template = templates.find((t) => {
+          // @ts-expect-error <StrictNullChecks/>
           return t.id === templateMetadata.templateId;
         });
 
@@ -191,22 +199,28 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
             a.forEach((subA) => {
               if (subA.startsWith('$')) {
                 const ref = subA.slice(1);
+                // @ts-expect-error <StrictNullChecks/>
                 subSubArr.push(formState[ref]);
               } else {
+                // @ts-expect-error <StrictNullChecks/>
                 subSubArr.push(subA);
               }
             });
+            // @ts-expect-error <StrictNullChecks/>
             subArr.push(subSubArr);
           } else {
             if (a.startsWith('$')) {
               const ref = a.slice(1);
+              // @ts-expect-error <StrictNullChecks/>
               subArr.push(formState[ref]);
             } else {
+              // @ts-expect-error <StrictNullChecks/>
               subArr.push(a);
             }
           }
         });
 
+        // @ts-expect-error <StrictNullChecks/>
         outputArr.push(subArr);
       } else {
         if (arg.startsWith('$')) {
@@ -217,18 +231,23 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
             paramState.forEach((method) => {
               const _params = [];
               method.paramRefs.forEach((param) => {
+                // @ts-expect-error <StrictNullChecks/>
                 _params.push(method[param]);
               });
               const w3 = new Web3();
               calldataSubArr.push(
+                // @ts-expect-error <StrictNullChecks/>
                 w3.eth.abi.encodeFunctionCall(method.abi, _params),
               );
             });
+            // @ts-expect-error <StrictNullChecks/>
             outputArr.push(calldataSubArr);
           } else {
+            // @ts-expect-error <StrictNullChecks/>
             outputArr.push(paramState);
           }
         } else {
+          // @ts-expect-error <StrictNullChecks/>
           outputArr.push(arg);
         }
       }
@@ -281,6 +300,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
           return (
             <CWText
               fontStyle={
+                // @ts-expect-error <StrictNullChecks/>
                 formData.isForm && field[component].field_type == 'h1'
                   ? 'h2'
                   : field[component].field_type
@@ -386,6 +406,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
           onClick: async () => {
             try {
               const functionAbi = parseFunctionFromABI(
+                // @ts-expect-error <StrictNullChecks/>
                 currentContract.abi,
                 json.tx_template?.method as string,
               );
@@ -393,6 +414,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
               const functionArgs = formatFunctionArgs();
               const txParams = formatFunctionArgs();
               const res = await callContractFunction({
+                // @ts-expect-error <StrictNullChecks/>
                 contract: currentContract,
                 fn: functionAbi,
                 inputArgs: functionArgs,
@@ -421,12 +443,15 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   };
 
   if (!json) {
+    // @ts-expect-error <StrictNullChecks/>
     if (formData.isForm) return <div>No Contract Available</div>;
     return;
   }
 
   return (
+    // @ts-expect-error <StrictNullChecks/>
     <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
+      {/* @ts-expect-error StrictNullChecks*/}
       {!formData.isForm && (
         <CWText type="h3" className="header">
           {templateNickname}
@@ -434,6 +459,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
       )}
 
       <div className="form">
+        {/* @ts-expect-error StrictNullChecks*/}
         {!formData.isForm && <CWDivider className="divider" />}
 
         {!templateError ? (
@@ -448,13 +474,8 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
         )}
         <CWDivider />
         <div className="bottom-row">
-          <CWButton label="Cancel" buttonType="secondary-black" />
-          <CWButton
-            label="Create"
-            buttonType="primary-black"
-            disabled={!txReady}
-            onClick={handleCreate}
-          />
+          <CWButton label="Cancel" buttonType="secondary" />
+          <CWButton label="Create" disabled={!txReady} onClick={handleCreate} />
         </div>
       </div>
     </div>

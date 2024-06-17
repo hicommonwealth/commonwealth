@@ -1,11 +1,13 @@
 import { models, UserInstance } from '@hicommonwealth/model';
 import { assert } from 'chai';
+import { describe, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/create_chain_node';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('create chain tests', () => {
-  it('fails when no eth_chain_id is provided when chain is ethereum', async () => {
+  test('fails when no eth_chain_id is provided when chain is ethereum', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -27,7 +29,8 @@ describe('create chain tests', () => {
     assert.fail(0, 1, 'Exception not thrown');
   });
 
-  it('fails when eth_chain_id is not a number', async () => {
+  test('fails when eth_chain_id is not a number', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,

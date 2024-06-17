@@ -83,8 +83,13 @@ export const VoteListing = (props: VoteListingProps) => {
   }) => {
     return (
       <User
-        userAddress={voter.address}
-        userCommunityId={voter.community?.id || voter.profile?.chain}
+        userAddress={voter?.address}
+        // @ts-expect-error <StrictNullChecks/>
+        userCommunityId={voter?.community?.id || voter?.profile?.chain}
+        // @ts-expect-error <StrictNullChecks/>
+        shouldShowAsDeleted={
+          voter?.address && !(voter?.community?.id || voter?.profile?.chain)
+        }
         shouldLinkProfile
         shouldShowPopover={shouldShowPopover}
       />

@@ -5,8 +5,8 @@ import moment from 'moment';
 import type { ConnectConfig, Near as NearApi } from 'near-api-js';
 import {
   Account as NearApiAccount,
-  connect as nearConnect,
   WalletAccount,
+  connect as nearConnect,
 } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import type {
@@ -122,7 +122,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       this.app.chain.block.lastTime = moment(latest_block_time);
       this.app.chain.block.height = latest_block_height;
       const prevBlock = await this._api.connection.provider.block(
-        latest_block_height - 1
+        latest_block_height - 1,
       );
       // TODO: check ms vs seconds here
       this.app.chain.block.duration =
@@ -141,7 +141,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   public async query<T>(
     contractId: string,
     method: string,
-    args: Record<string, unknown>
+    args: Record<string, unknown>,
   ): Promise<T> {
     const rawResult = await this.api.connection.provider.query<CodeResult>({
       request_type: 'call_function',
@@ -161,22 +161,23 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       ? 'sputnik-dao.near'
       : 'sputnikv2.testnet';
     const daos: string[] = await this.query(daoContract, 'get_dao_list', {});
+    // @ts-expect-error StrictNullChecks
     const daoInfos: IDaoInfo[] = await Promise.all(
       daos.map(async (daoId) => {
         try {
           const state = await new NearApiAccount(
             this.api.connection,
-            daoId
+            daoId,
           ).state();
           const policy: NearSputnikPolicy = await this.query(
             daoId,
             'get_policy',
-            {}
+            {},
           );
           const config: NearSputnikConfig = await this.query(
             daoId,
             'get_config',
-            {}
+            {},
           );
           const council = policy.roles.find((r) => isGroupRole(r.kind));
           // TODO: support diff types of policy roles
@@ -202,7 +203,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
           // console.error(`Failed to query dao info for ${daoId}: ${e.message}`);
           return null;
         }
-      })
+      }),
     );
     return daoInfos.filter((d) => !!d);
   }
@@ -213,7 +214,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     args: Record<string, unknown>,
     attachedDeposit?: string,
     postTxRedirect?: string,
-    gas?: string
+    gas?: string,
   ): Promise<void> {
     // construct tx object
     const functionCall: Partial<SerializableFunctionCallOptions> = {
@@ -249,6 +250,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
     const wallet = new WalletAccount(this.api, 'commonwealth_near');
     let shouldRequestSignIn = true;
+    // @ts-expect-error StrictNullChecks
     if (wallet.isSignedIn) {
       // check if we can send without requesting a new sign-in
       const accessKey = await wallet

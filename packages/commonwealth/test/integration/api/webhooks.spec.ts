@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
-require('dotenv').config();
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import Errors from '../../../server/routes/webhooks/errors';
+import { markdownComment } from '../../util/fixtures/markdownComment';
+import { markdownThread } from '../../util/fixtures/markdownThread';
+import { richTextComment } from '../../util/fixtures/richTextComment';
+import { richTextThread } from '../../util/fixtures/richTextThread';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
-const markdownComment = require('../../util/fixtures/markdownComment');
-const richTextThread = require('../../util/fixtures/richTextThread');
-const richTextComment = require('../../util/fixtures/richTextComment');
 
 const expectErrorOnResponse = (statusCode, errorMsg, response) => {
   expect(response.statusCode).to.be.equal(statusCode);
@@ -36,11 +36,11 @@ describe('Webhook Tests', () => {
   let topicId;
   let server: TestServer;
 
-  before('reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -53,7 +53,7 @@ describe('Webhook Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     await server.seeder.updateRole({
       address_id: +result.address_id,
@@ -68,12 +68,12 @@ describe('Webhook Tests', () => {
     loggedInNotAdminAddr = result.address;
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 
   describe('/createWebhook', () => {
-    it('should create a webhook for a chain', async () => {
+    test('should create a webhook for a chain', async () => {
       const webhookUrl = faker.internet.url();
       const res = await chai.request
         .agent(server.app)
@@ -87,7 +87,7 @@ describe('Webhook Tests', () => {
       expect(res.body.result.url).to.be.equal(webhookUrl);
     });
 
-    it('should fail to create a duplicate webhook', async () => {
+    test('should fail to create a duplicate webhook', async () => {
       const webhookUrl = faker.internet.url();
       await chai.request
         .agent(server.app)
@@ -112,7 +112,7 @@ describe('Webhook Tests', () => {
 
     // TODO: I believe our passport strategy is catching JWTs that don't correspond to users,
     // TODO: therefore our error is 401 rather than a 500 with the "Not logged in" message.
-    it('should fail to create a webhook if not a user', async () => {
+    test('should fail to create a webhook if not a user', async () => {
       const webhookUrl = faker.internet.url();
       const errorRes = await chai.request
         .agent(server.app)
@@ -122,7 +122,7 @@ describe('Webhook Tests', () => {
           address: notLoggedInAddr,
           chain,
           webhookUrl,
-          jwt: jwt.sign({ id: -999999, email: null }, JWT_SECRET),
+          jwt: jwt.sign({ id: -999999, email: null }, config.AUTH.JWT_SECRET),
         });
       expectErrorOnResponse(401, undefined, errorRes);
       const webhookUrls = await server.models.Webhook.findAll({
@@ -133,7 +133,7 @@ describe('Webhook Tests', () => {
   });
 
   describe('/deleteWebhook', () => {
-    it('should fail to create a webhook if not an admin', async () => {
+    test('should fail to create a webhook if not an admin', async () => {
       const webhookUrl = faker.internet.url();
       const errorRes = await chai.request
         .agent(server.app)
@@ -153,7 +153,7 @@ describe('Webhook Tests', () => {
       expect(webhookUrls).to.have.length(0);
     });
 
-    it('should delete a webhook', async () => {
+    test('should delete a webhook', async () => {
       const webhookUrl = faker.internet.url();
       await chai.request
         .agent(server.app)
@@ -175,7 +175,7 @@ describe('Webhook Tests', () => {
       expect(webhookUrls).to.have.length(0);
     });
 
-    it('should fail to delete a non-existent webhook', async () => {
+    test('should fail to delete a non-existent webhook', async () => {
       const webhookUrl = faker.internet.url();
       const errorRes = await chai.request
         .agent(server.app)
@@ -185,7 +185,7 @@ describe('Webhook Tests', () => {
       expectErrorOnResponse(400, Errors.NoWebhookFound, errorRes);
     });
 
-    it('should fail to delete a webhook from non-admin', async () => {
+    test('should fail to delete a webhook from non-admin', async () => {
       const webhookUrl = faker.internet.url();
       await chai.request
         .agent(server.app)
@@ -202,7 +202,7 @@ describe('Webhook Tests', () => {
   });
 
   describe('/getWebhooks', () => {
-    it('should get all webhooks', async () => {
+    test('should get all webhooks', async () => {
       const urls = await Promise.all(
         [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
@@ -223,7 +223,7 @@ describe('Webhook Tests', () => {
       expect(res.body.result).to.not.be.null;
     });
 
-    it('should fail to get webhooks from non-admin', async () => {
+    test('should fail to get webhooks from non-admin', async () => {
       const urls = await Promise.all(
         [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
@@ -247,10 +247,11 @@ describe('Webhook Tests', () => {
 
   describe('Integration Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
-    it('should send a webhook for markdown and rich text content', async () => {
-      const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
+    test('should send a webhook for markdown and rich text content', async () => {
+      const webhookUrl = config.SLACK_FEEDBACK_WEBHOOK;
       await server.seeder.createWebhook({
         chain,
+        // @ts-expect-error StrictNullChecks
         webhookUrl,
         jwt: jwtToken,
       });

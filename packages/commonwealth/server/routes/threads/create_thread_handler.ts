@@ -1,6 +1,6 @@
-import { IDiscordMeta } from '@hicommonwealth/core';
-import { ThreadAttributes } from '@hicommonwealth/model';
+import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -40,11 +40,13 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+  if (config.ENFORCE_SESSION_KEYS) {
     await verifyThread(canvasAction, canvasSession, canvasHash, {
       title,
       body,
+      // @ts-expect-error StrictNullChecks
       address: address.address,
+      // @ts-expect-error StrictNullChecks
       community: community.id,
       topic: topicId ? parseInt(topicId, 10) : null,
     });
@@ -52,8 +54,11 @@ export const createThreadHandler = async (
 
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
+      // @ts-expect-error StrictNullChecks
       community,
       title,
       body,

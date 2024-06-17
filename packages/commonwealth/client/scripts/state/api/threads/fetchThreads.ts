@@ -14,11 +14,13 @@ const THREADS_STALE_TIME = 180000; // 3 minutes
 const QueryTypes = {
   ACTIVE: cacheTypes.ACTIVE_THREADS,
   BULK: cacheTypes.BULK_THREADS,
+  COUNT: cacheTypes.COUNT_THREADS,
 };
 
 const queryTypeToRQMap = {
   bulk: useInfiniteQuery,
   active: useQuery,
+  count: useQuery,
 };
 
 interface CommonProps {
@@ -31,32 +33,33 @@ interface FetchBulkThreadsProps extends CommonProps {
   queryType: typeof QueryTypes.BULK; // discriminating union
   page: number;
   limit?: number;
-  toDate: string;
+  toDate?: string;
   fromDate?: string;
   topicId?: number;
   stage?: string;
   includePinnedThreads?: boolean;
   isOnArchivePage?: boolean;
+  contestAddress?: string;
+  contestStatus?: string;
   orderBy?:
     | 'newest'
     | 'oldest'
     | 'mostLikes'
     | 'mostComments'
     | 'latestActivity';
+  withXRecentComments?: number;
+}
+
+interface FetchThreadCountProps extends CommonProps {
+  queryType: typeof QueryTypes.COUNT;
+  limit?: number;
 }
 
 interface FetchActiveThreadsProps extends CommonProps {
   queryType: typeof QueryTypes.ACTIVE; // discriminating union
   topicsPerThread?: number;
+  withXRecentComments?: number;
 }
-
-export const featuredFilterQueryMap = {
-  newest: 'createdAt:desc',
-  oldest: 'createdAt:asc',
-  mostLikes: 'numberOfLikes:desc',
-  mostComments: 'numberOfComments:desc',
-  latestActivity: 'latestActivity:desc',
-};
 
 const useDateCursor = ({
   dateRange,
@@ -71,7 +74,9 @@ const useDateCursor = ({
   useEffect(() => {
     const updater = () => {
       const { toDate, fromDate } =
+        // @ts-expect-error StrictNullChecks
         getToAndFromDatesRangesForThreadsTimelines(dateRange);
+      // @ts-expect-error StrictNullChecks
       setDateCursor({ toDate, fromDate });
     };
 
@@ -93,20 +98,33 @@ const isFetchActiveThreadsProps = (props): props is FetchActiveThreadsProps =>
 const isFetchBulkThreadsProps = (props): props is FetchBulkThreadsProps =>
   props.queryType === QueryTypes.BULK;
 
+const isFetchThreadCountProps = (props): props is FetchThreadCountProps =>
+  props.queryType === QueryTypes.COUNT;
+
 const getFetchThreadsQueryKey = (props) => {
   if (isFetchBulkThreadsProps(props)) {
-    return [
+    const keys = [
       ApiEndpoints.FETCH_THREADS,
       props.communityId,
       props.queryType,
       props.topicId,
       props.stage,
       props.includePinnedThreads,
-      props.toDate,
       props.fromDate,
       props.limit,
       props.orderBy,
+      props.contestAddress,
+      props.contestStatus,
+      props.withXRecentComments,
     ];
+
+    // remove milliseconds from cache key
+    if (props.toDate) {
+      const toDate = new Date(props.toDate);
+      toDate.setMilliseconds(0);
+      keys.push(toDate.toISOString());
+    }
+    return keys;
   }
   if (isFetchActiveThreadsProps(props)) {
     return [
@@ -114,7 +132,11 @@ const getFetchThreadsQueryKey = (props) => {
       props.communityId,
       props.queryType,
       props.topicsPerThread,
+      props.withXRecentComments,
     ];
+  }
+  if (isFetchThreadCountProps(props)) {
+    return [ApiEndpoints.FETCH_THREADS, props.communityId, props.limit];
   }
 };
 
@@ -145,10 +167,17 @@ const fetchBulkThreads = (props) => {
           }),
           ...(props.fromDate && { from_date: props.fromDate }),
           to_date: props.toDate,
-          orderBy:
-            featuredFilterQueryMap[props.orderBy] ||
-            featuredFilterQueryMap.newest,
+          orderBy: props.orderBy || 'newest',
           ...(props.isOnArchivePage && { archived: true }),
+          ...(props.contestAddress && {
+            contestAddress: props.contestAddress,
+          }),
+          ...(props.contestStatus && {
+            status: props.contestStatus,
+          }),
+          ...(props.withXRecentComments && {
+            withXRecentComments: props.withXRecentComments,
+          }),
         },
       },
     );
@@ -175,12 +204,32 @@ const fetchActiveThreads = (props) => {
           active: true,
           community_id: props.communityId,
           threads_per_topic: props.topicsPerThread || 3,
+          ...(props.withXRecentComments && {
+            withXRecentComments: props.withXRecentComments,
+          }),
         },
       },
     );
 
     // transform response
     return response.data.result.map((c) => new Thread(c));
+  };
+};
+
+const fetchThreadCount = (props) => {
+  return async (): Promise<number> => {
+    const response = await axios.get(
+      `${app.serverUrl()}${ApiEndpoints.FETCH_THREADS}`,
+      {
+        params: {
+          community_id: props.communityId,
+          limit: props.limit,
+          count: true,
+        },
+      },
+    );
+
+    return response.data.result.count;
   };
 };
 
@@ -197,6 +246,7 @@ const useFetchThreadsQuery = (
     queryFn: (() => {
       if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props);
       if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props);
+      if (isFetchThreadCountProps(props)) return fetchThreadCount(props);
     })(),
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
@@ -223,7 +273,8 @@ const useFetchThreadsQuery = (
     };
   }
 
-  if (isFetchActiveThreadsProps(props)) return chosenQueryType;
+  if (isFetchActiveThreadsProps(props) || isFetchThreadCountProps(props))
+    return chosenQueryType;
 };
 
 export default useFetchThreadsQuery;

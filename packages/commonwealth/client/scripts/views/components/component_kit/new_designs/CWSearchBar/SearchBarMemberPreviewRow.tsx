@@ -31,6 +31,7 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
       <User
         userAddress={address}
         userCommunityId={community_id}
+        shouldShowAsDeleted={!address && !community_id}
         shouldLinkProfile
       />
     </div>

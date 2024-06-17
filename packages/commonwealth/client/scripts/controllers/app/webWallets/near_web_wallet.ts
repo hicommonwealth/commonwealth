@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -25,11 +25,13 @@ class NearWebWalletController implements IWebWallet<any> {
     return 'near';
   }
 
+  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
 
   public async getSessionPublicAddress(): Promise<string> {
+    // @ts-expect-error StrictNullChecks
     return null;
   }
 

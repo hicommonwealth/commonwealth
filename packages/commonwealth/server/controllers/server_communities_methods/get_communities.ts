@@ -1,24 +1,43 @@
 import {
   CommunityInstance,
-  CommunitySnapshotSpaceWithSpaceAttached,
+  CommunityTagsAttributes,
+  TagsAttributes,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { Includeable } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {
   hasGroups?: boolean; // only return communities with associated groups
   includeStakes?: boolean; // include community stakes
 };
+
+type CommunityWithTags = CommunityTagsAttributes & { Tag: TagsAttributes };
+
+type CommunityInstanceWithTags = CommunityInstance & {
+  CommunityTags: TagsAttributes;
+};
+
 export type GetCommunitiesResult = {
-  community: CommunityInstance;
-  snapshot: string[];
+  community: CommunityInstanceWithTags;
 }[];
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
   { hasGroups }: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
-  const communitiesInclude = [];
+  const communitiesInclude: Includeable[] = [
+    {
+      model: this.models.CommunityStake,
+    },
+    {
+      model: this.models.CommunityTags,
+      include: [
+        {
+          model: this.models.Tags,
+        },
+      ],
+    },
+  ];
   if (hasGroups) {
     communitiesInclude.push({
       model: this.models.Group,
@@ -32,32 +51,12 @@ export async function __getCommunities(
     include: communitiesInclude,
   });
 
-  const communityIds = communities.map((community) => community.id);
-  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-    await this.models.CommunitySnapshotSpaces.findAll({
-      where: {
-        community_id: {
-          [Op.in]: communityIds,
-        },
-      },
-      include: {
-        model: this.models.SnapshotSpace,
-        as: 'snapshot_space',
-      },
-    });
-
-  const communitiesWithSnapshots = communities.map((community) => {
-    const communitySnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.community_id === community.id,
-    );
-    const snapshotSpaceNames = communitySnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space,
-    );
-    return {
-      community,
-      snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
-    };
-  });
-
-  return communitiesWithSnapshots;
+  return communities.map((c) => ({
+    community: {
+      ...c.toJSON(),
+      CommunityTags: (c.toJSON().CommunityTags || []).map(
+        (ct) => (ct as unknown as CommunityWithTags).Tag,
+      ),
+    },
+  })) as GetCommunitiesResult;
 }

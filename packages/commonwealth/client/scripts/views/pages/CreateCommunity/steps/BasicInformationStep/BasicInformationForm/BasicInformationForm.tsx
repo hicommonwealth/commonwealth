@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
@@ -12,11 +12,11 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import {
   BaseMixpanelPayload,
@@ -28,6 +28,7 @@ import './BasicInformationForm.scss';
 import {
   BASE_ID,
   BLAST_ID,
+  ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   existingCommunityIds,
@@ -112,9 +113,15 @@ const BasicInformationForm = ({
 
   const getInitialValue = () => {
     switch (selectedCommunity.type) {
-      case CommunityType.Ethereum:
+      case CommunityType.Base:
         return {
           chain: getChainOptions()?.find((o) => o.value === BASE_ID),
+        };
+      case CommunityType.Ethereum:
+        return {
+          chain: getChainOptions()?.find(
+            (o) => o.value === ETHEREUM_MAINNET_ID,
+          ),
         };
       case CommunityType.Cosmos:
         return {
@@ -134,6 +141,7 @@ const BasicInformationForm = ({
     const hasLinksError = validateSocialLinks();
 
     if (isCommunityNameTaken || hasLinksError) return;
+    // @ts-expect-error StrictNullChecks
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
     const selectedChainNode = sortedChains.find(
@@ -147,8 +155,11 @@ const BasicInformationForm = ({
         chainBase: selectedCommunity.chainBase,
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
+        // @ts-expect-error StrictNullChecks
         socialLinks: values.links,
+        // @ts-expect-error StrictNullChecks
         nodeUrl: selectedChainNode.nodeUrl,
+        // @ts-expect-error StrictNullChecks
         altWalletUrl: selectedChainNode.altWalletUrl,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
@@ -156,6 +167,7 @@ const BasicInformationForm = ({
         }),
         ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
           cosmosChainId: values.chain.value,
+          // @ts-expect-error StrictNullChecks
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
       });
@@ -244,7 +256,6 @@ const BasicInformationForm = ({
 
       <CWCoverImageUploader
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
-        uploadCompleteCallback={console.log}
         canSelectImageBehaviour={false}
         showUploadAndGenerateText
         onImageProcessStatusChange={setIsProcessingProfileImage}
@@ -264,7 +275,7 @@ const BasicInformationForm = ({
               </CWText>
             </CWText>
             <CWText type="b1" className="description">
-              Add your Discord, Twitter (X), Telegram, Website, etc.
+              Add your Discord, X (Twitter), Telegram, Website, etc.
             </CWText>
           </section>
 
@@ -286,9 +297,11 @@ const BasicInformationForm = ({
                     )
                   }
                   onBlur={() =>
+                    // @ts-expect-error StrictNullChecks
                     updateAndValidateSocialLinkAtIndex(socialLink.value, index)
                   }
                   onFocus={() =>
+                    // @ts-expect-error StrictNullChecks
                     updateAndValidateSocialLinkAtIndex(socialLink.value, index)
                   }
                 />

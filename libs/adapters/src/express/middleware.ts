@@ -4,6 +4,7 @@ import {
   INVALID_INPUT_ERROR,
   User,
   analytics,
+  config,
   stats,
 } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
@@ -60,7 +61,7 @@ export const errorMiddleware = (
       default:
         response = InternalServerError(
           message,
-          process.env.NODE_ENV !== 'production' ? stack : undefined,
+          config.NODE_ENV !== 'production' ? stack : undefined,
         );
     }
   }

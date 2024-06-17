@@ -3,7 +3,7 @@ declare let window: any;
 import type { SessionPayload } from '@canvas-js/interfaces';
 import bs58 from 'bs58';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -39,6 +39,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }

@@ -9,7 +9,7 @@ import BN from 'bn.js';
 
 import type { GovernorCompatibilityBravo } from '@hicommonwealth/chains';
 import { GovernorMock__factory } from '@hicommonwealth/chains';
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import type { ContractTransaction } from 'ethers';
 import { BigNumber, utils } from 'ethers';
 
@@ -225,7 +225,8 @@ export default class CompoundProposal extends Proposal<
     const yesPower = this.data.forVotes;
     const abstainPower = this.data.abstainVotes;
     const totalTurnout = this._Gov.useAbstainInQuorum
-      ? yesPower.add(abstainPower)
+      ? // @ts-expect-error StrictNullChecks
+        yesPower.add(abstainPower)
       : yesPower;
     const requiredTurnout = this._Gov.quorumVotes.isZero()
       ? BigNumber.from(1)

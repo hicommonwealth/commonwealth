@@ -3,7 +3,7 @@ import type Comment from 'models/Comment';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import moment from 'moment';
 
-export const getRelativeTimestamp = (date: string | moment.Moment) => {
+export const getRelativeTimestamp = (date: number | string | moment.Moment) => {
   const now = moment();
   const inputDate = moment(date);
 

@@ -1,4 +1,4 @@
-import type { ChainBase } from '@hicommonwealth/core';
+import type { ChainBase } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 
 import axios from 'axios';
@@ -62,8 +62,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     const {
       admins,
-      // activeUsers,
-      // pinned and active threads must not be returned from api
       numVotingThreads,
       numTotalThreads,
       communityBanner,

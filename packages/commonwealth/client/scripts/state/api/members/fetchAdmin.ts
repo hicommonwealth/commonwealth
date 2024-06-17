@@ -1,4 +1,4 @@
-import { AccessLevel } from '@hicommonwealth/core';
+import { AccessLevel } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
@@ -23,8 +23,10 @@ const fetchAdmin = async ({ communityId }: FetchAdminProps) => {
   const roles = res.data.result || [];
   roles.forEach((role) => {
     if (role.permission === AccessLevel.Admin) {
+      // @ts-expect-error StrictNullChecks
       memberAdmins.push(role);
     } else if (role.permission === AccessLevel.Moderator) {
+      // @ts-expect-error StrictNullChecks
       memberMods.push(role);
     }
   });

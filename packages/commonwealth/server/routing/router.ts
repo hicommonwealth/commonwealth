@@ -2,9 +2,9 @@ import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
+import apiRouter from '../api';
 import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
-import ddd from '../routes/ddd';
 
 import {
   methodNotAllowedMiddleware,
@@ -26,6 +26,7 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
+import { healthHandler } from '../routes/health';
 import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
@@ -80,25 +81,22 @@ import getWebhooks from '../routes/webhooks/getWebhooks';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import type ViewCountCache from '../util/viewCountCache';
 
-import type { DB } from '@hicommonwealth/model';
+import type { DB, GlobalActivityCache } from '@hicommonwealth/model';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import { sendMessage } from '../routes/snapshotAPI';
 import updateAddress from '../routes/updateAddress';
 import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import createDiscordBotConfig from '../routes/createDiscordBotConfig';
+import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
+import getDiscordChannels from '../routes/discord/getDiscordChannels';
+import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
+import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
-import getDiscordChannels from '../routes/getDiscordChannels';
-import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
-import removeDiscordBotConfig from '../routes/removeDiscordBotConfig';
-import setDiscordBotConfig from '../routes/setDiscordBotConfig';
-import type GlobalActivityCache from '../util/globalActivityCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -136,12 +134,12 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import { GENERATE_IMAGE_RATE_LIMIT } from 'server/config';
+import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { updateChainNodeHandler } from 'server/routes/communities/update_chain_node_handler';
-import { sendWalletTransactionHandler } from 'server/routes/wallet/sendWalletTransactionHandler';
+import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -156,6 +154,7 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
+import { getFeedHandler } from '../routes/feed';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
@@ -168,6 +167,7 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
+import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
@@ -183,6 +183,7 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
+import { failure } from '../types';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -197,6 +198,7 @@ export type ServerControllers = {
   groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
+  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -226,6 +228,7 @@ function setupRouter(
     groups: new ServerGroupsController(models, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
+    tags: new ServerTagsController(models, banCache), // TOOD: maybe remove banCache?
   };
 
   // ---
@@ -233,6 +236,9 @@ function setupRouter(
   const router = express.Router();
 
   router.use(useragent.express());
+
+  // Routes API
+  app.use('/api', apiRouter);
 
   // Updating the address
   registerRoute(
@@ -620,6 +626,15 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     getThreadsHandler.bind(this, serverControllers),
   );
+
+  registerRoute(
+    router,
+    'get',
+    '/feed',
+    databaseValidationService.validateCommunity,
+    getFeedHandler.bind(this, models, serverControllers),
+  );
+
   registerRoute(
     router,
     'get',
@@ -788,6 +803,14 @@ function setupRouter(
     'post',
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models),
+  );
+
+  // tags
+  registerRoute(
+    router,
+    'get',
+    '/tags',
+    getTagsHandler.bind(this, serverControllers),
   );
 
   // roles
@@ -1127,7 +1150,7 @@ function setupRouter(
     '/generateImage',
     rateLimiterMiddleware({
       routerNamespace: 'generateImage',
-      requestsPerMinute: GENERATE_IMAGE_RATE_LIMIT,
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
@@ -1187,6 +1210,7 @@ function setupRouter(
     '/auth/magic',
     passport.authenticate('magic'),
     (req, res) => {
+      // @ts-expect-error StrictNullChecks
       return res.json({ status: 'Success', result: req.user.toJSON() });
     },
   );
@@ -1202,28 +1226,12 @@ function setupRouter(
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
-  // snapshotAPI
-  registerRoute(
-    router,
-    'post',
-    '/snapshotAPI/sendMessage',
-    sendMessage.bind(this),
-  );
-
   registerRoute(
     router,
     'get',
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  // snapshot-commonwealth
-  registerRoute(
-    router,
-    'get',
-    '/snapshot',
-    getSnapshotProposal.bind(this, models),
   );
 
   registerRoute(
@@ -1294,20 +1302,15 @@ function setupRouter(
     deleteGroupHandler.bind(this, serverControllers),
   );
 
-  registerRoute(
-    router,
-    'post',
-    'wallet/sendTransaction',
-    passport.authenticate('jwt', { session: false }),
-    sendWalletTransactionHandler.bind(this, models),
-  );
+  registerRoute(router, 'get', '/health', healthHandler.bind(this));
 
   app.use(endpoint, router);
 
-  // new ddd routes
-  app.use('/ddd', ddd);
-
   app.use(methodNotAllowedMiddleware());
+  app.use('/api/*', function (_req, res) {
+    res.status(404);
+    return failure(res, 'Not Found');
+  });
 }
 
 export default setupRouter;

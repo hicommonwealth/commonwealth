@@ -10,7 +10,7 @@ import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -29,12 +29,12 @@ import {
 } from '../../../../shared/analytics/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { ProposalSelector } from '../components/ProposalSelector';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 
 const getInitialSnapshots = (thread: Thread) =>
@@ -74,12 +74,14 @@ export const UpdateProposalStatusModal = ({
   );
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
+    // @ts-expect-error <StrictNullChecks/>
   >(getInitialSnapshots(thread));
   const [tempProposals, setTempProposals] = useState<
     Array<Pick<IAaveProposalResponse, 'identifier'>>
   >(getInitialProposals(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
+    // @ts-expect-error <StrictNullChecks/>
   >(getInitialCosmosProposals(thread));
 
   const showSnapshot = !!app.chain.meta.snapshot?.length;
@@ -91,19 +93,19 @@ export const UpdateProposalStatusModal = ({
       app.chain.network === ChainNetwork.Compound);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
@@ -117,8 +119,9 @@ export const UpdateProposalStatusModal = ({
     try {
       await editThread({
         address: app.user.activeAccount.address,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         threadId: thread.id,
+        // @ts-expect-error <StrictNullChecks/>
         stage: tempStage,
       });
     } catch (err) {
@@ -161,7 +164,7 @@ export const UpdateProposalStatusModal = ({
           });
         }
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: [
             {
@@ -177,7 +180,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((sn) => ({
             source: LinkSource.Snapshot,
@@ -201,7 +204,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map(({ identifier }) => ({
             source: LinkSource.Proposal,
@@ -214,7 +217,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
@@ -237,7 +240,7 @@ export const UpdateProposalStatusModal = ({
       );
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map(({ identifier, title }) => ({
             source: LinkSource.Proposal,
@@ -251,7 +254,7 @@ export const UpdateProposalStatusModal = ({
 
       if (toDelete.length > 0) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
@@ -270,6 +273,7 @@ export const UpdateProposalStatusModal = ({
       event: MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
     });
 
+    // @ts-expect-error <StrictNullChecks/>
     onChangeHandler?.(tempStage, links);
     onModalClose();
   };
@@ -341,6 +345,7 @@ export const UpdateProposalStatusModal = ({
             label: threadStageToLabel(stage),
           }))}
           className="StageSelector"
+          // @ts-expect-error <StrictNullChecks/>
           onChange={(option) => setTempStage(option.value)}
         />
         {showSnapshot && (

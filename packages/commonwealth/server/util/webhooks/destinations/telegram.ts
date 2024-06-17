@@ -1,6 +1,6 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import request from 'superagent';
-import { SERVER_URL, TELEGRAM_BOT_TOKEN } from '../../../config';
+import { config } from '../../../config';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
@@ -80,7 +80,7 @@ export async function sendTelegramWebhook(
   data: ForumWebhookData | ChainEventWebhookData,
 ) {
   // telegram API does not allow localhost urls in messages so replace them with Commonwealth url
-  if (SERVER_URL.includes('localhost')) {
+  if (config.SERVER_URL.includes('localhost')) {
     for (const key of [
       'previewImageUrl',
       'profileUrl',
@@ -89,6 +89,7 @@ export async function sendTelegramWebhook(
       'url',
     ]) {
       if (data[key]) {
+        // TODO: avoid magic strings
         data[key] = data[key].replace(
           'http://localhost:8080',
           'https://commonwealth.im',
@@ -102,7 +103,7 @@ export async function sendTelegramWebhook(
     throw new Error('Invalid Telegram webhook URL');
   }
 
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const url = `https://api.telegram.org/bot${config.TELEGRAM.BOT_TOKEN}/sendMessage`;
 
   const message = formatTelegramMessage(category, data, channelId);
   return request.post(url).send(message);

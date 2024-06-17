@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
@@ -14,6 +15,7 @@ interface UpdateProfileByAddressProps {
   avatarUrl?: string;
   socials?: string;
   backgroundImage?: string;
+  tagIds?: number[];
 }
 
 const updateProfileByAddress = async ({
@@ -26,6 +28,7 @@ const updateProfileByAddress = async ({
   backgroundImage,
   avatarUrl,
   socials,
+  tagIds,
 }: UpdateProfileByAddressProps) => {
   // TODO: ideally this should return a response
   const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
@@ -36,18 +39,21 @@ const updateProfileByAddress = async ({
     backgroundImage,
     avatarUrl,
     socials,
+    ...(tagIds && {
+      tag_ids: tagIds,
+    }),
     jwt: app.user.jwt,
   });
 
   const responseProfile = response.data.result.profile;
   const updatedProfile = new MinimumProfile(address, chain);
   updatedProfile.initialize(
-    responseProfile.name,
+    responseProfile.name || responseProfile.profile_name,
     address,
     responseProfile.avatarUrl,
-    profileId,
+    profileId || responseProfile.id,
     chain,
-    responseProfile.lastActive
+    responseProfile.lastActive,
   );
   return updatedProfile;
 };
@@ -64,11 +70,13 @@ interface UseUpdateProfileByAddressMutation {
 const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
 }: UseUpdateProfileByAddressMutation = {}) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
   return useMutation({
     mutationFn: updateProfileByAddress,
     onSuccess: async (updatedProfile) => {
       addressesWithChainsToUpdate?.map(({ address, chain }) => {
-        const key = [ApiEndpoints.FETCH_PROFILES, chain, address];
+        const key = [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chain, address];
         const existingProfile = queryClient.getQueryData(key);
 
         // TEMP: since we don't get the updated data from API, we will cancel existing and refetch profile
@@ -77,6 +85,32 @@ const useUpdateProfileByAddressMutation = ({
           queryClient.setQueryData(key, () => updatedProfile);
         }
       });
+
+      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const doesProfileIdMatch =
+        userProfileId && userProfileId === updatedProfile?.id;
+      if (doesProfileIdMatch) {
+        // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
+        const keys = [
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
+          [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
+        ];
+        keys.map((key) => {
+          queryClient.cancelQueries(key).catch(console.error);
+          queryClient.refetchQueries(key).catch(console.error);
+        });
+
+        // if `profileId` matches auth user's profile id, and user profile has a defined name, then
+        // set welcome onboard step as complete
+        if (
+          userOnboardingEnabled &&
+          updatedProfile.name &&
+          updatedProfile.name !== 'Anonymous' &&
+          !app.user.isWelcomeOnboardFlowComplete
+        ) {
+          app.user.setIsWelcomeOnboardFlowComplete(true);
+        }
+      }
 
       return updatedProfile;
     },

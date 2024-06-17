@@ -76,8 +76,12 @@ const getTextRows = (
           >
             <User
               shouldHideAvatar
-              userAddress={subscription.Comment.author}
-              userCommunityId={subscription.Comment.communityId}
+              userAddress={subscription?.Comment?.author}
+              userCommunityId={subscription?.Comment?.communityId}
+              shouldShowAsDeleted={
+                !subscription?.Comment?.author &&
+                !subscription?.Comment?.communityId
+              }
             />
             &apos;
           </CWText>
@@ -113,6 +117,7 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
+          {/* @ts-expect-error StrictNullChecks*/}
           {app.config.chains.getById(subscription.communityId)?.name}
         </CWText>
       </div>

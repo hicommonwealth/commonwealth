@@ -1,4 +1,5 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
+import ghostSvg from 'assets/img/ghost.svg';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,8 +12,8 @@ import CWPopover, {
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
@@ -131,6 +132,7 @@ export const User = ({
     >
       {showAvatar && (
         <Link
+          // @ts-expect-error <StrictNullChecks/>
           to={
             profile && shouldLinkProfile
               ? `/profile/id/${profile?.id}`
@@ -163,7 +165,7 @@ export const User = ({
           {isGhostAddress && (
             <img
               alt="ghost"
-              src="/static/img/ghost.svg"
+              src={ghostSvg}
               width="20px"
               style={{ display: 'inline-block' }}
             />
@@ -188,6 +190,7 @@ export const User = ({
             {app.chain && app.chain.base === ChainBase.Substrate && (
               <Link
                 className="user-display-name substrate@"
+                // @ts-expect-error <StrictNullChecks/>
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
@@ -222,7 +225,7 @@ export const User = ({
                   setIsModalOpen(true);
                 }}
                 label="Ban address"
-                buttonType="primary-red"
+                buttonType="destructive"
               />
             </div>
           )}

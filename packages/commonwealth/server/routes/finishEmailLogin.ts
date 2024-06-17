@@ -1,5 +1,6 @@
-import { NotificationCategories, stats } from '@hicommonwealth/core';
+import { stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -39,6 +40,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
   const tokenObj = await models.LoginToken.findOne({
     where: { token: token as string, email: email as string },
   });
+  // @ts-expect-error StrictNullChecks
   tokenObj.used = new Date();
   const existingUser = await models.User.scope('withPrivateData').findOne({
     where: { email: email as string },
@@ -79,6 +81,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       return redirectWithLoginSuccess(
         res,
         email,
+        // @ts-expect-error StrictNullChecks
         tokenObj.redirect_path,
         confirmation,
       );
@@ -105,19 +108,22 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       return redirectWithLoginSuccess(
         res,
         email,
+        // @ts-expect-error StrictNullChecks
         tokenObj.redirect_path,
         confirmation,
       );
     });
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
-    const newUser = await models.User.createWithProfile(models, {
+    // @ts-expect-error StrictNullChecks
+    const newUser = await models.User.createWithProfile({
       email: email as string,
       emailVerified: true,
     });
 
     // Automatically create subscription to their own mentions
     await models.Subscription.create({
+      // @ts-expect-error StrictNullChecks
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
       is_active: true,
@@ -125,6 +131,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
 
     // Automatically create a subscription to collaborations
     await models.Subscription.create({
+      // @ts-expect-error StrictNullChecks
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewCollaboration,
       is_active: true,
@@ -155,6 +162,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       return redirectWithLoginSuccess(
         res,
         email,
+        // @ts-expect-error StrictNullChecks
         tokenObj.redirect_path,
         confirmation,
         true,

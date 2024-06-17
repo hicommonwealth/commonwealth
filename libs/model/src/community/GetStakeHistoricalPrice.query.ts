@@ -1,30 +1,38 @@
 import type { Query } from '@hicommonwealth/core';
-import { schemas } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export const GetStakeHistoricalPrice: Query<
-  typeof schemas.queries.GetStakeHistoricalPrice
-> = () => ({
-  ...schemas.queries.GetStakeHistoricalPrice,
-  auth: [],
-  body: async ({ payload }) => {
-    const { past_date_epoch, community_id, stake_id } = payload;
+export function GetStakeHistoricalPrice(): Query<
+  typeof schemas.GetStakeHistoricalPrice
+> {
+  return {
+    ...schemas.GetStakeHistoricalPrice,
+    auth: [],
+    body: async ({ payload }) => {
+      const { past_date_epoch, community_id, stake_id } = payload;
 
-    const response: any = await models.sequelize.query(
-      `
-      SELECT stake_price / stake_amount::REAL as old_price
-      FROM "StakeTransactions"
-      WHERE community_id = :community_id AND stake_id = :stake_id
-      AND timestamp <= :past_date_epoch
-      ORDER BY timestamp DESC
-      LIMIT 1`,
-      {
-        replacements: { past_date_epoch, community_id, stake_id },
-        type: QueryTypes.SELECT,
-      },
-    );
+      const response: any = await models.sequelize.query(
+        `
+        SELECT s.community_id, (s.stake_price / s.stake_amount::REAL)::TEXT as old_price
+        FROM "StakeTransactions" s
+        INNER JOIN (
+            SELECT community_id, MIN(timestamp) AS earliest_timestamp
+            FROM "StakeTransactions"
+            WHERE stake_id = :stake_id
+            AND stake_direction = 'buy'
+            AND timestamp >= :past_date_epoch
+            ${community_id ? 'AND community_id = :community_id' : ''}
+            GROUP BY community_id
+        ) AS latest ON s.community_id = latest.community_id AND s.timestamp = latest.earliest_timestamp
+      `,
+        {
+          replacements: { past_date_epoch, community_id, stake_id },
+          type: QueryTypes.SELECT,
+        },
+      );
 
-    return { old_price: response[0]?.old_price ?? null };
-  },
-});
+      return response;
+    },
+  };
+}

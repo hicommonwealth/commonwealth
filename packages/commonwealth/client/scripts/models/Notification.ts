@@ -1,4 +1,4 @@
-import { NotificationCategory } from '@hicommonwealth/core';
+import { NotificationCategory } from '@hicommonwealth/shared';
 import moment from 'moment';
 import ChainEvent from './ChainEvent';
 
@@ -13,6 +13,7 @@ export class Notification {
   private _isRead?: boolean;
 
   public get isRead(): boolean {
+    // @ts-expect-error StrictNullChecks
     return this._isRead;
   }
 

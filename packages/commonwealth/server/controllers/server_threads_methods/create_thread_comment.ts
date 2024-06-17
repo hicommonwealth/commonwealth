@@ -1,21 +1,24 @@
-import {
-  AppError,
-  NotificationCategories,
-  ProposalType,
-  ServerError,
-} from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   CommentAttributes,
   CommentInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import { getCommentDepth } from '../../util/getCommentDepth';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import {
+  createCommentMentionNotifications,
+  emitMentions,
+  parseUserMentions,
+  queryMentionedUsers,
+  uniqueMentions,
+} from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -136,9 +139,11 @@ export async function __createThreadComment(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       thread.community_id,
       address,
+      PermissionEnum.CREATE_COMMENT,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
@@ -157,16 +162,19 @@ export async function __createThreadComment(
   // the comment's first version, formatted on the backend with timestamps
   const firstVersion = {
     timestamp: moment(),
+    author: address,
     body: decodeURIComponent(text),
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
   const commentContent: CommentAttributes = {
-    thread_id: `${threadId}`,
+    thread_id: threadId,
     text,
     plaintext,
     version_history,
+    // @ts-expect-error StrictNullChecks
     address_id: address.id,
     community_id: thread.community_id,
+    // @ts-expect-error StrictNullChecks
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -174,11 +182,17 @@ export async function __createThreadComment(
     discord_meta: discordMeta,
     reaction_count: 0,
     reaction_weights_sum: 0,
+    created_by: '',
   };
 
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
   }
+
+  // grab mentions to notify tagged users
+  const bodyText = decodeURIComponent(text);
+  const mentions = uniqueMentions(parseUserMentions(bodyText));
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   let comment: CommentInstance;
   try {
@@ -186,18 +200,35 @@ export async function __createThreadComment(
       comment = await this.models.Comment.create(commentContent, {
         transaction,
       });
+
+      await emitMentions(this.models, transaction, {
+        // @ts-expect-error StrictNullChecks
+        authorAddressId: address.id,
+        // @ts-expect-error StrictNullChecks
+        authorUserId: user.id,
+        authorAddress: address.address,
+        // @ts-expect-error StrictNullChecks
+        authorProfileId: address.profile_id,
+        mentions: mentionedAddresses,
+        comment,
+      });
+
       await this.models.Subscription.bulkCreate(
         [
           {
+            // @ts-expect-error StrictNullChecks
             subscriber_id: user.id,
             category_id: NotificationCategories.NewReaction,
+            // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
             comment_id: comment.id,
             is_active: true,
           },
           {
+            // @ts-expect-error StrictNullChecks
             subscriber_id: user.id,
             category_id: NotificationCategories.NewComment,
+            // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
             comment_id: comment.id,
             is_active: true,
@@ -210,29 +241,12 @@ export async function __createThreadComment(
     throw new ServerError('Failed to create comment', e);
   }
 
-  // grab mentions to notify tagged users
-  const bodyText = decodeURIComponent(text);
-  let mentionedAddresses;
-  try {
-    const mentions = parseUserMentions(bodyText);
-    if (mentions && mentions.length > 0) {
-      mentionedAddresses = await Promise.all(
-        mentions.map(async (mention) => {
-          const mentionedUser = await this.models.Address.findOne({
-            where: {
-              community_id: mention[0] || null,
-              address: mention[1],
-            },
-            include: [this.models.User],
-          });
-          return mentionedUser;
-        }),
-      );
-      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-    }
-  } catch (e) {
-    throw new AppError(Errors.ParseMentionsFailed);
-  }
+  const allNotificationOptions: EmitOptions[] = [];
+
+  allNotificationOptions.push(
+    // @ts-expect-error StrictNullChecks
+    ...createCommentMentionNotifications(mentionedAddresses, comment, address),
+  );
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(address.address);
@@ -244,8 +258,6 @@ export async function __createThreadComment(
 
   const root_title = thread.title || '';
 
-  const allNotificationOptions: EmitOptions[] = [];
-
   // build notification for root thread
   allNotificationOptions.push({
     notification: {
@@ -255,8 +267,11 @@ export async function __createThreadComment(
         thread_id: threadId,
         root_title,
         root_type: ProposalType.Thread,
+        // @ts-expect-error StrictNullChecks
         comment_id: +comment.id,
+        // @ts-expect-error StrictNullChecks
         comment_text: comment.text,
+        // @ts-expect-error StrictNullChecks
         community_id: comment.community_id,
         author_address: address.address,
         author_community_id: address.community_id,
@@ -275,10 +290,13 @@ export async function __createThreadComment(
           thread_id: +threadId,
           root_title,
           root_type: ProposalType.Thread,
+          // @ts-expect-error StrictNullChecks
           comment_id: +comment.id,
+          // @ts-expect-error StrictNullChecks
           comment_text: comment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
+          // @ts-expect-error StrictNullChecks
           community_id: comment.community_id,
           author_address: address.address,
           author_community_id: address.community_id,
@@ -286,36 +304,6 @@ export async function __createThreadComment(
       },
       excludeAddresses: excludedAddrs,
     });
-
-    // notify mentioned users if they have permission to view the originating forum
-    if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map((mentionedAddress) => {
-        if (!mentionedAddress.User) {
-          return; // some Addresses may be missing users, e.g. if the user removed the address
-        }
-        const shouldNotifyMentionedUser = true;
-        if (shouldNotifyMentionedUser) {
-          allNotificationOptions.push({
-            notification: {
-              categoryId: NotificationCategories.NewMention,
-              data: {
-                mentioned_user_id: mentionedAddress.User.id,
-                created_at: new Date(),
-                thread_id: +threadId,
-                root_title,
-                root_type: ProposalType.Thread,
-                comment_id: +comment.id,
-                comment_text: comment.text,
-                community_id: comment.community_id,
-                author_address: address.address,
-                author_community_id: address.community_id,
-              },
-            },
-            excludeAddresses: [address.address],
-          });
-        }
-      });
-    }
   }
 
   // update author last saved (in background)
@@ -332,6 +320,7 @@ export async function __createThreadComment(
     userId: user.id,
   };
 
+  // @ts-expect-error StrictNullChecks
   const commentJson = comment.toJSON();
   commentJson.Address = address.toJSON();
   return [commentJson, allNotificationOptions, analyticsOptions];

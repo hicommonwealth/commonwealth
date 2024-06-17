@@ -1,8 +1,8 @@
-**Contents**
+## Contents
 
 - [API Pagination Standard](#api-pagination-standard)
   * [Request Query Params](#request-query-params)
-  * [Limit/Offset vs Cursor Pagination](#limit-offset-vs-cursor-pagination)
+  * [Limit/Offset vs Cursor Pagination](#limitoffset-vs-cursor-pagination)
   * [Code Implementation](#code-implementation)
   * [Response Body](#response-body)
 - [Change Log](#change-log)
@@ -101,5 +101,6 @@ Use `TypedPaginationResult<T>`, which has the following shape:
 
 ## Change Log
 
-- 231027: Fixed code typo + added response body type.
+- 240415: Flagged for potential integration with [Platform Coding Guidelines](./Platform-Coding-Guidelines.md).
+- 231027: Cleaned up by Ryan Bennett.
 - 230714: Authored by Ryan Bennett.

@@ -5,7 +5,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
 
   .inner-container {
     align-items: center;
@@ -13,7 +12,6 @@
     flex-direction: column;
     gap: 16px;
     text-align: center;
-    width: 736px;
 
     img {
       max-width: 480px;

@@ -1,5 +1,5 @@
 import 'Layout.scss';
-import { deinitChainOrCommunity, selectChain } from 'helpers/chain';
+import { deinitChainOrCommunity, selectCommunity } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -9,6 +9,7 @@ import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import SubLayout from './Sublayout';
+import MetaTags from './components/MetaTags';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
 import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -16,7 +17,8 @@ import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCi
 type LayoutAttrs = {
   Component: ReactNode | any;
   scoped?: boolean;
-  type:
+  renderDefaultMetatags?: boolean;
+  type?:
     | 'community' // Community-scoped layout with a header, CW sidebar, & community sidebar.
     | 'common' // Generic layout with header and CW sidebar, used for non-community-scoped pages.
     | 'blank'; //  Blank layout using Layout.scss styles
@@ -26,6 +28,7 @@ type LayoutAttrs = {
 const LayoutComponent = ({
   Component, // Child component being rendered
   scoped = false,
+  renderDefaultMetatags = true,
   type = 'community',
 }: LayoutAttrs) => {
   const navigate = useCommonNavigate();
@@ -39,15 +42,19 @@ const LayoutComponent = ({
   // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     const redirectTo = app.config.redirects[selectedScope];
+    // @ts-expect-error <StrictNullChecks/>
     if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
+      // @ts-expect-error <StrictNullChecks/>
       const path = window.location.href.split(selectedScope);
       navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;
     }
   }, [selectedScope]);
 
-  const scopeMatchesChain = app.config.chains.getById(selectedScope);
+  // @ts-expect-error <StrictNullChecks/>
+  const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
 
   // If the navigated-to community scope differs from the active chain id at render time,
   // and we have not begun loading the new navigated-to community data, shouldSelectChain is
@@ -56,14 +63,14 @@ const LayoutComponent = ({
     selectedScope &&
     selectedScope !== app.activeChainId() &&
     selectedScope !== scopeToLoad &&
-    scopeMatchesChain;
+    scopeMatchesCommunity;
 
   useNecessaryEffect(() => {
     (async () => {
       if (shouldSelectChain) {
         setIsLoading(true);
         setScopeToLoad(selectedScope);
-        await selectChain(scopeMatchesChain);
+        await selectCommunity(scopeMatchesCommunity);
         setIsLoading(false);
       }
     })();
@@ -79,6 +86,7 @@ const LayoutComponent = ({
       if (shouldDeInitChain) {
         setIsLoading(true);
         await deinitChainOrCommunity();
+        // @ts-expect-error <StrictNullChecks/>
         setScopeToLoad(null);
         setIsLoading(false);
       }
@@ -118,7 +126,7 @@ const LayoutComponent = ({
     if (shouldShowLoadingState) return Bobber;
 
     // If attempting to navigate to a community not fetched by the /status query, return a 404
-    const pageNotFound = selectedScope && !scopeMatchesChain;
+    const pageNotFound = selectedScope && !scopeMatchesCommunity;
     return (
       <Suspense fallback={Bobber}>
         {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}
@@ -130,6 +138,7 @@ const LayoutComponent = ({
     <ErrorBoundary
       FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
     >
+      {renderDefaultMetatags && <MetaTags />}
       <div className="Layout">
         {type === 'blank' ? (
           childToRender()
@@ -143,7 +152,10 @@ const LayoutComponent = ({
   );
 };
 
-export const withLayout = (Component, params) => {
+export const withLayout = (
+  Component,
+  params: Omit<LayoutAttrs, 'Component'>,
+) => {
   const LayoutWrapper = withRouter(LayoutComponent);
   return <LayoutWrapper Component={Component} {...params} />;
 };

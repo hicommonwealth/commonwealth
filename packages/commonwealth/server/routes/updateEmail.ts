@@ -1,19 +1,18 @@
-import {
-  AppError,
-  DynamicTemplate,
-  WalletId,
-  logger,
-} from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { AppError, logger } from '@hicommonwealth/core';
+import { type DB } from '@hicommonwealth/model';
+import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import Sequelize from 'sequelize';
-import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
+import { fileURLToPath } from 'url';
+import { config } from '../config';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+// @ts-expect-error StrictNullChecks
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -43,6 +42,7 @@ const updateEmail = async (
   const existingUser = await models.User.findOne({
     where: {
       email,
+      // @ts-expect-error StrictNullChecks
       id: { [Sequelize.Op.ne]: req.user.id },
     },
   });
@@ -50,6 +50,7 @@ const updateEmail = async (
 
   const user = await models.User.scope('withPrivateData').findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       id: req.user.id,
     },
     include: [
@@ -61,6 +62,7 @@ const updateEmail = async (
     ],
   });
   if (!user) return next(new AppError(Errors.NoUser));
+  // @ts-expect-error StrictNullChecks
   if (user.Addresses?.length > 0)
     return next(new AppError(Errors.NoUpdateForMagic));
   // ensure no more than 3 tokens have been created in the last 5 minutes
@@ -68,20 +70,23 @@ const updateEmail = async (
     where: {
       email,
       created_at: {
-        $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate(),
+        $gte: moment()
+          .subtract(config.LOGIN_RATE_LIMIT_MINS, 'minutes')
+          .toDate(),
       },
     },
   });
-  if (recentTokens.count >= LOGIN_RATE_LIMIT_MINS) {
+  if (recentTokens.count >= config.LOGIN_RATE_LIMIT_MINS) {
     return res.json({
       status: 'Error',
-      message: `You've tried to update your email several times! Try again in ${LOGIN_RATE_LIMIT_MINS} minutes`,
+      message: `You've tried to update your email several times! Try again in ${config.LOGIN_RATE_LIMIT_MINS} minutes`,
     });
   }
 
   // create and email the token
+  // @ts-expect-error StrictNullChecks
   const tokenObj = await models.LoginToken.createForEmail(email);
-  const loginLink = `${SERVER_URL}/api/finishLogin?token=${
+  const loginLink = `${config.SERVER_URL}/api/finishLogin?token=${
     tokenObj.token
   }&email=${encodeURIComponent(email)}&confirmation=success`;
   const msg = {

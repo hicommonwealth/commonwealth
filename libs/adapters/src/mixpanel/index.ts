@@ -1,18 +1,24 @@
 import { Analytics, AnalyticsOptions, logger } from '@hicommonwealth/core';
 import MixpanelLib from 'mixpanel';
+import { fileURLToPath } from 'url';
+import { config } from '../config';
 
 export const MixpanelAnalytics = (): Analytics => {
-  const log = logger().getLogger(__filename);
+  const __filename = fileURLToPath(import.meta.url);
+  const log = logger(__filename);
 
   let mixpanelNode: MixpanelLib.Mixpanel;
 
   try {
-    if (process.env.NODE_ENV === 'production') {
-      mixpanelNode = MixpanelLib.init(process.env.MIXPANEL_PROD_TOKEN!);
-    } else if (process.env.NODE_ENV === 'development') {
+    if (config.NODE_ENV === 'production') {
+      mixpanelNode = MixpanelLib.init(config.ANALYTICS.MIXPANEL_PROD_TOKEN!);
+    } else if (
+      config.NODE_ENV === 'development' &&
+      config.ANALYTICS.MIXPANEL_DEV_TOKEN
+    ) {
       // NOTE: Only works if NODE_ENV defined in .env
       // Make sure that is set to development if you want to use backend Mixpanel locally.
-      mixpanelNode = MixpanelLib.init(process.env.MIXPANEL_DEV_TOKEN!);
+      mixpanelNode = MixpanelLib.init(config.ANALYTICS.MIXPANEL_DEV_TOKEN!);
     }
   } catch (e) {
     log.error(

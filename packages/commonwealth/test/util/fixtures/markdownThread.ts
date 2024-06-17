@@ -1,4 +1,4 @@
-module.exports = {
+export const markdownThread = {
   author_chain: 'edgeware',
   chain: 'edgeware',
   community: '',

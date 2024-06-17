@@ -1,7 +1,6 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 import type { UserAttributes, UserInstance } from './user';
 
@@ -34,32 +33,29 @@ export type ProfileInstance = ModelInstance<ProfileAttributes> & {
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
 };
 
-export type ProfileModelStatic = ModelStatic<ProfileInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): ProfileModelStatic => {
-  const Profile = <ProfileModelStatic>sequelize.define(
+): Sequelize.ModelStatic<ProfileInstance> =>
+  sequelize.define<ProfileInstance>(
     'Profile',
     {
       id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      user_id: { type: dataTypes.INTEGER, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: true },
-      updated_at: { type: dataTypes.DATE, allowNull: true },
-      profile_name: { type: dataTypes.STRING, allowNull: true },
-      email: { type: dataTypes.STRING, allowNull: true },
-      website: { type: dataTypes.STRING, allowNull: true },
-      bio: { type: dataTypes.TEXT, allowNull: true },
-      avatar_url: { type: dataTypes.STRING, allowNull: true },
-      slug: { type: dataTypes.STRING, allowNull: true },
-      socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },
-      background_image: { type: dataTypes.JSONB, allowNull: true },
+      user_id: { type: Sequelize.INTEGER, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: true },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
+      profile_name: { type: Sequelize.STRING, allowNull: true },
+      email: { type: Sequelize.STRING, allowNull: true },
+      website: { type: Sequelize.STRING, allowNull: true },
+      bio: { type: Sequelize.TEXT, allowNull: true },
+      avatar_url: { type: Sequelize.STRING, allowNull: true },
+      slug: { type: Sequelize.STRING, allowNull: true },
+      socials: { type: Sequelize.ARRAY(Sequelize.STRING), allowNull: true },
+      background_image: { type: Sequelize.JSONB, allowNull: true },
     },
     {
       tableName: 'Profiles',
@@ -70,14 +66,3 @@ export default (
       indexes: [{ fields: ['user_id'] }],
     },
   );
-
-  Profile.associate = (models) => {
-    models.Profile.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      targetKey: 'id',
-    });
-    models.Profile.hasMany(models.Address, { foreignKey: 'profile_id' });
-  };
-
-  return Profile;
-};

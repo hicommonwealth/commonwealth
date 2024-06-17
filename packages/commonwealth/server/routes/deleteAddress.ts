@@ -1,5 +1,6 @@
-import { AppError, WalletId } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { WalletId } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
@@ -42,8 +43,11 @@ const deleteAddress = async (
     return next(new AppError(Errors.CannotDeleteMagic));
   }
 
+  // @ts-expect-error StrictNullChecks
   addressObj.profile_id = null;
+  // @ts-expect-error StrictNullChecks
   addressObj.user_id = null;
+  // @ts-expect-error StrictNullChecks
   addressObj.verified = null;
   await addressObj.save();
   return res.json({ status: 'Success', response: 'Deleted address' });

@@ -11,20 +11,7 @@
   }
 
   .header {
-    margin: 16px 80px;
-    padding: 16px 0 0px 0px;
-    @include mediumInclusive {
-      margin: 40px 72px;
-    }
-
-    @include mediumSmallInclusive {
-      margin: 40px 48px;
-    }
-
-    @include smallInclusive {
-      flex-direction: column;
-      margin: 40px 32px;
-    }
+    margin-bottom: 24px;
   }
 
   &.loading {
@@ -36,37 +23,10 @@
   .ProfilePageContainer {
     display: flex;
     flex-direction: row;
-    margin: 64px 80px;
     gap: 24px;
-
-    &.smaller-margins {
-      margin: 24px 80px;
-
-      @include mediumInclusive {
-        margin: 24px 72px;
-      }
-
-      @include mediumSmallInclusive {
-        margin: 24px 48px;
-      }
-
-      @include smallInclusive {
-        margin: 0;
-        padding: 16px;
-      }
-    }
-
-    @include mediumInclusive {
-      margin: 80px 72px;
-    }
-
-    @include mediumSmallInclusive {
-      margin: 40px 48px;
-    }
 
     @include smallInclusive {
       flex-direction: column;
-      margin: 40px 32px;
     }
   }
 
@@ -75,10 +35,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 176px 0px;
+    padding: 176px 0;
 
     @include mediumSmallInclusive {
-      padding: 96px 0px;
+      padding: 96px 0;
     }
 
     .empty-state-text {

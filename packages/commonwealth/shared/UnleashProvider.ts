@@ -7,8 +7,7 @@ import {
   ResolutionDetails,
   StandardResolutionReasons,
 } from '@openfeature/web-sdk';
-import { UnleashClient } from 'unleash-proxy-client';
-import { IToggle } from 'unleash-proxy-client/src';
+import { IToggle, UnleashClient } from 'unleash-proxy-client';
 
 export class UnleashProvider implements Provider {
   readonly metadata: ProviderMetadata = {
@@ -24,7 +23,9 @@ export class UnleashProvider implements Provider {
   }
 
   async initialize(): Promise<void> {
+    // @ts-expect-error StrictNullChecks
     await this.client.start();
+    // @ts-expect-error StrictNullChecks
     this.flags = this.client.getAllToggles();
     this.status = ProviderStatus.READY;
   }
@@ -41,6 +42,7 @@ export class UnleashProvider implements Provider {
     }
 
     return {
+      // @ts-expect-error StrictNullChecks
       value: this.flags.find((f) => f.name === flagKey)?.enabled,
       reason: StandardResolutionReasons.TARGETING_MATCH,
     };

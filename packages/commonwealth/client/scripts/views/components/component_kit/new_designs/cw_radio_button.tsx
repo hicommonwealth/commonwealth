@@ -41,7 +41,8 @@ export const CWRadioButton = (props: RadioButtonProps) => {
 
   const formContext = useFormContext();
   const formFieldContext = hookToForm
-    ? formContext.register(name)
+    ? // @ts-expect-error <StrictNullChecks/>
+      formContext.register(name)
     : ({} as any);
 
   // TODO: this message is not needed now, but when its needed it should be coming from the radio group
@@ -53,6 +54,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
       <input
         type="radio"
         className={`radio-button ${disabled ? 'disabled' : ''}`}
+        disabled={disabled}
         checked={checked}
         name={groupName}
         value={value}

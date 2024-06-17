@@ -73,9 +73,19 @@ const CommunityProfile = lazy(
 const CommunityIntegrations = lazy(
   () => import('views/pages/CommunityManagement/Integrations'),
 );
+const CommunityStakeIntegration = lazy(
+  () => import('views/pages/CommunityManagement/StakeIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
+const AdminContestsPage = lazy(
+  () => import('views/pages/CommunityManagement/Contests/AdminContestsPage'),
+);
+const ManageContest = lazy(
+  () => import('views/pages/CommunityManagement/Contests/ManageContest'),
+);
+const Contests = lazy(() => import('views/pages/Contests'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -98,7 +108,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
   proposalTemplatesEnabled,
-  myCommunityStakePageEnabled,
+  contestEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -173,17 +183,11 @@ const CustomDomainRoutes = ({
       path="/finishsociallogin"
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
-    ...[
-      myCommunityStakePageEnabled ? (
-        <Route
-          key="/myCommunityStake"
-          path="/myCommunityStake"
-          element={withLayout(MyCommunityStake, { type: 'common' })}
-        />
-      ) : (
-        []
-      ),
-    ],
+    <Route
+      key="/myCommunityStake"
+      path="/myCommunityStake"
+      element={withLayout(MyCommunityStake, { type: 'common' })}
+    />,
 
     // NOTIFICATIONS
     <Route
@@ -263,6 +267,7 @@ const CustomDomainRoutes = ({
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
+        renderDefaultMetatags: false,
       })}
     />,
     <Route
@@ -346,6 +351,13 @@ const CustomDomainRoutes = ({
       })}
     />,
     <Route
+      key="/manage/integrations/stake"
+      path="/manage/integrations/stake"
+      element={withLayout(CommunityStakeIntegration, {
+        scoped: true,
+      })}
+    />,
+    <Route
       key="/manage/topics"
       path="/manage/topics"
       element={withLayout(CommunityTopics, {
@@ -359,6 +371,38 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(contestEnabled
+      ? [
+          <Route
+            key="/manage/contests"
+            path="/manage/contests"
+            element={withLayout(AdminContestsPage, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/contests/launch"
+            path="/manage/contests/launch"
+            element={withLayout(ManageContest, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/manage/contests/:contestAddress"
+            path="/manage/contests/:contestAddress"
+            element={withLayout(ManageContest, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            key="/contests"
+            path="/contests"
+            element={withLayout(Contests, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/discord-callback"
       path="/discord-callback"

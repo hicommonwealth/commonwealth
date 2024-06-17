@@ -21,9 +21,9 @@ export const ViewCommentUpvotesDrawer = ({
     );
 
     return {
-      name: reactor.profile.name,
-      avatarUrl: reactor.profile.avatarUrl,
-      address: reactor.profile.address,
+      name: reactor.profile?.name,
+      avatarUrl: reactor.profile?.avatarUrl,
+      address: reactor.profile?.address,
       updated_at: reactorMiscData?.updatedAt,
       voting_weight: reactorMiscData?.calculatedVotingWeight || 1,
     };
@@ -33,10 +33,14 @@ export const ViewCommentUpvotesDrawer = ({
     <ViewUpvotesDrawer
       isOpen={isOpen}
       setIsOpen={setIsOpen}
+      // @ts-expect-error <StrictNullChecks/>
       contentBody={comment.text}
       header="Comment upvotes"
+      // @ts-expect-error <StrictNullChecks/>
       reactorData={reactorData}
-      author={app.chain.accounts.get(comment.author)}
+      // @ts-expect-error <StrictNullChecks/>
+      author={comment?.author ? app.chain.accounts.get(comment?.author) : null}
+      // @ts-expect-error <StrictNullChecks/>
       publishDate={comment.createdAt}
     />
   );

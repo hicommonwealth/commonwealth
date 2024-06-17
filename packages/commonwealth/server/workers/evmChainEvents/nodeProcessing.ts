@@ -1,11 +1,29 @@
-import { logger, stats } from '@hicommonwealth/core';
-import { NotificationInstance, models } from '@hicommonwealth/model';
-import { emitChainEventNotifs } from './emitChainEventNotifs';
+import {
+  ChainEventSigs,
+  ContestContentAdded,
+  ContestContentUpvoted,
+  ContestStarted,
+  EventNames,
+  EvmNamespaceFactoryEventSignatures,
+  EvmRecurringContestEventSignatures,
+  EvmSingleContestEventSignatures,
+  OneOffContestManagerDeployed,
+  RecurringContestManagerDeployed,
+  events as coreEvents,
+  logger,
+  parseEvmEventToContestEvent,
+  stats,
+} from '@hicommonwealth/core';
+import { DB, emitEvent } from '@hicommonwealth/model';
+import { ethers } from 'ethers';
+import { fileURLToPath } from 'url';
+import { z } from 'zod';
 import { getEventSources } from './getEventSources';
-import { getEvents } from './logProcessing';
-import { EvmSource } from './types';
+import { getEvents, getProvider, migrateEvents } from './logProcessing';
+import { EvmEvent, EvmSource } from './types';
 
-const log = logger().getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 /**
  * Given a ChainNode id and event sources, this function fetches all events parsed since
@@ -13,9 +31,10 @@ const log = logger().getLogger(__filename);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
+  models: DB,
   chainNodeId: number,
   evmSource: EvmSource,
-): Promise<Promise<void | NotificationInstance>[] | void> {
+): Promise<void> {
   try {
     log.info(
       'Processing:\n' +
@@ -26,34 +45,120 @@ export async function processChainNode(
       chainNodeId: String(chainNodeId),
     });
 
-    const startBlock = await models.LastProcessedEvmBlock.findOne({
+    const lastProcessedBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
         chain_node_id: chainNodeId,
       },
     });
 
-    const startBlockNum = startBlock?.block_number
-      ? startBlock.block_number + 1
-      : null;
+    const provider = getProvider(evmSource.rpc);
+    const currentBlock = await provider.getBlockNumber();
 
-    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
-    const promises = await emitChainEventNotifs(chainNodeId, events);
-
-    if (!startBlock) {
-      await models.LastProcessedEvmBlock.create({
-        chain_node_id: chainNodeId,
-        block_number: lastBlockNum,
-      });
+    let startBlockNum: number;
+    // @ts-expect-error StrictNullChecks
+    if (lastProcessedBlock?.block_number < currentBlock) {
+      // @ts-expect-error StrictNullChecks
+      startBlockNum = lastProcessedBlock?.block_number + 1;
+    } else if (lastProcessedBlock?.block_number === undefined) {
+      startBlockNum = currentBlock - 10;
     } else {
-      startBlock.block_number = lastBlockNum;
-      startBlock.save();
+      // the last processed block is the same as the current block
+      // this occurs if the poll interval is shorter than the block time
+      return;
     }
 
-    log.info(
-      `Processed ${events.length} events for chainNodeId ${chainNodeId}`,
-    );
+    const allEvents: EvmEvent[] = [];
+    const migratedData = await migrateEvents(evmSource, startBlockNum);
+    // @ts-expect-error StrictNullChecks
+    if (migratedData?.events?.length > 0)
+      // @ts-expect-error StrictNullChecks
+      allEvents.push(...migratedData.events);
 
-    return promises;
+    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
+    allEvents.push(...events);
+
+    await models.sequelize.transaction(async (transaction) => {
+      if (!lastProcessedBlock) {
+        await models.LastProcessedEvmBlock.create(
+          {
+            chain_node_id: chainNodeId,
+            block_number: lastBlockNum,
+          },
+          { transaction },
+        );
+      } else if (lastProcessedBlock.block_number !== lastBlockNum) {
+        lastProcessedBlock.block_number = lastBlockNum;
+        await lastProcessedBlock.save({ transaction });
+      }
+
+      if (allEvents.length === 0) {
+        log.info(`Processed 0 events for chainNodeId ${chainNodeId}`);
+        return;
+      }
+
+      const records = allEvents.map((event) => {
+        const contractAddress = ethers.utils.getAddress(event.rawLog.address);
+
+        const parseContestEvent = (e: keyof typeof ChainEventSigs) =>
+          parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
+
+        switch (event.eventSource.eventSignature) {
+          case EvmNamespaceFactoryEventSignatures.NewContest:
+            return parseContestEvent('NewContest') as
+              | {
+                  event_name: EventNames.RecurringContestManagerDeployed;
+                  event_payload: z.infer<
+                    typeof RecurringContestManagerDeployed
+                  >;
+                }
+              | {
+                  event_name: EventNames.OneOffContestManagerDeployed;
+                  event_payload: z.infer<typeof OneOffContestManagerDeployed>;
+                };
+          case EvmRecurringContestEventSignatures.ContestStarted:
+            return parseContestEvent('NewRecurringContestStarted') as {
+              event_name: EventNames.ContestStarted;
+              event_payload: z.infer<typeof ContestStarted>;
+            };
+          case EvmSingleContestEventSignatures.ContestStarted:
+            return parseContestEvent('NewSingleContestStarted') as {
+              event_name: EventNames.ContestStarted;
+              event_payload: z.infer<typeof ContestStarted>;
+            };
+          case EvmRecurringContestEventSignatures.ContentAdded:
+          case EvmSingleContestEventSignatures.ContentAdded:
+            return parseContestEvent('ContentAdded') as {
+              event_name: EventNames.ContestContentAdded;
+              event_payload: z.infer<typeof ContestContentAdded>;
+            };
+          case EvmRecurringContestEventSignatures.VoterVoted:
+            return parseContestEvent('VoterVotedRecurring') as {
+              event_name: EventNames.ContestContentUpvoted;
+              event_payload: z.infer<typeof ContestContentUpvoted>;
+            };
+          case EvmSingleContestEventSignatures.VoterVoted:
+            return parseContestEvent('VoterVotedOneOff') as {
+              event_name: EventNames.ContestContentUpvoted;
+              event_payload: z.infer<typeof ContestContentUpvoted>;
+            };
+        }
+
+        // fallback to generic chain event
+        return {
+          event_name: EventNames.ChainEventCreated,
+          event_payload: event as z.infer<typeof coreEvents.ChainEventCreated>,
+        } as {
+          event_name: EventNames.ChainEventCreated;
+          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
+        };
+      });
+
+      await emitEvent(models.Outbox, records, transaction);
+    });
+
+    log.info(
+      `Processed ${allEvents.length} events for chainNodeId ${chainNodeId}`,
+    );
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
@@ -69,13 +174,15 @@ export async function processChainNode(
  * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
  */
 export async function scheduleNodeProcessing(
+  models: DB,
   interval: number,
   processFn: (
+    models: DB,
     chainNodeId: number,
     sources: EvmSource,
-  ) => Promise<Promise<void | NotificationInstance>[] | void>,
+  ) => Promise<void>,
 ) {
-  const evmSources = await getEventSources();
+  const evmSources = await getEventSources(models);
 
   const numEvmSources = Object.keys(evmSources).length;
   if (!numEvmSources) {
@@ -89,10 +196,7 @@ export async function scheduleNodeProcessing(
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      const promises = await processFn(+chainNodeId, evmSources[chainNodeId]);
-      if (promises) {
-        await Promise.allSettled(promises);
-      }
+      await processFn(models, +chainNodeId, evmSources[chainNodeId]);
     }, delay);
   });
 }

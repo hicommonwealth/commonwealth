@@ -1,14 +1,13 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ThreadAttributes, ThreadInstance } from './thread';
-import type { ModelInstance, ModelStatic } from './types';
+import type { ModelInstance } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;
   thread_id: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
 
   Address: AddressAttributes;
   Thread: ThreadAttributes;
@@ -27,27 +26,22 @@ export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
   >;
 };
 
-export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-) => {
-  const Collaboration = <CollaborationModelStatic>sequelize.define(
+): Sequelize.ModelStatic<CollaborationInstance> =>
+  sequelize.define(
     'Collaboration',
     {
       address_id: {
-        type: dataTypes.INTEGER,
-        allowNull: false,
+        type: Sequelize.INTEGER,
         primaryKey: true,
       },
       thread_id: {
-        type: dataTypes.INTEGER,
-        allowNull: false,
+        type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'Collaborations',
@@ -57,11 +51,3 @@ export default (
       underscored: true,
     },
   );
-
-  Collaboration.associate = (models) => {
-    models.Collaboration.belongsTo(models.Address);
-    models.Collaboration.belongsTo(models.Thread);
-  };
-
-  return Collaboration;
-};

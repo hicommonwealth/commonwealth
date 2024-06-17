@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
 import Web3 from 'web3';
@@ -24,7 +24,7 @@ abstract class ContractBase {
     withWallet: boolean = false,
     chainId?: string,
   ): Promise<void> {
-    if (!this.initialized) {
+    if (!this.initialized || withWallet) {
       try {
         let provider = this.rpc;
         if (withWallet) {
@@ -35,6 +35,7 @@ abstract class ContractBase {
           if (!this.wallet.api) {
             await this.wallet.enable(chainId);
           }
+          // @ts-expect-error StrictNullChecks
           await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
@@ -60,8 +61,11 @@ abstract class ContractBase {
     }
   }
 
-  protected toBN(number: string | number) {
-    return this.web3.utils.toBN(number);
+  protected reInitContract() {
+    this.contract = new this.web3.eth.Contract(
+      this.abi as AbiItem[],
+      this.contractAddress,
+    );
   }
 }
 

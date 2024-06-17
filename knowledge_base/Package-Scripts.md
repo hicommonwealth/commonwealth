@@ -6,72 +6,66 @@ If you add a script to the `package.json` file, please add documentation for it 
 
 ## Contents
 
-- [Build Scripts](#build-scripts)
-  - [build](#build)
-  - [build-ci](#build-ci)
-- [Build Heroku](#build-heroku)
-  - [heroku-postbuild](#heroku-postbuild)
-  - [heroku-prebuild](#heroku-prebuild)
-- [CI/CD](#cicd)
-  - [wait-server](#wait-server)
-- [Database](#database)
-  - [clean-db](#clean-db)
-  - [create-migration](#create-migration)
-  - [db-all](#db-all)
-  - [dump-db](#dump-db)
-  - [dump-db-limit](#dump-db-limit)
-  - [load-db](#load-db)
-  - [load-db-limit](#load-db-limit)
-  - [migrate-db](#migrate-db)
-  - [migrate-db-down](#migrate-db-down)
-  - [psql](#psql)
-  - [reset-db](#reset-db)
-  - [reset-frack-db](#reset-frack-db)
-- [Devnets](#devnets)
-  - [cosmos:build](#cosmosbuild)
-  - [cosmos:start](#cosmosstart)
-  - [cosmos:stop](#cosmosstop)
-- [Linting & Formatting](#linting--formatting)
-  - [format](#format)
-  - [lint-all](#lint-all)
-  - [lint-branch](#lint-branch)
-  - [lint-branch-warnings](#lint-branch-warnings)
-  - [style-lint](#style-lint)
-- [Other Services](#other-services)
-  - [send-cosmos-notifs](#send-cosmos-notifs)
-  - [send-notification-digest-emails](#send-notification-digest-emails)
-- [Playwright](#playwright)
-  - [e2e-start-server](#e2e-start-server)
-  - [test-e2e](#test-e2e)
-  - [test-e2e-serial](#test-e2e-serial)
-- [Testing](#testing)
-  - [integration-test](#integration-test)
-  - [test](#test)
-  - [test-api](#test-api)
-  - [test-devnet](#test-devnet)
-  - [test-emit-notif](#test-emit-notif)
-  - [test-integration-util](#test-integration-util)
-  - [test-select](#test-select)
-  - [test-suite](#test-suite)
-  - [unit-test](#unit-test)
-  - [unit-test:watch](#unit-testwatch)
-- [TypeScript](#typescript)
-  - [check-types](#check-types)
-  - [sanity](#sanity)
-- [Webpack & TSNode](#webpack--tsnode)
-  - [bundle-report](#bundle-report)
-  - [listen](#listen)
-  - [start](#start)
-  - [start-all](#start-all)
-  - [start-consumer](#start-consumer)
-  - [start-evm-ce](#start-evm-ce)
-- [Devnets](#devnets)
-  - [cosmos:build](#cosmos:build)
-  - [cosmos:start](#cosmos:start)
-  - [cosmos:stop](#cosmos:stop)
-- [Util scripts](#util-scripts)
-  - [add-components-showcase](#add-component-showcase)
-  - [set-super-admin](#set-super-admin)
+* [Build Scripts](#build-scripts)
+  + [build](#build)
+  + [heroku-prebuild](#heroku-prebuild)
+  + [heroku-postbuild](#heroku-postbuild)
+* [CI/CD](#cicd)
+  + [wait-server](#wait-server)
+* [Database](#database)
+  + [clean-db](#clean-db)
+  + [create-migration](#create-migration)
+  + [db-all](#db-all)
+  + [db-doc](#db-doc)
+  + [dump-db](#dump-db)
+  + [load-db](#load-db)
+  + [migrate-db](#migrate-db)
+  + [migrate-db-down](#migrate-db-down)
+  + [psql](#psql)
+  + [reset-db](#reset-db)
+  + [reset-frack-db](#reset-frack-db)
+  + [set-super-admin](#set-super-admin)
+* [Devnets](#devnets)
+  + [cosmos:build](#cosmosbuild)
+  + [cosmos:start](#cosmosstart)
+  + [cosmos:stop](#cosmosstop)
+* [Docker](#docker)
+  + [start-containers](#start-containers)
+  + [start-docker-setup](#start-docker-setup)
+* [Linting & Formatting](#linting--formatting)
+  + [format](#format)
+  + [lint-all](#lint-all)
+  + [lint-branch](#lint-branch)
+  + [lint-branch-warnings](#lint-branch-warnings)
+  + [style-lint](#style-lint)
+* [Playwright](#playwright)
+  + [e2e-start-server](#e2e-start-server)
+  + [emit-notification](#emit-notification)
+  + [test-e2e](#test-e2e)
+  + [test-e2e-serial](#test-e2e-serial)
+* [Testing](#testing)
+  + [integration-test](#integration-test)
+  + [test](#test)
+  + [test-api](#test-api)
+  + [test-devnet](#test-devnet)
+  + [test-integration-util](#test-integration-util)
+  + [test-select](#test-select)
+  + [test-suite](#test-suite)
+  + [unit-test](#unit-test)
+  + [unit-test:watch](#unit-testwatch)
+* [TypeScript](#typescript)
+  + [check-types](#check-types)
+  + [sanity](#sanity)
+* [Webpack && TSNode](#webpack--tsnode)
+  + [bundle-report](#bundle-report)
+  + [start](#start)
+  + [start-all](#start-all)
+  + [start-consumer](#start-consumer)
+  + [start-evm-ce](#start-evm-ce)
+* [Utils & Services](#utils--services)
+  + [add-component-showcase](#add-component-showcase)
+  + [send-cosmos-notifs](#send-cosmos-notifs)
+  + [send-notification-digest-emails](#send-notification-digest-emails)
 
 ## Build Scripts
 
@@ -84,25 +78,6 @@ Description:
 - Default: Runs webpack on our front-end code with 4096MB memory allocated to Node
 - Default: If successful, fires the commonwalth app build script
 - Optional: To build other app workspaces, see `/scripts/build.sh` for configuration options
-
-### build-ci
-
-Definition: `yarn global add node-gyp && yarn --ignore-engines && yarn build && yarn workspace commonwealth migrate-db`
-
-Description:
-
-- Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
-- Installs node modules, ignoring engine errors
-- Runs the default application build script (above)
-- Runs db migrations
-
-## Build Heroku
-
-### heroku-prebuild
-
-Definition: `yarn global add node-gyp`
-
-Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
 ### heroku-postbuild
 
@@ -127,7 +102,7 @@ Contributor: Kurtis Assad
 
 ### clean-db
 
-Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
+Definition: `tsx  server/scripts/cleanDb.ts`
 
 Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily.
 
@@ -139,15 +114,29 @@ Contributor: Timothee Legros
 
 Definition: `npx sequelize migration:generate --name`
 
-Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `yarn create-migration remove-user-last-visited-col`).
+Description: Generates a new database migration file, taking a passed argument in kebab-case as a name (e.g. `pnpm create-migration remove-user-last-visited-col`).
 
 ### db-all
 
-Definition: `yarn reset-db && yarn load-db && yarn migrate-db`
+Definition: `pnpm reset-db && pnpm load-db && pnpm migrate-db`
 
 Description: Resets, loads, and migrates db (composite script).
 
 Contributor: Kurtis Assad
+
+### db-doc
+
+Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
+
+Description: This pulls the schema from a local Postgres instance and generates a Mermaid ERD, updating `/knowledge_base/wiki/Database-ERD.md`
+
+Considerations:
+
+- Using a local PG instance with the default configuration. Developers must ensure it has the latest schema
+- Recommended after major database migrations (adding/removing tables/fields/relationships)
+- Not integrated (CI) yet, need to review how we incorporate file changes from GH actions back to the repo
+
+Contributor: Roger Torres
 
 ### dump-db
 
@@ -191,19 +180,24 @@ Definition: `heroku pg:copy commonwealth-beta::HEROKU_POSTGRESQL_MAROON_URL DATA
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
 
-### db-doc
+### set-super-admin
 
-Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
+Definition: `chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh`
 
-Description: This pulls the schema from a local Postgres instance and generates a Mermaid ERD, updating `/knowledge_base/wiki/Database-ERD.md`
+Description: It sets whether a user is a super admin or not. The script accepts 2 optional arguments that indicate the environment in which to set the super admin and whether to enable or disable the super admin. The script enables the super admin by default.
 
-Considerations:
+Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
 
-- Using a local PG instance with the default configuration. Developers must ensure it has the latest schema
-- Recommended after major database migrations (adding/removing tables/fields/relationships)
-- Not integrated (CI) yet, need to review how we incorporate file changes from GH actions back to the repo
+Examples:
 
-Contributor: Roger Torres
+- `pnpm set-super-admin`
+  - This sets the local user specified by the environment variables to a super admin.
+- `pnpm set-super-admin false`
+  - This disables super admin for the local user.
+- `pnpm set-super-admin [frick | frack | beta | demo]`
+  - This enables super admin for the specified user on the specified app.
+- `pnpm set-super-admin [frick | frack | beta | demo] false`
+  - This disables super admin for the specified user on the specified app.
 
 ## Docker
 
@@ -255,27 +249,11 @@ Description: Lints SCSS files.
 
 Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint-branch](#lint-branch) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
-## Other services
-
-### send-cosmos-notifs
-
-Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
-
-Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
-
-Contributor: Timothee Legros
-
-### send-notification-digest-emails
-
-Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
-
-Description: Schedules a daily task for sending notification email digests.
-
 ## Playwright
 
 ### e2e-start-server
 
-Definition: `ETH_RPC=e2e-test yarn start`
+Definition: `ETH_RPC=e2e-test pnpm start`
 
 Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
 
@@ -283,9 +261,9 @@ Contributor: Kurtis Assad
 
 ### emit-notification
 
-Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification.ts`
+Definition: `tsx  server/scripts/emitTestNotification.ts`
 
-Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
+Description: Emits a chain-event or snapshot notification. Run `pnpm emit-notification --help` to see options.
 
 Contributor: Timothee Legros
 
@@ -315,81 +293,51 @@ Open considerations:
   - See e.g. [test-select](#test-select)
 - Any test scripts we remove, we should ensure their respective invocations in `CI.yml` are replaced with appropriate definitions.
 
-### integration-test
-
-Definition: `nyc ts-mocha --project tsconfig.json './test/integration/**/*.spec.ts'`
-
-Description: Runs all tests in our integration folder and its subdirectories.
-
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested. We should also keep an eye on similar integration-scoped test scripts; there may be redundancies.
-
 ### test
 
-Definition: `nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
-
-Description: Runs all tests in our /test directory.
+See `test-unit`.
 
 ### test-api
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration/api`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-### test-devnet
+### test-integration
 
-Definition: `nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration`
 
-Description: Runs all tests in our `/devnet`` folder.
+Description: Runs all tests in the /test/integration folder (includes API tests).
 
-### test-emit-notif
+### test-devnet:evm
 
-Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/emitNotifications.spec.ts'`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/evm`
 
-Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
+Description: Runs all tests in our `/devnet/evm` folder.
 
-### test-integration-util
+### test-devnet:cosmos
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/*.spec.ts'`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/cosmos`
 
-Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
-
-Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
-
-Contributor: Timothee Legros
+Description: Runs all tests in our `/devnet/cosmos` folder.
 
 ### test-select
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json`
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run`
 
 Description: Append a path to run specific test files or folders.
 
-### test-suite
+### test-unit
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
-
-Description: Runs all tests in our /test directory.
-
-Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions? **Flagged for possible removal.**
-
-### unit-test
-
-Definition: `NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'`
+Definition: `NODE_ENV=test FEATURE_FLAG_GROUP_CHECK_ENABLED=true vitest --config ../../vite.config.ts run test/unit`
 
 Description: Tests all .spec files within the `./test/unit` sub-directory of test folder.
 
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
+### test-select:watch
 
-Contributor: Ryan Bennett
+Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false`
 
-### unit-test:watch
-
-Definition: `NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'`
-
-Description: Watches for changes to any .spec files within `./test/unit` and automatically runs test when they are updated.
-
-Considerations: This script breaks our more usual test script syntax, which typically begin with the "test-" prefix followed by the directory tested.
-
-Contributor: Ryan Bennett
+Description: Watches for changes to any .spec files within the given path and automatically runs test when they are updated.
 
 ## TypeScript
 
@@ -411,29 +359,29 @@ Description: Sanity scripts developers should run locally before pushing code, c
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
 
-Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
+Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.mjs](../packages/commonwealth/webpack/webpack.prod.config.mjs), set the `generateStatsFile` key to true, run `pnpm build` , and finally `pnpm bundle-report`.
 
 ### start
 
-Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
+Definition: `tsx watch  --max-old-space-size=4096 server.ts`
 
 Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
 ### start-all
 
-Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'`
+Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'pnpm start' 'pnpm start-consumer'`
 
-Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
+Description: Runs `pnpm start` and `pnpm start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
 
 ### start-consumer
 
-Definition: `ts-node -r tsconfig-paths/register server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
+Definition: `tsx  server/workers/commonwealthConsumer/commonwealthConsumer.ts`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
 ### start-evm-ce
 
-Definition: `ts-node -r tsconfig-paths/register server/workers/evmChainEvents/startEvmPolling.ts`
+Definition: `tsx  server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
 
@@ -457,28 +405,24 @@ Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/
 
 Description: Stop all Cosmos devnet containers.
 
-# Util scripts
+## Utils & Services
 
-## add-component-showcase
+### add-component-showcase
 
 Definition: `add-component-showcase`
 
-Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. Fore more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.
+Description: It creates new `tsx` file and modifies `componentsList.ts` file in order to add components to the showcase page easier. For more information take a look at [Component-Kit.md](./Component-Kit.md) documentation file.
 
-## set-super-admin
+### send-cosmos-notifs
 
-Definition: `chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh`
+Definition: `node --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/cosmosGovNotifications/generateCosmosGovNotifications.js`
 
-Description: It sets whether a user is a super admin or not. The script accepts 2 optional arguments that indicate the environment in which to set the super admin and whether to enable or disable the super admin. The script enables the super admin by default.
+Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
 
-Considerations: This script requires having SUPER_ADMIN_EMAIL or SUPER_ADMIN_WALLET_ADDRESS set in packages/commonwealth/.env. The script also requires having Heroku access on any apps in which a super admin status is being updated.
+Contributor: Timothee Legros
 
-Examples:
-- `yarn set-super-admin`
-  - This sets the local user specified by the environment variables to a super admin.
-- `yarn set-super-admin false`
-  - This disables super admin for the local user.
-- `yarn set-super-admin [frick | frack | beta | demo]`
-  - This enables super admin for the specified user on the specified app.
-- `yarn set-super-admin [frick | frack | beta | demo] false`
-  - This disables super admin for the specified user on the specified app.
+### send-notification-digest-emails
+
+Definition: `SEND_EMAILS=true tsx  server.ts`
+
+Description: Schedules a daily task for sending notification email digests.

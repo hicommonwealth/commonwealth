@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import React, { useEffect } from 'react';
 import type Notification from '../../../models/Notification';
 

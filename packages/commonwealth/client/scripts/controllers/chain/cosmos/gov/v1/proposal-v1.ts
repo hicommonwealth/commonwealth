@@ -5,7 +5,7 @@ import type {
   QueryTallyResultResponseSDKType,
   QueryVotesResponseSDKType,
 } from '@hicommonwealth/chains';
-import { ProposalType } from '@hicommonwealth/core';
+import { ProposalType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import type {
   CosmosProposalState,
@@ -13,6 +13,7 @@ import type {
   CosmosVoteChoice,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
+import Long from 'long';
 import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';
 import {
@@ -43,6 +44,7 @@ const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
     case 'VOTE_OPTION_NO_WITH_VETO':
       return 'NoWithVeto';
     default:
+      // @ts-expect-error StrictNullChecks
       return null;
   }
 };
@@ -69,6 +71,7 @@ export class CosmosProposalV1 extends Proposal<
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   public get author() {
     return this.data.proposer
       ? this._Accounts.fromAddress(this.data.proposer)
@@ -144,12 +147,13 @@ export class CosmosProposalV1 extends Proposal<
       this._initialized = true;
     }
     if (this.data.state.completed) {
+      // @ts-expect-error StrictNullChecks
       super.complete(this._Governance.store);
     }
   }
 
   public async fetchDeposits(): Promise<QueryDepositsResponseSDKType> {
-    const proposalId = longify(this.data.identifier);
+    const proposalId = longify(this.data.identifier) as Long;
     const deposits = await this._Chain.lcd.cosmos.gov.v1.deposits({
       proposalId,
     });
@@ -158,7 +162,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
-    const proposalId = longify(this.data.identifier);
+    const proposalId = longify(this.data.identifier) as Long;
     const tally = await this._Chain.lcd.cosmos.gov.v1.tallyResult({
       proposalId,
     });
@@ -167,7 +171,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
-    const proposalId = longify(this.data.identifier);
+    const proposalId = longify(this.data.identifier) as Long;
     const votes = await this._Chain.lcd.cosmos.gov.v1.votes({ proposalId });
     this.setVotes(votes);
     return votes;

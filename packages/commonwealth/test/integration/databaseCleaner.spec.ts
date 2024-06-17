@@ -1,9 +1,18 @@
-import { NotificationCategories, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { tester, type DB } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import { DatabaseCleaner } from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
@@ -12,11 +21,11 @@ const { expect } = chai;
 describe('DatabaseCleaner Tests', async () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -41,7 +50,7 @@ describe('DatabaseCleaner Tests', async () => {
       sinon.restore();
     });
 
-    it('should not run if started before the correct hour', () => {
+    test('should not run if started before the correct hour', () => {
       const now = new Date();
       // set cleaner to run at 10 AM UTC
       console.log('input time to run', now.toString(), now.getUTCHours() + 4);
@@ -56,7 +65,7 @@ describe('DatabaseCleaner Tests', async () => {
       expect(dbCleaner.completed).to.be.false;
     });
 
-    it('should run exactly once (immediately) if started in the correct hour', () => {
+    test('should run exactly once (immediately) if started in the correct hour', () => {
       const now = new Date();
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
@@ -68,7 +77,7 @@ describe('DatabaseCleaner Tests', async () => {
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
     });
 
-    it('should not run if started after the correct hour', () => {
+    test('should not run if started after the correct hour', () => {
       const now = new Date();
       const dbCleaner = new DatabaseCleaner();
       dbCleaner.initLoop(models, now.getUTCHours() - 4, true);
@@ -82,14 +91,14 @@ describe('DatabaseCleaner Tests', async () => {
       expect(dbCleaner.completed).to.be.false;
     });
 
-    it('should not run if an hour to run is not provided', () => {
+    test('should not run if an hour to run is not provided', () => {
       const dbCleaner = new DatabaseCleaner();
       dbCleaner.initLoop(models, NaN, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
       expect(dbCleaner.timeoutID).to.be.undefined;
     });
 
-    it('should not run if the hour provided is invalid', () => {
+    test('should not run if the hour provided is invalid', () => {
       let dbCleaner = new DatabaseCleaner();
       dbCleaner.initLoop(models, 24, true);
       expect(dbCleaner.timeToRun).to.be.undefined;
@@ -110,7 +119,7 @@ describe('DatabaseCleaner Tests', async () => {
   describe('Tests what the cleaner cleans', () => {
     let clock: sinon.SinonFakeTimers;
 
-    before(function () {
+    beforeAll(function () {
       const now = new Date();
       now.setUTCHours(8);
       now.setUTCMinutes(0);
@@ -123,11 +132,11 @@ describe('DatabaseCleaner Tests', async () => {
       });
     });
 
-    after(function () {
+    afterAll(function () {
       clock.restore();
     });
 
-    it('Should only delete notifications older than 3 months', async () => {
+    test('Should only delete notifications older than 3 months', async () => {
       const currentNotifLength = (await models.Notification.findAll()).length;
       expect(currentNotifLength).to.equal(0);
 
@@ -140,6 +149,7 @@ describe('DatabaseCleaner Tests', async () => {
       hundredDaysAgo.setUTCDate(now.getUTCDate() - 100);
 
       // create old notification
+      // @ts-expect-error StrictNullChecks
       await models.Notification.create({
         notification_data: 'testing',
         created_at: hundredDaysAgo,
@@ -148,6 +158,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new notification
+      // @ts-expect-error StrictNullChecks
       await models.Notification.create({
         notification_data: 'testing',
         community_id: 'ethereum',
@@ -161,12 +172,13 @@ describe('DatabaseCleaner Tests', async () => {
 
       const notifs = await models.Notification.findAll();
       expect(notifs.length).to.equal(1);
+      // @ts-expect-error StrictNullChecks
       expect(notifs[0].created_at.toString()).to.equal(
         eightyEightDaysAgo.toString(),
       );
     });
 
-    it('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {
+    test('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {
       const now = new Date();
 
       const oneYearAndTwoDaysAgo = new Date(now);
@@ -176,10 +188,12 @@ describe('DatabaseCleaner Tests', async () => {
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
       // create old user and address
-      const oldUser = await models.User.createWithProfile(models, {
+      // @ts-expect-error StrictNullChecks
+      const oldUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
       });
+      // @ts-expect-error StrictNullChecks
       await models.Address.create({
         user_id: oldUser.id,
         address: '0x1234',
@@ -189,10 +203,12 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       // create new user and address
-      const newUser = await models.User.createWithProfile(models, {
+      // @ts-expect-error StrictNullChecks
+      const newUser = await models.User.createWithProfile({
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
       });
+      // @ts-expect-error StrictNullChecks
       await models.Address.create({
         user_id: newUser.id,
         address: '0x2345',
@@ -202,6 +218,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       const newSub = await models.Subscription.create({
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
         community_id: 'ethereum',
@@ -210,6 +227,7 @@ describe('DatabaseCleaner Tests', async () => {
       });
 
       const oldSub = await models.Subscription.create({
+        // @ts-expect-error StrictNullChecks
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
         community_id: 'ethereum',

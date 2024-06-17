@@ -1,4 +1,4 @@
-import type { ChainBase, WalletId } from '@hicommonwealth/core';
+import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
 import Account from '../../models/Account';
@@ -80,6 +80,7 @@ export default class WebWalletController {
       throw new Error('account on wrong chain base');
     }
     if (account.walletId) {
+      // @ts-expect-error StrictNullChecks
       return this.getByName(account.walletId);
     }
     const availableWallets = this.availableWallets(chain);
@@ -111,15 +112,18 @@ export default class WebWalletController {
 
   constructor() {
     this._wallets = [
+      // @ts-expect-error StrictNullChecks
       new PolkadotWebWalletController(),
       new MetamaskWebWalletController(),
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new LeapWebWalletController(),
+      // @ts-expect-error StrictNullChecks
       new NearWebWalletController(),
       new TerraStationWebWalletController(),
       new CosmosEvmMetamaskWalletController(),
       new KeplrEthereumWalletController(),
+      // @ts-expect-error StrictNullChecks
       new PhantomWebWalletController(),
       new TerraWalletConnectWebWalletController(),
       new CoinbaseWebWalletController(),

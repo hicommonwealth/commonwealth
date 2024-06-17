@@ -1,4 +1,4 @@
-import { HttpMethod } from '@hicommonwealth/core';
+import { HttpMethod } from '@hicommonwealth/shared';
 import {
   Express,
   NextFunction,

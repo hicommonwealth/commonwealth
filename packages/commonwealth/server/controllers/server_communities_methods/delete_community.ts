@@ -1,11 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
-import {
-  ModelInstance,
-  ModelStatic,
-  UserInstance,
-  sequelize,
-} from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { ModelInstance, UserInstance, sequelize } from '@hicommonwealth/model';
+import { Op, type ModelStatic } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -89,7 +84,7 @@ export async function __deleteCommunity(
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
-                SELECT id 
+                SELECT id
                 FROM "Addresses"
                 WHERE community_id = :community_id
             ) DELETE FROM "Memberships" M
@@ -107,7 +102,7 @@ export async function __deleteCommunity(
           await this.models.sequelize.query(
             `
             WITH addresses_to_delete AS (
-                SELECT id 
+                SELECT id
                 FROM "Addresses"
                 WHERE community_id = :community_id
             ) DELETE FROM "Collaborations" C
@@ -122,26 +117,40 @@ export async function __deleteCommunity(
             },
           );
 
-          const models: Array<
-            ModelStatic<ModelInstance<{ community_id?: string }>>
-          > = [
-            this.models.CommunitySnapshotSpaces,
+          const models: ModelStatic<
+            ModelInstance<{ community_id?: string }>
+          >[] = [
+            // @ts-expect-error StrictNullChecks
             this.models.CommunityStake,
+            // @ts-expect-error StrictNullChecks
             this.models.DiscordBotConfig,
+            // @ts-expect-error StrictNullChecks
             this.models.Ban,
+            // @ts-expect-error StrictNullChecks
             this.models.Reaction,
+            // @ts-expect-error StrictNullChecks
             this.models.Comment,
+            // @ts-expect-error StrictNullChecks
             this.models.Topic,
             this.models.Subscription,
+            // @ts-expect-error StrictNullChecks
             this.models.CommunityContract,
+            // @ts-expect-error StrictNullChecks
             this.models.Webhook,
+            // @ts-expect-error StrictNullChecks
             this.models.Vote,
+            // @ts-expect-error StrictNullChecks
             this.models.Poll,
+            // @ts-expect-error StrictNullChecks
             this.models.Thread,
+            // @ts-expect-error StrictNullChecks
             this.models.StarredCommunity,
+            // @ts-expect-error StrictNullChecks
             this.models.CommunityBanner,
             this.models.Notification,
+            // @ts-expect-error StrictNullChecks
             this.models.Group,
+            // @ts-expect-error StrictNullChecks
             this.models.Address,
           ];
 
@@ -154,6 +163,7 @@ export async function __deleteCommunity(
           }
 
           await this.models.Collaboration.destroy({
+            // @ts-expect-error StrictNullChecks
             where: {
               thread_id: { [Op.in]: threads.map((thread) => thread.id) },
             },

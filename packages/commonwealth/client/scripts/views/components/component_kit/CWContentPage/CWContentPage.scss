@@ -54,8 +54,6 @@
   display: flex;
   flex: 1;
 
-  @include contentPadding;
-
   .sidebar-view {
     display: flex;
     gap: 56px;

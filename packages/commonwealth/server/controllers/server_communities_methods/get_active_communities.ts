@@ -5,7 +5,7 @@ import {
   sequelize,
 } from '@hicommonwealth/model';
 import { Op, QueryTypes } from 'sequelize';
-import { ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS } from 'server/config';
+import { config } from '../../config';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 const CACHE_KEY = 'active-communities';
@@ -63,12 +63,14 @@ export async function __getActiveCommunities(
   const [communities, totalCommunitiesCount]: [CommunityInstance[], number] =
     await Promise.all([
       this.models.Community.findAll({
+        // @ts-expect-error StrictNullChecks
         where: {
           id: {
             [Op.in]: communityIds,
           },
         },
         include: [
+          { model: this.models.CommunityStake },
           {
             model: this.models.Topic,
             required: true,
@@ -94,7 +96,7 @@ export async function __getActiveCommunities(
       CacheNamespaces.Function_Response,
       CACHE_KEY,
       JSON.stringify(result),
-      ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
+      config.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
     );
   }
 

@@ -1,10 +1,10 @@
 import {
   CommentAttributes,
   DB,
-  Role,
   ThreadAttributes,
   UserInstance,
 } from '@hicommonwealth/model';
+import type { Role } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { findAllRoles } from './roles';
 
@@ -52,6 +52,7 @@ export const validateOwner = async ({
   }
   const roles = await findAllRoles(
     models,
+    // @ts-expect-error StrictNullChecks
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
     communityId,
     requiredRoles,

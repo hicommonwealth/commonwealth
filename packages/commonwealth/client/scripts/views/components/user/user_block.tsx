@@ -1,8 +1,8 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable no-script-url */
-import { WalletId } from '@hicommonwealth/core';
+import { WalletId } from '@hicommonwealth/shared';
 import 'components/user/user.scss';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import React from 'react';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
@@ -46,9 +46,11 @@ export const UserBlock = ({
     userCommunityId = user.community.id;
   }
   const { data: users } = useFetchProfilesByAddressesQuery({
+    // @ts-expect-error <StrictNullChecks/>
     profileChainIds: [userCommunityId],
     profileAddresses: [user?.address],
     currentChainId: app.activeChainId(),
+    // @ts-expect-error <StrictNullChecks/>
     apiCallEnabled: !!(userCommunityId && user?.address),
   });
   const profile = users?.[0];
@@ -96,8 +98,8 @@ export const UserBlock = ({
           {showCommunityName && (
             <div>
               {user instanceof MinimumProfile
-                ? capitalize(user.chain)
-                : capitalize(user.community.name)}
+                ? _.capitalize(user.chain)
+                : _.capitalize(user.community.name)}
             </div>
           )}
         </div>

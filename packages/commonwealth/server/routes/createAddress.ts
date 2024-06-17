@@ -1,5 +1,5 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
 import type { AddressAttributes, DB } from '@hicommonwealth/model';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { createAddressHelper } from '../util/createAddressHelper';
@@ -31,6 +31,7 @@ const createAddress = async (
   req: TypedRequestBody<CreateAddressReq>,
   res: TypedResponse<CreateAddressResp>,
 ) => {
+  // @ts-expect-error StrictNullChecks
   const result = await createAddressHelper(req.body, models, req.user);
   return success(res, result);
 };

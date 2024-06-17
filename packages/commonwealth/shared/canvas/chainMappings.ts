@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 
 export function chainBaseToCaip2(chainBase: ChainBase): string {
   // Translate Commonwealth ChainBase names to CAIP-2 Chain names.
@@ -37,13 +37,14 @@ export function caip2ToChainBase(caip2: string): ChainBase {
 export function chainBaseToCanvasChainId(
   chainBase: ChainBase,
   idOrPrefix: string | number,
+  // @ts-expect-error StrictNullChecks
 ): string {
   // The Canvas chain id is a stringified ETH chain ID, or Cosmos bech32 prefix, or equivalent.
   if (chainBase === ChainBase.CosmosSDK) {
     // Temporarily locked to cosmoshub-1, since we don't have the live chain ID for cosmos chains
     return 'cosmoshub-1';
   } else if (chainBase === ChainBase.Ethereum) {
-    return idOrPrefix.toString();
+    return idOrPrefix ? idOrPrefix.toString() : '1';
   } else if (chainBase === ChainBase.NEAR) {
     // Temporarily locked to mainnet
     // See also: client/scripts/views/pages/finish_near_login.tsx

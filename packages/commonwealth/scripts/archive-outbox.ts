@@ -1,27 +1,29 @@
-import { PinoLogger } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
-import { S3 } from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { HotShotsStats } from '@hicommonwealth/adapters';
+import { dispose, logger, stats } from '@hicommonwealth/core';
+import { config, formatS3Url } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
-import * as dotenv from 'dotenv';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { createGzip } from 'zlib';
 
 // REQUIRED for S3 env var
-dotenv.config();
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 const S3_BUCKET_NAME = 'outbox-event-stream-archive';
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = config.DB.URI;
 
   if (!databaseUrl) {
     log.error('DATABASE_URL environment variable is not set.');
     return false;
   }
 
-  const cmd = `pg_dump -t ${table} -f ${outputFile} -d ${databaseUrl}`;
+  const cmd = `PGSSLMODE=allow pg_dump -t ${table} -f ${outputFile} -d ${databaseUrl}`;
 
   try {
     // execSync returns stdout as Buffer by default, convert it to string if needed
@@ -62,8 +64,17 @@ async function uploadToS3(filePath: string): Promise<boolean> {
       Body: fileStream,
     };
 
-    const data = await s3.upload(params).promise();
-    log.info(`File uploaded successfully at ${data.Location}`);
+    const data = await new Upload({
+      client: s3,
+      params,
+    }).done();
+    log.info(
+      `File uploaded successfully at ${formatS3Url(
+        // @ts-expect-error StrictNullChecks
+        data.Location,
+        S3_BUCKET_NAME,
+      )}`,
+    );
     return true;
   } catch (error) {
     log.error(`S3 upload failed`, error, {
@@ -82,12 +93,12 @@ async function getTablesToBackup(): Promise<string[]> {
     table_name: string;
   }>(
     `
-    SELECT tablename as table_name
-    FROM pg_tables
-    WHERE schemaname = 'public'
-    AND tablename LIKE 'outbox_relayed_p%'
-    AND to_date(SUBSTRING(tablename FROM 'p(\\d{8})$'), 'YYYYMMDD') < date_trunc('month', CURRENT_DATE);
-  `,
+        SELECT tablename as table_name
+        FROM pg_tables
+        WHERE schemaname = 'public'
+          AND tablename LIKE 'outbox_relayed_p%'
+          AND to_date(SUBSTRING(tablename FROM 'p(\\d{8})$'), 'YYYYMMDD') < date_trunc('month', CURRENT_DATE);
+    `,
     { type: QueryTypes.SELECT, raw: true },
   );
 
@@ -99,7 +110,7 @@ async function getTablesToBackup(): Promise<string[]> {
   }
 
   const tablesInPg = result.map((t) => t.table_name);
-  log.info('Possible tables found', undefined, {
+  log.info('Possible tables found', {
     tablesInPg,
   });
 
@@ -111,12 +122,10 @@ async function getTablesToBackup(): Promise<string[]> {
         log.info(
           `Searching for ${objectKey} in S3 bucket ${S3_BUCKET_NAME}...`,
         );
-        await s3
-          .headObject({
-            Bucket: S3_BUCKET_NAME,
-            Key: objectKey,
-          })
-          .promise();
+        await s3.headObject({
+          Bucket: S3_BUCKET_NAME,
+          Key: objectKey,
+        });
         return true;
       } catch (e) {
         if (e.statusCode === 404) return false;
@@ -125,14 +134,17 @@ async function getTablesToBackup(): Promise<string[]> {
     }),
   );
 
-  log.info('Existing archives retrieved', undefined, {
+  log.info('Existing archives retrieved', {
     archiveExists,
   });
 
   const tablesToArchive: string[] = [];
   for (let i = 0; i < tablesInPg.length; i++) {
     const s3Res = archiveExists[i];
-    if (s3Res.status === 'fulfilled' && !s3Res.value) {
+    if (
+      (s3Res.status === 'fulfilled' && !s3Res.value) ||
+      (s3Res.status === 'rejected' && s3Res.reason.name === 'NotFound')
+    ) {
       tablesToArchive.push(tablesInPg[i]);
     } else if (s3Res.status === 'rejected') {
       log.error('Error fetching headObject from S3', undefined, {
@@ -156,7 +168,7 @@ function getCompressedDumpName(dumpName: string): string {
 async function main() {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
-  log.info(`Found ${tables.length} to archive`, undefined, {
+  log.info(`Found ${tables.length} to archive`, {
     tables,
   });
 
@@ -164,19 +176,19 @@ async function main() {
     const dumpName = getDumpName(table);
     const compressedName = getCompressedDumpName(dumpName);
 
-    log.info(`Dumping table`, undefined, { table });
+    log.info(`Dumping table`, { table });
     const res = dumpTablesSync(table, dumpName);
     if (!res) continue;
-    log.info(`Dump complete`, undefined, { dumpName });
+    log.info(`Dump complete`, { dumpName });
 
-    log.info('Compressing dump', undefined, { table });
+    log.info('Compressing dump', { table });
     try {
       await compressFile(dumpName, compressedName);
     } catch (e) {
       log.error(`Failed to compress ${dumpName} to ${compressedName}`);
       continue;
     }
-    log.info('Compression complete beginning S3 upload', undefined, {
+    log.info('Compression complete beginning S3 upload', {
       compressedName,
     });
 
@@ -184,7 +196,7 @@ async function main() {
   }
 
   if (tables.length > 0) {
-    log.info('Archive outbox complete', undefined, {
+    log.info('Archive outbox complete', {
       tables,
     });
   } else {
@@ -192,14 +204,14 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.endsWith(process.argv[1])) {
   main()
-    .then(() => {
-      log.info('Success');
-      process.exit(0);
+    .then(async () => {
+      stats(HotShotsStats()).increment('cw.scheduler.archive-outbox');
+      await dispose()('EXIT', true);
     })
-    .catch((err) => {
+    .catch(async (err) => {
       log.fatal('Failed to archive outbox child partitions to S3', err);
-      process.exit(1);
+      await dispose()('ERROR', true);
     });
 }

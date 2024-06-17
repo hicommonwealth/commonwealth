@@ -1,4 +1,5 @@
-import { String } from 'aws-sdk/clients/apigateway';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
 import { reservationHookAbi } from './Abi/ReservationHookAbi';
@@ -28,7 +29,7 @@ class NamespaceFactory extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     const addr = await this.contract.methods.reservationHook().call();
-    if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
+    if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
         reservationHookAbi as AbiItem[],
         addr,
@@ -47,7 +48,7 @@ class NamespaceFactory extends ContractBase {
     }
     const hexString = this.web3.utils.utf8ToHex(name);
     const activeNamespace = await this.contract.methods
-      .getNamespace(hexString)
+      .getNamespace(hexString.padEnd(66, '0'))
       .call();
     return activeNamespace;
   }
@@ -63,7 +64,7 @@ class NamespaceFactory extends ContractBase {
       await this.initialize();
     }
     const activeNamespace = await this.getNamespaceAddress(name);
-    if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
+    if (activeNamespace !== ZERO_ADDRESS) {
       return false;
     }
     if (this.reservationHook) {
@@ -79,13 +80,14 @@ class NamespaceFactory extends ContractBase {
    * @param name New Namespace name
    * @param walletAddress an active evm wallet addresss to send tx from
    * @param feeManager wallet or contract address to send community fees
+   * @param chainId The id of the EVM chain
    * @returns txReceipt or Error if name is taken or tx fails
    */
   async deployNamespace(
     name: string,
     walletAddress: string,
     feeManager: string,
-    chainId: String,
+    chainId: string,
   ): Promise<any> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
@@ -138,7 +140,7 @@ class NamespaceFactory extends ContractBase {
           name,
           name + ' Community Stake',
           stakesId,
-          '0x0000000000000000000000000000000000000000',
+          ZERO_ADDRESS,
           2000000,
           0,
         )
@@ -147,6 +149,63 @@ class NamespaceFactory extends ContractBase {
           maxPriorityFeePerGas: null,
           maxFeePerGas: null,
         });
+    } catch {
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
+  async newContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    stakeId: number = 2,
+    voterShare: number,
+    weight: number = 1,
+    walletAddress: string,
+    exchangeToken?: string,
+    feeShare?: number,
+    prizeShare?: number,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    let txReceipt;
+    try {
+      if (!exchangeToken) {
+        txReceipt = await this.contract.methods
+          .newContest(
+            namespaceName,
+            contestInterval,
+            winnerShares,
+            stakeId,
+            prizeShare,
+            voterShare,
+            feeShare,
+            weight,
+          )
+          .send({
+            from: walletAddress,
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          });
+      } else {
+        txReceipt = await this.contract.methods
+          .newSingleContest(
+            namespaceName,
+            contestInterval,
+            winnerShares,
+            stakeId,
+            voterShare,
+            weight,
+            exchangeToken,
+          )
+          .send({
+            from: walletAddress,
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          });
+      }
     } catch {
       throw new Error('Transaction failed');
     }

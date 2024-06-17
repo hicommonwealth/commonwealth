@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/core';
+import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
@@ -29,6 +29,10 @@ class Account {
 
   public get profile() {
     return this._profile;
+  }
+
+  public set profile(profile) {
+    this._profile = profile;
   }
 
   constructor({
@@ -71,9 +75,11 @@ class Account {
     this._walletId = walletId;
     this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
+    // @ts-expect-error StrictNullChecks
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
+    // @ts-expect-error StrictNullChecks
     this.lastActive = lastActive ? moment(lastActive) : null;
     if (profile) {
       this._profile = profile;

@@ -5,12 +5,12 @@ import type Topic from '../../models/Topic';
 import app from '../../state';
 import { useEditThreadMutation } from '../../state/api/threads';
 import { useFetchTopicsQuery } from '../../state/api/topics';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { TopicSelector } from '../components/topic_selector';
 
 type ChangeThreadTopicModalProps = {
@@ -29,6 +29,7 @@ export const ChangeThreadTopicModal = ({
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
+      // @ts-expect-error <StrictNullChecks/>
       acc.enabledTopics.push(t);
       return acc;
     },
@@ -36,7 +37,7 @@ export const ChangeThreadTopicModal = ({
   );
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -45,7 +46,7 @@ export const ChangeThreadTopicModal = ({
   const handleSaveChanges = async () => {
     try {
       await editThread({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: app.user.activeAccount.address,
         threadId: thread.id,
         topicId: activeTopic.id,
@@ -65,7 +66,9 @@ export const ChangeThreadTopicModal = ({
       <CWModalHeader label="Change topic" onModalClose={onModalClose} />
       <CWModalBody>
         <TopicSelector
+          // @ts-expect-error <StrictNullChecks/>
           enabledTopics={topicsForSelector.enabledTopics}
+          // @ts-expect-error <StrictNullChecks/>
           disabledTopics={topicsForSelector.disabledTopics}
           value={activeTopic}
           onChange={setActiveTopic}

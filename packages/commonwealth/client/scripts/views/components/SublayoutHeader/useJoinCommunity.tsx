@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -10,6 +10,7 @@ import app from 'state';
 import { addressSwapper } from 'utils';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import TOSModal from 'views/modals/TOSModal';
+import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 
@@ -18,6 +19,7 @@ const useJoinCommunity = () => {
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
@@ -63,7 +65,9 @@ const useJoinCommunity = () => {
   const uniqueAddresses = [];
   const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
     (addressInfo) => {
+      // @ts-expect-error <StrictNullChecks/>
       if (!uniqueAddresses.includes(addressInfo.address)) {
+        // @ts-expect-error <StrictNullChecks/>
         uniqueAddresses.push(addressInfo.address);
         return true;
       }
@@ -82,6 +86,94 @@ const useJoinCommunity = () => {
     }
   };
 
+  // Handles linking the specified address to the specified community
+  const linkSpecificAddressToSpecificCommunity = async ({
+    address,
+    communityId,
+    communityChainBase,
+    activeChainId,
+  }: {
+    address: string;
+    communityId: string;
+    communityChainBase: string;
+    activeChainId?: string;
+  }) => {
+    try {
+      const res = await linkExistingAddressToChainOrCommunity(
+        address,
+        communityId,
+        communityChainBase,
+      );
+
+      if (res && res.data.result) {
+        const { verification_token, addresses, encodedAddress } =
+          res.data.result;
+
+        // update addresses
+        app.user.setAddresses(
+          addresses.map((a) => {
+            return new AddressInfo({
+              id: a.id,
+              address: a.address,
+              communityId: a.community_id,
+              keytype: a.keytype,
+              walletId: a.wallet_id,
+            });
+          }),
+        );
+
+        // get newly added address info
+        const addressInfo = app.user.addresses.find(
+          (a) => a.address === encodedAddress && a.community.id === communityId,
+        );
+
+        // set verification token for the newly created account
+        const account = app?.chain?.accounts?.get?.(
+          encodedAddress,
+          // @ts-expect-error <StrictNullChecks/>
+          addressInfo.keytype,
+        );
+        if (account && app.chain) {
+          account?.setValidationToken?.(verification_token);
+        }
+
+        // set active address if in a community
+        if (activeChainId) {
+          // set role in community
+          if (
+            !app.roles.getRoleInCommunity({
+              account,
+              community: activeChainId,
+            })
+          ) {
+            await app.roles.createRole({
+              // @ts-expect-error <StrictNullChecks/>
+              address: addressInfo,
+              community: activeChainId,
+            });
+          }
+
+          account && (await setActiveAccount(account));
+
+          // update active accounts
+          if (
+            account &&
+            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+              .length === 0
+          ) {
+            app.user.setActiveAccounts(
+              app.user.activeAccounts.concat([account]),
+            );
+          }
+        }
+      } else {
+        // Todo: handle error
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // Handles linking the existing address to the community
   const linkToCommunity = async (accountIndex: number) => {
     const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
@@ -93,64 +185,16 @@ const useJoinCommunity = () => {
 
         const address = originAddressInfo.address;
 
-        const res = await linkExistingAddressToChainOrCommunity(
+        await linkSpecificAddressToSpecificCommunity({
           address,
-          targetCommunity,
-          originAddressInfo.community.id,
-        );
+          communityId: targetCommunity,
+          communityChainBase: originAddressInfo.community.id,
+          activeChainId: activeCommunityId,
+        });
 
-        if (res && res.data.result) {
-          const { verification_token, addresses, encodedAddress } =
-            res.data.result;
-          app.user.setAddresses(
-            addresses.map((a) => {
-              return new AddressInfo({
-                id: a.id,
-                address: a.address,
-                chainId: a.community_id,
-                keytype: a.keytype,
-                walletId: a.wallet_id,
-              });
-            }),
-          );
-          const addressInfo = app.user.addresses.find(
-            (a) =>
-              a.address === encodedAddress &&
-              a.community.id === targetCommunity,
-          );
-
-          const account = app.chain.accounts.get(
-            encodedAddress,
-            addressInfo.keytype,
-          );
-          if (app.chain) {
-            account.setValidationToken(verification_token);
-            console.log('setting validation token');
-          }
-          if (
-            activeCommunityId &&
-            !app.roles.getRoleInCommunity({
-              account,
-              community: activeCommunityId,
-            })
-          ) {
-            await app.roles.createRole({
-              address: addressInfo,
-              community: activeCommunityId,
-            });
-          }
-          await setActiveAccount(account);
-          if (
-            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-              .length === 0
-          ) {
-            app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account]),
-            );
-          }
-        } else {
-          // Todo: handle error
-        }
+        await toggleCommunityStar({
+          community: activeCommunityId,
+        });
       } catch (err) {
         console.error(err);
       }
@@ -230,6 +274,7 @@ const useJoinCommunity = () => {
     handleJoinCommunity,
     sameBaseAddressesRemoveDuplicates,
     JoinCommunityModals,
+    linkSpecificAddressToSpecificCommunity,
   };
 };
 

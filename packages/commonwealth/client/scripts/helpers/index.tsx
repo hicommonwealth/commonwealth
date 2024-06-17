@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -28,16 +28,18 @@ export function threadStageToLabel(stage: string) {
   }
 }
 
-export function isDefaultStage(stage: string) {
+export function isDefaultStage(stage: string, customStages?: string[]) {
   return (
     stage === ThreadStage.Discussion ||
-    stage === parseCustomStages(app.chain.meta.customStages)[0]
+    stage === parseCustomStages(customStages || app.chain.meta.customStages)[0]
   );
 }
 
 // Provides a default if community has no custom stages.
 export function parseCustomStages(customStages?: string[]): string[] {
-  return customStages ?? Object.values(ThreadStage);
+  return customStages && customStages.length > 0
+    ? customStages
+    : Object.values(ThreadStage);
 }
 
 /*
@@ -46,6 +48,7 @@ export function parseCustomStages(customStages?: string[]): string[] {
 
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
+  // @ts-expect-error <StrictNullChecks/>
   return re.exec(url)[1];
 }
 
@@ -198,8 +201,10 @@ export function formatAddressShort(
   if (
     address.length <
     numberOfVisibleCharacters + numberOfVisibleCharactersTail + 1
-  )
+  ) {
     return address;
+  }
+
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
     -numberOfVisibleCharactersTail,
   )}`;
@@ -314,6 +319,7 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.Solana:
       return ChainNetwork.Solana;
     default:
+      // @ts-expect-error <StrictNullChecks/>
       return null;
   }
 }

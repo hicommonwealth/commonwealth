@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import { capitalize } from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
@@ -33,6 +33,7 @@ const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
 
 type SnapshotInfoLinkRowProps = SnapshotInfoRowProps & { url: string };
 
+// eslint-disable-next-line react/no-multi-comp
 const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
   const { label, url, value } = props;
 
@@ -56,11 +57,12 @@ type SnapshotInformationCardProps = {
   threads: Array<{ id: number; title: string }> | null;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SnapshotInformationCard = ({
   proposal,
   threads,
 }: SnapshotInformationCardProps) => {
-  const votingSystem = capitalize(
+  const votingSystem = _.capitalize(
     proposal.type.split('-').join(' ').concat(' voting'),
   );
 
@@ -75,14 +77,14 @@ export const SnapshotInformationCard = ({
               value={
                 app.chain ? (
                   <User
-                    userAddress={proposal.author}
+                    userAddress={proposal?.author}
                     userCommunityId={app.activeChainId()}
                     shouldHideAvatar
                     shouldLinkProfile
                     shouldShowPopover
                   />
                 ) : (
-                  proposal.author
+                  proposal?.author || 'Deleted'
                 )
               }
             />
@@ -101,11 +103,15 @@ export const SnapshotInformationCard = ({
               value={moment(+proposal.end * 1000).format('lll')}
             />
             <SnapshotInfoLinkRow
+              // @ts-expect-error <StrictNullChecks/>
               label={proposal.strategies.length > 1 ? 'Strategies' : 'Strategy'}
               value={
+                // @ts-expect-error <StrictNullChecks/>
                 proposal.strategies.length > 1
-                  ? `${proposal.strategies.length} Strategies`
-                  : proposal.strategies[0].name
+                  ? // @ts-expect-error <StrictNullChecks/>
+                    `${proposal.strategies.length} Strategies`
+                  : // @ts-expect-error <StrictNullChecks/>
+                    proposal.strategies[0].name
               }
               url={`https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`}
             />
@@ -115,12 +121,14 @@ export const SnapshotInformationCard = ({
               url={`https://etherscan.io/block/${proposal.snapshot}`}
             />
           </div>
+          {/* @ts-expect-error StrictNullChecks*/}
           {threads.length > 0 && (
             <>
               <div className="linked-discussions">
                 <CWText type="h5" fontWeight="semiBold">
                   Linked Discussions
                 </CWText>
+                {/* @ts-expect-error StrictNullChecks*/}
                 {threads.map((thread) => (
                   <SnapshotThreadLink thread={thread} key={thread.id} />
                 ))}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
@@ -64,11 +64,6 @@ export const GovernanceSection = () => {
       app.chain.meta.snapshot?.length);
 
   const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
-
-  const showCompoundOptions =
-    isNotOffchain &&
-    app.user.activeAccount &&
-    app.chain?.network === ChainNetwork.Compound;
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
@@ -177,6 +172,7 @@ export const GovernanceSection = () => {
           e,
           '/multiple-snapshots?action=select-space',
           app.activeChainId(),
+          // @ts-expect-error <StrictNullChecks/>
           null,
         );
       } else {
@@ -188,6 +184,7 @@ export const GovernanceSection = () => {
               .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
               .trim()}`,
             app.activeChainId(),
+            // @ts-expect-error <StrictNullChecks/>
             null,
           );
         } else {
@@ -196,6 +193,7 @@ export const GovernanceSection = () => {
             e,
             `/snapshot/${snapshotSpaces}`,
             app.activeChainId(),
+            // @ts-expect-error <StrictNullChecks/>
             null,
           );
         }

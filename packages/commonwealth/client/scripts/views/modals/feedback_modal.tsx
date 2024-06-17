@@ -5,12 +5,12 @@ import app from '../../state';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 import '../../../styles/modals/feedback_modal.scss';
 
@@ -54,6 +54,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
       <CWModalBody>
         <CWTextArea
           placeholder="Report a bug, or suggest an improvement"
+          // @ts-expect-error <StrictNullChecks/>
           value={feedbackText}
           onInput={(e) => {
             setFeedbackText(e.target.value);
@@ -61,6 +62,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
         />
       </CWModalBody>
       <CWModalFooter>
+        {/* @ts-expect-error StrictNullChecks*/}
         {message && <CWValidationText message={message} status={status} />}
         <CWButton
           buttonType="primary"

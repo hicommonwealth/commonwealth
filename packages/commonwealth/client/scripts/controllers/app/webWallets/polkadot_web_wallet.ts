@@ -7,7 +7,7 @@ import { stringToHex } from '@polkadot/util';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { addressSwapper } from 'utils';
 
 import app from 'state';
@@ -62,6 +62,7 @@ class PolkadotWebWalletController
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-expect-error StrictNullChecks
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
@@ -82,6 +83,7 @@ class PolkadotWebWalletController
       data: message,
       type: 'bytes',
     };
+    // @ts-expect-error StrictNullChecks
     const signature = (await signer.signRaw(payload)).signature;
     return signature;
   }

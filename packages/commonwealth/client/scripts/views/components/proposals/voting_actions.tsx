@@ -22,18 +22,18 @@ import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useEffect, useState } from 'react';
+import { MixpanelGovernanceEvents } from 'shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
-import { MixpanelGovernanceEvents } from '/analytics/types';
-import { useBrowserAnalyticsTrack } from '/hooks/useBrowserAnalyticsTrack';
 
 import app from 'state';
 
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
-import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
@@ -294,8 +294,10 @@ export const VotingActions = (props: VotingActionsProps) => {
     hasVotedVeto,
     hasVotedForAnyChoice,
     hasVotedRemove,
+    // @ts-expect-error <StrictNullChecks/>
   } = getVotingResults(proposal, user);
 
+  // @ts-expect-error <StrictNullChecks/>
   const canVote = getCanVote(proposal, hasVotedForAnyChoice);
 
   const yesButton = (
@@ -308,7 +310,7 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   const noButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedNo || votingModalOpen}
       onClick={voteNo}
       label={hasVotedNo ? 'Voted no' : 'Vote no'}
@@ -326,7 +328,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   // cosmos: abstain
   const abstainButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedAbstain || votingModalOpen}
       onClick={voteAbstain}
       label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
@@ -336,7 +338,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   // cosmos: veto
   const noWithVetoButton = (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!canVote || hasVotedVeto || votingModalOpen}
       onClick={voteVeto}
       label={hasVotedVeto ? 'Vetoed' : 'Veto'}
@@ -394,6 +396,7 @@ export const VotingActions = (props: VotingActionsProps) => {
       <>
         <div className="button-row">{multiDepositApproveButton}</div>
         <ProposalExtensions
+          // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           setCosmosDepositAmount={setAmount}
         />
@@ -408,6 +411,7 @@ export const VotingActions = (props: VotingActionsProps) => {
           {abstainButton}
           {noWithVetoButton}
         </div>
+        {/* @ts-expect-error StrictNullChecks*/}
         <ProposalExtensions proposal={proposal} />
       </>
     );

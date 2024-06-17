@@ -47,7 +47,7 @@ export const NewSnapshotProposalModal = ({
 
   return (
     <div className="NewSnapshotProposalModal">
-      <CWModalHeader label="Create New Snapshot" onModalClose={onModalClose} />
+      <CWModalHeader label="Create new Snapshot" onModalClose={onModalClose} />
       <CWModalBody>
         {snapshotOptions.length > 0 ? (
           <>
@@ -67,6 +67,7 @@ export const NewSnapshotProposalModal = ({
           </>
         ) : (
           <NewSnapshotProposalForm
+            // @ts-expect-error <StrictNullChecks/>
             snapshotId={selectedSnapshotId}
             thread={thread}
             onSave={onSave}

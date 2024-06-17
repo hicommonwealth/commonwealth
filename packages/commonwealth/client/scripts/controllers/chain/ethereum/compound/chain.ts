@@ -1,5 +1,5 @@
 import type { ERC20Votes } from '@hicommonwealth/chains';
-import { ContractType } from '@hicommonwealth/core';
+import { ContractType } from '@hicommonwealth/shared';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 import type { BigNumber } from 'ethers';
@@ -88,11 +88,13 @@ export default class CompoundChain extends EthereumChain {
     const token = this.compoundApi.Token;
     if (!token) {
       console.warn('No token found, cannot fetch delegate');
+      // @ts-expect-error StrictNullChecks
       return null;
     }
     if (this.compoundApi.isTokenMPond(token)) {
       // TODO: a user can have multiple delegates on MPond and it cannot be easily fetched. We ignore for now.
       console.warn('Cannot fetch delegates on MPond-type token');
+      // @ts-expect-error StrictNullChecks
       return null;
     } else {
       const delegate = await token.delegates(
@@ -105,6 +107,7 @@ export default class CompoundChain extends EthereumChain {
   public async isDelegate(address: string, block?: number): Promise<boolean> {
     if (!this.compoundApi.Token) {
       console.warn('No token found, cannot fetch vote status');
+      // @ts-expect-error StrictNullChecks
       return null;
     }
     let voteAmount: BigNumber;

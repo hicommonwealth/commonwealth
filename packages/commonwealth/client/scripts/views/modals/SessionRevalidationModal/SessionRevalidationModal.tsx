@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
-import useWallets from 'hooks/useWallets';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalHeader,
@@ -20,6 +19,7 @@ import {
 import { formatAddress } from 'views/components/user/user_block';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import useAuthentication from '../AuthModal/useAuthentication'; // TODO: This modal should be absorbed into AuthModal
 import './SessionRevalidationModal.scss';
 
 interface SessionRevalidationModalProps {
@@ -42,7 +42,7 @@ const SessionRevalidationModal = ({
     onSocialLogin,
     setEmail,
     isMagicLoading,
-  } = useWallets({
+  } = useAuthentication({
     useSessionKeyLoginFlow: true,
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
@@ -59,6 +59,7 @@ const SessionRevalidationModal = ({
             <>
               Expected the address <b>{formatAddress(walletAddress)}</b>, but
               the wallet you signed in with has address{' '}
+              {/* @ts-expect-error StrictNullChecks*/}
               <b>{formatAddress(signedAddress)}</b>.
               <br />
               Please try sign again with expected address.
@@ -72,6 +73,7 @@ const SessionRevalidationModal = ({
         const updatedAddress = app.user.activeAccounts.find(
           (addr) => addr.address === walletAddress,
         );
+        // @ts-expect-error <StrictNullChecks/>
         await setActiveAccount(updatedAddress);
       }
     },
@@ -125,7 +127,7 @@ const SessionRevalidationModal = ({
           ) : walletSsoSource === WalletSsoSource.Twitter ? (
             <CWAuthButton
               type="twitter"
-              label="Twitter"
+              label="X (Twitter)"
               onClick={() => onSocialLogin(WalletSsoSource.Twitter)}
             />
           ) : connectWithEmail ? (
@@ -144,7 +146,7 @@ const SessionRevalidationModal = ({
               <div className="buttons-row">
                 <CWButton
                   label="Back"
-                  buttonType="secondary-blue"
+                  buttonType="secondary"
                   onClick={() => setConnectWithEmail(false)}
                 />
                 <CWButton

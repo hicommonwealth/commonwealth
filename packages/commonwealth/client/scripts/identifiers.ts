@@ -1,6 +1,10 @@
-import { ChainBase, ChainNetwork, ProposalType } from '@hicommonwealth/core';
+import {
+  ChainBase,
+  ChainNetwork,
+  ProposalType,
+  slugify,
+} from '@hicommonwealth/shared';
 import type { ProposalStore } from 'stores';
-import { slugify } from 'utils';
 import type ChainInfo from './models/ChainInfo';
 import type NotificationSubscription from './models/NotificationSubscription';
 import type ProposalModule from './models/ProposalModule';
@@ -48,6 +52,7 @@ export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
 };
 
 export const proposalSlugToClass = () => {
+  // @ts-expect-error StrictNullChecks
   const mmap = new Map<string, ProposalModule<any, any, any>>([
     [ProposalType.Thread, null],
   ]);
@@ -73,6 +78,7 @@ export const proposalSlugToClass = () => {
  * Slug helpers for routing
  */
 export const proposalSlugToStore = (slug: string): ProposalStore<any> => {
+  // @ts-expect-error StrictNullChecks
   return proposalSlugToClass().get(slug).store;
 };
 

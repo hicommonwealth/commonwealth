@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
-import { schemas } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
-import { uniq } from 'lodash';
+import { buildPaginatedResponse } from '@hicommonwealth/schemas';
+import _ from 'lodash';
 import { PaginationSqlOptions, buildPaginationSql } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { ServerProfilesController } from '../server_profiles_controller';
@@ -19,6 +19,7 @@ export type SearchProfilesOptions = {
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
   includeGroupIds?: boolean;
+  includeCount?: boolean;
 };
 
 type Profile = {
@@ -46,9 +47,11 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
+    includeCount,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
+    // @ts-expect-error StrictNullChecks
     limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,
@@ -121,13 +124,15 @@ export async function __searchProfiles(
       bind,
       type: QueryTypes.SELECT,
     }),
-    this.models.sequelize.query(
-      `SELECT COUNT(*) FROM ( ${sqlWithoutPagination} ) as count`,
-      {
-        bind,
-        type: QueryTypes.SELECT,
-      },
-    ),
+    !includeCount
+      ? [{ count: 0 }]
+      : this.models.sequelize.query(
+          `SELECT COUNT(*) FROM ( ${sqlWithoutPagination} ) as count`,
+          {
+            bind,
+            type: QueryTypes.SELECT,
+          },
+        ),
   ]);
 
   const totalResults = parseInt(count, 10);
@@ -138,7 +143,7 @@ export async function __searchProfiles(
       user_id: profile.user_id,
       profile_name: profile.profile_name,
       avatar_url: profile.avatar_url,
-      addresses: profile.address_ids.map((_, i) => ({
+      addresses: profile.address_ids.map((unused1, i) => ({
         id: profile.address_ids[i],
         community_id: profile.community_ids[i],
         address: profile.addresses[i],
@@ -159,7 +164,7 @@ export async function __searchProfiles(
       {
         where: {
           address_id: {
-            [Op.in]: uniq(profileAddressIds),
+            [Op.in]: _.uniq(profileAddressIds),
           },
         },
       },
@@ -179,15 +184,12 @@ export async function __searchProfiles(
       for (const address of profile.addresses) {
         const addressRoles = addressIdRoles[address.id] || [];
         for (const role of addressRoles) {
+          // @ts-expect-error StrictNullChecks
           profile.roles.push(role.toJSON());
         }
       }
     }
   }
 
-  return schemas.queries.buildPaginatedResponse(
-    profilesWithAddresses,
-    totalResults,
-    bind,
-  );
+  return buildPaginatedResponse(profilesWithAddresses, totalResults, bind);
 }

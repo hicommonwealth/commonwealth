@@ -1,4 +1,4 @@
-import { NotificationCategories } from '@hicommonwealth/core';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import NotificationSubscription from 'models/NotificationSubscription';
 
 export type SubUniqueData =
@@ -33,13 +33,14 @@ export type SubUniqueData =
  * This function searches through a list of NotificationSubscriptions and returns the one that matches the given values.
  * If the minimum required values to uniquely identify a NotificationSubscription are not present, the function logs
  * an error and returns void. For example, in order to find a `new-thread-creation` subscription you must provide a
- * chainId.
+ * communityId.
  * @param findOptions The data used to find a matching NotificationSubscription.
  * @param subs The list of NotificationSubscriptions.
  */
 export function findSubscription(
   findOptions: SubUniqueData,
   subs: NotificationSubscription[],
+  // @ts-expect-error StrictNullChecks
 ): NotificationSubscription {
   const categoryId = findOptions.categoryId;
   if (
@@ -50,8 +51,10 @@ export function findSubscription(
       console.error(
         `Must provide the chain id to find a ${categoryId} subscription`,
       );
+      // @ts-expect-error StrictNullChecks
       return;
     }
+    // @ts-expect-error StrictNullChecks
     return subs.find(
       (s) =>
         s.categoryId === categoryId &&
@@ -61,6 +64,7 @@ export function findSubscription(
     categoryId === NotificationCategories.NewCollaboration ||
     categoryId === NotificationCategories.NewMention
   ) {
+    // @ts-expect-error StrictNullChecks
     return subs.find((s) => s.categoryId === categoryId);
   } else if (
     categoryId === NotificationCategories.NewComment ||
@@ -70,6 +74,7 @@ export function findSubscription(
       console.error(
         `Must provide a thread id or comment id to find a ${categoryId} subscription`,
       );
+      // @ts-expect-error StrictNullChecks
       return;
     }
 
@@ -77,9 +82,11 @@ export function findSubscription(
       console.error(
         `Cannot provide both a thread id and comment id to find a ${categoryId} subscription`,
       );
+      // @ts-expect-error StrictNullChecks
       return;
     }
 
+    // @ts-expect-error StrictNullChecks
     return subs.find((s) => {
       if (findOptions.options.threadId) {
         return (
@@ -98,8 +105,10 @@ export function findSubscription(
       console.error(
         'Must provide a snapshot space id to find a snapshot-proposal subscription',
       );
+      // @ts-expect-error StrictNullChecks
       return;
     }
+    // @ts-expect-error StrictNullChecks
     return subs.find(
       (s) =>
         s.categoryId === categoryId &&

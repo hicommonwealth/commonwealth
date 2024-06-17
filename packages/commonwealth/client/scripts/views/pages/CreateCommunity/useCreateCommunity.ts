@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
@@ -10,8 +10,10 @@ const useCreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
     useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
+    // @ts-expect-error StrictNullChecks
     { type: null, chainBase: null },
   );
+  // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
   const [selectedChainId, setSelectedChainId] = useState(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
@@ -40,16 +42,14 @@ const useCreateCommunity = () => {
     CreateCommunityStep.BasicInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
-  const isEthereumMainnetSelected =
-    // selectedChainId === ETHEREUM_MAINNET_ID ||
-    Object.values(commonProtocol.ValidChains).includes(
-      parseInt(selectedChainId),
-    );
+
+  const isSupportedChainSelected = Object.values(
+    commonProtocol.ValidChains,
+    // @ts-expect-error StrictNullChecks
+  ).includes(parseInt(selectedChainId));
+
   const showCommunityStakeStep =
-    isValidStepToShowCommunityStakeFormStep &&
-    (selectedCommunity.type === 'ethereum' ||
-      selectedCommunity.type === 'blast') &&
-    isEthereumMainnetSelected;
+    isValidStepToShowCommunityStakeFormStep && isSupportedChainSelected;
 
   return {
     createCommunityStep,

@@ -4,7 +4,9 @@ import {
   BellSimple,
   BellSimpleSlash,
   ChatCenteredDots,
+  Coins,
   DotsThree,
+  Trophy,
 } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
@@ -22,7 +24,10 @@ export type ActionType =
   | 'share'
   | 'subscribe'
   | 'overflow'
-  | 'view-upvotes';
+  | 'view-upvotes'
+  | 'leaderboard'
+  | 'winners'
+  | 'fund';
 
 const commonProps = (disabled: boolean) => {
   return {
@@ -59,6 +64,12 @@ const renderPhosphorIcon = (
       );
     case 'overflow':
       return <DotsThree {...commonProps(disabled)} />;
+    case 'leaderboard':
+      return <ArrowFatUp />;
+    case 'winners':
+      return <Trophy />;
+    case 'fund':
+      return <Coins />;
     default:
       return null;
   }
@@ -158,8 +169,10 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
 
   return (
     <TooltipWrapper
+      // @ts-expect-error <StrictNullChecks/>
       disabled={disabled}
       {...(!hideToolTip && {
+        // @ts-expect-error <StrictNullChecks/>
         text: tooltipText || getTooltipCopy(action, isThreadArchived),
       })}
     >
@@ -174,6 +187,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           ComponentType.ThreadAction,
         )}
       >
+        {/* @ts-expect-error StrictNullChecks*/}
         {renderPhosphorIcon(action, disabled, selected)}
         {action !== 'overflow' && action && label && (
           <CWText

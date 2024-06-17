@@ -1,29 +1,79 @@
 import {
   Broker,
-  BrokerTopics,
+  BrokerPublications,
+  BrokerSubscriptions,
+  CustomRetryStrategyError,
   EventContext,
   EventSchemas,
+  Events,
   EventsHandlerMetadata,
   ILogger,
   InvalidInput,
-  eventHandler,
+  RetryStrategyFn,
+  handleEvent,
   logger,
-  schemas,
 } from '@hicommonwealth/core';
 import { Message } from 'amqplib';
-import * as Rascal from 'rascal';
-import { AckOrNack } from 'rascal';
-import { RascalPublications, RascalSubscriptions } from './types';
+import { AckOrNack, default as Rascal } from 'rascal';
+import { fileURLToPath } from 'url';
 
-const BrokerTopicPublicationMap = {
-  [BrokerTopics.DiscordListener]: RascalPublications.DiscordListener,
-  [BrokerTopics.SnapshotListener]: RascalPublications.SnapshotListener,
-};
+/**
+ * Build a retry strategy function based on custom retry strategies map.
+ *
+ * @param {Function} customRetryStrategiesMap - A function which maps errors to retry strategies. The function should
+ * return `true` if an error was successfully mapped to a strategy and `false` otherwise.
+ * @param defaultDefer
+ * @param defaultAttempts
+ * @returns {RetryStrategyFn} The built retry strategy function.
+ */
+export function buildRetryStrategy(
+  customRetryStrategiesMap?: (...args: Parameters<RetryStrategyFn>) => boolean,
+  defaultDefer: number = 2000,
+  defaultAttempts: number = 3,
+): RetryStrategyFn {
+  return function (
+    err: Error | InvalidInput | CustomRetryStrategyError,
+    topic: BrokerSubscriptions,
+    content: any,
+    ackOrNackFn: AckOrNack,
+    log: ILogger,
+  ) {
+    const logContext = {
+      topic,
+      message: content,
+    };
 
-const BrokerTopicSubscriptionMap = {
-  [BrokerTopics.DiscordListener]: RascalSubscriptions.DiscordListener,
-  [BrokerTopics.SnapshotListener]: RascalSubscriptions.SnapshotListener,
-};
+    if (err instanceof InvalidInput) {
+      log.error(`Invalid event`, err, logContext);
+      ackOrNackFn(err, { strategy: 'nack' });
+      return;
+    } else if (err instanceof CustomRetryStrategyError) {
+      log.error(err.message, err, logContext);
+      ackOrNackFn(err, err.recoveryStrategy);
+      return;
+    }
+
+    let res = false;
+    if (customRetryStrategiesMap) {
+      res = customRetryStrategiesMap(err, topic, content, ackOrNackFn, log);
+    }
+
+    if (!res) {
+      log.error(`Failed to process event`, err, logContext);
+      ackOrNackFn(err, [
+        {
+          strategy: 'republish',
+          defer: defaultDefer,
+          attempts: defaultAttempts,
+        },
+        { strategy: 'nack' },
+      ]);
+      return;
+    }
+  };
+}
+
+const defaultRetryStrategy = buildRetryStrategy();
 
 export class RabbitMQAdapter implements Broker {
   protected _initialized = false;
@@ -32,10 +82,11 @@ export class RabbitMQAdapter implements Broker {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  private _log: ILogger;
+  private readonly _log: ILogger;
 
   constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
-    this._log = logger().getLogger(__filename);
+    const __filename = fileURLToPath(import.meta.url);
+    this._log = logger(__filename);
     this._rawVhost =
       _rabbitMQConfig.vhosts![Object.keys(_rabbitMQConfig.vhosts!)[0]];
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -76,8 +127,8 @@ export class RabbitMQAdapter implements Broker {
     this._initialized = true;
   }
 
-  public async publish<Name extends schemas.Events>(
-    topic: BrokerTopics,
+  public async publish<Name extends Events>(
+    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean> {
     if (!this.initialized) {
@@ -89,46 +140,26 @@ export class RabbitMQAdapter implements Broker {
       event,
     };
 
-    const rascalPubName: RascalPublications | undefined =
-      BrokerTopicPublicationMap[topic];
-    if (!rascalPubName) {
+    if (!this.publishers.includes(topic)) {
       this._log.error(
-        `Unsupported event: ${event.name}`,
-        undefined,
-        logContext,
-      );
-      return false;
-    }
-
-    if (!this.publishers.includes(rascalPubName)) {
-      this._log.error(
-        `${rascalPubName} not supported by this adapter instance`,
+        `${topic} not supported by this adapter instance`,
         undefined,
         {
           ...logContext,
-          rascalPublication: rascalPubName,
+          rascalPublication: topic,
         },
       );
       return false;
     }
 
-    const schema = schemas.events[event.name];
-    const validationResult = schema.safeParse(event.payload);
-    if (!validationResult.success) {
-      this._log.error(
-        'Event schema validation failed',
-        validationResult.error,
-        logContext,
-      );
-      return false;
-    }
-
     try {
-      const publication = await this.broker!.publish(rascalPubName, event);
+      const publication = await this.broker!.publish(topic, event, {
+        routingKey: event.name,
+      });
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
-          this._log.debug('Message published', undefined, {
+          this._log.debug('Message published', {
             messageId,
             ...logContext,
           });
@@ -149,7 +180,7 @@ export class RabbitMQAdapter implements Broker {
         e instanceof Error ? e : undefined,
         {
           ...logContext,
-          publication: rascalPubName,
+          publication: topic,
         },
       );
     }
@@ -158,63 +189,52 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async subscribe(
-    topic: BrokerTopics,
+    topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<EventSchemas>,
+    retryStrategy?: RetryStrategyFn,
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
     }
 
-    const rascalSubName = BrokerTopicSubscriptionMap[topic];
-    if (!rascalSubName) {
-      this._log.error(`Unsupported topic`, undefined, { topic });
-      return false;
-    }
-
-    if (!this.subscribers.includes(rascalSubName)) {
+    if (!this.subscribers.includes(topic)) {
       this._log.error(
-        `${rascalSubName} not supported by this adapter instance`,
+        `${topic} not supported by this adapter instance`,
         undefined,
         {
           topic,
-          rascalSubscription: rascalSubName,
+          rascalSubscription: topic,
         },
       );
       return false;
     }
 
     try {
-      this._log.info(`${this.name} subscribing to ${rascalSubName}`);
-      const subscription = await this.broker!.subscribe(rascalSubName);
+      this._log.info(`${this.name} subscribing to ${topic}`);
+      const subscription = await this.broker!.subscribe(topic);
 
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
-          eventHandler(handler, content)
+          handleEvent(handler, content, true)
             .then(() => {
-              this._log.debug('Message Acked', undefined, {
+              this._log.debug('Message Acked', {
                 topic,
                 message: content,
               });
               ackOrNackFn();
             })
-            .catch((err: Error | undefined) => {
-              if (err instanceof InvalidInput) {
-                this._log.error(`Invalid event`, err, {
+            .catch((err: Error) => {
+              if (retryStrategy)
+                retryStrategy(err, topic, content, ackOrNackFn, this._log);
+              else
+                defaultRetryStrategy(
+                  err,
                   topic,
-                  message: content,
-                });
-                ackOrNackFn(err, { strategy: 'nack' });
-              } else {
-                this._log.error(`Failed to process event`, err, {
-                  topic,
-                  message: content,
-                });
-                ackOrNackFn(err, [
-                  { strategy: 'republish', defer: 2000, attempts: 3 },
-                  { strategy: 'nack' },
-                ]);
-              }
+                  content,
+                  ackOrNackFn,
+                  this._log,
+                );
             });
         },
       );
@@ -249,7 +269,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async dispose(): Promise<void> {
-    await this.broker!.shutdown();
+    await this.broker?.shutdown();
     this._initialized = false;
   }
 

@@ -1,5 +1,5 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { chainBaseToCaip2 } from './chainMappings';
 
 export const createCanvasSessionPayload = (
@@ -25,6 +25,7 @@ export const createCanvasSessionPayload = (
     from,
     sessionAddress,
     sessionDuration: 86400 * 1000,
+    // @ts-expect-error StrictNullChecks
     sessionIssued,
   };
 

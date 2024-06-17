@@ -1,11 +1,13 @@
-import { AppError, NotificationCategories } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { AppError } from '@hicommonwealth/core';
 import {
+  checkSnapshotObjectExists,
   CommentInstance,
   CommunityInstance,
+  DB,
   SubscriptionAttributes,
   ThreadInstance,
 } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
@@ -45,6 +47,7 @@ export default async (
       // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
       if (!req.body.community_id)
         return next(new AppError(Errors.InvalidCommunity));
+      // @ts-expect-error StrictNullChecks
       community = await models.Community.findOne({
         where: {
           id: req.body.community_id,
@@ -58,12 +61,11 @@ export default async (
       if (!req.body.snapshot_id) {
         return next(new AppError(Errors.InvalidSnapshotSpace));
       }
-      const space = await models.SnapshotSpace.findOne({
-        where: {
-          snapshot_space: req.body.snapshot_id,
-        },
-      });
-      if (!space) return next(new AppError(Errors.InvalidSnapshotSpace));
+      const spaceExists = await checkSnapshotObjectExists(
+        'space',
+        req.body.snapshot_id,
+      );
+      if (!spaceExists) return next(new AppError(Errors.InvalidSnapshotSpace));
       obj = { snapshot_id: req.body.snapshot_id };
       break;
     }
@@ -76,6 +78,7 @@ export default async (
       }
 
       if (req.body.thread_id) {
+        // @ts-expect-error StrictNullChecks
         thread = await models.Thread.findOne({
           where: { id: req.body.thread_id },
         });
@@ -85,6 +88,7 @@ export default async (
           community_id: thread.community_id,
         };
       } else if (req.body.comment_id) {
+        // @ts-expect-error StrictNullChecks
         comment = await models.Comment.findOne({
           where: { id: req.body.comment_id },
         });
@@ -104,6 +108,7 @@ export default async (
     case NotificationCategories.ChainEvent: {
       if (!req.body.community_id)
         return next(new AppError(Errors.InvalidCommunity));
+      // @ts-expect-error StrictNullChecks
       community = await models.Community.findOne({
         where: {
           id: req.body.community_id,
@@ -120,15 +125,18 @@ export default async (
       subscriber_id: req.user.id,
       category_id: req.body.category,
       is_active: !!req.body.is_active,
+      // @ts-expect-error StrictNullChecks
       ...obj,
     },
   });
 
   const subJson = subscription.toJSON();
 
+  // @ts-expect-error StrictNullChecks
   if (thread) {
     subJson.Thread = thread.toJSON();
   }
+  // @ts-expect-error StrictNullChecks
   if (comment) {
     subJson.Comment = comment.toJSON();
   }

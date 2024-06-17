@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 
 export const enum MixpanelPageViewEvent {
   THREAD_PAGE_VIEW = 'Thread Page Viewed',

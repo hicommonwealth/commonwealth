@@ -38,6 +38,9 @@ export type BaseTextInputProps = {
   manualStatusMessage?: string;
   inputRef?: any;
   rightTextAddon?: string;
+  type?: 'text' | 'number';
+  min?: number;
+  step?: number;
 };
 
 type InputStyleProps = {
@@ -104,13 +107,18 @@ const CWTextInput = (props: TextInputProps) => {
     validationStatus,
     alignLabelToRight,
     rightTextAddon,
+    type = 'text',
+    min,
+    step,
   } = props;
 
   const formContext = useFormContext();
   const formFieldContext = hookToForm
-    ? formContext.register(name)
+    ? // @ts-expect-error <StrictNullChecks/>
+      formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
+    // @ts-expect-error <StrictNullChecks/>
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   const validateValue = (inputVal: string) => {
@@ -202,6 +210,9 @@ const CWTextInput = (props: TextInputProps) => {
           value={value}
           defaultValue={defaultValue}
           style={{ paddingRight: rightPaddingForAddon }}
+          type={type}
+          min={min}
+          step={step}
         />
         {rightTextAddon && (
           <div className="right-text-addon">{rightTextAddon}</div>

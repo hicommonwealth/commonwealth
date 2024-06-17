@@ -1,4 +1,5 @@
-import { AppError, schemas } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
+import { CreateCommunity } from '@hicommonwealth/schemas';
 import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 import {
   CreateCommunityOptions,
@@ -22,14 +23,14 @@ export const createCommunityHandler = async (
     }
   }
 
-  const validationResult =
-    await schemas.commands.CreateCommunity.input.safeParseAsync(req.body);
+  const validationResult = await CreateCommunity.input.safeParseAsync(req.body);
 
   if (validationResult.success === false) {
     throw new AppError(formatErrorPretty(validationResult));
   }
 
   const community = await controllers.communities.createCommunity({
+    // @ts-expect-error StrictNullChecks
     user: req.user,
     community: validationResult.data,
   });
@@ -39,6 +40,7 @@ export const createCommunityHandler = async (
       chainBase: community.community.base,
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+      // @ts-expect-error StrictNullChecks
       userId: req.user.id,
       community: community.community.id,
     },

@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
 import type { DeltaStatic } from 'quill';
@@ -6,7 +6,7 @@ import React from 'react';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
@@ -53,7 +53,8 @@ export const CommentEditor = ({
           >
             <User
               userAddress={author?.address}
-              userCommunityId={author?.community.id}
+              userCommunityId={author?.community?.id}
+              shouldShowAsDeleted={!author?.address && !author?.community?.id}
               shouldHideAvatar
               shouldLinkProfile
             />

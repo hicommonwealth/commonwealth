@@ -1,10 +1,10 @@
+import { hashAbi, models } from '@hicommonwealth/model';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
-} from '@hicommonwealth/core';
-import { hashAbi, models } from '@hicommonwealth/model';
+} from '@hicommonwealth/shared';
 import {
   rawCompoundAbi,
   rawDydxAbi,
@@ -36,6 +36,7 @@ export async function getTestChainNode(version?: 'v1' | 'v2') {
       url: rpc,
       balance_type: BalanceType.Ethereum,
     },
+    // @ts-expect-error StrictNullChecks
     defaults: {
       name,
     },
@@ -63,6 +64,7 @@ export async function getTestChain(version?: 'v1' | 'v2') {
       id: chainId,
       chain_node_id: chainNode.id,
     },
+    // @ts-expect-error StrictNullChecks
     defaults: {
       name,
       network: ChainNetwork.Compound,
@@ -105,6 +107,7 @@ export async function getTestAbi(version?: 'v1' | 'v2') {
 
   if (existingAbi) return existingAbi;
 
+  // @ts-expect-error StrictNullChecks
   return await models.ContractAbi.create({
     abi: !version || version === 'v1' ? rawCompoundAbi : rawDydxAbi,
     nickname: nickname,
@@ -168,6 +171,7 @@ export async function getTestSubscription(version?: 'v1' | 'v2') {
       category_id: 'chain-event',
       community_id: chain.id,
     },
+    // @ts-expect-error StrictNullChecks
     defaults: {
       is_active: true,
       immediate_email: false,
@@ -183,6 +187,7 @@ export async function getTestSubscription(version?: 'v1' | 'v2') {
 
 export async function getTestSignatures(version?: 'v1' | 'v2') {
   const chainNode = await getTestChainNode(version);
+  const abi = await getTestAbi(version);
 
   let contractAddress: string;
   if (!version || version === 'v1') {
@@ -198,6 +203,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
       contract_address: contractAddress,
       event_signature: compoundPropCreatedSignature,
       kind: 'proposal-created',
+      abi_id: abi.id,
     },
   });
 
@@ -207,6 +213,7 @@ export async function getTestSignatures(version?: 'v1' | 'v2') {
       contract_address: contractAddress,
       event_signature: compoundPropQueuedSignature,
       kind: 'proposal-queued',
+      abi_id: abi.id,
     },
   });
 

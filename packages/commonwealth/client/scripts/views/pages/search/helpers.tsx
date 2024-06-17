@@ -63,8 +63,9 @@ const ThreadResultRow = ({
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            userAddress={thread.address}
-            userCommunityId={thread.address_chain}
+            userAddress={thread?.address}
+            userCommunityId={thread?.address_chain}
+            shouldShowAsDeleted={!thread?.address && !thread?.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -140,6 +141,9 @@ const ReplyResultRow = ({
           <User
             userAddress={comment.address}
             userCommunityId={comment.address_community_id}
+            shouldShowAsDeleted={
+              !comment?.address && !comment?.address_community_id
+            }
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -211,6 +215,7 @@ export type MemberResult = {
   }[];
   group_ids?: [];
   roles?: any[];
+  last_active: string;
 };
 type MemberResultRowProps = {
   addr: MemberResult;
@@ -239,6 +244,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
       <User
         userAddress={address}
         userCommunityId={community_id}
+        shouldShowAsDeleted={!address && !community_id}
         shouldShowRole
         shouldLinkProfile
         avatarSize={32}

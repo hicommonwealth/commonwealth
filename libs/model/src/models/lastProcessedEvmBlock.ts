@@ -1,6 +1,5 @@
-import Sequelize, { DataTypes } from 'sequelize';
-import { DB } from '.';
-import { ModelInstance, ModelStatic } from './types';
+import Sequelize from 'sequelize';
+import { ModelInstance } from './types';
 
 export type LastProcessedEvmBlockAttributes = {
   chain_node_id: number;
@@ -10,36 +9,20 @@ export type LastProcessedEvmBlockAttributes = {
 export type LastProcessedEvmBlockInstance =
   ModelInstance<LastProcessedEvmBlockAttributes>;
 
-export type LastProcessedEvmBlockModelStatic =
-  ModelStatic<LastProcessedEvmBlockInstance>;
-
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): LastProcessedEvmBlockModelStatic => {
-  const LastProcessedEvmBlock: LastProcessedEvmBlockModelStatic = <
-    LastProcessedEvmBlockModelStatic
-  >sequelize.define(
+): Sequelize.ModelStatic<LastProcessedEvmBlockInstance> =>
+  sequelize.define<LastProcessedEvmBlockInstance>(
     'LastProcessedEvmBlock',
     {
       chain_node_id: {
-        type: dataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
       },
-      block_number: { type: dataTypes.INTEGER, allowNull: false },
+      block_number: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
       timestamps: false,
       tableName: 'LastProcessedEvmBlocks',
     },
   );
-
-  LastProcessedEvmBlock.associate = (models: DB) => {
-    models.LastProcessedEvmBlock.belongsTo(models.ChainNode, {
-      foreignKey: 'chain_node_id',
-      targetKey: 'id',
-    });
-  };
-
-  return LastProcessedEvmBlock;
-};

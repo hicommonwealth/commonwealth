@@ -36,8 +36,11 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          userCommunityId={searchResult.community_id}
-          userAddress={searchResult.address}
+          userCommunityId={searchResult?.community_id}
+          userAddress={searchResult?.address}
+          shouldShowAsDeleted={
+            !searchResult?.community_id && !searchResult?.address
+          }
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
@@ -47,6 +50,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
 
       <div className="content-row">
         <CWText type="b2" fontWeight="bold">
+          {/* @ts-expect-error StrictNullChecks*/}
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <CWText type="caption" className="excerpt-text" fontWeight="medium">

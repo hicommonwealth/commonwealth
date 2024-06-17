@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import { ContractMethods, queryClient } from 'state/api/config';
 import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';
@@ -11,6 +11,7 @@ interface BuyStakeProps {
   chainRpc: string;
   walletAddress: string;
   ethChainId: number;
+  chainId?: string;
 }
 
 const buyStake = async ({
@@ -20,12 +21,14 @@ const buyStake = async ({
   chainRpc,
   walletAddress,
   ethChainId,
+  chainId,
 }: BuyStakeProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
     commonProtocol.factoryContracts[ethChainId].communityStake,
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
+    chainId,
   );
 
   return await communityStakes.buyStake(
@@ -36,7 +39,13 @@ const buyStake = async ({
   );
 };
 
-const useBuyStakeMutation = () => {
+interface UseBuyStakeMutationProps {
+  shouldUpdateActiveAddress?: boolean;
+}
+
+const useBuyStakeMutation = ({
+  shouldUpdateActiveAddress = true,
+}: UseBuyStakeMutationProps) => {
   return useMutation({
     mutationFn: buyStake,
     onSuccess: async (_, variables) => {
@@ -49,7 +58,9 @@ const useBuyStakeMutation = () => {
           variables.walletAddress,
         ],
       });
-      await setActiveAccountOnTransactionSuccess(variables.walletAddress);
+      if (shouldUpdateActiveAddress) {
+        await setActiveAccountOnTransactionSuccess(variables.walletAddress);
+      }
     },
   });
 };

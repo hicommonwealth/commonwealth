@@ -3,11 +3,12 @@ import { commonProtocol, type UserInstance } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
-import { get, post } from './external/appHook.spec';
+import { get, post } from '../../util/httpUtils';
 
 chai.use(chaiHttp);
 chai.should();
@@ -31,15 +32,16 @@ const expectedCreateResp = {
 describe('POST communityStakes Tests', () => {
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('The handler creates and updates community stake', async () => {
+  test('The handler creates and updates community stake', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
       models: server.models,
@@ -88,11 +90,11 @@ describe('POST communityStakes Tests', () => {
     );
   });
 
-  it('The community stake routes work correctly', async () => {
+  test('The community stake routes work correctly', async () => {
     const stake_id = 3;
     const jwtToken = jwt.sign(
       { id: 2, email: server.e2eTestEntities.testUsers[0].email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
 
     const actualPutResponse = (
@@ -119,6 +121,7 @@ describe('POST communityStakes Tests', () => {
     const actualGetResponse = (
       await get(
         `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
+        // @ts-expect-error StrictNullChecks
         null,
         true,
         server.app,
@@ -138,7 +141,7 @@ describe('POST communityStakes Tests', () => {
     );
   });
 
-  it('The integration with protocol works', async () => {
+  test('The integration with protocol works', async () => {
     const community = await server.models.Community.findOne({
       where: {
         id: 'common-protocol',
@@ -149,9 +152,10 @@ describe('POST communityStakes Tests', () => {
           attributes: ['eth_chain_id', 'url'],
         },
       ],
-      attributes: ['namespace'],
+      attributes: ['namespace', 'namespace_address'],
     });
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      // @ts-expect-error StrictNullChecks
       community,
       2,
     );

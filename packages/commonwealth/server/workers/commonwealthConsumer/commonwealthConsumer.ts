@@ -1,31 +1,33 @@
 import {
   HotShotsStats,
-  PinoLogger,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
+  buildRetryStrategy,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerTopics,
-  Policy,
+  BrokerSubscriptions,
   broker,
   logger,
-  schemas,
   stats,
 } from '@hicommonwealth/core';
-import { ZodUndefined } from 'zod';
-import { RABBITMQ_URI } from '../../config';
+import { Contest, ContestWorker } from '@hicommonwealth/model';
+import { fileURLToPath } from 'url';
+import { config } from '../../config';
+import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
-const log = logger(PinoLogger()).getLogger(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
+
 stats(HotShotsStats());
 
 let isServiceHealthy = false;
 
 startHealthCheckLoop({
-  enabled: require.main === module,
+  enabled: __filename.endsWith(process.argv[1]),
   service: ServiceKey.CommonwealthConsumer,
   checkFn: async () => {
     if (!isServiceHealthy) {
@@ -46,7 +48,10 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -58,28 +63,50 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     throw e;
   }
 
-  const { processSnapshotProposalCreated } = await import(
-    './messageProcessors/snapshotConsumer'
+  const chainEventSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ChainEvent,
+    ChainEventPolicy(),
   );
 
-  const inputs = {
-    SnapshotProposalCreated: schemas.events.SnapshotProposalCreated,
-  };
-
-  const Snapshot: Policy<typeof inputs, ZodUndefined> = () => ({
-    inputs,
-    body: {
-      SnapshotProposalCreated: processSnapshotProposalCreated,
-    },
-  });
-
-  const result = await brokerInstance.subscribe(
-    BrokerTopics.SnapshotListener,
-    Snapshot(),
+  const contestWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestWorkerPolicy,
+    ContestWorker(),
+    buildRetryStrategy(undefined, 20_000),
   );
 
-  if (!result) {
-    throw new Error(`Failed to subscribe to ${BrokerTopics.SnapshotListener}`);
+  const contestProjectionsSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestProjection,
+    Contest.Contests(),
+  );
+
+  if (!chainEventSubRes) {
+    log.fatal(
+      'Failed to subscribe to chain-events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ChainEvent,
+      },
+    );
+  }
+
+  if (!contestWorkerSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest worker events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestWorkerPolicy,
+      },
+    );
+  }
+
+  if (!contestProjectionsSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest projection events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestProjection,
+      },
+    );
   }
 }
 
@@ -87,12 +114,12 @@ async function main() {
   try {
     log.info('Starting main consumer');
     await setupCommonwealthConsumer();
+    isServiceHealthy = true;
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
-  isServiceHealthy = true;
 }
 
-if (process.argv[2] === 'run-as-script') {
+if (import.meta.url.endsWith(process.argv[1])) {
   main();
 }

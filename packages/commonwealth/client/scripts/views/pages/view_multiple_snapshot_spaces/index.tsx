@@ -3,11 +3,12 @@ import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import 'pages/snapshot/multiple_snapshots_page.scss';
 import React from 'react';
 import app from 'state';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import type Thread from '../../../models/Thread';
+import { Skeleton } from '../../components/Skeleton';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotSpaceCard } from './SnapshotSpaceCard';
-import { Skeleton } from '../../components/Skeleton';
 
 enum SPACES_HEADER_MESSAGES {
   NEW_PROPOSAL = 'Select a Snapshot Space to Create a Proposal:',
@@ -22,7 +23,7 @@ export enum REDIRECT_ACTIONS {
 
 function redirectHandler(
   action: string,
-  proposal: null | Thread
+  proposal: null | Thread,
 ): {
   headerMessage: string;
   redirectOption: string;
@@ -39,6 +40,7 @@ function redirectHandler(
   } else if (action === 'create-from-thread') {
     header = SPACES_HEADER_MESSAGES.NEW_PROPOSAL;
     redirect = REDIRECT_ACTIONS.NEW_FROM_THREAD;
+    // @ts-expect-error <StrictNullChecks/>
     fromProposal = proposal;
   }
 
@@ -65,11 +67,12 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
     }>
   >();
 
+  // @ts-expect-error <StrictNullChecks/>
   const redirectOptions = redirectHandler(action, proposal);
 
   if (app.chain && !snapshotSpaces) {
     setSnapshotSpaces(
-      app.config.chains?.getById(app.activeChainId()).snapshot || []
+      app.config.chains?.getById(app.activeChainId()).snapshot || [],
     );
   }
 
@@ -79,40 +82,46 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
     });
 
     return (
-      <div className="MultipleSnapshotsPage">
-        <Skeleton count={1} width={'40%'} />
-        <br />
-        <CardsCollection
-          content={Array.from({ length: 2 }).map(() => (
-            <SnapshotSpaceCard
-              showSkeleton={true}
-              proposal={null}
-              proposals={[]}
-              redirectAction=""
-              space={{} as any}
-            />
-          ))}
-        />
-      </div>
+      <CWPageLayout>
+        <div className="MultipleSnapshotsPage">
+          <Skeleton count={1} width="40%" />
+          <br />
+          <CardsCollection
+            content={Array.from({ length: 2 }).map((_, index) => (
+              <SnapshotSpaceCard
+                key={index}
+                showSkeleton={true}
+                proposal={null}
+                proposals={[]}
+                redirectAction=""
+                space={{} as any}
+              />
+            ))}
+          />
+        </div>
+      </CWPageLayout>
     );
   }
 
   return (
-    <div className="MultipleSnapshotsPage">
-      <CWText type="h3">{redirectOptions.headerMessage}</CWText>
-      {app.chain && spacesMetadata && (
-        <CardsCollection
-          content={spacesMetadata.map((data) => (
-            <SnapshotSpaceCard
-              space={data.space}
-              proposals={data.proposals}
-              redirectAction={redirectOptions.redirectOption}
-              proposal={redirectOptions.proposal}
-            />
-          ))}
-        />
-      )}
-    </div>
+    <CWPageLayout>
+      <div className="MultipleSnapshotsPage">
+        <CWText type="h3">{redirectOptions.headerMessage}</CWText>
+        {app.chain && spacesMetadata && (
+          <CardsCollection
+            content={spacesMetadata.map((data, index) => (
+              <SnapshotSpaceCard
+                key={index}
+                space={data.space}
+                proposals={data.proposals}
+                redirectAction={redirectOptions.redirectOption}
+                proposal={redirectOptions.proposal}
+              />
+            ))}
+          />
+        )}
+      </div>
+    </CWPageLayout>
   );
 };
 

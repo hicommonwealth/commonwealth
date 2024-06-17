@@ -1,21 +1,28 @@
-import { schemas } from '@hicommonwealth/core';
-import type * as Sequelize from 'sequelize';
-import type { CreateOptions, DataTypes } from 'sequelize';
+import { User } from '@hicommonwealth/schemas';
+import type { CreateOptions } from 'sequelize';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { DB } from '.';
 import type { AddressAttributes, AddressInstance } from './address';
+import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
+import type { CommunityAlertAttributes } from './community_alerts';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type { ModelInstance, ModelStatic } from './types';
+import type { SubscriptionPreferenceAttributes } from './subscription_preference';
+import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
+import type { ModelInstance } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
-export type UserAttributes = z.infer<typeof schemas.entities.User> & {
+export type UserAttributes = z.infer<typeof User> & {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
+  SubscriptionPreferences?: SubscriptionPreferenceAttributes;
+  threadSubscriptions?: ThreadSubscriptionAttributes[];
+  commentSubscriptions?: CommentSubscriptionAttributes[];
+  communityAlerts?: CommunityAlertAttributes[];
 };
 
 // eslint-disable-next-line no-use-before-define
@@ -39,43 +46,41 @@ export type UserInstance = ModelInstance<UserAttributes> & {
   getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
 };
 
-export type UserCreationAttributes = UserAttributes & {
+export type UserModelStatic = Sequelize.ModelStatic<UserInstance> & {
   createWithProfile?: (
-    models: DB,
     attrs: UserAttributes,
     options?: CreateOptions,
   ) => Promise<UserInstance>;
 };
 
-export type UserModelStatic = ModelStatic<UserInstance> &
-  UserCreationAttributes;
-
-export default (
-  sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
-): UserModelStatic => {
-  const User = <UserModelStatic>sequelize.define(
+export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
+  const User = <UserModelStatic>sequelize.define<UserInstance>(
     'User',
     {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: dataTypes.STRING, allowNull: true, unique: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      email: { type: Sequelize.STRING, allowNull: true },
       emailVerified: {
-        type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
       },
       emailNotificationInterval: {
-        type: dataTypes.STRING,
+        type: Sequelize.STRING,
         defaultValue: 'never',
         allowNull: false,
       },
-      isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
-      disableRichText: {
-        type: dataTypes.BOOLEAN,
+      promotional_emails_enabled: { type: Sequelize.BOOLEAN, allowNull: true },
+      is_welcome_onboard_flow_complete: {
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
       },
-      selected_community_id: { type: dataTypes.STRING, allowNull: true },
+      isAdmin: { type: Sequelize.BOOLEAN, defaultValue: false },
+      disableRichText: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      selected_community_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -101,34 +106,19 @@ export default (
     },
   );
 
-  User.createWithProfile = async (
-    models: DB,
-    attrs: UserAttributes,
-    options?: CreateOptions,
-  ): Promise<UserInstance> => {
-    const newUser = await User.create(attrs, options);
-    const profile = await models.Profile.create(
-      {
-        user_id: newUser.id!,
-      },
-      options,
-    );
-    newUser.Profiles = [profile];
-    return newUser;
-  };
-
-  User.associate = (models) => {
-    models.User.belongsTo(models.Community, {
-      as: 'selectedCommunity',
-      foreignKey: 'selected_community_id',
-      constraints: false,
-    });
-    models.User.hasMany(models.Address);
-    models.User.hasMany(models.Profile);
-    models.User.hasMany(models.StarredCommunity, {
-      foreignKey: 'user_id',
-      sourceKey: 'id',
-    });
+  User.createWithProfile = async (attrs, options) => {
+    const user = await User.create(attrs, options);
+    if (user) {
+      user.Profiles = user.Profiles || [];
+      const profile = await sequelize.models.Profile.create(
+        {
+          user_id: user.id,
+        },
+        options,
+      );
+      if (profile) user.Profiles.push(profile.toJSON());
+    }
+    return user;
   };
 
   return User;

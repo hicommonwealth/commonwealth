@@ -25,7 +25,7 @@
 4. Commonwealth Manage Community Page (`/packages/commonwealth/…/community_metadata_rows.tsx`), where admins are able to add a bot connection and connect Forum Channels (in a connected Discord Server) to Topics (in the CW forum).
 
 The basic flow here:
-![image (4)](https://github.com/hicommonwealth/commonwealth/assets/31940965/aaf5719a-4ea1-46be-bbbf-3cce55ba7528)
+![image (4)](./assets/Discobot-2.png)
 
 ## Deployments
 
@@ -83,9 +83,9 @@ All redirect URLs that the bot should support need to be inserted/
 
 ### Startup
 
-1. Start a local RabbitMQ instance by executing `yarn start-rmq` in the root directory (requires Docker).
-2. In a separate terminal execute `yarn start` in `packages/discord-bot/` to start the Discord Listener
-3. In a separate terminal execute `yarn start-consumer` in `packages/discord-bot/` to start the Discord Consumer
+1. Start a local RabbitMQ instance by executing `pnpm start-rmq` in the root directory (requires Docker).
+2. In a separate terminal execute `pnpm start` in `packages/discord-bot/` to start the Discord Listener
+3. In a separate terminal execute `pnpm start-consumer` in `packages/discord-bot/` to start the Discord Consumer
 
 ## Staging and Production Setup
 

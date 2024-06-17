@@ -1,4 +1,4 @@
-import { ChainNetwork } from '@hicommonwealth/core';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { IAaveVoteResponse } from 'adapters/chain/aave/types';
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { providers } from 'ethers';

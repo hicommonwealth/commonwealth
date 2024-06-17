@@ -1,5 +1,6 @@
-import { AppError, BalanceType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 export const Errors = {
@@ -19,6 +20,7 @@ const createChainNode = async (
   req: TypedRequestBody<createChainNodeReq>,
   res: TypedResponse<{ node_id: number }>,
 ) => {
+  // @ts-expect-error StrictNullChecks
   if (!req.user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
@@ -33,6 +35,7 @@ const createChainNode = async (
 
   const newChainNode = await models.ChainNode.create({
     url: req.body.url,
+    // @ts-expect-error StrictNullChecks
     name: req.body.name,
     balance_type: req.body.balance_type as BalanceType,
     bech32: req.body.bech32,

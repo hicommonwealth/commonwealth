@@ -1,8 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
@@ -21,6 +24,7 @@ const createComment = async ({
   profile,
   threadId,
   unescapedText,
+  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
 }: CreateCommentProps) => {
   const {
@@ -60,11 +64,17 @@ const useCreateCommentMutation = ({
   threadId,
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
+    // @ts-expect-error StrictNullChecks
     communityId,
+    // @ts-expect-error StrictNullChecks
     threadId,
   });
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
 
   return useMutation({
     mutationFn: createComment,
@@ -75,9 +85,27 @@ const useCreateCommentMutation = ({
       queryClient.setQueryData(key, () => {
         return [...comments, newComment];
       });
+      // @ts-expect-error StrictNullChecks
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
+      updateThreadInAllCaches(
+        // @ts-expect-error StrictNullChecks
+        communityId,
+        threadId,
+        { recentComments: [newComment] },
+        'combineAndRemoveDups',
+      );
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.CreateContent,
+          // @ts-expect-error StrictNullChecks
+          profileId,
+        );
+      }
+
       return newComment;
     },
   });

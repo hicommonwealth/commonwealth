@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/core';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import useSidebarStore from 'state/ui/sidebar';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { AuthModal } from 'views/modals/AuthModal';
+import { AuthModalType } from 'views/modals/AuthModal';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 
@@ -13,18 +13,20 @@ import MobileHeader from './MobileHeader';
 type SublayoutHeaderProps = {
   onMobile: boolean;
   isInsideCommunity: boolean;
+  onAuthModalOpen: (modalType: AuthModalType) => void;
 };
 
 export const SublayoutHeader = ({
   onMobile,
   isInsideCommunity,
+  onAuthModalOpen,
 }: SublayoutHeaderProps) => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const { menuVisible, setRecentlyUpdatedVisibility } = useSidebarStore();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [revalidationModalData, setRevalidationModalData] = useState<{
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
+    // @ts-expect-error <StrictNullChecks/>
   }>(null);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export const SublayoutHeader = ({
       {onMobile ? (
         <MobileHeader
           onMobile={onMobile}
-          onAuthModalOpen={() => setIsAuthModalOpen(true)}
+          onAuthModalOpen={onAuthModalOpen}
           isInsideCommunity={isInsideCommunity}
           onRevalidationModalData={setRevalidationModalData}
           onFeedbackModalOpen={() => setIsFeedbackModalOpen(true)}
@@ -44,7 +46,7 @@ export const SublayoutHeader = ({
       ) : (
         <DesktopHeader
           onMobile={onMobile}
-          onAuthModalOpen={() => setIsAuthModalOpen(true)}
+          onAuthModalOpen={onAuthModalOpen}
           onRevalidationModalData={setRevalidationModalData}
           onFeedbackModalOpen={() => setIsFeedbackModalOpen(true)}
         />
@@ -58,19 +60,17 @@ export const SublayoutHeader = ({
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      <AuthModal
-        onClose={() => setIsAuthModalOpen(false)}
-        isOpen={isAuthModalOpen}
-      />
       <CWModal
         size="medium"
         content={
           <SessionRevalidationModal
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setRevalidationModalData(null)}
             walletSsoSource={revalidationModalData?.walletSsoSource}
             walletAddress={revalidationModalData?.walletAddress}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setRevalidationModalData(null)}
         open={!!revalidationModalData}
       />

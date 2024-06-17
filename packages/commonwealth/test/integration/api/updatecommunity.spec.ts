@@ -3,8 +3,9 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { testServer, TestServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { afterAll, beforeAll, describe, test } from 'vitest';
+import { TestServer, testServer } from '../../../server-test';
+import { config } from '../../../server/config';
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
 import type { CommunityArgs } from '../../util/modelUtils';
 
@@ -13,12 +14,13 @@ const { expect } = chai;
 
 describe('Update Community/Chain Tests', () => {
   let jwtToken;
+  let siteAdminJwt;
   let loggedInAddr;
   const chain = 'ethereum';
 
   let server: TestServer;
 
-  before('reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     // get logged in address/user with JWT
@@ -29,7 +31,7 @@ describe('Update Community/Chain Tests', () => {
     loggedInAddr = result.address;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     const isAdmin = await server.seeder.updateRole({
       address_id: +result.address_id,
@@ -37,6 +39,20 @@ describe('Update Community/Chain Tests', () => {
       role: 'admin',
     });
     expect(isAdmin).to.not.be.null;
+
+    // get site admin JWT
+    const siteAdminResult = await server.seeder.createAndVerifyAddress(
+      { chain },
+      'Bob',
+    );
+    const siteAdminSetSuccessfully = await server.seeder.setSiteAdmin({
+      user_id: +siteAdminResult.user_id,
+    });
+    expect(siteAdminSetSuccessfully).to.be.true;
+    siteAdminJwt = jwt.sign(
+      { id: siteAdminResult.user_id, email: siteAdminResult.email },
+      config.AUTH.JWT_SECRET,
+    );
 
     // create community for test
     const communityArgs: CommunityArgs = {
@@ -54,12 +70,12 @@ describe('Update Community/Chain Tests', () => {
     await server.seeder.createCommunity(communityArgs);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('/updateChain route tests', () => {
-    it('should update chain name', async () => {
+    test('should update chain name', async () => {
       const name = 'commonwealtheum';
       const res = await chai
         .request(server.app)
@@ -70,7 +86,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.name).to.be.equal(name);
     });
 
-    it('should update description', async () => {
+    test('should update description', async () => {
       const description = 'hello this the new chain';
       const res = await chai
         .request(server.app)
@@ -81,7 +97,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.description).to.be.equal(description);
     });
 
-    it.skip('should update website', async () => {
+    test.skip('should update website', async () => {
       const website = 'http://edgewa.re';
       const res = await chai
         .request(server.app)
@@ -92,7 +108,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.website).to.be.equal(website);
     });
 
-    it('should update discord', async () => {
+    test('should update discord', async () => {
       const discord = ['http://discord.gg'];
       const res = await chai
         .request(server.app)
@@ -103,7 +119,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.social_links).to.deep.equal(discord);
     });
 
-    it.skip('should fail to update social link without proper prefix', async () => {
+    test.skip('should fail to update social link without proper prefix', async () => {
       const socialLinks = ['github.com'];
       const res = await chai
         .request(server.app)
@@ -113,7 +129,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.exist;
     });
 
-    it('should update telegram', async () => {
+    test('should update telegram', async () => {
       const telegram = ['https://t.me/'];
       const res = await chai
         .request(server.app)
@@ -124,7 +140,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.social_links).to.deep.equal(telegram);
     });
 
-    it.skip('should update github', async () => {
+    test.skip('should update github', async () => {
       const github = ['https://github.com/'];
       const res = await chai
         .request(server.app)
@@ -135,7 +151,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.github).to.deep.equal(github);
     });
 
-    it('should update symbol', async () => {
+    test('should update symbol', async () => {
       const default_symbol = 'CWL';
       const res = await chai
         .request(server.app)
@@ -146,8 +162,8 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.default_symbol).to.be.equal(default_symbol);
     });
 
-    it('should update icon_url', async () => {
-      const icon_url = '/static/img/protocols/cwl.png';
+    test('should update icon_url', async () => {
+      const icon_url = 'assets/img/protocols/cwl.png';
       const res = await chai
         .request(server.app)
         .patch(`/api/communities/${chain}`)
@@ -157,7 +173,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.icon_url).to.be.equal(icon_url);
     });
 
-    it('should update active', async () => {
+    test('should update active', async () => {
       const active = false;
       const res = await chai
         .request(server.app)
@@ -168,7 +184,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.active).to.be.equal(active);
     });
 
-    it('should update type', async () => {
+    test('should update type', async () => {
       const type = 'parachain';
       const res = await chai
         .request(server.app)
@@ -179,7 +195,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.type).to.be.equal(type);
     });
 
-    it('should fail to update network', async () => {
+    test('should fail to update network', async () => {
       const network = 'ethereum-testnet';
       const res = await chai
         .request(server.app)
@@ -190,7 +206,29 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.be.equal(ChainError.CantChangeNetwork);
     });
 
-    it('should fail if no chain id', async () => {
+    test('should fail to update custom domain if not site admin', async () => {
+      const custom_domain = 'test.com';
+      const res = await chai
+        .request(server.app)
+        .patch(`/api/communities/${chain}`)
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, custom_domain });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(ChainError.CantChangeCustomDomain);
+    });
+
+    test('should update custom domain if site admin', async () => {
+      const custom_domain = 'test.com';
+      const res = await chai
+        .request(server.app)
+        .patch(`/api/communities/${chain}`)
+        .set('Accept', 'application/json')
+        .send({ jwt: siteAdminJwt, id: chain, custom_domain });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.custom_domain).to.be.equal(custom_domain);
+    });
+
+    test('should fail if no chain id', async () => {
       const name = 'ethereum-testnet';
       const res = await chai
         .request(server.app)
@@ -201,7 +239,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.be.equal(ChainError.NoCommunityId);
     });
 
-    it('should fail if no chain found', async () => {
+    test('should fail if no chain found', async () => {
       const id = 'ethereum-testnet';
       const res = await chai
         .request(server.app)
@@ -212,7 +250,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.error).to.be.equal(ChainError.NoCommunityFound);
     });
 
-    it('should fail if not admin ', async () => {
+    test('should fail if not admin ', async () => {
       const id = 'ethereum';
       const result = await server.seeder.createAndVerifyAddress(
         { chain },
@@ -220,7 +258,7 @@ describe('Update Community/Chain Tests', () => {
       );
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       const res = await chai
         .request(server.app)
@@ -232,8 +270,8 @@ describe('Update Community/Chain Tests', () => {
     });
   });
 
-  describe('/updateCommunity route tests', () => {
-    it.skip('should update community name', async () => {
+  describe.skip('/updateCommunity route tests', () => {
+    test.skip('should update community name', async () => {
       const name = 'commonwealth tester community';
       const res = await chai
         .request(server.app)
@@ -244,7 +282,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.name).to.be.equal(name);
     });
 
-    it.skip('should update community description', async () => {
+    test.skip('should update community description', async () => {
       const description = 'for me! and the tester community';
       const res = await chai
         .request(server.app)
@@ -255,7 +293,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.description).to.be.equal(description);
     });
 
-    it.skip('should update website', async () => {
+    test.skip('should update website', async () => {
       const website = 'http://edgewa.re';
       const res = await chai
         .request(server.app)
@@ -266,7 +304,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.website).to.be.equal(website);
     });
 
-    it.skip('should update discord', async () => {
+    test.skip('should update discord', async () => {
       const discord = 'http://discord.gg';
       const res = await chai
         .request(server.app)
@@ -277,7 +315,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.discord).to.be.equal(discord);
     });
 
-    it.skip('should update telegram', async () => {
+    test.skip('should update telegram', async () => {
       const telegram = 'https://t.me/';
       const res = await chai
         .request(server.app)
@@ -288,7 +326,7 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.telegram).to.be.equal(telegram);
     });
 
-    it.skip('should update github', async () => {
+    test.skip('should update github', async () => {
       const github = 'https://github.com/';
       const res = await chai
         .request(server.app)

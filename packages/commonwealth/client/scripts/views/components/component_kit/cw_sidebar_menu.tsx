@@ -11,7 +11,7 @@ import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
-import { CWButton } from './new_designs/cw_button';
+import { CWButton } from './new_designs/CWButton';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
@@ -90,10 +90,12 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     );
   } else if (props.type === 'community') {
     const item = props.community;
+    // @ts-expect-error <StrictNullChecks/>
     const roles = app.roles.getAllRolesInCommunity({ community: item.id });
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
+          // @ts-expect-error <StrictNullChecks/>
           { isSelected: app.activeChainId() === item.id },
           'SidebarMenuItem community',
         )}
@@ -105,24 +107,33 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           navigateToCommunity({
             navigate,
             path: '/',
+            // @ts-expect-error <StrictNullChecks/>
             chain: item.id,
           });
         }}
       >
+        {/*// @ts-expect-error <StrictNullChecks/>*/}
         <CommunityLabel community={item} />
         {app.isLoggedIn() && roles.length > 0 && (
           <div className="roles-and-star">
             <User
               avatarSize={18}
               shouldShowAvatarOnly
-              userAddress={roles[0].address}
-              userCommunityId={roles[0].address_chain || roles[0].community_id}
+              userAddress={roles?.[0]?.address}
+              userCommunityId={
+                roles?.[0]?.address_chain || roles?.[0]?.community_id
+              }
+              shouldShowAsDeleted={
+                !roles?.[0]?.address &&
+                !(roles?.[0]?.address_chain || roles?.[0]?.community_id)
+              }
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
+                  // @ts-expect-error <StrictNullChecks/>
                   community: item.id,
                 });
                 setIsStarred((prevState) => !prevState);
@@ -149,6 +160,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   return (
     <div
       className={getClasses<{ className: string }>(
+        // @ts-expect-error <StrictNullChecks/>
         { className },
         ComponentType.SidebarMenu,
       )}
@@ -167,7 +179,8 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             ...item,
             isStarred:
               item.type === 'community'
-                ? app.user.isCommunityStarred(item.community.id)
+                ? // @ts-expect-error <StrictNullChecks/>
+                  app.user.isCommunityStarred(item.community.id)
                 : false,
           };
 

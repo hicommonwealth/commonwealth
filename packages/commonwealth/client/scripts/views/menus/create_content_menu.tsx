@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
@@ -60,6 +60,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             cct.cctmd.display_options === '3'
           ) {
             const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
+            // @ts-expect-error <StrictNullChecks/>
             items.push({
               label: `New ${cct.cctmd.nickname}`,
               iconLeft: 'star',

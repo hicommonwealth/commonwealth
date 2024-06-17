@@ -1,13 +1,15 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { dispose, NotificationCategories } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { SubscriptionValidationErrors } from '@hicommonwealth/model';
+import { NotificationCategories } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
 import { TestServer, testServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { config } from '../../../server/config';
 import Errors from '../../../server/routes/subscription/errors';
 
 chai.use(chaiHttp);
@@ -18,7 +20,7 @@ describe('Subscriptions Tests', () => {
   const community_id = 'ethereum';
   let server: TestServer;
 
-  before('reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
     // get logged in address/user with JWT
     const result = await server.seeder.createAndVerifyAddress(
@@ -29,7 +31,7 @@ describe('Subscriptions Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
     userId = +result.user_id;
 
@@ -48,6 +50,7 @@ describe('Subscriptions Tests', () => {
       body: 't',
       kind: 'discussion',
       stage: 'discussion',
+      // @ts-expect-error StrictNullChecks
       topicId: topic.id,
       session: loggedInSession.session,
       sign: loggedInSession.sign,
@@ -70,13 +73,13 @@ describe('Subscriptions Tests', () => {
     comment = res.result;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('/createSubscription test', () => {
     describe(`${NotificationCategories.NewThread} subscription tests`, () => {
-      it('should create new-thread subscription', async () => {
+      test('should create new-thread subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
         const res = await chai
@@ -92,7 +95,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.thread_id).to.be.null;
       });
 
-      it('should fail to create a new-thread subscription if an invalid chain is given', async () => {
+      test('should fail to create a new-thread subscription if an invalid chain is given', async () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
         let res = await chai
@@ -119,7 +122,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.be.equal(Errors.InvalidCommunity);
       });
 
-      it('should not create a duplicate new-thread subscription', async () => {
+      test('should not create a duplicate new-thread subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.NewThread;
         let res = await chai
@@ -158,7 +161,7 @@ describe('Subscriptions Tests', () => {
     describe(`${NotificationCategories.NewComment} subscription tests`, () => {
       let rootCommmentSubscription, commentSubscription;
 
-      it('should create new-comment subscription on a thread', async () => {
+      test('should create new-comment subscription on a thread', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -181,7 +184,7 @@ describe('Subscriptions Tests', () => {
         rootCommmentSubscription = res.body.result;
       });
 
-      it('should create new-comment subscription on a comment', async () => {
+      test('should create new-comment subscription on a comment', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -204,7 +207,7 @@ describe('Subscriptions Tests', () => {
         commentSubscription = res.body.result;
       });
 
-      it('should not create a duplicate new-comment subscription', async () => {
+      test('should not create a duplicate new-comment subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         let res = await chai
@@ -236,7 +239,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.id).to.be.equal(commentSubscription.id);
       });
 
-      it('should fail to create a new-comment subscription on a thread and comment simultaneously', async () => {
+      test('should fail to create a new-comment subscription on a thread and comment simultaneously', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -255,7 +258,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.equal(Errors.BothThreadAndComment);
       });
 
-      it('should fail to create a new-comment subscription without a thread or comment', async () => {
+      test('should fail to create a new-comment subscription without a thread or comment', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -272,7 +275,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.equal(Errors.NoThreadOrComment);
       });
 
-      it('should fail to create a new-comment subscription on a non-existent thread', async () => {
+      test('should fail to create a new-comment subscription on a non-existent thread', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -292,7 +295,7 @@ describe('Subscriptions Tests', () => {
         );
       });
 
-      it('should fail to create a new-comment subscription on a non-existent comment', async () => {
+      test('should fail to create a new-comment subscription on a non-existent comment', async () => {
         const is_active = true;
         const category = NotificationCategories.NewComment;
         const res = await chai
@@ -316,7 +319,7 @@ describe('Subscriptions Tests', () => {
     describe(`${NotificationCategories.NewReaction} subscription tests`, () => {
       let rootCommmentSubscription, commentSubscription;
 
-      it('should create a new-reaction subscription on a thread', async () => {
+      test('should create a new-reaction subscription on a thread', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -339,7 +342,7 @@ describe('Subscriptions Tests', () => {
         rootCommmentSubscription = res.body.result;
       });
 
-      it('should create new-reaction subscription on a comment', async () => {
+      test('should create new-reaction subscription on a comment', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -362,7 +365,7 @@ describe('Subscriptions Tests', () => {
         commentSubscription = res.body.result;
       });
 
-      it('should not create a duplicate new-reaction subscription', async () => {
+      test('should not create a duplicate new-reaction subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         let res = await chai
@@ -394,7 +397,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.id).to.be.equal(commentSubscription.id);
       });
 
-      it('should fail to create a new-reaction subscription on a thread and comment simultaneously', async () => {
+      test('should fail to create a new-reaction subscription on a thread and comment simultaneously', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -413,7 +416,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.equal(Errors.BothThreadAndComment);
       });
 
-      it('should fail to create a new-reaction subscription without a thread or comment', async () => {
+      test('should fail to create a new-reaction subscription without a thread or comment', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -430,7 +433,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.equal(Errors.NoThreadOrComment);
       });
 
-      it('should fail to create a new-reaction subscription on a non-existent thread', async () => {
+      test('should fail to create a new-reaction subscription on a non-existent thread', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -450,7 +453,7 @@ describe('Subscriptions Tests', () => {
         );
       });
 
-      it('should fail to create a new-reaction subscription on a non-existent comment', async () => {
+      test('should fail to create a new-reaction subscription on a non-existent comment', async () => {
         const is_active = true;
         const category = NotificationCategories.NewReaction;
         const res = await chai
@@ -472,7 +475,7 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.NewMention} subscription tests`, () => {
-      it('should fail to create a new-mention subscription using this route', async () => {
+      test('should fail to create a new-mention subscription using this route', async () => {
         const is_active = true;
         const category = NotificationCategories.NewMention;
         const res = await chai
@@ -491,7 +494,7 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.NewCollaboration} subscription tests`, () => {
-      it('should fail to create a new-collaboration subscription using this route', async () => {
+      test('should fail to create a new-collaboration subscription using this route', async () => {
         const is_active = true;
         const category = NotificationCategories.NewCollaboration;
         const res = await chai
@@ -512,7 +515,7 @@ describe('Subscriptions Tests', () => {
     describe(`${NotificationCategories.ChainEvent} subscription tests`, () => {
       let chainSubscription;
 
-      it('should create a chain-event subscription', async () => {
+      test('should create a chain-event subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.ChainEvent;
         const res = await chai
@@ -528,7 +531,7 @@ describe('Subscriptions Tests', () => {
         chainSubscription = res.body.result;
       });
 
-      it('should not create a duplicate chain-event subscription', async () => {
+      test('should not create a duplicate chain-event subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.ChainEvent;
         const res = await chai
@@ -544,7 +547,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.id).to.equal(chainSubscription.id);
       });
 
-      it('should fail to create a chain-event subscription with an invalid chain', async () => {
+      test('should fail to create a chain-event subscription with an invalid chain', async () => {
         const is_active = true;
         const category = NotificationCategories.ChainEvent;
         let res = await chai
@@ -573,16 +576,10 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.SnapshotProposal} subscription tests`, () => {
-      const snapshot_id = 'test_space';
+      const snapshot_id = 'dydxgov.eth';
       let snapshotSubscription;
 
-      before('create a snapshot space', async () => {
-        await server.models.SnapshotSpace.create({
-          snapshot_space: snapshot_id,
-        });
-      });
-
-      it('should create a snapshot-proposal subscription', async () => {
+      test('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
         const res = await chai
@@ -598,7 +595,7 @@ describe('Subscriptions Tests', () => {
         snapshotSubscription = res.body.result;
       });
 
-      it('should not create a duplicate snapshot-proposal subscription', async () => {
+      test('should not create a duplicate snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
         const res = await chai
@@ -613,7 +610,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.result.id).to.equal(snapshotSubscription.id);
       });
 
-      it('should fail to create a chain-event subscription with an invalid snapshot_id', async () => {
+      test('should fail to create a chain-event subscription with an invalid snapshot_id', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
         let res = await chai
@@ -642,7 +639,7 @@ describe('Subscriptions Tests', () => {
     });
 
     describe('Misc category subscription tests', () => {
-      it('should fail to create a subscription with an unknown category', async () => {
+      test('should fail to create a subscription with an unknown category', async () => {
         const is_active = true;
         const category = 'unknown_category';
         const res = await chai
@@ -655,7 +652,7 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.be.equal(Errors.InvalidNotificationCategory);
       });
 
-      it('should fail to create a subscription with an invalid category', async () => {
+      test('should fail to create a subscription with an invalid category', async () => {
         const is_active = true;
         let category = NotificationCategories.ThreadEdit;
         let res = await chai
@@ -681,7 +678,7 @@ describe('Subscriptions Tests', () => {
 
   describe('/viewSubscriptions', () => {
     let threadSub, chainEventSub;
-    before('Delete existing subscriptions and create new ones', async () => {
+    beforeAll(async () => {
       await server.models.Subscription.destroy({
         where: {},
       });
@@ -700,7 +697,7 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it('should retrieve all of a users subscriptions', async () => {
+    test('should retrieve all of a users subscriptions', async () => {
       const res = await chai
         .request(server.app)
         .get('/api/viewSubscriptions')
@@ -724,14 +721,14 @@ describe('Subscriptions Tests', () => {
       expect(ceSubRes.id).to.be.equal(chainEventSub.id);
     });
 
-    it('should not fetch subscriptions of another user', async () => {
+    test('should not fetch subscriptions of another user', async () => {
       const result = await server.seeder.createAndVerifyAddress(
         { chain: community_id },
         'Alice',
       );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
 
       await server.seeder.createSubscription({
@@ -767,7 +764,7 @@ describe('Subscriptions Tests', () => {
 
   describe('/disableSubscriptions + /enableSubscriptions', () => {
     let subscription: NotificationSubscription;
-    before('creating a subscription', async () => {
+    beforeAll(async () => {
       subscription = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
@@ -776,7 +773,7 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it('should disable a subscription', async () => {
+    test('should disable a subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -787,7 +784,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should enable a subscription', async () => {
+    test('should enable a subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -797,7 +794,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should disable and enable a subscription with just the id as string (not array)', async () => {
+    test('should disable and enable a subscription with just the id as string (not array)', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
         .request(server.app)
@@ -805,6 +802,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body).to.not.be.null;
@@ -815,18 +813,20 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should pause and unpause an array of subscription', async () => {
+    test('should pause and unpause an array of subscription', async () => {
       const subscriptions = [];
       for (const category of [
         NotificationCategories.NewThread,
         NotificationCategories.ChainEvent,
       ]) {
         subscriptions.push(
+          // @ts-expect-error StrictNullChecks
           server.seeder.createSubscription({
             jwt: jwtToken,
             is_active: true,
@@ -836,6 +836,7 @@ describe('Subscriptions Tests', () => {
         );
       }
       const subscriptionIds = (await Promise.all(subscriptions)).map(
+        // @ts-expect-error StrictNullChecks
         (s) => s.id,
       );
       let res = await chai
@@ -854,7 +855,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should fail to enable and disable subscriptions not owned by the requester', async () => {
+    test('should fail to enable and disable subscriptions not owned by the requester', async () => {
       expect(subscription).to.not.be.null;
       const result = await server.seeder.createAndVerifyAddress(
         { chain: community_id },
@@ -862,7 +863,7 @@ describe('Subscriptions Tests', () => {
       );
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       let res = await chai
         .request(server.app)
@@ -882,7 +883,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
     });
 
-    it('should fail to enable and disable subscription when no subscriptions are passed to route', async () => {
+    test('should fail to enable and disable subscription when no subscriptions are passed to route', async () => {
       let res = await chai
         .request(server.app)
         .post('/api/enableSubscriptions')
@@ -904,7 +905,7 @@ describe('Subscriptions Tests', () => {
 
   describe('/enableImmediateEmails and /disableImmediateEmails', () => {
     let subscription: NotificationSubscription;
-    before('creating a subscription', async () => {
+    beforeAll(async () => {
       subscription = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
@@ -913,7 +914,7 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it('should turn on immediate emails, /enableImmediateEmails', async () => {
+    test('should turn on immediate emails, /enableImmediateEmails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -924,7 +925,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should turn off immediate emails, /disableImmediateEmails', async () => {
+    test('should turn off immediate emails, /disableImmediateEmails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -934,7 +935,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should fail to enable and disable immediate emails when not passed ids', async () => {
+    test('should fail to enable and disable immediate emails when not passed ids', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
         .request(server.app)
@@ -952,7 +953,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
 
-    it('should successfully enable and disable with just a string id', async () => {
+    test('should successfully enable and disable with just a string id', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai
         .request(server.app)
@@ -960,6 +961,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body).to.not.be.null;
@@ -970,19 +972,21 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
+          // @ts-expect-error StrictNullChecks
           'subscription_ids[]': subscription.id.toString(),
         });
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
+    // eslint-disable-next-line max-len
+    test('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
       const result = await server.seeder.createAndVerifyAddress(
         { chain: community_id },
         'Alice',
       );
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET,
+        config.AUTH.JWT_SECRET,
       );
       expect(subscription).to.not.be.null;
       let res = await chai
@@ -1004,7 +1008,7 @@ describe('Subscriptions Tests', () => {
   describe('/deleteSubscription', () => {
     let subscription;
 
-    before('make subscription', async () => {
+    beforeAll(async () => {
       subscription = await server.seeder.createSubscription({
         jwt: jwtToken,
         is_active: true,
@@ -1013,7 +1017,7 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it('should delete an active subscription', async () => {
+    test('should delete an active subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -1023,7 +1027,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should fail to delete when no subscription id is passed', async () => {
+    test('should fail to delete when no subscription id is passed', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -1034,7 +1038,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
 
-    it('should fail to find an invalid subscription id', async () => {
+    test('should fail to find an invalid subscription id', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai
         .request(server.app)
@@ -1048,7 +1052,7 @@ describe('Subscriptions Tests', () => {
   describe('Subscription model validation', () => {
     const sequelizeErrMsg = 'Validation error: ';
     const subscriptionCreateErrMsg = 'Subscription creation should fail';
-    it('should fail to create a subscription with an invalid category', async () => {
+    test('should fail to create a subscription with an invalid category', async () => {
       let category_id = 'invalid';
       try {
         await server.models.Subscription.create({
@@ -1089,7 +1093,7 @@ describe('Subscriptions Tests', () => {
       }
     });
 
-    it(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
+    test(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
       const category_id = NotificationCategories.NewThread;
       try {
         await server.models.Subscription.create({
@@ -1104,7 +1108,7 @@ describe('Subscriptions Tests', () => {
       }
     });
 
-    it(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
+    test(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
       const category_id = NotificationCategories.ChainEvent;
       try {
         await server.models.Subscription.create({
@@ -1120,7 +1124,7 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.NewComment} tests`, () => {
-      it(`should fail to create a subscription without a chain_id`, async () => {
+      test(`should fail to create a subscription without a chain_id`, async () => {
         const category_id = NotificationCategories.NewComment;
         try {
           await server.models.Subscription.create({
@@ -1135,7 +1139,7 @@ describe('Subscriptions Tests', () => {
         }
       });
 
-      it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
+      test(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewComment;
         try {
           await server.models.Subscription.create({
@@ -1153,7 +1157,7 @@ describe('Subscriptions Tests', () => {
         }
       });
 
-      it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
+      test(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewComment;
         try {
           await server.models.Subscription.create({
@@ -1171,7 +1175,7 @@ describe('Subscriptions Tests', () => {
     });
 
     describe(`${NotificationCategories.NewReaction} tests`, () => {
-      it(`should fail to create a subscription without a chain_id`, async () => {
+      test(`should fail to create a subscription without a chain_id`, async () => {
         const category_id = NotificationCategories.NewReaction;
         try {
           await server.models.Subscription.create({
@@ -1186,7 +1190,7 @@ describe('Subscriptions Tests', () => {
         }
       });
 
-      it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
+      test(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewReaction;
         try {
           await server.models.Subscription.create({
@@ -1204,7 +1208,7 @@ describe('Subscriptions Tests', () => {
         }
       });
 
-      it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
+      test(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
         const category_id = NotificationCategories.NewReaction;
         try {
           await server.models.Subscription.create({
@@ -1221,7 +1225,7 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
+    test(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
       const category_id = NotificationCategories.NewMention;
       try {
         const result = await server.models.Subscription.create({
@@ -1234,7 +1238,7 @@ describe('Subscriptions Tests', () => {
       }
     });
 
-    it(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
+    test(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
       const category_id = NotificationCategories.NewCollaboration;
       try {
         const result = await server.models.Subscription.create({

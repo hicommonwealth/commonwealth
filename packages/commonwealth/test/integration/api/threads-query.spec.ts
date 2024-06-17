@@ -3,6 +3,7 @@ import { dispose } from '@hicommonwealth/core';
 import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -10,21 +11,23 @@ const { expect } = chai;
 describe('Thread queries', () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('query_thread_through_collabo', async () => {
+  test('query_thread_through_collaborations', async () => {
     const chain = await models.Community.findOne();
+    // @ts-expect-error StrictNullChecks
     expect(chain.id).to.not.be.null;
     const address = (
       await models.Address.findOrCreate({
         where: {
           address: 'JhgYcbJOdWHLVFHJKLPhC12',
+          // @ts-expect-error StrictNullChecks
           community_id: chain.id,
           verification_token: 'fgdfgd',
         },
@@ -35,6 +38,7 @@ describe('Thread queries', () => {
     const thread = (
       await models.Thread.findOrCreate({
         where: {
+          // @ts-expect-error StrictNullChecks
           community_id: chain.id,
           address_id: address.id,
           title: 'title',
@@ -46,6 +50,7 @@ describe('Thread queries', () => {
     expect(thread.id).to.be.greaterThan(0);
     expect(thread.address_id).to.to.be.greaterThan(0);
     const collaboration = await models.Collaboration.findOrCreate({
+      // @ts-expect-error StrictNullChecks
       where: {
         address_id: thread.address_id,
         thread_id: thread.id,
@@ -73,9 +78,11 @@ describe('Thread queries', () => {
     });
     expect(threads).to.not.be.null;
     expect(threads[0].id).to.equal(thread.id);
+    // @ts-expect-error StrictNullChecks
     expect(threads[0].Address.id).to.not.be.null;
     expect(threads).length.above(0);
     expect(threads[0].collaborators).length.above(0);
+    // @ts-expect-error StrictNullChecks
     threads[0].collaborators.map(({ id }) => {
       expect(id).to.equal(address.id);
     });

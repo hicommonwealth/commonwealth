@@ -22,13 +22,13 @@
 - **Environment**: All app environment variables, including DATABASE_URL, are readily available.
 - **Entry Point**: Post-installation, the user's script serves as the dyno's entry point.
 - **Integration with Datadog**: There's a possibility that one-off dynos may not integrate seamlessly with Datadog. However, this can be confirmed upon testing.
-- **Commandline**: Tools like psql, yarn, and others are accessible via the command line. This flexibility allows for the scheduling of raw commands. For instance:
+- **Commandline**: Tools like psql, pnpm, and others are accessible via the command line. This flexibility allows for the scheduling of raw commands. For instance:
 
 ```bash
 psql $DATABASE_URL -c "SELECT * FROM \"Threads\" LIMIT 1"
 ```
 
-![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/f6ca8c80-b73e-4b19-87a0-02ce98030841)
+![image](./assets/Background-Scheduler-1.png)
 
 ### Best Practice
 
@@ -75,12 +75,13 @@ heroku logs -a commonwealth-frick -t
 heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
 ```
 
-![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/a372876a-0f79-45b6-8828-557245f3a25c)
+![image](./assets/Background-Scheduler-2.png)
 
 ### Scheduling Options
 
 - **Frequency**: Options include every 10 minutes, hourly, or daily.
-  ![Scheduling UI](https://github.com/hicommonwealth/commonwealth/assets/4791635/492ef824-c5df-4389-bd9b-aa32db048608)
+
+![Scheduling UI](./assets/Background-Scheduler-3.png)
 
 ### Deployment
 
@@ -88,7 +89,7 @@ heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
 - **Package Installation**: All required packages are installed automatically similarly to the main app dyno. Tasks can be executed using npm scripts, for example:
 
 ```bash
-yarn --cwd packages/commonwealth recompute-counts
+pnpm --cwd packages/commonwealth recompute-counts
 ```
 
 ## Scheduling externally vs in-memory

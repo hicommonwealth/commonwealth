@@ -2,10 +2,11 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { testServer, TestServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import { TestServer, testServer } from '../../../server-test';
+import { config } from '../../../server/config';
 import { Errors } from '../../../server/controller/index';
-import { get } from './external/appHook.spec';
+import { get } from '../../util/httpUtils';
 
 chai.use(chaiHttp);
 
@@ -13,11 +14,11 @@ describe('get roles Integration Tests', () => {
   let jwtToken;
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -27,11 +28,11 @@ describe('get roles Integration Tests', () => {
         id: server.e2eTestEntities.testUsers[0].id,
         email: server.e2eTestEntities.testUsers[0].email,
       },
-      JWT_SECRET,
+      config.AUTH.JWT_SECRET,
     );
   });
 
-  it('should return an error response if there is an invalid chain specified', async () => {
+  test('should return an error response if there is an invalid chain specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -39,11 +40,10 @@ describe('get roles Integration Tests', () => {
 
     const response = await get('/api/roles', invalidRequest, true, server.app);
 
-    response.should.have.status(400);
     chai.assert.equal(response.error, 'Community does not exist');
   });
 
-  it('should return an error response if an invalid permission is specified', async () => {
+  test('should return an error response if an invalid permission is specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -53,11 +53,12 @@ describe('get roles Integration Tests', () => {
 
     const response = await get('/api/roles', invalidRequest, true, server.app);
 
-    response.should.have.status(400);
+    chai.assert.equal(response.status, 400);
+    chai.assert.equal(response.status, 400);
     chai.assert.equal(response.error, Errors.InvalidPermissions);
   });
 
-  it('should get roles and return a success response', async () => {
+  test('should get roles and return a success response', async () => {
     const validRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,

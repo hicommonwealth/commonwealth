@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { config } from '../../../server/config';
 import { e2eSeeder, type E2E_Seeder } from '../utils/e2eUtils';
-import { discussionTests } from './discussionsTest';
 
 let seeder: E2E_Seeder;
 
@@ -8,7 +8,7 @@ test.beforeAll(async () => {
   seeder = await e2eSeeder();
 });
 
-if (process.env.IS_CI === 'true') {
+if (config.IS_CI) {
   // ssl proxy takes a while, so increase test timeout
   test.setTimeout(200000);
 
@@ -20,7 +20,6 @@ if (process.env.IS_CI === 'true') {
       await page.goto(`https://${seeder.testChains[0]['custom_domain']}/`);
     }).toPass({ intervals: [20_000] });
   });
-  test.describe('Commonwealth custom domain Homepage', discussionTests(test));
 } else {
   test.skip('Skipping tests in local environment', () => {});
 }

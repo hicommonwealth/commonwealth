@@ -2,7 +2,7 @@ import {
   NotificationCategories,
   ProposalType,
   SupportedNetwork,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/shared';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -33,23 +33,24 @@ export const ChainEventNotificationRow = (
     throw new Error('chain event notification does not have expected data');
   }
 
-  const chainId = notification.chainEvent.chain;
+  const communityId = notification.chainEvent.chain;
 
-  if (app.isCustomDomain() && chainId !== app.customDomainId()) {
+  if (app.isCustomDomain() && communityId !== app.customDomainId()) {
     return;
   }
 
   const chainEvent: CWEvent = {
+    // @ts-expect-error <StrictNullChecks/>
     blockNumber: notification.chainEvent.blockNumber,
     network: notification.chainEvent.network,
     data: notification.chainEvent.data,
   };
 
-  const communityName = app.config.chains.getById(chainId)?.name;
+  const communityName = app.config.chains.getById(communityId)?.name;
 
   let label: IEventLabel | undefined;
   try {
-    label = ChainEventLabel(chainId, chainEvent);
+    label = ChainEventLabel(communityId, chainEvent);
   } catch (e) {
     console.warn(e);
     return;
@@ -81,6 +82,7 @@ export const ChainEventNotificationRow = (
     proposalType = ProposalType.CompoundProposal;
   }
 
+  // @ts-expect-error <StrictNullChecks/>
   if (!proposalType) {
     return;
   }
@@ -89,7 +91,7 @@ export const ChainEventNotificationRow = (
     proposalType,
     (chainEvent.data as any).id,
     false,
-    chainId,
+    communityId,
   );
 
   return (
@@ -182,7 +184,11 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
         <UserGallery
           users={authorInfo.map(
             (auth) =>
-              new AddressInfo({ id: null, address: auth[1], chainId: auth[0] }),
+              new AddressInfo({
+                id: null,
+                address: auth[1],
+                communityId: auth[0],
+              }),
           )}
           avatarSize={26}
         />

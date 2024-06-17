@@ -1,6 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Role } from '@hicommonwealth/model';
+import type { Role } from '@hicommonwealth/shared';
 import type { Request, Response } from 'express';
 import { findAllRoles } from '../util/roles';
 
@@ -17,7 +17,9 @@ export async function listRoles(models: DB, req: Request, res: Response) {
   if (typeof permissions !== 'undefined' && !Array.isArray(permissions)) {
     throw new AppError(Errors.InvalidPermissions);
   }
+  // @ts-expect-error StrictNullChecks
   const filteredPermissions: Role[] =
+    // @ts-expect-error StrictNullChecks
     permissions?.length > 0 && Array.isArray(permissions)
       ? (permissions
           .map(String)

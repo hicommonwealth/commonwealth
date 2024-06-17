@@ -5,6 +5,7 @@
 .idea
 /venv
 /build
+/dist
 node_modules/
 jsconfig.json
 .vscode
@@ -51,3 +52,7 @@ test_accounts.txt
 /test-results
 
 summary.json
+
+.eslintcache
+
+.eslintcache

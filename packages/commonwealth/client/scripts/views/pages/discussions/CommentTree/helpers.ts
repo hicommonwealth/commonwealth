@@ -1,4 +1,4 @@
-import type { ContentType } from '@hicommonwealth/core';
+import type { ContentType } from '@hicommonwealth/shared';
 import app from 'state';
 
 // highlight the header/body of a parent thread, or the body of a comment

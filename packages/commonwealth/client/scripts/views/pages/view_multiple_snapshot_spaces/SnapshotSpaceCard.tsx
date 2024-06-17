@@ -43,7 +43,8 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
       app.snapshot.init(space.id).then(() => {
         navigate(
           `/new/snapshot/${app.chain.meta.snapshot}` +
-            `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
+            // @ts-expect-error <StrictNullChecks/>
+            `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`,
         );
       });
     }

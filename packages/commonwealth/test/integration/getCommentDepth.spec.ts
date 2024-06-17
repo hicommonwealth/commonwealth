@@ -2,13 +2,16 @@ import { dispose } from '@hicommonwealth/core';
 import { CommentInstance, models, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { getCommentDepth } from 'server/util/getCommentDepth';
+import { afterAll, beforeAll, describe, test } from 'vitest';
+
+4;
 
 describe('getCommentDepth', () => {
   const community_id = 'ethereum';
   const comments: CommentInstance[] = [];
   const maxDepth = 8;
 
-  before(async () => {
+  beforeAll(async () => {
     await tester.seedDb();
     const address = await models.Address.findOne({
       where: {
@@ -17,6 +20,7 @@ describe('getCommentDepth', () => {
     });
     const thread = await models.Thread.create({
       community_id,
+      // @ts-expect-error StrictNullChecks
       address_id: address.id,
       title: 'Testing',
       plaintext: '',
@@ -26,8 +30,11 @@ describe('getCommentDepth', () => {
     for (let i = 0; i < maxDepth; i++) {
       const result = await models.Comment.create({
         community_id,
-        thread_id: String(thread.id),
+        // @ts-expect-error StrictNullChecks
+        thread_id: thread.id,
+        // @ts-expect-error StrictNullChecks
         parent_id: comment ? String(comment.id) : undefined,
+        // @ts-expect-error StrictNullChecks
         address_id: address.id,
         text: String(i),
       });
@@ -36,11 +43,11 @@ describe('getCommentDepth', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should correctly calculate comment depth (recursion terminated naturally)', async () => {
+  test('should correctly calculate comment depth (recursion terminated naturally)', async () => {
     for (let i = 0; i < maxDepth; i++) {
       const [exceeded, depth] = await getCommentDepth(
         models,
@@ -52,7 +59,7 @@ describe('getCommentDepth', () => {
     }
   });
 
-  it('should correctly calculate comment depth (recursion depth exceeded)', async () => {
+  test('should correctly calculate comment depth (recursion depth exceeded)', async () => {
     const maxIterations = 2;
     const [exceeded, depth] = await getCommentDepth(
       models,

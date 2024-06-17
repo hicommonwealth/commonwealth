@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { getActivityFeed } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { getActivityFeed } from '../util/activityQuery';
 
 export const Errors = {
   NotLoggedIn: 'Must be signed in to view user dashboard',
@@ -17,6 +17,6 @@ export default async (
     return next(new AppError(Errors.NotLoggedIn));
   }
   const { id } = req.user;
-  const notificationsWithProfiles = await getActivityFeed(models, id);
-  return res.json({ status: 'Success', result: notificationsWithProfiles });
+  const notificationsWithActivity = await getActivityFeed(models, id);
+  return res.json({ status: 'Success', result: notificationsWithActivity });
 };

@@ -8,7 +8,8 @@ import React, { useEffect } from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
@@ -26,6 +27,7 @@ const OverviewPage = () => {
     queryType: 'active',
     communityId: app.activeChainId(),
     topicsPerThread: 3,
+    withXRecentComments: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
 
@@ -48,7 +50,8 @@ const OverviewPage = () => {
     : topics;
 
   const topicsSorted = anyTopicsFeatured
-    ? topicsFiltered.sort((a, b) => a.order - b.order)
+    ? // @ts-expect-error <StrictNullChecks/>
+      topicsFiltered.sort((a, b) => a.order - b.order)
     : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
   const topicSummaryRows: Array<{
@@ -75,59 +78,61 @@ const OverviewPage = () => {
   return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
-    <div className="OverviewPage">
-      <div className="header-row">
-        <div className="header-row-left">
-          <CWText type="h3" fontWeight="semiBold">
-            Overview
-          </CWText>
-          <CWButton
-            className="latest-button"
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Latest Threads"
-            iconLeft="home"
-            onClick={() => {
-              navigate('/discussions');
-            }}
-          />
+    <CWPageLayout>
+      <div className="OverviewPage">
+        <div className="header-row">
+          <div className="header-row-left">
+            <CWText type="h3" fontWeight="semiBold">
+              Overview
+            </CWText>
+            <CWButton
+              className="latest-button"
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Latest Threads"
+              iconLeft="home"
+              onClick={() => {
+                navigate('/discussions');
+              }}
+            />
+          </div>
+          {!isWindowSmallInclusive && (
+            <CWButton
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Create thread"
+              iconLeft="plus"
+              onClick={() => {
+                navigate('/new/discussion');
+              }}
+              disabled={!hasJoinedCommunity}
+            />
+          )}
         </div>
-        {!isWindowSmallInclusive && (
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Create thread"
-            iconLeft="plus"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        )}
-      </div>
-      <div className="column-headers-row">
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="threads-header-row-text"
-        >
-          Topic
-        </CWText>
-        <div className="threads-header-container">
+        <div className="column-headers-row">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Recent threads
+            Topic
           </CWText>
+          <div className="threads-header-container">
+            <CWText
+              type="h5"
+              fontWeight="semiBold"
+              className="threads-header-row-text"
+            >
+              Recent threads
+            </CWText>
+          </div>
         </div>
+        <CWDivider />
+        {topicSummaryRows.map((row, i) => (
+          <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
+        ))}
       </div>
-      <CWDivider />
-      {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
-      ))}
-    </div>
+    </CWPageLayout>
   );
 };
 

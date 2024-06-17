@@ -28,12 +28,19 @@ class SnapshotController {
     this._proposals = newProposals;
   }
 
-  public async init(space: string) {
+  public async init(space: string): Promise<void> {
     if (this._initializing) return;
     this._initializing = true;
     try {
       this._space = await getSpace(space);
       this._proposals = await getProposals(space);
+      if (this._space === null) {
+        this._initializing = false;
+        this._initialized = true;
+        this.snapshotEmitter.emit('initialized');
+        // @ts-expect-error StrictNullChecks
+        return null;
+      }
     } catch (e) {
       console.error(`Failed to fetch snapshot proposals: ${e.message}`);
     }
@@ -45,6 +52,7 @@ class SnapshotController {
 
   public async deinit() {
     this._initialized = false;
+    // @ts-expect-error StrictNullChecks
     this._space = null;
     this._proposals = [];
 

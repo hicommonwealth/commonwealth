@@ -2,6 +2,7 @@ import { Actor, InvalidState, command, dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Chance } from 'chance';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   CreateGroup,
   Errors,
@@ -13,7 +14,7 @@ chai.use(chaiAsPromised);
 const chance = Chance();
 
 describe('Group lifecycle', () => {
-  let id;
+  let id: string;
   let actor: Actor;
 
   const payload = {
@@ -27,35 +28,18 @@ describe('Group lifecycle', () => {
     topics: [],
   };
 
-  before(async () => {
-    const [node] = await seed(
-      'ChainNode',
-      { contracts: [] },
-      // { mock: true, log: true },
-    );
-    const [user] = await seed(
-      'User',
-      { isAdmin: true, selected_community_id: null },
-      // { mock: true, log: true },
-    );
-    const [community] = await seed(
-      'Community',
-      {
-        chain_node_id: node?.id,
-        Addresses: [
-          {
-            role: 'admin',
-            user_id: user!.id,
-            profile_id: undefined,
-          },
-        ],
-        CommunityStakes: [],
-        topics: [],
-        groups: [],
-        discord_config_id: null,
-      },
-      // { mock: true, log: true },
-    );
+  beforeAll(async () => {
+    const [node] = await seed('ChainNode', {});
+    const [user] = await seed('User', { isAdmin: true });
+    const [community] = await seed('Community', {
+      chain_node_id: node?.id,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: user!.id,
+        },
+      ],
+    });
 
     id = community!.id!;
     actor = {
@@ -64,23 +48,22 @@ describe('Group lifecycle', () => {
     };
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should create group when none exists', async () => {
+  test('should create group when none exists', async () => {
     const results = await command(CreateGroup(), { id, actor, payload });
     expect(results?.groups?.at(0)?.metadata).to.includes(payload.metadata);
   });
 
-  it('should fail creation when group with same id found', () => {
+  test('should fail creation when group with same id found', () => {
     expect(
       command(CreateGroup(), { id, actor, payload }),
     ).to.eventually.be.rejectedWith(InvalidState);
   });
 
-  it('should fail creation when sending invalid topics', () => {
-    console.log('testing');
+  test('should fail creation when sending invalid topics', () => {
     const invalid = {
       id,
       actor,
@@ -100,7 +83,7 @@ describe('Group lifecycle', () => {
     );
   });
 
-  it('should fail creation when community reached max number of groups allowed', async () => {
+  test('should fail creation when community reached max number of groups allowed', async () => {
     // create max groups
     for (let i = 1; i < MAX_GROUPS_PER_COMMUNITY; i++) {
       await command(CreateGroup(), {

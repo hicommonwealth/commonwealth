@@ -1,4 +1,4 @@
-import { ChainBase, ChainType, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import {
   tester,
   tokenBalanceCache,
@@ -6,8 +6,10 @@ import {
   type DB,
   type UserInstance,
 } from '@hicommonwealth/model';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { assert } from 'chai';
 import Sinon from 'sinon';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { Errors } from '../../../server/controllers/server_communities_methods/update_community';
 import { buildUser } from '../../unit/unitHelpers';
@@ -17,9 +19,10 @@ const baseRequest: CommunityAttributes = {
   name: 'ethereum',
   chain_node_id: 1,
   default_symbol: 'EDG',
+  // @ts-expect-error StrictNullChecks
   network: null,
   base: ChainBase.Substrate,
-  icon_url: '/static/img/protocols/edg.png',
+  icon_url: 'assets/img/protocols/edg.png',
   active: true,
   type: ChainType.Chain,
   social_links: [],
@@ -28,15 +31,16 @@ const baseRequest: CommunityAttributes = {
 describe('UpdateChain Tests', () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('Correctly updates chain', async () => {
+  test('Correctly updates chain', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -58,6 +62,7 @@ describe('UpdateChain Tests', () => {
     response = await controller.updateCommunity({
       ...baseRequest,
       directory_page_enabled: false,
+      // @ts-expect-error StrictNullChecks
       directory_page_chain_node_id: null,
       type: ChainType.Chain,
       user: user,
@@ -68,7 +73,8 @@ describe('UpdateChain Tests', () => {
     assert.equal(response.type, 'chain');
   });
 
-  it('Fails if namespace present but no transaction hash', async () => {
+  test('Fails if namespace present but no transaction hash', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -87,7 +93,8 @@ describe('UpdateChain Tests', () => {
     }
   });
 
-  it('Fails if chain node of community does not match supported chain', async () => {
+  test('Fails if chain node of community does not match supported chain', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -109,11 +116,12 @@ describe('UpdateChain Tests', () => {
 
   // skipped because public chainNodes are unreliable. If you want to test this functionality, update the goleri
   // chainNode and do it locally.
-  xit('Correctly updates namespace', async () => {
+  test.skip('Correctly updates namespace', async () => {
     Sinon.stub(tokenBalanceCache, 'getBalances').resolves({
       '0x42D6716549A78c05FD8EF1f999D52751Bbf9F46a': '1',
     });
 
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,

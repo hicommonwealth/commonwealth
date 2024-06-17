@@ -1,5 +1,6 @@
-import { AppError, BalanceType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import { UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -16,6 +17,7 @@ export type UpdateChainNodeOptions = {
   url: string;
   name?: string;
   bech32?: string;
+  slip44?: number;
   balanceType?: string;
   eth_chain_id?: number;
   cosmos_chain_id?: string;
@@ -30,6 +32,7 @@ export async function __updateChainNode(
     url,
     name,
     bech32,
+    slip44,
     balanceType,
     eth_chain_id,
     cosmos_chain_id,
@@ -60,13 +63,17 @@ export async function __updateChainNode(
 
   const chainNode = await this.models.ChainNode.findOne({ where });
 
+  // @ts-expect-error StrictNullChecks
   const updatedChainNode = await chainNode.update({
     url,
     name,
     bech32,
+    slip44,
   });
 
+  // @ts-expect-error StrictNullChecks
   await chainNode.save();
 
+  // @ts-expect-error StrictNullChecks
   return { updated_node_id: updatedChainNode.id };
 }

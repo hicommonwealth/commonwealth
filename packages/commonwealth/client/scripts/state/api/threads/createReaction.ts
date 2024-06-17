@@ -1,11 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import app from 'state';
+import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
   threadId: number;
-  chainId: string;
+  communityId: string;
 }
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
@@ -40,9 +43,14 @@ const createReaction = async ({
 };
 
 const useCreateThreadReactionMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: IuseCreateThreadReactionMutation) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+
+  const { markTrainingActionAsComplete } =
+    useUserOnboardingSliderMutationStore();
+
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
@@ -54,11 +62,20 @@ const useCreateThreadReactionMutation = ({
         voting_weight: response.data.result.calculated_voting_weight || 1,
       };
       updateThreadInAllCaches(
-        chainId,
+        communityId,
         threadId,
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+
+      if (userOnboardingEnabled) {
+        const profileId = app?.user?.addresses?.[0]?.profile?.id;
+        markTrainingActionAsComplete(
+          UserTrainingCardTypes.GiveUpvote,
+          // @ts-expect-error StrictNullChecks
+          profileId,
+        );
+      }
     },
   });
 };

@@ -8,10 +8,11 @@ import EthereumChain from './chain';
 export default class EthereumAccount extends Account {
   // TODO: @Timothee this function is not used so this entire object is useless
   public get balance(): Promise<EthereumCoin> {
+    // @ts-expect-error StrictNullChecks
     if (!this._Chain) return; // TODO
     return this._Chain.api.eth
       .getBalance(this.address)
-      .then((v) => new EthereumCoin('ETH', new BN(v), false));
+      .then((v) => new EthereumCoin('ETH', new BN(Number(v)), false));
   }
 
   protected _initialized: Promise<boolean>;
@@ -28,7 +29,7 @@ export default class EthereumAccount extends Account {
     ChainInfo: EthereumChain,
     Accounts: EthereumAccounts,
     address: string,
-    ignoreProfile = true
+    ignoreProfile = true,
   ) {
     super({ community: app.chain.meta, address, ignoreProfile });
     if (!app.isModuleReady) {

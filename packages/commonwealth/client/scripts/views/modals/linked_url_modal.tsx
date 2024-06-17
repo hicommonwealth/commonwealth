@@ -8,16 +8,16 @@ import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
 } from 'state/api/threads';
-import type Thread from '../../models/Thread';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import type Thread from '../../models/Thread';
+import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 
 type LinkedUrlModalProps = {
   urlLinks: Link[];
@@ -32,18 +32,20 @@ export const LinkedUrlModal = ({
   onModalClose,
   onSave,
 }: LinkedUrlModalProps) => {
+  // @ts-expect-error <StrictNullChecks/>
   const [newTitle, setNewTitle] = useState<string>(null);
+  // @ts-expect-error <StrictNullChecks/>
   const [newUrl, setNewUrl] = useState<string>(null);
   const [tempLinkedUrls, setTempLinkedUrls] =
     useState<Array<Link>>(initialUrlLinks);
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
 
@@ -51,14 +53,14 @@ export const LinkedUrlModal = ({
     const { toAdd, toDelete } = getAddedAndDeleted(
       tempLinkedUrls,
       initialUrlLinks,
-      'identifier'
+      'identifier',
     );
     let links: Thread['links'];
 
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Web,
@@ -71,7 +73,7 @@ export const LinkedUrlModal = ({
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          chainId: app.activeChainId(),
+          communityId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Web,
@@ -84,6 +86,7 @@ export const LinkedUrlModal = ({
 
       onModalClose();
 
+      // @ts-expect-error <StrictNullChecks/>
       if (links && onSave) {
         onSave(links);
       }
@@ -96,12 +99,12 @@ export const LinkedUrlModal = ({
 
   const handleSelectThread = (selectedUrl: Link) => {
     const isSelected = tempLinkedUrls.find(
-      ({ identifier }) => selectedUrl.identifier === identifier
+      ({ identifier }) => selectedUrl.identifier === identifier,
     );
 
     const updatedLinkedUrls = isSelected
       ? tempLinkedUrls.filter(
-          ({ identifier }) => selectedUrl.identifier !== identifier
+          ({ identifier }) => selectedUrl.identifier !== identifier,
         )
       : [...tempLinkedUrls, selectedUrl];
 

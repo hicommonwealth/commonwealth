@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/core';
+import { ContentType } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -8,6 +8,7 @@ import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import Thread from '../../../models/Thread';
+import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
@@ -51,9 +52,19 @@ export const CreateComment = ({
 
   const editorValue = getTextFromDelta(contentDelta);
 
-  const author = app.user.activeAccount;
-
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
+
+  const { data: profile } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [app.user.activeAccount?.community?.id],
+    profileAddresses: [app.user.activeAccount?.address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!app.user.activeAccount?.profile,
+  });
+
+  if (app.user.activeAccount) {
+    app.user.activeAccount.profile = profile?.[0];
+  }
+  const author = app.user.activeAccount;
 
   const {
     mutateAsync: createComment,
@@ -81,12 +92,17 @@ export const CreateComment = ({
         threadId: rootThread.id,
         communityId,
         profile: {
+          // @ts-expect-error <StrictNullChecks/>
           id: app.user.activeAccount.profile.id,
           address: app.user.activeAccount.address,
+          // @ts-expect-error <StrictNullChecks/>
           avatarUrl: app.user.activeAccount.profile.avatarUrl,
+          // @ts-expect-error <StrictNullChecks/>
           name: app.user.activeAccount.profile.name,
+          // @ts-expect-error <StrictNullChecks/>
           lastActive: app.user.activeAccount.profile.lastActive?.toString(),
         },
+        // @ts-expect-error <StrictNullChecks/>
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -146,6 +162,7 @@ export const CreateComment = ({
             parentType={parentType}
             canComment={canComment}
             handleSubmitComment={handleSubmitComment}
+            // @ts-expect-error <StrictNullChecks/>
             errorMsg={errorMsg}
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}

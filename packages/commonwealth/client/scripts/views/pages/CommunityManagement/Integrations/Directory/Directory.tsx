@@ -5,9 +5,9 @@ import app from 'state';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from 'views/components/component_kit/new_designs/CWTypeaheadSelectList';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './Directory.scss';
 
 const Directory = () => {
@@ -80,6 +80,7 @@ const Directory = () => {
             <CWLabel label="Enter or select your community's chain" />
             <CWTypeaheadSelectList
               options={chainNodeOptionsSorted}
+              // @ts-expect-error <StrictNullChecks/>
               defaultValue={defaultOption}
               placeholder="Select community's chain"
               onChange={(selectedOption) =>

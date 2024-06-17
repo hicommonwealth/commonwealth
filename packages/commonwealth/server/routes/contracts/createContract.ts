@@ -1,5 +1,4 @@
-import type { ContractType } from '@hicommonwealth/core';
-import { AbiType, AppError } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type {
   ChainNodeAttributes,
   ContractAbiInstance,
@@ -8,6 +7,8 @@ import type {
   DB,
 } from '@hicommonwealth/model';
 import { hashAbi } from '@hicommonwealth/model';
+import type { ContractType } from '@hicommonwealth/shared';
+import { AbiType } from '@hicommonwealth/shared';
 import { Transaction } from 'sequelize';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
@@ -44,6 +45,7 @@ async function findOrCreateAbi(
 ): Promise<ContractAbiInstance> {
   let contractAbi: ContractAbiInstance;
   const abiHash = hashAbi(abi);
+  // @ts-expect-error StrictNullChecks
   contractAbi = await models.ContractAbi.findOne({
     where: {
       abi_hash: abiHash,
@@ -53,6 +55,7 @@ async function findOrCreateAbi(
 
   if (!contractAbi) {
     contractAbi = await models.ContractAbi.create(
+      // @ts-expect-error StrictNullChecks
       {
         abi: abi,
         abi_hash: abiHash,
@@ -119,6 +122,7 @@ const createContract = async (
 
   if (oldContract && oldContract.address === address) {
     if (abi && !oldContract.abi_id) {
+      // @ts-expect-error StrictNullChecks
       const contract_abi = await findOrCreateAbi(abiAsRecord, models);
       oldContract.abi_id = contract_abi.id;
       await oldContract.save();
@@ -175,6 +179,7 @@ const createContract = async (
       await models.CommunityContract.create(
         {
           community_id,
+          // @ts-expect-error StrictNullChecks
           contract_id: contract.id,
         },
         { transaction: t },
@@ -183,11 +188,13 @@ const createContract = async (
 
     const globalTemplate = await models.Template.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         abi_id: contract.abi_id,
       },
     });
 
     return success(res, {
+      // @ts-expect-error StrictNullChecks
       contract: contract.toJSON(),
       hasGlobalTemplate: !!globalTemplate,
     });
@@ -208,6 +215,7 @@ const createContract = async (
       await models.CommunityContract.create(
         {
           community_id,
+          // @ts-expect-error StrictNullChecks
           contract_id: contract.id,
         },
         { transaction: t },
@@ -216,11 +224,13 @@ const createContract = async (
 
     const globalTemplate = await models.Template.findOne({
       where: {
+        // @ts-expect-error StrictNullChecks
         abi_id: contract.abi_id,
       },
     });
 
     return success(res, {
+      // @ts-expect-error StrictNullChecks
       contract: contract.toJSON(),
       hasGlobalTemplate: !!globalTemplate,
     });

@@ -13,8 +13,8 @@ import {
   getStatusClass,
   getStatusText,
 } from '../../components/ProposalCard/helpers';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { cancelProposal } from '../../components/proposals/helpers';
 import { ThreadLink } from './proposal_header_links';
 
@@ -33,9 +33,10 @@ export const AaveCancelButton = (props: AaveCancelButtonProps) => {
 
   return (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={!proposal.isCancellable || votingModalOpen}
       onClick={(e) =>
+        // @ts-expect-error <StrictNullChecks/>
         cancelProposal(e, toggleVotingModal, proposal, onModalClose)
       }
       label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
@@ -52,9 +53,10 @@ export const CompoundCancelButton = (props: CompoundCancelButtonProps) => {
 
   return (
     <CWButton
-      buttonType="primary-red"
+      buttonType="destructive"
       disabled={proposal.completed || votingModalOpen}
       onClick={(e) =>
+        // @ts-expect-error <StrictNullChecks/>
         cancelProposal(e, toggleVotingModal, proposal, onModalClose)
       }
       label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
@@ -72,6 +74,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
   const forceRerender = useForceRerender();
   const [linkedThreads, setLinkedThreads] =
+    // @ts-expect-error <StrictNullChecks/>
     useState<{ id: number; title: string }[]>(null);
 
   useEffect(() => {

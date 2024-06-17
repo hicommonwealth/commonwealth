@@ -1,4 +1,4 @@
-import { ChainNetwork } from '@hicommonwealth/core';
+import { ChainNetwork, slugify } from '@hicommonwealth/shared';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useForceRerender from 'hooks/useForceRerender';
@@ -23,7 +23,7 @@ import {
   useCosmosProposalTallyQuery,
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
-import { slugify } from 'utils';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -52,6 +52,7 @@ const ViewProposalPage = ({
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
+  // @ts-expect-error <StrictNullChecks/>
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const [title, setTitle] = useState<string>(proposal?.title);
   const [description, setDescription] = useState<string>(proposal?.description);
@@ -65,12 +66,16 @@ const ViewProposalPage = ({
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
+  // @ts-expect-error <StrictNullChecks/>
   useCosmosProposalVotesQuery(proposal, +poolData);
   useCosmosProposalTallyQuery(proposal);
+  // @ts-expect-error <StrictNullChecks/>
   useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     setProposal(cosmosProposal);
+    // @ts-expect-error <StrictNullChecks/>
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
   }, [cosmosProposal]);
@@ -96,6 +101,7 @@ const ViewProposalPage = ({
     if (!typeProp) {
       resolvedType = chainToProposalSlug(app.chain.meta);
     }
+    // @ts-expect-error <StrictNullChecks/>
     return idToProposal(resolvedType, proposalId);
   };
 
@@ -122,7 +128,9 @@ const ViewProposalPage = ({
       );
 
       if (!foundProposal?.ipfsData) {
+        // @ts-expect-error <StrictNullChecks/>
         foundProposal.ipfsDataReady.once('ready', () =>
+          // @ts-expect-error <StrictNullChecks/>
           setProposal(foundProposal),
         );
       } else {
@@ -132,6 +140,7 @@ const ViewProposalPage = ({
       const foundProposal = cachedCompoundProposals?.find(
         (p) => p.identifier === proposalId,
       );
+      // @ts-expect-error <StrictNullChecks/>
       setProposal(foundProposal);
     }
   }, [
@@ -201,59 +210,64 @@ const ViewProposalPage = ({
   };
 
   return (
-    <CWContentPage
-      showSkeleton={!proposal}
-      title={proposalTitle}
-      author={proposal?.author}
-      createdAt={proposal?.createdAt}
-      updatedAt={null}
-      subHeader={
-        <ProposalSubheader
-          proposal={proposal as SubheaderProposalType}
-          toggleVotingModal={toggleVotingModal}
-          votingModalOpen={votingModalOpen}
-        />
-      }
-      body={() =>
-        proposalDescription && (
-          <CollapsibleProposalBody doc={proposalDescription} />
-        )
-      }
-      subBody={
-        <>
-          {proposal instanceof AaveProposal && (
-            <AaveViewProposalDetail proposal={proposal} />
-          )}
-          {isFetchingMetadata ? (
-            <Skeleton height={94.4} />
-          ) : (
-            !_.isEmpty(metadata) && (
-              <JSONDisplay data={metadata} title="Metadata" />
-            )
-          )}
-          {!_.isEmpty(proposal?.data?.messages) && (
-            <JSONDisplay data={proposal.data.messages} title="Messages" />
-          )}
-          {proposal instanceof CosmosProposal &&
-            proposal?.data?.type === 'communitySpend' && (
-              <JSONDisplay
-                data={{
-                  recipient: proposal.data?.spendRecipient,
-                  amount: proposal.data?.spendAmount,
-                }}
-                title="Community Spend Proposal"
-              />
-            )}
-          <VotingResults proposal={proposal} />
-          <VotingActions
-            onModalClose={onModalClose}
-            proposal={proposal}
+    <CWPageLayout>
+      <CWContentPage
+        showSkeleton={!proposal}
+        title={proposalTitle}
+        author={proposal?.author}
+        createdAt={proposal?.createdAt}
+        // @ts-expect-error <StrictNullChecks/>
+        updatedAt={null}
+        subHeader={
+          <ProposalSubheader
+            proposal={proposal as SubheaderProposalType}
             toggleVotingModal={toggleVotingModal}
             votingModalOpen={votingModalOpen}
           />
-        </>
-      }
-    />
+        }
+        body={() =>
+          proposalDescription && (
+            <CollapsibleProposalBody doc={proposalDescription} />
+          )
+        }
+        subBody={
+          <>
+            {proposal instanceof AaveProposal && (
+              <AaveViewProposalDetail proposal={proposal} />
+            )}
+            {isFetchingMetadata ? (
+              <Skeleton height={94.4} />
+            ) : (
+              !_.isEmpty(metadata) && (
+                <JSONDisplay data={metadata} title="Metadata" />
+              )
+            )}
+            {!_.isEmpty(proposal?.data?.messages) && (
+              <JSONDisplay data={proposal.data.messages} title="Messages" />
+            )}
+            {proposal instanceof CosmosProposal &&
+              proposal?.data?.type === 'communitySpend' && (
+                <JSONDisplay
+                  data={{
+                    recipient: proposal.data?.spendRecipient,
+                    amount: proposal.data?.spendAmount,
+                  }}
+                  title="Community Spend Proposal"
+                />
+              )}
+            {/* @ts-expect-error StrictNullChecks*/}
+            <VotingResults proposal={proposal} />
+            <VotingActions
+              onModalClose={onModalClose}
+              // @ts-expect-error <StrictNullChecks/>
+              proposal={proposal}
+              toggleVotingModal={toggleVotingModal}
+              votingModalOpen={votingModalOpen}
+            />
+          </>
+        }
+      />
+    </CWPageLayout>
   );
 };
 

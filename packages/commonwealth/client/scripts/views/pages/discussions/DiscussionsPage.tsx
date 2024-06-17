@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -6,11 +6,9 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import useFetchThreadsQuery, {
-  featuredFilterQueryMap,
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import { slugify } from 'utils';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -22,12 +20,18 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
+import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -35,6 +39,7 @@ type DiscussionsPageProps = {
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const communityId = app.activeChainId();
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
@@ -42,6 +47,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
+  // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -52,15 +58,19 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId,
   });
+  const contestAddress = searchParams.get('contest');
+  const contestStatus = searchParams.get('status');
 
-  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const containerRef = useRef();
+
+  useBrowserWindow({});
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: communityId,
+    communityId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
@@ -84,12 +94,18 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicId,
       stage: stageName ?? undefined,
       includePinnedThreads: true,
-      ...(featuredFilterQueryMap[featuredFilter] && {
-        orderBy: featuredFilterQueryMap[featuredFilter],
+      ...(featuredFilter && {
+        orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
+      // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
+      // @ts-expect-error <StrictNullChecks/>
+      contestAddress,
+      // @ts-expect-error <StrictNullChecks/>
+      contestStatus,
+      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -102,7 +118,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
       return null;
 
-    if (isOnArchivePage && t.archivedAt) return null;
+    if (isOnArchivePage && !t.archivedAt) return null;
 
     return t;
   });
@@ -110,11 +126,18 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
-    <div className="DiscussionsPage">
+    // @ts-expect-error <StrictNullChecks/>
+    <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
+      <DiscussionsFeedDiscovery
+        orderBy={featuredFilter}
+        community={communityId}
+        includePinnedThreads={true}
+      />
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
         data={isInitialLoading ? [] : filteredThreads}
+        customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -165,8 +188,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             />
           );
         }}
-        endReached={() => hasNextPage && fetchNextPage()}
-        overscan={200}
+        endReached={() => {
+          hasNextPage && fetchNextPage();
+        }}
+        overscan={50}
         components={{
           // eslint-disable-next-line react/no-multi-comp
           EmptyPlaceholder: () => (
@@ -178,12 +203,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           // eslint-disable-next-line react/no-multi-comp
           Header: () => (
             <>
-              {isWindowSmallInclusive && (
-                <div className="mobileBreadcrumbs">
-                  <Breadcrumbs />
-                </div>
-              )}
+              <Breadcrumbs />
+              {userOnboardingEnabled && <UserTrainingSlider />}
+              <AdminOnboardingSlider />
               <HeaderWithFilters
+                // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}
                 stage={stageName}
                 featuredFilter={featuredFilter}
@@ -205,7 +229,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
         }}
       />
-    </div>
+    </CWPageLayout>
   );
 };
 

@@ -1,5 +1,4 @@
-import { IDiscordMeta } from '@hicommonwealth/core';
-import { CommentAttributes } from '@hicommonwealth/model';
+import { CommentAttributes, IDiscordMeta } from '@hicommonwealth/model';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -19,12 +18,16 @@ export const updateCommentHandler = async (
   res: TypedResponse<UpdateCommentResponse>,
 ) => {
   const { user, address } = req;
+  // @ts-expect-error StrictNullChecks
   const { id: commentId } = req.params;
+  // @ts-expect-error StrictNullChecks
   const { body: commentBody, discord_meta: discordMeta } = req.body;
 
   const [updatedComment, notificationOptions] =
     await controllers.comments.updateComment({
+      // @ts-expect-error StrictNullChecks
       user,
+      // @ts-expect-error StrictNullChecks
       address,
       commentId,
       commentBody,

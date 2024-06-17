@@ -1,14 +1,15 @@
-import { BalanceSourceType } from '@hicommonwealth/core';
 import {
   AddressAttributes,
   GetBalancesOptions,
   GroupAttributes,
 } from '@hicommonwealth/model';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
+import { describe, test } from 'vitest';
 
 describe('makeGetBalancesOptions', () => {
-  it('should return empty array', () => {
+  test('should return empty array', () => {
     const groups: GroupAttributes[] = [];
     const addresses: AddressAttributes[] = [];
     const result = makeGetBalancesOptions(
@@ -19,7 +20,7 @@ describe('makeGetBalancesOptions', () => {
     expect(result).to.have.length(0);
   });
 
-  it('should build options for batch fetching balances (single address)', () => {
+  test('should build options for batch fetching balances (single address)', () => {
     const groups: GroupAttributes[] = [
       {
         id: 1,
@@ -120,7 +121,7 @@ describe('makeGetBalancesOptions', () => {
     expect(result);
   });
 
-  it('should build options for batch fetching balances (multiple addresses)', () => {
+  test('should build options for batch fetching balances (multiple addresses)', () => {
     const groups: GroupAttributes[] = [
       {
         id: 1,

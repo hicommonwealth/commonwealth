@@ -1,16 +1,14 @@
-import {
-  AppError,
-  NotificationCategories,
-  commonProtocol,
-} from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
-import { REACTION_WEIGHT_OVERRIDE } from 'server/config';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { config } from '../../config';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_controller';
@@ -88,9 +86,11 @@ export async function __createThreadReaction(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       thread.community_id,
       address,
+      PermissionEnum.CREATE_THREAD_REACTION,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
@@ -98,8 +98,8 @@ export async function __createThreadReaction(
   }
 
   let calculatedVotingWeight: number | null = null;
-  if (REACTION_WEIGHT_OVERRIDE) {
-    calculatedVotingWeight = REACTION_WEIGHT_OVERRIDE;
+  if (config.REACTION_WEIGHT_OVERRIDE) {
+    calculatedVotingWeight = config.REACTION_WEIGHT_OVERRIDE;
   } else {
     // calculate voting weight
     const stake = await this.models.CommunityStake.findOne({
@@ -118,10 +118,13 @@ export async function __createThreadReaction(
       );
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          community.namespace,
+          // @ts-expect-error StrictNullChecks
+          community.namespace_address,
           stake.stake_id,
+          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
+          // @ts-expect-error StrictNullChecks
           node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
@@ -136,10 +139,12 @@ export async function __createThreadReaction(
     reaction,
     address_id: address.id,
     community_id: thread.community_id,
+    // @ts-expect-error StrictNullChecks
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
+    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -148,6 +153,7 @@ export async function __createThreadReaction(
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({
     where: reactionWhere,
+    // @ts-expect-error StrictNullChecks
     defaults: reactionData,
   });
 
@@ -157,6 +163,7 @@ export async function __createThreadReaction(
       categoryId: NotificationCategories.NewReaction,
       data: {
         created_at: new Date(),
+        // @ts-expect-error StrictNullChecks
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',

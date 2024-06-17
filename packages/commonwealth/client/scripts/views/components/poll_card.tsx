@@ -7,13 +7,13 @@ import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
+import { CWButton } from './component_kit/new_designs/CWButton';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from './component_kit/new_designs/CWModal';
-import { CWButton } from './component_kit/new_designs/cw_button';
 
 import 'components/poll_card.scss';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -71,10 +71,13 @@ export const PollOptions = ({
             <CWRadioButton
               key={option.value}
               checked={
+                // @ts-expect-error <StrictNullChecks/>
                 selectedOptions.length > 0 &&
+                // @ts-expect-error <StrictNullChecks/>
                 option.value === selectedOptions[0]
               }
               groupName="votes"
+              // @ts-expect-error <StrictNullChecks/>
               onChange={() => setSelectedOptions([option.value])}
               label={option.label}
               value={option.value}
@@ -243,9 +246,11 @@ export const ResultsSection = ({
           <CWText
             type="caption"
             className={getClasses<{ clickable?: boolean }>({
+              // @ts-expect-error <StrictNullChecks/>
               clickable: onResultsClick && hasVotes,
             })}
             onClick={
+              // @ts-expect-error <StrictNullChecks/>
               onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
             }
           >

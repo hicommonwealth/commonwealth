@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-expressions */
-import { ChainBase, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { personalSign } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { bech32ToHex } from 'shared/utils';
 import * as siwe from 'siwe';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
@@ -21,16 +22,16 @@ const { expect } = chai;
 describe('API Tests', () => {
   let server: TestServer;
 
-  before('reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('address tests', () => {
-    it('should call the /api/status route', async () => {
+    test('should call the /api/status route', async () => {
       const res = await chai
         .request(server.app)
         .get('/api/status')
@@ -38,9 +39,8 @@ describe('API Tests', () => {
       expect(res.body).to.not.be.null;
     });
 
-    it('should create an ETH address', async () => {
-      const keypair = wallet.generate();
-      const address = `0x${keypair.getAddress().toString('hex')}`;
+    test('should create an ETH address', async () => {
+      const { address } = server.seeder.generateEthAddress();
       const chain = 'ethereum';
       const wallet_id = 'metamask';
       const res = await chai
@@ -61,7 +61,7 @@ describe('API Tests', () => {
       expect(res.body.result.verification_token).to.be.not.null;
     });
 
-    it('should create a Cosmos address', async () => {
+    test('should create a Cosmos address', async () => {
       const address = 'osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6';
       const expectedHex = await bech32ToHex(address);
       const community_id = 'osmosis';
@@ -85,8 +85,8 @@ describe('API Tests', () => {
       expect(res.body.result.verification_token).to.be.not.null;
     });
 
-    it('should verify an ETH address', async () => {
-      const { keypair, address } = server.seeder.generateEthAddress();
+    test('should verify an ETH address', async () => {
+      const { privateKey, address } = server.seeder.generateEthAddress();
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
       let res = await chai
@@ -114,7 +114,6 @@ describe('API Tests', () => {
       const nonce = siwe.generateNonce();
       const domain = 'https://commonwealth.test';
       const siweMessage = createSiweMessage(message, domain, nonce);
-      const privateKey = keypair.getPrivateKey();
       const signatureData = personalSign({ privateKey, data: siweMessage });
       const signature = `${domain}/${nonce}/${signatureData}`;
       res = await chai

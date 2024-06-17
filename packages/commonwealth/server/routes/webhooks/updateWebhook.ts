@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
+import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { validateOwner } from 'server/util/validateOwner';
-import { DB } from '../../../../../libs/model/src/models';
 import Errors from './errors';
 
 const updateWebhook = async (
@@ -26,6 +26,7 @@ const updateWebhook = async (
 
   const isAdmin = await validateOwner({
     models: models,
+    // @ts-expect-error StrictNullChecks
     user,
     communityId: webhook.community_id,
     allowAdmin: true,

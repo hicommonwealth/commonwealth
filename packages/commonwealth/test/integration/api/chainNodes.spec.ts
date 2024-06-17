@@ -1,21 +1,24 @@
-import { BalanceType, dispose } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
+import { BalanceType } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     models = await tester.seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('Creates new ChainNode when', async () => {
+  test('Creates new ChainNode when', async () => {
+    // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
@@ -32,13 +35,17 @@ describe('ChainNode Tests', () => {
     const createdNode = await models.ChainNode.findOne({
       where: { id: resp.node_id },
     });
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.url, 'wss://');
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.name, 'asd');
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.balance_type, 'ethereum');
+    // @ts-expect-error StrictNullChecks
     assert.equal(createdNode.eth_chain_id, 123);
   });
 
-  it('adds eth chain node to db', async () => {
+  test('adds eth chain node to db', async () => {
     await models.ChainNode.destroy({ where: { eth_chain_id: 123 } });
     assert.equal(
       await models.ChainNode.count({
@@ -63,7 +70,7 @@ describe('ChainNode Tests', () => {
     );
   });
 
-  it('fails when duplicate eth_chain_id', async () => {
+  test('fails when duplicate eth_chain_id', async () => {
     const ethChainId = 555;
     assert.equal(
       await models.ChainNode.count({
@@ -99,7 +106,7 @@ describe('ChainNode Tests', () => {
     }
   });
 
-  it('adds cosmos chain node to db', async () => {
+  test('adds cosmos chain node to db', async () => {
     const cosmosChainId = 'osmosiz';
     assert.equal(
       await models.ChainNode.count({
@@ -114,6 +121,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Osmosis',
         url: 'https://osmosis-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -125,7 +133,7 @@ describe('ChainNode Tests', () => {
     );
   });
 
-  it('fails when duplicate cosmos_chain_id', async () => {
+  test('fails when duplicate cosmos_chain_id', async () => {
     const cosmosChainId = 'cosmoz';
     assert.equal(
       await models.ChainNode.count({
@@ -140,6 +148,7 @@ describe('ChainNode Tests', () => {
         balance_type: BalanceType.Cosmos,
         name: 'Cosmos1',
         url: 'https://cosmos-mainnet.g.com/2',
+        slip44: 118,
       },
     });
 
@@ -150,6 +159,7 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Cosmos2',
           url: 'https://cosmos-mainnet.g.com/3',
+          slip44: 118,
         },
       });
 
@@ -168,9 +178,14 @@ describe('ChainNode Tests', () => {
     );
   });
 
-  it('Updates a ChainNode from community controller', async () => {
-    it('EVM', async () => {
+  describe('Updates a ChainNode from community controller', () => {
+    beforeAll(async () => {
+      await tester.bootstrap_testing(true);
+    });
+
+    test('EVM', async () => {
       const eth_chain_id = 123;
+      // @ts-expect-error StrictNullChecks
       const controller = new ServerCommunitiesController(models, null);
 
       const [createdNode] = await models.ChainNode.findOrCreate({
@@ -188,6 +203,7 @@ describe('ChainNode Tests', () => {
       }) as UserInstance;
 
       await controller.updateChainNode({
+        // @ts-expect-error StrictNullChecks
         id: createdNode.id,
         user,
         url: 'https://eth-mainnet.g.com/3',
@@ -198,14 +214,19 @@ describe('ChainNode Tests', () => {
       const updatedNode = await models.ChainNode.findOne({
         where: { eth_chain_id },
       });
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.url, 'https://eth-mainnet.g.com/3');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.name, 'Ethereum3');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.balance_type, 'ethereum');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.eth_chain_id, 123);
     });
 
-    it('Cosmos', async () => {
+    test('Cosmos', async () => {
       const cosmos_chain_id = 'osmosiz';
+      // @ts-expect-error StrictNullChecks
       const controller = new ServerCommunitiesController(models, null);
       const user: UserInstance = buildUser({
         models,
@@ -225,24 +246,33 @@ describe('ChainNode Tests', () => {
           balance_type: BalanceType.Cosmos,
           name: 'Osmosis',
           url: 'https://osmosis-mainnet.g.com/2',
+          slip44: 118,
         },
       });
 
       await controller.updateChainNode({
+        // @ts-expect-error StrictNullChecks
         id: createdNode.id,
         user,
         url: 'https://cosmos-mainnet.g.com/4',
         name: 'mmm',
         cosmos_chain_id,
+        slip44: 118,
       });
 
       const updatedNode = await models.ChainNode.findOne({
         where: { cosmos_chain_id },
       });
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.url, 'https://cosmos-mainnet.g.com/4');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.name, 'mmm');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.balance_type, 'cosmos');
+      // @ts-expect-error StrictNullChecks
       assert.equal(updatedNode.cosmos_chain_id, 'osmosiz');
+      // @ts-expect-error StrictNullChecks
+      assert.equal(updatedNode.slip44, 118);
     });
   });
 });

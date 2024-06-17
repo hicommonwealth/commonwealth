@@ -1,14 +1,14 @@
+import { type DB } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
-
-import { DB } from '@hicommonwealth/model';
-import { SENDGRID_API_KEY } from '../config';
+import { config } from '../config';
 
 import {
+  __emit,
   EmitOptions,
   EmitResult,
-  __emit,
 } from './server_notifications_methods/emit';
-sgMail.setApiKey(SENDGRID_API_KEY);
+// @ts-expect-error StrictNullChecks
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 
 /**
  * Implements methods related to notifications

@@ -39,7 +39,6 @@ export const CWBreadcrumbs = ({
                     onMouseEnter={handleInteraction}
                     onMouseLeave={handleInteraction}
                     type="caption"
-                    fontWeight="medium"
                     className={clsx({
                       'disable-active-cursor': index === 0,
                       'current-text': isCurrent,
@@ -53,8 +52,8 @@ export const CWBreadcrumbs = ({
             ) : (
               <CWText
                 type="caption"
-                fontWeight="medium"
                 className={isCurrent ? 'current-text' : 'parent-text'}
+                // @ts-expect-error <StrictNullChecks/>
                 onClick={isCurrent ? undefined : () => navigate(path)}
               >
                 {truncateText(label)}

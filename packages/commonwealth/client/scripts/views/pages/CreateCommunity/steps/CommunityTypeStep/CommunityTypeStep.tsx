@@ -17,7 +17,7 @@ import {
 import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyticsTrack';
 import { communityTypeOptions } from './helpers';
 
-import { ChainBase } from '@hicommonwealth/core';
+import { ChainBase } from '@hicommonwealth/shared';
 import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTypeStep.scss';
 
@@ -74,11 +74,12 @@ const CommunityTypeStep = ({
     const pickedAddress = app.user.addresses.find(
       ({ addressId }) => String(addressId) === address,
     );
+    // @ts-expect-error <StrictNullChecks/>
     setSelectedAddress(pickedAddress);
     handleContinue();
   };
 
-  const [blastOption, ethereumOption, ...advancedOptions] =
+  const [baseOption, blastOption, ethereumOption, ...advancedOptions] =
     communityTypeOptions;
 
   return (
@@ -92,15 +93,28 @@ const CommunityTypeStep = ({
       </CWText>
       <div className="advanced-options-container">
         <CWCommunitySelector
+          key={baseOption.type}
+          type={baseOption.type}
+          title={baseOption.title}
+          description={baseOption.description}
+          isRecommended={baseOption.isRecommended}
+          onClick={() =>
+            handleCommunitySelection({
+              type: baseOption.type,
+              chainBase: baseOption.chainBase,
+            })
+          }
+        />
+        <CWCommunitySelector
           key={blastOption.type}
           type={blastOption.type}
           title={blastOption.title}
           description={blastOption.description}
-          isRecommended={true}
+          isRecommended={blastOption.isRecommended}
           onClick={() =>
             handleCommunitySelection({
               type: blastOption.type,
-              chainBase: ethereumOption.chainBase,
+              chainBase: blastOption.chainBase,
             })
           }
         />
@@ -110,7 +124,7 @@ const CommunityTypeStep = ({
           type={ethereumOption.type}
           title={ethereumOption.title}
           description={ethereumOption.description}
-          isRecommended={false}
+          isRecommended={ethereumOption.isRecommended}
           onClick={() =>
             handleCommunitySelection({
               type: ethereumOption.type,

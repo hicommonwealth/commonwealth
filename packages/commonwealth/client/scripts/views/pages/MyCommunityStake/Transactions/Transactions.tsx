@@ -1,21 +1,29 @@
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import CommunityInfo from 'client/scripts/views/components/component_kit/CommunityInfo';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { formatAddressShort } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import CommunityInfo from '../common/CommunityInfo';
-import { transactionHistoryData } from '../common/sampleData'; // TODO: get data from API
-import { FilterOptions } from '../types';
+import { TransactionsProps } from '../types';
 import './Transactions.scss';
-import { CWIcon } from '/views/components/component_kit/cw_icons/cw_icon';
-import { CWTable } from '/views/components/component_kit/new_designs/CWTable';
 
-const columnInfo = [
+const columns: CWTableColumnInfo[] = [
   {
     key: 'community',
     header: 'Community',
     numeric: false,
     sortable: true,
     hasCustomSortValue: true,
+  },
+  {
+    key: 'chain',
+    header: 'Chain',
+    numeric: true,
+    sortable: true,
   },
   {
     key: 'address',
@@ -63,51 +71,32 @@ const columnInfo = [
   },
 ];
 
-type TransactionsProps = {
-  filterOptions: FilterOptions;
-};
-
-const Transactions = ({ filterOptions }: TransactionsProps) => {
-  const [filteredTransactionHistoryData, setFilteredTransactionHistoryData] =
-    useState(transactionHistoryData);
-
-  useEffect(() => {
-    let tempFilteredData = [...transactionHistoryData];
-
-    // filter by community name and symbol
-    if (filterOptions.searchText) {
-      tempFilteredData = tempFilteredData.filter((tx) =>
-        (tx.community.symbol + tx.community.name)
-          .toLowerCase()
-          .includes(filterOptions.searchText.toLowerCase()),
-      );
-    }
-
-    // filter by selected address
-    if (filterOptions?.selectedAddress?.value) {
-      tempFilteredData = tempFilteredData.filter(
-        (tx) =>
-          tx.address.toLowerCase() ===
-          filterOptions.selectedAddress.value.toLowerCase(),
-      );
-    }
-
-    setFilteredTransactionHistoryData(tempFilteredData);
-  }, [filterOptions]);
+const Transactions = ({ transactions }: TransactionsProps) => {
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'timestamp',
+    initialSortDirection: APIOrderDirection.Desc,
+  });
 
   return (
     <section className="Transactions">
       <CWTable
-        columnInfo={columnInfo}
-        rowData={filteredTransactionHistoryData.map((tx) => ({
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
+        rowData={transactions.map((tx) => ({
           ...tx,
           community: {
+            // @ts-expect-error <StrictNullChecks/>
             sortValue: tx.community.name.toLowerCase(),
             customElement: (
               <CommunityInfo
-                symbol={tx.community.symbol}
-                iconUrl={tx.community.iconUrl}
+                symbol={tx.community.default_symbol}
+                // @ts-expect-error <StrictNullChecks/>
+                iconUrl={tx.community.icon_url}
+                // @ts-expect-error <StrictNullChecks/>
                 name={tx.community.name}
+                // @ts-expect-error <StrictNullChecks/>
                 communityId={tx.community.id}
               />
             ),

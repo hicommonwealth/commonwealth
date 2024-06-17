@@ -1,11 +1,19 @@
-import { AppError, CommunityCategoryType } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { CommunityCategoryType } from '@hicommonwealth/shared';
+import { updateTags } from 'server/util/updateTags';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+
+const Errors = {
+  InvalidCommunityId: 'Invalid Community Id',
+  InvalidTagIds: 'Some tag ids are invalid',
+};
 
 type UpdateCommunityCategoryReq = {
   selected_tags: { [tag: string]: boolean };
   community_id: string;
+  tag_ids?: number[];
   auth: string;
   jwt: string;
 };
@@ -25,7 +33,7 @@ const updateCommunityCategory = async (
       id: req.body.community_id,
     },
   });
-  if (!community) throw new AppError('Invalid Community Id');
+  if (!community) throw new AppError(Errors.InvalidCommunityId);
 
   const existingCategories = community.category
     ? (community.category as string[])
@@ -36,6 +44,10 @@ const updateCommunityCategory = async (
       Object.keys(CommunityCategoryType).includes(tag)
     );
   });
+
+  const { tag_ids } = req.body;
+  // @ts-expect-error StrictNullChecks
+  await updateTags(tag_ids, models, community.id, 'community_id');
 
   if (
     existingCategories.length !== updateCategories.length ||

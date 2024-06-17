@@ -2,13 +2,20 @@
 
 .Transactions {
   .Table {
+    .header-text {
+      text-align: start;
+    }
     .data-container {
       vertical-align: middle;
+
+      .numeric {
+        text-align: start;
+      }
 
       .timestamp {
         display: block;
         width: 100%;
-        text-align: end;
+        text-align: start;
         cursor: pointer;
       }
 

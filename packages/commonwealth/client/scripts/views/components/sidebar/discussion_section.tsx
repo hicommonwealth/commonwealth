@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'components/sidebar/index.scss';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -43,15 +44,30 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const DiscussionSection = () => {
+interface DiscussionSectionProps {
+  isContestAvailable: boolean;
+  topicIdsIncludedInContest: number[];
+}
+
+export const DiscussionSection = ({
+  isContestAvailable,
+  topicIdsIncludedInContest,
+}: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+
+  const contestsEnabled = useFlag('contest');
+
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
     location,
   );
   const matchesOverviewRoute = matchRoutes(
     [{ path: '/overview' }, { path: ':scope/overview' }],
+    location,
+  );
+  const matchesContestsRoute = matchRoutes(
+    [{ path: '/contests' }, { path: ':scope/contests' }],
     location,
   );
   const matchesArchivedRoute = matchRoutes(
@@ -74,6 +90,7 @@ export const DiscussionSection = () => {
   const topics = (topicsData || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
+    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const discussionsLabel = ['vesuvius', 'olympus'].includes(app.activeChainId())
@@ -141,6 +158,37 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
+    // @ts-expect-error <StrictNullChecks/>
+    ...(contestsEnabled && isContestAvailable
+      ? [
+          {
+            title: 'Contests',
+            containsChildren: false,
+            displayData: null,
+            hasDefaultToggle: false,
+            isActive: !!matchesContestsRoute,
+            isVisible: true,
+            isUpdated: true,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
+              resetSidebarState();
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/contests`,
+                app.activeChainId(),
+                () => {
+                  setDiscussionsToggleTree(
+                    `children.Contests.toggledState`,
+                    toggle,
+                  );
+                },
+              );
+            },
+          },
+        ]
+      : []),
+    // @ts-expect-error <StrictNullChecks/>
     {
       title: 'Overview',
       containsChildren: false,
@@ -163,6 +211,7 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
+    // @ts-expect-error <StrictNullChecks/>
     app.activeChainId() === 'near' && {
       title: 'Sputnik Daos',
       containsChildren: false,
@@ -194,6 +243,9 @@ export const DiscussionSection = () => {
 
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
+      const topicInvolvedInActiveContest =
+        contestsEnabled && topicIdsIncludedInContest.includes(topic.id);
+
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
         containsChildren: false,
@@ -220,6 +272,9 @@ export const DiscussionSection = () => {
           );
         },
         displayData: null,
+        ...(topicInvolvedInActiveContest
+          ? { rightIcon: <CWIcon iconName="trophy" iconSize="small" /> }
+          : {}),
       };
       discussionsGroupData.push(discussionSectionGroup);
     }

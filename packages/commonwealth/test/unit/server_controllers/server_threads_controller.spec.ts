@@ -1,8 +1,12 @@
 import { commonProtocol } from '@hicommonwealth/model';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
+import { afterEach, beforeEach, describe, test } from 'vitest';
+
+chai.use(chaiAsPromised);
 
 describe('ServerThreadsController', () => {
   beforeEach(() => {
@@ -14,7 +18,7 @@ describe('ServerThreadsController', () => {
     Sinon.restore();
   });
   describe('#createThreadReaction', () => {
-    it('should create a thread reaction (new reaction)', async () => {
+    test('should create a thread reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         // for findAllRoles
@@ -89,6 +93,7 @@ describe('ServerThreadsController', () => {
           transaction: async (callback) => {
             return callback();
           },
+          query: sandbox.stub().resolves([]),
         },
       };
       const user = {
@@ -148,6 +153,7 @@ describe('ServerThreadsController', () => {
 
       expect(notificationOptions).to.have.property('excludeAddresses');
       const { excludeAddresses } = notificationOptions;
+      // @ts-expect-error StrictNullChecks
       expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(analyticsOptions).to.include({
@@ -156,7 +162,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    it('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -187,6 +193,9 @@ describe('ServerThreadsController', () => {
         Thread: {
           findOne: sandbox.stub().resolves(null),
         },
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
@@ -213,7 +222,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 123');
     });
 
-    it('should throw an error (thread archived)', async () => {
+    test('should throw an error (thread archived)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -276,7 +285,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread is archived');
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
@@ -311,6 +320,9 @@ describe('ServerThreadsController', () => {
             community_id: 'ethereum',
           }),
         },
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([false, 'big ban err']),
@@ -338,9 +350,10 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
-    it('should throw error (token balance)', async () => {
+    test('should throw error (token balance)', () => {
       const sandbox = Sinon.createSandbox();
-      const fakeMembershipReject = 'fake membership rejection message';
+      const fakeMembershipReject =
+        'User does not have permission to perform action CREATE_THREAD_REACTION';
       const db = {
         Reaction: {
           findOne: sandbox.stub().resolves({
@@ -437,6 +450,9 @@ describe('ServerThreadsController', () => {
           ]),
           bulkCreate: sandbox.stub().resolves([]),
         },
+        sequelize: {
+          query: sandbox.stub().resolves([]),
+        },
       };
       const banCache = {
         checkBan: sandbox.stub().resolves([true, null]),
@@ -470,7 +486,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#createThreadComment', () => {
-    it('should create a thread comment', async () => {
+    test('should create a thread comment', async () => {
       const address = {
         id: 1,
         address: '0x123',
@@ -509,6 +525,7 @@ describe('ServerThreadsController', () => {
         },
         sequelize: {
           transaction: async (callback: () => any) => callback(),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async (data) => {
@@ -549,6 +566,7 @@ describe('ServerThreadsController', () => {
         await serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -558,7 +576,7 @@ describe('ServerThreadsController', () => {
         });
 
       expect(newComment).to.include({
-        thread_id: String(threadId),
+        thread_id: threadId,
         text,
         address_id: address.id,
         community_id: 'ethereum',
@@ -570,7 +588,7 @@ describe('ServerThreadsController', () => {
       });
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -590,6 +608,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -632,6 +651,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -642,7 +662,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: big bad error');
     });
 
-    it('should throw error (thread not found)', async () => {
+    test('should throw error (thread not found)', () => {
       const db = {
         Thread: {
           findOne: async () => null,
@@ -660,6 +680,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -702,6 +723,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -712,7 +734,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found');
     });
 
-    it('should throw an error (thread archived)', async () => {
+    test('should throw an error (thread archived)', () => {
       const user = {};
       const address = {
         id: 1,
@@ -750,6 +772,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async (data) => ({
@@ -789,6 +812,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -799,7 +823,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread is archived');
     });
 
-    it('should throw error (thread readonly)', async () => {
+    test('should throw error (thread readonly)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -820,6 +844,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -862,6 +887,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
+          // @ts-expect-error StrictNullChecks
           parentId,
           threadId,
           text,
@@ -872,7 +898,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
     });
 
-    it('should throw error (invalid parent)', async () => {
+    test('should throw error (invalid parent)', () => {
       const parentId = 3;
 
       const db = {
@@ -894,6 +920,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => Promise.resolve([]),
         },
         Comment: {
           create: async () => ({}),
@@ -949,7 +976,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Invalid parent');
     });
 
-    it('should throw error (nesting too deep)', async () => {
+    test('should throw error (nesting too deep)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1026,7 +1053,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#deleteThread', () => {
-    it('should delete a thread', async () => {
+    test('should delete a thread', async () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1056,6 +1083,7 @@ describe('ServerThreadsController', () => {
         },
         sequelize: {
           transaction: async (callback) => callback({}),
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -1088,7 +1116,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
     });
 
-    it('should should throw error (thread not found)', async () => {
+    test('should should throw error (thread not found)', () => {
       const db = {
         Thread: {
           findOne: async () => null,
@@ -1103,6 +1131,9 @@ describe('ServerThreadsController', () => {
         },
         Subscription: {
           destroy: async () => ({}),
+        },
+        sequelize: {
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -1128,7 +1159,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Thread not found: 1');
     });
 
-    it('should throw error (banned)', async () => {
+    test('should throw error (banned)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1149,6 +1180,9 @@ describe('ServerThreadsController', () => {
         },
         Subscription: {
           destroy: async () => ({}),
+        },
+        sequelize: {
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -1174,7 +1208,7 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: bad');
     });
 
-    it('should throw error (not owned)', async () => {
+    test('should throw error (not owned)', () => {
       const db = {
         Thread: {
           findOne: async () => ({
@@ -1194,6 +1228,9 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        sequelize: {
+          query: () => Promise.resolve([]),
         },
       };
       const banCache = {
@@ -1222,7 +1259,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#createThread', () => {
-    it('should create a thread', async () => {
+    test('should create a thread', async () => {
       let data = {};
 
       const db = {
@@ -1370,6 +1407,7 @@ describe('ServerThreadsController', () => {
         author_address: '0x123',
         author_community_id: 'ethereum',
       });
+      // @ts-expect-error StrictNullChecks
       expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });

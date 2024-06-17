@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/core';
+import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { setActiveAccount } from 'controllers/app/login';
 import * as siwe from 'siwe';
@@ -60,9 +60,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     });
 
     return {
-      number: hexToNumber(block.number),
+      number: Number(hexToNumber(block.number)),
       hash: block.hash,
-      timestamp: hexToNumber(block.timestamp),
+      timestamp: Number(hexToNumber(block.timestamp)),
     };
   }
 

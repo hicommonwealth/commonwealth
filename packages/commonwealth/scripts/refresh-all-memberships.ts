@@ -1,16 +1,17 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import { cache } from '@hicommonwealth/core';
+import { cache, dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import * as dotenv from 'dotenv';
-import { REDIS_URL } from '../server/config';
+import { fileURLToPath } from 'url';
+import { config } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import BanCache from '../server/util/banCheckCache';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 async function main() {
-  REDIS_URL && cache(new RedisCache(REDIS_URL));
+  config.CACHE.REDIS_URL && cache(new RedisCache(config.CACHE.REDIS_URL));
 
   const banCache = new BanCache(models);
 
@@ -29,15 +30,22 @@ async function main() {
     if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
       continue;
     await groupsController.refreshCommunityMemberships({
+      // @ts-expect-error StrictNullChecks
       communityId: community.id,
     });
   }
 
-  console.log(`done- refreshed ${communitiesResult.length} communities`);
-  process.exit(0);
+  log.info(`done- refreshed ${communitiesResult.length} communities`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main()
+  .then(
+    async () =>
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      await dispose()('EXIT', true),
+  )
+  .catch((err) => {
+    log.error('Failed to refresh all membership', err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('ERROR', true);
+  });
