@@ -38,12 +38,14 @@ To manage RabbitMQ configuration and connections we use [Rascal](https://www.npm
 
 ## Policies & error handling
 
-When subscribing to Rascal, you must provide a policy. A policy is a strictly typed object that encodes functions to handle various message types. As part of that policy, you can find a retry strategy for that policy when you subscribe.
+When subscribing to Rascal, you must provide a policy. A policy is a strictly typed object that encodes functions to handle various message types. As part of that policy, you can define a retry strategy for that policy when you subscribe.
 
-A retry strategy is defined by the `buildRetryStrategy` function. Strategies include:
+Several retry strategies exist by default; they are only unavailable if a RetryStrategy is defined for a policy without use of the `buildRetryStrategy` function.
 
-- `deadLetterQueue`: Houses all unprocessable events
-  - If the schema of the event is incorrectly structure, the event is deadLetterQueued
+Strategies include:
+
+- `deadLetterQueue`: Houses all unprocessable events (messages)
+  - If the event's schema is incorrectly structured, the event is deadLetterQueued
   - If other strategies fail, our strategy of last resort is to try three times, then send to deadLetterQueue
 - `customRetryStrategy`: Custom retry strategies may be provided to handle edgecases; they are written as conditional statements within the policy.
 
@@ -64,10 +66,6 @@ One strategy involves caching and de-duplicating of incoming events. A preferabl
 Our system implements a Transactional Outbox pattern for recovering from total RabbitMQ failures (e.g. cloud outages). Events are stored in an `Outbox` table, functioning essentially as an event log, so that they can be replayed and reprocessed (re-queued) post-failure.
 
 Data placed in the Outbox table includes a `relayed` number column in the database. If the publication of data is successful, the `relayed` column value is incremented. If the publication fails, `relayed` is not incremented, and a background process will retry queueing the data again at a later time. Once a record has a `relayed` value of 5 (subject to change) the system will send a critical alert to the backend developers so that the issue can be manually resolved. This method of ensuring consistency is used when we wish to retain the data inserted into the original database regardless of what happens to the publishing.
-
-### Preventing data inconsistencies across deployments and migrations
-
-Direct write/update access should be restricted for any tables that share data with another service. No connection except the app itself (sequelize) should have write access to the database. As part of the deployment process, at the end of each migration execution, the script described above is executed to ensure that any changes made within migrations are copied over to the databases of the other services ([see Heroku docs](https://devcenter.heroku.com/articles/release-phase#specifying-release-phase-tasks)).
 
 ## Management panel
 
