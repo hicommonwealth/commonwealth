@@ -38,7 +38,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           private_url: string;
         }>(
           `
-            SELECT cm.contest_address, cn.url, cn.private_url
+            SELECT coalesce(cn.private_url, cn.url) as url, cn.private_url
             FROM "Communities" c
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -61,9 +61,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           return;
         }
 
-        const chainNodeUrl =
-          activeContestManagers[0]!.private_url ||
-          activeContestManagers[0]!.url;
+        const chainNodeUrl = activeContestManagers[0]!.url;
 
         const addressesToProcess = activeContestManagers.map(
           (c) => c.contest_address,
@@ -118,7 +116,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           content_id: number;
         }>(
           `
-            SELECT cn.url, cn.private_url, cm.contest_address, added.content_id
+            SELECT coalesce(cn.private_url, cn.url) as url, cm.contest_address, added.content_id
             FROM "Communities" c
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -157,9 +155,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           );
         }
 
-        const chainNodeUrl =
-          activeContestManagersWithoutVote[0]!.private_url ||
-          activeContestManagersWithoutVote[0]!.url;
+        const chainNodeUrl = activeContestManagersWithoutVote[0]!.url;
 
         log.debug(
           `ThreadUpvoted: contest managers to process: ${JSON.stringify(

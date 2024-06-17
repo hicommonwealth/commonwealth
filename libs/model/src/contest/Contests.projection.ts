@@ -7,10 +7,10 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { models, sequelize } from '../database';
+import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
@@ -177,7 +177,7 @@ async function getContestDetails(
 }
 
 /**
- * Updates contest score (eventually winners)
+ * Updates contest score
  */
 async function updateScore(
   contest_address: string,
@@ -198,10 +198,6 @@ async function updateScore(
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    log.debug(
-      `updateScore: contest details: ${JSON.stringify(details, null, 2)}`,
-    );
-
     const { scores, contestBalance } =
       await protocol.contestHelper.getContestScore(
         details.url,
@@ -209,9 +205,6 @@ async function updateScore(
         is_current_contest ? undefined : contest_id,
         oneOff,
       );
-
-    // log.debug(`updateScore scores: ${JSON.stringify(scores, null, 2)}`);
-    // log.debug(`updateScore contestBalance: ${Number(contestBalance)}`);
 
     const prizePool =
       (Number(contestBalance) * Number(details.prize_percentage)) / 100;
@@ -238,62 +231,6 @@ async function updateScore(
           contest_id,
         },
       },
-    );
-  } catch (err) {
-    err instanceof Error
-      ? log.error(err.message, err)
-      : log.error(err as string);
-  }
-}
-
-/**
- * Makes sure all previous contests have an updated score
- */
-async function updateEndedContests(
-  contest_address: string,
-  contest_id: number,
-) {
-  try {
-    const outdated = await models.Contest.findAll({
-      where: {
-        contest_address: contest_address,
-        contest_id: { [Op.lt]: contest_id },
-        [Op.or]: [
-          { score_updated_at: { [Op.is]: null } },
-          { score_updated_at: { [Op.lte]: sequelize.col('end_time') } },
-        ],
-      },
-    });
-    log.debug(
-      `updateEndedContests: found ${outdated.length} contests to process`,
-    );
-    if (outdated.length === 0) {
-      return;
-    }
-    const promises = outdated.map((contest) =>
-      updateScore(contest_address, contest.contest_id, false).then(
-        () => contest,
-      ),
-    );
-    const results = await Promise.allSettled(promises);
-    for (const r of results) {
-      if (r.status === 'fulfilled') {
-        log.debug(
-          `successfully updated score for contest address ${contest_address} at contest ID ${r.value.contest_id}`,
-        );
-      }
-    }
-    const errors = results
-      .filter(({ status }) => status === 'rejected')
-      .map(
-        (result) =>
-          (result as PromiseRejectedResult).reason || '<unknown reason>',
-      );
-    if (errors.length > 0) {
-      throw new Error(`updateScore failed with errors: ${errors.join(', ')}"`);
-    }
-    log.debug(
-      `updateEndedContests: successfully updated score for ${results.length} contests`,
     );
   } catch (err) {
     err instanceof Error

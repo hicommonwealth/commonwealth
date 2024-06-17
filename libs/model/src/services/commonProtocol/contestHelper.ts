@@ -1,14 +1,10 @@
-import { AppError, logger } from '@hicommonwealth/core';
+import { AppError } from '@hicommonwealth/core';
 import { Mutex } from 'async-mutex';
-import { fileURLToPath } from 'url';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
 
 const nonceMutex = new Mutex();
 
@@ -208,8 +204,6 @@ export const getContestScore = async (
   ]);
 
   const winnerIds: string[] = contestData[0] as string[];
-
-  log.debug(`getContestScore balance: ${Number(contestData[1])}`);
 
   if (winnerIds.length == 0) {
     throw new Error(
