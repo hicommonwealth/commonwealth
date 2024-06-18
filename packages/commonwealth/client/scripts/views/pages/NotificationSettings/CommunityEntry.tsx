@@ -51,7 +51,7 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
   ]);
 
   return (
-    <div key={communityInfo?.id} className="notification-row">
+    <div key={communityInfo?.id} className="notification-row CommunityEntry">
       <div className="notification-row-header">
         <div className="left-content-container">
           <div className="avatar-and-name">
@@ -61,7 +61,7 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
               communityId={communityInfo.id}
             />
 
-            <div style={{ marginLeft: 'auto' }}>
+            <div className="toggle">
               <CWToggle checked={subscribed} onChange={toggleSubscription} />
             </div>
           </div>
