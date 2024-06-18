@@ -56,7 +56,6 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>3', app.chain.id);
     const url = `${
       window.location.origin
     }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
