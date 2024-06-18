@@ -124,9 +124,6 @@ const NotificationSettings = () => {
               .sort((x, y) => x[0].localeCompare(y[0]))
               .map(([communityName]) => {
                 const communityInfo = app?.config.chains.getById(communityName);
-
-                if (!communityInfo?.id) return null; // handles incomplete loading case
-
                 return (
                   <CommunityEntry
                     key={communityInfo.id}
