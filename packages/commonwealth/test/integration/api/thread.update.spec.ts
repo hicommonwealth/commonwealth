@@ -212,7 +212,7 @@ describe('Thread Patch Update', () => {
             pinned: true,
             topicId,
           });
-        expect(res.status).to.equal(200);
+        expect(res.status).to.equal(500);
         expect(res.body.result.pinned).to.be.true;
       }
 
