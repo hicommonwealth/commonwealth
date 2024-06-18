@@ -73,7 +73,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
-
+  const commonWallet = app.user.commonWallet;
   return (
     <>
       <div className="community-menu">
@@ -81,7 +81,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           <>
             <AccountConnectionIndicator
               connected={!!activeAccount}
-              address={activeAccount?.address}
+              address={commonWallet ? `AAWallet` : activeAccount?.address}
+              commonWalletAddress={commonWallet}
             />
 
             {communityStakeEnabled && stakeEnabled && (

@@ -35,7 +35,7 @@ const buyStake = async ({
     namespace,
     stakeId,
     amount,
-    walletAddress,
+    ethChainId === 11155111 ? 'common' : walletAddress,
   );
 };
 

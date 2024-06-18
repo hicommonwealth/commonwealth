@@ -139,12 +139,13 @@ const StakeExchangeForm = ({
           chainId: `${community.ChainNode.ethChainId}`,
         }),
       });
-
-      await createStakeTransaction.mutateAsync({
-        id: '1',
-        transaction_hash: txReceipt.transactionHash,
-        community_id: communityId,
-      });
+      if (ethChainId !== 11155111) {
+        await createStakeTransaction.mutateAsync({
+          id: '1',
+          transaction_hash: txReceipt.transactionHash,
+          community_id: communityId,
+        });
+      }
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
@@ -187,12 +188,13 @@ const StakeExchangeForm = ({
         // @ts-expect-error <StrictNullChecks/>
         ethChainId,
       });
-
-      await createStakeTransaction.mutateAsync({
-        id: '1',
-        transaction_hash: txReceipt.transactionHash,
-        community_id: communityId,
-      });
+      if (ethChainId !== 11155111) {
+        await createStakeTransaction.mutateAsync({
+          id: '1',
+          transaction_hash: txReceipt.transactionHash,
+          community_id: communityId,
+        });
+      }
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);

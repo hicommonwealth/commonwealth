@@ -10,8 +10,12 @@ import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
+import { ChainBase } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { EventEmitter } from 'events';
+import { getCreateWallet } from '../../helpers/ContractHelpers/aaWallet';
+import MetamaskWebWalletController from '../app/webWallets/metamask_web_wallet';
+import WebWalletController from '../app/web_wallets';
 import NotificationsController from './notifications';
 
 export class UserController {
@@ -24,6 +28,15 @@ export class UserController {
 
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
+  }
+
+  private _commonWallet: string;
+  public get commonWallet(): string {
+    return this._commonWallet;
+  }
+
+  private _setCommonWallet(address: string): void {
+    this._commonWallet = address;
   }
 
   private _id: number;
@@ -296,6 +309,32 @@ export class UserController {
         const community = app.config.chains.getById(options.community);
         if (!community) {
           throw new Error('unexpected community');
+        }
+        console.log(community.ChainNode.ethChainId);
+        if (community.ChainNode.ethChainId === 11155111) {
+          let commonWallet;
+          try {
+            console.log(this.activeAccount.address);
+            commonWallet = await getCreateWallet(
+              this.activeAccount.address,
+              '',
+            );
+            console.log(commonWallet);
+          } catch {
+            console.log('inside sig');
+            const wallet = WebWalletController.Instance.availableWallets(
+              ChainBase.Ethereum,
+            )[0] as MetamaskWebWalletController;
+            alert('Creating Common Wallet');
+            const sig = await wallet.signCommonWallet(
+              this.activeAccount.address,
+            );
+            commonWallet = await getCreateWallet(
+              this.activeAccount.address,
+              sig,
+            );
+          }
+          this._setCommonWallet(commonWallet);
         }
         this.setSelectedCommunity(community);
       }

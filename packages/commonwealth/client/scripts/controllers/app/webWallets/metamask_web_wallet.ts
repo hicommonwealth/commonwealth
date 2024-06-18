@@ -93,6 +93,20 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return `${domain}/${nonce}/${signature}`;
   }
 
+  public async signCommonWallet(address: string): Promise<string> {
+    if (!this.enabled) {
+      await this.enable();
+    }
+    const signature = await this._web3.givenProvider.request({
+      method: 'personal_sign',
+      params: [
+        address,
+        'I approve commonwealth to create a smart wallet on behalf of this account',
+      ],
+    });
+    return signature;
+  }
+
   // ACTIONS
   public async enable(forceChainId?: string) {
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active

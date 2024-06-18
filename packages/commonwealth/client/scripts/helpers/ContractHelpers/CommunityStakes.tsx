@@ -2,6 +2,7 @@ import { toBigInt } from 'web3-utils';
 import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
+import { sendUserOpTransaction } from './aaWallet';
 
 export type PriceData = {
   price: string;
@@ -14,6 +15,7 @@ class CommunityStakes extends ContractBase {
   namespaceFactory: NamespaceFactory;
   addressCache = { address: '0x0', name: '' };
   chainId?: string;
+  contractAddress1: string;
 
   constructor(
     contractAddress: string,
@@ -24,6 +26,7 @@ class CommunityStakes extends ContractBase {
     super(contractAddress, communityStakesAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
     this.chainId = chainId;
+    this.contractAddress1 = contractAddress;
   }
 
   async initialize(withWallet: boolean = false): Promise<void> {
@@ -129,28 +132,39 @@ class CommunityStakes extends ContractBase {
       .call();
     let txReceipt;
     try {
-      txReceipt = await this.contract.methods
-        .buyStake(namespaceAddress, id, amount)
-        .send({
-          value: totalPrice,
-          from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
-      try {
-        // @ts-expect-error StrictNullChecks
-        await this.web3.currentProvider.request({
-          method: 'wallet_watchAsset',
-          params: {
-            type: 'ERC1155',
-            options: {
-              address: namespaceAddress,
-              tokenId: id.toString(),
+      if (walletAddress !== 'common') {
+        txReceipt = await this.contract.methods
+          .buyStake(namespaceAddress, id, amount)
+          .send({
+            value: totalPrice,
+            from: walletAddress,
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          });
+        try {
+          // @ts-expect-error StrictNullChecks
+          await this.web3.currentProvider.request({
+            method: 'wallet_watchAsset',
+            params: {
+              type: 'ERC1155',
+              options: {
+                address: namespaceAddress,
+                tokenId: id.toString(),
+              },
             },
-          },
-        });
-      } catch (error) {
-        console.log('Failed to watch asset in MM, watch manaually', error);
+          });
+        } catch (error) {
+          console.log('Failed to watch asset in MM, watch manaually', error);
+        }
+      } else {
+        const tx = this.contract.methods
+          .buyStake(namespaceAddress, id, amount)
+          .encodeABI();
+        txReceipt = await sendUserOpTransaction(
+          this.contractAddress1,
+          totalPrice,
+          tx,
+        );
       }
     } catch {
       throw new Error('Transaction failed');
@@ -178,13 +192,20 @@ class CommunityStakes extends ContractBase {
     const namespaceAddress = await this.getNamespaceAddress(name);
     let txReceipt;
     try {
-      txReceipt = await this.contract.methods
-        .sellStake(namespaceAddress, id.toString(), amount.toString())
-        .send({
-          from: walletAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+      if (walletAddress !== 'common') {
+        txReceipt = await this.contract.methods
+          .sellStake(namespaceAddress, id.toString(), amount.toString())
+          .send({
+            from: walletAddress,
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          });
+      } else {
+        const tx = this.contract.methods
+          .sellStake(namespaceAddress, id.toString(), amount.toString())
+          .encodeABI();
+        txReceipt = await sendUserOpTransaction(this.contractAddress1, 0, tx);
+      }
     } catch {
       throw new Error('Transaction failed');
     }

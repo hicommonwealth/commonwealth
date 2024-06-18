@@ -10,17 +10,26 @@ import './AccountConnectionIndicator.scss';
 interface AccountConnectionIndicatorProps {
   connected: boolean;
   address: string;
+  commonWalletAddress?: string;
 }
 
 const AccountConnectionIndicator = ({
   connected,
   address,
+  commonWalletAddress,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
   return (
     <>
-      <div className="AccountConnectionIndicator">
+      <div
+        className="AccountConnectionIndicator"
+        onClick={() =>
+          copyToClipboard(commonWalletAddress ? commonWalletAddress : address)
+        }
+      >
         {connected && (
           <div className="status-address">
             <CWText fontWeight="medium" type="caption" className="status-text">
@@ -30,6 +39,11 @@ const AccountConnectionIndicator = ({
               <div className={clsx('status-light', { connected })} />
               <CWIdentificationTag address={address} />
             </div>
+            {commonWalletAddress && (
+              <div className="status-row">
+                <CWText>Click to copy Commmon Wallet address</CWText>
+              </div>
+            )}
           </div>
         )}
 

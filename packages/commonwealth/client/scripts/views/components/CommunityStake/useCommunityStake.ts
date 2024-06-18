@@ -20,13 +20,13 @@ const chainIds = {
   1397: 'Blast',
   1322: 'Base',
   37: 'Ethereum',
+  11155111: 'Sepolia',
 };
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
   const { isLoggedIn } = useUserLoggedIn();
-
   const activeCommunityId = community?.id || app?.chain?.id;
   const activeCommunityNamespace =
     community?.namespace || app?.chain?.meta?.namespace;
@@ -36,6 +36,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   const activeAccountAddress = app?.user?.activeAccount?.address;
   const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
+  const commonWalletAddress = app?.user?.commonWallet;
 
   const {
     isInitialLoading: communityStakeLoading,
@@ -66,7 +67,9 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     stakeId: commonProtocol.STAKE_ID,
     apiEnabled,
     chainRpc,
-    walletAddress: walletAddress || activeAccountAddress,
+    walletAddress: commonWalletAddress
+      ? commonWalletAddress
+      : walletAddress || activeAccountAddress,
     keepPreviousData: true,
     // @ts-expect-error StrictNullChecks
     ethChainId,
