@@ -27,8 +27,6 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
-import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -170,10 +168,8 @@ export async function main(
     banCache,
     globalActivityCache,
     dbValidationService,
+    cacheDecorator,
   );
-
-  setupCosmosProxies(app, cacheDecorator);
-  setupIpfsProxy(app, cacheDecorator);
 
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);

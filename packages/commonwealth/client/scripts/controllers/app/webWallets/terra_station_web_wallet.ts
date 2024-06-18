@@ -3,6 +3,7 @@ import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
+import app from 'state';
 
 type TerraAddress = {
   address: string;
@@ -66,7 +67,9 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const url = `${
+      window.location.origin
+    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();

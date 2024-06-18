@@ -352,8 +352,9 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
           new CosmosExtension({
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
-            // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
+            rpcUrl: `${
+              document.location.origin
+            }${app.serverUrl()}/magicCosmosProxy/${chain}`,
           }),
         ],
   });

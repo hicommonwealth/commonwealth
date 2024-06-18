@@ -56,7 +56,10 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>3', app.chain.id);
+    const url = `${
+      window.location.origin
+    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -99,7 +102,9 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain.network}`;
+      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+        app.chain.id
+      }`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();

@@ -5,6 +5,7 @@ import type {
 } from '@terra-money/wallet-provider';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import app from 'state';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
@@ -48,7 +49,9 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const url = `${
+      window.location.origin
+    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
