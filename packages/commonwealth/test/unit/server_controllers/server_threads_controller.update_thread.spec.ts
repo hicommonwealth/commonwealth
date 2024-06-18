@@ -103,10 +103,13 @@ describe('ServerThreadsController', () => {
             Address: address,
             address_id: address.id,
             version_history: ['{"body": ""}'],
-            update: async () => null,
+            update: () => ({ id: 1, created_at: Date.now() }),
             toJSON: () => ({}),
           }),
-          update: () => null,
+          update: () => ({ id: 1, created_at: Date.now() }),
+        },
+        ThreadVersionHistory: {
+          create: () => null,
         },
         Topic: {
           findOne: async () => ({
