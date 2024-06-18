@@ -203,7 +203,9 @@ export async function updateScore(contest_address: string, contest_id: number) {
       );
 
     const prizePool =
-      (Number(contestBalance) * Number(details.prize_percentage)) / 100;
+      (Number(contestBalance) *
+        Number(oneOff ? 100 : details.prize_percentage)) /
+      100;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
