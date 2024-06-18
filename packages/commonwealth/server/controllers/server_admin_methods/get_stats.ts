@@ -63,7 +63,7 @@ export async function __getStats(
     [{ result: averageAddressesPerCommunity }],
     [{ result: populatedCommunities }],
   ] = await Promise.all([
-    this.models.sequelize.query<{ id: string }>(
+    this.models.sequelize.query<{ id: string; created_at: string }>(
       `SELECT id, created_at FROM "Communities"
        WHERE created_at >= NOW() - INTERVAL '30 days'
        ORDER BY created_at desc`,
