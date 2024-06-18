@@ -3,8 +3,7 @@ import { notifySuccess } from 'controllers/app/notifications';
 import type ChainInfo from 'models/ChainInfo';
 import React, { useCallback, useState } from 'react';
 import { trpc } from 'utils/trpcClient';
-import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
-import { CWText } from 'views/components/component_kit/cw_text';
+import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import { z } from 'zod';
 
@@ -56,10 +55,11 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
       <div className="notification-row-header">
         <div className="left-content-container">
           <div className="avatar-and-name">
-            <CWCommunityAvatar size="medium" community={communityInfo} />
-            <CWText type="h5" fontWeight="medium">
-              {communityInfo?.name}
-            </CWText>
+            <CommunityInfo
+              name={communityInfo.name}
+              iconUrl={communityInfo.iconUrl}
+              communityId={communityInfo.id}
+            />
 
             <div style={{ marginLeft: 'auto' }}>
               <CWToggle checked={subscribed} onChange={toggleSubscription} />
