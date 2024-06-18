@@ -102,6 +102,9 @@ export async function __updateThread(
   if (discordMeta) {
     threadWhere.discord_meta = discordMeta;
   }
+  if (!body) {
+    throw new AppError(Errors.NoBody);
+  }
 
   const thread = await this.models.Thread.findOne({
     where: threadWhere,
@@ -236,24 +239,12 @@ export async function __updateThread(
       toUpdate,
     );
 
-    const updatedThread = await thread.update(
+    await thread.update(
       {
         ...toUpdate,
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       { transaction },
-    );
-
-    await this.models.ThreadVersionHistory.create(
-      {
-        thread_id: updatedThread.id!,
-        address: address.address!,
-        body: toUpdate.body!,
-        timestamp: updatedThread.created_at!,
-      },
-      {
-        transaction,
-      },
     );
 
     if (versionHistory) {
