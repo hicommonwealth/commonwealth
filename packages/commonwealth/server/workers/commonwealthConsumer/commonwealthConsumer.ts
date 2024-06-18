@@ -110,11 +110,19 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   }
 }
 
+function startRolloverLoop() {
+  log.info('Starting rollover loop');
+  setInterval(() => {
+    Contest.performContestRollovers().catch(console.error);
+  }, 1_000 * 60);
+}
+
 async function main() {
   try {
     log.info('Starting main consumer');
     await setupCommonwealthConsumer();
     isServiceHealthy = true;
+    startRolloverLoop();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
