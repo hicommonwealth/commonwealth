@@ -19,7 +19,7 @@ import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
-import app, { ApiStatus } from 'state';
+import { ApiStatus } from 'state';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
@@ -97,7 +97,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _tmClient: Tendermint34Client;
 
   public async init(chain: ChainInfo, reset = false) {
-    const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+    const url = `${window.location.origin}${this.app.serverUrl()}/cosmosProxy/${
       chain.id
     }`;
 
@@ -129,7 +129,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       try {
         const lcdUrl = `${
           window.location.origin
-        }${app.serverUrl()}/cosmosProxy/v1/${chain.id}`;
+        }${this.app.serverUrl()}/cosmosProxy/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
         const lcd = await getLCDClient(lcdUrl);
         this._lcd = lcd;
@@ -237,7 +237,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         {
           restUrl: `${
             window.location.origin
-          }${app.serverUrl()}/cosmosProxy/v1/${dbId}`,
+          }${this.app.serverUrl()}/cosmosProxy/v1/${dbId}`,
           chainId,
           path: dbId,
         },
