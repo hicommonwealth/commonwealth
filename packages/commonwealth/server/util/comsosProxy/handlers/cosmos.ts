@@ -52,14 +52,6 @@ export async function cosmosHandler(
       new Date() > nodeTimeoutEnd)
   ) {
     let url: string;
-    console.log(
-      '\noriginalUrl',
-      req.originalUrl,
-      '\nbaseUrl',
-      req.baseUrl,
-      '\nurl',
-      req.url,
-    );
     if (requestType === 'REST' && community.ChainNode!.alt_wallet_url) {
       url = req.originalUrl.replace(
         req.baseUrl,
@@ -81,6 +73,7 @@ export async function cosmosHandler(
     }
 
     try {
+      log.info(`Querying Cosmos node at ${url}`);
       const response = await axios.post(
         url,
         _.isEmpty(req.body) ? null : req.body,
