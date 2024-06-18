@@ -1,8 +1,67 @@
-import { Query } from '@hicommonwealth/core';
+import { Query, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models } from '../database';
+import { rollOverContest } from '../services/commonProtocol/contestHelper';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
+
+// TODO: replace with proper scheduled solution
+// find community contests that are ended and trigger rollover
+export async function performContestRollovers() {
+  const contestManagersWithEndedContest = await models.sequelize.query<{
+    contest_address: string;
+    interval: number;
+    url: string;
+  }>(
+    `
+    SELECT cm.contest_address, cm.interval, co.contest_id, co.end_time, COALESCE(cn.private_url, cn.url) as url
+    FROM "ContestManagers" cm
+    JOIN (
+        SELECT *
+        FROM "Contests"
+        WHERE (contest_address, contest_id) IN (
+            SELECT contest_address, MAX(contest_id) AS contest_id
+            FROM "Contests"
+            GROUP BY contest_address
+        )
+    ) co ON co.contest_address = cm.contest_address AND NOW() > co.end_time AND cm.interval > 0 AND cm.cancelled = false
+    JOIN "Communities" cu ON cm.community_id = cu.id
+    JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
+  `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+    },
+  );
+
+  const contestRolloverPromises = contestManagersWithEndedContest.map(
+    async ({ url, contest_address, interval }) => {
+      log.debug(`ROLLOVER: ${contest_address}`);
+      return rollOverContest(url, contest_address, interval === 0);
+    },
+  );
+
+  const promiseResults = await Promise.allSettled(contestRolloverPromises);
+
+  const errors = promiseResults
+    .filter(({ status }) => status === 'rejected')
+    .map(
+      (result) =>
+        (result as PromiseRejectedResult).reason || '<unknown reason>',
+    );
+
+  if (errors.length > 0) {
+    log.warn(
+      `GetAllContests performContestRollovers: failed with errors: ${errors.join(
+        ', ',
+      )}"`,
+    );
+  }
+}
 
 export function GetAllContests(): Query<typeof schemas.GetAllContests> {
   return {
@@ -29,7 +88,7 @@ select
   cm.cancelled,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
-    from "ContestTopics" ct 
+    from "ContestTopics" ct
     left join "Topics" t on ct.topic_id = t.id
     where cm.contest_address = ct.contest_address
   ), '[]'::jsonb) as topics,
@@ -46,7 +105,7 @@ from
       'score', c.score --,
 --      'actions', coalesce(ca.actions, '[]'::jsonb)
 		) order by c.contest_id desc) as contests
-	from "Contests" c 
+	from "Contests" c
 --    left join (
 --      select
 --        a.contest_id,
@@ -62,7 +121,7 @@ from
 --        ) order by a.created_at) as actions
 --      from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
 --      group by a.contest_id
---    ) as ca on c.contest_id = ca.contest_id 
+--    ) as ca on c.contest_id = ca.contest_id
     ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
@@ -99,7 +158,7 @@ order by
       results.forEach((r) =>
         r.contests.forEach((c) => {
           c.score?.forEach((w) => {
-            w.tickerPrize = Number(BigInt(w.prize)) / 10 ** r.decimals;
+            w.tickerPrize = Number(w.prize) / 10 ** r.decimals;
           });
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);
@@ -108,6 +167,7 @@ order by
           // c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
         }),
       );
+
       return results;
     },
   };
