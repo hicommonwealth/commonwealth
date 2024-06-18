@@ -182,7 +182,6 @@ export async function __updateThread(
   const community = await this.models.Community.findByPk(thread.community_id);
 
   const previousDraftMentions = parseUserMentions(latestVersion);
-  // @ts-expect-error StrictNullChecks
   const currentDraftMentions = parseUserMentions(decodeURIComponent(body));
 
   const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
