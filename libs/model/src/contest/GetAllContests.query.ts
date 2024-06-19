@@ -1,67 +1,8 @@
-import { Query, logger } from '@hicommonwealth/core';
+import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { models } from '../database';
-import { rollOverContest } from '../services/commonProtocol/contestHelper';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
-
-// TODO: replace with proper scheduled solution
-// find community contests that are ended and trigger rollover
-export async function performContestRollovers() {
-  const contestManagersWithEndedContest = await models.sequelize.query<{
-    contest_address: string;
-    interval: number;
-    url: string;
-  }>(
-    `
-    SELECT cm.contest_address, cm.interval, co.contest_id, co.end_time, COALESCE(cn.private_url, cn.url) as url
-    FROM "ContestManagers" cm
-    JOIN (
-        SELECT *
-        FROM "Contests"
-        WHERE (contest_address, contest_id) IN (
-            SELECT contest_address, MAX(contest_id) AS contest_id
-            FROM "Contests"
-            GROUP BY contest_address
-        )
-    ) co ON co.contest_address = cm.contest_address AND NOW() > co.end_time AND cm.interval > 0 AND cm.cancelled = false
-    JOIN "Communities" cu ON cm.community_id = cu.id
-    JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
-  `,
-    {
-      type: QueryTypes.SELECT,
-      raw: true,
-    },
-  );
-
-  const contestRolloverPromises = contestManagersWithEndedContest.map(
-    async ({ url, contest_address, interval }) => {
-      log.debug(`ROLLOVER: ${contest_address}`);
-      return rollOverContest(url, contest_address, interval === 0);
-    },
-  );
-
-  const promiseResults = await Promise.allSettled(contestRolloverPromises);
-
-  const errors = promiseResults
-    .filter(({ status }) => status === 'rejected')
-    .map(
-      (result) =>
-        (result as PromiseRejectedResult).reason || '<unknown reason>',
-    );
-
-  if (errors.length > 0) {
-    log.warn(
-      `GetAllContests performContestRollovers: failed with errors: ${errors.join(
-        ', ',
-      )}"`,
-    );
-  }
-}
 
 export function GetAllContests(): Query<typeof schemas.GetAllContests> {
   return {
