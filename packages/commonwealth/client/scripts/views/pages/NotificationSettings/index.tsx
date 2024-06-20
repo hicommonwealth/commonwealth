@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import app from 'state';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 // eslint-disable-next-line max-len
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -28,6 +29,7 @@ const NotificationSettings = () => {
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
+  const { isLoggedIn } = useUserLoggedIn();
   const registerClientRegistrationToken =
     useRegisterClientRegistrationTokenMutation();
 
@@ -68,7 +70,7 @@ const NotificationSettings = () => {
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
-  } else if (!app.isLoggedIn()) {
+  } else if (!isLoggedIn) {
     return <PageNotFound />;
   }
 
