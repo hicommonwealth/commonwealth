@@ -1,4 +1,5 @@
 import { dispose, logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import pg from 'pg';
 import { fileURLToPath } from 'url';
@@ -58,9 +59,15 @@ export async function setupListener(): Promise<pg.Client> {
       : { rejectUnauthorized: false },
   });
 
-  client.on('notification', (payload) => {
+  client.on('notification', async (payload) => {
     log.info('Notification received', { payload });
-    incrementNumUnrelayedEvents(1);
+    // payload does not provide number of rows inserted
+    const count = await models.Outbox.count({
+      where: {
+        relayed: false,
+      },
+    });
+    incrementNumUnrelayedEvents(count);
     stats().increment('messageRelayerNotificationReceived');
   });
 
