@@ -161,7 +161,9 @@ export const ThreadCard = ({
               })}
               {...(thread.updatedAt && {
                 lastUpdated: (
-                  thread?.lastEdited || thread.createdAt
+                  thread?.lastEdited ||
+                  thread.createdAt ||
+                  thread.updatedAt
                 ).toISOString(),
               })}
               discord_meta={thread.discord_meta}
@@ -236,7 +238,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`Prop 
+                    label={`Prop
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
