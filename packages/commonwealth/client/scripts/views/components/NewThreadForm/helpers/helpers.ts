@@ -31,6 +31,7 @@ export const checkIsTopicInContest = (data: Contest[], topicId?: number) => {
   }
 
   return (data || []).some(
-    (item) => item.topics && item.topics.some((topic) => topic.id === topicId),
+    (item) =>
+      item?.topics && item?.topics.some((topic) => topic?.id === topicId),
   );
 };

@@ -94,6 +94,7 @@ export const ReactionButton = ({
     }
     if (hasReacted) {
       if (undoUpvoteDisabled) {
+        // for contest threads, users can only upvote because we cannot revert onchain transaction
         return notifyError('Upvotes on contest entries cannot be removed');
       }
 
