@@ -37,6 +37,7 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
+
   const urlParams = new URLSearchParams(location.search);
   const focusEditorParam = urlParams.get('focusEditor') === 'true';
 
@@ -174,7 +175,6 @@ export const CreateComment = ({
             onCancel={handleCancel}
             author={author}
             editorValue={editorValue}
-            shouldFocus={canComment && focusEditorParam}
             tooltipText={tooltipText}
           />
           {RevalidationModal}

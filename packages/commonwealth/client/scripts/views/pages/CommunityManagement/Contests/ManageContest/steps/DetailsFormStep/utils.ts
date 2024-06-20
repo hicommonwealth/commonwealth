@@ -1,4 +1,4 @@
-import * as colors from '../../../../../../../../styles/mixins/colors.scss';
+import colors from '../../../../../../../../styles/mixins/colors.module.scss';
 
 export const INITIAL_PERCENTAGE_VALUE = 10;
 export const MAX_WINNERS = 10;

@@ -27,7 +27,6 @@ import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 export enum DashboardViews {
   ForYou = 'For You',
   Global = 'Global',
-  Chain = 'Chain',
 }
 
 type UserDashboardProps = {
@@ -90,11 +89,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [loggedIn, navigate, type]);
 
   const subpage: DashboardViews =
-    type === 'chain-events'
-      ? DashboardViews.Chain
-      : type === 'global'
-      ? DashboardViews.Global
-      : loggedIn
+    loggedIn && type !== 'global'
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 
@@ -135,13 +130,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                     navigate('/dashboard/global');
                   }}
                 />
-                <CWTab
-                  label={DashboardViews.Chain}
-                  isSelected={activePage === DashboardViews.Chain}
-                  onClick={() => {
-                    navigate('/dashboard/chain-events');
-                  }}
-                />
               </CWTabsRow>
             </div>
             <>
@@ -161,16 +149,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
-                />
-              )}
-              {activePage === DashboardViews.Chain && (
-                <Feed
-                  fetchData={() => fetchActivity(activePage)}
-                  noFeedMessage="Join some communities that have governance to see Chain Events!"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
-                  // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
-                  isChainEventsRow={true}
                 />
               )}
             </>
