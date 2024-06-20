@@ -84,7 +84,7 @@ const SessionRevalidationModal = ({
                 <b>{formatAddress(signedAddress!)}</b>.
               </p>
               <p>
-                We've switched your active address to the one in your wallet.
+                We’ve switched your active address to the one in your wallet.
                 You can switch it back in the user menu.
               </p>
             </>
