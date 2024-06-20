@@ -191,7 +191,7 @@ export async function __getBulkThreads(
             'type', R.reaction,
             'address', A.address,
             'updated_at', R.updated_at::text,
-            'vote_weight', R.calculated_voting_weight,
+            'voting_weight', R.calculated_voting_weight,
             'profile_name', P.profile_name,
             'avatar_url', P.avatar_url,
             'last_active', A.last_active::text
