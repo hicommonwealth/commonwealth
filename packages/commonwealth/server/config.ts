@@ -18,7 +18,6 @@ const {
   NO_GLOBAL_ACTIVITY_CACHE,
   LOGIN_RATE_LIMIT_TRIES,
   LOGIN_RATE_LIMIT_MINS,
-  SLACK_FEEDBACK_WEBHOOK,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_API_KEY,
@@ -57,7 +56,6 @@ export const config = configure(
     // increased because of chain waitlist registrations
     LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
     LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
-    SLACK_FEEDBACK_WEBHOOK,
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(GENERATE_IMAGE_RATE_LIMIT ?? '10', 10),
     DEFAULT_COMMONWEALTH_LOGO:
@@ -129,7 +127,6 @@ export const config = configure(
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     LOGIN_RATE_LIMIT_TRIES: z.number().int().positive(),
     LOGIN_RATE_LIMIT_MINS: z.number().int().positive(),
-    SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
