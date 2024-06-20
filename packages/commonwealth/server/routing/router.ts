@@ -66,7 +66,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
-import sendFeedback from '../routes/sendFeedback';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -1055,14 +1054,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // send feedback button
-  registerRoute(
-    router,
-    'post',
-    '/sendFeedback',
-    sendFeedback.bind(this, models),
   );
 
   // bans
