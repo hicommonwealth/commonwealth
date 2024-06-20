@@ -11,6 +11,7 @@ export let numUnrelayedEvents = 0;
 
 export function incrementNumUnrelayedEvents(numEvents: number) {
   numUnrelayedEvents += numEvents;
+  console.log('numUnrelayedEvents: ', numUnrelayedEvents);
   stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
 }
 

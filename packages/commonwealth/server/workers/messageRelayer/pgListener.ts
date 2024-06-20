@@ -66,6 +66,7 @@ export async function setupListener(): Promise<pg.Client> {
       const count = await models.Outbox.count({
         where: {
           relayed: false,
+          event_name: payload.payload, // payload contains event name
         },
       });
       incrementNumUnrelayedEvents(count);
