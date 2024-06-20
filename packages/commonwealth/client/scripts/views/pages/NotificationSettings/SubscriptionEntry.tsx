@@ -5,8 +5,8 @@ import { getRelativeTimestamp } from 'helpers/dates';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useDeleteThreadSubscriptionMutation } from 'state/api/trpc/subscription/useDeleteThreadSubscriptionMutation';
 import { getCommunityUrl } from 'utils';
-import { trpc } from 'utils/trpcClient';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -39,7 +39,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
     navigate(threadUrl);
   }, [navigate, threadUrl]);
   const deleteThreadSubscriptionMutation =
-    trpc.subscription.deleteThreadSubscription.useMutation();
+    useDeleteThreadSubscriptionMutation();
 
   const deleteThreadSubscription = useCallback(async () => {
     await deleteThreadSubscriptionMutation.mutateAsync({
