@@ -28,7 +28,9 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -74,6 +76,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
+
+  const { contestsData } = useCommunityContests();
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -163,6 +167,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadTopicGated: isRestrictedMembership,
           });
 
+          const isTopicInContest = checkIsTopicInContest(
+            contestsData,
+            thread?.topic?.id,
+          );
+
           return (
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
@@ -185,6 +194,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideRecentComments
+              editingDisabled={isTopicInContest}
             />
           );
         }}

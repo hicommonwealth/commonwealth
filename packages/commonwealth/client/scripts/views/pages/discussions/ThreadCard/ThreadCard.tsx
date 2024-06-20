@@ -45,6 +45,7 @@ type CardProps = AdminActionsProps & {
   maxRecentCommentsToDisplay?: number;
   layoutType?: 'author-first' | 'community-first';
   customStages?: string[];
+  editingDisabled?: boolean;
 };
 
 export const ThreadCard = ({
@@ -75,6 +76,7 @@ export const ThreadCard = ({
   maxRecentCommentsToDisplay = 2,
   layoutType = 'author-first',
   customStages,
+  editingDisabled,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -138,6 +140,7 @@ export const ThreadCard = ({
             thread={thread}
             size="big"
             disabled={!canReact}
+            undoUpvoteDisabled={editingDisabled}
             tooltipText={
               typeof disabledActionsTooltipText === 'function'
                 ? disabledActionsTooltipText?.('upvote')
@@ -275,6 +278,7 @@ export const ThreadCard = ({
               disabledActionsTooltipText={disabledActionsTooltipText}
               setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
               hideUpvoteDrawerButton={hideUpvotesDrawer}
+              editingDisabled={editingDisabled}
             />
           </div>
         </div>
