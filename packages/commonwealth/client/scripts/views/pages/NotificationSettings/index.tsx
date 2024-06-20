@@ -1,6 +1,5 @@
 import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
 import { useFlag } from 'hooks/useFlag';
-import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
@@ -26,7 +25,6 @@ import './index.scss';
 type NotificationSection = 'community-alerts' | 'subscriptions';
 
 const NotificationSettings = () => {
-  const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
