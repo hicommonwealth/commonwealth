@@ -1,6 +1,7 @@
 import { ThreadSubscription } from '@hicommonwealth/schemas';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
@@ -98,7 +99,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
 
       <div className="SubscriptionFooter">
         <CWThreadAction
-          label={`${thread.comment_count}`}
+          label={pluralize(thread.comment_count, 'Comment')}
           action="comment"
           onClick={(e) => {
             e.preventDefault();
@@ -107,6 +108,7 @@ export const SubscriptionEntry = (props: SubscriptionEntryProps) => {
         />
 
         <CWThreadAction
+          label="Subscribe"
           action="subscribe"
           onClick={(e) => {
             e.preventDefault();

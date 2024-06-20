@@ -156,6 +156,7 @@ const NotificationSettings = () => {
                     subscription={current as z.infer<typeof ThreadSubscription>}
                     onUnsubscribe={handleUnsubscribe}
                   />
+                  {/*<ThreadCard thread={current.Thread!}/>*/}
                 </>
               ))}
           </>
