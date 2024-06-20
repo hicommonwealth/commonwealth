@@ -2,7 +2,8 @@ import { CommunityAlert } from '@hicommonwealth/schemas';
 import { notifySuccess } from 'controllers/app/notifications';
 import type ChainInfo from 'models/ChainInfo';
 import React, { useCallback, useState } from 'react';
-import { trpc } from 'utils/trpcClient';
+import { useCreateCommunityAlertMutation } from 'state/api/trpc/subscription/useCreateCommunityAlertMutation';
+import { useDeleteCommunityAlertMutation } from 'state/api/trpc/subscription/useDeleteCommunityAlertMutation';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import { z } from 'zod';
@@ -17,11 +18,9 @@ export const CommunityEntry = (props: CommunityEntryProps) => {
 
   const [subscribed, setSubscribed] = useState(!!communityAlert);
 
-  const createCommunityAlert =
-    trpc.subscription.createCommunityAlert.useMutation();
+  const createCommunityAlert = useCreateCommunityAlertMutation();
 
-  const deleteCommunityAlert =
-    trpc.subscription.deleteCommunityAlert.useMutation();
+  const deleteCommunityAlert = useDeleteCommunityAlertMutation();
 
   const toggleSubscription = useCallback(() => {
     async function doAsync() {
