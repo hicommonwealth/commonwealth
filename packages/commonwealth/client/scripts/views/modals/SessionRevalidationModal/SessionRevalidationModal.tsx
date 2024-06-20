@@ -69,22 +69,32 @@ const SessionRevalidationModal = ({
         );
         await setActiveAccount(updatedAddress!);
       } else {
+        await setActiveAccount(
+          app.user.activeAccounts.find(
+            (addr) => addr.address === signedAddress!,
+          )!,
+        );
         openConfirmation({
-          title: 'Address switch required',
+          title: 'Logged in with unexpected address',
           description: (
             <>
-              <p>
-                The wallet you just signed in with has the address{' '}
-                <b>{formatAddress(signedAddress!)}</b>, but we were expecting{' '}
-                <b>{formatAddress(walletAddress)}</b>.
+              <p style={{ marginBottom: 6 }}>
+                You tried to sign in as <b>{formatAddress(walletAddress!)}</b>,
+                but your wallet has the address{' '}
+                <b>{formatAddress(signedAddress!)}</b>.
               </p>
               <p>
-                Try switching addresses in your wallet, or link this address by
-                selecting <b>Connect a new address</b> in the user menu.
+                We've switched your active address to the one in your wallet.
+                You can switch it back in the user menu.
               </p>
             </>
           ),
-          buttons: [],
+          buttons: [
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+            },
+          ],
           className: 'AddressMismatch',
         });
       }
