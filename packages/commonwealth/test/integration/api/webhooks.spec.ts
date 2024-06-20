@@ -23,13 +23,10 @@ const expectErrorOnResponse = (statusCode, errorMsg, response) => {
 
 describe('Webhook Tests', () => {
   let jwtToken;
-  let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
-  let loggedInSession;
   let notAdminJWT;
   const chain = 'ethereum';
-  let topicId;
   let server: TestServer;
 
   beforeAll(async () => {
@@ -42,11 +39,8 @@ describe('Webhook Tests', () => {
 
   beforeEach(async () => {
     // get topic
-    topicId = await server.seeder.getTopicId({ chain });
     // get logged in address/user with JWT
     let result = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
-    loggedInAddr = result.address;
-    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       config.AUTH.JWT_SECRET,
