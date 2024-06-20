@@ -160,7 +160,7 @@ export const ThreadCard = ({
                 lockedAt: thread.lockedAt.toISOString(),
               })}
               {...(thread.updatedAt && {
-                lastUpdated: thread.updatedAt.toISOString(),
+                lastUpdated: thread.lastEdited.toISOString(),
               })}
               discord_meta={thread.discord_meta}
               // @ts-expect-error <StrictNullChecks/>
