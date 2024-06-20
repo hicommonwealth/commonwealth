@@ -4,6 +4,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
+// eslint-disable-next-line max-len
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
