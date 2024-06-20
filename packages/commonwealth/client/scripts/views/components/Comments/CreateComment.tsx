@@ -37,8 +37,6 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-  const urlParams = new URLSearchParams(location.search);
-
   const { isAddedToHomeScreen } = useAppStatus();
 
   // get restored draft on init
