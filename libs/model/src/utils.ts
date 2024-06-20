@@ -153,7 +153,7 @@ function getWordAtIndex(
   startIndex: number;
   endIndex: number;
 } | null {
-  if (index < 0 || index >= inputString.length) {
+  if (index < 0 || index >= inputString.length || inputString[index] === ' ') {
     return null;
   }
 
