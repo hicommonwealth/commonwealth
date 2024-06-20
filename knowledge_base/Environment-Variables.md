@@ -56,7 +56,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [MIXPANEL_PROD_TOKEN](#mixpanel_prod_token)
 - [NEXT_PUBLIC_RSA_PRIVATE_KEY](#next_public_rsa_private_key)
 - [NEXT_PUBLIC_RSA_PUBLIC_KEY](#next_public_rsa_public_key)
-- [NO_CLIENT](#no_client)
 - [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
 - [NO_PRERENDER](#no_prerender)
 - [NO_SSL](#no_ssl)
@@ -76,7 +75,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SESSION_SECRET](#session_secret)
 - [SL_BUILD](#sl_build)
 - [SL_PORT](#sl_port)
-- [SLACK_FEEDBACK_WEBHOOK](#slack_feedback_webhook)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [SUPER_ADMIN_EMAIL](#super_admin_email)
@@ -291,10 +289,6 @@ Mixpanel analytics tracking token for our live production site.
 
 <!-- Likely deprecated; flagged for removal with closing of #6185. -->
 
-## NO_CLIENT
-
-If `true`, disables the front-end build.
-
 ## NO_GLOBAL_ACTIVITY_CACHE
 
 If `true`, disables the initialization of `globalActivityCache.ts` from server.
@@ -374,10 +368,6 @@ Boolean triggering our `snapshot-listener` package to build.
 ## SL_PORT
 
 Port used for the `snapshot-listener` package. We use the default value `8001`.
-
-## SLACK_FEEDBACK_WEBHOOK
-
-Enables Common users to share feedback on the app to our Slack. As of 240109, we still hook into the previous Commonwealth Slack, but this is liable to change soon.
 
 ## SLACK_WEBHOOK_URL_DEV
 

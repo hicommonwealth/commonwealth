@@ -163,17 +163,17 @@ const CommunitiesPage = () => {
     }
 
     // @ts-expect-error <StrictNullChecks/>
-    const historicalPriceMap: Map<string, string> = historicalPriceLoading
-      ? null
-      : new Map(
-          Object.entries(
-            // @ts-expect-error <StrictNullChecks/>
-            historicalPrices?.reduce((acc, { community_id, old_price }) => {
-              acc[community_id] = old_price;
-              return acc;
-            }, {}),
-          ),
-        );
+    const historicalPriceMap: Map<string, string> =
+      historicalPriceLoading || !historicalPrices
+        ? null
+        : new Map(
+            Object.entries(
+              historicalPrices?.reduce((acc, { community_id, old_price }) => {
+                acc[community_id] = old_price;
+                return acc;
+              }, {}),
+            ),
+          );
 
     // Filter by recent thread activity
     const res = filteredList

@@ -33,7 +33,6 @@ interface MobileHeaderProps {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }) => void;
-  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const MobileHeader = ({
@@ -41,7 +40,6 @@ const MobileHeader = ({
   onAuthModalOpen,
   isInsideCommunity,
   onRevalidationModalData,
-  onFeedbackModalOpen,
 }: MobileHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
@@ -72,13 +70,6 @@ const MobileHeader = ({
     {
       label: 'Help documentation',
       onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-    },
-    {
-      label: 'Send feedback',
-      onClick: () => {
-        onFeedbackModalOpen(true);
-        setIsUserDrawerOpen(false);
-      },
     },
   ] as PopoverMenuItem[];
 

@@ -1,4 +1,5 @@
 import 'Sublayout.scss';
+import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -14,12 +15,12 @@ import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
-import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -30,11 +31,7 @@ type SublayoutProps = {
   isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
-const Sublayout = ({
-  children,
-  hideFooter = true,
-  isInsideCommunity,
-}: SublayoutProps) => {
+const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
@@ -223,8 +220,14 @@ const Sublayout = ({
               <AdminOnboardingSlider />
             )}
             {children}
-            {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
+          <CWGrowlTemplate
+            headerText="Shape the Future of Crypto with Ideacoin!"
+            bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
+            buttonText="Take the Survey for an NFT"
+            buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
+            growlImage={ideacoinSurveyGrowlImage}
+          />
         </div>
         {userOnboardingEnabled && (
           <WelcomeOnboardModal

@@ -2,37 +2,37 @@ import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { Alias, defineConfig, loadEnv } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 const projectRootDir = path.resolve(__dirname);
 
-function createClientResolver(folder: string): Alias {
+function createScriptsResolver(folder: string): Alias {
   const find = new RegExp(`^${folder}/(.*)$`);
   return {
     find,
-    replacement: path.resolve(
-      projectRootDir,
-      'client',
-      'scripts',
-      folder,
-      '$1',
-    ),
+    replacement: path.resolve(projectRootDir, 'scripts', folder, '$1'),
   };
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+export default defineConfig(({ mode }) => {
+  const envPath = path.dirname(path.dirname(process.cwd())); // root project .env
+  const env = loadEnv(mode, envPath, '');
   return {
+    root: projectRootDir,
     plugins: [
       react(),
       createHtmlPlugin({
-        entry: `./${command === 'serve' ? 'client/' : ''}scripts/index.tsx`,
-        template: './client/index.html',
+        entry: `./scripts/index.tsx`,
+        template: './index.html',
       }),
       tsconfigPaths(),
+      nodePolyfills(),
     ],
-    publicDir: 'static',
+    build: {
+      outDir: '../build',
+    },
     server: {
       port: 8080,
       host: 'localhost',
@@ -49,26 +49,27 @@ export default defineConfig(({ command, mode }) => {
         {
           // matches only non-relative paths that end with .scss
           find: /^([^.].*)\.scss$/,
-          replacement: path.resolve(
-            projectRootDir,
-            'client',
-            'styles',
-            '$1.scss',
-          ),
+          replacement: path.resolve(projectRootDir, 'styles', '$1.scss'),
         },
-        createClientResolver('hooks'),
-        createClientResolver('navigation'),
-        createClientResolver('state'),
-        createClientResolver('views'),
-        createClientResolver('controllers'),
-        createClientResolver('models'),
-        createClientResolver('helpers'),
+        {
+          // resolves assets/
+          find: /^assets\/(.*)$/,
+          replacement: path.resolve(projectRootDir, 'assets', '$1'),
+        },
+        createScriptsResolver('hooks'),
+        createScriptsResolver('navigation'),
+        createScriptsResolver('state'),
+        createScriptsResolver('views'),
+        createScriptsResolver('controllers'),
+        createScriptsResolver('models'),
+        createScriptsResolver('helpers'),
       ],
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
     define: {
-      global: {},
+      'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
       'process.env.NODE_ENV': JSON.stringify('development'),
+      'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
       'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
         env.KNOCK_PUBLIC_API_KEY,
       ),

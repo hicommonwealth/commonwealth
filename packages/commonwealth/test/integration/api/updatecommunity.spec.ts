@@ -163,7 +163,7 @@ describe('Update Community/Chain Tests', () => {
     });
 
     test('should update icon_url', async () => {
-      const icon_url = '/static/img/protocols/cwl.png';
+      const icon_url = 'assets/img/protocols/cwl.png';
       const res = await chai
         .request(server.app)
         .patch(`/api/communities/${chain}`)

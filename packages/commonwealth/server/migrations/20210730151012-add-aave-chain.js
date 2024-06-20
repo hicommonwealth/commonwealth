@@ -17,7 +17,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.bulkUpdate(
@@ -31,7 +31,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -52,7 +52,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.bulkUpdate(
@@ -66,7 +66,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

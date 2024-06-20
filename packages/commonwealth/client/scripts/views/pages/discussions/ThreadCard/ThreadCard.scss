@@ -92,10 +92,15 @@
         .MarkdownFormattedText {
           @include caption;
           overflow: hidden;
+          --line-height: 20px;
+
+          & > div {
+            overflow: hidden;
+          }
 
           @include extraSmall {
             p {
-              line-height: 18px !important;
+              line-height: calc(var(--line-height) - 2) !important;
             }
           }
 
@@ -109,11 +114,26 @@
           span,
           div {
             font-size: 16px !important;
+            line-height: var(--line-height) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: black !important;
+          }
+
+          strong {
+            font-weight: 500;
           }
 
           &.collapsed {
             div :last-child {
-              color: $neutral-300;
+              color: transparent !important;
+              background: linear-gradient(
+                180deg,
+                rgba(2, 0, 36, 1) 0%,
+                rgba(40, 39, 39, 1) 10%,
+                rgb(179, 174, 180) 100%
+              );
+              background-clip: text;
             }
           }
         }
