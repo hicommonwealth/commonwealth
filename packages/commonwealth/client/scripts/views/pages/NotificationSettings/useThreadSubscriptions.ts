@@ -1,6 +1,6 @@
 import { GetThreadSubscriptions } from '@hicommonwealth/schemas';
 import { useMemo } from 'react';
-import { trpc } from 'utils/trpcClient';
+import { useThreadSubscriptionsQuery } from 'state/api/trpc/subscription/useThreadSubscriptionsQuery';
 
 /**
  * @deprecated TODO this is ALREADY deprecated because this is a workaround to
@@ -8,9 +8,7 @@ import { trpc } from 'utils/trpcClient';
  * this once we fix types on the client.
  */
 export function useThreadSubscriptions() {
-  const threadSubscriptions = trpc.subscription.getThreadSubscriptions.useQuery(
-    {},
-  );
+  const threadSubscriptions = useThreadSubscriptionsQuery();
 
   return useMemo(() => {
     return {
