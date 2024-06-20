@@ -200,6 +200,7 @@ const ModalBase = ({
     // 1. When `showWalletsFor` is either `Ethereum` or `Cosmos`, show all SSO options.
     // 2. On communities based on `Ethereum` and `Cosmos`, show all SSO options.
     // 3. On unscoped pages, show all SSO options.
+    // 4. In all other cases, hide all SSO options.
     const showSSOOptionsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showSSOOptionsForSpecificChains) {
       switch (showSSOOptionsForSpecificChains) {
