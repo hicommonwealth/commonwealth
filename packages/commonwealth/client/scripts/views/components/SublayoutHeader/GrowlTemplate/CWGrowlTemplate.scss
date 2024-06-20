@@ -1,6 +1,6 @@
-@import '../../../../styles/shared';
+@import '../../../../../styles/shared.scss';
 
-.UserSurveyGrowl {
+.CWGrowlTemplate {
   display: flex;
   flex-direction: column;
   background-color: $white;

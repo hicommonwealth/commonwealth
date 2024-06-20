@@ -22,7 +22,7 @@ const baseRequest: CommunityAttributes = {
   // @ts-expect-error StrictNullChecks
   network: null,
   base: ChainBase.Substrate,
-  icon_url: '/static/img/protocols/edg.png',
+  icon_url: 'assets/img/protocols/edg.png',
   active: true,
   type: ChainType.Chain,
   social_links: [],

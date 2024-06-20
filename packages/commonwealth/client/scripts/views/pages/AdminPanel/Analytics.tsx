@@ -25,7 +25,7 @@ type Stats = {
 const Analytics = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [lastMonthNewCommunties, setLastMonthNewCommunities] = useState<
-    string[]
+    { id: string; created_at: string }[]
   >([]);
   const [globalStats, setGlobalStats] = useState<Stats>();
   const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
@@ -248,17 +248,24 @@ const Analytics = () => {
               The ids of all communities created in the last month
             </CWText>
             <div className="AnalyticsList">
+              <CWText className="CommunityName no-hover">
+                <CWText className="CommunityName no-hover">Name</CWText>
+                <CWText className="RightSide no-hover">Created At</CWText>
+              </CWText>
               {lastMonthNewCommunties &&
                 lastMonthNewCommunties?.map((community) => {
                   return (
                     <CWText
                       onClick={() => {
-                        window.open(`/${community}`, '_blank');
+                        window.open(`/${community.id}`, '_blank');
                       }}
                       className="CommunityName"
-                      key={community}
+                      key={community.id}
                     >
-                      {community}
+                      <CWText className="CommunityName">{community.id}</CWText>
+                      <CWText className="RightSide">
+                        {new Date(community.created_at).toLocaleString()}
+                      </CWText>
                     </CWText>
                   );
                 })}

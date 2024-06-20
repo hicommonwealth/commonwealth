@@ -61,9 +61,18 @@
           cursor: pointer;
           padding: 4px;
 
+          .RightSide {
+            align-content: flex-end;
+            margin-left: -500px;
+            padding-top: 4px;
+          }
+
           &:hover {
             background-color: $neutral-100;
           }
+        }
+        .CommunityName.no-hover:hover {
+          background-color: transparent;
         }
       }
 

@@ -4,7 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { testServer, TestServer } from '../../../server-test';
+import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
 import type { CommunityArgs } from '../../util/modelUtils';
@@ -163,7 +163,7 @@ describe('Update Community/Chain Tests', () => {
     });
 
     test('should update icon_url', async () => {
-      const icon_url = '/static/img/protocols/cwl.png';
+      const icon_url = 'assets/img/protocols/cwl.png';
       const res = await chai
         .request(server.app)
         .patch(`/api/communities/${chain}`)

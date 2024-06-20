@@ -24,7 +24,7 @@ type TableCounts = {
 };
 
 export type GetStatsResult = {
-  lastMonthNewCommunities: Array<string>;
+  lastMonthNewCommunities: Array<{ id: string; created_at: string }>;
   totalStats: TableCounts & {
     averageAddressesPerCommunity: number;
     populatedCommunities: number;
@@ -63,8 +63,10 @@ export async function __getStats(
     [{ result: averageAddressesPerCommunity }],
     [{ result: populatedCommunities }],
   ] = await Promise.all([
-    this.models.sequelize.query<{ id: string }>(
-      `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
+    this.models.sequelize.query<{ id: string; created_at: string }>(
+      `SELECT id, created_at FROM "Communities"
+       WHERE created_at >= NOW() - INTERVAL '30 days'
+       ORDER BY created_at desc`,
       { type: QueryTypes.SELECT },
     ),
     this.models.sequelize.query<{ monthlySummary: TableCounts }>(
@@ -133,7 +135,9 @@ export async function __getStats(
   ]);
 
   return {
-    lastMonthNewCommunities: lastMonthNewCommunities.map(({ id }) => id),
+    lastMonthNewCommunities: lastMonthNewCommunities.map(
+      ({ id, created_at }) => ({ id, created_at }),
+    ),
     totalStats: {
       ...monthlySummary,
       averageAddressesPerCommunity,

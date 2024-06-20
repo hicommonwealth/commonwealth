@@ -236,4 +236,7 @@ export const buildAssociations = (db: DB) => {
   db.Subscription.belongsTo(db.Comment, {
     foreignKey: 'comment_id',
   });
+  db.ContestManager.belongsTo(db.ContestManager, {
+    foreignKey: 'community_id',
+  });
 };

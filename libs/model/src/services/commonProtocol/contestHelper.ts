@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -72,7 +73,7 @@ const addContent = async (
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
-      gas: '200000',
+      gas: '1000000',
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -128,7 +129,7 @@ const voteContent = async (
   try {
     const txDetails: PayableCallOptions = {
       from: web3.eth.defaultAccount,
-      gas: '200000',
+      gas: '1000000',
     };
     if (nonce) {
       txDetails.nonce = nonce.toString();
@@ -206,8 +207,8 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new AppError(
-      `getContestScore ERROR: Contest Id (${contestId}) not found on Contest address: ${contest}`,
+    throw new Error(
+      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
   }
 
@@ -266,7 +267,7 @@ export const getContestBalance = async (
       feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
     );
   }
-  if (String(results[0]) === '0x0000000000000000000000000000000000000000') {
+  if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
       web3.eth.getBalance(contest).then((v) => {
         return Number(v);
@@ -320,11 +321,14 @@ export const addContentBatch = async (
   });
 };
 
+export type VoteContentBatchEntry = {
+  contestAddress: string;
+  contentId: string;
+};
 export const voteContentBatch = async (
   rpcNodeUrl: string,
-  contest: string[],
   voter: string,
-  contentId: string,
+  entries: VoteContentBatchEntry[],
 ): Promise<PromiseSettledResult<any>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
@@ -334,9 +338,16 @@ export const voteContentBatch = async (
 
     const promises: Promise<any>[] = [];
 
-    contest.forEach((c) => {
+    entries.forEach(({ contestAddress, contentId }) => {
       promises.push(
-        voteContent(rpcNodeUrl, c, voter, contentId, web3, currNonce),
+        voteContent(
+          rpcNodeUrl,
+          contestAddress,
+          voter,
+          contentId,
+          web3,
+          currNonce,
+        ),
       );
       currNonce++;
     });
@@ -360,28 +371,30 @@ export const rollOverContest = async (
   contest: string,
   oneOff: boolean,
 ): Promise<boolean> => {
-  const web3 = await createWeb3Provider(rpcNodeUrl);
-  const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
-    contest,
-  );
+  return nonceMutex.runExclusive(async () => {
+    const web3 = await createWeb3Provider(rpcNodeUrl);
+    const contestInstance = new web3.eth.Contract(
+      contestABI as AbiItem[],
+      contest,
+    );
 
-  const contractCall = oneOff
-    ? contestInstance.methods.endContest()
-    : contestInstance.methods.newContest();
+    const contractCall = oneOff
+      ? contestInstance.methods.endContest()
+      : contestInstance.methods.newContest();
 
-  let gasResult;
-  try {
-    gasResult = await contractCall.estimateGas({
+    let gasResult;
+    try {
+      gasResult = await contractCall.estimateGas({
+        from: web3.eth.defaultAccount,
+      });
+    } catch {
+      return false;
+    }
+
+    await contractCall.send({
       from: web3.eth.defaultAccount,
+      gas: gasResult.toString(),
     });
-  } catch {
-    return false;
-  }
-
-  await contractCall.send({
-    from: web3.eth.defaultAccount,
-    gas: gasResult.toString(),
+    return true;
   });
-  return true;
 };
