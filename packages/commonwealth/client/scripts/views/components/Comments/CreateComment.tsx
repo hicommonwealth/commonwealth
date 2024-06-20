@@ -37,9 +37,7 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-
   const urlParams = new URLSearchParams(location.search);
-  const focusEditorParam = urlParams.get('focusEditor') === 'true';
 
   const { isAddedToHomeScreen } = useAppStatus();
 
