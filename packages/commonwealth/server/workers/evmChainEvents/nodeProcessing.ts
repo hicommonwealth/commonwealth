@@ -161,7 +161,7 @@ export async function processChainNode(
     );
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
-    log.error(msg, e);
+    log.warn(msg, e);
   }
 }
 
