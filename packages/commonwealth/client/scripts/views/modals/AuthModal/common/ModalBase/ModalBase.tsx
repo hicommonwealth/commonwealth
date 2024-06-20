@@ -52,13 +52,14 @@ const MODAL_COPY = {
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
- * @param onClose callback triggered when the modal is closed or user is authenticated
+ * @param onClose callback triggered when the modal is closed or user is authenticated.
  * @param onSuccess callback triggered on successful user authentication.
  * @param layoutType specifies the layout type/variant of the modal.
  * @param hideDescription if `true`, hides the description after modal header.
  * @param customBody custom content to add before the modal body.
- * @param showAuthenticationOptionsFor determines authentication options ('wallets', 'sso', or both) to display.
- *                                     Ignored if internal modal state hides SSO options.
+ * @param showAuthenticationOptionsFor determines auth options category ('wallets', 'sso', or both) to display.
+ *                                     All options are displayed if prop is not provided.
+ *                                     Prop is ignored if internal modal state hides SSO options.
  * @param showWalletsFor specifies wallets to display for the specified chain.
  * @param bodyClassName custom class to apply to the modal body.
  * @param onSignInClick callback triggered when the user clicks on the `Sign in` link in the modal footer.
