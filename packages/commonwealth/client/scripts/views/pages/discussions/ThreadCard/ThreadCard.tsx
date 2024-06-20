@@ -161,7 +161,7 @@ export const ThreadCard = ({
               })}
               {...(thread.updatedAt && {
                 lastUpdated: (
-                  thread?.lastEdited || thread.updatedAt
+                  thread?.lastEdited || thread.createdAt
                 ).toISOString(),
               })}
               discord_meta={thread.discord_meta}
