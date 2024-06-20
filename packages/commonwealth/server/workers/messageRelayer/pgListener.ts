@@ -59,16 +59,19 @@ export async function setupListener(): Promise<pg.Client> {
       : { rejectUnauthorized: false },
   });
 
-  client.on('notification', async (payload) => {
-    log.info('Notification received', { payload });
-    // payload does not provide number of rows inserted
-    const count = await models.Outbox.count({
-      where: {
-        relayed: false,
-      },
-    });
-    incrementNumUnrelayedEvents(count);
-    stats().increment('messageRelayerNotificationReceived');
+  client.on('notification', (payload) => {
+    const fn = async () => {
+      log.info('Notification received', { payload });
+      // payload does not provide number of rows inserted
+      const count = await models.Outbox.count({
+        where: {
+          relayed: false,
+        },
+      });
+      incrementNumUnrelayedEvents(count);
+      stats().increment('messageRelayerNotificationReceived');
+    };
+    fn().catch((err) => log.error('PG notification error: ', err));
   });
 
   client.on('error', (err: Error) => {
