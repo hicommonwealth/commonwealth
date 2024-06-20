@@ -3,6 +3,7 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
+import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import { trpc } from 'utils/trpcClient';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -12,7 +13,6 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
-import { useCommunityAlerts } from 'views/pages/NotificationSettings/useCommunityAlerts';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
@@ -26,7 +26,7 @@ type NotificationSection = 'community-alerts' | 'subscriptions';
 const NotificationSettings = () => {
   const navigate = useCommonNavigate();
   const threadSubscriptions = useThreadSubscriptions();
-  const communityAlerts = useCommunityAlerts();
+  const communityAlerts = useCommunityAlertsQuery();
   const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const registerClientRegistrationToken =
     trpc.subscription.registerClientRegistrationToken.useMutation();
