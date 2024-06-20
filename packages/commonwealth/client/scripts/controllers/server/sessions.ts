@@ -33,7 +33,8 @@ export async function signSessionWithAccount<T extends { address: string }>(
   account: Account,
 ) {
   const session = await getSessionFromWallet(wallet);
-  const walletAddress = session.address.split(':')[2];
+  const [_did, _pkh, _chainBase, _chainId, walletAddress] =
+    session.address.split(':');
   if (walletAddress !== account.address) {
     throw new Error(
       `Session signed with wrong address ('${walletAddress}', expected '${account.address}')`,
@@ -78,7 +79,7 @@ export async function getSessionFromWallet(
   }
 }
 
-function getCaip2Address(address: string) {
+function getDid(address: string) {
   const caip2Prefix = chainBaseToCaip2(app.chain.base);
 
   const idOrPrefix =
@@ -87,7 +88,7 @@ function getCaip2Address(address: string) {
       : app.chain?.meta.node?.ethChainId || 1;
   const canvasChainId = chainBaseToCanvasChainId(app.chain.base, idOrPrefix);
 
-  return `${caip2Prefix}:${canvasChainId}:${address}`;
+  return `did:pkh:${caip2Prefix}:${canvasChainId}:${address}`;
 }
 
 // Sign an arbitrary action, using context from the last authSession() call.
@@ -101,14 +102,19 @@ async function sign(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
 ): Promise<CanvasSignResult> {
-  const address = getCaip2Address(address_);
+  const address = getDid(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(address)) {
       let lookupAddress = address;
 
-      const [chainBaseFromAddress, chainIdFromAddress, walletAddress] =
-        address.split(':');
+      const [
+        _did,
+        _pkh,
+        chainBaseFromAddress,
+        chainIdFromAddress,
+        walletAddress,
+      ] = address.split(':');
 
       // if using polkadot, we need to convert the address so that it has the prefix 42
       if (chainBaseFromAddress === 'polkadot') {
@@ -120,7 +126,7 @@ async function sign(
       }
 
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
-        address: lookupAddress,
+        did: lookupAddress,
       });
       if (!savedSessionMessage) {
         throw new SessionKeyError({
@@ -133,8 +139,9 @@ async function sign(
       const { payload: session, signer: messageSigner } = savedSessionMessage;
 
       // check if session is expired
-      if (session.duration !== null) {
-        const sessionExpirationTime = session.timestamp + session.duration;
+      if (session.context.duration !== undefined) {
+        const sessionExpirationTime =
+          session.context.timestamp + session.context.duration;
         if (Date.now() > sessionExpirationTime) {
           throw new SessionKeyError({
             name: 'Authentication Error',
@@ -160,11 +167,12 @@ async function sign(
         topic: CANVAS_TOPIC,
         payload: {
           type: 'action' as const,
-          address: session.address,
-          blockhash: null,
+          did: session.did,
           name: call,
           args,
-          timestamp: Date.now(),
+          context: {
+            timestamp: Date.now(),
+          },
         },
       };
 

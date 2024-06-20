@@ -22,23 +22,6 @@ export function chainBaseToCaip2(chainBase: ChainBase): string {
   }
 }
 
-export function caip2ToChainBase(caip2: string): ChainBase {
-  const prefix = caip2.split(':')[0];
-  if (prefix === 'eip155') {
-    return ChainBase.Ethereum;
-  } else if (prefix === 'cosmos') {
-    return ChainBase.CosmosSDK;
-  } else if (prefix === 'near') {
-    return ChainBase.NEAR;
-  } else if (prefix === 'solana') {
-    return ChainBase.Solana;
-  } else if (prefix === 'polkadot') {
-    return ChainBase.Substrate;
-  } else {
-    throw new Error(`Unknown CAIP-2 chain prefix: ${prefix}`);
-  }
-}
-
 /**
  * Convert ChainBase to a Canvas chain id, which is a stringified
  * ETH chain ID, or Cosmos bech32 prefix, or equivalent.

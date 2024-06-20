@@ -6,7 +6,7 @@ import {
   hasCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
 import { verifyReaction } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+import { canonicalizeDid } from 'shared/utils';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -61,16 +61,10 @@ export const createCommentReactionHandler = async (
 
       await verifyReaction(canvasSignedData, {
         comment_id: commentId,
-        address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
+        did: canonicalizeDid(
+          canvasSignedData.actionMessage.payload.did,
+          address?.address,
+        ),
         value: reaction,
       });
     }

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { logger } from '@hicommonwealth/core';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { getSessionSignerForAddress } from 'shared/canvas/verify';
+import { getSessionSignerForDid } from 'shared/canvas/verify';
 
 import {
   type AddressInstance,
@@ -23,14 +23,14 @@ const verifySessionSignature = async (
   session: Session,
 ): Promise<boolean> => {
   const expectedAddress = addressModel.address;
-  const sessionAddress = session.address.split(':')[2];
+  const sessionAddress = session.did;
   if (sessionAddress !== expectedAddress) {
     log.warn(
-      `session.address (${sessionAddress}) does not match addressModel.address (${expectedAddress})`,
+      `session.did (${sessionAddress}) does not match addressModel.address (${expectedAddress})`,
     );
   }
 
-  const signer = getSessionSignerForAddress(session.address);
+  const signer = getSessionSignerForDid(session.did);
   let isValid = false;
   try {
     if (signer !== undefined) {

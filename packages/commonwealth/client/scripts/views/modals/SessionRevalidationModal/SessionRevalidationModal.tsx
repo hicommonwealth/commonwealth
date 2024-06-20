@@ -64,16 +64,15 @@ const SessionRevalidationModal = ({
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
-        const updatedAddress = app.user.activeAccounts.find(
+        const signedAddressAccount = app.user.activeAccounts.find(
           (addr) => addr.address === walletAddress,
         );
-        await setActiveAccount(updatedAddress!);
+        await setActiveAccount(signedAddressAccount!);
       } else {
-        await setActiveAccount(
-          app.user.activeAccounts.find(
-            (addr) => addr.address === signedAddress!,
-          )!,
+        const signedAddressAccount = app.user.activeAccounts.find(
+          (addr) => addr.address === signedAddress,
         );
+        await setActiveAccount(signedAddressAccount!);
         openConfirmation({
           title: 'Logged in with unexpected address',
           description: (

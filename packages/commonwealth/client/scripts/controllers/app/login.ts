@@ -223,7 +223,7 @@ export async function updateActiveAddresses({
       }
 
       const session = await matchedSessionSigner.getSession(CANVAS_TOPIC, {
-        address: communityAccount.address,
+        did: communityAccount.address,
       });
 
       if (session !== null) {

@@ -143,9 +143,9 @@ const useUserMenuItems = ({
         // @ts-expect-error StrictNullChecks
         communityIdOrPrefix,
       );
-      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+      const did = `did:pkh:${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-      const signed = authenticatedAddresses[caip2Address];
+      const signed = authenticatedAddresses[did];
       const isActive = app.user.activeAccount?.address === account.address;
       const walletSsoSource = app.user.addresses.find(
         (address) => address.address === account.address,

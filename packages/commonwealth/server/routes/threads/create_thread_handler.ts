@@ -5,7 +5,7 @@ import {
   hasCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
 import { verifyThread } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+import { canonicalizeDid } from 'shared/utils';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -67,17 +67,10 @@ export const createThreadHandler = async (
       await verifyThread(canvasSignedData, {
         title,
         body,
-        address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
-        // @ts-expect-error <StrictNullChecks>
+        did: canonicalizeDid(
+          canvasSignedData.actionMessage.payload.did,
+          address?.address,
+        ),
         community: community.id,
         topic: topicId ? parseInt(topicId, 10) : null,
       });
