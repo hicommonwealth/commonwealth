@@ -45,11 +45,11 @@ const CreateCommunityGroupPage = () => {
       initialValues={{
         requirementsToFulfill: 'ALL',
       }}
-      onSubmit={(values) => {
+      onSubmit={async (values) => {
         const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
         payload.isPWA = isAddedToHomeScreen;
         try {
-          createGroup(payload);
+          await createGroup(payload);
           notifySuccess('Group Created');
           setShouldShowGroupMutationBannerForCommunity(
             app.activeChainId(),

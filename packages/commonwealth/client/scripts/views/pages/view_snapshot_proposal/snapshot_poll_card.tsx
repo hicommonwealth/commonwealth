@@ -29,9 +29,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
   const {
     disableVoteButton = false,
     hasVoted,
-    incrementalVoteCast,
     isPreview,
-    onVoteCast,
     onSnapshotVoteCast,
     pollEnded,
     proposalTitle,

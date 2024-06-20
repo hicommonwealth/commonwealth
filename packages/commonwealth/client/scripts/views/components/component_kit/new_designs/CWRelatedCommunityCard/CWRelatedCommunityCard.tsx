@@ -77,7 +77,7 @@ export const CWRelatedCommunityCard = ({
       }
       navigateToCommunity({ navigate, path: '', chain: community.id });
     },
-    [navigate, trackAnalytics, community.id],
+    [navigate, trackAnalytics, community.id, isAddedToHomeScreen],
   );
 
   const handleBuyStakeClick = () => {
