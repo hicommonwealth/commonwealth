@@ -24,7 +24,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
 type ActivityResponse = {
-  notification_id: number;
   thread: {
     id: number;
     body: string;
@@ -48,10 +47,9 @@ type ActivityResponse = {
     user_id: number;
     user_address: string;
     topic: Topic;
+    community_id: string;
   };
   recentcomments?: [];
-  category_id: string;
-  community_id: string;
 };
 
 type FeedProps = {
@@ -211,7 +209,7 @@ export const Feed = ({
                 // @ts-expect-error <StrictNullChecks/>
                 avatar_url: x.thread.profile_avatar_url,
                 profile_name: x.thread.profile_name,
-                community_id: x.community_id,
+                community_id: x.thread.community_id,
                 kind: x.thread.kind,
                 last_edited: x.thread.updated_at,
                 // @ts-expect-error <StrictNullChecks/>
@@ -233,7 +231,7 @@ export const Feed = ({
                 has_poll: x.thread.has_poll,
                 Address: {
                   address: x.thread.user_address,
-                  community_id: x.community_id,
+                  community_id: x.thread.community_id,
                 },
                 topic: x?.thread?.topic,
                 // filler values
