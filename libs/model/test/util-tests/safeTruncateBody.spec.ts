@@ -6,7 +6,7 @@ const spliceUserMentionIndex = 12;
 const spliceUrlIndex = 38;
 const testString = '012345 [@Tim](/profile/id/118532) https://www.google.com';
 
-describe.only('safeTruncateBody', () => {
+describe('safeTruncateBody', () => {
   test('should not splice user mentions', () => {
     const res = safeTruncateBody(testString, spliceUserMentionIndex);
     expect(res).to.equal(testString.substring(0, 7));
@@ -65,10 +65,15 @@ describe.only('safeTruncateBody', () => {
   });
 
   test('should properly truncate a string with multiple matches', () => {
-    let res = safeTruncateBody(
+    const res = safeTruncateBody(
       '[@Tim](/profile/id/1) [@Tim2](/profile/id/2) [@Tim3](/profile/id/3)',
       63,
     );
     expect(res).to.equal('[@Tim](/profile/id/1) [@Tim2](/profile/id/2) ');
+  });
+
+  test('should truncate normally on whitespace', () => {
+    const res = safeTruncateBody('1234 6789', 5);
+    expect(res).to.equal('1234 ');
   });
 });
