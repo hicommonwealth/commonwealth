@@ -48,4 +48,27 @@ describe.only('safeTruncateBody', () => {
     const res = safeTruncateBody('[@Tim](/profile/id/118532)', 5);
     expect(res).to.equal('...');
   });
+
+  // Parsing mentions without whitespaces in between each is expensive so treat these as 'one word'
+  test('should properly truncate a string with multiple profiles without spaces', () => {
+    let res = safeTruncateBody(
+      '[@Tim](/profile/id/118532)[@Tim](/profile/id/118532)',
+      5,
+    );
+    expect(res).to.equal('...');
+
+    res = safeTruncateBody(
+      '[@Tim](/profile/id/118532)[@Tim](/profile/id/118532)[@Tim](/profile/id/118532)',
+      28,
+    );
+    expect(res).to.equal('...');
+  });
+
+  test('should properly truncate a string with multiple matches', () => {
+    let res = safeTruncateBody(
+      '[@Tim](/profile/id/1) [@Tim2](/profile/id/2) [@Tim3](/profile/id/3)',
+      63,
+    );
+    expect(res).to.equal('[@Tim](/profile/id/1) [@Tim2](/profile/id/2) ');
+  });
 });

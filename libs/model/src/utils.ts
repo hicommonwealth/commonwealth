@@ -145,6 +145,38 @@ export function decodeThreadContentUrl(contentUrl: string): {
   };
 }
 
+function getWordAtIndex(
+  inputString: string,
+  index: number,
+): {
+  word: string;
+  startIndex: number;
+  endIndex: number;
+} | null {
+  if (index < 0 || index >= inputString.length) {
+    return null;
+  }
+
+  // Find the start of the word
+  let start = index;
+  while (start > 0 && inputString[start - 1] !== ' ') {
+    start--;
+  }
+
+  // Find the end of the word
+  let end = index;
+  while (end < inputString.length && inputString[end] !== ' ') {
+    end++;
+  }
+
+  // Extract and return the word
+  return {
+    word: inputString.substring(start, end),
+    startIndex: start,
+    endIndex: end,
+  };
+}
+
 /**
  * This function attempts to safely truncates thread or comment content by not splicing urls
  * or user mentions e.g. `[@Tim](/profile/id/118532)`. If the body contains only a URL or a user mention,
@@ -153,51 +185,22 @@ export function decodeThreadContentUrl(contentUrl: string): {
  * @param length The maximum length of the returned string. Note, the returned string may be shorter than this length.
  */
 export function safeTruncateBody(body: string, length: number = 500): string {
-  if (body.length <= length) {
-    return body;
-  }
+  if (body.length <= length) return body;
+
   // Regular expressions to identify URLs and user mentions
-  const urlRegex = /((https?:\/\/|www\.)[^\s]+)/gi;
-  const mentionRegex = /\[@[^\]]+\]\(\/profile\/id\/\d+\)/g;
+  const urlRegex = /((https?:\/\/|www\.)[^\s]+)$/gi;
+  const mentionRegex = /\[@[^\]]+\]\(\/profile\/id\/\d+\)$/g;
 
-  // Function to check if truncation happens within a match
-  let match: RegExpExecArray | null = null;
+  const result = getWordAtIndex(body, length);
+  if (!result) return body.substring(0, length);
 
-  function getSplicedMatch(regex: RegExp): number | null {
-    while ((match = regex.exec(body)) !== null) {
-      if (
-        match.index === 0 &&
-        match.index < length &&
-        match.index + match[0].length > length
-      ) {
-        return 0;
-      } else if (
-        match.index < length &&
-        match.index + match[0].length > length
-      ) {
-        return match.index;
-      } else if (match.index < length) {
-        return null;
-      }
-    }
-
-    return null;
-  }
-
-  let spliceIndex: number = 0;
-  const urlSpliceIndex = getSplicedMatch(urlRegex);
-  const mentionSpliceIndex = getSplicedMatch(mentionRegex);
-
-  if (urlSpliceIndex !== null) {
-    spliceIndex = urlSpliceIndex;
-  } else if (mentionSpliceIndex !== null) {
-    spliceIndex = mentionSpliceIndex;
+  const match = urlRegex.exec(result.word) || mentionRegex.exec(result.word);
+  if (!match) return body.substring(0, length);
+  else if (match && result.startIndex === 0 && result.endIndex > length) {
+    return '...';
   } else {
-    spliceIndex = length;
+    return body.substring(0, result.startIndex);
   }
-
-  if (spliceIndex === 0) return '...';
-  return body.substring(0, spliceIndex);
 }
 
 /**
