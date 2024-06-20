@@ -76,7 +76,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SESSION_SECRET](#session_secret)
 - [SL_BUILD](#sl_build)
 - [SL_PORT](#sl_port)
-- [SLACK_FEEDBACK_WEBHOOK](#slack_feedback_webhook)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [SUPER_ADMIN_EMAIL](#super_admin_email)
@@ -374,10 +373,6 @@ Boolean triggering our `snapshot-listener` package to build.
 ## SL_PORT
 
 Port used for the `snapshot-listener` package. We use the default value `8001`.
-
-## SLACK_FEEDBACK_WEBHOOK
-
-Enables Common users to share feedback on the app to our Slack. As of 240109, we still hook into the previous Commonwealth Slack, but this is liable to change soon.
 
 ## SLACK_WEBHOOK_URL_DEV
 

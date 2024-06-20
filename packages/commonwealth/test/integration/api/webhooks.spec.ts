@@ -10,10 +10,6 @@ import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import Errors from '../../../server/routes/webhooks/errors';
-import { markdownComment } from '../../util/fixtures/markdownComment';
-import { markdownThread } from '../../util/fixtures/markdownThread';
-import { richTextComment } from '../../util/fixtures/richTextComment';
-import { richTextThread } from '../../util/fixtures/richTextThread';
 
 dotenv.config();
 chai.use(chaiHttp);
@@ -28,13 +24,10 @@ const expectErrorOnResponse = (statusCode, errorMsg, response) => {
 
 describe('Webhook Tests', () => {
   let jwtToken;
-  let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
-  let loggedInSession;
   let notAdminJWT;
   const chain = 'ethereum';
-  let topicId;
   let server: TestServer;
 
   before('reset database', async () => {
@@ -47,11 +40,8 @@ describe('Webhook Tests', () => {
 
   beforeEach(async () => {
     // get topic
-    topicId = await server.seeder.getTopicId({ chain });
     // get logged in address/user with JWT
     let result = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
-    loggedInAddr = result.address;
-    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET,
@@ -245,6 +235,7 @@ describe('Webhook Tests', () => {
       expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
     });
   });
+<<<<<<< HEAD
 
   describe('Integration Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
@@ -303,4 +294,6 @@ describe('Webhook Tests', () => {
       // expect(res.statusCode).to.be.equal(200);
     });
   });
+=======
+>>>>>>> 2c4ea3afae (removed Send Feedback from dropdown et al (#8166))
 });
