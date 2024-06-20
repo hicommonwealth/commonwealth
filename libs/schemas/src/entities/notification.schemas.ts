@@ -82,7 +82,6 @@ export const CommentSubscription = z.object({
 
 export const CommunityAlert = z
   .object({
-    //id: PG_INT.optional(),
     user_id: PG_INT,
     community_id: z.string(),
     created_at: zDate.optional(),
