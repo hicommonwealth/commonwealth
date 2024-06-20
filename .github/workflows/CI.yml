@@ -457,6 +457,7 @@ jobs:
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
 
       - name: Coveralls parallel
+        if: steps.changed-files-specific.outputs.all_changed_files
         uses: coverallsapp/github-action@v2
         with:
           flag-name: cosmos-devnet-test-coverage

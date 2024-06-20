@@ -39,6 +39,12 @@ export const ContestManager = z
       .boolean()
       .nullish()
       .describe('Flags when contest policy is cancelled by admin'),
+    ended: z
+      .boolean()
+      .nullish()
+      .describe(
+        'Flags when the one-off contest has ended and rollover was completed',
+      ),
     topics: z.array(Topic).optional(),
     contests: z.array(Contest).optional(),
   })
