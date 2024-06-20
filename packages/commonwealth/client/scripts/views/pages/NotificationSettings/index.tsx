@@ -12,6 +12,7 @@ import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
+import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
@@ -70,8 +71,7 @@ const NotificationSettings = () => {
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
-    navigate('/', { replace: true });
-    return <PageLoading />;
+    return <PageNotFound />;
   }
 
   return (
