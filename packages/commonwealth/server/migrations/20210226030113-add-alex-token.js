@@ -17,7 +17,7 @@ module.exports = {
             base: 'ethereum',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'ChainNodes',
@@ -28,7 +28,7 @@ module.exports = {
             address: '0x8BA6DcC667d3FF64C1A2123cE72FF5F0199E5315',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -41,28 +41,28 @@ module.exports = {
         {
           chain: 'alex',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Roles',
         {
           chain_id: 'alex',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         {
           chain: 'alex',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         {
           id: 'alex',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
