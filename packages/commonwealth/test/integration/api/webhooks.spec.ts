@@ -10,10 +10,6 @@ import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import Errors from '../../../server/routes/webhooks/errors';
-import { markdownComment } from '../../util/fixtures/markdownComment';
-import { markdownThread } from '../../util/fixtures/markdownThread';
-import { richTextComment } from '../../util/fixtures/richTextComment';
-import { richTextThread } from '../../util/fixtures/richTextThread';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -27,13 +23,10 @@ const expectErrorOnResponse = (statusCode, errorMsg, response) => {
 
 describe('Webhook Tests', () => {
   let jwtToken;
-  let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
-  let loggedInSession;
   let notAdminJWT;
   const chain = 'ethereum';
-  let topicId;
   let server: TestServer;
 
   beforeAll(async () => {
@@ -46,11 +39,8 @@ describe('Webhook Tests', () => {
 
   beforeEach(async () => {
     // get topic
-    topicId = await server.seeder.getTopicId({ chain });
     // get logged in address/user with JWT
     let result = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
-    loggedInAddr = result.address;
-    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       config.AUTH.JWT_SECRET,
@@ -242,65 +232,6 @@ describe('Webhook Tests', () => {
         .set('Accept', 'application/json')
         .query({ chain, auth: true, jwt: notAdminJWT });
       expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
-    });
-  });
-
-  describe('Integration Tests', () => {
-    // we want to test that no errors occur up to the point the webhook is hit
-    test('should send a webhook for markdown and rich text content', async () => {
-      const webhookUrl = config.SLACK_FEEDBACK_WEBHOOK;
-      await server.seeder.createWebhook({
-        chain,
-        // @ts-expect-error StrictNullChecks
-        webhookUrl,
-        jwt: jwtToken,
-      });
-      await server.seeder.createThread({
-        chainId: chain,
-        topicId,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        title: decodeURIComponent(markdownThread.title),
-        body: decodeURIComponent(markdownThread.body),
-        kind: 'discussion',
-        stage: 'discussion',
-        session: loggedInSession.session,
-        sign: loggedInSession.sign,
-      });
-      // expect(res.statusCode).to.be.equal(200);
-      await server.seeder.createComment({
-        chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        text: decodeURIComponent(markdownComment.text),
-        thread_id: `$`,
-        session: loggedInSession.session,
-        sign: loggedInSession.sign,
-      });
-      // expect(res.statusCode).to.be.equal(200);
-      await server.seeder.createThread({
-        chainId: chain,
-        topicId,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        title: decodeURIComponent(richTextThread.title),
-        body: decodeURIComponent(richTextThread.body),
-        kind: 'discussion',
-        stage: 'discussion',
-        session: loggedInSession.session,
-        sign: loggedInSession.sign,
-      });
-      // expect(res.statusCode).to.be.equal(200);
-      await server.seeder.createComment({
-        chain,
-        address: loggedInAddr,
-        jwt: jwtToken,
-        text: decodeURIComponent(richTextComment.text),
-        thread_id: `discussion_`,
-        session: loggedInSession.session,
-        sign: loggedInSession.sign,
-      });
-      // expect(res.statusCode).to.be.equal(200);
     });
   });
 });

@@ -1,4 +1,3 @@
-import userGrowlImg from 'assets/img/userSurveyGrowlImage.svg';
 import React, { useState } from 'react';
 import useGrowlStore from 'state/ui/growl';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -6,19 +5,33 @@ import { CWGrowl } from 'views/components/component_kit/cw_growl';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import './UserSurveyGrowl.scss';
+import { CWButton } from '../../component_kit/new_designs/CWButton';
+import './CWGrowlTemplate.scss';
 
-const LOCALSTORAGE_USER_SURVEY_GROWL_KEY = 'userSurveyGrowlHidden';
+const LOCALSTORAGE_GROWL_TEMPLATE_KEY = 'GrowlTemplateHidden';
 
-export const UserSurveyGrowl = () => {
+interface CWGrowlTemplateProps {
+  headerText: string;
+  bodyText: string;
+  buttonText: string;
+  buttonLink: string;
+  growlImage: string;
+}
+
+export const CWGrowlTemplate = ({
+  headerText,
+  bodyText,
+  buttonText,
+  buttonLink,
+  growlImage,
+}: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
 
   const [shouldHideGrowlPermanently, setShouldHideGrowlPermanently] =
     useState(false);
 
   const [isDisabled, setIsDisabled] = useState(
-    localStorage.getItem(LOCALSTORAGE_USER_SURVEY_GROWL_KEY) === 'true' ||
+    localStorage.getItem(LOCALSTORAGE_GROWL_TEMPLATE_KEY) === 'true' ||
       isGrowlHidden,
   );
 
@@ -27,36 +40,35 @@ export const UserSurveyGrowl = () => {
     setIsGrowlHidden(true);
 
     if (shouldHideGrowlPermanently) {
-      localStorage.setItem(LOCALSTORAGE_USER_SURVEY_GROWL_KEY, 'true');
+      localStorage.setItem(LOCALSTORAGE_GROWL_TEMPLATE_KEY, 'true');
     }
   };
 
   return (
     <CWGrowl disabled={isDisabled} position="bottom-right">
-      <div className="UserSurveyGrowl">
+      <div className="CWGrowlTemplate">
         <CWIconButton
           iconName="close"
           iconSize="medium"
           className="closeButton"
           onClick={handleExit}
         />
-        <img src={userGrowlImg} alt="" className="img" />
+        <img src={growlImage} alt="" className="img" />
         <div className="container">
           <CWText type="h2" fontWeight="bold" isCentered>
-            Complete our survey and get a free NFT!
+            {headerText}
           </CWText>
           <CWText type="b1" fontWeight="medium" isCentered className="body">
-            We’d like to get to know you better! Take our 2 minute audience
-            survey, and we can build Common’s future together.
+            {bodyText}
           </CWText>
           <CWButton
             className="CalenderButton"
             buttonType="primary"
             buttonHeight="med"
-            label="Complete Survey"
+            label={buttonText}
             onClick={(e) => {
               e.preventDefault();
-              window.open('https://bit.ly/CMNSRVY', '_blank');
+              window.open(buttonLink, '_blank');
             }}
           />
           <CWText type="b2" fontWeight="regular" isCentered className="body">
@@ -97,4 +109,4 @@ export const UserSurveyGrowl = () => {
   );
 };
 
-export default UserSurveyGrowl;
+export default CWGrowlTemplate;

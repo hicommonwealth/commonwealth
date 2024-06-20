@@ -1,0 +1,27 @@
+@import '../../../../../styles/shared';
+
+.ContestThreadBanner {
+  .content-container {
+    @include extraSmall {
+      flex-direction: column;
+    }
+
+    .right-side {
+      display: flex;
+      padding-left: 64px;
+      margin-top: 8px;
+
+      @include extraSmall {
+        padding-left: 0;
+        margin-left: unset !important;
+      }
+
+      .banner-accessory-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 120px;
+      }
+    }
+  }
+}

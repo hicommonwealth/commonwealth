@@ -7,7 +7,10 @@ export const formatVersionText = (
   profile: UserProfile,
   collabInfo: Record<string, string>,
 ) => {
-  const formattedTime = timestamp.format('MMMM Do, YYYY • h:mm A');
+  const formattedTime = timestamp
+    ?.utc?.()
+    ?.local?.()
+    ?.format?.('Do MMMM, YYYY • h:mm A');
   // Some old posts don't have address, so account for them by omitting address
   if (!address) {
     return formattedTime;
