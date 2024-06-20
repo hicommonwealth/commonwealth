@@ -189,7 +189,7 @@ export const CWContentPage = ({
           lockedAt: thread.lockedAt.toISOString(),
         })}
         {...(thread?.lastEdited && {
-          lastUpdated: thread.lastEdited.toISOString(),
+          lastUpdated: (thread?.lastEdited || thread.updatedAt).toISOString(),
         })}
         // @ts-expect-error <StrictNullChecks/>
         authorAddress={author?.address}
