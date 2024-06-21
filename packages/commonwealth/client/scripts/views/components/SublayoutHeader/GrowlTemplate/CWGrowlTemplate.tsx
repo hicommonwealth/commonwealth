@@ -35,6 +35,9 @@ export const CWGrowlTemplate = ({
       isGrowlHidden,
   );
 
+  //to be deleted later
+  console.log('hello worldddd');
+
   const handleExit = () => {
     setIsDisabled(true);
     setIsGrowlHidden(true);
