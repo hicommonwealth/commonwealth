@@ -1,5 +1,4 @@
 import 'Sublayout.scss';
-import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
