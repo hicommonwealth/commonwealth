@@ -57,7 +57,6 @@ const DiscussionsRedirectPage = lazy(
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect'),
 );
-const FeedPage = lazy(() => import('views/pages/feed'));
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
@@ -118,7 +117,6 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
-  communityHomepageEnabled,
   contestEnabled,
   knockInAppNotifications,
 }: RouteFeatureFlags) => [
@@ -357,17 +355,6 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
-  ...(communityHomepageEnabled
-    ? [
-        <Route
-          key="/:scope/feed"
-          path="/:scope/feed"
-          element={withLayout(FeedPage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
   <Route
     key={0}
     path="/:scope/archived"

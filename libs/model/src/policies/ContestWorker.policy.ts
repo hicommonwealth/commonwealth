@@ -43,9 +43,19 @@ export function ContestWorker(): Policy<typeof inputs> {
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
             JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+            JOIN (
+                SELECT contest_address, MAX(contest_id) AS max_contest_id, MAX(end_time) as end_time
+                FROM "Contests"
+                GROUP BY contest_address
+            ) co ON cm.contest_address = co.contest_address
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
+            AND (
+              cm.interval = 0 AND NOW() < co.end_time
+              OR
+              cm.interval > 0
+            )
         `,
           {
             type: QueryTypes.SELECT,
@@ -57,7 +67,7 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
 
         if (!activeContestManagers?.length) {
-          log.warn('ThreadCreated: no contest managers found');
+          log.warn('ThreadCreated: no matching contest managers found');
           return;
         }
 
@@ -134,7 +144,11 @@ export function ContestWorker(): Policy<typeof inputs> {
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
-            AND NOW() > co.start_time
+            AND (
+              cm.interval = 0 AND NOW() < co.end_time
+              OR
+              cm.interval > 0
+            )
             AND ca.action IS NULL;
         `,
           {

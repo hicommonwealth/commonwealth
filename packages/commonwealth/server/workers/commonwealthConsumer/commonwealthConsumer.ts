@@ -8,9 +8,11 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
+  Actor,
   Broker,
   BrokerSubscriptions,
   broker,
+  command,
   logger,
   stats,
 } from '@hicommonwealth/core';
@@ -112,8 +114,17 @@ export async function setupCommonwealthConsumer(): Promise<void> {
 
 function startRolloverLoop() {
   log.info('Starting rollover loop');
+
+  // TODO: move to external service triggered via scheduler?
   setInterval(() => {
-    Contest.performContestRollovers().catch(console.error);
+    command(
+      Contest.PerformContestRollovers(),
+      {
+        actor: {} as Actor,
+        payload: {},
+      },
+      false,
+    ).catch(console.error);
   }, 1_000 * 60);
 }
 

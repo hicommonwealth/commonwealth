@@ -65,3 +65,8 @@ export const ResumeContestManagerMetadata = {
     contest_managers: z.array(ContestManager),
   }),
 };
+
+export const PerformContestRollovers = {
+  input: z.object({}),
+  output: z.object({}),
+};

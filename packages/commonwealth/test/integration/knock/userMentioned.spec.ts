@@ -9,7 +9,7 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { safeTruncateBody, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
@@ -132,19 +132,15 @@ describe('userMentioned Event Handler', () => {
       key: WorkflowKeys.UserMentioned,
       users: [{ id: String(user!.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author_address_id: community!.Addresses[0].id,
+        author_address_id: community!.Addresses![0].id,
         author_user_id: author!.id,
-        // @ts-expect-error StrictNullChecks
-        author_address: community!.Addresses[0].address,
+        author_address: community!.Addresses![0].address,
         author_profile_id: authorProfile!.id,
         community_id: community!.id,
         community_name: community!.name,
         author: authorProfile!.profile_name,
-        // @ts-expect-error StrictNullChecks
-        object_body: thread!.body.substring(255),
-        // @ts-expect-error StrictNullChecks
-        object_url: getThreadUrl(community!.id, thread!.id),
+        object_body: safeTruncateBody(thread!.body!, 255),
+        object_url: getThreadUrl(community!.id!, thread!.id!),
       },
     });
   });

@@ -23,8 +23,8 @@ export type CommentAttributes = {
   parent_id?: string;
   version_history?: string[];
 
-  canvas_action: string;
-  canvas_session: string;
+  // canvas-related columns
+  canvas_signed_data: string;
   canvas_hash: string;
 
   created_by: string;
@@ -74,10 +74,11 @@ export default (
         defaultValue: [],
         allowNull: false,
       },
-      // signed data
-      canvas_action: { type: Sequelize.JSONB, allowNull: true },
-      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+
+      // canvas-related columns
+      canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_hash: { type: Sequelize.STRING, allowNull: true },
+
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
