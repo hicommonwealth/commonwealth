@@ -2,9 +2,11 @@ import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
+import { Session } from '@canvas-js/interfaces';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
+import { serializeCanvas } from 'shared/canvas/types';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
@@ -170,31 +172,14 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(
-    signature: string,
-    timestamp: number,
-    chainId: string | number,
-    shouldRedraw = true,
-  ) {
-    if (!signature) {
-      throw new Error('signature required for validation');
-    }
-
+  public async validate(session: Session, shouldRedraw = true) {
     const params = {
       address: this.address,
       community_id: this.community.id,
-      chain_id: chainId,
       jwt: app.user.jwt,
-      signature,
+      session: serializeCanvas(session),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
-      session_public_address: await app.sessions.getOrCreateAddress(
-        this.community.base,
-        chainId.toString(),
-        this.address,
-      ),
-      session_timestamp: timestamp,
-      session_block_data: this.validationBlockInfo,
     };
 
     const res = await axios.post(`${app.serverUrl()}/verifyAddress`, params);

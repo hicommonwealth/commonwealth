@@ -204,7 +204,7 @@ export const AuthorAndPublishInfo = ({
             <div className="version-history">
               <CWSelectList
                 options={versionHistoryOptions}
-                placeholder={`Edited ${publishDate
+                placeholder={`Edited ${moment(versionHistory?.[0]?.timestamp)
                   ?.utc?.()
                   ?.local?.()
                   ?.format('DD/MM/YYYY')}`}

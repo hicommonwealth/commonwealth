@@ -158,6 +158,7 @@ type SubscriptionRowMenuProps = {
   onUnsubscribe: (subscription: NotificationSubscription) => void;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SubscriptionRowMenu = ({
   subscription,
   onUnsubscribe,

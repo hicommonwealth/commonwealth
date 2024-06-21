@@ -1,4 +1,10 @@
-import { ActionPayload, Session } from '@canvas-js/interfaces';
+import type {
+  Action,
+  Awaitable,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
 import { LinkSource } from '@hicommonwealth/shared';
@@ -27,13 +33,13 @@ describe('Linking Tests', () => {
     adminAddress: string,
     adminSession: {
       session: Session;
-      sign: (payload: ActionPayload) => string;
+      sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
     },
     userJWT: string,
     userAddress: string,
     userSession: {
       session: Session;
-      sign: (payload: ActionPayload) => string;
+      sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
     },
     thread1: ThreadAttributes,
     thread2: ThreadAttributes;
