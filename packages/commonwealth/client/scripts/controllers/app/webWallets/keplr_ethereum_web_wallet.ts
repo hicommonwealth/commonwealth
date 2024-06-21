@@ -100,7 +100,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           const { data: addressData } = fromBech32(this.accounts[0].address);
           return `0x${bytesToHex(addressData)}`;
         },
-        getChainId: () => this._chainId,
+        getChainId: () => this._chainId || 'cosmoshub-1',
       },
     });
   }

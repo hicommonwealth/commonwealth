@@ -87,12 +87,12 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'osmo',
+      bech32Prefix: app.chain?.meta.bech32Prefix || 'cosmos',
       signer: {
         type: 'amino',
         signAmino: window.wallet.signAmino,
         getAddress: () => this.accounts[0].address,
-        getChainId: () => this.getChainId() || 'osmosis-1',
+        getChainId: () => this.getChainId() || 'cosmoshub-1',
       },
     });
   }

@@ -82,7 +82,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'inj',
+      bech32Prefix: app.chain?.meta.bech32Prefix || 'cosmos',
       signer: {
         type: 'ethereum',
         signEthereum: (
@@ -91,7 +91,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
           message: string,
         ) => this._web3.eth.personal.sign(message, signerAddress, ''),
         getAddress: () => this._ethAccounts[0],
-        getChainId: () => this._chainId,
+        getChainId: () => this._chainId || 'cosmoshub-1',
       },
     });
   }
