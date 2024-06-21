@@ -15,7 +15,7 @@ interface CWGrowlTemplateProps {
   bodyText: string;
   buttonText: string;
   buttonLink: string;
-  growlImage: string;
+  growlImage?: string;
 }
 
 export const CWGrowlTemplate = ({
@@ -23,7 +23,6 @@ export const CWGrowlTemplate = ({
   bodyText,
   buttonText,
   buttonLink,
-  growlImage,
 }: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
 
@@ -53,7 +52,11 @@ export const CWGrowlTemplate = ({
           className="closeButton"
           onClick={handleExit}
         />
-        <img src={growlImage} alt="" className="img" />
+        <img
+          src="/static/img/ideacoinSurveyGrowlImage.svg"
+          alt=""
+          className="img"
+        />
         <div className="container">
           <CWText type="h2" fontWeight="bold" isCentered>
             {headerText}

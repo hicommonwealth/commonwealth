@@ -1,5 +1,4 @@
 import 'Sublayout.scss';
-import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -229,11 +228,10 @@ const Sublayout = ({
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
           <CWGrowlTemplate
-            headerText="Shape the Future of Crypto with Ideacoin!"
+            headerText="Shape the Future of Crypto"
             bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
             buttonText="Take the Survey for an NFT"
             buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
-            growlImage={ideacoinSurveyGrowlImage}
           />
         </div>
         {userOnboardingEnabled && (
