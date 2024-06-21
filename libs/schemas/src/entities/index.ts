@@ -1,5 +1,6 @@
 export * from './chain.schemas';
 export * from './comment-version-history.schemas';
+export { CommentVersionHistory } from './comment.schemas';
 export * from './community.schemas';
 export * from './contest-manager.schemas';
 export * from './contract.schemas';

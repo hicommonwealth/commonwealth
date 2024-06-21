@@ -47,7 +47,7 @@ export type UpdateThreadOptions = {
   address: AddressInstance;
   threadId?: number;
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;
