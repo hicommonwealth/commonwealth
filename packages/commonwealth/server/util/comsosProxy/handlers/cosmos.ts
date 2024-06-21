@@ -73,7 +73,6 @@ export async function cosmosHandler(
     }
 
     try {
-      log.info(`Querying Cosmos node at ${url}`);
       const response = await axios.post(
         url,
         _.isEmpty(req.body) ? null : req.body,
