@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
-// import ideacoinSurveyGrowlImage from 'static/img/ideacoinSurveyGrowlImage.svg';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import { getUniqueUserAddresses } from '../helpers/user';
