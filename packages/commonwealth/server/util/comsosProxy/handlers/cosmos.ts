@@ -44,35 +44,27 @@ export async function cosmosHandler(
   );
 
   if (
-    !community.ChainNode.health ||
-    community.ChainNode.health === NodeHealth.Healthy ||
-    (community.ChainNode.health === NodeHealth.Failed &&
+    !community.ChainNode!.health ||
+    community.ChainNode!.health === NodeHealth.Healthy ||
+    (community.ChainNode!.health === NodeHealth.Failed &&
       new Date() > nodeTimeoutEnd)
   ) {
     let url: string;
-    console.log(
-      '\noriginalUrl',
-      req.originalUrl,
-      '\nbaseUrl',
-      req.baseUrl,
-      '\nurl',
-      req.url,
-    );
-    if (requestType === 'REST' && community.ChainNode.alt_wallet_url) {
+    if (requestType === 'REST' && community.ChainNode!.alt_wallet_url) {
       url = req.originalUrl.replace(
         req.baseUrl,
         // remove trailing slash
-        community.ChainNode.alt_wallet_url.trim().replace(/\/$/, ''),
+        community.ChainNode!.alt_wallet_url.trim().replace(/\/$/, ''),
       );
     } else if (requestType === 'RPC') {
       url =
-        community.ChainNode.private_url?.trim() ||
-        community.ChainNode.url?.trim();
+        community.ChainNode!.private_url?.trim() ||
+        community.ChainNode!.url?.trim();
     }
 
     if (!url) {
       log.error('No URL found for chain node', undefined, {
-        cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
+        cosmos_chain_id: community.ChainNode!.cosmos_chain_id,
       });
       throw new Error('No URL found for chain node');
     }
@@ -113,7 +105,7 @@ export async function cosmosHandler(
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {
         requestType,
-        cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
+        cosmos_chain_id: community?.ChainNode!.cosmos_chain_id,
       });
       await updateNodeHealthIfNeeded(
         req,
@@ -124,10 +116,10 @@ export async function cosmosHandler(
       );
 
       if (
-        IGNORE_COSMOS_CHAIN_IDS.includes(community.ChainNode.cosmos_chain_id)
+        IGNORE_COSMOS_CHAIN_IDS.includes(community.ChainNode!.cosmos_chain_id)
       ) {
         log.warn('Ignoring external proxy request for dev Cosmos chain', {
-          cosmos_chain_id: community.ChainNode.cosmos_chain_id,
+          cosmos_chain_id: community.ChainNode!.cosmos_chain_id,
         });
         return res.status(err?.response?.status || 500).json({
           message: err?.message,
@@ -151,7 +143,7 @@ export async function cosmosHandler(
     return res.status(response.status || 200).send(response?.data);
   } catch (err) {
     log.error('Failed to query external Cosmos proxy', err, {
-      chainNode: community?.ChainNode.cosmos_chain_id,
+      chainNode: community?.ChainNode!.cosmos_chain_id,
     });
     return res.status(err?.response?.status || 500).json({
       message: err?.message || 'Failed to query external Cosmos proxy',

@@ -165,6 +165,7 @@ export async function queryExternalProxy(
     url = req.originalUrl.replace(req.baseUrl, proxyUrl);
   }
 
+  log.info(`Querying Cosmos node at ${url}`);
   return await axios.post(url, _.isEmpty(req.body) ? null : req.body, {
     headers: {
       origin: 'https://commonwealth.im',
