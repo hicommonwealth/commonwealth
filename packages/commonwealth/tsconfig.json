@@ -9,16 +9,9 @@
     "strictNullChecks": true,
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
-      "*": ["./*", "shared/*", "client/scripts/*"]
-    }
-  },
-  "tsc-alias": {
-    "replacers": {
-      "webpack": {
-        "enabled": true,
-        "file": "./webpackReplacer.cjs"
-      }
-    }
+      "*": ["./*", "shared/*", "client/scripts/*", "client/assets/*"]
+    },
+    "types": ["vite/client"]
   },
   "include": [
     "client",

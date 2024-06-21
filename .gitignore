@@ -2,6 +2,7 @@ docker-compose.yaml
 stellar
 node_modules/
 **/build
+**/dist
 **/*.tsbuildinfo
 **/.DS_Store
 *.env

@@ -80,7 +80,6 @@ const ReactQuillEditor = ({
 
   const editorRef = useRef<ReactQuill>();
 
-  const [isVisible] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -285,80 +284,73 @@ const ReactQuillEditor = ({
             >
               {showTooltip && <QuillTooltip label={tooltipLabel} />}
               {isUploading && <LoadingIndicator />}
-
-              {isVisible && (
-                <>
-                  <CustomQuillToolbar
-                    toolbarId={toolbarId}
-                    isDisabled={isDisabled}
-                  />
-                  <DragDropContext onDragEnd={handleDragStop}>
-                    <Droppable droppableId="quillEditor">
-                      {(provided) => (
-                        <div
-                          className={`${isDraggingOver ? 'ondragover' : ''}`}
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                          onDragOver={handleDragStart}
-                          onDragLeave={handleDragStop}
-                          onDrop={handleDragStop}
-                        >
-                          <div data-text-editor="name">
-                            <ReactQuill
-                              // @ts-expect-error <StrictNullChecks/>
-                              ref={editorRef}
-                              className={`QuillEditor markdownEnabled ${className}`}
-                              scrollingContainer="ql-container"
-                              placeholder={placeholder}
-                              tabIndex={tabIndex}
-                              theme="snow"
-                              bounds={`[data-text-editor="name"]`}
-                              value={contentDeltaToUse}
-                              onFocus={() => setIsFocused(true)}
-                              onBlur={() => {
-                                setIsFocused(false);
-                                isHookedToFormProper &&
-                                  formContext
-                                    .trigger(name)
-                                    .catch(console.error);
-                              }}
-                              onChange={handleChange}
-                              onChangeSelection={(selection: RangeStatic) => {
-                                if (!selection) {
-                                  return;
-                                }
-                                lastSelectionRef.current = selection;
-                              }}
-                              formats={[]}
-                              modules={{
-                                toolbar: {
-                                  container: `#${toolbarId}`,
-                                  handlers: markdownToolbarHandlers,
-                                },
-                                imageDropAndPaste: {
-                                  handler: handleImageDropAndPaste,
-                                },
-                                clipboard: {
-                                  matchVisual: false,
-                                  handler: handleTextPaste,
-                                },
-                                mention,
-                                magicUrl: false,
-                                keyboard: markdownKeyboardShortcuts,
-                              }}
-                            />
-                          </div>
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                  <CustomQuillFooter
-                    // @ts-expect-error <StrictNullChecks/>
-                    handleImageUploader={handleImageUploader}
-                  />
-                </>
-              )}
+              <CustomQuillToolbar
+                toolbarId={toolbarId}
+                isDisabled={isDisabled}
+              />
+              <DragDropContext onDragEnd={handleDragStop}>
+                <Droppable droppableId="quillEditor">
+                  {(provided) => (
+                    <div
+                      className={`${isDraggingOver ? 'ondragover' : ''}`}
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      onDragOver={handleDragStart}
+                      onDragLeave={handleDragStop}
+                      onDrop={handleDragStop}
+                    >
+                      <div data-text-editor="name">
+                        <ReactQuill
+                          // @ts-expect-error <StrictNullChecks/>
+                          ref={editorRef}
+                          className={`QuillEditor markdownEnabled ${className}`}
+                          scrollingContainer="ql-container"
+                          placeholder={placeholder}
+                          tabIndex={tabIndex}
+                          theme="snow"
+                          bounds={`[data-text-editor="name"]`}
+                          value={contentDeltaToUse}
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => {
+                            setIsFocused(false);
+                            isHookedToFormProper &&
+                              formContext.trigger(name).catch(console.error);
+                          }}
+                          onChange={handleChange}
+                          onChangeSelection={(selection: RangeStatic) => {
+                            if (!selection) {
+                              return;
+                            }
+                            lastSelectionRef.current = selection;
+                          }}
+                          formats={[]}
+                          modules={{
+                            toolbar: {
+                              container: `#${toolbarId}`,
+                              handlers: markdownToolbarHandlers,
+                            },
+                            imageDropAndPaste: {
+                              handler: handleImageDropAndPaste,
+                            },
+                            clipboard: {
+                              matchVisual: false,
+                              handler: handleTextPaste,
+                            },
+                            mention,
+                            magicUrl: false,
+                            keyboard: markdownKeyboardShortcuts,
+                          }}
+                        />
+                      </div>
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+              <CustomQuillFooter
+                // @ts-expect-error <StrictNullChecks/>
+                handleImageUploader={handleImageUploader}
+              />
             </div>
           </div>
         ) : (

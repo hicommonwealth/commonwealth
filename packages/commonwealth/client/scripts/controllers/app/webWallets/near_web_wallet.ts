@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import type { SessionPayload } from '@canvas-js/interfaces';
+import { SessionSigner } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
@@ -25,20 +22,18 @@ class NearWebWalletController implements IWebWallet<any> {
     return 'near';
   }
 
-  // @ts-expect-error StrictNullChecks
-  public async getRecentBlock(chainIdentifier: string) {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async getRecentBlock(_chainIdentifier: string) {
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async getSessionPublicAddress(): Promise<string> {
     // @ts-expect-error StrictNullChecks
     return null;
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
+  public getSessionSigner(): SessionSigner {
     throw new Error('not implemented');
   }
 

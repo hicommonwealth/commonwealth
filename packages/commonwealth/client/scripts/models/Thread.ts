@@ -183,8 +183,7 @@ export class Thread implements IUniqueId {
   public stage: ThreadStage;
   public readOnly: boolean;
 
-  public readonly canvasAction: string;
-  public readonly canvasSession: string;
+  public readonly canvasSignedData: string;
   public readonly canvasHash: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
@@ -255,8 +254,7 @@ export class Thread implements IUniqueId {
     reactedProfileName,
     reactedProfileAvatarUrl,
     reactedAddressLastActive,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     links,
     discord_meta,
@@ -278,8 +276,7 @@ export class Thread implements IUniqueId {
     url?: string;
     pinned?: boolean;
     links?: Link[];
-    canvasAction?: string;
-    canvasSession?: string;
+    canvasSignedData?: string;
     canvasHash?: string;
     plaintext?: string;
     collaborators?: any[];
@@ -352,10 +349,8 @@ export class Thread implements IUniqueId {
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
     // @ts-expect-error StrictNullChecks
-    this.canvasAction = canvasAction;
-    // @ts-expect-error StrictNullChecks
-    this.canvasSession = canvasSession;
-    // @ts-expect-error StrictNullChecks
+    this.canvasSignedData = canvasSignedData;
+    // @ts-expect-error <StrictNullChecks>
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
@@ -409,9 +404,8 @@ export class Thread implements IUniqueId {
           reactions: [],
           version_history: [],
           reaction_weights_sum: 0,
-          canvas_action: null,
+          canvas_signed_data: null,
           canvas_hash: null,
-          canvas_session: null,
         }),
     );
     this.latestActivity = last_commented_on

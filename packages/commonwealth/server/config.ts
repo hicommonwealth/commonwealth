@@ -14,12 +14,10 @@ const {
   JWT_SECRET,
   SEND_EMAILS: _SEND_EMAILS,
   SEND_WEBHOOKS_EMAILS,
-  NO_CLIENT: _NO_CLIENT,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   LOGIN_RATE_LIMIT_TRIES,
   LOGIN_RATE_LIMIT_MINS,
-  SLACK_FEEDBACK_WEBHOOK,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_API_KEY,
@@ -41,8 +39,7 @@ const {
 } = process.env;
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
-const NO_CLIENT = _NO_CLIENT === 'true' || SEND_EMAILS;
-const NO_PRERENDER = _NO_PRERENDER || NO_CLIENT;
+const NO_PRERENDER = _NO_PRERENDER;
 
 export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
@@ -53,14 +50,12 @@ export const config = configure(
     // Risks sending webhooks/emails to real users if incorrectly set to true
     SEND_WEBHOOKS_EMAILS:
       model_config.NODE_ENV === 'production' && SEND_WEBHOOKS_EMAILS === 'true',
-    NO_CLIENT,
     NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     // limit logins in the last 5 minutes
     // increased because of chain waitlist registrations
     LOGIN_RATE_LIMIT_TRIES: parseInt(LOGIN_RATE_LIMIT_TRIES ?? '15', 10),
     LOGIN_RATE_LIMIT_MINS: parseInt(LOGIN_RATE_LIMIT_MINS ?? '5', 10),
-    SLACK_FEEDBACK_WEBHOOK,
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(GENERATE_IMAGE_RATE_LIMIT ?? '10', 10),
     DEFAULT_COMMONWEALTH_LOGO:
@@ -128,12 +123,10 @@ export const config = configure(
     ENFORCE_SESSION_KEYS: z.boolean(),
     SEND_EMAILS: z.boolean(),
     SEND_WEBHOOKS_EMAILS: z.boolean(),
-    NO_CLIENT: z.boolean(),
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     LOGIN_RATE_LIMIT_TRIES: z.number().int().positive(),
     LOGIN_RATE_LIMIT_MINS: z.number().int().positive(),
-    SLACK_FEEDBACK_WEBHOOK: z.string().optional(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
