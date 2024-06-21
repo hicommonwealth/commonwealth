@@ -35,6 +35,7 @@ const useToggleCommunityStarMutation = () => {
         const star = app.user.starredCommunities.find((c) => {
           return c.community_id === community;
         });
+        // @ts-expect-error StrictNullChecks
         app.user.removeStarredCommunity(star.community_id, star.user_id);
       }
     },

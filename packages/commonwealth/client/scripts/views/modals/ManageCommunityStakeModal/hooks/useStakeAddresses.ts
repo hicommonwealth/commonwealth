@@ -35,7 +35,9 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
 
   const availableAddresses = (() => {
     // if filtering addresses for a specific community
+    // @ts-expect-error StrictNullChecks
     if (communityAddresses?.length > 0) {
+      // @ts-expect-error StrictNullChecks
       return communityAddresses.map((addr) => ({ address: addr }));
     }
 

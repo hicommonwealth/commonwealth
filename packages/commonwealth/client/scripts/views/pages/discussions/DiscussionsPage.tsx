@@ -28,7 +28,9 @@ import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -47,6 +49,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
+  // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -74,6 +77,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
+  const { contestsData } = useCommunityContests();
+
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
@@ -97,11 +102,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         orderBy: featuredFilter,
       }),
       toDate: dateCursor.toDate,
+      // @ts-expect-error <StrictNullChecks/>
       fromDate: dateCursor.fromDate,
       isOnArchivePage: isOnArchivePage,
+      // @ts-expect-error <StrictNullChecks/>
       contestAddress,
+      // @ts-expect-error <StrictNullChecks/>
       contestStatus,
-      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -122,6 +129,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
+    // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
       <DiscussionsFeedDiscovery
         orderBy={featuredFilter}
@@ -132,6 +140,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
         data={isInitialLoading ? [] : filteredThreads}
+        customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -158,6 +167,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadTopicGated: isRestrictedMembership,
           });
 
+          const isTopicInContest = checkIsTopicInContest(
+            contestsData,
+            thread?.topic?.id,
+          );
+
           return (
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
@@ -176,9 +190,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
+                navigate(`${discussionLink}?focusComments=true`)
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
+              hideRecentComments
+              editingDisabled={isTopicInContest}
             />
           );
         }}
@@ -201,6 +217,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               {userOnboardingEnabled && <UserTrainingSlider />}
               <AdminOnboardingSlider />
               <HeaderWithFilters
+                // @ts-expect-error <StrictNullChecks/>
                 topic={topicName}
                 stage={stageName}
                 featuredFilter={featuredFilter}

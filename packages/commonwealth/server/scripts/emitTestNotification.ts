@@ -191,6 +191,7 @@ async function setupNotification(
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   if (!existingNotifications) {
     existingNotifications = await getExistingNotifications(
       transaction,
@@ -338,6 +339,7 @@ async function main() {
         );
         await dispose()('ERROR', true);
       } else {
+        // @ts-expect-error StrictNullChecks
         userId = address.user_id;
       }
     }
@@ -346,7 +348,7 @@ async function main() {
     if (argv.chain_id) {
       result = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: userId,
+          subscriber_id: userId!,
           community_id: argv.chain_id,
           category_id: NotificationCategories.ChainEvent,
         },
@@ -355,7 +357,7 @@ async function main() {
     } else {
       result = await models.Subscription.findOrCreate({
         where: {
-          subscriber_id: userId,
+          subscriber_id: userId!,
           snapshot_id: argv.snapshot_id,
           category_id: NotificationCategories.SnapshotProposal,
         },

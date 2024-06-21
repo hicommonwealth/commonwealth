@@ -165,6 +165,7 @@ class NotificationsController {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.disable();
+          // @ts-expect-error StrictNullChecks
           if (s.category === 'chain-event') ceSubs.push(s);
         }
       },
@@ -322,6 +323,7 @@ class NotificationsController {
       throw new Error('must be signed in to refresh notifications');
     }
 
+    // @ts-expect-error StrictNullChecks
     const options: NotifOptions = app.isCustomDomain()
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };
@@ -338,6 +340,7 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
+    // @ts-expect-error StrictNullChecks
     const options: NotifOptions = app.isCustomDomain()
       ? { community_filter: app.activeChainId(), maxId: undefined }
       : { community_filter: undefined, maxId: undefined };

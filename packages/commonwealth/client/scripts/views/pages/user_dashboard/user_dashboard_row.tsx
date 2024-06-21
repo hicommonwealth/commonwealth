@@ -52,11 +52,17 @@ export const UserDashboardRow = ({
   }
 
   const {
+    // @ts-expect-error <StrictNullChecks/>
     commentCount,
+    // @ts-expect-error <StrictNullChecks/>
     categoryId,
+    // @ts-expect-error <StrictNullChecks/>
     threadId,
+    // @ts-expect-error <StrictNullChecks/>
     blockNumber,
+    // @ts-expect-error <StrictNullChecks/>
     communityId,
+    // @ts-expect-error <StrictNullChecks/>
     commenters,
   } = notification;
 
@@ -67,12 +73,14 @@ export const UserDashboardRow = ({
       <UserDashboardChainEventRow
         blockNumber={blockNumber}
         community={communityInfo}
+        // @ts-expect-error <StrictNullChecks/>
         label={label}
       />
     );
   }
 
   const { community_id, thread_id, root_type } = JSON.parse(
+    // @ts-expect-error <StrictNullChecks/>
     notification.notificationData,
   );
 

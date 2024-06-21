@@ -1,10 +1,11 @@
 import { AddressAttributes } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { validateOwner } from 'server/util/validateOwner';
+import { describe, test } from 'vitest';
 
 describe('validateOwner', () => {
   describe('default behavior', () => {
-    it('should deny user by default', async () => {
+    test('should deny user by default', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -35,7 +36,7 @@ describe('validateOwner', () => {
   });
 
   describe('check super admin mode', () => {
-    it('should deny super admin mode user', async () => {
+    test('should deny super admin mode user', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -65,7 +66,7 @@ describe('validateOwner', () => {
       expect(result).to.be.false;
     });
 
-    it('should allow super admin user', async () => {
+    test('should allow super admin user', async () => {
       const models: any = {};
       const user: any = {
         getAddresses: async () => [],
@@ -92,7 +93,7 @@ describe('validateOwner', () => {
   });
 
   describe('check entity owner', () => {
-    it('should deny non-owner user', async () => {
+    test('should deny non-owner user', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -128,7 +129,7 @@ describe('validateOwner', () => {
       expect(result).to.be.false;
     });
 
-    it('should allow owner user', async () => {
+    test('should allow owner user', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -166,7 +167,7 @@ describe('validateOwner', () => {
   });
 
   describe('check moderator/admin', () => {
-    it('should deny moderator', async () => {
+    test('should deny moderator', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -192,6 +193,7 @@ describe('validateOwner', () => {
         models,
         user,
         communityId: chainId,
+        // @ts-expect-error StrictNullChecks
         entity,
         allowMod,
         allowAdmin,
@@ -200,7 +202,7 @@ describe('validateOwner', () => {
       expect(result).to.be.false;
     });
 
-    it('should allow moderator', async () => {
+    test('should allow moderator', async () => {
       const models: any = {
         // for findAllRoles
         Address: {
@@ -226,6 +228,7 @@ describe('validateOwner', () => {
         models,
         user,
         communityId: chainId,
+        // @ts-expect-error StrictNullChecks
         entity,
         allowMod,
         allowAdmin,
@@ -235,7 +238,7 @@ describe('validateOwner', () => {
     });
   });
 
-  it('should deny admin', async () => {
+  test('should deny admin', async () => {
     const models: any = {
       // for findAllRoles
       Address: {
@@ -261,6 +264,7 @@ describe('validateOwner', () => {
       models,
       user,
       communityId: chainId,
+      // @ts-expect-error StrictNullChecks
       entity,
       allowMod,
       allowAdmin,
@@ -269,7 +273,7 @@ describe('validateOwner', () => {
     expect(result).to.be.false;
   });
 
-  it('should allow admin', async () => {
+  test('should allow admin', async () => {
     const models: any = {
       // for findAllRoles
       Address: {
@@ -295,6 +299,7 @@ describe('validateOwner', () => {
       models,
       user,
       communityId: chainId,
+      // @ts-expect-error StrictNullChecks
       entity,
       allowMod,
       allowAdmin,

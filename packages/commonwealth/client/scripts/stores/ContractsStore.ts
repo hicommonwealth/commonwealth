@@ -22,7 +22,7 @@ class ContractsStore extends IdStore<Contract> {
     const typeIndex = this._storeType[contract.type].indexOf(contract);
     if (typeIndex === -1) {
       console.error(
-        'Attempting to remove a contract that was not found in the types store'
+        'Attempting to remove a contract that was not found in the types store',
       );
     }
     this._storeType[contract.type].splice(typeIndex, 1);
@@ -36,6 +36,7 @@ class ContractsStore extends IdStore<Contract> {
       return contracts[0];
     } else {
       console.log('No contract found with nickname: ', nickname);
+      // @ts-expect-error StrictNullChecks
       return null;
     }
   }

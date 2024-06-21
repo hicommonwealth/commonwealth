@@ -122,14 +122,19 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
+                      // @ts-expect-error <StrictNullChecks/>
                       id: c.Address.id,
+                      // @ts-expect-error <StrictNullChecks/>
                       address: c.Address.address,
+                      // @ts-expect-error <StrictNullChecks/>
                       community_id: c.Address.community_id,
+                      // @ts-expect-error <StrictNullChecks/>
                       User: null,
                     })
                   }
                 >
                   <User
+                    // @ts-expect-error <StrictNullChecks/>
                     userAddress={c?.Address?.address}
                     userCommunityId={c?.community_id}
                     shouldShowAsDeleted={
@@ -190,6 +195,7 @@ export const EditCollaboratorsModal = ({
           onClick={async () => {
             const newCollaborators = collaborators.filter(
               (c1) =>
+                // @ts-expect-error <StrictNullChecks/>
                 !thread.collaborators.some((c2) => c1.address === c2.address),
             );
             const removedCollaborators = (thread.collaborators as any).filter(
@@ -216,6 +222,7 @@ export const EditCollaboratorsModal = ({
                 });
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
+                  // @ts-expect-error <StrictNullChecks/>
                   onCollaboratorsUpdated(updatedThread.collaborators);
               } catch (err) {
                 const error =

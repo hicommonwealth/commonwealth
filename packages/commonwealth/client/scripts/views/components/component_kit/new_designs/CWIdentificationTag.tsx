@@ -1,8 +1,8 @@
-import { CustomIconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
-import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { formatAddressShort } from 'helpers';
 import React from 'react';
+import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
+import { CustomIconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
+import { CWText } from 'views/components/component_kit/cw_text';
 
 import 'components/component_kit/new_designs/CWIdentificationTag.scss';
 
@@ -33,6 +33,7 @@ export const CWIdentificationTag = ({
         />
       )}
       <CWText className="label" type="b2" fontWeight="regular">
+        {/* @ts-expect-error StrictNullChecks*/}
         {username || formatAddressShort(address, 6)}
       </CWText>
       {iconRight && (

@@ -90,10 +90,12 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     );
   } else if (props.type === 'community') {
     const item = props.community;
+    // @ts-expect-error <StrictNullChecks/>
     const roles = app.roles.getAllRolesInCommunity({ community: item.id });
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
+          // @ts-expect-error <StrictNullChecks/>
           { isSelected: app.activeChainId() === item.id },
           'SidebarMenuItem community',
         )}
@@ -105,10 +107,12 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           navigateToCommunity({
             navigate,
             path: '/',
+            // @ts-expect-error <StrictNullChecks/>
             chain: item.id,
           });
         }}
       >
+        {/*// @ts-expect-error <StrictNullChecks/>*/}
         <CommunityLabel community={item} />
         {app.isLoggedIn() && roles.length > 0 && (
           <div className="roles-and-star">
@@ -129,6 +133,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
+                  // @ts-expect-error <StrictNullChecks/>
                   community: item.id,
                 });
                 setIsStarred((prevState) => !prevState);
@@ -155,6 +160,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   return (
     <div
       className={getClasses<{ className: string }>(
+        // @ts-expect-error <StrictNullChecks/>
         { className },
         ComponentType.SidebarMenu,
       )}
@@ -173,7 +179,8 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             ...item,
             isStarred:
               item.type === 'community'
-                ? app.user.isCommunityStarred(item.community.id)
+                ? // @ts-expect-error <StrictNullChecks/>
+                  app.user.isCommunityStarred(item.community.id)
                 : false,
           };
 

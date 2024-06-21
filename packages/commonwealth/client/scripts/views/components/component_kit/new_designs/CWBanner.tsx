@@ -17,14 +17,10 @@ import {
   CWButton,
 } from 'views/components/component_kit/new_designs/CWButton';
 
-// TODO this component covers only one type of Banner,
-// it should be extended with other types
-// https://github.com/hicommonwealth/commonwealth/issues/4407
-//
-
 const typeIconLookup: {
   [key in BannerType]: React.ForwardRefExoticComponent<IconProps>;
 } = {
+  // @ts-expect-error <StrictNullChecks/>
   default: null,
   info: Info,
   success: CheckCircle,
@@ -40,8 +36,9 @@ interface CWBannerProps {
   body?: string;
   buttons?: ButtonProps[];
   className?: string;
-  onClose: () => void;
+  onClose?: () => void;
   footer?: ReactNode;
+  accessoryRight?: ReactNode;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -63,6 +60,7 @@ const CWBanner = ({
   buttons,
   className,
   onClose,
+  accessoryRight,
   footer,
 }: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
@@ -75,37 +73,49 @@ const CWBanner = ({
         </div>
       )}
       <div className="content-container">
-        <CWText type="b1" fontWeight="medium" className="header">
-          {title}
-        </CWText>
-        {body && (
-          <div>
-            <CWText type="b2" className="body">
-              {body}
-            </CWText>
-          </div>
-        )}
-        {buttons?.length > 0 && (
-          <div className="actions-row">
-            {buttons.map((buttonProps, index) => {
-              const buttonType = getButtonType(index, type);
+        <div>
+          <CWText type="b1" fontWeight="medium" className="header">
+            {title}
+          </CWText>
+          {body && (
+            <div>
+              <CWText type="b2" className="body">
+                {body}
+              </CWText>
+            </div>
+          )}
+          {/* @ts-expect-error StrictNullChecks*/}
+          {buttons?.length > 0 && (
+            <div className="actions-row">
+              {/* @ts-expect-error StrictNullChecks*/}
+              {buttons.map((buttonProps, index) => {
+                const buttonType = getButtonType(index, type);
 
-              return (
-                <CWButton
-                  key={`${buttonProps.label}-index`}
-                  buttonHeight="sm"
-                  buttonType={buttonType}
-                  {...buttonProps}
-                />
-              );
-            })}
-          </div>
-        )}
-        {footer && <div className="footer">{footer}</div>}
+                return (
+                  <CWButton
+                    key={`${buttonProps.label}-index`}
+                    buttonHeight="sm"
+                    buttonType={buttonType}
+                    {...buttonProps}
+                  />
+                );
+              })}
+            </div>
+          )}
+          {footer && <div className="footer">{footer}</div>}
+        </div>
+        <div className="right-side">{accessoryRight}</div>
       </div>
-      <div className="close-icon-container">
-        <X weight="light" size={20} className="close-icon" onClick={onClose} />
-      </div>
+      {onClose && (
+        <div className="close-icon-container">
+          <X
+            weight="light"
+            size={20}
+            className="close-icon"
+            onClick={onClose}
+          />
+        </div>
+      )}
     </div>
   );
 };

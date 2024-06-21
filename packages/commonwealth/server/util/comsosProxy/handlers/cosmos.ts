@@ -18,6 +18,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+// @ts-expect-error StrictNullChecks
 const FALLBACK_NODE_DURATION = +process.env.FALLBACK_NODE_DURATION_S || 300;
 
 export async function cosmosHandler(
@@ -40,39 +41,33 @@ export async function cosmosHandler(
   await updateSlip44IfNeeded(community.ChainNode as ChainNodeInstance);
 
   const nodeTimeoutEnd = new Date(
+    // @ts-expect-error StrictNullChecks
     community.ChainNode.updated_at.getTime() + FALLBACK_NODE_DURATION,
   );
 
   if (
-    !community.ChainNode.health ||
-    community.ChainNode.health === NodeHealth.Healthy ||
-    (community.ChainNode.health === NodeHealth.Failed &&
+    !community.ChainNode!.health ||
+    community.ChainNode!.health === NodeHealth.Healthy ||
+    (community.ChainNode!.health === NodeHealth.Failed &&
       new Date() > nodeTimeoutEnd)
   ) {
     let url: string;
-    console.log(
-      '\noriginalUrl',
-      req.originalUrl,
-      '\nbaseUrl',
-      req.baseUrl,
-      '\nurl',
-      req.url,
-    );
-    if (requestType === 'REST' && community.ChainNode.alt_wallet_url) {
+    if (requestType === 'REST' && community.ChainNode!.alt_wallet_url) {
       url = req.originalUrl.replace(
         req.baseUrl,
         // remove trailing slash
-        community.ChainNode.alt_wallet_url.trim().replace(/\/$/, ''),
+        community.ChainNode!.alt_wallet_url.trim().replace(/\/$/, ''),
       );
     } else if (requestType === 'RPC') {
       url =
-        community.ChainNode.private_url?.trim() ||
-        community.ChainNode.url?.trim();
+        community.ChainNode!.private_url?.trim() ||
+        community.ChainNode!.url?.trim();
     }
 
+    // @ts-expect-error StrictNullChecks
     if (!url) {
       log.error('No URL found for chain node', undefined, {
-        cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
+        cosmos_chain_id: community.ChainNode!.cosmos_chain_id,
       });
       throw new Error('No URL found for chain node');
     }
@@ -113,6 +108,7 @@ export async function cosmosHandler(
     } catch (err) {
       log.error('Failed to query internal Cosmos chain node', err, {
         requestType,
+        // @ts-expect-error StrictNullChecks
         cosmos_chain_id: community?.ChainNode.cosmos_chain_id,
       });
       await updateNodeHealthIfNeeded(
@@ -124,9 +120,11 @@ export async function cosmosHandler(
       );
 
       if (
+        // @ts-expect-error StrictNullChecks
         IGNORE_COSMOS_CHAIN_IDS.includes(community.ChainNode.cosmos_chain_id)
       ) {
         log.warn('Ignoring external proxy request for dev Cosmos chain', {
+          // @ts-expect-error StrictNullChecks
           cosmos_chain_id: community.ChainNode.cosmos_chain_id,
         });
         return res.status(err?.response?.status || 500).json({
@@ -151,6 +149,7 @@ export async function cosmosHandler(
     return res.status(response.status || 200).send(response?.data);
   } catch (err) {
     log.error('Failed to query external Cosmos proxy', err, {
+      // @ts-expect-error StrictNullChecks
       chainNode: community?.ChainNode.cosmos_chain_id,
     });
     return res.status(err?.response?.status || 500).json({

@@ -1,5 +1,5 @@
 import { events, logger, Policy } from '@hicommonwealth/core';
-import { Op } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { models } from '../database';
 import { contestHelper } from '../services/commonProtocol';
@@ -22,82 +22,74 @@ export function ContestWorker(): Policy<typeof inputs> {
           log.warn('ThreadCreated: payload does not contain topic_id');
           return;
         }
-        const contestTopics = await models.ContestTopic.findAll({
-          where: {
-            topic_id: payload.topic_id,
-          },
-        });
-        if (contestTopics.length === 0) {
-          log.warn('ThreadCreated: no matching contest topics');
-          return;
-        }
 
         const { address: userAddress } = (await models.Address.findByPk(
           payload!.address_id,
         ))!;
 
-        const community = await models.Community.findByPk(
-          payload.community_id,
+        const contentUrl = buildThreadContentUrl(
+          payload.community_id!,
+          payload.id!,
+        );
+
+        const activeContestManagers = await models.sequelize.query<{
+          contest_address: string;
+          url: string;
+          private_url: string;
+        }>(
+          `
+            SELECT COALESCE(cn.private_url, cn.url) as url, cm.contest_address
+            FROM "Communities" c
+            JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
+            JOIN "ContestManagers" cm ON cm.community_id = c.id
+            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+            JOIN (
+                SELECT contest_address, MAX(contest_id) AS max_contest_id, MAX(end_time) as end_time
+                FROM "Contests"
+                GROUP BY contest_address
+            ) co ON cm.contest_address = co.contest_address
+            WHERE ct.topic_id = :topic_id
+            AND cm.community_id = :community_id
+            AND cm.cancelled = false
+            AND (
+              cm.interval = 0 AND NOW() < co.end_time
+              OR
+              cm.interval > 0
+            )
+        `,
           {
-            include: [
-              {
-                model: models.ChainNode.scope('withPrivateData'),
-                required: false,
-              },
-              {
-                model: models.ContestManager,
-                as: 'contest_managers',
-              },
-            ],
-          },
-        );
-
-        const chainNodeUrl =
-          community?.ChainNode?.private_url || community?.ChainNode?.url;
-
-        const contentUrl = buildThreadContentUrl(community!.id!, payload.id!);
-
-        // add content only for contest managers that don't already
-        // have the content
-
-        const contestAddresses = community!
-          .contest_managers!.filter((c) => !c.cancelled) // must be active
-          .filter((c) =>
-            contestTopics.find(
-              (ct) => ct.contest_address === c.contest_address,
-            ),
-          ) // must have an associated contest topic
-          .map((c) => c.contest_address);
-
-        const existingAddActions = await models.ContestAction.findAll({
-          where: {
-            content_url: contentUrl,
-            contest_address: {
-              [Op.in]: contestAddresses,
+            type: QueryTypes.SELECT,
+            replacements: {
+              topic_id: payload.topic_id!,
+              community_id: payload.community_id,
             },
-            action: 'added',
           },
-        });
-        const processedContestAddresses = existingAddActions.map(
-          (action) => action.contest_address,
         );
-        const unprocessedContestAddresses = contestAddresses.filter(
-          (a) => !processedContestAddresses.includes(a),
-        );
-        if (unprocessedContestAddresses.length === 0) {
-          log.warn('ThreadCreated: no contest addresses to process');
+
+        if (!activeContestManagers?.length) {
+          log.warn('ThreadCreated: no matching contest managers found');
           return;
         }
 
-        const results = await Promise.allSettled(
-          unprocessedContestAddresses.map(async (contestAddress) => {
-            await contestHelper.addContent(
-              chainNodeUrl!,
-              contestAddress,
-              userAddress,
-              contentUrl,
-            );
-          }),
+        const chainNodeUrl = activeContestManagers[0]!.url;
+
+        const addressesToProcess = activeContestManagers.map(
+          (c) => c.contest_address,
+        );
+
+        log.debug(
+          `ThreadCreated: addresses to process: ${JSON.stringify(
+            addressesToProcess,
+            null,
+            2,
+          )}`,
+        );
+
+        const results = await contestHelper.addContentBatch(
+          chainNodeUrl!,
+          addressesToProcess,
+          userAddress,
+          contentUrl,
         );
 
         const errors = results
@@ -108,8 +100,9 @@ export function ContestWorker(): Policy<typeof inputs> {
           );
 
         if (errors.length > 0) {
+          // TODO: ignore duplicate content error
           throw new Error(
-            `addContent failed ${errors.length} times: ${errors.join(', ')}"`,
+            `addContent failed with errors: ${errors.join(', ')}"`,
           );
         }
       },
@@ -121,92 +114,78 @@ export function ContestWorker(): Policy<typeof inputs> {
           log.warn('ThreadUpvoted: thread does not contain topic_id');
           return;
         }
-        const contestTopics = await models.ContestTopic.findAll({
-          where: {
-            topic_id: topic_id,
-          },
-        });
-        if (contestTopics.length === 0) {
-          log.warn('ThreadUpvoted: no matching contest topics');
-          return;
-        }
 
-        const community = await models.Community.findByPk(
-          payload.community_id,
+        const { address: userAddress } = (await models.Address.findByPk(
+          payload!.address_id,
+        ))!;
+
+        const activeContestManagersWithoutVote = await models.sequelize.query<{
+          url: string;
+          private_url: string;
+          contest_address: string;
+          content_id: number;
+        }>(
+          `
+            SELECT coalesce(cn.private_url, cn.url) as url, cm.contest_address, added.content_id
+            FROM "Communities" c
+            JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
+            JOIN "ContestManagers" cm ON cm.community_id = c.id
+            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+            JOIN "Contests" co ON cm.contest_address = co.contest_address
+            JOIN "ContestActions" added on co.contest_address = added.contest_address
+              AND co.contest_id = added.contest_id
+              AND added.thread_id = :thread_id
+              AND added.action = 'added'
+            LEFT JOIN "ContestActions" ca ON co.contest_address = ca.contest_address
+              AND co.contest_id = ca.contest_id
+              AND ca.thread_id = :thread_id
+              AND ca.actor_address = :actor_address
+              AND ca.action = 'upvoted'
+            WHERE ct.topic_id = :topic_id
+            AND cm.community_id = :community_id
+            AND cm.cancelled = false
+            AND (
+              cm.interval = 0 AND NOW() < co.end_time
+              OR
+              cm.interval > 0
+            )
+            AND ca.action IS NULL;
+        `,
           {
-            include: [
-              {
-                model: models.ChainNode.scope('withPrivateData'),
-                required: false,
-              },
-              {
-                model: models.ContestManager,
-                as: 'contest_managers',
-              },
-            ],
-          },
-        );
-        const chainNodeUrl =
-          community?.ChainNode?.private_url || community?.ChainNode?.url;
-
-        const contentUrl = buildThreadContentUrl(
-          community!.id!,
-          payload.thread_id!,
-        );
-
-        const contestAddresses = community!
-          .contest_managers!.filter((c) => !c.cancelled) // must be active
-          .filter((c) =>
-            contestTopics.find(
-              (ct) => ct.contest_address === c.contest_address,
-            ),
-          ) // must have an associated contest topic
-          .map((c) => c.contest_address);
-
-        const addAction = await models.ContestAction.findOne({
-          where: {
-            content_url: contentUrl,
-            contest_address: {
-              [Op.in]: contestAddresses,
+            type: QueryTypes.SELECT,
+            replacements: {
+              thread_id: payload.thread_id!,
+              actor_address: userAddress,
+              topic_id: topic_id,
+              community_id: payload.community_id,
             },
-            action: 'added',
           },
-        });
-
-        // add upvotes on the content only if not already added
-        const existingVoteActions = await models.ContestAction.findAll({
-          where: {
-            content_id: addAction!.content_id,
-            contest_address: {
-              [Op.in]: contestAddresses,
-            },
-            action: 'upvoted',
-          },
-        });
-
-        const processedContestAddresses = existingVoteActions.map(
-          (action) => action.contest_address,
         );
-        const unprocessedContestAddresses = contestAddresses.filter(
-          (a) => !processedContestAddresses.includes(a),
-        );
-        if (unprocessedContestAddresses.length === 0) {
-          log.warn('ThreadUpvoted: no contest addresses to process');
-          return;
+
+        if (!activeContestManagersWithoutVote?.length) {
+          // throw to trigger retry in case the content is pending creation
+          throw new Error(
+            'ThreadUpvoted: no matching active contests without actions',
+          );
         }
 
-        const userAddress = addAction!.actor_address!;
-        const contentId = addAction!.content_id!;
+        const chainNodeUrl = activeContestManagersWithoutVote[0]!.url;
 
-        const results = await Promise.allSettled(
-          unprocessedContestAddresses.map(async (contestAddress) => {
-            await contestHelper.voteContent(
-              chainNodeUrl!,
-              contestAddress,
-              userAddress,
-              contentId.toString(),
-            );
-          }),
+        log.debug(
+          `ThreadUpvoted: contest managers to process: ${JSON.stringify(
+            activeContestManagersWithoutVote,
+            null,
+            2,
+          )}`,
+        );
+
+        const results = await contestHelper.voteContentBatch(
+          chainNodeUrl!,
+          userAddress,
+          activeContestManagersWithoutVote.map((m) => ({
+            contestAddress: m.contest_address,
+            contentId: m.content_id.toString(),
+          })),
         );
 
         const errors = results

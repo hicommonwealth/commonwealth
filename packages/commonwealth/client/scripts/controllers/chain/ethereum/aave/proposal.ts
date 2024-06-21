@@ -136,6 +136,7 @@ export default class AaveProposal extends Proposal<
     if (currentTime > +this.data.executionTimeWithGracePeriod)
       return ProposalState.EXPIRED;
     if (this.data.queued) return ProposalState.QUEUED;
+    // @ts-expect-error StrictNullChecks
     return null;
   }
 
@@ -156,6 +157,7 @@ export default class AaveProposal extends Proposal<
 
     // queued but not ready for execution
     if (state === ProposalState.QUEUED)
+      // @ts-expect-error StrictNullChecks
       return { kind: 'fixed', time: moment.unix(this.data.executionTime) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed

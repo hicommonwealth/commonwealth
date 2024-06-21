@@ -29,7 +29,7 @@ type ContractAndVersion = {
  */
 async function deriveCompoundGovContractAndVersion(
   compoundGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
 ): Promise<ContractAndVersion> {
   try {
     const contract = GovernorAlpha__factory.connect(
@@ -77,7 +77,7 @@ async function deriveCompoundGovContractAndVersion(
 function getCompoundGovContract(
   govVersion: GovVersion,
   compoundGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
 ) {
   switch (govVersion) {
     case GovVersion.Alpha:
@@ -104,7 +104,7 @@ function getCompoundGovContract(
 
 export async function getCompoundGovContractAndVersion(
   compoundGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
 ): Promise<ContractAndVersion> {
   const govVersion = (await cache().getKey(
     CacheNamespaces.Compound_Gov_Version,

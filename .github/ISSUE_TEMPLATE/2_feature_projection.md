@@ -1,5 +1,5 @@
 ---
-name: Projection Feature Request
+name: "Platform: Projection Feature Request"
 about: Use this template for requesting a projection feature within a user story.
 labels: projection, enhancement, needs estimate
 ---

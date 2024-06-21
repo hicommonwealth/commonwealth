@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { ChainNetwork } from '@hicommonwealth/shared';
-import { providers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import {
   GetProposalVotesOptions,
   GetProposalVotesResult,
@@ -62,6 +62,7 @@ export class ServerProposalsController {
       ],
     });
 
+    // @ts-expect-error StrictNullChecks
     if (!contract.Contract.address) {
       throw new ServerError(
         `No contract address found for community ${communityId}`,
@@ -69,8 +70,11 @@ export class ServerProposalsController {
     }
 
     if (
+      // @ts-expect-error StrictNullChecks
       !contract.Contract.type ||
+      // @ts-expect-error StrictNullChecks
       (contract.Contract.type !== ChainNetwork.Aave &&
+        // @ts-expect-error StrictNullChecks
         contract.Contract.type !== ChainNetwork.Compound)
     ) {
       throw new AppError(
@@ -79,14 +83,16 @@ export class ServerProposalsController {
     }
 
     return {
+      // @ts-expect-error StrictNullChecks
       address: contract.Contract.address,
+      // @ts-expect-error StrictNullChecks
       type: contract.Contract.type,
     };
   }
 
   private async createEvmProvider(
     communityId: string,
-  ): Promise<providers.Web3Provider> {
+  ): Promise<providers.JsonRpcProvider> {
     const ethNetworkUrl = await this.getRPCUrl(communityId);
 
     if (ethNetworkUrl.slice(0, 4) != 'http')
@@ -95,11 +101,7 @@ export class ServerProposalsController {
       );
 
     try {
-      const Web3 = (await import('web3')).default;
-      const web3Provider = new Web3(ethNetworkUrl);
-      return new providers.Web3Provider(
-        web3Provider.givenProvider as providers.ExternalProvider,
-      );
+      return new ethers.providers.JsonRpcProvider(ethNetworkUrl);
     } catch (e) {
       throw new ServerError(
         `Failed to create EVM provider for ${communityId}. ${e}`,
@@ -121,6 +123,7 @@ export class ServerProposalsController {
       ],
     });
 
+    // @ts-expect-error StrictNullChecks
     if (!community.ChainNode.private_url && !community.ChainNode.url) {
       throw new ServerError(`No RPC URL found for community ${communityId}`);
     }
@@ -131,9 +134,13 @@ export class ServerProposalsController {
     // a private node, indexing the chain, or using an existing
     // indexer like TheGraph or SubQuery
     if (
+      // @ts-expect-error StrictNullChecks
       community.ChainNode.name !== 'Ethereum (Mainnet)' ||
+      // @ts-expect-error StrictNullChecks
       (community.network !== ChainNetwork.Aave &&
+        // @ts-expect-error StrictNullChecks
         community.network !== ChainNetwork.Compound &&
+        // @ts-expect-error StrictNullChecks
         community.base !== 'ethereum')
     ) {
       throw new AppError(
@@ -141,6 +148,7 @@ export class ServerProposalsController {
       );
     }
 
+    // @ts-expect-error StrictNullChecks
     return community.ChainNode.private_url || community.ChainNode.url;
   }
 }

@@ -66,6 +66,7 @@ export async function __updateTopicChannel(
         topic_id: channelId ? topic.id : null,
       },
       {
+        // @ts-expect-error StrictNullChecks
         where: {
           id: {
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
@@ -75,6 +76,7 @@ export async function __updateTopicChannel(
     );
 
     // Remove channel_id from old topic
+    // @ts-expect-error StrictNullChecks
     topicWithChannel.channel_id = null;
     await topicWithChannel.save();
   } else {
@@ -95,6 +97,7 @@ export async function __updateTopicChannel(
         topic_id: topic.id,
       },
       {
+        // @ts-expect-error StrictNullChecks
         where: {
           id: {
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
