@@ -214,6 +214,7 @@ const EditProfile = () => {
       updateProfile({
         name: values.username.trim(),
         ...(backgroundImage && { backgroundImage }),
+        avatarUrl,
         email: values.email.trim(),
         socials: JSON.stringify(
           (links || [])
