@@ -74,24 +74,24 @@ const SessionRevalidationModal = ({
         );
         await setActiveAccount(signedAddressAccount!);
         openConfirmation({
-          title: 'Logged in with unexpected address',
+          title: signedAddressAccount
+            ? 'Address switched'
+            : 'Logged in with unexpected address',
           description: (
             <>
               <p style={{ marginBottom: 6 }}>
-                You tried to sign in as <b>{formatAddress(walletAddress!)}</b>,
-                but your wallet has the address{' '}
+                Your active address was <b>{formatAddress(walletAddress!)}</b>,
+                but you just signed in with your wallet for{' '}
                 <b>{formatAddress(signedAddress!)}</b>.
               </p>
               {signedAddressAccount ? (
                 <p>
                   We’ve switched your active address to the one in your wallet.
-                  You can switch it back in the user menu.
                 </p>
               ) : (
                 <p>
                   Select <strong>Connect a new address</strong> in the user menu
-                  to connect this as a new address, or switch addresses in your
-                  wallet to continue.
+                  to connect this as a new address.
                 </p>
               )}
             </>
