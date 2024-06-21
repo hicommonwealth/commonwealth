@@ -80,7 +80,9 @@ const AuthModal = ({
             {...commonVariantProps}
             // TODO: session keys should support all wallet types, atm they only work with sso
             // this is broken in master branch
-            showAuthOptionFor={sessionKeyValidationError.ssoSource as AuthTypes}
+            showAuthOptionFor={
+              sessionKeyValidationError?.ssoSource as AuthTypes
+            }
           />
         );
       }

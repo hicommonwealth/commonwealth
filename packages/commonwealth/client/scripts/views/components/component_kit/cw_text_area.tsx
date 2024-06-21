@@ -2,13 +2,13 @@ import React, { useEffect, useRef } from 'react';
 
 import 'components/component_kit/cw_text_area.scss';
 
-import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import type { ValidationStatus } from './cw_validation_text';
-import { MessageRow, useTextInputWithValidation } from './cw_text_input';
-import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
-import type { BaseTextInputProps } from './cw_text_input';
 import { useFormContext } from 'react-hook-form';
+import type { BaseTextInputProps } from './cw_text_input';
+import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
+import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
+import { ComponentType } from './types';
 
 type TextAreaStyleProps = {
   disabled?: boolean;
@@ -49,18 +49,24 @@ export const CWTextArea = (props: TextAreaProps) => {
 
   useEffect(() => {
     if (resizeWithText) {
+      // @ts-expect-error <StrictNullChecks/>
       textareaRef.current.style.height = 'auto';
+      // @ts-expect-error <StrictNullChecks/>
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      // @ts-expect-error <StrictNullChecks/>
       textareaRef.current.style.minHeight = '152px';
+      // @ts-expect-error <StrictNullChecks/>
       textareaRef.current.style.maxHeight = '512px';
     }
   }, [value, resizeWithText]);
 
   const formContext = useFormContext();
   const formFieldContext = hookToForm
-    ? formContext.register(name)
+    ? // @ts-expect-error <StrictNullChecks/>
+      formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
+    // @ts-expect-error <StrictNullChecks/>
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
@@ -111,7 +117,7 @@ export const CWTextArea = (props: TextAreaProps) => {
                   validationProps.setValidationStatus(result[0]);
                   validationProps.setStatusMessage(result[1]);
                 }
-              }, timeout)
+              }, timeout),
             );
           }
         }}
@@ -141,6 +147,7 @@ export const CWTextArea = (props: TextAreaProps) => {
       {label && (
         <NewMessageRow
           hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
+          // @ts-expect-error <StrictNullChecks/>
           statusMessage={validationProps.statusMessage || formFieldErrorMessage}
           validationStatus={
             validationProps.validationStatus ||

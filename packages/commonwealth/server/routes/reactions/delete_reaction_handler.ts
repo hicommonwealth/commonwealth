@@ -20,8 +20,11 @@ export const deleteReactionHandler = async (
   }
 
   await controllers.reactions.deleteReaction({
+    // @ts-expect-error StrictNullChecks
     user: req.user,
+    // @ts-expect-error StrictNullChecks
     address: req.address,
+    // @ts-expect-error StrictNullChecks
     community: req.community,
     reactionId,
   });

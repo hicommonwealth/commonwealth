@@ -1,8 +1,16 @@
+import type {
+  Action,
+  Awaitable,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { testServer, TestServer } from '../../../server-test';
+import { afterAll, beforeAll, describe, test } from 'vitest';
+import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
@@ -13,13 +21,20 @@ describe('Polls', () => {
 
   let userJWT: string;
   let userAddress: string;
+  // the userAddress with the chain and chain id prefix - this is used by canvas
+  let canvasAddress: string;
+  let userSession: {
+    session: Session;
+    sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
+  };
+
   let topicId;
   let threadId = 0;
   let pollId = 0;
 
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
@@ -28,51 +43,43 @@ describe('Polls', () => {
         group_ids: [],
       },
     });
+    // @ts-expect-error StrictNullChecks
     topicId = topic.id;
 
     const userRes = await server.seeder.createAndVerifyAddress(
       { chain },
       'Alice',
     );
-    userAddress = userRes.address;
+    canvasAddress = userRes.address;
+    userAddress = canvasAddress.split(':')[2];
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       config.AUTH.JWT_SECRET,
     );
+    userSession = {
+      session: userRes.session,
+      sign: userRes.sign,
+    };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should create a poll for a thread', async () => {
+  test('should create a poll for a thread', async () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: 'ethereum',
-      address: userAddress,
+      address: canvasAddress,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
       topicId,
-      session: {
-        type: 'session',
-        signature: '',
-        payload: {
-          app: '',
-          chain: '',
-          from: '',
-          sessionAddress: '',
-          sessionDuration: 0,
-          sessionIssued: 0,
-          block: '',
-        },
-      },
-      sign: function (): string {
-        return '';
-      },
+      session: userSession.session,
+      sign: userSession.sign,
     });
 
     const data = {
@@ -82,10 +89,13 @@ describe('Polls', () => {
 
     const res = await chai.request
       .agent(server.app)
+      // @ts-expect-error StrictNullChecks
       .post(`/api/threads/${thread.id}/polls`)
       .set('Accept', 'application/json')
       .send({
+        // @ts-expect-error StrictNullChecks
         author_chain: thread.community_id,
+        // @ts-expect-error StrictNullChecks
         chain: thread.community_id,
         address: userAddress,
         jwt: userJWT,
@@ -98,11 +108,12 @@ describe('Polls', () => {
       options: JSON.stringify(data.options),
     });
 
+    // @ts-expect-error StrictNullChecks
     threadId = thread.id;
     pollId = res.body.result.id;
   });
 
-  it('should fail to cast a vote with invalid option', async () => {
+  test('should fail to cast a vote with invalid option', async () => {
     const data = {
       option: 'optionC',
     };
@@ -122,7 +133,7 @@ describe('Polls', () => {
     expect(res.status).to.equal(400);
   });
 
-  it('should cast a vote', async () => {
+  test('should cast a vote', async () => {
     const data = {
       option: 'optionA',
     };
@@ -145,7 +156,7 @@ describe('Polls', () => {
     });
   });
 
-  it('should get thread polls, response shows poll and vote', async () => {
+  test('should get thread polls, response shows poll and vote', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/threads/${threadId}/polls`)
@@ -164,7 +175,7 @@ describe('Polls', () => {
     );
   });
 
-  it('should recast vote', async () => {
+  test('should recast vote', async () => {
     const data = {
       option: 'optionB',
     };
@@ -187,7 +198,7 @@ describe('Polls', () => {
     });
   });
 
-  it('should get thread polls, response shows updated poll and vote', async () => {
+  test('should get thread polls, response shows updated poll and vote', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/threads/${threadId}/polls`)
@@ -204,7 +215,7 @@ describe('Polls', () => {
     );
   });
 
-  it('should get thread poll votes', async () => {
+  test('should get thread poll votes', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/polls/${pollId}/votes`)
@@ -218,7 +229,7 @@ describe('Polls', () => {
     expect(res.body.result[0]).to.have.property('address', userAddress);
   });
 
-  it('should delete poll', async () => {
+  test('should delete poll', async () => {
     const res = await chai.request
       .agent(server.app)
       .delete(`/api/polls/${pollId}`)
@@ -233,7 +244,7 @@ describe('Polls', () => {
     expect(res.status).to.equal(200);
   });
 
-  it('should get thread polls, response shows no results', async () => {
+  test('should get thread polls, response shows no results', async () => {
     const res = await chai.request
       .agent(server.app)
       .get(`/api/threads/${threadId}/polls`)

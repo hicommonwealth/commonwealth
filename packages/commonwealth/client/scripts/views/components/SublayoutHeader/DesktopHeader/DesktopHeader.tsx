@@ -26,14 +26,9 @@ import './DesktopHeader.scss';
 interface DesktopHeaderProps {
   onMobile: boolean;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
-  onFeedbackModalOpen: (open: boolean) => void;
 }
 
-const DesktopHeader = ({
-  onMobile,
-  onAuthModalOpen,
-  onFeedbackModalOpen,
-}: DesktopHeaderProps) => {
+const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -107,7 +102,7 @@ const DesktopHeader = ({
               )}
             />
 
-            <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
+            <HelpMenuPopover />
 
             {isLoggedIn && !enableKnockInAppNotifications && (
               <NotificationsMenuPopover />

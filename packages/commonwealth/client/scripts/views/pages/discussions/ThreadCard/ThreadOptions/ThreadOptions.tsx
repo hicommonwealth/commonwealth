@@ -29,6 +29,7 @@ type OptionsProps = AdminActionsProps & {
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
+  editingDisabled?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -56,6 +57,7 @@ export const ThreadOptions = ({
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
+  editingDisabled,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -91,6 +93,7 @@ export const ThreadOptions = ({
             <ViewUpvotesDrawerTrigger
               onClick={(e) => {
                 e.preventDefault();
+                // @ts-expect-error <StrictNullChecks/>
                 setIsUpvoteDrawerOpen(true);
               }}
             />
@@ -101,6 +104,7 @@ export const ThreadOptions = ({
               thread={thread}
               size="small"
               disabled={!canReact}
+              undoUpvoteDisabled={editingDisabled}
               tooltipText={
                 typeof disabledActionsTooltipText === 'function'
                   ? disabledActionsTooltipText?.('upvote')
@@ -109,8 +113,10 @@ export const ThreadOptions = ({
             />
           )}
 
+          {/* @ts-expect-error StrictNullChecks*/}
           {commentBtnVisible && totalComments >= 0 && (
             <CWThreadAction
+              // @ts-expect-error <StrictNullChecks/>
               label={pluralize(totalComments, 'Comment')}
               action="comment"
               disabled={!canComment}
@@ -126,6 +132,7 @@ export const ThreadOptions = ({
             />
           )}
 
+          {/* @ts-expect-error StrictNullChecks*/}
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
 
           <CWThreadAction
@@ -150,6 +157,7 @@ export const ThreadOptions = ({
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
               hasPendingEdits={hasPendingEdits}
+              editingDisabled={editingDisabled}
             />
           )}
         </div>
@@ -157,6 +165,7 @@ export const ThreadOptions = ({
           <ViewUpvotesDrawerTrigger
             onClick={(e) => {
               e.preventDefault();
+              // @ts-expect-error <StrictNullChecks/>
               setIsUpvoteDrawerOpen(true);
             }}
           />

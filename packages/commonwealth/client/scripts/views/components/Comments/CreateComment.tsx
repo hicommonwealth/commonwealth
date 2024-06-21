@@ -35,9 +35,6 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-  const urlParams = new URLSearchParams(location.search);
-  const focusEditorParam = urlParams.get('focusEditor') === 'true';
-
   // get restored draft on init
   const restoredDraft = useMemo(() => {
     return restoreDraft() || createDeltaFromText('');
@@ -82,12 +79,17 @@ export const CreateComment = ({
         threadId: rootThread.id,
         communityId,
         profile: {
+          // @ts-expect-error <StrictNullChecks/>
           id: app.user.activeAccount.profile.id,
           address: app.user.activeAccount.address,
+          // @ts-expect-error <StrictNullChecks/>
           avatarUrl: app.user.activeAccount.profile.avatarUrl,
+          // @ts-expect-error <StrictNullChecks/>
           name: app.user.activeAccount.profile.name,
+          // @ts-expect-error <StrictNullChecks/>
           lastActive: app.user.activeAccount.profile.lastActive?.toString(),
         },
+        // @ts-expect-error <StrictNullChecks/>
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -144,6 +146,7 @@ export const CreateComment = ({
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
+      // @ts-expect-error <StrictNullChecks/>
       errorMsg={errorMsg}
       contentDelta={contentDelta}
       setContentDelta={setContentDelta}
@@ -151,7 +154,6 @@ export const CreateComment = ({
       onCancel={handleCancel}
       author={author}
       editorValue={editorValue}
-      shouldFocus={canComment && focusEditorParam}
       tooltipText={tooltipText}
     />
   ) : (

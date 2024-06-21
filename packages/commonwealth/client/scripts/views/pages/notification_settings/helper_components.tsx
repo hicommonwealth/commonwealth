@@ -117,6 +117,7 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
+          {/* @ts-expect-error StrictNullChecks*/}
           {app.config.chains.getById(subscription.communityId)?.name}
         </CWText>
       </div>
@@ -157,6 +158,7 @@ type SubscriptionRowMenuProps = {
   onUnsubscribe: (subscription: NotificationSubscription) => void;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SubscriptionRowMenu = ({
   subscription,
   onUnsubscribe,

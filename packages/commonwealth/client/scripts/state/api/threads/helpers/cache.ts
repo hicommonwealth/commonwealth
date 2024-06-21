@@ -289,6 +289,7 @@ const cacheUpdater = ({
             });
           }
           if (method === 'remove') {
+            // @ts-expect-error StrictNullChecks
             remainingCallbacks.push(() => queryClient.refetchQueries(cacheKey));
             return [{}];
           }
@@ -296,6 +297,7 @@ const cacheUpdater = ({
       });
 
       // run the remanining callbacks
+      // @ts-expect-error StrictNullChecks
       remainingCallbacks.map((x) => x());
     }
   });

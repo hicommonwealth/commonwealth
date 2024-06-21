@@ -25,14 +25,12 @@ interface MobileHeaderProps {
   onMobile: boolean;
   isInsideCommunity: boolean;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
-  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const MobileHeader = ({
   onMobile,
   onAuthModalOpen,
   isInsideCommunity,
-  onFeedbackModalOpen,
 }: MobileHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
@@ -46,7 +44,7 @@ const MobileHeader = ({
     ? !menuVisible
     : true;
 
-  const userMenuItems = useUserMenuItems({
+  const { userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
@@ -62,13 +60,6 @@ const MobileHeader = ({
     {
       label: 'Help documentation',
       onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-    },
-    {
-      label: 'Send feedback',
-      onClick: () => {
-        onFeedbackModalOpen(true);
-        setIsUserDrawerOpen(false);
-      },
     },
   ] as PopoverMenuItem[];
 

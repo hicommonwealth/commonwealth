@@ -23,6 +23,7 @@ const AuthButton = ({
   return (
     <button
       disabled={disabled}
+      // @ts-expect-error StrictNullChecks
       onClick={disabled ? null : onClick}
       className={clsx('AuthButton', variant, className, { rounded })}
     >

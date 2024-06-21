@@ -24,7 +24,7 @@ module.exports = {
             collapsed_on_homepage: false,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -35,7 +35,7 @@ module.exports = {
             url: 'ws://api.clover.finance/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -45,37 +45,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'clover' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'clover' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'clover' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'clover' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'clover' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'clover' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['clover'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

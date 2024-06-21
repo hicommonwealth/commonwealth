@@ -51,6 +51,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
           <DetailsFormStep
             contestAddress={contestAddress}
             onSetLaunchContestStep={setLaunchContestStep}
+            // @ts-expect-error <StrictNullChecks/>
             contestFormData={contestFormData}
             onSetContestFormData={setContestFormData}
           />
@@ -60,6 +61,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
         return (
           <SignTransactionsStep
             onSetLaunchContestStep={setLaunchContestStep}
+            // @ts-expect-error <StrictNullChecks/>
             contestFormData={contestFormData}
             onSetCreatedContestAddress={setCreatedContestAddress}
           />

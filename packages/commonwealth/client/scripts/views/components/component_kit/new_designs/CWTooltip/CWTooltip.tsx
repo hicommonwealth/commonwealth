@@ -32,6 +32,7 @@ export const CWTooltip: FC<TooltipProps> = ({
           disablePortal={disablePortal}
           placement={placement}
           content={
+            // @ts-expect-error <StrictNullChecks/>
             <TooltipContainer placement={placement}>
               <CWText type="caption">{content}</CWText>
             </TooltipContainer>

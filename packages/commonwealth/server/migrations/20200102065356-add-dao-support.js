@@ -66,12 +66,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'Chains',
         { id: molochDAOs.map((r) => r.id) },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: molochDAOAddresses.map((r) => r.id) },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

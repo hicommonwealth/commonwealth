@@ -1,3 +1,4 @@
+import commonUrl from 'assets/img/branding/common.svg';
 import { useAnimation } from 'hooks/useAnimation';
 import React, { useState } from 'react';
 import { CWCheckbox } from '../../component_kit/cw_checkbox';
@@ -25,14 +26,17 @@ export const AndroidPrompt = ({
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     event.preventDefault();
 
+    // @ts-expect-error StrictNullChecks
     installPromptEvent = event;
   });
 
   const handleInstallClick = () => {
     try {
+      // @ts-expect-error StrictNullChecks
       installPromptEvent.prompt();
 
       // Wait for the user to respond to the prompt
+      // @ts-expect-error StrictNullChecks
       installPromptEvent.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
           // Hide after install prompt is accepted
@@ -77,7 +81,7 @@ export const AndroidPrompt = ({
         <CWText className="title">Install App</CWText>
         <div className="header">
           <div className="icon">
-            <img src="/static/img/branding/common.svg" alt="Commonwealth" />
+            <img src={commonUrl} alt="Commonwealth" />
           </div>
           <div className="app">
             <CWText className="app-name">Common</CWText>

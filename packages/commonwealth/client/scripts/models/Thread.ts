@@ -83,6 +83,7 @@ function processAssociatedReactions(
     tempReactionTimestamps.length === tempReactionWeights.length
   ) {
     for (let i = 0; i < tempReactionIds.length; i++) {
+      // @ts-expect-error StrictNullChecks
       temp.push({
         id: tempReactionIds[i],
         type: tempReactionType[i],
@@ -182,8 +183,7 @@ export class Thread implements IUniqueId {
   public stage: ThreadStage;
   public readOnly: boolean;
 
-  public readonly canvasAction: string;
-  public readonly canvasSession: string;
+  public readonly canvasSignedData: string;
   public readonly canvasHash: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
@@ -254,8 +254,7 @@ export class Thread implements IUniqueId {
     reactedProfileName,
     reactedProfileAvatarUrl,
     reactedAddressLastActive,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     links,
     discord_meta,
@@ -277,8 +276,7 @@ export class Thread implements IUniqueId {
     url?: string;
     pinned?: boolean;
     links?: Link[];
-    canvasAction?: string;
-    canvasSession?: string;
+    canvasSignedData?: string;
     canvasHash?: string;
     plaintext?: string;
     collaborators?: any[];
@@ -315,34 +313,44 @@ export class Thread implements IUniqueId {
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
+    // @ts-expect-error StrictNullChecks
     this.body = getDecodedString(body);
+    // @ts-expect-error StrictNullChecks
     this.plaintext = plaintext;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
+    // @ts-expect-error StrictNullChecks
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
+    // @ts-expect-error StrictNullChecks
     this.pinned = pinned;
+    // @ts-expect-error StrictNullChecks
     this.url = url;
     this.communityId = community_id;
     this.readOnly = read_only;
     this.collaborators = collaborators || [];
+    // @ts-expect-error StrictNullChecks
     this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
     this.hasPoll = has_poll;
+    // @ts-expect-error StrictNullChecks
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
       ? this.versionHistory[0].timestamp
       : null;
+    // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
     this.archivedAt = archived_at ? moment(archived_at) : null;
+    // @ts-expect-error StrictNullChecks
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
-    this.canvasAction = canvasAction;
-    this.canvasSession = canvasSession;
+    // @ts-expect-error StrictNullChecks
+    this.canvasSignedData = canvasSignedData;
+    // @ts-expect-error <StrictNullChecks>
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
@@ -351,6 +359,7 @@ export class Thread implements IUniqueId {
     this.associatedReactions =
       associatedReactions ??
       processAssociatedReactions(
+        // @ts-expect-error StrictNullChecks
         reactions,
         reactionIds,
         reactionType,
@@ -395,9 +404,8 @@ export class Thread implements IUniqueId {
           reactions: [],
           version_history: [],
           reaction_weights_sum: 0,
-          canvas_action: null,
+          canvas_signed_data: null,
           canvas_hash: null,
-          canvas_session: null,
         }),
     );
     this.latestActivity = last_commented_on

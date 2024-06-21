@@ -41,7 +41,9 @@ export const createGroupHandler = async (
   } = validationResult.data;
 
   const [group, analyticsOptions] = await controllers.groups.createGroup({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     community,
     metadata: metadata as Required<typeof metadata>,
     requirements,
@@ -52,6 +54,7 @@ export const createGroupHandler = async (
   // refresh memberships in background
   controllers.groups
     .refreshCommunityMemberships({
+      // @ts-expect-error StrictNullChecks
       communityId: community.id,
       groupId: group.id,
     })

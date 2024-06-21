@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 
+// @ts-expect-error StrictNullChecks
 sgMail.setApiKey(config.SENDGRID.API_KEY);
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -69,6 +70,7 @@ const startEmailLogin = async (
 
   const isNewRegistration = !previousUser;
   const isExistingMagicUser =
+    // @ts-expect-error StrictNullChecks
     previousUser && previousUser.Addresses?.length > 0;
   if (
     isExistingMagicUser || // existing magic users should always use magic login, even if they're in the wrong community
@@ -108,6 +110,7 @@ const startEmailLogin = async (
 
   // create and email the token
   const path = req.body.path;
+  // @ts-expect-error StrictNullChecks
   const tokenObj = await models.LoginToken.createForEmail(email, path);
 
   const loginLink = `${protocol}://${hostname}/api/finishLogin?token=${

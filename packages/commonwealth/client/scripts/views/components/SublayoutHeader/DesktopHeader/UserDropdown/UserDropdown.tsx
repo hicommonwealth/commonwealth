@@ -17,7 +17,7 @@ interface UserDropdownProps {
 const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const userMenuItems = useUserMenuItems({
+  const { RevalidationModal, userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     isMenuOpen: isOpen,
   });
@@ -51,6 +51,7 @@ const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
           </button>
         )}
       />
+      {RevalidationModal}
     </>
   );
 };

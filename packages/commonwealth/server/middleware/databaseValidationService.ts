@@ -63,6 +63,7 @@ export default class DatabaseValidationService {
         profile_name: 'Discord Bot',
       },
     });
+    // @ts-expect-error StrictNullChecks
     req.user = await profile.getUser();
     next();
   };

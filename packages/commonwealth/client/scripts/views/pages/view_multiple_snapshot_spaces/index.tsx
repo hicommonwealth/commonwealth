@@ -40,6 +40,7 @@ function redirectHandler(
   } else if (action === 'create-from-thread') {
     header = SPACES_HEADER_MESSAGES.NEW_PROPOSAL;
     redirect = REDIRECT_ACTIONS.NEW_FROM_THREAD;
+    // @ts-expect-error <StrictNullChecks/>
     fromProposal = proposal;
   }
 
@@ -66,6 +67,7 @@ const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
     }>
   >();
 
+  // @ts-expect-error <StrictNullChecks/>
   const redirectOptions = redirectHandler(action, proposal);
 
   if (app.chain && !snapshotSpaces) {

@@ -141,6 +141,7 @@ const BasicInformationForm = ({
     const hasLinksError = validateSocialLinks();
 
     if (isCommunityNameTaken || hasLinksError) return;
+    // @ts-expect-error StrictNullChecks
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
     const selectedChainNode = sortedChains.find(
@@ -154,8 +155,11 @@ const BasicInformationForm = ({
         chainBase: selectedCommunity.chainBase,
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
+        // @ts-expect-error StrictNullChecks
         socialLinks: values.links,
+        // @ts-expect-error StrictNullChecks
         nodeUrl: selectedChainNode.nodeUrl,
+        // @ts-expect-error StrictNullChecks
         altWalletUrl: selectedChainNode.altWalletUrl,
         userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
@@ -163,6 +167,7 @@ const BasicInformationForm = ({
         }),
         ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
           cosmosChainId: values.chain.value,
+          // @ts-expect-error StrictNullChecks
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
       });
@@ -292,9 +297,11 @@ const BasicInformationForm = ({
                     )
                   }
                   onBlur={() =>
+                    // @ts-expect-error StrictNullChecks
                     updateAndValidateSocialLinkAtIndex(socialLink.value, index)
                   }
                   onFocus={() =>
+                    // @ts-expect-error StrictNullChecks
                     updateAndValidateSocialLinkAtIndex(socialLink.value, index)
                   }
                 />

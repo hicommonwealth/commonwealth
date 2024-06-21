@@ -1,14 +1,13 @@
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-
-import { WalletId } from '@hicommonwealth/shared';
-import { SessionKeyError } from 'client/scripts/controllers/server/sessions';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
@@ -21,7 +20,16 @@ import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
+// import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+
+import {
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+} from 'shared/canvas/chainMappings';
+import { getSessionSigners } from 'shared/canvas/verify';
+
 import { useCommunityStake } from '../CommunityStake';
+
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -32,6 +40,7 @@ const resetWalletConnectSession = async () => {
   const walletConnectWallet = WebWalletController.Instance.getByName(
     WalletId.WalletConnect,
   );
+  // @ts-expect-error <StrictNullChecks/>
   await walletConnectWallet.reset();
 };
 
@@ -40,6 +49,9 @@ export const handleLogout = async () => {
     await axios.get(`${app.serverUrl()}/logout`);
     await initAppState();
     await resetWalletConnectSession();
+    for (const signer of getSessionSigners()) {
+      signer.target.clear();
+    }
     notifySuccess('Signed out');
     setDarkMode(false);
   } catch (err) {
@@ -78,6 +90,7 @@ const useUserMenuItems = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = app.user?.addresses?.[0];
+  // @ts-expect-error <StrictNullChecks/>
   const profileId = user?.profileId || user?.profile.id;
 
   const uniqueChainAddresses = getUniqueUserAddresses({
@@ -108,7 +121,19 @@ const useUserMenuItems = ({
 
   const addresses: PopoverMenuItem[] = app.user?.activeAccounts?.map(
     (account) => {
-      const signed = authenticatedAddresses[account.address];
+      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+      const communityIdOrPrefix =
+        account.community.base === ChainBase.CosmosSDK
+          ? account.community.ChainNode?.bech32
+          : account.community.ChainNode?.ethChainId;
+      const communityCanvasChainId = chainBaseToCanvasChainId(
+        account.community.base,
+        // @ts-expect-error StrictNullChecks
+        communityIdOrPrefix,
+      );
+      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+
+      const signed = authenticatedAddresses[caip2Address];
       const isActive = app.user.activeAccount?.address === account.address;
       const walletSsoSource = app.user.addresses.find(
         (address) => address.address === account.address,
@@ -130,6 +155,7 @@ const useUserMenuItems = ({
           }
 
           onAddressItemClick?.();
+
           checkForSessionKeyRevalidationErrors(
             new SessionKeyError({
               name: 'SessionKeyError',
@@ -162,83 +188,85 @@ const useUserMenuItems = ({
     },
   );
 
-  return [
-    // if a user is in a stake enabled community without membership, show user addresses that
-    // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
-    ...(shouldShowAddressesSwitcherForNonMember
-      ? ([
-          {
-            type: 'header',
-            label: 'Addresses',
-          },
-          ...uniqueChainAddressOptions,
-          { type: 'divider' },
-        ] as PopoverMenuItem[])
-      : []),
-    ...(app.user.activeAccounts.length > 0
-      ? ([
-          {
-            type: 'header',
-            label: 'Addresses',
-          },
-          ...addresses,
-          {
-            type: 'default',
-            label: 'Connect a new address',
-            onClick: () => {
-              onAuthModalOpen();
-              onAddressItemClick?.();
+  return {
+    userMenuItems: [
+      // if a user is in a stake enabled community without membership, show user addresses that
+      // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
+      ...(shouldShowAddressesSwitcherForNonMember
+        ? ([
+            {
+              type: 'header',
+              label: 'Addresses',
             },
-          },
-          { type: 'divider' },
-        ] as PopoverMenuItem[])
-      : []),
-    {
-      type: 'header',
-      label: 'Settings',
-    },
-    {
-      type: 'default',
-      label: 'View profile',
-      onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
-    },
-    {
-      type: 'default',
-      label: 'Edit profile',
-      onClick: () => navigate(`/profile/edit`, {}, null),
-    },
-    {
-      type: 'default',
-      label: 'My community stake',
-      onClick: () => navigate(`/myCommunityStake`, {}, null),
-    },
-    {
-      type: 'default',
-      label: 'Notifications',
-      onClick: () => navigate('/notification-settings', {}, null),
-    },
-    {
-      type: 'default',
-      label: (
-        <div className="UserMenuItem">
-          <div>Dark mode</div>
-          <CWToggle readOnly checked={isDarkModeOn} />
-        </div>
-      ),
-      preventClosing: true,
-      onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
-    },
-    {
-      type: 'default',
-      label: 'Sign out',
-      onClick: () => {
-        clearSetGatingGroupBannerForCommunities();
-        clearSetAdminOnboardingCardVisibilityForCommunities();
-
-        handleLogout();
+            ...uniqueChainAddressOptions,
+            { type: 'divider' },
+          ] as PopoverMenuItem[])
+        : []),
+      ...(app.user.activeAccounts.length > 0
+        ? ([
+            {
+              type: 'header',
+              label: 'Addresses',
+            },
+            ...addresses,
+            {
+              type: 'default',
+              label: 'Connect a new address',
+              onClick: () => {
+                onAuthModalOpen();
+                onAddressItemClick?.();
+              },
+            },
+            { type: 'divider' },
+          ] as PopoverMenuItem[])
+        : []),
+      {
+        type: 'header',
+        label: 'Settings',
       },
-    },
-  ] as PopoverMenuItem[];
+      {
+        type: 'default',
+        label: 'View profile',
+        onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
+      },
+      {
+        type: 'default',
+        label: 'Edit profile',
+        onClick: () => navigate(`/profile/edit`, {}, null),
+      },
+      {
+        type: 'default',
+        label: 'My community stake',
+        onClick: () => navigate(`/myCommunityStake`, {}, null),
+      },
+      {
+        type: 'default',
+        label: 'Notifications',
+        onClick: () => navigate('/notification-settings', {}, null),
+      },
+      {
+        type: 'default',
+        label: (
+          <div className="UserMenuItem">
+            <div>Dark mode</div>
+            <CWToggle readOnly checked={isDarkModeOn} />
+          </div>
+        ),
+        preventClosing: true,
+        onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
+      },
+      {
+        type: 'default',
+        label: 'Sign out',
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick: async () => {
+          clearSetGatingGroupBannerForCommunities();
+          clearSetAdminOnboardingCardVisibilityForCommunities();
+          await handleLogout();
+        },
+      },
+    ] as PopoverMenuItem[],
+  };
 };
 
 export default useUserMenuItems;

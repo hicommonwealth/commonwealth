@@ -9,6 +9,7 @@ import {
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
+import { describe, test } from 'vitest';
 
 chai.use(chaiAsPromised);
 
@@ -136,6 +137,7 @@ const createMockedGroupsController = () => {
 };
 
 const createMockParams = () => {
+  // @ts-expect-error StrictNullChecks
   const user = {
     getAddresses: async () => {
       return [];
@@ -148,7 +150,7 @@ const createMockParams = () => {
 };
 
 describe('ServerGroupsController', () => {
-  describe('#refreshMembership', async () => {
+  test('#refreshMembership', async () => {
     const controller = createMockedGroupsController();
     const { user, address } = createMockParams();
     const results = await controller.refreshMembership({
@@ -162,10 +164,11 @@ describe('ServerGroupsController', () => {
     expect(results[0]).to.have.property('rejectReason', null);
   });
 
-  describe('#getGroups', async () => {
+  test('#getGroups', async () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
+      // @ts-expect-error StrictNullChecks
       communityId: chain.id,
     });
     expect(result).to.have.length(1);
@@ -175,7 +178,7 @@ describe('ServerGroupsController', () => {
     expect(result[0]).to.have.property('requirements');
   });
 
-  describe('#createGroup', async () => {
+  test('#createGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, chain } = createMockParams();
     const [result, analytics] = await controller.createGroup({
@@ -200,7 +203,7 @@ describe('ServerGroupsController', () => {
     });
   });
 
-  describe('#createGroup (invalid requirements)', async () => {
+  test('#createGroup (invalid requirements)', () => {
     const controller = createMockedGroupsController();
     const { user, chain } = createMockParams();
     expect(
@@ -217,7 +220,7 @@ describe('ServerGroupsController', () => {
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
-  describe('#updateGroup', async () => {
+  test('#updateGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, address } = createMockParams();
     const [result, analytics] = await controller.updateGroup({
@@ -242,7 +245,7 @@ describe('ServerGroupsController', () => {
     });
   });
 
-  describe('#updateGroup (invalid requirements)', async () => {
+  test('#updateGroup (invalid requirements)', () => {
     const controller = createMockedGroupsController();
     const { user, address } = createMockParams();
     expect(
@@ -259,7 +262,7 @@ describe('ServerGroupsController', () => {
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
-  describe('#deleteGroup', async () => {
+  test('#deleteGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, address } = createMockParams();
     const result = await controller.deleteGroup({

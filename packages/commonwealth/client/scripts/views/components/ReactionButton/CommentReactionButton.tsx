@@ -60,6 +60,7 @@ export const CommentReactionButton = ({
       return;
     }
 
+    // @ts-expect-error <StrictNullChecks/>
     onReaction();
 
     if (hasReacted) {
@@ -69,7 +70,9 @@ export const CommentReactionButton = ({
       deleteCommentReaction({
         communityId: app.activeChainId(),
         address: app.user.activeAccount.address,
+        // @ts-expect-error <StrictNullChecks/>
         canvasHash: foundReaction.canvasHash,
+        // @ts-expect-error <StrictNullChecks/>
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {

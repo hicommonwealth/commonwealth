@@ -5,6 +5,7 @@ import {
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
@@ -29,9 +30,8 @@ export type CreateThreadReactionOptions = {
   address: AddressInstance;
   reaction: string;
   threadId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 export type CreateThreadReactionResult = [
@@ -47,8 +47,7 @@ export async function __createThreadReaction(
     address,
     reaction,
     threadId,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
   }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
@@ -85,9 +84,11 @@ export async function __createThreadReaction(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       thread.community_id,
       address,
+      PermissionEnum.CREATE_THREAD_REACTION,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
@@ -115,10 +116,13 @@ export async function __createThreadReaction(
       );
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
+          // @ts-expect-error StrictNullChecks
           community.namespace_address,
           stake.stake_id,
+          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
+          // @ts-expect-error StrictNullChecks
           node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
@@ -133,18 +137,20 @@ export async function __createThreadReaction(
     reaction,
     address_id: address.id,
     community_id: thread.community_id,
+    // @ts-expect-error StrictNullChecks
     thread_id: thread.id,
   };
   const reactionData: Partial<ReactionAttributes> = {
     ...reactionWhere,
+    // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
   };
 
   const [finalReaction] = await this.models.Reaction.findOrCreate({
     where: reactionWhere,
+    // @ts-expect-error StrictNullChecks
     defaults: reactionData,
   });
 
@@ -154,6 +160,7 @@ export async function __createThreadReaction(
       categoryId: NotificationCategories.NewReaction,
       data: {
         created_at: new Date(),
+        // @ts-expect-error StrictNullChecks
         thread_id: thread.id,
         root_title: thread.title,
         root_type: 'discussion',

@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signCommentReaction } from 'client/scripts/controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import Reaction from 'models/Reaction';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -23,11 +25,7 @@ const createReaction = async ({
   communityId,
   commentId,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signCommentReaction(address, {
+  const canvasSignedData = await signCommentReaction(address, {
     comment_id: commentId,
     like: reactionType === 'like',
   });
@@ -40,9 +38,7 @@ const createReaction = async ({
       address,
       reaction: reactionType,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
       comment_id: commentId,
     },
   );
@@ -56,7 +52,9 @@ const useCreateCommentReactionMutation = ({
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
+    // @ts-expect-error StrictNullChecks
     communityId,
+    // @ts-expect-error StrictNullChecks
     threadId,
   });
 
@@ -87,6 +85,7 @@ const useCreateCommentReactionMutation = ({
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
         markTrainingActionAsComplete(
           UserTrainingCardTypes.GiveUpvote,
+          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

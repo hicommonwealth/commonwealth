@@ -45,6 +45,7 @@ type CardProps = AdminActionsProps & {
   maxRecentCommentsToDisplay?: number;
   layoutType?: 'author-first' | 'community-first';
   customStages?: string[];
+  editingDisabled?: boolean;
 };
 
 export const ThreadCard = ({
@@ -75,6 +76,7 @@ export const ThreadCard = ({
   maxRecentCommentsToDisplay = 2,
   layoutType = 'author-first',
   customStages,
+  editingDisabled,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -94,7 +96,9 @@ export const ThreadCard = ({
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
+    // @ts-expect-error <StrictNullChecks/>
     Permissions.isCommunityAdmin(null, thread.communityId) ||
+    // @ts-expect-error <StrictNullChecks/>
     Permissions.isCommunityModerator(null, thread.communityId);
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
@@ -122,6 +126,7 @@ export const ThreadCard = ({
   return (
     <>
       <Link
+        // @ts-expect-error <StrictNullChecks/>
         to={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
@@ -135,6 +140,7 @@ export const ThreadCard = ({
             thread={thread}
             size="big"
             disabled={!canReact}
+            undoUpvoteDisabled={editingDisabled}
             tooltipText={
               typeof disabledActionsTooltipText === 'function'
                 ? disabledActionsTooltipText?.('upvote')
@@ -154,9 +160,14 @@ export const ThreadCard = ({
                 lockedAt: thread.lockedAt.toISOString(),
               })}
               {...(thread.updatedAt && {
-                lastUpdated: thread.updatedAt.toISOString(),
+                lastUpdated: (
+                  thread?.lastEdited ||
+                  thread.createdAt ||
+                  thread.updatedAt
+                ).toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              // @ts-expect-error <StrictNullChecks/>
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
               layoutType={layoutType}
@@ -212,8 +223,11 @@ export const ThreadCard = ({
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {
+                    // @ts-expect-error <StrictNullChecks/>
                     e.preventDefault();
+                    // @ts-expect-error <StrictNullChecks/>
                     e.stopPropagation();
+                    // @ts-expect-error <StrictNullChecks/>
                     await onStageTagClick(thread.stage);
                   }}
                 />
@@ -224,7 +238,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`Prop 
+                    label={`Prop
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
@@ -268,12 +282,14 @@ export const ThreadCard = ({
               disabledActionsTooltipText={disabledActionsTooltipText}
               setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
               hideUpvoteDrawerButton={hideUpvotesDrawer}
+              editingDisabled={editingDisabled}
             />
           </div>
         </div>
       </Link>
       {!hideRecentComments &&
       maxRecentCommentsToDisplay &&
+      // @ts-expect-error <StrictNullChecks/>
       thread?.recentComments?.length > 0 ? (
         <div className={clsx('RecentComments', { hideReactionButton })}>
           {[...(thread?.recentComments || [])]

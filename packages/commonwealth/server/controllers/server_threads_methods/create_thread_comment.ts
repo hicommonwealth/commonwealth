@@ -5,6 +5,7 @@ import {
   CommentInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
@@ -45,9 +46,8 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -65,8 +65,7 @@ export async function __createThreadComment(
     parentId,
     threadId,
     text,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     discordMeta,
   }: CreateThreadCommentOptions,
@@ -138,9 +137,11 @@ export async function __createThreadComment(
   if (!isAdmin) {
     const { isValid, message } = await validateTopicGroupsMembership(
       this.models,
+      // @ts-expect-error StrictNullChecks
       thread.topic_id,
       thread.community_id,
       address,
+      PermissionEnum.CREATE_COMMENT,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
@@ -168,11 +169,14 @@ export async function __createThreadComment(
     text,
     plaintext,
     version_history,
+    // @ts-expect-error StrictNullChecks
     address_id: address.id,
     community_id: thread.community_id,
+    // @ts-expect-error StrictNullChecks
     parent_id: null,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    // @ts-expect-error <StrictNullChecks>
+    canvas_signed_data: canvasSignedData,
+    // @ts-expect-error <StrictNullChecks>
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,
@@ -197,9 +201,12 @@ export async function __createThreadComment(
       });
 
       await emitMentions(this.models, transaction, {
+        // @ts-expect-error StrictNullChecks
         authorAddressId: address.id,
+        // @ts-expect-error StrictNullChecks
         authorUserId: user.id,
         authorAddress: address.address,
+        // @ts-expect-error StrictNullChecks
         authorProfileId: address.profile_id,
         mentions: mentionedAddresses,
         comment,
@@ -208,15 +215,19 @@ export async function __createThreadComment(
       await this.models.Subscription.bulkCreate(
         [
           {
+            // @ts-expect-error StrictNullChecks
             subscriber_id: user.id,
             category_id: NotificationCategories.NewReaction,
+            // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
             comment_id: comment.id,
             is_active: true,
           },
           {
+            // @ts-expect-error StrictNullChecks
             subscriber_id: user.id,
             category_id: NotificationCategories.NewComment,
+            // @ts-expect-error StrictNullChecks
             community_id: comment.community_id || null,
             comment_id: comment.id,
             is_active: true,
@@ -232,6 +243,7 @@ export async function __createThreadComment(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push(
+    // @ts-expect-error StrictNullChecks
     ...createCommentMentionNotifications(mentionedAddresses, comment, address),
   );
 
@@ -254,8 +266,11 @@ export async function __createThreadComment(
         thread_id: threadId,
         root_title,
         root_type: ProposalType.Thread,
+        // @ts-expect-error StrictNullChecks
         comment_id: +comment.id,
+        // @ts-expect-error StrictNullChecks
         comment_text: comment.text,
+        // @ts-expect-error StrictNullChecks
         community_id: comment.community_id,
         author_address: address.address,
         author_community_id: address.community_id,
@@ -274,10 +289,13 @@ export async function __createThreadComment(
           thread_id: +threadId,
           root_title,
           root_type: ProposalType.Thread,
+          // @ts-expect-error StrictNullChecks
           comment_id: +comment.id,
+          // @ts-expect-error StrictNullChecks
           comment_text: comment.text,
           parent_comment_id: +parentId,
           parent_comment_text: parentComment.text,
+          // @ts-expect-error StrictNullChecks
           community_id: comment.community_id,
           author_address: address.address,
           author_community_id: address.community_id,
@@ -301,6 +319,7 @@ export async function __createThreadComment(
     userId: user.id,
   };
 
+  // @ts-expect-error StrictNullChecks
   const commentJson = comment.toJSON();
   commentJson.Address = address.toJSON();
   return [commentJson, allNotificationOptions, analyticsOptions];

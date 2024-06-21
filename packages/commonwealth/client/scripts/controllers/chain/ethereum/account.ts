@@ -8,6 +8,7 @@ import EthereumChain from './chain';
 export default class EthereumAccount extends Account {
   // TODO: @Timothee this function is not used so this entire object is useless
   public get balance(): Promise<EthereumCoin> {
+    // @ts-expect-error StrictNullChecks
     if (!this._Chain) return; // TODO
     return this._Chain.api.eth
       .getBalance(this.address)
