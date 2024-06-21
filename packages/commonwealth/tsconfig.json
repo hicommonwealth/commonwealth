@@ -11,7 +11,7 @@
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
       "*": ["./*", "shared/*", "client/scripts/*", "client/assets/*"]
     },
-    "types": ["vite/client"]
+    "types": ["vite/client", "vitest/importMeta"]
   },
   "include": [
     "client",

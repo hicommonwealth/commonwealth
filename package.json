@@ -44,6 +44,7 @@
     "extensionless": "^1.9.6"
   },
   "devDependencies": {
+    "@vitest/ui": "^1.6.0",
     "@aave/aave-token": "^1.0.4",
     "@hicommonwealth/eslint-plugin": "workspace:*",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
