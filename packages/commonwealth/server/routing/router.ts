@@ -65,7 +65,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
-import sendFeedback from '../routes/sendFeedback';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -85,7 +84,6 @@ import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -117,7 +115,6 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
-import viewChainActivity from '../routes/viewChainActivity';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -132,6 +129,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { CacheDecorator } from '@hicommonwealth/adapters';
 import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
@@ -182,6 +180,8 @@ import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
+import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
+import setupIpfsProxy from '../util/ipfsProxy';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -207,6 +207,7 @@ function setupRouter(
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
+  cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
@@ -983,20 +984,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewChainIcons',
-    viewCommunityIcons.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/viewChainActivity',
-    viewChainActivity.bind(this, models),
   );
 
   registerRoute(
@@ -1063,14 +1052,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // send feedback button
-  registerRoute(
-    router,
-    'post',
-    '/sendFeedback',
-    sendFeedback.bind(this, models),
   );
 
   // bans
@@ -1289,6 +1270,10 @@ function setupRouter(
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));
+
+  // proxies
+  setupCosmosProxy(router, cacheDecorator);
+  setupIpfsProxy(router, cacheDecorator);
 
   app.use(endpoint, router);
 

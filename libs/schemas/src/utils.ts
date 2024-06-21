@@ -42,7 +42,6 @@ export const zDate = z.preprocess(
   (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
   z.date(),
 );
-
 export const ETHERS_BIG_NUMBER = z.object({
   hex: z.string().regex(/^0x[0-9a-fA-F]+$/),
   type: z.literal('BigNumber'),

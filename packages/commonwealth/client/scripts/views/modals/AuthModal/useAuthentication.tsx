@@ -1,4 +1,4 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { Session } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
@@ -13,10 +13,14 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import WebWalletController from 'controllers/app/web_wallets';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { signSessionWithAccount } from 'controllers/server/sessions';
+import {
+  getSessionFromWallet,
+  signSessionWithAccount,
+} from 'controllers/server/sessions';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { addressSwapper } from 'utils';
@@ -40,7 +44,10 @@ import {
 import { authModal } from '../../../state/ui/modals/authModal';
 
 type UseAuthenticationProps = {
-  onSuccess?: (address?: string | undefined, isNewlyCreated?: boolean) => void;
+  onSuccess?: (
+    address?: string | null | undefined,
+    isNewlyCreated?: boolean,
+  ) => void;
   onModalClose: () => void;
   onUnrecognizedAddressReceived?: () => boolean;
   useSessionKeyLoginFlow?: boolean;
@@ -260,18 +267,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Handle Logged in and joining community of different chain base
     if (app.activeChainId() && app.isLoggedIn()) {
-      const timestamp = +new Date();
-      const { signature, chainId, sessionPayload } =
-        // @ts-expect-error <StrictNullChecks>
-        await signSessionWithAccount(walletToUse, account, timestamp);
-      await account.validate(signature, timestamp, chainId);
-      app.sessions.authSession(
-        app.chain.base,
-        chainId,
-        account.address,
-        sessionPayload,
-        signature,
-      );
+      // @ts-expect-error StrictNullChecks
+      const session = await getSessionFromWallet(walletToUse);
+      await account.validate(session);
       await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
@@ -294,19 +292,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     // Handle receiving and caching wallet signature strings
     if (!newlyCreated && !linking) {
       try {
-        const timestamp = +new Date();
-        const { signature, sessionPayload, chainId } =
-          // @ts-expect-error <StrictNullChecks>
-          await signSessionWithAccount(walletToUse, account, timestamp);
-        await account.validate(signature, timestamp, chainId);
-        app.sessions.authSession(
-          // @ts-expect-error <StrictNullChecks>
-          app.chain ? app.chain.base : walletToUse.chain,
-          chainId,
-          account.address,
-          sessionPayload,
-          signature,
-        );
+        // @ts-expect-error StrictNullChecks
+        const session = await getSessionFromWallet(walletToUse);
+        await account.validate(session);
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -316,22 +304,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (linking) return;
 
       try {
-        const timestamp = +new Date();
-        const { signature, chainId, sessionPayload } =
-          // @ts-expect-error <StrictNullChecks>
-          await signSessionWithAccount(walletToUse, account, timestamp);
+        // @ts-expect-error StrictNullChecks
+        const session = await signSessionWithAccount(walletToUse, account);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
         props.onSuccess?.(account.address, newlyCreated);
 
         // Create the account with default values
-        await onCreateNewAccount(
-          walletToUse,
-          signature,
-          timestamp,
-          chainId,
-          sessionPayload,
-          account,
-        );
+        // await onCreateNewAccount(walletToUse, session, account);
+        await onCreateNewAccount(walletToUse, session, account);
         await onSaveProfileInfo(account, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -343,10 +323,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (
     wallet?: Wallet,
-    walletSignature?: string,
-    cachedTimestamp?: number,
-    cachedChainId?: string,
-    cachedSessionPayload?: SessionPayload,
+    session?: Session,
     account?: Account,
   ) => {
     const walletToUse = wallet || selectedWallet;
@@ -354,23 +331,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       // @ts-expect-error <StrictNullChecks>
       if (walletToUse.chain !== 'near') {
-        // @ts-expect-error <StrictNullChecks>
-        await account.validate(
-          // @ts-expect-error <StrictNullChecks>
-          walletSignature,
-          cachedTimestamp,
-          cachedChainId,
-        );
-        app.sessions.authSession(
-          // @ts-expect-error <StrictNullChecks>
-          walletToUse.chain,
-          // @ts-expect-error <StrictNullChecks>
-          cachedChainId,
-          // @ts-expect-error <StrictNullChecks>
-          account.address,
-          cachedSessionPayload,
-          walletSignature,
-        );
+        // @ts-expect-error StrictNullChecks
+        await account.validate(session);
+        // @ts-expect-error StrictNullChecks
+        await verifySession(session);
       }
       // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true, false);
@@ -400,9 +364,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         );
       }
     } catch (e) {
-      notifyError(`Error creating account. Please try again.`);
-      console.error(`Error creating account: ${e}`);
-      props?.onModalClose?.();
+      console.log(e);
+      notifyError('Failed to create account. Please try again.');
     }
   };
 
@@ -549,12 +512,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-        wallet.chain,
-        // @ts-expect-error <StrictNullChecks>
-        wallet.getChainId().toString(),
-        address,
-      );
+      const session = await getSessionFromWallet(wallet);
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       const validationBlockInfo = await getWalletRecentBlock(
@@ -572,7 +530,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         // @ts-expect-error <StrictNullChecks>
         null, // no sso source
         chainIdentifier,
-        sessionPublicAddress,
+        session.publicKey,
         validationBlockInfo,
       );
 
@@ -598,13 +556,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onSessionKeyRevalidation = async (wallet: Wallet, address: string) => {
-    const timestamp = +new Date();
-    const sessionAddress = await app.sessions.getOrCreateAddress(
-      wallet.chain,
-      // @ts-expect-error <StrictNullChecks>
-      wallet.getChainId().toString(),
-      address,
-    );
+    const session = await getSessionFromWallet(wallet);
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
     const validationBlockInfo = await getWalletRecentBlock(
       wallet,
@@ -619,7 +571,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error <StrictNullChecks>
       null, // no sso source?
       chainIdentifier,
-      sessionAddress,
+      // TODO: I don't think we need this field in Account at all
+      session.publicKey,
       validationBlockInfo,
     );
     account.setValidationBlockInfo(
@@ -627,20 +580,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
     );
 
-    const { chainId, sessionPayload, signature } = await signSessionWithAccount(
-      wallet,
-      account,
-      timestamp,
-    );
-    await account.validate(signature, timestamp, chainId);
-    app.sessions.authSession(
-      wallet.chain,
-      chainId,
-      account.address,
-      sessionPayload,
-      signature,
-    );
-    console.log('Started new session for', wallet.chain, chainId);
+    await account.validate(session);
+    await verifySession(session);
+    console.log('Started new session for', wallet.chain, chainIdentifier);
 
     // ensure false for newlyCreated / linking vars on revalidate
     if (isMobile) {

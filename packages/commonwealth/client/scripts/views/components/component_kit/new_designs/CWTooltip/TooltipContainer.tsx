@@ -23,7 +23,7 @@ export const TooltipContainer: FC<ContainerProps> = ({
           {
             placement,
             Arrow: true,
-            tipTop: placement === 'top' && menuVisible,
+            tipTop: placement === 'top',
             tipBottomSidebarHidden: placement === 'bottom' && !menuVisible,
             tipRight: placement === 'right',
             tipBottom: placement === 'bottom',

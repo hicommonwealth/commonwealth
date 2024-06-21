@@ -21,7 +21,7 @@ const EmptyContestsList = ({
     <div className="EmptyContestsList">
       {!isStakeEnabled ? (
         <EmptyCard
-          img="/static/img/shapes/shape2.svg"
+          img="assets/img/shapes/shape2.svg"
           title="You must enable Community Stake"
           subtitle="Contests require Community Stake..."
           button={{
@@ -31,7 +31,7 @@ const EmptyContestsList = ({
         />
       ) : !isContestAvailable ? (
         <EmptyCard
-          img="/static/img/shapes/shape1.svg"
+          img="assets/img/shapes/shape1.svg"
           title="You haven’t launched any contests yet"
           subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
           button={{

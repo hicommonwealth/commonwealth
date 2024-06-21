@@ -26,8 +26,10 @@ import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
+import { CANVAS_TOPIC } from 'shared/canvas';
+import { deserializeCanvas } from 'shared/canvas/types';
 import { fileURLToPath } from 'url';
-import { verify as verifyCanvas } from '../../shared/canvas/verify';
+import { getSessionSignerForAddress } from '../../shared/canvas/verify';
 import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -435,7 +437,7 @@ async function magicLoginRoute(
     username?: string;
     avatarUrl?: string;
     signature: string;
-    sessionPayload?: string; // optional because session keys are feature-flagged
+    session?: string;
     magicAddress?: string; // optional because session keys are feature-flagged
     walletSsoSource: WalletSsoSource;
   }>,
@@ -525,13 +527,8 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
-    const session: Session = {
-      type: 'session',
-      signature: req.body.signature,
-      payload: req.body.sessionPayload
-        ? JSON.parse(req.body.sessionPayload)
-        : undefined,
-    };
+    // @ts-expect-error <StrictNullChecks>
+    const session: Session = deserializeCanvas(req.body.session);
 
     // @ts-expect-error StrictNullChecks
     if (communityToJoin) {
@@ -556,7 +553,7 @@ async function magicLoginRoute(
         });
       } else if (
         communityToJoin.base === ChainBase.Ethereum &&
-        session.payload.chain.startsWith('eip155:')
+        session.address.startsWith('eip155:')
       ) {
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
@@ -573,18 +570,12 @@ async function magicLoginRoute(
     }
 
     if (config.ENFORCE_SESSION_KEYS) {
-      if (
-        !session.payload?.from ||
-        req.body.magicAddress !== session.payload.from
-      ) {
-        throw new Error(
-          'sessionPayload address did not match user-provided magicAddress',
-        );
+      // verify the session signature using session signer
+      const sessionSigner = getSessionSignerForAddress(session.address);
+      if (!sessionSigner) {
+        throw new Error('No session signer found for address');
       }
-      const valid = await verifyCanvas({ session });
-      if (!valid) {
-        throw new Error('sessionPayload signed with invalid signature');
-      }
+      await sessionSigner.verifySession(CANVAS_TOPIC, session);
     }
   } catch (err) {
     log.warn(

@@ -144,9 +144,9 @@ export const UserTrainingSlider = () => {
   ]);
 
   if (
+    !profileId ||
     !isLoggedIn ||
     isLoadingProfile ||
-    // @ts-expect-error <StrictNullChecks/>
     (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
       completedActions.length === 0) ||
     isAdminSliderVisible // if admin slider is visible, we hide user training slider
@@ -277,7 +277,6 @@ export const UserTrainingSlider = () => {
 
                   markTrainingActionAsComplete(
                     UserTrainingCardTypes.ExploreCommunities,
-                    // @ts-expect-error <StrictNullChecks/>
                     profileId,
                   );
                 }}

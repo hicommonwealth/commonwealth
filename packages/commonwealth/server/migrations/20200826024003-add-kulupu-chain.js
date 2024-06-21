@@ -63,7 +63,7 @@ module.exports = {
             type: 'chain',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'ChainNodes',
@@ -73,7 +73,7 @@ module.exports = {
             url: 'wss://rpc.kulupu.corepaper.org/ws',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       const buildObject = (event_name, chain) => ({
@@ -82,7 +82,7 @@ module.exports = {
         event_name,
       });
       const kulupuObjs = Object.values(SubstrateEventKinds).map((s) =>
-        buildObject(s, 'kulupu')
+        buildObject(s, 'kulupu'),
       );
 
       // TODO: somehow switch this on for testing purposes?
@@ -97,37 +97,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['kulupu'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

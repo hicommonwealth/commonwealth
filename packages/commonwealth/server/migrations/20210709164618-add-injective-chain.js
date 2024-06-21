@@ -21,7 +21,7 @@ module.exports = {
             github: 'https://github.com/InjectiveLabs/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -32,7 +32,7 @@ module.exports = {
             url: 'https://staking-lcd.injective.network',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -41,12 +41,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'injective' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['injective'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

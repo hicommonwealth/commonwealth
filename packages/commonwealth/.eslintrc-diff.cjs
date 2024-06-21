@@ -19,11 +19,6 @@ const ENABLE_ESLINT_DIFF_PLUGIN =
 
 module.exports = {
   settings: {
-    'import/resolver': {
-      webpack: {
-        config: path.resolve(__dirname, 'webpack/webpack.base.config.js'),
-      },
-    },
     react: {
       version: 'detect',
     },

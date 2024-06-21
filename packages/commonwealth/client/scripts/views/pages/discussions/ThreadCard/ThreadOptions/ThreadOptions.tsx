@@ -29,6 +29,7 @@ type OptionsProps = AdminActionsProps & {
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
+  editingDisabled?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -56,6 +57,7 @@ export const ThreadOptions = ({
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
+  editingDisabled,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -102,6 +104,7 @@ export const ThreadOptions = ({
               thread={thread}
               size="small"
               disabled={!canReact}
+              undoUpvoteDisabled={editingDisabled}
               tooltipText={
                 typeof disabledActionsTooltipText === 'function'
                   ? disabledActionsTooltipText?.('upvote')
@@ -154,6 +157,7 @@ export const ThreadOptions = ({
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onSpamToggle={onSpamToggle}
               hasPendingEdits={hasPendingEdits}
+              editingDisabled={editingDisabled}
             />
           )}
         </div>
