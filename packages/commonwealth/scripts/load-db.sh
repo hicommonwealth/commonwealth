@@ -5,7 +5,7 @@
 # from which the script exists i.e. commonwealth/scripts/
 . ../../scripts/load-env-var.sh --source-only
 
-load-env-var '.env';
+load-env-var '../../.env';
 
 if [[ -z "${PGPASSWORD}" ]]; then
   PGPASSWORD="edgeware"
