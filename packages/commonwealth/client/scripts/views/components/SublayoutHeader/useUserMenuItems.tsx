@@ -121,13 +121,13 @@ const useUserMenuItems = ({
 
   const addresses: PopoverMenuItem[] = app.user?.activeAccounts?.map(
     (account) => {
-      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+      const communityCaip2Prefix = chainBaseToCaip2(account?.community?.base);
       const communityIdOrPrefix =
-        account.community.base === ChainBase.CosmosSDK
-          ? account.community.ChainNode?.bech32
-          : account.community.ChainNode?.ethChainId;
+        account?.community?.base === ChainBase.CosmosSDK
+          ? account?.community?.ChainNode?.bech32
+          : account?.community?.ChainNode?.ethChainId;
       const communityCanvasChainId = chainBaseToCanvasChainId(
-        account.community.base,
+        account?.community?.base,
         // @ts-expect-error StrictNullChecks
         communityIdOrPrefix,
       );
