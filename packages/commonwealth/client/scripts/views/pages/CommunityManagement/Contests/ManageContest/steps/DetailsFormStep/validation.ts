@@ -1,4 +1,4 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
+import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
 
