@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
+// import ideacoinSurveyGrowlImage from 'static/img/ideacoinSurveyGrowlImage.svg';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import { getUniqueUserAddresses } from '../helpers/user';
@@ -21,6 +22,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -226,6 +228,13 @@ const Sublayout = ({
             {children}
             {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
+          <CWGrowlTemplate
+            headerText="Shape the Future of Crypto"
+            bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
+            buttonText="Take the Survey for an NFT"
+            buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
+            // growlImage={ideacoinSurveyGrowlImage}
+          />
         </div>
         {userOnboardingEnabled && (
           <WelcomeOnboardModal

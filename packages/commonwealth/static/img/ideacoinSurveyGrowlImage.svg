@@ -1,0 +1,135 @@
+<svg width="320" height="200" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_346_1050)">
+<rect width="320" height="200" fill="black"/>
+<circle cx="89.6317" cy="65.0654" r="34.9346" fill="white"/>
+<circle cx="229.37" cy="65.0657" r="34.9346" fill="white"/>
+<path d="M89.6314 99.9997C108.925 99.9997 124.566 84.359 124.566 65.0652H89.6314V99.9997Z" fill="white"/>
+<path d="M194.435 65.0652C194.435 84.359 210.076 99.9997 229.369 99.9997L229.369 65.0652L194.435 65.0652Z" fill="white"/>
+<path d="M229.369 100C210.076 100 194.435 115.641 194.435 134.935L229.369 134.935L229.369 100Z" fill="white"/>
+<circle cx="159.5" cy="65.0657" r="34.9346" fill="white"/>
+<path d="M159.5 99.9997C178.794 99.9997 194.435 84.359 194.435 65.0652H124.566C124.566 84.359 140.206 99.9997 159.5 99.9997Z" fill="white"/>
+<circle cx="89.6317" cy="134.935" r="34.9346" fill="white"/>
+<circle cx="159.5" cy="134.935" r="34.9346" fill="white"/>
+<path d="M159.501 100C140.207 100 124.566 115.641 124.566 134.935L194.435 134.935C194.435 115.641 178.794 100 159.501 100Z" fill="white"/>
+<path d="M124.566 134.935C124.566 115.641 108.925 100 89.6314 100L89.6314 134.935L124.566 134.935Z" fill="white"/>
+<circle cx="229.37" cy="134.935" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="89.6317" cy="65.0654" r="34.9346" fill="#FF80D7"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="229.37" cy="65.0654" r="34.9346" fill="#FF1F00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M89.6315 99.9997C108.925 99.9997 124.566 84.359 124.566 65.0652H89.6315V99.9997Z" fill="#F1CB00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M194.436 65.0652C194.436 84.359 210.076 99.9997 229.37 99.9997L229.37 65.0652L194.436 65.0652Z" fill="#E76200"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M229.37 99.9998C210.076 99.9998 194.436 115.64 194.436 134.934L229.37 134.934L229.37 99.9998Z" fill="#E76200"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="159.501" cy="65.0654" r="34.9346" fill="#0079CC"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M159.501 99.9997C178.795 99.9997 194.436 84.359 194.436 65.0652H124.567C124.567 84.359 140.207 99.9997 159.501 99.9997Z" fill="#F57BCF"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="89.6317" cy="134.935" r="34.9346" fill="#F1CB00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="159.501" cy="134.935" r="34.9346" fill="#F16600"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M159.501 99.9998C140.207 99.9998 124.566 115.64 124.566 134.934L194.435 134.934C194.435 115.641 178.794 99.9998 159.501 99.9998Z" fill="#DE2F00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M124.566 134.934C124.566 115.641 108.925 99.9998 89.6315 99.9998L89.6315 134.934L124.566 134.934Z" fill="#0079CC"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="229.37" cy="134.935" r="34.9346" fill="#006000"/>
+</g>
+<circle cx="89.6317" cy="205.196" r="34.9346" fill="white"/>
+<circle cx="229.37" cy="205.196" r="34.9346" fill="white"/>
+<circle cx="159.5" cy="205.196" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="89.6317" cy="205.196" r="34.9346" fill="#FF80D7"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="229.37" cy="205.196" r="34.9346" fill="#FF1F00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="159.501" cy="205.196" r="34.9346" fill="#0079CC"/>
+</g>
+<circle cx="299.239" cy="65.0654" r="34.9346" fill="white"/>
+<path d="M299.239 99.9997C318.533 99.9997 334.173 84.359 334.173 65.0652H299.239V99.9997Z" fill="white"/>
+<circle cx="299.239" cy="134.935" r="34.9346" fill="white"/>
+<path d="M334.173 134.935C334.173 115.641 318.533 100 299.239 100L299.239 134.935L334.173 134.935Z" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="299.239" cy="65.0654" r="34.9346" fill="#FF80D7"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M299.239 99.9997C318.533 99.9997 334.173 84.359 334.173 65.0652H299.239V99.9997Z" fill="#F1CB00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="299.239" cy="134.935" r="34.9346" fill="#F1CB00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M334.173 134.934C334.173 115.641 318.533 99.9998 299.239 99.9998L299.239 134.934L334.173 134.934Z" fill="#0079CC"/>
+</g>
+<circle cx="299.239" cy="205.196" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="299.239" cy="205.196" r="34.9346" fill="#FF80D7"/>
+</g>
+<circle cx="19.7623" cy="65.0657" r="34.9346" fill="white"/>
+<path d="M-15.1725 65.0652C-15.1725 84.359 0.468245 99.9997 19.7621 99.9997L19.7621 65.0652L-15.1725 65.0652Z" fill="white"/>
+<path d="M19.7621 100C0.46825 100 -15.1725 115.641 -15.1725 134.935L19.7621 134.935L19.7621 100Z" fill="white"/>
+<circle cx="19.7623" cy="134.935" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="19.7624" cy="65.0654" r="34.9346" fill="#FF1F00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M-15.1718 65.0652C-15.1718 84.359 0.468977 99.9997 19.7628 99.9997L19.7628 65.0652L-15.1718 65.0652Z" fill="#E76200"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<path d="M19.7629 99.9998C0.469058 99.9998 -15.1717 115.64 -15.1717 134.934L19.7629 134.934L19.7629 99.9998Z" fill="#E76200"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="19.7624" cy="134.935" r="34.9346" fill="#006000"/>
+</g>
+<circle cx="19.7623" cy="205.196" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="19.7624" cy="205.196" r="34.9346" fill="#FF1F00"/>
+</g>
+<circle cx="19.7623" cy="-5.19606" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="19.7624" cy="-5.19606" r="34.9346" fill="#006000"/>
+</g>
+<circle cx="89.6317" cy="-5.19606" r="34.9346" fill="white"/>
+<circle cx="159.5" cy="-5.19606" r="34.9346" fill="white"/>
+<circle cx="229.37" cy="-5.19606" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="89.6317" cy="-5.19606" r="34.9346" fill="#F1CB00"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="159.501" cy="-5.19606" r="34.9346" fill="#F16600"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="229.37" cy="-5.19606" r="34.9346" fill="#006000"/>
+</g>
+<circle cx="299.239" cy="-5.19606" r="34.9346" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="299.239" cy="-5.19606" r="34.9346" fill="#F1CB00"/>
+</g>
+<path d="M67.2582 29.9531C56.492 31.1558 55.6006 32.1308 54.501 43.9063C53.4015 32.1308 52.51 31.1558 41.7439 29.9531C52.51 28.7505 53.4015 27.7755 54.501 16C55.6006 27.7755 56.492 28.7505 67.2582 29.9531Z" fill="white"/>
+<path d="M270.479 22.25L257.197 38.1666" stroke="white" stroke-width="0.677091"/>
+<path d="M265.747 18.4316L264.738 38.6186" stroke="white" stroke-width="0.677091"/>
+<path d="M271.48 31.7832L259.871 27.0284" stroke="white" stroke-width="0.677091"/>
+<path d="M135.481 163.037C127.184 170.002 126.982 171.308 132.59 181.721C125.152 172.526 123.869 172.208 114.24 177.171C122.537 170.206 122.739 168.9 117.131 158.487C124.57 167.682 125.852 168 135.481 163.037Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_346_1050">
+<rect width="320" height="200" fill="white"/>
+</clipPath>
+</defs>
+</svg>
