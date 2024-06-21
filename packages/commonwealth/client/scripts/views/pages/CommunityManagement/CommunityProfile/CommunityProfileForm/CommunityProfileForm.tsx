@@ -4,6 +4,7 @@ import {
   usePreferenceTags,
 } from 'client/scripts/views/components/PreferenceTags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -30,10 +31,7 @@ import { useFlag } from '../../../../../hooks/useFlag';
 import './CommunityProfileForm.scss';
 import { getCommunityTags } from './helpers';
 import { CommunityTags, FormSubmitValues } from './types';
-import {
-  communityProfileValidationSchema,
-  linkValidationSchema,
-} from './validation';
+import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
@@ -140,7 +138,7 @@ const CommunityProfileForm = () => {
     areLinksValid,
   } = useLinksArray({
     initialLinks: initialLinks,
-    linkValidation: linkValidationSchema,
+    linkValidation: linkValidationSchema.required,
   });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();

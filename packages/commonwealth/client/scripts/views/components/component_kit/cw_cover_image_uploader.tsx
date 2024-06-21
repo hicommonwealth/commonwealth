@@ -11,13 +11,13 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
-import { CWRadioGroup } from './cw_radio_group';
 import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
 import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
 import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
+import { CWRadioButton } from './new_designs/cw_radio_button';
 
 // TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
 // pick it up like the rest of CWForm hooked components do. Add suport for it when needed.
@@ -32,11 +32,11 @@ type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   enableGenerativeAI?: boolean;
   generatedImageCallback?: CallableFunction;
   defaultImageUrl?: string;
-  defaultImageBehavior?: string;
   uploadCompleteCallback?: CallableFunction;
   canSelectImageBehaviour?: boolean;
   defaultImageBehaviour?: ImageBehavior;
   showUploadAndGenerateText?: boolean;
+  onImageBehaviourChange?: (behaviour: ImageBehavior) => void;
   onImageProcessStatusChange?: (isProcessing: boolean) => any;
 };
 
@@ -61,10 +61,10 @@ export const CWCoverImageUploader = ({
   generatedImageCallback,
   uploadCompleteCallback,
   defaultImageUrl,
-  defaultImageBehavior,
   canSelectImageBehaviour = true,
   showUploadAndGenerateText,
   defaultImageBehaviour,
+  onImageBehaviourChange,
   onImageProcessStatusChange = () => {},
 }: CoverImageUploaderProps) => {
   const [imageURL, setImageURL] = React.useState<string>();
@@ -288,7 +288,6 @@ export const CWCoverImageUploader = ({
 
   React.useEffect(() => {
     setImageURL(defaultImageUrl);
-    setImageBehavior(defaultImageBehavior as ImageBehavior);
     setIsPrompting(false);
 
     // @ts-expect-error <StrictNullChecks/>
@@ -502,24 +501,21 @@ export const CWCoverImageUploader = ({
           >
             Choose image behavior
           </CWText>
-          <CWRadioGroup
-            name="image-behaviour"
-            onChange={(e) => {
-              setImageBehavior(e.target.value);
-              uploadCompleteCallback?.(imageURL, e.target.value);
-            }}
-            toggledOption={imageBehavior}
-            options={[
-              {
-                label: 'Fill',
-                value: ImageBehavior.Fill,
-              },
-              {
-                label: 'Tile',
-                value: ImageBehavior.Tiled,
-              },
-            ]}
-          />
+          {['Fill', 'Tiled'].map((option) => (
+            <CWRadioButton
+              key={option}
+              value={ImageBehavior[option]}
+              label={option}
+              groupName="image-behaviour"
+              checked={imageBehavior === ImageBehavior[option]}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setImageBehavior(ImageBehavior[option]);
+                  onImageBehaviourChange?.(ImageBehavior[option]);
+                }
+              }}
+            />
+          ))}
         </div>
       )}
     </div>

@@ -131,6 +131,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { CacheDecorator } from '@hicommonwealth/adapters';
 import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
@@ -181,6 +182,8 @@ import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
+import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
+import setupIpfsProxy from '../util/ipfsProxy';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -206,6 +209,7 @@ function setupRouter(
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
+  cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
@@ -1280,6 +1284,10 @@ function setupRouter(
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));
+
+  // proxies
+  setupCosmosProxy(router, cacheDecorator);
+  setupIpfsProxy(router, cacheDecorator);
 
   app.use(endpoint, router);
 

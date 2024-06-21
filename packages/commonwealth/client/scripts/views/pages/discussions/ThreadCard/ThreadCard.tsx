@@ -160,7 +160,11 @@ export const ThreadCard = ({
                 lockedAt: thread.lockedAt.toISOString(),
               })}
               {...(thread.updatedAt && {
-                lastUpdated: thread.lastEdited.toISOString(),
+                lastUpdated: (
+                  thread?.lastEdited ||
+                  thread.createdAt ||
+                  thread.updatedAt
+                ).toISOString(),
               })}
               discord_meta={thread.discord_meta}
               // @ts-expect-error <StrictNullChecks/>
@@ -234,7 +238,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`Prop 
+                    label={`Prop
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
