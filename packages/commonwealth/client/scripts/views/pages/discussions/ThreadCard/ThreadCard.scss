@@ -124,6 +124,10 @@
             font-weight: 500;
           }
 
+          img {
+            display: none;
+          }
+
           &.collapsed {
             div :last-child {
               color: transparent !important;

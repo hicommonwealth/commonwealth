@@ -4,11 +4,21 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { notifyError } from 'controllers/app/notifications';
-import { signSessionWithMagic } from 'controllers/server/sessions';
+import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
+
+import { getSessionSigners } from 'shared/canvas/verify';
 import { initAppState } from 'state';
 
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { Session } from '@canvas-js/interfaces';
+import { CosmosExtension } from '@magic-ext/cosmos';
+import { OAuthExtension } from '@magic-ext/oauth';
 import { OpenFeature } from '@openfeature/web-sdk';
+import { Magic } from 'magic-sdk';
+import { CANVAS_TOPIC } from 'shared/canvas';
+import { serializeCanvas } from 'shared/canvas/types';
+
 import axios from 'axios';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
@@ -81,20 +91,23 @@ export async function setActiveAccount(
     if (response.data.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
-  } catch (err) {
-    console.error(err?.response.data.error || err?.message);
-    notifyError('Could not set active account');
-  }
 
-  app.user.ephemerallySetActiveAccount(account);
-  if (
-    app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
-    0
-  ) {
-    app.user.setActiveAccounts(
-      app.user.activeAccounts.concat([account]),
-      shouldRedraw,
-    );
+    app.user.ephemerallySetActiveAccount(account);
+    if (
+      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+        .length === 0
+    ) {
+      app.user.setActiveAccounts(
+        app.user.activeAccounts.concat([account]),
+        shouldRedraw,
+      );
+    }
+  } catch (err) {
+    // Failed to set the user's active address to this account.
+    // This might be because this address isn't `verified`,
+    // so we don't show an error here.
+    console.error(err?.response?.data?.error || err?.message);
+    notifyError('Could not set active account');
   }
 }
 
@@ -198,21 +211,23 @@ export async function updateActiveAddresses({
     ].sort((a, b) => b.lastActive?.diff(a.lastActive));
 
     // From the sorted adddress in the current community, find an address which has an active session key
-    const chainBase = app.chain?.base;
-    const idOrPrefix =
-      chainBase === ChainBase.CosmosSDK
-        ? app.chain?.meta.bech32Prefix
-        : app.chain?.meta.node?.ethChainId;
-    // @ts-expect-error StrictNullChecks
-    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
     let foundAddressWithActiveSessionKey = null;
-    for (const communityAccount of communityAddressesSortedByLastUsed) {
-      const isAuth = await app.sessions
-        .getSessionController(chainBase)
-        .hasAuthenticatedSession(canvasChainId, communityAccount.address);
 
-      if (isAuth) {
-        // @ts-expect-error StrictNullChecks
+    const sessionSigners = getSessionSigners();
+    for (const communityAccount of communityAddressesSortedByLastUsed) {
+      const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
+        sessionSigner.match(communityAccount.address),
+      );
+      if (!matchedSessionSigner) {
+        continue;
+      }
+
+      const session = await matchedSessionSigner.getSession(CANVAS_TOPIC, {
+        address: communityAccount.address,
+      });
+
+      if (session !== null) {
+        // @ts-expect-error <StrictNullChecks>
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }
@@ -336,10 +351,6 @@ export async function createUserWithAddress(
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
-  const { Magic } = await import('magic-sdk');
-  const { OAuthExtension } = await import('@magic-ext/oauth');
-  const { CosmosExtension } = await import('@magic-ext/cosmos');
-
   if (isCosmos && !chain) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
@@ -444,7 +455,7 @@ export async function handleSocialLoginCallback({
   walletSsoSource,
   returnEarlyIfNewAddress = false,
 }: {
-  bearer?: string;
+  bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
   returnEarlyIfNewAddress?: boolean;
@@ -474,6 +485,7 @@ export async function handleSocialLoginCallback({
     const result = await magic.oauth.getRedirectResult();
 
     if (!bearer) {
+      console.log('No bearer token found in magic redirect result');
       bearer = result.magic.idToken;
       console.log('Magic redirect result:', result);
     }
@@ -514,32 +526,27 @@ export async function handleSocialLoginCallback({
     }
   }
 
-  let authedSessionPayload, authedSignature;
+  let session: Session | null = null;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
-      const bech32Prefix = desiredChain.bech32Prefix;
-      const communityId = 'cosmoshub';
-      const timestamp = +new Date();
-
       const signer = { signMessage: magic.cosmos.sign };
-      const { signature, sessionPayload } = await signSessionWithMagic(
+      const prefix = app.chain?.meta?.bech32Prefix || 'cosmos';
+      const canvasChainId = chainBaseToCanvasChainId(
         ChainBase.CosmosSDK,
+        prefix,
+      );
+      const sessionSigner = getMagicCosmosSessionSigner(
         signer,
         magicAddress,
-        timestamp,
+        canvasChainId,
       );
-      // TODO: provide blockhash as last argument to signSessionWithMagic
-      signature.signatures[0].chain_id = communityId;
-      await app.sessions.authSession(
-        ChainBase.CosmosSDK, // could be desiredChain.base in the future?
-        chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
-        magicAddress,
-        sessionPayload,
-        JSON.stringify(signature.signatures[0]),
-      );
-      authedSessionPayload = JSON.stringify(sessionPayload);
-      authedSignature = JSON.stringify(signature.signatures[0]);
+      let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
+      if (!sessionObject) {
+        sessionObject = await sessionSigner.newSession(CANVAS_TOPIC);
+      }
+      session = sessionObject?.payload;
+
       console.log(
         'Reauthenticated Cosmos session from magic address:',
         magicAddress,
@@ -552,24 +559,15 @@ export async function handleSocialLoginCallback({
       const signer = provider.getSigner();
       const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
 
-      const timestamp = +new Date();
-      const { signature, sessionPayload } = await signSessionWithMagic(
-        ChainBase.Ethereum,
+      const sessionSigner = new SIWESigner({
         signer,
-        checksumAddress,
-        timestamp,
-      );
-      // TODO: provide blockhash as last argument to signSessionWithMagic
-
-      await app.sessions.authSession(
-        ChainBase.Ethereum, // could be desiredChain.base in the future?
-        chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
-        checksumAddress,
-        sessionPayload,
-        signature,
-      );
-      authedSessionPayload = JSON.stringify(sessionPayload);
-      authedSignature = signature;
+        chainId: app.chain?.meta.node?.ethChainId || 1,
+      });
+      let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
+      if (!sessionObject) {
+        sessionObject = await sessionSigner.newSession(CANVAS_TOPIC);
+      }
+      session = sessionObject.payload;
       console.log(
         'Reauthenticated Ethereum session from magic address:',
         checksumAddress,
@@ -577,6 +575,7 @@ export async function handleSocialLoginCallback({
     }
   } catch (err) {
     // if session auth fails, do nothing
+    console.log('Magic session auth failed', err);
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
@@ -589,8 +588,7 @@ export async function handleSocialLoginCallback({
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,
-        sessionPayload: authedSessionPayload,
-        signature: authedSignature,
+        session: session && serializeCanvas(session),
         walletSsoSource,
       },
     },

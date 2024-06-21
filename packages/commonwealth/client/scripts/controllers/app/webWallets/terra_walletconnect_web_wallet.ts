@@ -1,12 +1,11 @@
-import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   ConnectedWallet,
   WalletController,
 } from '@terra-money/wallet-provider';
 
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import app from 'state';
-import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
@@ -65,30 +64,26 @@ class TerraWalletConnectWebWalletController
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    const canvas = await import('@canvas-js/interfaces');
-    try {
-      const result = await this._wallet.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload)),
-      );
-      if (!result.success) {
-        throw new Error('SignBytes unsuccessful');
-      }
-      return JSON.stringify({
-        pub_key: {
-          type: 'tendermint/PubKeySecp256k1',
-          // @ts-expect-error StrictNullChecks
-          value: result.result.public_key.toAmino().value,
+  public getSessionSigner() {
+    return new CosmosSignerCW({
+      bech32Prefix: app.chain?.meta.bech32Prefix,
+      signer: {
+        type: 'bytes',
+        getAddress: () => this._accounts[0].address,
+        getChainId: () => this.getChainId(),
+        signBytes: async (bytes) => {
+          const result = await this._wallet.signBytes(Buffer.from(bytes));
+          if (!result.success) {
+            throw new Error('SignBytes unsuccessful');
+          }
+          return {
+            // @ts-expect-error <StrictNullChecks>
+            public_key: result.result.public_key.toAmino().value as string,
+            signature: Buffer.from(result.result.signature).toString('base64'),
+          };
         },
-        signature: Buffer.from(result.result.signature).toString('base64'),
-      });
-    } catch (error) {
-      console.error(error);
-      throw new Error(`Failed to sign with account: ${error.message}`);
-    }
+      },
+    });
   }
 
   public async reset() {

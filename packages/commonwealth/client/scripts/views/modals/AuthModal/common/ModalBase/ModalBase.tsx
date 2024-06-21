@@ -50,6 +50,22 @@ const MODAL_COPY = {
   },
 };
 
+/**
+ * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
+ * @param onClose callback triggered when the modal is closed or user is authenticated.
+ * @param onSuccess callback triggered on successful user authentication.
+ * @param layoutType specifies the layout type/variant of the modal.
+ * @param hideDescription if `true`, hides the description after modal header.
+ * @param customBody custom content to add before the modal body.
+ * @param showAuthenticationOptionsFor determines auth options category ('wallets', 'sso', or both) to display.
+ *                                     All options are displayed if prop is not provided.
+ *                                     Prop is ignored if internal modal state hides SSO options.
+ * @param showWalletsFor specifies wallets to display for the specified chain.
+ * @param bodyClassName custom class to apply to the modal body.
+ * @param onSignInClick callback triggered when the user clicks on the `Sign in` link in the modal footer.
+ * @param onChangeModalType callback triggered when `layoutType` change is requested from within the modal.
+ * @returns {ReactNode}
+ */
 const ModalBase = ({
   onClose,
   onSuccess,
@@ -71,16 +87,6 @@ const ModalBase = ({
       ? 1
       : 0,
   );
-  useEffect(() => {
-    setActiveTabIndex((prevActiveTab) => {
-      return (showAuthenticationOptionsFor?.includes('sso') &&
-        showAuthenticationOptionsFor.length === 1) ||
-        prevActiveTab === 1
-        ? 1
-        : 0;
-    });
-  }, [showAuthenticationOptionsFor]);
-
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
@@ -149,14 +155,14 @@ const ModalBase = ({
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
-    // 2. On communities based on 'Ethereum', 'Cosmos', 'Solana', 'Substrate', or 'Near' chains:
+    // 2. On communities based on `Ethereum`, `Cosmos`, `Solana`, `Substrate`, or `Near` chains:
     //    - Display wallets specific to the respective community chain.
-    //    - 'Near' is the only community where 'Near' wallet is shown
-    // 3. On non-community pages, show 'Ethereum', 'Cosmos', 'Solana', and 'Substrate' based wallets
+    //    - `Near` is the only community where `Near` wallet is shown
+    // 3. On non-community pages, show `Ethereum`, `Cosmos`, `Solana`, and `Substrate` based wallets
     // 4. On specific communities, show specific wallets
-    //    a. On 'terra' community, only show 'terrastation' and 'terra-walletconnect' (wallet connect for terra) wallets
-    //    b. On 'evmos' and 'injective' communities, only show 'cosm-metamask' (metamask for cosmos communities) and
-    //       'keplr-ethereum' (keplr for ethereum communities) wallets
+    //    a. On `terra` community, only show `terrastation` and `terra-walletconnect` (wallet connect for terra) wallets
+    //    b. On `evmos` and `injective` communities, only show `cosm-metamask` (metamask for cosmos communities) and
+    //       `keplr-ethereum` (keplr for ethereum communities) wallets
 
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
@@ -188,6 +194,27 @@ const ModalBase = ({
     return [];
   };
 
+  const shouldShowSSOOptions = (() => {
+    // All auth options lead to either an `Ethereum` or `Cosmos` address once user authenticates.
+    // SSO Display Logic:
+    // 1. When `showWalletsFor` is either `Ethereum` or `Cosmos`, show all SSO options.
+    // 2. On communities based on `Ethereum` or `Cosmos`, show all SSO options.
+    // 3. On unscoped pages, show all SSO options.
+    // 4. In all other cases, hide all SSO options.
+    const showSSOOptionsForSpecificChains = showWalletsFor || app?.chain?.base;
+    if (showSSOOptionsForSpecificChains) {
+      switch (showSSOOptionsForSpecificChains) {
+        case ChainBase.Ethereum:
+        case ChainBase.CosmosSDK:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    return true;
+  })();
+
   const tabsList: ModalBaseTabs[] = [
     {
       name: 'Wallet',
@@ -198,6 +225,22 @@ const ModalBase = ({
       options: ['google', 'discord', 'x', 'apple', 'github', 'email'],
     },
   ];
+
+  useEffect(() => {
+    setActiveTabIndex((prevActiveTab) => {
+      if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
+
+      if (
+        (showAuthenticationOptionsFor?.includes('sso') &&
+          showAuthenticationOptionsFor.length === 1) ||
+        prevActiveTab === 1
+      ) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }, [showAuthenticationOptionsFor, shouldShowSSOOptions]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
@@ -262,20 +305,21 @@ const ModalBase = ({
           {/* @ts-expect-error StrictNullChecks*/}
           {showAuthenticationOptionsFor?.length > 0 && (
             <>
-              {/* @ts-expect-error StrictNullChecks*/}
-              {showAuthenticationOptionsFor?.length > 1 && (
-                <CWTabsRow className="tabs">
-                  {tabsList.map((tab, index) => (
-                    <CWTab
-                      key={tab.name}
-                      label={tab.name}
-                      isDisabled={isMagicLoading}
-                      isSelected={tabsList[activeTabIndex].name === tab.name}
-                      onClick={() => setActiveTabIndex(index)}
-                    />
-                  ))}
-                </CWTabsRow>
-              )}
+              {shouldShowSSOOptions &&
+                // @ts-expect-error StrictNullChecks*
+                showAuthenticationOptionsFor?.length > 1 && (
+                  <CWTabsRow className="tabs">
+                    {tabsList.map((tab, index) => (
+                      <CWTab
+                        key={tab.name}
+                        label={tab.name}
+                        isDisabled={isMagicLoading}
+                        isSelected={tabsList[activeTabIndex].name === tab.name}
+                        onClick={() => setActiveTabIndex(index)}
+                      />
+                    ))}
+                  </CWTabsRow>
+                )}
 
               <section className="auth-options">
                 {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}

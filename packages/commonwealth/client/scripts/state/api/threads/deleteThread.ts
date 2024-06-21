@@ -1,6 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signDeleteThread } from 'client/scripts/controllers/server/sessions';
 import { ThreadStage } from 'models/types';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
@@ -16,11 +18,7 @@ const deleteThread = async ({
   threadId,
   address,
 }: DeleteThreadProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteThread(address, {
+  const canvasSignedData = await signDeleteThread(address, {
     thread_id: threadId,
   });
 
@@ -30,9 +28,7 @@ const deleteThread = async ({
       community_id: communityId,
       address: address,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   });
 };
