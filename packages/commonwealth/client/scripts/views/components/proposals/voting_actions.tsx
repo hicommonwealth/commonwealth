@@ -16,12 +16,6 @@ import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import type { NearAccount } from 'controllers/chain/near/account';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import {
-  NearSputnikVote,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useEffect, useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
@@ -84,8 +78,6 @@ export const VotingActions = (props: VotingActionsProps) => {
     proposal instanceof AaveProposal
   ) {
     user = app.user.activeAccount as EthereumAccount;
-  } else if (proposal instanceof NearSputnikProposal) {
-    user = app.user.activeAccount as NearAccount;
   } else {
     return <CannotVote label="Unrecognized proposal type" />;
   }
@@ -146,18 +138,6 @@ export const VotingActions = (props: VotingActionsProps) => {
       } catch (err) {
         notifyError(err.toString());
       }
-    } else if (proposal instanceof NearSputnikProposal) {
-      try {
-        await proposal.submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Approve),
-        );
-        emitRedraw();
-        trackAnalytics({
-          event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
-        });
-      } catch (err) {
-        notifyError(err.toString());
-      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
@@ -199,18 +179,6 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.AAVE_VOTE_OCCURRED,
-        });
-      } catch (err) {
-        notifyError(err.toString());
-      }
-    } else if (proposal instanceof NearSputnikProposal) {
-      try {
-        await proposal.submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Reject),
-        );
-        emitRedraw();
-        trackAnalytics({
-          event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
         });
       } catch (err) {
         notifyError(err.toString());
@@ -259,28 +227,6 @@ export const VotingActions = (props: VotingActionsProps) => {
         .voteTx(new CosmosVote(user, 'NoWithVeto'))
         .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
-    } else {
-      toggleVotingModal(false);
-      return notifyError('Invalid proposal type');
-    }
-  };
-
-  const voteRemove = (e) => {
-    e.preventDefault();
-    toggleVotingModal(true);
-
-    if (proposal instanceof NearSputnikProposal) {
-      proposal
-        .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Remove),
-        )
-        .then(() => {
-          onModalClose();
-        })
-        .catch((err) => {
-          onModalClose();
-          notifyError(err.toString());
-        });
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
@@ -342,15 +288,6 @@ export const VotingActions = (props: VotingActionsProps) => {
       disabled={!canVote || hasVotedVeto || votingModalOpen}
       onClick={voteVeto}
       label={hasVotedVeto ? 'Vetoed' : 'Veto'}
-    />
-  );
-
-  // near: remove
-  const removeButton = proposal instanceof NearSputnikProposal && (
-    <CWButton
-      disabled={!canVote || votingModalOpen}
-      onClick={voteRemove}
-      label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
     />
   );
 
@@ -437,14 +374,6 @@ export const VotingActions = (props: VotingActionsProps) => {
           proposal={proposal as CompoundProposal}
           votingModalOpen={votingModalOpen}
         />
-      </div>
-    );
-  } else if (proposal.votingType === VotingType.YesNoReject) {
-    votingActionObj = (
-      <div className="button-row">
-        {yesButton}
-        {noButton}
-        {removeButton}
       </div>
     );
   } else if (proposal.votingType === VotingType.RankedChoiceVoting) {

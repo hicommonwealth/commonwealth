@@ -176,9 +176,7 @@ export function formatAddressShort(
   prefix?: string,
 ) {
   if (!address) return;
-  if (chain === 'near') {
-    return `@${address}`;
-  } else if (prefix && !maxCharLength) {
+  if (prefix && !maxCharLength) {
     if (!includeEllipsis) return address;
     const totalLength = address.length;
     return `${address.slice(0, prefix.length + 3)}...${address.slice(

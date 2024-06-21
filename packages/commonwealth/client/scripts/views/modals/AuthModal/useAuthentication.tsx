@@ -11,7 +11,6 @@ import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
-import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
@@ -32,7 +31,7 @@ import {
 } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { setDarkMode } from '../../../helpers/darkMode';
-import { getAddressFromWallet, loginToNear } from '../../../helpers/wallet';
+import { getAddressFromWallet } from '../../../helpers/wallet';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import { useFlag } from '../../../hooks/useFlag';
 import Account from '../../../models/Account';
@@ -106,7 +105,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const sortedChainBases = [
         ChainBase.CosmosSDK,
         ChainBase.Ethereum,
-        // ChainBase.NEAR,
         ChainBase.Substrate,
         ChainBase.Solana,
       ];
@@ -326,16 +324,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     session?: Session,
     account?: Account,
   ) => {
-    const walletToUse = wallet || selectedWallet;
-
     try {
-      // @ts-expect-error <StrictNullChecks>
-      if (walletToUse.chain !== 'near') {
-        // @ts-expect-error StrictNullChecks
-        await account.validate(session, false);
-        // @ts-expect-error StrictNullChecks
-        await verifySession(session);
-      }
+      // @ts-expect-error StrictNullChecks
+      await account.validate(session, false);
+      // @ts-expect-error StrictNullChecks
+      await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true, false);
       // Important: when we first create an account and verify it, the user id
@@ -412,47 +405,43 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     await wallet.enable();
     setSelectedWallet(wallet);
 
-    if (wallet.chain === 'near') {
-      await loginToNear(app.chain as Near, app.isCustomDomain());
+    const selectedAddress = getAddressFromWallet(wallet);
+
+    if (userOnboardingEnabled) {
+      // check if address exists
+      const profileAddresses = await fetchProfilesByAddress({
+        currentChainId: '',
+        profileAddresses: [
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address: selectedAddress,
+                currentPrefix: parseInt(
+                  (app.chain as Substrate)?.meta.ss58Prefix,
+                  10,
+                ),
+              })
+            : selectedAddress,
+        ],
+        profileChainIds: [app.activeChainId() ?? wallet.chain],
+        initiateProfilesAfterFetch: false,
+      });
+      const addressExists = profileAddresses?.length > 0;
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      if (
+        !addressExists &&
+        !isAttemptingToConnectAddressToCommunity &&
+        props.onUnrecognizedAddressReceived
+      ) {
+        const shouldContinue = props.onUnrecognizedAddressReceived();
+        if (!shouldContinue) return;
+      }
+    }
+
+    if (props.useSessionKeyLoginFlow) {
+      await onSessionKeyRevalidation(wallet, selectedAddress);
     } else {
-      const selectedAddress = getAddressFromWallet(wallet);
-
-      if (userOnboardingEnabled) {
-        // check if address exists
-        const profileAddresses = await fetchProfilesByAddress({
-          currentChainId: '',
-          profileAddresses: [
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: selectedAddress,
-                  currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
-                    10,
-                  ),
-                })
-              : selectedAddress,
-          ],
-          profileChainIds: [app.activeChainId() ?? wallet.chain],
-          initiateProfilesAfterFetch: false,
-        });
-        const addressExists = profileAddresses?.length > 0;
-        const isAttemptingToConnectAddressToCommunity =
-          app.isLoggedIn() && app.activeChainId();
-        if (
-          !addressExists &&
-          !isAttemptingToConnectAddressToCommunity &&
-          props.onUnrecognizedAddressReceived
-        ) {
-          const shouldContinue = props.onUnrecognizedAddressReceived();
-          if (!shouldContinue) return;
-        }
-      }
-
-      if (props.useSessionKeyLoginFlow) {
-        await onSessionKeyRevalidation(wallet, selectedAddress);
-      } else {
-        await onNormalWalletLogin(wallet, selectedAddress);
-      }
+      await onNormalWalletLogin(wallet, selectedAddress);
     }
   };
 

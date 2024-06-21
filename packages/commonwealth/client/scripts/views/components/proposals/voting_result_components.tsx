@@ -7,9 +7,6 @@ import type {
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
-import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import type { NearSputnikVote } from 'controllers/chain/near/sputnik/types';
-import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
@@ -246,60 +243,6 @@ export const YesNoAbstainVetoVotingResult = (
           // @ts-expect-error <StrictNullChecks/>
           proposal={proposal}
           votes={votes.filter((v) => v.choice === 'NoWithVeto')}
-        />
-      </div>
-    </div>
-  );
-};
-
-type YesNoRejectVotingResultProps = {
-  proposal: NearSputnikProposal;
-  votes: Array<NearSputnikVote>;
-};
-
-export const YesNoRejectVotingResult = (
-  props: YesNoRejectVotingResultProps,
-) => {
-  const { proposal, votes } = props;
-
-  return (
-    <div className="VotingResult">
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted approve (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
-              .length
-          })`}
-        </CWText>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter(
-            (v) => v.choice === NearSputnikVoteString.Approve,
-          )}
-        />
-      </div>
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted reject (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
-              .length
-          })`}
-        </CWText>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === NearSputnikVoteString.Reject)}
-        />
-      </div>
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted remove (${
-            votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
-              .length
-          })`}
-        </CWText>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === NearSputnikVoteString.Remove)}
         />
       </div>
     </div>

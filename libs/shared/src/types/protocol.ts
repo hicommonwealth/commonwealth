@@ -14,7 +14,6 @@ export enum BalanceType {
   Ethereum = 'ethereum',
   Solana = 'solana',
   Cosmos = 'cosmos',
-  NEAR = 'near',
   Substrate = 'substrate',
 }
 
@@ -71,7 +70,6 @@ export enum WalletId {
   KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
   Leap = 'leap',
-  NearWallet = 'near',
   TerraStation = 'terrastation',
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
@@ -94,7 +92,6 @@ export enum ChainBase {
   CosmosSDK = 'cosmos',
   Substrate = 'substrate',
   Ethereum = 'ethereum',
-  NEAR = 'near',
   Solana = 'solana',
 }
 
@@ -139,8 +136,6 @@ export enum ChainNetwork {
   InjectiveTestnet = 'injective-testnet',
   Terra = 'terra',
   Ethereum = 'ethereum',
-  NEAR = 'near',
-  NEARTestnet = 'near-testnet',
   Compound = 'compound',
   Aave = 'aave',
   AaveLocal = 'aave-local',
@@ -155,7 +150,6 @@ export enum ChainNetwork {
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
-  Sputnik = 'sputnik',
   SolanaDevnet = 'solana-devnet',
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',

@@ -93,11 +93,6 @@ export async function createAddressHelper(
       if (!isAddress(encodedAddress)) {
         throw new AppError('Eth address is not valid');
       }
-    } else if (community.base === ChainBase.NEAR) {
-      const nearRegex = /^[a-z0-9_\-.]*$/;
-      if (!nearRegex.test(encodedAddress)) {
-        throw new AppError('NEAR address is not valid');
-      }
     } else if (community.base === ChainBase.Solana) {
       const { PublicKey } = await import('@solana/web3.js');
       const key = new PublicKey(encodedAddress);

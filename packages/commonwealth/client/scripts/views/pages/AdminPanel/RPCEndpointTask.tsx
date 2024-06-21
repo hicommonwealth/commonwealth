@@ -284,7 +284,6 @@ const RPCEndpointTask = () => {
                 { label: 'ethereum', value: BalanceType.Ethereum },
                 { label: 'solana', value: BalanceType.Solana },
                 { label: 'cosmos', value: BalanceType.Cosmos },
-                { label: 'NEAR', value: BalanceType.NEAR },
                 { label: 'substrate', value: BalanceType.Substrate },
               ]}
               onSelect={(item) => {

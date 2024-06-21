@@ -350,9 +350,7 @@ export async function __createCommunity(
           : base === ChainBase.Ethereum
           ? BalanceType.Ethereum
           : // beyond here should never really happen, but just to make sure...
-          base === ChainBase.NEAR
-          ? BalanceType.NEAR
-          : base === ChainBase.Solana
+          base === ChainBase.Solana
           ? BalanceType.Solana
           : undefined,
       // use first chain name as node name
@@ -434,25 +432,6 @@ export async function __createCommunity(
         user_id: user.id,
         address: {
           [Op.startsWith]: '0x',
-        },
-      },
-      include: [
-        {
-          model: this.models.Community,
-          where: { base: createdCommunity.base },
-          required: true,
-        },
-      ],
-    });
-  } else if (createdCommunity.base === ChainBase.NEAR) {
-    // @ts-expect-error StrictNullChecks
-    addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData',
-    ).findOne({
-      where: {
-        user_id: user.id,
-        address: {
-          [Op.endsWith]: '.near',
         },
       },
       include: [

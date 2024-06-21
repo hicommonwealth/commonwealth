@@ -4,7 +4,6 @@ import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
-import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -37,11 +36,7 @@ export const enum LoginState {
 export interface IApp {
   chain: IChainAdapter<
     any,
-    | CosmosAccount
-    | EthereumAccount
-    | NearAccount
-    | SolanaAccount
-    | SubstrateAccount
+    CosmosAccount | EthereumAccount | SolanaAccount | SubstrateAccount
   >;
 
   // XXX: replace this with some app.chain helper

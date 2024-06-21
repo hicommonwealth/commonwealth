@@ -147,10 +147,7 @@ export const useMention = ({
               nameSpan.className = 'ql-mention-name';
 
               const addrSpan = document.createElement('span');
-              addrSpan.innerText =
-                profileCommunity === 'near'
-                  ? profileAddress
-                  : `${profileAddress.slice(0, 6)}...`;
+              addrSpan.innerText = `${profileAddress.slice(0, 6)}...`;
               addrSpan.className = 'ql-mention-addr';
 
               const lastActiveSpan = document.createElement('span');

@@ -66,7 +66,6 @@ const TagsShowcase = () => {
         <CWTag label="mnh7a" type="login" iconName="envelope" />
         <CWTag label="mnh7a" type="login" iconName="ethereum" />
         <CWTag label="mnh7a" type="login" iconName="octocat" />
-        <CWTag label="mnh7a" type="login" iconName="near" />
         <CWTag label="mnh7a" type="login" iconName="polkadot" />
         <CWTag label="mnh7a" type="login" iconName="polygon" />
         <CWTag label="mnh7a" type="login" iconName="twitterNew" />
@@ -79,7 +78,6 @@ const TagsShowcase = () => {
         <CWTag label="0xd83e1...a39bD" type="address" iconName="envelope" />
         <CWTag label="0xd83e1...a39bD" type="address" iconName="ethereum" />
         <CWTag label="0xd83e1...a39bD" type="address" iconName="octocat" />
-        <CWTag label="0xd83e1...a39bD" type="address" iconName="near" />
         <CWTag label="0xd83e1...a39bD" type="address" iconName="polkadot" />
         <CWTag label="0xd83e1...a39bD" type="address" iconName="polygon" />
         <CWTag label="0xd83e1...a39bD" type="address" iconName="twitterNew" />

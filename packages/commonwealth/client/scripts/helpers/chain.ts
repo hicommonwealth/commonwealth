@@ -56,7 +56,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
-  let initApi; // required for NEAR
 
   if (chain.base === ChainBase.Substrate) {
     const Substrate = (await import('../controllers/chain/substrate/adapter'))
@@ -66,18 +65,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     const Cosmos = (await import('../controllers/chain/cosmos/adapter'))
       .default;
     newChain = new Cosmos(chain, app);
-  } else if (
-    chain.network === ChainNetwork.NEAR ||
-    chain.network === ChainNetwork.NEARTestnet
-  ) {
-    const Near = (await import('../controllers/chain/near/adapter')).default;
-    newChain = new Near(chain, app);
-    initApi = true;
-  } else if (chain.network === ChainNetwork.Sputnik) {
-    const Sputnik = (await import('../controllers/chain/near/sputnik/adapter'))
-      .default;
-    newChain = new Sputnik(chain, app);
-    initApi = true;
   } else if (chain.network === ChainNetwork.Compound) {
     const Compound = (
       await import('../controllers/chain/ethereum/compound/adapter')
@@ -123,10 +110,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     return false;
   } else {
     app.chain = newChain;
-  }
-
-  if (initApi) {
-    await app.chain.initApi(); // required for loading NearAccounts
   }
 
   app.chainPreloading = false;

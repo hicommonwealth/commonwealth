@@ -170,7 +170,7 @@ const CommunityTypeStep = ({
         }}
         showWalletsFor={
           communityTypeOptions.find((c) => c.type === selectedCommunity.type)
-            ?.chainBase as Exclude<ChainBase, ChainBase.NEAR>
+            ?.chainBase as ChainBase
         }
       />
     </div>

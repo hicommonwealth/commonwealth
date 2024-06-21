@@ -314,8 +314,6 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.Edgeware;
     case ChainBase.Ethereum:
       return ChainNetwork.Ethereum;
-    case ChainBase.NEAR:
-      return ChainNetwork.NEAR;
     case ChainBase.Solana:
       return ChainNetwork.Solana;
     default:
