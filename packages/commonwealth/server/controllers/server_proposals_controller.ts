@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { ChainNetwork } from '@hicommonwealth/shared';
-import { providers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import {
   GetProposalVotesOptions,
   GetProposalVotesResult,
@@ -86,7 +86,7 @@ export class ServerProposalsController {
 
   private async createEvmProvider(
     communityId: string,
-  ): Promise<providers.Web3Provider> {
+  ): Promise<providers.JsonRpcProvider> {
     const ethNetworkUrl = await this.getRPCUrl(communityId);
 
     if (ethNetworkUrl.slice(0, 4) != 'http')
@@ -95,11 +95,7 @@ export class ServerProposalsController {
       );
 
     try {
-      const Web3 = (await import('web3')).default;
-      const web3Provider = new Web3(ethNetworkUrl);
-      return new providers.Web3Provider(
-        web3Provider.givenProvider as providers.ExternalProvider,
-      );
+      return new ethers.providers.JsonRpcProvider(ethNetworkUrl);
     } catch (e) {
       throw new ServerError(
         `Failed to create EVM provider for ${ethNetworkUrl}. ${e}`,

@@ -25,7 +25,7 @@ export function formatAaveProposalVote(
 
 export async function getAaveProposalVotes(
   aaveGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
   proposalId: number,
 ): Promise<VoteEventArgsObject[]> {
   const govContract = IAaveGovernanceV2__factory.connect(
