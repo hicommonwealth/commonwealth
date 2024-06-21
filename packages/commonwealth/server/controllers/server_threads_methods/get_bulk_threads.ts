@@ -1,9 +1,10 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import { ThreadAttributes } from '@hicommonwealth/model';
-import type { ReactionType } from 'models/Reaction';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
+
+type ReactionType = 'like';
 
 export type GetBulkThreadsOptions = {
   communityId: string;
@@ -103,33 +104,36 @@ export async function __getBulkThreads(
     all: '',
   };
 
-  const contestJoin =
-    ' JOIN "ContestActions" CA ON CA.thread_id = id' +
-    ' JOIN "Contests" CON ON CON.contest_id = CA.contest_id';
-
   const responseThreadsQuery = this.models.sequelize.query<ThreadsQuery>(
     `
-        WITH top_threads AS (
+        WITH contest_ids as (
+            SELECT DISTINCT(CA.thread_id)
+            FROM "Contests" CON
+            JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+            ${
+              contestAddress
+                ? ` WHERE CA.contest_address = '${contestAddress}' `
+                : ''
+            }
+            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
+        ),
+        top_threads AS (
         SELECT id, title, url, body, kind, stage, read_only, discord_meta,
             pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
             has_poll, last_commented_on, plaintext, comment_count as "numberOfComments",
-            marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_action as "canvasAction",
-            canvas_session as "canvasSession", canvas_hash as "canvasHash", plaintext, last_edited, address_id
+            marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data as "canvasSignedData",
+            canvas_hash as "canvasHash", plaintext, last_edited, address_id
         FROM "Threads" T
-        ${contestAddress ? contestJoin : ''}
         WHERE
             community_id = :communityId AND
             deleted_at IS NULL AND
-            archived_at IS ${archived ? 'NOT' : ''} NULL 
+            archived_at IS ${archived ? 'NOT' : ''} NULL
             ${topicId ? ' AND topic_id = :topicId' : ''}
             ${stage ? ' AND stage = :stage' : ''}
             ${fromDate ? ' AND T.created_at > :fromDate' : ''}
             ${toDate ? ' AND T.created_at < :toDate' : ''}
-            ${
-              contestAddress ? ' AND CA.contest_address = :contestAddress ' : ''
-            }
-            ${contestAddress ? contestStatus[status] || contestStatus.all : ''}
-        ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'} 
+            ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
+        ORDER BY pinned DESC, ${orderByQueries[orderBy] ?? 'T.created_at DESC'}
         LIMIT :limit OFFSET :offset
     ), thread_metadata AS (
     -- get the thread authors and their profiles
@@ -170,7 +174,7 @@ export async function __getBulkThreads(
                             'avatarUrl', editor_profiles.avatar_url::text
                         ))
                     )
-                ))) 
+                )))
             ELSE '[]'::json
             END AS collaborators
         FROM top_threads TT
@@ -204,14 +208,15 @@ export async function __getBulkThreads(
           SELECT
               TT.id as thread_id,
               json_agg(json_strip_nulls(json_build_object(
-              'id', CON.contest_id,
+              'contest_id', CON.contest_id,
+              'contest_address', CON.contest_address,
               'thread_id', TT.id,
               'content_id', CA.content_id,
               'start_time', CON.start_time,
               'end_time', CON.end_time
           ))) as "associatedContests"
           FROM "Contests" CON
-          JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+          JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
           JOIN top_threads TT ON TT.id = CA.thread_id
           GROUP BY TT.id
     )${
@@ -264,7 +269,6 @@ export async function __getBulkThreads(
     }
   `,
     {
-      //logging: true,
       replacements,
       type: QueryTypes.SELECT,
     },

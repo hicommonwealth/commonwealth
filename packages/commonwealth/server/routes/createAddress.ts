@@ -31,6 +31,7 @@ const createAddress = async (
   req: TypedRequestBody<CreateAddressReq>,
   res: TypedResponse<CreateAddressResp>,
 ) => {
+  // @ts-expect-error StrictNullChecks
   const result = await createAddressHelper(req.body, models, req.user);
   return success(res, result);
 };

@@ -44,6 +44,7 @@ export async function createTemplate(
 
   const isAdmin = await validateOwner({
     models: models,
+    // @ts-expect-error StrictNullChecks
     user: req.user,
     communityId: community_id,
     allowAdmin: true,
@@ -71,6 +72,7 @@ export async function createTemplate(
 
   const abi = await models.ContractAbi.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       id: contract.abi_id,
     },
   });
@@ -81,6 +83,7 @@ export async function createTemplate(
 
   try {
     const newTemplate = await models.Template.create({
+      // @ts-expect-error StrictNullChecks
       abi_id: contract.abi_id,
       name,
       template,

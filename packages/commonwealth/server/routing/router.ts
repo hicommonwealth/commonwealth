@@ -26,6 +26,7 @@ import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
+import { healthHandler } from '../routes/health';
 import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
@@ -65,7 +66,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
-import sendFeedback from '../routes/sendFeedback';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -86,7 +86,6 @@ import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
 import updateAddress from '../routes/updateAddress';
-import viewCommunityIcons from '../routes/viewCommunityIcons';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -118,7 +117,6 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
-import viewChainActivity from '../routes/viewChainActivity';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -988,20 +986,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewChainIcons',
-    viewCommunityIcons.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/viewChainActivity',
-    viewChainActivity.bind(this, models),
   );
 
   registerRoute(
@@ -1068,14 +1054,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // send feedback button
-  registerRoute(
-    router,
-    'post',
-    '/sendFeedback',
-    sendFeedback.bind(this, models),
   );
 
   // bans
@@ -1209,6 +1187,7 @@ function setupRouter(
     '/auth/magic',
     passport.authenticate('magic'),
     (req, res) => {
+      // @ts-expect-error StrictNullChecks
       return res.json({ status: 'Success', result: req.user.toJSON() });
     },
   );
@@ -1299,6 +1278,8 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     deleteGroupHandler.bind(this, serverControllers),
   );
+
+  registerRoute(router, 'get', '/health', healthHandler.bind(this));
 
   app.use(endpoint, router);
 

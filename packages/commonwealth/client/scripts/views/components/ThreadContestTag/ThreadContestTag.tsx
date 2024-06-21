@@ -27,6 +27,7 @@ const ThreadContestTag = ({
         label="1st"
         type="contest"
         classNames="prize-1"
+        // @ts-expect-error <StrictNullChecks/>
         onMouseEnter={popoverProps.handleInteraction}
         onMouseLeave={popoverProps.handleInteraction}
       />

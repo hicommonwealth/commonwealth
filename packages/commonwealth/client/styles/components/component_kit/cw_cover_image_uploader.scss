@@ -131,9 +131,15 @@
   }
 
   .options {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 4px;
+    margin-top: 18px;
+
     .cover-image-title {
-      margin-top: 24px;
-      margin-bottom: 16px;
+      color: $neutral-700 !important;
+      padding-bottom: 8px;
     }
   }
 }

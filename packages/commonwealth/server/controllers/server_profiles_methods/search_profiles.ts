@@ -51,6 +51,7 @@ export async function __searchProfiles(
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
+    // @ts-expect-error StrictNullChecks
     limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,
@@ -183,6 +184,7 @@ export async function __searchProfiles(
       for (const address of profile.addresses) {
         const addressRoles = addressIdRoles[address.id] || [];
         for (const role of addressRoles) {
+          // @ts-expect-error StrictNullChecks
           profile.roles.push(role.toJSON());
         }
       }

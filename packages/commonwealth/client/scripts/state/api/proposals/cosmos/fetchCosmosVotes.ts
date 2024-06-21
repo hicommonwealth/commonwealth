@@ -20,6 +20,7 @@ const fetchCosmosVotes = async (
   ) {
     return proposal.fetchVotes();
   } else {
+    // @ts-expect-error StrictNullChecks
     return null;
   }
 };

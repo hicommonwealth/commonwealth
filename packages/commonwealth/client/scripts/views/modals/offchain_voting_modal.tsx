@@ -21,6 +21,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
 
   const csvRows = [];
 
+  // @ts-expect-error <StrictNullChecks/>
   votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
 
   return (
@@ -32,6 +33,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
             onClick={(e) => {
               e.preventDefault();
               const csvContent = `data:text/csv;charset=utf-8,${csvRows
+                // @ts-expect-error <StrictNullChecks/>
                 .map((r) => r.join(','))
                 .join('\n')}`;
               const encodedUri = encodeURI(csvContent);

@@ -69,6 +69,7 @@ export const useImageDropAndPaste = ({
 
         const selectedIndex = editor.getSelection()?.index;
 
+        // @ts-expect-error <StrictNullChecks/>
         editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
 
         setContentDelta({
@@ -78,6 +79,7 @@ export const useImageDropAndPaste = ({
       } catch (err) {
         console.error(err);
       } finally {
+        // @ts-expect-error <StrictNullChecks/>
         editor.enable();
         setIsUploading(false);
       }

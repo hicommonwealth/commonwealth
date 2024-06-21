@@ -28,6 +28,7 @@ export const getCompletedProposals = async (
   if (isV1 || betaAttemptFailed) {
     const v1Proposals = await getCompletedProposalsV1(chain.lcd);
 
+    // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Proposals.map(
       (p) =>
         new CosmosProposalV1(
@@ -39,12 +40,14 @@ export const getCompletedProposals = async (
     );
   } else {
     const v1Beta1Proposals = await getCompletedProposalsV1Beta1(chain.api);
+    // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Beta1Proposals.map(
       (p) =>
         new CosmosProposal(chain, accounts, governance as CosmosGovernance, p),
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   Promise.all(cosmosProposals.map((p) => p.init()));
   return cosmosProposals;
 };
@@ -63,6 +66,7 @@ export const getActiveProposals = async (
 
   if (isV1 || betaAttemptFailed) {
     const v1Proposals = await getActiveProposalsV1(chain.lcd);
+    // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Proposals.map(
       (p) =>
         new CosmosProposalV1(
@@ -74,12 +78,14 @@ export const getActiveProposals = async (
     );
   } else {
     const v1Beta1Proposals = await getActiveProposalsV1Beta1(chain.api);
+    // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Beta1Proposals.map(
       (p) =>
         new CosmosProposal(chain, accounts, governance as CosmosGovernance, p),
     );
   }
 
+  // @ts-expect-error StrictNullChecks
   Promise.all(cosmosProposals.map((p) => p.init()));
   return cosmosProposals;
 };

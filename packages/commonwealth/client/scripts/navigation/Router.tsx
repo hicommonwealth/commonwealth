@@ -13,7 +13,6 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
-  communityHomepageEnabled: boolean;
   contestEnabled: boolean;
 };
 
@@ -23,14 +22,9 @@ const Router = (customDomain: string) => {
     'proposalTemplates',
     false,
   );
-  const communityHomepageEnabled = client.getBooleanValue(
-    'communityHomepage',
-    false,
-  );
   const contestEnabled = client.getBooleanValue('contest', false);
   const flags = {
     proposalTemplatesEnabled,
-    communityHomepageEnabled,
     contestEnabled,
   };
 

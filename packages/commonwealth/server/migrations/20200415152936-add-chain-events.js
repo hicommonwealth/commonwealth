@@ -61,7 +61,7 @@ const initChainEventTypes = (queryInterface, Sequelize, t) => {
     event_name,
   });
   const edgewareObjs = Object.values(SubstrateEventKinds).map((s) =>
-    buildObject(s, 'edgeware')
+    buildObject(s, 'edgeware'),
   );
 
   // TODO: somehow switch this on for testing purposes?
@@ -72,7 +72,7 @@ const initChainEventTypes = (queryInterface, Sequelize, t) => {
       ...edgewareObjs,
       //  ...edgewareLocalObjs
     ],
-    { transaction: t }
+    { transaction: t },
   );
 };
 
@@ -96,7 +96,7 @@ module.exports = {
           timestamps: false,
           underscored: true,
           indexes: [{ fields: ['id'] }, { fields: ['chain', 'event_name'] }],
-        }
+        },
       );
 
       await queryInterface.createTable(
@@ -125,7 +125,7 @@ module.exports = {
             { fields: ['id'] },
             { fields: ['block_number', 'chain_event_type_id'] },
           ],
-        }
+        },
       );
 
       // add association on notifications
@@ -137,7 +137,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'ChainEvents', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // add type to NotificationCategories
@@ -151,7 +151,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       // TODO: TESTING ONLY
@@ -183,14 +183,14 @@ module.exports = {
             [Op.ne]: null,
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         {
           category_id: 'chain-event',
         },
-        { transaction: t }
+        { transaction: t },
       );
       // remove type from NotificationCategories
       await queryInterface.bulkDelete(
@@ -198,7 +198,7 @@ module.exports = {
         {
           name: 'chain-event',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // remove association from notifications

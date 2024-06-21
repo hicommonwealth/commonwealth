@@ -9,6 +9,7 @@ import { DB, formatS3Url } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
+// @ts-expect-error StrictNullChecks
 let openai: OpenAI = undefined;
 
 try {
@@ -72,6 +73,7 @@ const generateImage = async (
       client: s3,
       params,
     }).done();
+    // @ts-expect-error StrictNullChecks
     imageUrl = formatS3Url(upload.Location);
   } catch (e) {
     console.log(e);

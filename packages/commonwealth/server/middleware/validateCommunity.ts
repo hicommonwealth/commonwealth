@@ -48,9 +48,11 @@ export const validateCommunity = async (
   const communityId = params.chain || params.chain_id || params.community_id;
   if (communityId === ALL_COMMUNITIES) {
     // if all communities, then bypass validation
+    // @ts-expect-error StrictNullChecks
     return [null, null, true];
   }
   if (!communityId) {
+    // @ts-expect-error StrictNullChecks
     return [null, CommunityCommunityErrors.CommunityDNE, false];
   }
   const community = await models.Community.findOne(
@@ -58,8 +60,10 @@ export const validateCommunity = async (
   );
   // searching for communities that doesn't exist
   if (!community) {
+    // @ts-expect-error StrictNullChecks
     return [null, CommunityCommunityErrors.CommunityDNE, false];
   }
+  // @ts-expect-error StrictNullChecks
   return [community, null, false];
 };
 

@@ -1,12 +1,9 @@
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
-
-type TerraAddress = {
-  address: string;
-};
+import { toBase64 } from '@cosmjs/encoding';
+import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import app from 'state';
 
 declare global {
   interface Window {
@@ -14,9 +11,9 @@ declare global {
   }
 }
 
-class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
+class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
-  private _accounts: TerraAddress[] = [];
+  private _accounts: string[] = [];
   private _enabling = false;
 
   public readonly name = WalletId.TerraStation;
@@ -80,32 +77,15 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     };
   }
 
-  public async signCanvasMessage(
-    account: Account,
-    canvasSessionPayload: SessionPayload,
-  ): Promise<string> {
-    // timeout?
-    const canvas = await import('@canvas-js/interfaces');
-    let result;
-
-    try {
-      const signBytesResult = await window.station.signBytes(
-        Buffer.from(
-          canvas.serializeSessionPayload(canvasSessionPayload),
-        ).toString('base64'),
-      );
-
-      result = signBytesResult;
-    } catch (error) {
-      console.error(error);
-    }
-
-    return JSON.stringify({
-      pub_key: {
-        type: 'tendermint/PubKeySecp256k1',
-        value: result.public_key,
+  public getSessionSigner() {
+    return new CosmosSignerCW({
+      bech32Prefix: app.chain?.meta.bech32Prefix,
+      signer: {
+        type: 'bytes',
+        signBytes: (message) => window.station.signBytes(toBase64(message)),
+        getAddress: () => this._accounts[0],
+        getChainId: () => this.getChainId(),
       },
-      signature: result.signature,
     });
   }
 }
