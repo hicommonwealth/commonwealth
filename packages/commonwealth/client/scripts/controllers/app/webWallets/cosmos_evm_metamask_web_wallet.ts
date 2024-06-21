@@ -60,7 +60,9 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const url = `${
+      window.location.origin
+    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -80,7 +82,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'inj',
+      bech32Prefix: app.chain?.meta.bech32Prefix || 'cosmos',
       signer: {
         type: 'ethereum',
         signEthereum: (
@@ -89,7 +91,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
           message: string,
         ) => this._web3.eth.personal.sign(message, signerAddress, ''),
         getAddress: () => this._ethAccounts[0],
-        getChainId: () => this._chainId,
+        getChainId: () => this._chainId || 'cosmoshub-1',
       },
     });
   }
@@ -129,7 +131,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       }
 
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${
+      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
         app.chain?.network || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');

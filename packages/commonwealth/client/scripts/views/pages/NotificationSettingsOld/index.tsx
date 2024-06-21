@@ -1,15 +1,12 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import app from 'state';
-import { trpc } from 'utils/trpcClient';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { getFirebaseMessagingToken } from 'views/pages/notification_settings/getFirebaseMessagingToken';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
@@ -40,7 +37,6 @@ const emailIntervalFrequencyMap = {
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-  const enableKnockPushNotifications = useFlag('knockPushNotifications');
 
   const {
     email,
@@ -59,25 +55,6 @@ const NotificationSettingsPage = () => {
     chainEventSubs,
     relevantSubscribedCommunities,
   } = useNotificationSettings();
-
-  const registerClientRegistrationToken =
-    trpc.subscription.registerClientRegistrationToken.useMutation();
-
-  const handlePushNotificationSubscription = useCallback(() => {
-    async function doAsync() {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        const token = await getFirebaseMessagingToken();
-        await registerClientRegistrationToken.mutateAsync({
-          id: 'none',
-          token,
-        });
-      }
-    }
-
-    doAsync().catch(console.error);
-  }, [registerClientRegistrationToken]);
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
@@ -101,19 +78,6 @@ const NotificationSettingsPage = () => {
           Notification settings for all new threads, comments, mentions, likes,
           and chain events in the following communities.
         </CWText>
-
-        {enableKnockPushNotifications && (
-          <div>
-            <CWText type="h5">Push Notifications</CWText>
-
-            <p>
-              <CWButton
-                label="Subscribe to Push Notifications"
-                onClick={handlePushNotificationSubscription}
-              />
-            </p>
-          </div>
-        )}
 
         <div className="email-management-section">
           <div className="text-description">
@@ -203,6 +167,7 @@ const NotificationSettingsPage = () => {
                       disabled={!emailValidated}
                       onClick={() => {
                         try {
+                          // eslint-disable-next-line @typescript-eslint/no-floating-promises
                           app.user.updateEmail(email);
                           setSentEmail(true);
                           // forceRerender();
@@ -269,12 +234,14 @@ const NotificationSettingsPage = () => {
                     disabled={true}
                     checked={false}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleEmailSubscriptions(false, []);
                     }}
                   />
                   <CWToggle
                     checked={false}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       app.user.notifications
                         .subscribe({
                           categoryId: NotificationCategories.ChainEvent,
@@ -318,12 +285,14 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleEmailSubscriptions(hasSomeEmailSubs, subs);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleSubscriptions(hasSomeInAppSubs, subs);
                     }}
                   />
@@ -395,12 +364,14 @@ const NotificationSettingsPage = () => {
                       <CWCheckbox
                         label="Receive Emails"
                         checked={hasSomeEmailSubs}
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         onChange={() =>
                           handleEmailSubscriptions(hasSomeEmailSubs, subs)
                         }
                       />
                       <CWToggle
                         checked={hasSomeInAppSubs}
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         onChange={() =>
                           handleSubscriptions(hasSomeInAppSubs, subs)
                         }
@@ -480,6 +451,7 @@ const NotificationSettingsPage = () => {
                               {getUser()}
                               <SubscriptionRowMenu
                                 subscription={sub}
+                                // eslint-disable-next-line @typescript-eslint/no-misused-promises
                                 onUnsubscribe={handleUnsubscribe}
                               />
                             </div>
@@ -490,6 +462,7 @@ const NotificationSettingsPage = () => {
                                 />
                                 <SubscriptionRowMenu
                                   subscription={sub}
+                                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                                   onUnsubscribe={handleUnsubscribe}
                                 />
                               </div>
@@ -587,12 +560,14 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleEmailSubscriptions(hasSomeEmailSubs, subs);
                     }}
                   />
                   <CWToggle
                     checked={hasSomeInAppSubs}
                     onChange={() => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       handleSubscriptions(hasSomeInAppSubs, subs);
                     }}
                   />

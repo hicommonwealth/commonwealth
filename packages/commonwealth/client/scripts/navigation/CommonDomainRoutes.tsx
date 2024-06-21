@@ -31,8 +31,12 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
-const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings'),
+
+const NotificationSettingsOld = lazy(
+  () => import('views/pages/NotificationSettingsOld'),
+);
+const NotificationSettings = lazy(
+  () => import('views/pages/NotificationSettings'),
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
@@ -114,6 +118,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   contestEnabled,
+  knockInAppNotifications,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -238,7 +243,10 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(NotificationSettingsPage, { type: 'common' })}
+    element={withLayout(
+      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
+      { type: 'common' },
+    )}
   />,
   <Route
     key="/:scope/notification-settings"

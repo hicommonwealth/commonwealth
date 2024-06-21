@@ -101,7 +101,7 @@ async function sign(
   call: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
-): Promise<CanvasSignResult> {
+): Promise<CanvasSignResult | null> {
   const address = getDid(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
@@ -129,6 +129,9 @@ async function sign(
         did: lookupAddress,
       });
       if (!savedSessionMessage) {
+        if (!app.config.enforceSessionKeys) {
+          return null;
+        }
         throw new SessionKeyError({
           name: 'Authentication Error',
           message: `No session found for address ${address}`,
@@ -143,6 +146,9 @@ async function sign(
         const sessionExpirationTime =
           session.context.timestamp + session.context.duration;
         if (Date.now() > sessionExpirationTime) {
+          if (!app.config.enforceSessionKeys) {
+            return null;
+          }
           throw new SessionKeyError({
             name: 'Authentication Error',
             message: `Session expired for address ${address}`,

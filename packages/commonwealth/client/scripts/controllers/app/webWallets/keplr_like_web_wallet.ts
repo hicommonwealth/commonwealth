@@ -69,7 +69,9 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const url = `${
+      window.location.origin
+    }${app.serverUrl()}/cosmosProxy/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
@@ -85,12 +87,12 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'osmo',
+      bech32Prefix: app.chain?.meta.bech32Prefix || 'cosmos',
       signer: {
         type: 'amino',
         signAmino: window.wallet.signAmino,
         getAddress: () => this.accounts[0].address,
-        getChainId: () => this.getChainId() || 'osmosis-1',
+        getChainId: () => this.getChainId() || 'cosmoshub-1',
       },
     });
   }
@@ -110,8 +112,8 @@ class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${
-        app.chain?.network || this.defaultNetwork
+      const url = `${window.location.origin}${app.serverUrl()}/cosmosProxy/${
+        app.chain?.id || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
