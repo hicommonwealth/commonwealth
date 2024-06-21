@@ -89,8 +89,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const user = app?.user?.addresses?.[0];
-  // @ts-expect-error StrictNullChecks
-  const profileId = user?.profileId || user?.profile.id;
+  const profileId = user?.profileId || user?.profile?.id;
 
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title,
@@ -109,8 +108,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     location.pathname,
     profileId,
     navigate,
-    // @ts-expect-error StrictNullChecks
-    app.isCustomDomain() ? app.activeChainId() : undefined,
+    app?.isCustomDomain() ? app?.activeChainId() : undefined,
     currentDiscussion,
   );
 
@@ -119,11 +117,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     if (
       topics &&
       pathnames &&
-      topics.length > 0 &&
-      pathnames.length > 0 &&
-      pathnames[0].label === 'Discussions' &&
-      pathnames[1].label !== 'Overview' &&
-      pathnames[1].label !== 'archived'
+      topics?.length > 0 &&
+      pathnames?.length > 0 &&
+      pathnames[0]?.label === 'Discussions' &&
+      pathnames[1]?.label !== 'Overview' &&
+      pathnames[1]?.label !== 'archived'
     ) {
       const validTopics = topics.some(
         (topic) => topic.name === pathnames[1].label,
