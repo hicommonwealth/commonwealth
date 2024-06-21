@@ -100,7 +100,7 @@ async function sign(
   call: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
-): Promise<CanvasSignResult> {
+): Promise<CanvasSignResult | null> {
   const address = getCaip2Address(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
