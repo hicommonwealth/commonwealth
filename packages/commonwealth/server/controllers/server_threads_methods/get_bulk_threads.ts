@@ -207,18 +207,21 @@ export async function __getBulkThreads(
       -- get the contest data associated with the thread
           SELECT
               TT.id as thread_id,
+              CM.name as name,
               json_agg(json_strip_nulls(json_build_object(
               'contest_id', CON.contest_id,
               'contest_address', CON.contest_address,
+              'score', CON.score,
               'thread_id', TT.id,
               'content_id', CA.content_id,
               'start_time', CON.start_time,
               'end_time', CON.end_time
           ))) as "associatedContests"
           FROM "Contests" CON
+          JOIN "ContestManagers" CM ON CM.contest_address = CON.contest_address
           JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
           JOIN top_threads TT ON TT.id = CA.thread_id
-          GROUP BY TT.id
+          GROUP BY TT.id, CM.name
     )${
       withXRecentComments
         ? `, recent_comments AS (
