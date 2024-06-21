@@ -25,7 +25,7 @@ export type GetProposalVotesResult =
 export async function __getProposalVotes(
   this: ServerProposalsController,
   { communityId, proposalId }: GetProposalVotesOptions,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
   contractInfo: ContractInfo,
 ): Promise<GetProposalVotesResult> {
   let votes: IAaveVoteResponse[] | ICompoundVoteResponse[] = [];
