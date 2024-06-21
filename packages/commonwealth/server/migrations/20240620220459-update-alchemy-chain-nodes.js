@@ -18,6 +18,7 @@ module.exports = {
     await queryInterface.sequelize.query(`
       UPDATE "ChainNodes"
       SET url = regexp_replace(url, '\\/([^\\/]*)$', '${publicKey}'),
+          alt_wallet_url = regexp_replace(url, '\\/([^\\/]*)$', '${publicKey}'),
           private_url = regexp_replace(url, '\\/([^\\/]*)$', '${privateKey}')
       WHERE url LIKE '%.g.alchemy%' OR private_url LIKE '%.g.alchemy%';
     `);
