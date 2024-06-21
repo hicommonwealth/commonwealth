@@ -4,6 +4,7 @@ import axios from 'axios';
 import {
   completeClientLogin,
   createUserWithAddress,
+  setActiveAccount,
   startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
@@ -41,7 +42,11 @@ import {
   DISCOURAGED_NONREACTIVE_fetchProfilesByAddress,
   fetchProfilesByAddress,
 } from '../../../state/api/profiles/fetchProfilesByAddress';
-import { authModal } from '../../../state/ui/modals/authModal';
+import useAuthModalStore, {
+  authModal,
+} from '../../../state/ui/modals/authModal';
+import { formatAddress } from '../../components/user/user_block';
+import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -86,6 +91,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
 
+  const { sessionKeyValidationError } = useAuthModalStore();
+
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
@@ -119,6 +126,54 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       );
     }
   }, []);
+
+  const handleSuccess = async (
+    authAddress?: string | null | undefined,
+    isNew?: boolean,
+  ) => {
+    props?.onSuccess?.(authAddress, isNew);
+
+    // show address mismatch message, if user revalidated session with unexpected address
+    if (props.withSessionKeyLoginFlow) {
+      // @ts-expect-error StrictNullChecks
+      const isSubstrate = app.user.activeAccounts.find(
+        (addr) => addr.address === sessionKeyValidationError?.address,
+      ).community.ss58Prefix;
+      if (
+        authAddress === sessionKeyValidationError?.address ||
+        (isSubstrate &&
+          addressSwapper({
+            address: sessionKeyValidationError?.address || '',
+            currentPrefix: 42,
+          }) === authAddress)
+      ) {
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === sessionKeyValidationError?.address,
+        );
+        await setActiveAccount(updatedAddress!);
+      } else {
+        await setActiveAccount(
+          app.user.activeAccounts.find(
+            (addr) => addr.address === authAddress!,
+          )!,
+        );
+        openConfirmation({
+          title: 'Address Mismatch',
+          description: `You tried to sign in as ${formatAddress(
+            sessionKeyValidationError?.address || '',
+          )} but your wallet has the address ${formatAddress(
+            authAddress || '',
+          )}. We've switched your active address to the one in your wallet. You can switch it back from the user menu.`,
+          buttons: [
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+            },
+          ],
+        });
+      }
+    }
+  };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
     trackAnalytics({
@@ -175,7 +230,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         return;
       }
 
-      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      await handleSuccess(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
 
       trackLoginEvent('email', true);
@@ -200,7 +255,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       });
       setIsMagicLoading(false);
 
-      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      await handleSuccess(magicAddress, isNewlyCreated);
       props?.onModalClose?.();
 
       trackLoginEvent(provider, true);
@@ -247,7 +302,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (exitOnComplete) {
       props?.onModalClose?.();
-      props?.onSuccess?.(account.address, newelyCreated);
+      await handleSuccess(account.address, newelyCreated);
     }
   };
 
@@ -259,7 +314,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     wallet?: Wallet,
   ) => {
     if (props.withSessionKeyLoginFlow) {
-      props?.onSuccess?.(account.address, newlyCreated);
+      await handleSuccess(account.address, newlyCreated);
       return;
     }
 
@@ -387,7 +442,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         NewProfilesController.Instance.isFetched.emit('redraw');
       }
       // @ts-expect-error <StrictNullChecks>
-      props?.onSuccess?.(account.profile.address, newelyCreated);
+      await handleSuccess(account.profile.address, newelyCreated);
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account
     } catch (e) {
       notifyError('Failed to save profile info');

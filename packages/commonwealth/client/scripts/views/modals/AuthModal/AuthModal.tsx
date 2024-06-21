@@ -1,3 +1,4 @@
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import {
@@ -79,10 +80,13 @@ const AuthModal = ({
           <RevalidateSessionModal
             {...commonVariantProps}
             // TODO: session keys should support all wallet types, atm they only work with sso
-            // this is broken in master branch
-            showAuthOptionFor={
-              sessionKeyValidationError?.ssoSource as AuthTypes
-            }
+            // this is broken in master branch, create a ticket for fix
+            {...(sessionKeyValidationError?.ssoSource &&
+              sessionKeyValidationError?.ssoSource !==
+                WalletSsoSource.Unknown && {
+                showAuthOptionFor:
+                  sessionKeyValidationError?.ssoSource as AuthTypes,
+              })}
           />
         );
       }
