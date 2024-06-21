@@ -94,8 +94,8 @@ describe('Thread subscription lifecycle', () => {
       payload: {},
     });
     expect(res).to.have.deep.members([
-      threadSubOne.toJSON(),
-      threadSubTwo.toJSON(),
+      { ...threadSubOne.toJSON(), Thread: null },
+      { ...threadSubTwo.toJSON(), Thread: null },
     ]);
   });
 
