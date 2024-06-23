@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.577.0",
-    "moment": "^2.23.0"
+    "moment": "^2.23.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0"

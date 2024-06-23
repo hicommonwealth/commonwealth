@@ -109,6 +109,10 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      s3_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

@@ -19,6 +19,7 @@ export type CommentAttributes = {
   text: string;
   plaintext: string;
   id?: number;
+  s3_id?: string | null;
   community_id: string;
   parent_id?: string;
   version_history?: string[];
@@ -96,6 +97,10 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+      s3_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
     },
     {

@@ -9,6 +9,7 @@ export const Thread = z.object({
   kind: z.string(),
   stage: z.string(),
   id: PG_INT.nullish(),
+  s3_id: z.string().nullish(),
   body: z.string().nullish(),
   plaintext: z.string().nullish(),
   url: z.string().nullish(),
