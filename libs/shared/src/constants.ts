@@ -8,3 +8,5 @@ export const MIN_SCHEMA_BIGINT = BigInt(0);
 export const MAX_SCHEMA_BIGINT = BigInt('9223372036854775807');
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const CONTENT_BUCKET_NAME = 'common-content';
