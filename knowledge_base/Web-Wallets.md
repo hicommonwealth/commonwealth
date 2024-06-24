@@ -17,6 +17,8 @@ This entry documents our web wallet support and authentication flow. At some poi
 
     + The `walletconnect` type supports a plethora of Ethereum wallets not listed in the `WalletId` enum.
 
+    + As of 240621, we have deprecated NEAR wallet support.
+
 2. The [WalletSsoSource enum](../libs/shared/src/types/protocol.ts) lists all the SSO types we currently support.
 
     + The `unknown` type is used for legacy support.
@@ -34,8 +36,6 @@ This entry documents our web wallet support and authentication flow. At some poi
     + Within non-community pages, 'Ethereum', 'Cosmos', 'Solana', and 'Substrate'-based wallets are rendered.
 
     + Within communities based on 'Ethereum', 'Cosmos', 'Solana', or 'Substrate' chains, wallets specific to the respective community chain are rendered.
-
-    + Within the Near community, the Near wallet is rendered.
 
     + Within the 'terra' community, only the 'terrastation' and 'terra-walletconnect' wallets are rendered.
 
