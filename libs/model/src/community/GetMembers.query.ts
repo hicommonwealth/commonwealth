@@ -84,6 +84,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         }
       }
 
+      // This query is overly complex in order to entice the query planner to use the trigram indices
       const sqlWithoutPagination = `
     SELECT
       "Profiles".id,
@@ -95,20 +96,31 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
-    FROM
-      "Profiles"
-    JOIN
-      "Addresses" ON "Profiles".user_id = "Addresses".user_id
-    WHERE
-      ${communityWhere}
-      (
-        "Profiles".profile_name ILIKE '%' || :searchTerm || '%'
-        OR
-        "Addresses".address ILIKE '%' || :searchTerm || '%'
-      )
+      FROM "Profiles"
+      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      WHERE ${communityWhere} 
+      ("Profiles".profile_name ILIKE '%' || :searchTerm || '%')
       ${membershipsWhere}
-    GROUP BY
-      "Profiles".id
+      GROUP BY "Profiles".id
+
+      UNION ALL
+
+      SELECT
+      "Profiles".id,
+      "Profiles".user_id,
+      "Profiles".profile_name,
+      "Profiles".avatar_url,
+      "Profiles".created_at,
+      array_agg("Addresses".id) as address_ids,
+      array_agg("Addresses".community_id) as community_ids,
+      array_agg("Addresses".address) as addresses,
+      MAX("Addresses".last_active) as last_active
+      FROM "Profiles" p
+      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      WHERE ${communityWhere} 
+      ("Addresses".address ILIKE '%' || :searchTerm || '%')
+      ${membershipsWhere}
+      GROUP BY "Profiles".id
   `;
 
       const allCommunityProfiles = await models.sequelize.query<{
