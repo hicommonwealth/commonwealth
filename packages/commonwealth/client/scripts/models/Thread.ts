@@ -17,6 +17,31 @@ function getDecodedString(str: string) {
   }
 }
 
+function processAssociatedContests(
+  associatedContests?: AssociatedContest[] | null,
+  contestActions?: ContestActions[] | null,
+): AssociatedContest[] | [] {
+  if (associatedContests) {
+    return associatedContests;
+  }
+
+  if (contestActions) {
+    return contestActions.map((action) => ({
+      contest_id: action.Contest.contest_id,
+      contest_name: action.Contest.ContestManager.name,
+      contest_address: action.Contest.contest_address,
+      score: action.Contest.score,
+      contest_cancelled: action.Contest.ContestManager.cancelled,
+      thread_id: action.thread_id,
+      content_id: action.content_id,
+      start_time: action.Contest.start_time,
+      end_time: action.Contest.end_time,
+    }));
+  }
+
+  return [];
+}
+
 function processVersionHistory(versionHistory: any[]) {
   let versionHistoryProcessed;
   if (versionHistory) {
@@ -102,6 +127,33 @@ function processAssociatedReactions(
   }
   return temp;
 }
+
+type Score = {
+  prize: string;
+  votes: number;
+  content_id: string;
+  creator_address: string;
+};
+
+type ContestManager = {
+  name: string;
+  cancelled: boolean;
+};
+
+type Contest = {
+  contest_id: number;
+  contest_address: string;
+  score: Score[];
+  start_time: string;
+  end_time: string;
+  ContestManager: ContestManager;
+};
+
+type ContestActions = {
+  content_id: number;
+  thread_id: number;
+  Contest: Contest;
+};
 
 export interface VersionHistory {
   author?: MinimumProfile & { profile_id: number };
@@ -274,6 +326,7 @@ export class Thread implements IUniqueId {
     associatedReactions,
     associatedContests,
     recentComments,
+    ContestActions,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -319,6 +372,7 @@ export class Thread implements IUniqueId {
     associatedReactions?: AssociatedReaction[];
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
+    ContestActions: ContestActions[];
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
@@ -379,7 +433,10 @@ export class Thread implements IUniqueId {
         reactedProfileAvatarUrl,
         reactedAddressLastActive,
       );
-    this.associatedContests = associatedContests || [];
+    this.associatedContests = processAssociatedContests(
+      associatedContests,
+      ContestActions,
+    );
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({

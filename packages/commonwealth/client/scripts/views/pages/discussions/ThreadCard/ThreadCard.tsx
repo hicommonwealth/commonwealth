@@ -258,7 +258,6 @@ export const ThreadCard = ({
                 ))}
             </div>
           )}
-          <pre>{JSON.stringify(thread.associatedContests, null, 2)}</pre>
           <div
             className="content-footer"
             onClick={(e) => {
