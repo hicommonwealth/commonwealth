@@ -20,11 +20,11 @@ export const getWinnersFromAssociatedContests = (
       return {
         date: moment(contest.end_time).format('DD/MM/YYYY'),
         prize:
-          contest.score.findIndex(
+          contest.score?.findIndex(
             (s) => s.content_id === String(contest.content_id),
           ) + 1,
-        // TODO
-        round: undefined,
+        // todo show only for recurring
+        round: contest.contest_id + 1,
         title: contest.contest_name,
       };
     })
