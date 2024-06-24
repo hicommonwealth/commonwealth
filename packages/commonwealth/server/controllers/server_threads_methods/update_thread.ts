@@ -59,9 +59,8 @@ export type UpdateThreadOptions = {
     toAdd?: number[];
     toRemove?: number[];
   };
-  canvasSession?: any;
-  canvasAction?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -87,9 +86,8 @@ export async function __updateThread(
     spam,
     topicId,
     collaborators,
-    canvasSession,
-    canvasAction,
     canvasHash,
+    canvasSignedData,
     discordMeta,
   }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
@@ -199,9 +197,8 @@ export async function __updateThread(
         title,
         body,
         url,
-        canvasSession,
-        canvasAction,
         canvasHash,
+        canvasSignedData,
       },
       toUpdate,
     );
@@ -501,8 +498,7 @@ export type UpdatableThreadAttributes = {
   title?: string;
   body?: string;
   url?: string;
-  canvasSession?: string;
-  canvasAction?: string;
+  canvasSignedData?: string;
   canvasHash?: string;
 };
 
@@ -512,14 +508,7 @@ export type UpdatableThreadAttributes = {
 async function setThreadAttributes(
   permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
-  {
-    title,
-    body,
-    url,
-    canvasSession,
-    canvasAction,
-    canvasHash,
-  }: UpdatableThreadAttributes,
+  { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
@@ -566,11 +555,8 @@ async function setThreadAttributes(
       toUpdate.url = url;
     }
 
-    if (typeof canvasSession !== 'undefined') {
-      toUpdate.canvas_session = canvasSession;
-      toUpdate.canvas_action = canvasAction;
-      toUpdate.canvas_hash = canvasHash;
-    }
+    toUpdate.canvas_signed_data = canvasSignedData;
+    toUpdate.canvas_hash = canvasHash;
   }
 }
 

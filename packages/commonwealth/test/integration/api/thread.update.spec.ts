@@ -1,8 +1,15 @@
-import { ActionPayload, Session } from '@canvas-js/interfaces';
+import type {
+  Action,
+  Awaitable,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -13,19 +20,23 @@ describe('Thread Patch Update', () => {
   const chain = 'ethereum';
 
   let adminJWT: string;
+  // the adminAddress with the chain and chain id prefix - this is used by canvas
+  let adminCanvasAddress: string;
   let adminAddress: string;
 
   let userJWT: string;
+  // the userAddress with the chain and chain id prefix - this is used by canvas
+  let canvasAddress: string;
   let userAddress: string;
   let userSession: {
     session: Session;
-    sign: (payload: ActionPayload) => string;
+    sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
   };
   let topicId: number;
 
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     const adminRes = await server.seeder.createAndVerifyAddress(
@@ -33,7 +44,8 @@ describe('Thread Patch Update', () => {
       'Alice',
     );
     {
-      adminAddress = adminRes.address;
+      adminCanvasAddress = adminRes.address;
+      adminAddress = adminCanvasAddress.split(':')[2];
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
         config.AUTH.JWT_SECRET,
@@ -53,7 +65,8 @@ describe('Thread Patch Update', () => {
       'Alice',
     );
     {
-      userAddress = userRes.address;
+      canvasAddress = userRes.address;
+      userAddress = canvasAddress.split(':')[2];
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
         config.AUTH.JWT_SECRET,
@@ -73,15 +86,15 @@ describe('Thread Patch Update', () => {
     topicId = topic.id;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('update thread', () => {
-    it('should update thread attributes as owner', async () => {
+    test('should update thread attributes as owner', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: userAddress,
+        address: canvasAddress,
         jwt: userJWT,
         title: 'test1',
         body: 'body1',
@@ -126,10 +139,10 @@ describe('Thread Patch Update', () => {
       expect(res.body.result.archived).to.not.be.null;
     });
 
-    it('should not allow non-admin to set pinned or spam', async () => {
+    test('should not allow non-admin to set pinned or spam', async () => {
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: userAddress,
+        address: canvasAddress,
         jwt: userJWT,
         title: 'test2',
         body: 'body2',
@@ -179,11 +192,11 @@ describe('Thread Patch Update', () => {
       }
     });
 
-    it('should allow admin to set pinned or spam', async () => {
+    test('should allow admin to set pinned or spam', async () => {
       // non-admin creates thread
       const { result: thread } = await server.seeder.createThread({
         chainId: 'ethereum',
-        address: userAddress,
+        address: canvasAddress,
         jwt: userJWT,
         title: 'test2',
         body: 'body2',

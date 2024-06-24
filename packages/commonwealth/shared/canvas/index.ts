@@ -1,3 +1,3 @@
 export { chainBaseToCanvasChainId } from './chainMappings';
-export { createCanvasSessionPayload } from './constructMessage';
+export { CANVAS_TOPIC } from './utils';
 export { verify } from './verify';

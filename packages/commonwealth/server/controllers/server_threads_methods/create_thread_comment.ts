@@ -5,6 +5,7 @@ import {
   CommentInstance,
   UserInstance,
 } from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
@@ -45,9 +46,8 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -65,8 +65,7 @@ export async function __createThreadComment(
     parentId,
     threadId,
     text,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     discordMeta,
   }: CreateThreadCommentOptions,
@@ -142,6 +141,7 @@ export async function __createThreadComment(
       thread.topic_id,
       thread.community_id,
       address,
+      PermissionEnum.CREATE_COMMENT,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
@@ -174,8 +174,9 @@ export async function __createThreadComment(
     community_id: thread.community_id,
     // @ts-expect-error StrictNullChecks
     parent_id: null,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    // @ts-expect-error <StrictNullChecks>
+    canvas_signed_data: canvasSignedData,
+    // @ts-expect-error <StrictNullChecks>
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,

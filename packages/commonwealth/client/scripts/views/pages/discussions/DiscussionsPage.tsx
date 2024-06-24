@@ -29,8 +29,9 @@ import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { generateBreadcrumbs } from '../../../../scripts/views/components/Breadcrumbs/utils';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -97,6 +98,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     // @ts-expect-error StrictNullChecks
     topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
   };
+  const { contestsData } = useCommunityContests();
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -156,7 +158,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
-      withXRecentComments: 3,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -188,6 +189,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
         data={isInitialLoading ? [] : filteredThreads}
+        customScrollParent={containerRef.current}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -214,6 +216,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadTopicGated: isRestrictedMembership,
           });
 
+          const isTopicInContest = checkIsTopicInContest(
+            contestsData,
+            thread?.topic?.id,
+          );
+
           return (
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
@@ -232,9 +239,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   scrollEle.scrollTop;
               }}
               onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
+                navigate(`${discussionLink}?focusComments=true`)
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
+              hideRecentComments
+              editingDisabled={isTopicInContest}
             />
           );
         }}

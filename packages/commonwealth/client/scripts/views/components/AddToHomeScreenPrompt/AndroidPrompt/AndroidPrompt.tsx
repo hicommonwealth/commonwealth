@@ -1,3 +1,4 @@
+import commonUrl from 'assets/img/branding/common.svg';
 import { useAnimation } from 'hooks/useAnimation';
 import React, { useState } from 'react';
 import { CWCheckbox } from '../../component_kit/cw_checkbox';
@@ -80,7 +81,7 @@ export const AndroidPrompt = ({
         <CWText className="title">Install App</CWText>
         <div className="header">
           <div className="icon">
-            <img src="/static/img/branding/common.svg" alt="Commonwealth" />
+            <img src={commonUrl} alt="Commonwealth" />
           </div>
           <div className="app">
             <CWText className="app-name">Common</CWText>

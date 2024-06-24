@@ -48,7 +48,7 @@ const CWCommunitySelector = ({
           src={
             type === CommunityType.Blast
               ? BLAST_LOGO
-              : `/static/img/communitySelector/${type}.svg`
+              : `assets/img/communitySelector/${type}.svg`
           }
           alt={title}
         />

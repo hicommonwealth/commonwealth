@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
 import { AppError } from '@hicommonwealth/core';
@@ -46,9 +47,8 @@ export type CreateThreadOptions = {
   topicId?: number;
   stage?: string;
   url?: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -71,8 +71,7 @@ export async function __createThread(
     topicId,
     stage,
     url,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     discordMeta,
   }: CreateThreadOptions,
@@ -138,8 +137,7 @@ export async function __createThread(
     stage,
     url,
     read_only: readOnly,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     // @ts-expect-error StrictNullChecks
@@ -161,6 +159,7 @@ export async function __createThread(
       topicId,
       community.id,
       address,
+      PermissionEnum.CREATE_THREAD,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
