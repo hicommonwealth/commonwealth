@@ -41,7 +41,7 @@ const {
 
 const SEND_EMAILS = _SEND_EMAILS === 'true';
 const NO_PRERENDER = _NO_PRERENDER;
-const FLAG_COMMON_WALLET = _FLAG_COMMON_WALLET === ' true';
+const FLAG_COMMON_WALLET = _FLAG_COMMON_WALLET === 'true';
 
 export const config = configure(
   { ...model_config, ...adapters_config, ...evm_config },
