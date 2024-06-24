@@ -12,6 +12,7 @@ import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
+import { updateCommunityThreadCount } from './helpers/counts';
 
 interface CreateThreadProps {
   address: string;
@@ -79,6 +80,7 @@ const useCreateThreadMutation = ({
     onSuccess: async (newThread) => {
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
+
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
         ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
@@ -89,6 +91,9 @@ const useCreateThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
+
+      // increment communities thread count
+      if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
       if (userOnboardingEnabled) {
         const profileId = app?.user?.addresses?.[0]?.profile?.id;
