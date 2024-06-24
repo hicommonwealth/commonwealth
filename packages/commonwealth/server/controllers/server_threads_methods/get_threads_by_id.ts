@@ -97,6 +97,7 @@ export async function __getThreadsById(
         where: {
           action: 'upvoted',
         },
+        required: false,
         attributes: ['content_id'],
         include: [
           {
