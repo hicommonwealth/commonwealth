@@ -7,10 +7,10 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { ContestScore } from '@hicommonwealth/schemas';
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
-import { models, sequelize } from '../database';
+import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
@@ -177,9 +177,9 @@ async function getContestDetails(
 }
 
 /**
- * Updates contest score (eventually winners)
+ * Updates contest score (only works if contest_id is currently active!)
  */
-async function updateScore(contest_address: string, contest_id: number) {
+export async function updateScore(contest_address: string, contest_id: number) {
   try {
     const contestManager = await models.ContestManager.findOne({
       where: {
@@ -198,11 +198,14 @@ async function updateScore(contest_address: string, contest_id: number) {
       await protocol.contestHelper.getContestScore(
         details.url,
         contest_address,
-        contest_id,
+        undefined,
         oneOff,
       );
+
     const prizePool =
-      (Number(contestBalance) * Number(details.prize_percentage)) / 100;
+      (Number(contestBalance) *
+        Number(oneOff ? 100 : details.prize_percentage)) /
+      100;
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
@@ -210,8 +213,8 @@ async function updateScore(contest_address: string, contest_id: number) {
       prize:
         i < Number(details.payout_structure.length)
           ? (
-              (BigInt(prizePool) * BigInt(details.payout_structure[i])) /
-              100n
+              (Number(prizePool) * Number(details.payout_structure[i])) /
+              100
             ).toString()
           : '0',
     }));
@@ -227,31 +230,6 @@ async function updateScore(contest_address: string, contest_id: number) {
         },
       },
     );
-  } catch (err) {
-    err instanceof Error
-      ? log.error(err.message, err)
-      : log.error(err as string);
-  }
-}
-
-/**
- * Makes sure all previous contests have an updated score
- */
-async function updateEndedContests(
-  contest_address: string,
-  contest_id: number,
-) {
-  try {
-    const outdated = await models.Contest.findAll({
-      where: {
-        contest_address: contest_address,
-        contest_id: { [Op.lt]: contest_id },
-        score_updated_at: { [Op.lte]: sequelize.col('end_time') },
-      },
-    });
-    for (const contest of outdated) {
-      await updateScore(contest_address, contest.contest_id);
-    }
   } catch (err) {
     err instanceof Error
       ? log.error(err.message, err)
@@ -286,15 +264,10 @@ export function Contests(): Projection<typeof inputs> {
       // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
         const contest_id = payload.contest_id!;
-        // update winners on ended contests
         await models.Contest.create({
           ...payload,
           contest_id,
         });
-        contest_id > 0 &&
-          setImmediate(() =>
-            updateEndedContests(payload.contest_address, contest_id),
-          );
       },
 
       ContestContentAdded: async ({ payload }) => {
@@ -331,7 +304,6 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action?.thread_id,
           created_at: new Date(),
         });
-        // update score if vote is less than 1hr old
         setImmediate(() => updateScore(payload.contest_address, contest_id));
       },
     },

@@ -1,5 +1,3 @@
-import { createCanvasSessionPayload } from 'canvas';
-
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
@@ -17,6 +15,8 @@ import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { NEAR_MAINNET_CHAIN_ID } from 'shared/canvas/chainMappings';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
@@ -81,11 +81,11 @@ const FinishNearLogin = () => {
         app.user.selectedCommunity ||
         app.config.chains.getById(app.activeChainId());
 
-      // create canvas thing
-      const chainId = 'mainnet';
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
-        chainId,
+        NEAR_MAINNET_CHAIN_ID,
         acct.address,
       );
 
@@ -100,9 +100,11 @@ const FinishNearLogin = () => {
         null,
       );
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const canvasSessionPayload = createCanvasSessionPayload(
         'near' as ChainBase,
-        chainId,
+        NEAR_MAINNET_CHAIN_ID,
         acct.address,
         sessionPublicAddress,
         +new Date(),
@@ -122,18 +124,20 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasSessionPayload),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        canvas.serializeCanvasPayload(canvasSessionPayload),
       );
 
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
-        chainId,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        NEAR_MAINNET_CHAIN_ID,
       );
 
-      app.sessions
-        .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, acct.address, canvasSessionPayload, signature);
+      await verifySession(canvasSessionPayload);
 
       if (!app.isLoggedIn()) {
         await initAppState();

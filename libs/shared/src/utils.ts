@@ -35,18 +35,25 @@ export const getThreadUrl = (
     title?: string;
   },
   comment?: string | number,
+  relative?: boolean,
 ): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
   const cId = comment ? `?comment=${comment}` : '';
 
+  const relativePath = `/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+
+  if (relative) {
+    return relativePath;
+  }
+
   // TODO: Should we relocate this?
   // - cannot use config util in libs/shared
   // - duplicate found in knock utils
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+    ? `https://commonwealth.im${relativePath}`
+    : `http://localhost:8080${relativePath}`;
 };
 
 export function timeoutPromise(timeout: number) {

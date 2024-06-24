@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signComment } from 'client/scripts/controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -27,11 +29,7 @@ const createComment = async ({
   // @ts-expect-error StrictNullChecks
   parentCommentId = null,
 }: CreateCommentProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signComment(profile.address, {
+  const canvasSignedData = await signComment(profile.address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -46,9 +44,7 @@ const createComment = async ({
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 
