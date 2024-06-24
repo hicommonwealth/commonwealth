@@ -5,6 +5,7 @@ import {
   UserInstance,
   commonProtocol as commonProtocolService,
 } from '@hicommonwealth/model';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { NotificationCategories, commonProtocol } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { config } from '../../config';
@@ -29,9 +30,8 @@ export type CreateThreadReactionOptions = {
   address: AddressInstance;
   reaction: string;
   threadId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 export type CreateThreadReactionResult = [
@@ -47,8 +47,7 @@ export async function __createThreadReaction(
     address,
     reaction,
     threadId,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
   }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
@@ -89,6 +88,7 @@ export async function __createThreadReaction(
       thread.topic_id,
       thread.community_id,
       address,
+      PermissionEnum.CREATE_THREAD_REACTION,
     );
     if (!isValid) {
       throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
@@ -144,8 +144,7 @@ export async function __createThreadReaction(
     ...reactionWhere,
     // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
   };
 

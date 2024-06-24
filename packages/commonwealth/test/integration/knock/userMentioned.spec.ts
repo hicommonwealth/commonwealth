@@ -9,12 +9,13 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { safeTruncateBody, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
 import { getThreadUrl } from '../../../server/workers/knock/util';
@@ -28,7 +29,7 @@ describe('userMentioned Event Handler', () => {
   let thread: z.infer<typeof schemas.Thread> | undefined;
   let sandbox: sinon.SinonSandbox;
 
-  before(async () => {
+  beforeAll(async () => {
     const [chainNode] = await tester.seed(
       'ChainNode',
       {
@@ -70,6 +71,7 @@ describe('userMentioned Event Handler', () => {
       pinned: false,
       read_only: false,
       version_history: [],
+      body: 'some body',
     });
   });
 
@@ -82,11 +84,11 @@ describe('userMentioned Event Handler', () => {
     }
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should not throw if relevant community is not found', async () => {
+  test('should not throw if relevant community is not found', async () => {
     const res = await processUserMentioned({
       name: EventNames.UserMentioned,
       payload: {
@@ -96,7 +98,7 @@ describe('userMentioned Event Handler', () => {
     expect(res).to.be.false;
   });
 
-  it('should execute the triggerWorkflow function with the appropriate data', async () => {
+  test('should execute the triggerWorkflow function with the appropriate data', async () => {
     sandbox = sinon.createSandbox();
     const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
 
@@ -130,24 +132,20 @@ describe('userMentioned Event Handler', () => {
       key: WorkflowKeys.UserMentioned,
       users: [{ id: String(user!.id) }],
       data: {
-        // @ts-expect-error StrictNullChecks
-        author_address_id: community!.Addresses[0].id,
+        author_address_id: community!.Addresses![0].id,
         author_user_id: author!.id,
-        // @ts-expect-error StrictNullChecks
-        author_address: community!.Addresses[0].address,
+        author_address: community!.Addresses![0].address,
         author_profile_id: authorProfile!.id,
         community_id: community!.id,
         community_name: community!.name,
         author: authorProfile!.profile_name,
-        // @ts-expect-error StrictNullChecks
-        object_body: thread!.body.substring(255),
-        // @ts-expect-error StrictNullChecks
-        object_url: getThreadUrl(community!.id, thread!.id),
+        object_body: safeTruncateBody(thread!.body!, 255),
+        object_url: getThreadUrl(community!.id!, thread!.id!),
       },
     });
   });
 
-  it('should throw if triggerWorkflow fails', async () => {
+  test('should throw if triggerWorkflow fails', async () => {
     sandbox = sinon.createSandbox();
     notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
 

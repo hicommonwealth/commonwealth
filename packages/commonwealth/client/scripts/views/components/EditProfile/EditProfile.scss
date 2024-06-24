@@ -1,0 +1,70 @@
+@import '../../../../styles/shared';
+
+.EditProfile {
+  &.full-height {
+    height: 100%;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+
+      .tertiary-black {
+        padding-left: 0;
+      }
+    }
+  }
+
+  .LinkedAddresses {
+    margin-bottom: 32px;
+  }
+
+  .link-type {
+    min-width: 80px;
+    text-align: center;
+    text-transform: capitalize;
+  }
+
+  .input-controls {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .preferences-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 16px;
+
+    .h4 {
+      color: $neutral-600;
+    }
+
+    .h5 {
+      color: $neutral-500;
+    }
+  }
+
+  .Divider {
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+}

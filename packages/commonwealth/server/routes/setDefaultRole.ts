@@ -1,7 +1,9 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { ChainBase } from '@hicommonwealth/shared';
 import type { NextFunction, Response } from 'express';
 import Sequelize from 'sequelize';
+import { addressSwapper } from 'shared/utils';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -19,10 +21,23 @@ const setDefaultRole = async (
   if (!req.body.address || !req.body.author_community_id)
     return next(new AppError(Errors.InvalidAddress));
 
+  const authorCommunity = await models.Community.findOne({
+    where: { id: req.body.author_community_id },
+  });
+  const encodedAddress =
+    // @ts-expect-error StrictNullChecks
+    authorCommunity.base === ChainBase.Substrate
+      ? addressSwapper({
+          address: req.body.address,
+          // @ts-expect-error StrictNullChecks
+          currentPrefix: authorCommunity.ss58_prefix,
+        })
+      : req.body.address;
+
   const validAddress = await models.Address.findOne({
     // @ts-expect-error StrictNullChecks
     where: {
-      address: req.body.address,
+      address: encodedAddress,
       community_id: req.body.author_community_id,
       user_id: req.user.id,
       verified: { [Sequelize.Op.ne]: null },
@@ -39,7 +54,7 @@ const setDefaultRole = async (
     {
       // @ts-expect-error StrictNullChecks
       where: {
-        address: { [Sequelize.Op.ne]: req.body.address },
+        address: { [Sequelize.Op.ne]: encodedAddress },
         community_id: req.body.author_community_id,
         user_id: req.user.id,
         verified: { [Sequelize.Op.ne]: null },

@@ -122,7 +122,7 @@ export const TopicSummaryRow = ({
               }}
               threadHref={discussionLink}
               onCommentBtnClick={() =>
-                navigate(`${discussionLinkWithoutChain}?focusEditor=true`)
+                navigate(`${discussionLinkWithoutChain}?focusComments=true`)
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideReactionButton

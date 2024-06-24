@@ -269,7 +269,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async dispose(): Promise<void> {
-    await this.broker!.shutdown();
+    await this.broker?.shutdown();
     this._initialized = false;
   }
 
