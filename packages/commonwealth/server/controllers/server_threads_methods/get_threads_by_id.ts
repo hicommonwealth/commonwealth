@@ -92,6 +92,31 @@ export async function __getThreadsById(
           },
         ],
       },
+      {
+        model: this.models.ContestAction,
+        where: {
+          action: 'upvoted',
+        },
+        attributes: ['content_id'],
+        include: [
+          {
+            model: this.models.Contest,
+            attributes: [
+              'contest_id',
+              'contest_address',
+              'score',
+              'start_time',
+              'end_time',
+            ],
+            include: [
+              {
+                model: this.models.ContestManager,
+                attributes: ['name', 'cancelled'],
+              },
+            ],
+          },
+        ],
+      },
     ],
   });
 
