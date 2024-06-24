@@ -144,7 +144,7 @@ export function ContestWorker(): Policy<typeof inputs> {
               OR
               cm.interval > 0
             )
-          -- content cannot be a winner in a previous contests
+          -- content cannot be a winner in a previous contest
           AND NOT EXISTS (
             WITH max_contest AS (
               SELECT MAX(contest_id) AS max_id
