@@ -1,5 +1,6 @@
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
+import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
@@ -10,6 +11,7 @@ import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import ThreadContestTag from 'views/components/ThreadContestTag';
+import { getWinnersFromAssociatedContests } from 'views/components/ThreadContestTag/utils';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -123,6 +125,7 @@ export const CWContentPage = ({
   const [urlQueryParams] = useSearchParams();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+  const contestsEnabled = useFlag('contest');
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
@@ -222,17 +225,10 @@ export const CWContentPage = ({
     isThreadTopicGated: isRestrictedMembership,
   });
 
-  const contestWinners = [
-    { date: '03/09/2024', round: 7, isRecurring: true },
-    { date: '03/10/2024', isRecurring: false },
-    {
-      date: '03/10/2024',
-      round: 8,
-      isRecurring: true,
-    },
-  ];
-  const showContestWinnerTag = false;
-  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const contestWinners = getWinnersFromAssociatedContests(
+    thread?.associatedContests,
+  );
+  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   const mainBody = (
     <div className="main-body-container">
@@ -240,9 +236,21 @@ export const CWContentPage = ({
         {typeof title === 'string' ? (
           <h1 className="title">
             {showContestWinnerTag &&
-              contestWinners?.map((winner, index) => (
-                <ThreadContestTag key={index} {...winner} />
-              ))}
+              contestWinners.map((winner, index) => {
+                if (!winner) {
+                  return null;
+                }
+
+                return (
+                  <ThreadContestTag
+                    date={winner.date}
+                    round={winner.round}
+                    title={winner.title}
+                    prize={winner.prize}
+                    key={index}
+                  />
+                );
+              })}
             {truncate(title)}
           </h1>
         ) : (

@@ -126,8 +126,17 @@ export type AssociatedReaction = {
   last_active?: string;
 };
 
-type AssociatedContest = {
-  id: number;
+export type AssociatedContest = {
+  contest_id: number;
+  contest_name: string;
+  contest_address: string;
+  score: {
+    prize: string;
+    votes: number;
+    content_id: string;
+    creator_address: string;
+  }[];
+  contest_cancelled: boolean;
   thread_id: number;
   content_id: number;
   start_time: string;
