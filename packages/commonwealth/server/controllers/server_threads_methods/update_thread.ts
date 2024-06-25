@@ -229,16 +229,16 @@ export async function __updateThread(
     );
 
     // @ts-expect-error StrictNullChecks
-    await setThreadPinned(permissions, pinned, isContestThread, toUpdate);
+    await setThreadPinned(permissions, pinned, toUpdate);
 
     // @ts-expect-error StrictNullChecks
-    await setThreadSpam(permissions, spam, isContestThread, toUpdate);
+    await setThreadSpam(permissions, spam, toUpdate);
 
     // @ts-expect-error StrictNullChecks
-    await setThreadLocked(permissions, locked, isContestThread, toUpdate);
+    await setThreadLocked(permissions, locked, toUpdate);
 
     // @ts-expect-error StrictNullChecks
-    await setThreadArchived(permissions, archived, isContestThread, toUpdate);
+    await setThreadArchived(permissions, archived, toUpdate);
 
     await setThreadStage(
       // @ts-expect-error StrictNullChecks
@@ -246,7 +246,6 @@ export async function __updateThread(
       stage,
       community,
       allAnalyticsOptions,
-      isContestThread,
       toUpdate,
     );
 
@@ -598,7 +597,6 @@ async function setThreadAttributes(
 async function setThreadPinned(
   permissions: UpdateThreadPermissions,
   pinned: boolean | undefined,
-  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof pinned !== 'undefined') {
@@ -618,7 +616,6 @@ async function setThreadPinned(
 async function setThreadLocked(
   permissions: UpdateThreadPermissions,
   locked: boolean | undefined,
-  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof locked !== 'undefined') {
@@ -642,7 +639,6 @@ async function setThreadLocked(
 async function setThreadArchived(
   permissions: UpdateThreadPermissions,
   archive: boolean | undefined,
-  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof archive !== 'undefined') {
@@ -665,7 +661,6 @@ async function setThreadArchived(
 async function setThreadSpam(
   permissions: UpdateThreadPermissions,
   spam: boolean | undefined,
-  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof spam !== 'undefined') {
@@ -689,7 +684,6 @@ async function setThreadStage(
   stage: string | undefined,
   community: CommunityInstance,
   allAnalyticsOptions: TrackOptions[],
-  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof stage !== 'undefined') {
