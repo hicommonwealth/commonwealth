@@ -540,14 +540,14 @@ async function setThreadAttributes(
   isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (isContestThread) {
-    throw new AppError(Errors.ContestLock);
-  }
   if (
     typeof title !== 'undefined' ||
     typeof body !== 'undefined' ||
     typeof url !== 'undefined'
   ) {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
@@ -692,9 +692,6 @@ async function setThreadStage(
   isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (isContestThread) {
-    throw new AppError(Errors.ContestLock);
-  }
   if (typeof stage !== 'undefined') {
     validatePermissions(permissions, {
       isThreadOwner: true,
@@ -756,10 +753,10 @@ async function setThreadTopic(
   isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
-  if (isContestThread) {
-    throw new AppError(Errors.ContestLock);
-  }
   if (typeof topicId !== 'undefined') {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
@@ -796,11 +793,12 @@ async function updateThreadCollaborators(
   models: DB,
   transaction: Transaction,
 ) {
-  if (isContestThread) {
-    throw new AppError(Errors.ContestLock);
-  }
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
+
     validatePermissions(permissions, {
       isThreadOwner: true,
       isSuperAdmin: true,
