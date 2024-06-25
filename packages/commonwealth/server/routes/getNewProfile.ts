@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import type {
   AddressAttributes,
   CommentAttributes,
@@ -42,6 +43,14 @@ const getNewProfile = async (
   next: NextFunction,
 ) => {
   const { profileId } = req.query;
+
+  if (profileId) {
+    const parsedInt = parseInt(profileId);
+    if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
+      throw new AppError('Invalid profile id');
+    }
+  }
+
   let profile: ProfileInstance;
 
   if (profileId) {
