@@ -252,7 +252,7 @@ class NamespaceFactory extends ContractBase {
         data: calldata,
       });
       const balance = this.web3.eth.abi.decodeParameter('uint256', result);
-      return this.web3.utils.fromWei(String(balance), decimals ?? 'ether');
+      return this.web3.utils.fromWei(String(balance), decimals);
     }
   }
 }
