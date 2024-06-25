@@ -102,6 +102,11 @@ export async function __getThreadsById(
         include: [
           {
             model: this.models.Contest,
+            where: {
+              content_id: {
+                [Op.eq]: this.models.sequelize.col('ContestActions.contest_id'),
+              },
+            },
             attributes: [
               'contest_id',
               'contest_address',
