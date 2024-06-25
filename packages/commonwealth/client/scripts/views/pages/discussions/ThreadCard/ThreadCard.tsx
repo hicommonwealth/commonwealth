@@ -8,13 +8,11 @@ import {
   GetThreadActionTooltipTextResponse,
   filterLinks,
 } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ThreadContestTag from 'views/components/ThreadContestTag';
-import { getWinnersFromAssociatedContests } from 'views/components/ThreadContestTag/utils';
+import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -84,7 +82,6 @@ export const ThreadCard = ({
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const contestsEnabled = useFlag('contest');
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -113,12 +110,6 @@ export const ThreadCard = ({
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
-
-  const contestWinners = getWinnersFromAssociatedContests(
-    thread.associatedContests,
-  );
-
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   return (
     <>
@@ -177,23 +168,9 @@ export const ThreadCard = ({
             {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
             <div className="content-title">
               <CWText type="h5" fontWeight="semiBold">
-                {showContestWinnerTag &&
-                  contestWinners.map((winner, index) => {
-                    if (!winner) {
-                      return null;
-                    }
-
-                    return (
-                      <ThreadContestTag
-                        date={winner.date}
-                        round={winner.round}
-                        title={winner.title}
-                        prize={winner.prize}
-                        key={index}
-                      />
-                    );
-                  })}
-
+                <ThreadContestTagContainer
+                  associatedContests={thread.associatedContests}
+                />
                 {thread.title}
               </CWText>
             </div>
