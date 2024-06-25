@@ -6,6 +6,7 @@ import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
+import { updateCommunityThreadCount } from './helpers/counts';
 
 interface DeleteThreadProps {
   communityId: string;
@@ -47,6 +48,8 @@ const useDeleteThreadMutation = ({
   return useMutation({
     mutationFn: deleteThread,
     onSuccess: async (response) => {
+      removeThreadFromAllCaches(communityId, threadId);
+
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
         ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
@@ -57,7 +60,10 @@ const useDeleteThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
-      removeThreadFromAllCaches(communityId, threadId);
+
+      // decrement communities thread count
+      if (communityId) updateCommunityThreadCount(communityId, 'decrement');
+
       return response.data;
     },
   });
