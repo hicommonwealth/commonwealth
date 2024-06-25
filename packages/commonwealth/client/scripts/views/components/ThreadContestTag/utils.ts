@@ -23,8 +23,8 @@ export const getWinnersFromAssociatedContests = (
           contest.score?.findIndex(
             (s) => s.content_id === String(contest.content_id),
           ) + 1,
-        // todo show only for recurring
-        round: contest.contest_id + 1,
+        // show only for recurring
+        round: contest.contest_interval > 0 ? contest.contest_id + 1 : null,
         title: contest.contest_name,
       };
     })

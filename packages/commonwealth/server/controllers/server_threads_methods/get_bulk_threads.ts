@@ -211,6 +211,7 @@ export async function __getBulkThreads(
             'contest_id', CON.contest_id,
             'contest_name', CM.name,
             'contest_cancelled', CM.cancelled,
+            'contest_interval', CM.interval,
             'contest_address', CON.contest_address,
             'score', CON.score,
             'thread_id', TT.id,

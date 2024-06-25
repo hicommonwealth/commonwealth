@@ -112,7 +112,7 @@ export async function __getThreadsById(
             include: [
               {
                 model: this.models.ContestManager,
-                attributes: ['name', 'cancelled'],
+                attributes: ['name', 'cancelled', 'interval'],
               },
             ],
           },

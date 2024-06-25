@@ -11,7 +11,7 @@ import './ThreadContestTag.scss';
 
 interface ThreadContestTagProps {
   date: string;
-  round?: number;
+  round: number | null;
   title: string;
   prize: number;
 }

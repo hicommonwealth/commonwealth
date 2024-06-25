@@ -36,6 +36,7 @@ function processAssociatedContests(
       content_id: action.content_id,
       start_time: action.Contest.start_time,
       end_time: action.Contest.end_time,
+      contest_interval: action.Contest.ContestManager.interval,
     }));
   }
 
@@ -138,6 +139,7 @@ type Score = {
 type ContestManager = {
   name: string;
   cancelled: boolean;
+  interval: number;
 };
 
 type Contest = {
@@ -193,6 +195,7 @@ export type AssociatedContest = {
   content_id: number;
   start_time: string;
   end_time: string;
+  contest_interval: number;
 };
 
 type RecentComment = {
