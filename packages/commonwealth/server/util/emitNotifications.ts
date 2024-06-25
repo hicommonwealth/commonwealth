@@ -10,7 +10,6 @@ import {
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { config } from '../config';
-import { createImmediateNotificationEmailObject } from '../scripts/emails';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
@@ -138,20 +137,6 @@ export default async function emitNotifications(
           undefined,
       });
     }
-  }
-
-  let msg;
-  try {
-    if (category_id !== 'snapshot-proposal') {
-      msg = await createImmediateNotificationEmailObject(
-        notification_data,
-        category_id,
-        models,
-      );
-    }
-  } catch (e) {
-    console.log('Error generating immediate notification email!');
-    console.trace(e);
   }
 
   let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
