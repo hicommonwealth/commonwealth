@@ -10,10 +10,7 @@ import {
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { config } from '../config';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail,
-} from '../scripts/emails';
+import { createImmediateNotificationEmailObject } from '../scripts/emails';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
@@ -194,19 +191,6 @@ export default async function emitNotifications(
   }
 
   if (config.SEND_WEBHOOKS_EMAILS) {
-    // emails
-    for (const subscription of subscriptions) {
-      // @ts-expect-error StrictNullChecks
-      if (msg && isChainEventData && chainEvent.community_id) {
-        // @ts-expect-error StrictNullChecks
-        msg.dynamic_template_data.notification.path = `${config.SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
-      }
-      if (msg && subscription?.immediate_email && subscription?.User) {
-        // kick off async call and immediately return
-        sendImmediateNotificationEmail(subscription.User, msg);
-      }
-    }
-
     // webhooks
     try {
       await dispatchWebhooks(notification_data_and_category);
