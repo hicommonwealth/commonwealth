@@ -44,16 +44,14 @@ const getNewProfile = async (
 ) => {
   const { profileId } = req.query;
 
+  let profile: ProfileInstance;
+
   if (profileId) {
     const parsedInt = parseInt(profileId);
     if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
       throw new AppError('Invalid profile id');
     }
-  }
 
-  let profile: ProfileInstance;
-
-  if (profileId) {
     // @ts-expect-error StrictNullChecks
     profile = await models.Profile.findOne({
       where: {
