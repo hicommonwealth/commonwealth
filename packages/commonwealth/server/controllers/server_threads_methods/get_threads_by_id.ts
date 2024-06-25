@@ -12,6 +12,7 @@ export async function __getThreadsById(
   this: ServerThreadsController,
   { threadIds }: GetThreadsByIdOptions,
 ): Promise<GetThreadsByIdResult> {
+  const sequelize = this.models.Sequelize;
   const threads = await this.models.Thread.findAll({
     where: {
       id: { [Op.in]: threadIds },
@@ -102,10 +103,17 @@ export async function __getThreadsById(
         include: [
           {
             model: this.models.Contest,
-            where: {
-              content_id: {
-                [Op.eq]: this.models.sequelize.col('ContestActions.contest_id'),
-              },
+            on: {
+              contest_id: sequelize.where(
+                sequelize.col('"ContestActions".contest_id'),
+                '=',
+                sequelize.col('"ContestActions->Contest".contest_id'),
+              ),
+              contest_address: sequelize.where(
+                sequelize.col('"ContestActions".contest_address'),
+                '=',
+                sequelize.col('"ContestActions->Contest".contest_address'),
+              ),
             },
             attributes: [
               'contest_id',
