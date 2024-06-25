@@ -8,7 +8,7 @@ import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import { AccountSelector } from 'views/components/component_kit/AccountSelector/AccountSelector';
 import TOSModal from 'views/modals/TOSModal';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';

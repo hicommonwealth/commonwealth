@@ -6,7 +6,6 @@ import type { DeltaStatic } from 'quill';
 import React from 'react';
 import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -40,20 +39,11 @@ export const EditBody = (props: EditBodyProps) => {
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
 
-  const {
-    mutateAsync: editThread,
-    reset: resetEditThreadMutation,
-    error: editThreadError,
-  } = useEditThreadMutation({
+  const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
-  });
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetEditThreadMutation,
-    error: editThreadError,
   });
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -121,29 +111,26 @@ export const EditBody = (props: EditBodyProps) => {
   };
 
   return (
-    <>
-      <div className="EditBody">
-        <ReactQuillEditor
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-          cancelEditing={cancelEditing}
+    <div className="EditBody">
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+        cancelEditing={cancelEditing}
+      />
+      <div className="buttons-row">
+        <CWButton
+          label="Cancel"
+          disabled={saving}
+          buttonType="tertiary"
+          onClick={cancel}
         />
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            disabled={saving}
-            buttonType="tertiary"
-            onClick={cancel}
-          />
-          <CWButton
-            label="Save"
-            buttonWidth="wide"
-            disabled={saving}
-            onClick={save}
-          />
-        </div>
+        <CWButton
+          label="Save"
+          buttonWidth="wide"
+          disabled={saving}
+          onClick={save}
+        />
       </div>
-      {RevalidationModal}
-    </>
+    </div>
   );
 };

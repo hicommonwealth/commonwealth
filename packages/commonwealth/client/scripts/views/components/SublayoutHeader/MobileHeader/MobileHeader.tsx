@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
@@ -26,20 +25,12 @@ interface MobileHeaderProps {
   onMobile: boolean;
   isInsideCommunity: boolean;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
 }
 
 const MobileHeader = ({
   onMobile,
   onAuthModalOpen,
   isInsideCommunity,
-  onRevalidationModalData,
 }: MobileHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
@@ -53,9 +44,8 @@ const MobileHeader = ({
     ? !menuVisible
     : true;
 
-  const { RevalidationModal, userMenuItems } = useUserMenuItems({
+  const { userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
-    onRevalidationModalData,
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
   });
@@ -151,7 +141,6 @@ const MobileHeader = ({
         onClose={() => isSetModalOpen(false)}
         open={isModalOpen}
       />
-      {RevalidationModal}
     </>
   );
 };

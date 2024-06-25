@@ -1,0 +1,54 @@
+@import '../../../../../styles/shared.scss';
+
+.AccountSelector {
+  margin-bottom: 24px;
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+
+  .account-item {
+    cursor: pointer;
+    padding: 16px 18px 9px;
+    border: 1px solid $neutral-50;
+    border-bottom: none;
+    text-align: left;
+    display: flex;
+
+    .account-item-avatar {
+      width: 56px;
+    }
+
+    .account-item-address {
+      color: $neutral-500;
+    }
+
+    .account-item-left {
+      flex: 1;
+    }
+
+    .account-item-right {
+      text-align: right;
+    }
+
+    &:hover {
+      background: $neutral-200;
+    }
+
+    &:first-child {
+      border-top-right-radius: 6px;
+      border-top-left-radius: 6px;
+    }
+
+    &:last-child {
+      border-bottom: 1px solid $neutral-50;
+      border-bottom-right-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+  }
+
+  .account-item.account-item-emphasized {
+    &:hover {
+      background: $neutral-200;
+    }
+  }
+}

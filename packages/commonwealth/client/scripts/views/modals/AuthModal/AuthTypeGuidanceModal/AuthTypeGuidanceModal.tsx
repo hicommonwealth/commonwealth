@@ -8,6 +8,7 @@ const AuthTypeGuidanceModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
+  showAuthOptionFor,
   onChangeModalType,
 }: ModalVariantProps) => {
   return (
@@ -16,6 +17,7 @@ const AuthTypeGuidanceModal = ({
       onSuccess={onSuccess}
       layoutType={AuthModalType.AccountTypeGuidance}
       showWalletsFor={showWalletsFor}
+      showAuthOptionFor={showAuthOptionFor}
       customBody={
         <>
           <Option

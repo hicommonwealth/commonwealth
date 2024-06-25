@@ -8,6 +8,7 @@ import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import { useAuthModalStore } from '../../ui/modals';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
@@ -60,6 +61,8 @@ const useCreateCommentReactionMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
@@ -89,6 +92,7 @@ const useCreateCommentReactionMutation = ({
 
       return reaction;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

@@ -1,7 +1,5 @@
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -9,16 +7,20 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
-import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import {
+  useAuthModalStore,
+  useManageCommunityStakeModalStore,
+} from 'state/ui/modals';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+// import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 import {
   chainBaseToCaip2,
@@ -60,20 +62,12 @@ export const handleLogout = async () => {
 
 interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
 }
 
 const useUserMenuItems = ({
   onAuthModalOpen,
-  onRevalidationModalData,
   isMenuOpen,
   onAddressItemClick,
 }: UseUserMenuItemsProps) => {
@@ -87,19 +81,13 @@ const useUserMenuItems = ({
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isMenuOpen,
   });
-  const [sessionKeyRevalidationError, setSessionKeyRevalidationError] =
-    useState<SessionKeyError | null>(null);
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: () => {
-      setSessionKeyRevalidationError(null);
-    },
-    error: sessionKeyRevalidationError,
-  });
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
   const { selectedAddress, setSelectedAddress } =
     useManageCommunityStakeModalStore();
+
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = app.user?.addresses?.[0];
   // @ts-expect-error <StrictNullChecks/>
@@ -131,15 +119,15 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
+  const addresses: PopoverMenuItem[] = app.user?.activeAccounts?.map(
     (account) => {
-      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+      const communityCaip2Prefix = chainBaseToCaip2(account?.community?.base);
       const communityIdOrPrefix =
-        account.community.base === ChainBase.CosmosSDK
-          ? account.community.ChainNode?.bech32
-          : account.community.ChainNode?.ethChainId;
+        account?.community?.base === ChainBase.CosmosSDK
+          ? account?.community?.ChainNode?.bech32
+          : account?.community?.ChainNode?.ethChainId;
       const communityCanvasChainId = chainBaseToCanvasChainId(
-        account.community.base,
+        account?.community?.base,
         // @ts-expect-error StrictNullChecks
         communityIdOrPrefix,
       );
@@ -168,11 +156,14 @@ const useUserMenuItems = ({
 
           onAddressItemClick?.();
 
-          onRevalidationModalData({
-            // @ts-expect-error <StrictNullChecks/>
-            walletSsoSource: walletSsoSource,
-            walletAddress: account.address,
-          });
+          checkForSessionKeyRevalidationErrors(
+            new SessionKeyError({
+              name: 'SessionKeyError',
+              message: 'Session Key Expired',
+              ssoSource: walletSsoSource,
+              address: account.address,
+            }),
+          );
         },
       };
     },
@@ -198,7 +189,6 @@ const useUserMenuItems = ({
   );
 
   return {
-    RevalidationModal,
     userMenuItems: [
       // if a user is in a stake enabled community without membership, show user addresses that
       // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.

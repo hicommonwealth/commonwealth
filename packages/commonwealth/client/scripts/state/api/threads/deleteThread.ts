@@ -4,6 +4,7 @@ import { signDeleteThread } from 'client/scripts/controllers/server/sessions';
 import { ThreadStage } from 'models/types';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
+import { useAuthModalStore } from '../../ui/modals';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
@@ -45,6 +46,8 @@ const useDeleteThreadMutation = ({
   threadId,
   currentStage,
 }: UseDeleteThreadMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteThread,
     onSuccess: async (response) => {
@@ -66,6 +69,7 @@ const useDeleteThreadMutation = ({
 
       return response.data;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

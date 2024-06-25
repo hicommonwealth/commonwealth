@@ -20,7 +20,6 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
@@ -93,17 +92,8 @@ export const NewThreadForm = () => {
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
-  const {
-    mutateAsync: createThread,
-    error: createThreadError,
-    reset: resetCreateThreadMutation,
-  } = useCreateThreadMutation({
+  const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId: app.activeChainId(),
-  });
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetCreateThreadMutation,
-    error: createThreadError,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -313,7 +303,6 @@ export const NewThreadForm = () => {
         </div>
       </CWPageLayout>
       {JoinCommunityModals}
-      {RevalidationModal}
     </>
   );
 };

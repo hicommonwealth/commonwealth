@@ -3,6 +3,7 @@ import axios from 'axios';
 import { signDeleteThreadReaction } from 'client/scripts/controllers/server/sessions';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
+import { useAuthModalStore } from '../../ui/modals';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
@@ -54,6 +55,8 @@ const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
 }: UseDeleteThreadReactionMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: deleteReaction,
     onSuccess: async (response) => {
@@ -68,6 +71,7 @@ const useDeleteThreadReactionMutation = ({
         'removeFromExisting',
       );
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 

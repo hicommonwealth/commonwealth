@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -27,20 +26,9 @@ import './DesktopHeader.scss';
 interface DesktopHeaderProps {
   onMobile: boolean;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
-  onRevalidationModalData: ({
-    walletSsoSource,
-    walletAddress,
-  }: {
-    walletSsoSource: WalletSsoSource;
-    walletAddress: string;
-  }) => void;
 }
 
-const DesktopHeader = ({
-  onMobile,
-  onAuthModalOpen,
-  onRevalidationModalData,
-}: DesktopHeaderProps) => {
+const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -127,10 +115,7 @@ const DesktopHeader = ({
         </div>
 
         {isLoggedIn && (
-          <UserDropdown
-            onAuthModalOpen={() => onAuthModalOpen()}
-            onRevalidationModalData={onRevalidationModalData}
-          />
+          <UserDropdown onAuthModalOpen={() => onAuthModalOpen()} />
         )}
 
         {!isLoggedIn && (

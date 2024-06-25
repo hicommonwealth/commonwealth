@@ -6,6 +6,7 @@ import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
+import { useAuthModalStore } from '../../ui/modals';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
@@ -116,6 +117,8 @@ const useEditThreadMutation = ({
   currentStage,
   currentTopicId,
 }: UseEditThreadMutationProps) => {
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
   return useMutation({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {
@@ -138,6 +141,7 @@ const useEditThreadMutation = ({
 
       return updatedThread;
     },
+    onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
 };
 
