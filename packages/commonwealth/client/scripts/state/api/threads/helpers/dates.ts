@@ -18,7 +18,11 @@ export const getToAndFromDatesRangesForThreadsTimelines = (
       ].includes(timeline)
     ) {
       return today
-        .startOf(timeline.toLowerCase().replace('this', '') as any)
+        .startOf(
+          timeline
+            .toLowerCase()
+            .replace('this', '') as moment.unitOfTime.StartOf,
+        )
         .toISOString();
     }
   })();
@@ -35,7 +39,11 @@ export const getToAndFromDatesRangesForThreadsTimelines = (
       ].includes(timeline)
     ) {
       return today
-        .endOf(timeline.toLowerCase().replace('this', '') as any)
+        .endOf(
+          timeline
+            .toLowerCase()
+            .replace('this', '') as moment.unitOfTime.StartOf,
+        )
         .toISOString();
     }
   })();
