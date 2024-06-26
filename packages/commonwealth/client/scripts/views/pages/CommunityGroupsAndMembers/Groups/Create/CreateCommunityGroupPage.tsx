@@ -46,8 +46,12 @@ const CreateCommunityGroupPage = () => {
         requirementsToFulfill: 'ALL',
       }}
       onSubmit={async (values) => {
-        const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
-        payload.isPWA = isAddedToHomeScreen;
+        const payload = makeGroupDataBaseAPIPayload(
+          values,
+          isAddedToHomeScreen,
+          allowedAddresses,
+        );
+
         try {
           await createGroup(payload);
           notifySuccess('Group Created');
