@@ -1,4 +1,5 @@
 import { Session } from '@canvas-js/interfaces';
+import assert from 'assert';
 import { fileURLToPath } from 'url';
 
 import { logger } from '@hicommonwealth/core';
@@ -16,34 +17,35 @@ import { CANVAS_TOPIC } from '../../shared/canvas';
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
+/**
+ * Verify the session signature is valid for the address model,
+ * and either create a new user linked to `addressModel`
+ * or attach it to an existing `user_id`.
+ */
 const verifySessionSignature = async (
   models: DB,
   addressModel: AddressInstance,
-  user_id: number,
+  user_id?: number,
   session: Session,
-): Promise<boolean> => {
+): Promise<void> => {
   const expectedAddress = addressModel.address;
   const sessionAddress = session.address.split(':')[2];
-  if (sessionAddress !== expectedAddress) {
-    log.warn(
-      `session.address (${sessionAddress}) does not match addressModel.address (${expectedAddress})`,
-    );
-  }
+
+  assert(
+    sessionAddress === expectedAddress,
+    `session.address (${sessionAddress}) does not match addressModel.address (${expectedAddress})`,
+  );
 
   const signer = getSessionSignerForAddress(session.address);
-  let isValid = false;
-  try {
-    if (signer !== undefined) {
-      await signer.verifySession(CANVAS_TOPIC, session);
-      isValid = true;
-    }
-  } catch (e) {
-    log.error(e);
+  if (!signer) {
+    throw new Error('missing signer');
   }
+
+  await signer.verifySession(CANVAS_TOPIC, session);
 
   addressModel.last_active = new Date();
 
-  if (isValid && user_id === null) {
+  if (user_id === null) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user
     // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
@@ -81,7 +83,7 @@ const verifySessionSignature = async (
         addressModel.user_id = user.id;
       }
     }
-  } else if (isValid) {
+  } else {
     // mark the address as verified
     // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
@@ -92,7 +94,6 @@ const verifySessionSignature = async (
     addressModel.profile_id = profile.id;
   }
   await addressModel.save();
-  return isValid;
 };
 
 export default verifySessionSignature;
