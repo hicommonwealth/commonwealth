@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import {
   NotificationCategories,
   NotificationDataAndCategory,
@@ -47,6 +47,7 @@ export function mapNotificationsDataToSubscriptions(
     uniqueData['subscriber_id'] = notification.data.collaborator_user_id;
   } else {
     log.info(`${notification.categoryId} does not support subscriptions`);
+    // @ts-expect-error StrictNullChecks
     return;
   }
   return uniqueData;

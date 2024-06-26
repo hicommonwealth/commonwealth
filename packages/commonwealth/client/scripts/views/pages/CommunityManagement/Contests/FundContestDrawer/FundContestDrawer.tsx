@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import app from 'state';
+import { useFundContestOnchainMutation } from 'state/api/contests';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
@@ -11,6 +12,8 @@ import {
   FundContestLoading,
   FundContestSuccess,
 } from './steps';
+import useFundContestForm, { INITIAL_AMOUNT } from './useFundContestForm';
+import useUserAddressesForFundForm from './useUserAddressesForFundForm';
 
 import './FundContestDrawer.scss';
 
@@ -20,19 +23,6 @@ interface FundContestDrawerProps {
   contestAddress: string;
 }
 
-const fakeApiCall = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const randomNum = Math.random();
-      if (randomNum < 0.5) {
-        resolve('API call successful');
-      } else {
-        reject(new Error('API call failed'));
-      }
-    }, 2000);
-  });
-};
-
 export type FundContestStep = 'Form' | 'Loading' | 'Success' | 'Failure';
 
 const FundContestDrawer = ({
@@ -40,53 +30,65 @@ const FundContestDrawer = ({
   onClose,
   contestAddress,
 }: FundContestDrawerProps) => {
-  const addressOptions = app?.user?.activeAccounts?.map((account) => ({
-    value: String(account.address),
-    label: account.address,
-  }));
-
-  const activeAccountOption = {
-    value: String(app.user?.activeAccount?.address),
-    label: app?.user?.activeAccount?.address,
-  };
-
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
-  const [selectedAddress, setSelectedAddress] = useState(activeAccountOption);
-  const [amountEth, setAmountEth] = useState('0.0001');
+  const [txHash, setTxHash] = useState('');
 
-  const userEthBalance = '113.456';
-  const contestEthBalance = '56.102';
-  const amountEthInUsd = '1.23';
-  const amountError =
-    (parseFloat(userEthBalance) < parseFloat(amountEth) &&
-      'Not enough funds in wallet') ||
-    (amountEth === '' && 'Please enter an amount') ||
-    (parseFloat(amountEth) < 0 && 'Please enter non negative amount');
-  const newContestBalanceInEth = '56.102';
-  const newContestBalanceInUsd = '1.12';
-  const transferFeesInEth = '1.12';
-  const transferFeesInUsd = '56.102';
+  const chainRpc = app?.chain?.meta?.ChainNode?.url;
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+
+  const { addressOptions, selectedAddress, setSelectedAddress } =
+    useUserAddressesForFundForm();
+
+  const {
+    amountEth,
+    amountEthInUsd,
+    setAmountEth,
+    amountError,
+    contestEthBalance,
+    newContestBalanceInUsd,
+    newContestBalanceInEth,
+    userEthBalance,
+  } = useFundContestForm({
+    contestAddress,
+    chainRpc,
+    // @ts-expect-error <StrictNullChecks/>
+    ethChainId,
+    userAddress: selectedAddress.value,
+  });
+
+  const { mutateAsync: fundContest } = useFundContestOnchainMutation();
 
   const handleChangeEthAmount = (e) => {
     setAmountEth(e.target.value);
   };
 
-  const handleTransferFunds = async () => {
-    try {
-      setFundContestDrawerStep('Loading');
-      await fakeApiCall();
-      setFundContestDrawerStep('Success');
-    } catch (err) {
-      setFundContestDrawerStep('Failure');
-    }
+  const handleTransferFunds = () => {
+    setFundContestDrawerStep('Loading');
+
+    fundContest({
+      contestAddress,
+      // @ts-expect-error <StrictNullChecks/>
+      ethChainId,
+      chainRpc,
+      amount: Number(amountEth),
+      walletAddress: selectedAddress.value,
+    })
+      .then((tx) => {
+        setFundContestDrawerStep('Success');
+        setTxHash(tx.transactionHash as string);
+      })
+      .catch((err) => {
+        console.log('Failed to fund contest', err);
+        setFundContestDrawerStep('Failure');
+      });
   };
 
   const handleClose = () => {
     onClose();
     setFundContestDrawerStep('Form');
-    setAmountEth('0');
-    setSelectedAddress(activeAccountOption);
+    setAmountEth(INITIAL_AMOUNT);
+    setTxHash('');
   };
 
   const getCurrentStep = () => {
@@ -95,21 +97,20 @@ const FundContestDrawer = ({
         return (
           <FundContestForm
             onClose={handleClose}
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             handleTransferFunds={handleTransferFunds}
             amountEth={amountEth}
+            // @ts-expect-error <StrictNullChecks/>
             amountError={amountError}
             handleChangeEthAmount={handleChangeEthAmount}
             selectedAddress={selectedAddress}
             onSetSelectedAddress={setSelectedAddress}
             addressOptions={addressOptions}
+            // @ts-expect-error <StrictNullChecks/>
             userEthBalance={userEthBalance}
             contestEthBalance={contestEthBalance}
             amountEthInUsd={amountEthInUsd}
             newContestBalanceInEth={newContestBalanceInEth}
             newContestBalanceInUsd={newContestBalanceInUsd}
-            transferFeesInEth={transferFeesInEth}
-            transferFeesInUsd={transferFeesInUsd}
             contestAddress={contestAddress}
           />
         );
@@ -126,7 +127,11 @@ const FundContestDrawer = ({
 
       case 'Success':
         return (
-          <FundContestSuccess onClose={handleClose} address={contestAddress} />
+          <FundContestSuccess
+            onClose={handleClose}
+            address={contestAddress}
+            txHash={txHash}
+          />
         );
     }
   };

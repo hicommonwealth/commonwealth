@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
 import _ from 'lodash';
@@ -71,6 +71,7 @@ const threadsUsersCountAndAvatar = async (
           ).filter(({ address }) => address !== authorAddress);
           const addressesCount = uniqueAddresses.length + 1;
           const addresses = uniqueAddresses
+            // @ts-expect-error StrictNullChecks
             .concat({
               thread_id: thread_id,
               address: authorAddress,

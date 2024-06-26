@@ -83,7 +83,7 @@ export type NearSputnikPolicy = {
 
 export function getUserRoles(
   policy: NearSputnikPolicy,
-  user: AccountId
+  user: AccountId,
 ): string[] {
   const userPermissions: string[] = [];
   for (const role of policy.roles) {
@@ -103,7 +103,8 @@ export function getUserRoles(
 export function getTotalSupply(
   policy: NearSputnikPolicy,
   votePolicy: VotePolicy,
-  tokenSupply: BN
+  tokenSupply: BN,
+  // @ts-expect-error StrictNullChecks
 ): BN {
   if (votePolicy.weight_kind === WeightKind.RoleWeight) {
     // locate the role representing the proposal's voting group
@@ -163,7 +164,7 @@ export type NearSputnikProposalKind =
   | FunctionCall;
 
 export function isAddMemberToRole(
-  kind: NearSputnikProposalKind
+  kind: NearSputnikProposalKind,
 ): kind is AddMemberToRole {
   return (
     typeof kind === 'object' && typeof kind['AddMemberToRole'] === 'object'
@@ -171,7 +172,7 @@ export function isAddMemberToRole(
 }
 
 export function isRemoveMemberFromRole(
-  kind: NearSputnikProposalKind
+  kind: NearSputnikProposalKind,
 ): kind is RemoveMemberFromRole {
   return (
     typeof kind === 'object' && typeof kind['RemoveMemberFromRole'] === 'object'
@@ -183,19 +184,19 @@ export function isTransfer(kind: NearSputnikProposalKind): kind is Transfer {
 }
 
 export function isFunctionCall(
-  kind: NearSputnikProposalKind
+  kind: NearSputnikProposalKind,
 ): kind is FunctionCall {
   return typeof kind === 'object' && typeof kind['FunctionCall'] === 'object';
 }
 
 export function isChangePolicy(
-  kind: NearSputnikProposalKind
+  kind: NearSputnikProposalKind,
 ): kind is ChangePolicy {
   return typeof kind === 'object' && typeof kind['ChangePolicy'] === 'object';
 }
 
 export function isChangeConfig(
-  kind: NearSputnikProposalKind
+  kind: NearSputnikProposalKind,
 ): kind is ChangeConfig {
   return typeof kind === 'object' && typeof kind['ChangeConfig'] === 'object';
 }
@@ -218,7 +219,7 @@ export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
 
 export function getVotePolicy(
   policy: NearSputnikPolicy,
-  kind: NearSputnikProposalKind
+  kind: NearSputnikProposalKind,
 ): VotePolicy {
   try {
     const policyString = kindToPolicyLabel(kind);
@@ -259,7 +260,7 @@ export class NearSputnikVote implements IVote<NearToken> {
   constructor(
     member: NearAccount,
     choice: NearSputnikVoteString,
-    balance = new BN(1)
+    balance = new BN(1),
   ) {
     this.account = member;
     this.choice = choice;

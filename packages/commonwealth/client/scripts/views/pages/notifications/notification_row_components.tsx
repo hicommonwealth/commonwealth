@@ -40,6 +40,7 @@ export const ChainEventNotificationRow = (
   }
 
   const chainEvent: CWEvent = {
+    // @ts-expect-error <StrictNullChecks/>
     blockNumber: notification.chainEvent.blockNumber,
     network: notification.chainEvent.network,
     data: notification.chainEvent.data,
@@ -81,6 +82,7 @@ export const ChainEventNotificationRow = (
     proposalType = ProposalType.CompoundProposal;
   }
 
+  // @ts-expect-error <StrictNullChecks/>
   if (!proposalType) {
     return;
   }

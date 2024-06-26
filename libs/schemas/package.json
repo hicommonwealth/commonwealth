@@ -15,12 +15,12 @@
   },
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "clean": "rm -rf build && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/schemas"
   },
   "dependencies": {
-    "@hicommonwealth/shared": "*",
+    "@hicommonwealth/shared": "workspace:*",
     "moment": "^2.23.0",
     "zod": "^3.22.4"
   },

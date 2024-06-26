@@ -63,6 +63,7 @@ export const HeaderWithFilters = ({
   const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
+  // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
   const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
     useState(false);
@@ -119,6 +120,7 @@ export const HeaderWithFilters = ({
   const featuredTopics = (topics || [])
     .filter((t) => t.featuredInSidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
+    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
@@ -129,7 +131,7 @@ export const HeaderWithFilters = ({
 
   const contestNameOptions = (contestsData || []).map((contest) => ({
     label: contest?.name,
-    value: contest?.name,
+    value: contest?.contest_address,
     id: contest?.contest_address,
     type: 'contest',
   }));
@@ -285,6 +287,7 @@ export const HeaderWithFilters = ({
       )}
 
       {app.chain?.meta && (
+        // @ts-expect-error <StrictNullChecks/>
         <div className="filter-row" ref={filterRowRef}>
           <div className="filter-section">
             <p className="filter-label">Sort</p>
@@ -386,6 +389,7 @@ export const HeaderWithFilters = ({
                   })}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
+                      // @ts-expect-error <StrictNullChecks/>
                       [...featuredTopics, ...otherTopics].find(
                         (x) => x.id === item.id,
                       ),
@@ -395,12 +399,11 @@ export const HeaderWithFilters = ({
               )}
               {matchesContestFilterRoute ? (
                 <Select
-                  selected={urlParams.status || 'all-statuses'}
+                  selected={urlParams.status || 'all'}
                   onSelect={(item: any) =>
                     onFilterSelect({
                       filterKey: 'status',
-                      filterVal:
-                        item.value === 'all-statuses' ? '' : item.value,
+                      filterVal: item.value === 'all' ? '' : item.value,
                     })
                   }
                   options={[
@@ -412,12 +415,12 @@ export const HeaderWithFilters = ({
                     {
                       id: 1,
                       label: 'Past winners',
-                      value: 'past-winners',
+                      value: 'pastWinners',
                     },
                     {
                       id: 2,
                       label: 'All Statuses',
-                      value: 'all-statuses',
+                      value: 'all',
                     },
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
@@ -494,6 +497,7 @@ export const HeaderWithFilters = ({
           checked={isIncludingSpamThreads}
           label="Include posts flagged as spam"
           onChange={(e) => {
+            // @ts-expect-error <StrictNullChecks/>
             onIncludeSpamThreads(e.target.checked);
           }}
         />
@@ -503,6 +507,7 @@ export const HeaderWithFilters = ({
             checked={isIncludingArchivedThreads}
             label="Include archived posts"
             onChange={(e) => {
+              // @ts-expect-error <StrictNullChecks/>
               onIncludeArchivedThreads(e.target.checked);
             }}
           />
@@ -514,9 +519,11 @@ export const HeaderWithFilters = ({
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setTopicSelectedToEdit(null)}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
       />

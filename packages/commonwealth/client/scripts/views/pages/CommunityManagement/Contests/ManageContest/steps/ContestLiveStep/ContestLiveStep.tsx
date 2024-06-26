@@ -9,21 +9,24 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CopyAddressInput from '../../../CopyAddressInput';
 import FundContestDrawer from '../../../FundContestDrawer';
 
+import contestSuccess from 'assets/img/contestSuccess.png';
 import './ContestLiveStep.scss';
 
-const ContestLiveStep = () => {
+interface ContestLiveStepProps {
+  createdContestAddress: string;
+}
+
+const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const navigate = useCommonNavigate();
   const { animationStyles } = useAnimation();
 
-  const createdContestAddress = '0xb794f5ea0ba39494ce839613fffba74279579268';
-
   return (
     <>
       <CWPageLayout>
         <div className="ContestLiveStep" style={animationStyles}>
-          <img src="/static/img/contestSuccess.png" alt="" className="img" />
+          <img src={contestSuccess} alt="" className="img" />
           <CWText type="h4">Your contest is live!</CWText>
           <div className="content-container" style={animationStyles}>
             <CWText type="b1" className="description">

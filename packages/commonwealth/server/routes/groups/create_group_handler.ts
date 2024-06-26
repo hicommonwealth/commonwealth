@@ -28,9 +28,8 @@ export const createGroupHandler = async (
         description: z.string(),
         required_requirements: z.number().optional(),
       }),
-      requirements: z.array(z.any()), // validated in controller
+      requirements: z.array(z.any()).min(1), // validated in controller
       topics: z.array(z.number()).optional(),
-      allowList: z.array(z.number()).default([]),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -38,22 +37,24 @@ export const createGroupHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    body: { metadata, requirements, topics, allowList },
+    body: { metadata, requirements, topics },
   } = validationResult.data;
 
   const [group, analyticsOptions] = await controllers.groups.createGroup({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     community,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
-    allowList,
   });
 
   // Warning: keep for now, but should be a debounced async integration policy that get's triggered by creation events
   // refresh memberships in background
   controllers.groups
     .refreshCommunityMemberships({
+      // @ts-expect-error StrictNullChecks
       communityId: community.id,
       groupId: group.id,
     })

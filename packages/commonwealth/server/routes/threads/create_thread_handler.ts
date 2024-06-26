@@ -1,5 +1,12 @@
 import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
-import { verifyThread } from '../../../shared/canvas/serverVerify';
+import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
+import {
+  fromCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import { verifyThread } from 'shared/canvas/verify';
+import { addressSwapper } from 'shared/utils';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -12,9 +19,6 @@ type CreateThreadRequestBody = {
   stage: string;
   url?: string;
   readOnly: boolean;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
   discord_meta?: IDiscordMeta;
 };
 type CreateThreadResponse = ThreadAttributes;
@@ -33,39 +37,55 @@ export const createThreadHandler = async (
     stage,
     url,
     readOnly,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
     discord_meta,
   } = req.body;
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyThread(canvasAction, canvasSession, canvasHash, {
-      title,
-      body,
-      address: address.address,
-      community: community.id,
-      topic: topicId ? parseInt(topicId, 10) : null,
-    });
+  const threadFields: CreateThreadOptions = {
+    // @ts-expect-error <StrictNullChecks>
+    user,
+    // @ts-expect-error <StrictNullChecks>
+    address,
+    // @ts-expect-error <StrictNullChecks>
+    community,
+    title,
+    body,
+    kind,
+    readOnly,
+    topicId: parseInt(topicId, 10) || undefined,
+    stage,
+    url,
+    discordMeta: discord_meta,
+  };
+
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    threadFields.canvasSignedData = req.body.canvas_signed_data;
+    threadFields.canvasHash = req.body.canvas_hash;
+
+    if (config.ENFORCE_SESSION_KEYS) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+
+      await verifyThread(canvasSignedData, {
+        title,
+        body,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                // @ts-expect-error <StrictNullChecks>
+                address: address.address,
+              })
+            : // @ts-expect-error <StrictNullChecks>
+              address.address,
+        // @ts-expect-error <StrictNullChecks>
+        community: community.id,
+        topic: topicId ? parseInt(topicId, 10) : null,
+      });
+    }
   }
 
   const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread({
-      user,
-      address,
-      community,
-      title,
-      body,
-      kind,
-      readOnly,
-      topicId: parseInt(topicId, 10) || undefined,
-      stage,
-      url,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-      discordMeta: discord_meta,
-    });
+    await controllers.threads.createThread(threadFields);
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);

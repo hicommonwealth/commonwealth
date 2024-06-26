@@ -5,7 +5,7 @@ import {
   ProposalStatus,
   numberToLong,
 } from '@hicommonwealth/chains';
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { CommunityInstance } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { getCosmosClient } from './getCosmosClient';
@@ -29,12 +29,14 @@ export async function fetchLatestCosmosProposalV1(
       proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
       depositor: '',
       voter: '',
+      // @ts-expect-error StrictNullChecks
       pagination: nextKey ? ({ key: nextKey } as PageRequest) : undefined,
     });
     finalProposalsPage = proposals;
     if (pagination?.next_key) {
       if (Number(pagination.total) != 0) {
         const newNextKey = numberToUint8ArrayBE(Number(pagination.total));
+        // @ts-expect-error StrictNullChecks
         if (nextKey != newNextKey) {
           nextKey = newNextKey;
         } else {
@@ -45,9 +47,11 @@ export async function fetchLatestCosmosProposalV1(
 
     // TODO: temp fix to handle chains that return nextKey as a string instead of Uint8Array
     // Our v1 API needs to handle this better. To be addressed in #6610
+    // @ts-expect-error StrictNullChecks
     if (typeof nextKey === 'string') {
       nextKey = new Uint8Array(Buffer.from(nextKey, 'base64'));
     }
+    // @ts-expect-error StrictNullChecks
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
   if (finalProposalsPage.length > 0) {
@@ -79,6 +83,7 @@ export async function fetchUpToLatestCosmosProposalV1(
       const result = await client.proposal({
         proposalId: numberToLong(proposalId),
       });
+      // @ts-expect-error StrictNullChecks
       proposal = result.proposal;
     } catch (e) {
       if (!e.message.includes('Request failed with status code 404')) {
@@ -86,6 +91,7 @@ export async function fetchUpToLatestCosmosProposalV1(
       }
     }
 
+    // @ts-expect-error StrictNullChecks
     if (proposal) {
       proposals.push(proposal);
       proposalId++;

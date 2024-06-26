@@ -61,6 +61,7 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
           ) : (
             <User
               userAddress={proposal?.author?.address}
+              // @ts-expect-error StrictNullChecks
               userCommunityId={
                 proposal?.author?.community?.id ||
                 proposal?.author?.profile?.chain

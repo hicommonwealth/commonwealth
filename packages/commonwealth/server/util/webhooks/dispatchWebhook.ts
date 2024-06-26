@@ -1,5 +1,4 @@
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { logger, stats } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   WebhookInstance,
@@ -52,6 +51,7 @@ export async function dispatchWebhooks(
 
   // const communityId =
 
+  // @ts-expect-error StrictNullChecks
   const community: CommunityInstance | undefined =
     await models.Community.findOne({
       where: {
@@ -68,6 +68,7 @@ export async function dispatchWebhooks(
     switch (getWebhookDestination(webhook.url)) {
       case WebhookDestinations.Discord:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendDiscordWebhook(
             webhook.url,
             notification.categoryId,
@@ -80,6 +81,7 @@ export async function dispatchWebhooks(
         break;
       case WebhookDestinations.Slack:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendSlackWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           }),
@@ -87,6 +89,7 @@ export async function dispatchWebhooks(
         break;
       case WebhookDestinations.Telegram:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendTelegramWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           }),
@@ -94,6 +97,7 @@ export async function dispatchWebhooks(
         break;
       case WebhookDestinations.Zapier:
         webhookPromises.push(
+          // @ts-expect-error StrictNullChecks
           sendZapierWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           }),

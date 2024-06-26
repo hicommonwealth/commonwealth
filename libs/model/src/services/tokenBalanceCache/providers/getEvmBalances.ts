@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { fileURLToPath } from 'url';
 import Web3 from 'web3';

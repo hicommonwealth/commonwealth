@@ -1,24 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
+import app from 'state';
+import { useGetContestsQuery } from 'state/api/contests';
 import { useCommunityStake } from 'views/components/CommunityStake';
-
-import mockedContests from './mockedContests';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import { useFlag } from '../../../../hooks/useFlag';
 
 const useCommunityContests = () => {
+  const enabled = useFlag('contest');
   const { stakeEnabled } = useCommunityStake();
 
-  const { data: contestsData, isLoading: isContestDataLoading } = useQuery<
-    typeof mockedContests
-  >({
-    queryKey: ['contests'],
-    queryFn: () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(mockedContests);
-        }, 2000);
-      });
-    },
-  });
+  const { data: contestsData, isLoading: isContestDataLoading } =
+    useGetContestsQuery({ community_id: app.activeChainId(), enabled });
 
+  // @ts-expect-error StrictNullChecks
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;
 
   const getContestByAddress = (contestAddress: string) => {
@@ -30,8 +23,8 @@ const useCommunityContests = () => {
   return {
     stakeEnabled,
     isContestAvailable,
-    contestsData,
-    isContestDataLoading,
+    contestsData: contestsData as unknown as Contest[],
+    isContestDataLoading: isContestDataLoading && enabled,
     getContestByAddress,
   };
 };

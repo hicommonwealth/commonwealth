@@ -8,9 +8,11 @@ type GetPollVotesResponse = null;
 
 export const getPollVotesHandler = async (
   controllers: ServerControllers,
+  // @ts-expect-error StrictNullChecks
   req: TypedRequest<null, null, GetPollVotesParams>,
-  res: TypedResponse<GetPollVotesResponse>
+  res: TypedResponse<GetPollVotesResponse>,
 ) => {
+  // @ts-expect-error StrictNullChecks
   const { id: pollId } = req.params;
 
   const votes = await controllers.polls.getPollVotes({

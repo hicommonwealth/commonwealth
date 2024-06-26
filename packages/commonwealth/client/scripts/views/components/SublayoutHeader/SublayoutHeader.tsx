@@ -5,7 +5,6 @@ import useSidebarStore from 'state/ui/sidebar';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { AuthModalType } from 'views/modals/AuthModal';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import { FeedbackModal } from 'views/modals/feedback_modal';
 
 import DesktopHeader from './DesktopHeader';
 import MobileHeader from './MobileHeader';
@@ -21,11 +20,11 @@ export const SublayoutHeader = ({
   isInsideCommunity,
   onAuthModalOpen,
 }: SublayoutHeaderProps) => {
-  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const { menuVisible, setRecentlyUpdatedVisibility } = useSidebarStore();
   const [revalidationModalData, setRevalidationModalData] = useState<{
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
+    // @ts-expect-error <StrictNullChecks/>
   }>(null);
 
   useEffect(() => {
@@ -40,34 +39,25 @@ export const SublayoutHeader = ({
           onAuthModalOpen={onAuthModalOpen}
           isInsideCommunity={isInsideCommunity}
           onRevalidationModalData={setRevalidationModalData}
-          onFeedbackModalOpen={() => setIsFeedbackModalOpen(true)}
         />
       ) : (
         <DesktopHeader
           onMobile={onMobile}
           onAuthModalOpen={onAuthModalOpen}
           onRevalidationModalData={setRevalidationModalData}
-          onFeedbackModalOpen={() => setIsFeedbackModalOpen(true)}
         />
       )}
-
-      <CWModal
-        size="small"
-        content={
-          <FeedbackModal onModalClose={() => setIsFeedbackModalOpen(false)} />
-        }
-        onClose={() => setIsFeedbackModalOpen(false)}
-        open={isFeedbackModalOpen}
-      />
       <CWModal
         size="medium"
         content={
           <SessionRevalidationModal
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setRevalidationModalData(null)}
             walletSsoSource={revalidationModalData?.walletSsoSource}
             walletAddress={revalidationModalData?.walletAddress}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setRevalidationModalData(null)}
         open={!!revalidationModalData}
       />

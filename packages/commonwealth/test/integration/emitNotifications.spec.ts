@@ -10,7 +10,8 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { TestServer, testServer } from 'server-test';
-import { JWT_SECRET } from '../../server/config';
+import { afterAll, beforeAll, describe, test } from 'vitest';
+import { config } from '../../server/config';
 import emitNotifications from '../../server/util/emitNotifications';
 import { JoinCommunityArgs } from '../util/modelUtils';
 
@@ -40,7 +41,7 @@ describe('emitNotifications tests', () => {
 
   let server: TestServer;
 
-  before('Reset database', async () => {
+  beforeAll(async () => {
     server = await testServer();
 
     // creates 2 ethereum users
@@ -51,7 +52,10 @@ describe('emitNotifications tests', () => {
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
-    userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
+    userJWT = jwt.sign(
+      { id: userId, email: firstUser.email },
+      config.AUTH.JWT_SECRET,
+    );
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -64,7 +68,10 @@ describe('emitNotifications tests', () => {
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
-    userJWT2 = jwt.sign({ id: userId2, email: secondUser.email }, JWT_SECRET);
+    userJWT2 = jwt.sign(
+      { id: userId2, email: secondUser.email },
+      config.AUTH.JWT_SECRET,
+    );
     expect(userId2).to.not.be.null;
     expect(userAddress2).to.not.be.null;
     expect(userAddressId2).to.not.be.null;
@@ -90,6 +97,7 @@ describe('emitNotifications tests', () => {
     expect(isAdmin).to.not.be.null;
 
     // create a thread manually to bypass emitNotifications in-route
+    // @ts-expect-error StrictNullChecks
     thread = await server.models.Thread.create({
       community_id: chain,
       address_id: userAddressId2,
@@ -98,6 +106,7 @@ describe('emitNotifications tests', () => {
       kind,
     });
 
+    // @ts-expect-error StrictNullChecks
     comment = await server.models.Comment.create({
       thread_id: thread.id,
       address_id: userAddressId2,
@@ -106,6 +115,7 @@ describe('emitNotifications tests', () => {
     });
 
     //reaction = await server.models.Reaction.create({
+    // @ts-expect-error StrictNullChecks
     await server.models.Reaction.create({
       community_id: chain,
       thread_id: thread.id,
@@ -114,12 +124,12 @@ describe('emitNotifications tests', () => {
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
   describe('Forum Notifications', () => {
-    it('should generate a notification and notification reads for a new thread', async () => {
+    test('should generate a notification and notification reads for a new thread', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewThread,
@@ -150,7 +160,9 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(notif.thread_id).to.equal(thread.id);
+      // @ts-expect-error StrictNullChecks
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data),
       );
@@ -158,6 +170,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -171,10 +184,11 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
+      // @ts-expect-error StrictNullChecks
       expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
-    it('should generate a notification and notification reads for a thread comment', async () => {
+    test('should generate a notification and notification reads for a thread comment', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewComment,
@@ -205,7 +219,9 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(notif.thread_id).to.equal(thread.id);
+      // @ts-expect-error StrictNullChecks
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notifData),
       );
@@ -213,6 +229,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -226,15 +243,17 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
+      // @ts-expect-error StrictNullChecks
       expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
-    it('should generate a notification and notification reads for a new thread reaction', async () => {
+    test('should generate a notification and notification reads for a new thread reaction', async () => {
       let updatedThread = await server.models.Thread.findOne({
         where: {
           id: thread.id,
         },
       });
+      // @ts-expect-error StrictNullChecks
       const before_thread_max_notif_id = updatedThread.max_notif_id;
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
@@ -265,7 +284,9 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(notif.thread_id).to.equal(thread.id);
+      // @ts-expect-error StrictNullChecks
       expect(notif.toJSON().notification_data).to.deep.equal(
         JSON.stringify(notification_data),
       );
@@ -273,6 +294,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -287,10 +309,11 @@ describe('emitNotifications tests', () => {
           id: thread.id,
         },
       });
+      // @ts-expect-error StrictNullChecks
       expect(updatedThread.max_notif_id).to.equal(before_thread_max_notif_id);
     });
 
-    it('should generate a notification and notification read for a new mention', async () => {
+    test('should generate a notification and notification read for a new mention', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewMention,
@@ -318,11 +341,13 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(JSON.parse(notif.notification_data).thread_id).to.equal(thread.id);
 
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -331,7 +356,7 @@ describe('emitNotifications tests', () => {
       expect(notifRead).to.not.be.null;
     });
 
-    it('should generate a notification and notification read for a new collaboration', async () => {
+    test('should generate a notification and notification read for a new collaboration', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewCollaboration,
@@ -359,11 +384,13 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notif).to.not.be.null;
+      // @ts-expect-error StrictNullChecks
       expect(JSON.parse(notif.notification_data).thread_id).to.equal(thread.id);
 
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
           is_read: false,
@@ -374,7 +401,7 @@ describe('emitNotifications tests', () => {
   });
 
   describe('Snapshot Notifications', () => {
-    it('should generate a notification for a new snapshot proposal', async () => {
+    test('should generate a notification for a new snapshot proposal', async () => {
       const space = 'plutusclub.eth';
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
@@ -414,6 +441,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
         },
@@ -424,7 +452,7 @@ describe('emitNotifications tests', () => {
   });
 
   describe('Chain Event Notifications', () => {
-    it('should generate a notification and notification reads for a new chain event', async () => {
+    test('should generate a notification and notification reads for a new chain event', async () => {
       const subscription = await server.models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.ChainEvent,
@@ -460,6 +488,7 @@ describe('emitNotifications tests', () => {
       const notifRead = await server.models.NotificationsRead.findOne({
         where: {
           subscription_id: subscription.id,
+          // @ts-expect-error StrictNullChecks
           notification_id: notif.id,
           user_id: userId,
         },

@@ -1,6 +1,9 @@
-import { ServerError } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { EventNames, events, ServerError } from '@hicommonwealth/core';
+import { DB, emitEvent } from '@hicommonwealth/model';
+import { Comment, Thread } from '@hicommonwealth/schemas';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
+import { QueryTypes, Transaction } from 'sequelize';
+import z from 'zod';
 import { EmitOptions } from '../controllers/server_notifications_methods/emit';
 
 export type UserMention = {
@@ -9,8 +12,11 @@ export type UserMention = {
 };
 
 export type UserMentionQuery = {
+  address_id: number;
   address: string;
   user_id: number;
+  profile_id: number;
+  profile_name: string;
 }[];
 
 const hash = (mention: UserMention) =>
@@ -81,29 +87,34 @@ export const queryMentionedUsers = async (
   }
 
   try {
-    const mentionQueries = mentions.map(async ({ profileId, profileName }) => {
-      const result = await models.sequelize.query(
-        `
-        SELECT a.address, a.user_id
-        FROM "Addresses" as a
-        INNER JOIN "Profiles" as p ON a.profile_id = p.id
-        WHERE a.user_id IS NOT NULL AND p.id = :profileId AND p.profile_name = :profileName
-      `,
-        {
-          replacements: {
-            profileId,
-            profileName,
-          },
-        },
-      );
+    // Create an array of tuples for the replacements
+    const tuples = mentions.map(({ profileId, profileName }) => [
+      profileId,
+      profileName,
+    ]);
 
-      return result[0][0];
-    });
-    return (await Promise.all(mentionQueries)).filter(
-      (u) => !!u,
-    ) as UserMentionQuery;
+    return await models.sequelize.query<{
+      address_id: number;
+      address: string;
+      user_id: number;
+      profile_id: number;
+      profile_name: string;
+    }>(
+      `
+          SELECT a.id as address_id, a.address, a.user_id, p.id as profile_id, p.profile_name
+          FROM "Addresses" as a
+                   INNER JOIN "Profiles" as p ON a.profile_id = p.id
+          WHERE a.user_id IS NOT NULL
+            AND (p.id, p.profile_name) IN (:tuples)
+      `,
+      {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements: { tuples },
+      },
+    );
   } catch (e) {
-    throw new ServerError('Failed to parse mentions', e);
+    throw new ServerError('Failed to query mentioned users', e);
   }
 };
 
@@ -157,4 +168,49 @@ export const createThreadMentionNotifications = (
       excludeAddresses: [finalThread.Address.address],
     };
   }) as EmitOptions[];
+};
+
+type EmitMentionsData = {
+  authorAddressId: number;
+  authorUserId: number;
+  authorAddress: string;
+  authorProfileId: number;
+  mentions: UserMentionQuery;
+} & (
+  | {
+      thread: z.infer<typeof Thread>;
+    }
+  | {
+      comment: z.infer<typeof Comment>;
+    }
+);
+
+export const emitMentions = async (
+  models: DB,
+  transaction: Transaction,
+  data: EmitMentionsData,
+) => {
+  if (data.mentions.length) {
+    const values: {
+      event_name: EventNames.UserMentioned;
+      event_payload: z.infer<typeof events.UserMentioned>;
+    }[] = data.mentions.map(({ user_id }) => ({
+      event_name: EventNames.UserMentioned,
+      event_payload: {
+        authorAddressId: data.authorAddressId,
+        authorUserId: data.authorUserId,
+        authorAddress: data.authorAddress,
+        authorProfileId: data.authorProfileId,
+        mentionedUserId: user_id,
+        communityId:
+          'comment' in data
+            ? data.comment.community_id
+            : data.thread.community_id,
+        comment: 'comment' in data ? data.comment : undefined,
+        thread: 'thread' in data ? data.thread : undefined,
+      },
+    }));
+
+    await emitEvent(models.Outbox, values, transaction);
+  }
 };

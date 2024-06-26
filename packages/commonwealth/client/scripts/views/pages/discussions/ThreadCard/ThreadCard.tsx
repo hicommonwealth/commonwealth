@@ -1,11 +1,14 @@
-import { slugify } from '@hicommonwealth/shared';
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
+import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
+import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
-import { filterLinks } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
+import {
+  GetThreadActionTooltipTextResponse,
+  filterLinks,
+} from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -17,6 +20,7 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
+import { CommentCard } from '../CommentCard';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
 import './ThreadCard.scss';
@@ -32,8 +36,16 @@ type CardProps = AdminActionsProps & {
   showSkeleton?: boolean;
   canReact?: boolean;
   canComment?: boolean;
-  disabledActionsTooltipText?: string;
+  canUpdateThread?: boolean;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
+  hideRecentComments?: boolean;
+  hideReactionButton?: boolean;
+  hideUpvotesDrawer?: boolean;
+  maxRecentCommentsToDisplay?: number;
+  layoutType?: 'author-first' | 'community-first';
+  customStages?: string[];
+  editingDisabled?: boolean;
 };
 
 export const ThreadCard = ({
@@ -55,13 +67,21 @@ export const ThreadCard = ({
   showSkeleton,
   canReact = true,
   canComment = true,
+  canUpdateThread = true,
   disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
+  hideRecentComments = false,
+  hideReactionButton = false,
+  hideUpvotesDrawer = false,
+  maxRecentCommentsToDisplay = 2,
+  layoutType = 'author-first',
+  customStages,
+  editingDisabled,
 }: CardProps) => {
+  const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const contestsEnabled = useFlag('contest');
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -76,20 +96,17 @@ export const ThreadCard = ({
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin() ||
-    Permissions.isCommunityModerator();
+    // @ts-expect-error <StrictNullChecks/>
+    Permissions.isCommunityAdmin(null, thread.communityId) ||
+    // @ts-expect-error <StrictNullChecks/>
+    Permissions.isCommunityModerator(null, thread.communityId);
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
 
-  const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
-  );
-
-  const isStageDefault = isDefaultStage(thread.stage);
+  const isStageDefault = isDefaultStage(thread.stage, customStages);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
@@ -103,11 +120,13 @@ export const ThreadCard = ({
       isRecurring: true,
     },
   ];
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const showContestWinnerTag = false;
+  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
 
   return (
     <>
       <Link
+        // @ts-expect-error <StrictNullChecks/>
         to={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
@@ -116,12 +135,17 @@ export const ThreadCard = ({
         onClick={() => onBodyClick && onBodyClick()}
         key={thread.id}
       >
-        {!isWindowSmallInclusive && (
+        {!hideReactionButton && !isWindowSmallInclusive && (
           <ReactionButton
             thread={thread}
             size="big"
             disabled={!canReact}
-            tooltipText={disabledActionsTooltipText}
+            undoUpvoteDisabled={editingDisabled}
+            tooltipText={
+              typeof disabledActionsTooltipText === 'function'
+                ? disabledActionsTooltipText?.('upvote')
+                : disabledActionsTooltipText
+            }
           />
         )}
         <div className="content-wrapper">
@@ -136,11 +160,17 @@ export const ThreadCard = ({
                 lockedAt: thread.lockedAt.toISOString(),
               })}
               {...(thread.updatedAt && {
-                lastUpdated: thread.updatedAt.toISOString(),
+                lastUpdated: (
+                  thread?.lastEdited ||
+                  thread.createdAt ||
+                  thread.updatedAt
+                ).toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              // @ts-expect-error <StrictNullChecks/>
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
+              layoutType={layoutType}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -172,8 +202,16 @@ export const ThreadCard = ({
                 />
               )}
             </div>
-            <CWText type="caption" className="content-body">
-              <QuillRenderer doc={thread.plaintext} />
+            <CWText type="b1" className="content-body">
+              <QuillRenderer
+                doc={thread.plaintext}
+                cutoffLines={4}
+                customShowMoreButton={
+                  <CWText type="b1" className="show-more-btn">
+                    Show more
+                  </CWText>
+                }
+              />
             </CWText>
           </div>
           {isTagsRowVisible && (
@@ -185,8 +223,11 @@ export const ThreadCard = ({
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {
+                    // @ts-expect-error <StrictNullChecks/>
                     e.preventDefault();
+                    // @ts-expect-error <StrictNullChecks/>
                     e.stopPropagation();
+                    // @ts-expect-error <StrictNullChecks/>
                     await onStageTagClick(thread.stage);
                   }}
                 />
@@ -197,7 +238,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`Prop 
+                    label={`Prop
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
@@ -215,11 +256,12 @@ export const ThreadCard = ({
           >
             <ThreadOptions
               totalComments={thread.numberOfComments}
-              shareEndpoint={discussionLink}
+              shareEndpoint={`${window.location.origin}${threadHref}`}
               thread={thread}
-              upvoteBtnVisible={isWindowSmallInclusive}
+              upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
               commentBtnVisible={!thread.readOnly}
               canUpdateThread={
+                canUpdateThread &&
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
@@ -237,17 +279,63 @@ export const ThreadCard = ({
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
               onCommentBtnClick={onCommentBtnClick}
-              disabledActionTooltipText={disabledActionsTooltipText}
+              disabledActionsTooltipText={disabledActionsTooltipText}
               setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+              hideUpvoteDrawerButton={hideUpvotesDrawer}
+              editingDisabled={editingDisabled}
             />
           </div>
         </div>
       </Link>
-      <ViewThreadUpvotesDrawer
-        thread={thread}
-        isOpen={isUpvoteDrawerOpen}
-        setIsOpen={setIsUpvoteDrawerOpen}
-      />
+      {!hideRecentComments &&
+      maxRecentCommentsToDisplay &&
+      // @ts-expect-error <StrictNullChecks/>
+      thread?.recentComments?.length > 0 ? (
+        <div className={clsx('RecentComments', { hideReactionButton })}>
+          {[...(thread?.recentComments || [])]
+            ?.filter((recentComment) => !recentComment.deleted)
+            ?.slice?.(0, maxRecentCommentsToDisplay)
+            ?.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
+            ?.map((recentComment) => (
+              <Link
+                to={`${threadHref}?comment=${recentComment.id}`}
+                key={recentComment.id}
+                className="Comment"
+                onClick={() => onBodyClick && onBodyClick()}
+              >
+                <CommentCard
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  canReply={!disabledActionsTooltipText}
+                  replyBtnVisible
+                  hideReactButton
+                  comment={recentComment}
+                  isThreadArchived={!!thread.archivedAt}
+                  isSpam={!!recentComment.markedAsSpamAt}
+                  maxReplyLimitReached={false}
+                  viewUpvotesButtonVisible={false}
+                  shareURL={`${window.location.origin}${threadHref}?comment=${recentComment.id}`}
+                  onReply={() =>
+                    navigate(
+                      `${threadHref}?comment=${recentComment.id}`,
+                      {},
+                      null,
+                    )
+                  }
+                />
+              </Link>
+            ))}
+        </div>
+      ) : (
+        <></>
+      )}
+      {!hideUpvotesDrawer && (
+        <ViewThreadUpvotesDrawer
+          thread={thread}
+          isOpen={isUpvoteDrawerOpen}
+          setIsOpen={setIsUpvoteDrawerOpen}
+        />
+      )}
+      <CWDivider className="ThreadDivider" />
     </>
   );
 };

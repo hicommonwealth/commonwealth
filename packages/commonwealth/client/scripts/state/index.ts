@@ -13,7 +13,6 @@ import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
-import SessionsController from 'controllers/server/sessions';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
@@ -75,7 +74,6 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  sessions: SessionsController;
 
   // Web3
   snapshot: SnapshotController;
@@ -123,6 +121,7 @@ const roles = new RolesController(user);
 
 // INITIALIZE MAIN APP
 const app: IApp = {
+  // @ts-expect-error StrictNullChecks
   chain: null,
   activeChainId: () => app.chain?.id,
 
@@ -160,7 +159,6 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
 
@@ -180,8 +178,10 @@ const app: IApp = {
     return '/api';
   },
 
+  // @ts-expect-error StrictNullChecks
   loadingError: null,
 
+  // @ts-expect-error StrictNullChecks
   _customDomainId: null,
   isCustomDomain: () => app._customDomainId !== null,
   customDomainId: () => {

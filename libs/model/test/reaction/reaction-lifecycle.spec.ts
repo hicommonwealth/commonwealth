@@ -1,14 +1,15 @@
 import { dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { bootstrap_testing, seed } from 'model/src/tester';
+import { afterAll, beforeAll, describe, test } from 'vitest';
+import { models } from '../../src/database';
 
 describe('Reactions lifecycle', () => {
   const addressId = 555;
   const communityId = 'eee';
   const threadId = 999;
 
-  before(async () => {
+  beforeAll(async () => {
     await bootstrap_testing();
     const [chain] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
@@ -49,22 +50,24 @@ describe('Reactions lifecycle', () => {
         address_id: community?.Addresses?.at(0)?.id,
         topic_id: undefined,
         deleted_at: undefined, // so we can find it!
+        pinned: false,
+        read_only: false,
+        version_history: [],
       },
       //{ mock: true, log: true },
     );
   });
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
-  it('should create an outbox entry when a thread is liked', async () => {
+  test('should create an outbox entry when a thread is liked', async () => {
     await models.Reaction.create({
       community_id: communityId,
       address_id: addressId,
       thread_id: threadId,
       reaction: 'like',
-      canvas_action: '',
-      canvas_session: '',
+      canvas_signed_data: '',
       canvas_hash: '',
       calculated_voting_weight: 0,
     });

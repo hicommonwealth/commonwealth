@@ -10,6 +10,7 @@ import { validateOwner } from 'server/util/validateOwner';
 import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   createCommentMentionNotifications,
+  emitMentions,
   findMentionDiff,
   parseUserMentions,
   queryMentionedUsers,
@@ -91,6 +92,7 @@ export async function __updateComment(
   }
 
   const { latestVersion, versionHistory } = addVersionHistory(
+    // @ts-expect-error StrictNullChecks
     comment.version_history,
     commentBody,
     address,
@@ -107,16 +109,39 @@ export async function __updateComment(
     }
   })();
 
-  await this.models.Comment.update(
-    {
-      text,
-      plaintext,
-      version_history: versionHistory ?? undefined,
-    },
-    {
-      where: { id: comment.id },
-    },
+  const previousDraftMentions = parseUserMentions(latestVersion);
+  const currentDraftMentions = parseUserMentions(
+    decodeURIComponent(commentBody),
   );
+
+  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
+  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
+
+  await this.models.sequelize.transaction(async (transaction) => {
+    await this.models.Comment.update(
+      {
+        text,
+        plaintext,
+        version_history: versionHistory ?? undefined,
+      },
+      {
+        where: { id: comment.id },
+        transaction,
+      },
+    );
+
+    await emitMentions(this.models, transaction, {
+      // @ts-expect-error StrictNullChecks
+      authorAddressId: address.id,
+      // @ts-expect-error StrictNullChecks
+      authorUserId: user.id,
+      authorAddress: address.address,
+      // @ts-expect-error StrictNullChecks
+      authorProfileId: address.profile_id,
+      mentions: mentionedAddresses,
+      comment,
+    });
+  });
 
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
@@ -135,28 +160,27 @@ export async function __updateComment(
         thread_id: comment.thread_id,
         root_title,
         root_type: ProposalType.Thread,
+        // @ts-expect-error StrictNullChecks
         comment_id: +finalComment.id,
+        // @ts-expect-error StrictNullChecks
         comment_text: finalComment.text,
+        // @ts-expect-error StrictNullChecks
         community_id: finalComment.community_id,
+        // @ts-expect-error StrictNullChecks
         author_address: finalComment.Address.address,
+        // @ts-expect-error StrictNullChecks
         author_community_id: finalComment.Address.community_id,
       },
     },
+    // @ts-expect-error StrictNullChecks
     excludeAddresses: [finalComment.Address.address],
   });
-
-  const previousDraftMentions = parseUserMentions(latestVersion);
-  const currentDraftMentions = parseUserMentions(
-    decodeURIComponent(commentBody),
-  );
-
-  const mentions = findMentionDiff(previousDraftMentions, currentDraftMentions);
-  const mentionedAddresses = await queryMentionedUsers(mentions, this.models);
 
   allNotificationOptions.push(
     ...createCommentMentionNotifications(
       mentionedAddresses,
       finalComment,
+      // @ts-expect-error StrictNullChecks
       finalComment.Address,
     ),
   );
@@ -165,5 +189,6 @@ export async function __updateComment(
   address.last_active = new Date();
   address.save();
 
+  // @ts-expect-error StrictNullChecks
   return [finalComment.toJSON(), allNotificationOptions];
 }

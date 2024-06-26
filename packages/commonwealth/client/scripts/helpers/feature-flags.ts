@@ -7,7 +7,7 @@ import { InMemoryProvider } from '@openfeature/web-sdk';
 import { UnleashClient } from 'unleash-proxy-client';
 import { UnleashProvider } from '../../../shared/UnleashProvider';
 
-const buildFlag = (env: string) => {
+const buildFlag = (env: string | undefined) => {
   return {
     variants: {
       on: true,
@@ -19,19 +19,20 @@ const buildFlag = (env: string) => {
 };
 
 // WARN: for frontend work you MUST define these feature flags in
-// webpack.base.config.mjs or they won't be passed to the frontend.
+// vite.config.ts or they won't be passed to the frontend.
 const featureFlags = {
   allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
   contest: buildFlag(process.env.FLAG_CONTEST),
   proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
-  existingCommunityStakeIntegrationEnabled: buildFlag(
-    process.env.FLAG_EXISTING_COMMUNITY_STAKE_INTEGRATION_ENABLED,
-  ),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
   knockInAppNotifications: buildFlag(
-    process.env.FLAG_KNOCK_IN_APP_NOTIFICATIONS,
+    process.env.FLAG_KNOCK_INTEGRATION_ENABLED,
+  ),
+  contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
+  knockPushNotifications: buildFlag(
+    process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   ),
 };
 
@@ -45,5 +46,6 @@ const unleashConfig = {
 };
 
 export const openFeatureProvider = process.env.UNLEASH_FRONTEND_API_TOKEN
-  ? new UnleashProvider(new UnleashClient(unleashConfig))
+  ? // @ts-expect-error StrictNullChecks
+    new UnleashProvider(new UnleashClient(unleashConfig))
   : new InMemoryProvider(featureFlags);

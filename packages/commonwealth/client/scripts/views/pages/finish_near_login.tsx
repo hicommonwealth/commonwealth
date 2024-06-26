@@ -1,5 +1,3 @@
-import { createCanvasSessionPayload } from 'canvas';
-
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
@@ -17,6 +15,8 @@ import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { NEAR_MAINNET_CHAIN_ID } from 'shared/canvas/chainMappings';
+import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
@@ -39,6 +39,7 @@ const redirectToNextPage = (navigate) => {
   ) {
     // handle localStorage-based redirect after Github login (callback must occur within 1 day)
     try {
+      // @ts-expect-error <StrictNullChecks/>
       const postAuth = JSON.parse(localStorage.getItem('nearPostAuthRedirect'));
 
       if (
@@ -80,11 +81,11 @@ const FinishNearLogin = () => {
         app.user.selectedCommunity ||
         app.config.chains.getById(app.activeChainId());
 
-      // create canvas thing
-      const chainId = 'mainnet';
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
-        chainId,
+        NEAR_MAINNET_CHAIN_ID,
         acct.address,
       );
 
@@ -92,15 +93,18 @@ const FinishNearLogin = () => {
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
+        // @ts-expect-error <StrictNullChecks/>
         null, // no wallet sso source
         community.id,
         sessionPublicAddress,
         null,
       );
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const canvasSessionPayload = createCanvasSessionPayload(
         'near' as ChainBase,
-        chainId,
+        NEAR_MAINNET_CHAIN_ID,
         acct.address,
         sessionPublicAddress,
         +new Date(),
@@ -109,26 +113,31 @@ const FinishNearLogin = () => {
 
       setIsNewAccount(newAcct.newlyCreated);
       // account = newAcct.account;
+      // @ts-expect-error <StrictNullChecks/>
       acct.setValidationToken(newAcct.account.validationToken);
       acct.setWalletId(WalletId.NearWallet);
+      // @ts-expect-error <StrictNullChecks/>
       acct.setAddressId(newAcct.account.addressId);
       acct.setSessionPublicAddress(sessionPublicAddress);
+      // @ts-expect-error <StrictNullChecks/>
       acct.setValidationBlockInfo(null);
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasSessionPayload),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        canvas.serializeCanvasPayload(canvasSessionPayload),
       );
 
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
-        chainId,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        NEAR_MAINNET_CHAIN_ID,
       );
 
-      app.sessions
-        .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, acct.address, canvasSessionPayload, signature);
+      await verifySession(canvasSessionPayload);
 
       if (!app.isLoggedIn()) {
         await initAppState();
@@ -236,6 +245,7 @@ const FinishNearLogin = () => {
       </>
     );
   } else if (validationCompleted) {
+    // @ts-expect-error <StrictNullChecks/>
     if (validatedAccount.profile.name) {
       redirectToNextPage(navigate);
     } else {
@@ -243,6 +253,7 @@ const FinishNearLogin = () => {
         if (!app.isLoggedIn()) {
           setIsModalOpen(true);
         } else {
+          // @ts-expect-error <StrictNullChecks/>
           completeClientLogin(validatedAccount).then(() => {
             redirectToNextPage(navigate);
           });
@@ -260,6 +271,7 @@ const FinishNearLogin = () => {
           redirectToNextPage(navigate);
         }}
         onSuccess={() => setIsModalOpen(false)}
+        // @ts-expect-error <StrictNullChecks/>
         showWalletsFor={validatedAccount.walletId as any}
       />
     );

@@ -1,5 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signDeleteComment } from 'client/scripts/controllers/server/sessions';
+import Comment from 'models/Comment';
+import { IUniqueId } from 'models/interfaces';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
@@ -19,13 +23,12 @@ const deleteComment = async ({
   commentId,
   canvasHash,
 }: DeleteCommentProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
-    comment_id: canvasHash,
-  });
+  const canvasSignedData = await signDeleteComment(
+    app.user.activeAccount.address,
+    {
+      comment_id: canvasHash,
+    },
+  );
 
   await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
     data: {
@@ -46,9 +49,7 @@ const deleteComment = async ({
       text: '[deleted]',
       plaintext: '[deleted]',
       versionHistory: [],
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   };
 };
@@ -96,6 +97,16 @@ const useDeleteCommentMutation = ({
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,
       });
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        {
+          recentComments: [
+            { id: response.softDeleted.id },
+          ] as Comment<IUniqueId>[],
+        },
+        'removeFromExisting',
+      );
       return response;
     },
   });

@@ -111,7 +111,9 @@ export default async (
   for (const nr of notificationsRead) {
     let chainEvent;
     // if the Notification instance defines a chain_event_id then this is a chain-event notification so parse it
+    // @ts-expect-error StrictNullChecks
     if (nr.Notification.category_id === 'chain-event') {
+      // @ts-expect-error StrictNullChecks
       chainEvent = JSON.parse(nr.Notification.notification_data);
     }
     // creates an object for each subscription for which we have a NotificationsRead instance.
@@ -152,6 +154,7 @@ export default async (
   const subscriptions = [];
   for (const sub_id in subscriptionsObj) {
     if (subscriptionsObj[sub_id]) {
+      // @ts-expect-error StrictNullChecks
       subscriptions.push(subscriptionsObj[sub_id]);
     }
   }

@@ -45,6 +45,7 @@ export const CreateTopicSection = () => {
     try {
       await createTopic({
         name: values.topicName,
+        // @ts-expect-error <StrictNullChecks/>
         description: values.topicDescription,
         featuredInSidebar,
         featuredInNewPost: false,
@@ -57,6 +58,7 @@ export const CreateTopicSection = () => {
   };
 
   const handleInputValidation = (text: string): [ValidationStatus, string] => {
+    // @ts-expect-error <StrictNullChecks/>
     const currentCommunityTopicNames = topics.map((t) => t.name.toLowerCase());
 
     if (currentCommunityTopicNames.includes(text.toLowerCase())) {
@@ -71,7 +73,7 @@ export const CreateTopicSection = () => {
   };
 
   useMemo(() => {
-    if (descriptionDelta?.ops[0]?.insert?.length > 250) {
+    if ((descriptionDelta?.ops || [])?.[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
       setDescErrorMsg(null);
@@ -95,6 +97,7 @@ export const CreateTopicSection = () => {
               setName(e.target.value);
               handleInputValidation(e.target.value.trim());
             }}
+            // @ts-expect-error <StrictNullChecks/>
             customError={nameErrorMsg}
             autoFocus
           />
@@ -106,7 +109,7 @@ export const CreateTopicSection = () => {
           />
           <div className="description-char-count">
             <CWText type="caption">
-              {descriptionDelta.ops[0].insert.length} / 250
+              {descriptionDelta?.ops?.[0].insert.length / 250 || 0}
             </CWText>
           </div>
           <CWText type="caption">
@@ -133,6 +136,7 @@ export const CreateTopicSection = () => {
         </div>
         <div className="actions">
           <MessageRow
+            // @ts-expect-error <StrictNullChecks/>
             statusMessage={descErrorMsg}
             hasFeedback={!!descErrorMsg}
             validationStatus={descErrorMsg ? 'failure' : undefined}

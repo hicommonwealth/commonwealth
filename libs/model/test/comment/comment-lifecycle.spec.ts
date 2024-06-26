@@ -1,18 +1,17 @@
 import { dispose } from '@hicommonwealth/core';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { seedDb } from '../../src/tester';
 
-chai.use(chaiAsPromised);
-
 describe('Comment lifecycle', () => {
-  before(async () => {
+  beforeAll(async () => {
     await seedDb();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
+
+  test('should show correct stack traces', async () => {});
 
   // TODO: Add comment tests
 });
