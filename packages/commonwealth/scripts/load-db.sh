@@ -22,8 +22,11 @@ psql -h localhost -d commonwealth -U commonwealth -f "$DUMP_NAME";
 
 if [ "$ETH_ALCHEMY_API_KEY" ]
 then
-  ETH_ALCHEMY_URL="https://eth-mainnet.g.alchemy.com/v2"
-  psql -h localhost -d commonwealth -U commonwealth -c "UPDATE \"ChainNodes\" SET url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY', alt_wallet_url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY', private_url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY' WHERE url LIKE '%alchemy%';"
+  psql -h localhost -d commonwealth -U commonwealth -c "UPDATE \"ChainNodes\"
+                                                                SET url = regexp_replace(url, '\\/([^\\/]*)$', '/$ETH_ALCHEMY_API_KEY'),
+                                                                    alt_wallet_url = regexp_replace(url, '\\/([^\\/]*)$', '/$ETH_ALCHEMY_API_KEY'),
+                                                                    private_url = regexp_replace(url, '\\/([^\\/]*)$', '/$ETH_ALCHEMY_API_KEY')
+                                                                WHERE url LIKE '%.g.alchemy%' OR private_url LIKE '%.g.alchemy%';"
 else
   echo "You don't have the correct env var set so the Alchemy API urls were not updated"
 fi
