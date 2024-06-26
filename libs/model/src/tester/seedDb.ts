@@ -21,7 +21,7 @@ export const seedDb = async () => {
   try {
     const models = await bootstrap_testing(true);
 
-    const [drew] = await models.User.bulkCreate([
+    await models.User.bulkCreate([
       {
         email: 'drewstone329@gmail.com',
         emailVerified: true,

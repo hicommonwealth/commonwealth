@@ -225,8 +225,6 @@ export async function __createThreadComment(
     rootNotifExcludeAddresses.push(parentComment.Address.address);
   }
 
-  const root_title = thread.title || '';
-
   // update author last saved (in background)
   address.last_active = new Date();
   address.save();
