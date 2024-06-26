@@ -1,5 +1,4 @@
 import { ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -12,23 +11,13 @@ import type {
 import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
-import { SESSION_EXPIRY_MILLIS } from '../../session';
-import { ETH_RPC, JWT_SECRET } from '../config';
+import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-
-dotenv.config();
-
-const KNOCK_SIGNING_KEY = process.env.KNOCK_SIGNING_KEY;
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
 
 type ThreadCountQueryData = {
   communityId: string;
@@ -73,6 +62,7 @@ const getCommunityStatus = async (models: DB) => {
   } = {};
   for (const community of communities) {
     if (community.category !== null) {
+      // @ts-expect-error StrictNullChecks
       communityCategories[community.id] =
         community.category as CommunityCategoryType[];
     }
@@ -122,6 +112,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ]);
 
   // look up my roles & private communities
+  // @ts-expect-error StrictNullChecks
   const myAddressIds: number[] = Array.from(
     addresses.map((address) => address.id),
   );
@@ -290,6 +281,8 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
+      promotional_emails_enabled: user.promotional_emails_enabled,
+      is_welcome_onboard_flow_complete: user.is_welcome_onboard_flow_complete,
       jwt: '',
       knockJwtToken: '',
       addresses,
@@ -322,8 +315,8 @@ export const status = async (
       return success(res, {
         notificationCategories,
         recentThreads: threadCountQueryData,
-        evmTestEnv: ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        evmTestEnv: config.EVM.ETH_RPC,
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     } else {
@@ -344,25 +337,27 @@ export const status = async (
         communityCategories,
         threadCountQueryData,
       } = communityStatus;
-      const { roles, user, id, email } = userStatus;
+      const { roles, user, id } = userStatus;
 
-      const jwtToken = jwt.sign({ id, email }, JWT_SECRET, {
-        expiresIn: SESSION_EXPIRY_MILLIS / 1000,
+      const jwtToken = jwt.sign({ id }, config.AUTH.JWT_SECRET, {
+        expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
 
+      // @ts-expect-error StrictNullChecks
       const knockJwtToken = await computeKnockJwtToken(user.id);
 
       user.jwt = jwtToken as string;
-      user.knockJwtToken = knockJwtToken;
+      user.knockJwtToken = knockJwtToken!;
 
       return success(res, {
         notificationCategories,
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
+        // @ts-expect-error StrictNullChecks
         user: { ...user, profileId: profileInstance.id },
-        evmTestEnv: ETH_RPC,
-        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
+        evmTestEnv: config.EVM.ETH_RPC,
+        enforceSessionKeys: config.ENFORCE_SESSION_KEYS,
         communityCategoryMap: communityCategories,
       });
     }
@@ -376,14 +371,11 @@ export const status = async (
  * We have to generate a JWT token for use by the frontend Knock SDK.
  */
 async function computeKnockJwtToken(userId: number) {
-  if (KNOCK_SIGNING_KEY) {
+  if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
     return await Knock.signUserToken(`${userId}`, {
-      signingKey: KNOCK_SIGNING_KEY,
-      expiresInSeconds: SESSION_EXPIRY_MILLIS / 1000,
+      signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
+      expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
     });
-  } else {
-    log.warn('No process.env.KNOCK_SIGNING_KEY defined ');
-    return '';
   }
 }
 
@@ -392,6 +384,7 @@ type CommunityActivity = [communityId: string, timestamp: string | null][];
 function getCommunityActivity(
   addresses: AddressInstance[],
 ): Promise<CommunityActivity> {
+  // @ts-expect-error StrictNullChecks
   return Promise.all(
     addresses.map(async (address) => {
       const { community_id, last_active } = address;

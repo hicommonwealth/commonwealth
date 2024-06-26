@@ -48,4 +48,34 @@
     align-items: center;
     width: 100%;
   }
+
+  .allowlist-table {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: -10px;
+
+    .table-spacing {
+      padding-right: 80px;
+      padding-top: 10px;
+    }
+
+    .user-info {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: black;
+
+      :hover,
+      :focus,
+      :visited {
+        text-decoration: underline;
+      }
+    }
+
+    .pagination-buttons {
+      padding-top: 10px;
+    }
+  }
 }

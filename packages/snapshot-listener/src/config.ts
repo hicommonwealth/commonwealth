@@ -1,11 +1,11 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { config as target } from '@hicommonwealth/adapters';
 
-export const NODE_ENV = process.env.NODE_ENV || 'development';
-export const RABBITMQ_URI = (() => {
-  if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    return 'amqp://127.0.0.1';
-  } else return process.env.CLOUDAMQP_URL;
-})();
+const { PORT, SL_PORT } = process.env;
 
-export const DEFAULT_PORT = '8001';
+export const config = {
+  ...target,
+  PORT:
+    target.NODE_ENV !== 'production'
+      ? parseInt(SL_PORT ?? '8001', 10)
+      : parseInt(PORT, 10),
+};

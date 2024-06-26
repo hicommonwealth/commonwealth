@@ -37,6 +37,7 @@ export type AdminActionsProps = {
   onEditConfirm?: () => any;
   onEditCancel?: () => any;
   hasPendingEdits?: boolean;
+  editingDisabled?: boolean;
 };
 
 export const AdminActions = ({
@@ -52,6 +53,7 @@ export const AdminActions = ({
   onEditCancel,
   onEditConfirm,
   hasPendingEdits,
+  editingDisabled,
 }: AdminActionsProps) => {
   const navigate = useCommonNavigate();
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
@@ -203,9 +205,10 @@ export const AdminActions = ({
     })
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
-        onLockToggle(!thread?.readOnly);
+        onLockToggle?.(!thread?.readOnly);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         notifyError('Could not update thread read_only');
       });
   };
@@ -219,7 +222,7 @@ export const AdminActions = ({
     })
       .then(() => {
         notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
-        onPinToggle && onPinToggle(!thread.pinned);
+        onPinToggle?.(!thread.pinned);
       })
       .catch(() => {
         notifyError('Could not update pinned state');
@@ -308,12 +311,14 @@ export const AdminActions = ({
               ? [
                   {
                     label: 'Edit',
+                    disabled: editingDisabled,
                     iconLeft: 'write' as const,
                     iconLeftWeight: 'bold' as const,
                     onClick: handleEditThread,
                   },
                   {
                     label: 'Edit collaborators',
+                    disabled: editingDisabled,
                     iconLeft: 'write' as const,
                     iconLeftWeight: 'bold' as const,
                     onClick: () => {
@@ -342,6 +347,7 @@ export const AdminActions = ({
                         },
                         {
                           onClick: () => setIsChangeTopicModalOpen(true),
+                          disabled: editingDisabled,
                           label: 'Change topic',
                           iconLeft: 'filter' as const,
                           iconLeftWeight: 'bold' as const,
@@ -379,6 +385,7 @@ export const AdminActions = ({
                           iconLeftWeight: 'bold' as const,
                           onClick: () => {
                             const snapshotSpaces = app.chain.meta.snapshot;
+                            // @ts-expect-error StrictNullChecks
                             onSnapshotProposalFromThread();
                             navigate(
                               snapshotSpaces.length > 1
@@ -411,6 +418,7 @@ export const AdminActions = ({
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',
+                    disabled: editingDisabled,
                     iconLeft: 'trash' as const,
                     iconLeftWeight: 'bold' as const,
                     className: 'danger',
@@ -459,6 +467,7 @@ export const AdminActions = ({
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
+            // @ts-expect-error StrictNullChecks
             onCollaboratorsUpdated={onCollaboratorsEdit}
           />
         }

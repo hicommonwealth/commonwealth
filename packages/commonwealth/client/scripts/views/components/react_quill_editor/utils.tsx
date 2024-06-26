@@ -98,7 +98,7 @@ export const uploadFileToS3 = async (
 
     // upload the file via the signed URL
     await axios.put(signedUploadUrl, compressedFile, {
-      params: {
+      headers: {
         'Content-Type': file.type,
       },
     });
@@ -232,9 +232,8 @@ const formatOpsInsert = (currentLine, formattingAttrs) => {
 
 export const RTFtoMD = (delta: DeltaStatic) => {
   let mdString = '';
-
-  delta.ops.forEach((currentLine, index) => {
-    const nextLine = delta.ops[index + 1];
+  (delta?.ops || []).forEach((currentLine, index) => {
+    const nextLine = delta.ops?.[index + 1];
 
     const onlyNewLinesRegex = /^(\n+)$/g;
     const currentIsNewLineInsert = onlyNewLinesRegex.test(currentLine.insert);

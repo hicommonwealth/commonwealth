@@ -55,6 +55,7 @@ const CreateCommunity = () => {
           <BasicInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
+            // @ts-expect-error <StrictNullChecks/>
             handleSelectedChainId={setSelectedChainId}
             handleGoBack={() => onChangeStep(false)}
             handleContinue={handleCompleteBasicInformationStep}
@@ -68,6 +69,7 @@ const CreateCommunity = () => {
             createdCommunityName={createdCommunityName}
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
+            // @ts-expect-error <StrictNullChecks/>
             chainId={selectedChainId}
           />
         );

@@ -9,7 +9,7 @@ Link Previews are implemented using the Open Graph Standard: [https://ogp.me/](h
 To get link previews, you will need to do the following:
 
 1. In `database.ts` comment out the line `ssl: { rejectUnauthorized: false },`
-2. Build the site: `yarn build`
+2. Build the site: `pnpm build`
 3. Run against the built site in the packages/commonwealth folder with:
 
     ```bash

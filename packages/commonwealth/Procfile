@@ -3,4 +3,4 @@ consumer: cd packages/commonwealth && node --import=extensionless/register --max
 evm-ce: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/evmChainEvents/startEvmPolling.js
 knock: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/knockWorker.js
 message-relayer: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/workers/messageRelayer/messageRelayer.js
-release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json
+release: cd packages/commonwealth && node --import=extensionless/register --max-old-space-size=$(../../scripts/get-max-old-space-size.sh) build/server/scripts/releasePhaseEnvCheck.js && npx sequelize-cli db:migrate --config server/sequelize.json

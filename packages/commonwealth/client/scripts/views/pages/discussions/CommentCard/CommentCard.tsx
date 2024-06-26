@@ -1,32 +1,33 @@
-import type { Action, Session } from '@canvas-js/interfaces';
-import { verify } from 'canvas';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 
+import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
+import { SharePopover } from 'client/scripts/views/components/SharePopover';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
 } from 'client/scripts/views/components/UpvoteDrawer';
+import clsx from 'clsx';
 import type Comment from 'models/Comment';
+import { verify } from 'shared/canvas';
+import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { SharePopover } from 'views/components/share_popover';
-import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
 type CommentCardProps = {
-  disabledActionsTooltipText?: string;
+  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -45,6 +46,8 @@ type CommentCardProps = {
   maxReplyLimitReached: boolean;
   // Reaction
   canReact?: boolean;
+  hideReactButton?: boolean;
+  viewUpvotesButtonVisible?: boolean;
   // Spam
   isSpam?: boolean;
   onSpamToggle?: () => any;
@@ -52,6 +55,9 @@ type CommentCardProps = {
   // actual comment
   comment: Comment<any>;
   isThreadArchived: boolean;
+  // other
+  className?: string;
+  shareURL: string;
 };
 
 export const CommentCard = ({
@@ -74,6 +80,8 @@ export const CommentCard = ({
   maxReplyLimitReached,
   // reaction
   canReact,
+  hideReactButton = false,
+  viewUpvotesButtonVisible = true,
   // spam
   isSpam,
   onSpamToggle,
@@ -81,60 +89,57 @@ export const CommentCard = ({
   // actual comment
   comment,
   isThreadArchived,
+  // other
+  className,
+  shareURL,
 }: CommentCardProps) => {
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = deserializeDelta(
     (editDraft || commentText) ?? comment.text,
   );
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
-  const author = comment?.author
-    ? app.chain.accounts.get(comment?.author)
-    : null;
+  const author =
+    comment?.author && app?.chain?.accounts
+      ? app.chain.accounts.get(comment?.author)
+      : null;
 
-  const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
-    useState<boolean>(false);
-  const [verifiedAction, setVerifiedAction] = useState<Action>();
-  const [verifiedSession, setVerifiedSession] = useState<Session>();
+  const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
+    useState<CanvasSignedData | null>(null);
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  useEffect(() => {
+  const doVerify = useCallback(async () => {
     try {
-      // suppress "unexpected error while verifying" error message on non-synced comments
-      if (!comment.canvasSession || !comment.canvasAction) return;
-      const session: Session = JSON.parse(comment.canvasSession);
-      const action: Action = JSON.parse(comment.canvasAction);
-      const actionSignerAddress = session?.payload?.sessionAddress;
-      if (
-        !comment.canvasSession ||
-        !comment.canvasAction ||
-        !actionSignerAddress
-      )
-        return;
-      verify({ session })
-        .then(() => setVerifiedSession(session))
-        .catch((err) => console.log('Could not verify session', err.stack));
-      verify({ action, actionSignerAddress })
-        .then(() => setVerifiedAction(action))
-        .catch((err) => console.log('Could not verify action', err.stack));
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        comment.canvasSignedData,
+      );
+      await verify(canvasSignedData);
+      setVerifiedCanvasSignedData(canvasSignedData);
     } catch (err) {
       console.log('Unexpected error while verifying action/session');
       return;
     }
-  }, [comment.canvasAction, comment.canvasSession]);
+  }, [comment.canvasSignedData]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    doVerify();
+  }, [doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
   };
 
   return (
-    <div className="comment-body">
+    <div className={clsx('comment-body', className)}>
       <div className="comment-header">
         {comment.deleted ? (
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorAddress={author?.address}
+            // @ts-expect-error <StrictNullChecks/>
+            authorAddress={app.chain ? author?.address : comment?.author}
+            // @ts-expect-error <StrictNullChecks/>
             authorCommunityId={author?.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
@@ -162,6 +167,7 @@ export const CommentCard = ({
                 const hasContentChanged =
                   JSON.stringify(commentBody) !== JSON.stringify(commentDelta);
 
+                // @ts-expect-error <StrictNullChecks/>
                 onEditCancel(hasContentChanged);
               }}
             />
@@ -172,6 +178,7 @@ export const CommentCard = ({
               onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                // @ts-expect-error <StrictNullChecks/>
                 await onEditConfirm(commentDelta);
               }}
             />
@@ -185,29 +192,36 @@ export const CommentCard = ({
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton
-                comment={comment}
-                disabled={!canReact}
-                tooltipText={
-                  disabledActionsTooltipText ? 'Join community to upvote' : ''
-                }
-                onReaction={handleReaction}
-              />
+              {!hideReactButton && (
+                <CommentReactionButton
+                  comment={comment}
+                  disabled={!canReact}
+                  tooltipText={
+                    typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('upvote')
+                      : disabledActionsTooltipText
+                  }
+                  onReaction={handleReaction}
+                />
+              )}
 
-              <ViewUpvotesDrawerTrigger
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsUpvoteDrawerOpen(true);
-                }}
-              />
+              {viewUpvotesButtonVisible && (
+                <>
+                  <ViewUpvotesDrawerTrigger
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsUpvoteDrawerOpen(true);
+                    }}
+                  />
+                  <ViewCommentUpvotesDrawer
+                    comment={comment}
+                    isOpen={isUpvoteDrawerOpen}
+                    setIsOpen={setIsUpvoteDrawerOpen}
+                  />
+                </>
+              )}
 
-              <ViewCommentUpvotesDrawer
-                comment={comment}
-                isOpen={isUpvoteDrawerOpen}
-                setIsOpen={setIsUpvoteDrawerOpen}
-              />
-
-              <SharePopover commentId={comment.id} />
+              <SharePopover linkToShare={shareURL} buttonLabel="Share" />
 
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
@@ -215,26 +229,29 @@ export const CommentCard = ({
                   label="Reply"
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
-                    disabledActionsTooltipText
-                      ? 'Join community to reply'
-                      : canReply && maxReplyLimitReached
+                    (typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('reply')
+                      : disabledActionsTooltipText) ||
+                    (canReply && maxReplyLimitReached
                       ? 'Nested reply limit reached'
-                      : ''
+                      : '')
                   }
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    // @ts-expect-error <StrictNullChecks/>
                     await onReply();
                   }}
                 />
               )}
 
-              {!isThreadArchived && (canEdit || canDelete) && (
+              {!isThreadArchived && (canEdit || canDelete || canToggleSpam) && (
                 <PopoverMenu
                   className="CommentActions"
                   renderTrigger={(onClick) => (
                     <CWThreadAction action="overflow" onClick={onClick} />
                   )}
+                  // @ts-expect-error <StrictNullChecks/>
                   menuItems={[
                     canEdit && {
                       label: 'Edit',
@@ -259,27 +276,24 @@ export const CommentCard = ({
                 />
               )}
 
-              {isCanvasVerifyModalVisible && (
-                <CWModal
-                  size="medium"
-                  content={
-                    <CanvasVerifyDataModal
-                      obj={comment}
-                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                    />
-                  }
-                  onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                  open={isCanvasVerifyModalVisible}
-                />
-              )}
-              {verifiedAction && verifiedSession && (
+              {verifiedCanvasSignedData && (
                 <CWText
                   type="caption"
                   fontWeight="medium"
                   className="verification-icon"
-                  onClick={() => setIsCanvasVerifyDataModalVisible(true)}
                 >
-                  <CWIcon iconName="check" iconSize="xs" />
+                  <CWTooltip
+                    placement="top"
+                    content="Signed by author"
+                    renderTrigger={(handleInteraction) => (
+                      <span
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      >
+                        <CWIcon iconName="check" iconSize="xs" />
+                      </span>
+                    )}
+                  ></CWTooltip>
                 </CWText>
               )}
             </div>

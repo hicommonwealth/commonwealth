@@ -17,6 +17,7 @@ import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSte
 import InputsShowcase from 'views/pages/ComponentsShowcase/components/Inputs.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
+import PaginationsShowcase from 'views/pages/ComponentsShowcase/components/Paginations.showcase';
 import PopoversShowcase from 'views/pages/ComponentsShowcase/components/Popovers.showcase';
 import ProgressBarsShowcase from 'views/pages/ComponentsShowcase/components/ProgressBars.showcase';
 import RadioButtonsShowcase from 'views/pages/ComponentsShowcase/components/RadioButtons.showcase';
@@ -62,6 +63,7 @@ export const ComponentPageName = {
   Breadcrumbs: 'Breadcrumbs',
   Dropdowns: 'Dropdowns',
   Inputs: 'Inputs',
+  Paginations: 'Paginations',
 };
 
 export const ComponentType = {
@@ -223,6 +225,11 @@ export const componentItems = [
   {
     ComponentPage: InputsShowcase,
     displayName: ComponentPageName.Inputs,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: PaginationsShowcase,
+    displayName: ComponentPageName.Paginations,
     type: ComponentType.Components,
   },
 ];

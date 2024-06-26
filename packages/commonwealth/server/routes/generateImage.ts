@@ -1,13 +1,15 @@
-import AWS from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AppError } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { DB, formatS3Url } from '@hicommonwealth/model';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
+// @ts-expect-error StrictNullChecks
 let openai: OpenAI = undefined;
 
 try {
@@ -55,7 +57,7 @@ const generateImage = async (
     throw new AppError('Problem Generating Image!');
   }
 
-  const s3 = new AWS.S3();
+  const s3 = new S3();
   const resp = await fetch(image);
   const buffer = await resp.buffer();
   const params = {
@@ -67,8 +69,12 @@ const generateImage = async (
 
   let imageUrl = '';
   try {
-    const upload = await s3.upload(params).promise();
-    imageUrl = upload.Location;
+    const upload = await new Upload({
+      client: s3,
+      params,
+    }).done();
+    // @ts-expect-error StrictNullChecks
+    imageUrl = formatS3Url(upload.Location);
   } catch (e) {
     console.log(e);
     throw new AppError('Problem uploading image!');

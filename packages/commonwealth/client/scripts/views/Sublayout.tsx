@@ -1,4 +1,5 @@
 import 'Sublayout.scss';
+import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -13,13 +14,13 @@ import { useFlag } from '../hooks/useFlag';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
-import { useWelcomeOnboardModal } from '../state/ui/modals';
-import { Footer } from './Footer';
+import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -30,17 +31,14 @@ type SublayoutProps = {
   isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
-const Sublayout = ({
-  children,
-  hideFooter = true,
-  isInsideCommunity,
-}: SublayoutProps) => {
+const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const { isLoggedIn } = useUserLoggedIn();
   const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const [authModalType, setAuthModalType] = useState<AuthModalType>();
+  const [profileId, setProfileId] = useState(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: userOnboardingEnabled,
@@ -50,37 +48,45 @@ const Sublayout = ({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
+  const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
 
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+  useEffect(() => {
+    if (triggerOpenModalType) {
+      setAuthModalType(triggerOpenModalType);
+      // @ts-expect-error StrictNullChecks
+      setTriggerOpenModalType(undefined);
+    }
+  }, [triggerOpenModalType, setTriggerOpenModalType]);
 
-  const {
-    onboardedProfiles,
-    setProfileAsOnboarded,
-    isWelcomeOnboardModalOpen,
-    setIsWelcomeOnboardModalOpen,
-  } = useWelcomeOnboardModal();
+  const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
+    useWelcomeOnboardModal();
+
+  useEffect(() => {
+    let timeout = null;
+    if (isLoggedIn) {
+      // @ts-expect-error StrictNullChecks
+      timeout = setTimeout(() => {
+        // @ts-expect-error StrictNullChecks
+        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
+      }, 100);
+    } else {
+      setProfileId(null);
+    }
+
+    return () => {
+      if (timeout !== null) clearTimeout(timeout);
+    };
+  }, [isLoggedIn]);
 
   useNecessaryEffect(() => {
     if (
       isLoggedIn &&
       userOnboardingEnabled &&
       !isWelcomeOnboardModalOpen &&
-      profileId
+      profileId &&
+      !app.user.isWelcomeOnboardFlowComplete
     ) {
-      // if a single user address has a set `username` (not defaulting to `Anonymous`), then user is onboarded
-      const hasUsername = app?.user?.addresses?.find(
-        (addr) => addr?.profile?.name && addr.profile?.name !== 'Anonymous',
-      );
-
-      // open welcome modal if user is not onboarded
-      if (!hasUsername && !onboardedProfiles[profileId]) {
-        setIsWelcomeOnboardModalOpen(true);
-      }
-
-      // if the user has a set username, mark as onboarded
-      if (hasUsername && !onboardedProfiles[profileId]) {
-        setProfileAsOnboarded(profileId);
-      }
+      setIsWelcomeOnboardModalOpen(true);
     }
 
     if (!isLoggedIn && isWelcomeOnboardModalOpen) {
@@ -88,7 +94,6 @@ const Sublayout = ({
     }
   }, [
     profileId,
-    onboardedProfiles,
     userOnboardingEnabled,
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
@@ -102,6 +107,16 @@ const Sublayout = ({
   });
 
   const routesWithoutGenericBreadcrumbs = matchRoutes(
+    [
+      { path: '/discussions/*' },
+      { path: ':scope/discussions/*' },
+      { path: '/archived' },
+      { path: ':scope/archived' },
+    ],
+    location,
+  );
+
+  const routesWithoutGenericSliders = matchRoutes(
     [
       { path: '/discussions/*' },
       { path: ':scope/discussions/*' },
@@ -134,7 +149,9 @@ const Sublayout = ({
   }, [resizing]);
 
   const chain = app.chain ? app.chain.meta : null;
+  // @ts-expect-error StrictNullChecks
   const terms = app.chain ? chain.terms : null;
+  // @ts-expect-error StrictNullChecks
   const banner = app.chain ? chain.communityBanner : null;
 
   return (
@@ -142,14 +159,16 @@ const Sublayout = ({
       {!isWindowSmallInclusive && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
         />
       )}
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
+        // @ts-expect-error StrictNullChecks
         isInsideCommunity={isInsideCommunity}
         onAuthModalOpen={(modalType) =>
-          setAuthModalType(modalType || 'sign-in')
+          setAuthModalType(modalType || AuthModalType.SignIn)
         }
       />
       <AuthModal
@@ -159,6 +178,7 @@ const Sublayout = ({
       />
       <div className="sidebar-and-body-container">
         <Sidebar
+          // @ts-expect-error StrictNullChecks
           isInsideCommunity={isInsideCommunity}
           onMobile={isWindowExtraSmall}
         />
@@ -176,6 +196,7 @@ const Sublayout = ({
             resizing,
           )}
         >
+          {/* @ts-expect-error StrictNullChecks */}
           <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
           <div className="Body">
@@ -192,11 +213,21 @@ const Sublayout = ({
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {userOnboardingEnabled && <UserTrainingSlider />}
-            {isInsideCommunity && <AdminOnboardingSlider />}
+            {userOnboardingEnabled && !routesWithoutGenericSliders && (
+              <UserTrainingSlider />
+            )}
+            {isInsideCommunity && !routesWithoutGenericSliders && (
+              <AdminOnboardingSlider />
+            )}
             {children}
-            {!app.isCustomDomain() && !hideFooter && <Footer />}
           </div>
+          <CWGrowlTemplate
+            headerText="Shape the Future of Crypto with Ideacoin!"
+            bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
+            buttonText="Take the Survey for an NFT"
+            buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
+            growlImage={ideacoinSurveyGrowlImage}
+          />
         </div>
         {userOnboardingEnabled && (
           <WelcomeOnboardModal

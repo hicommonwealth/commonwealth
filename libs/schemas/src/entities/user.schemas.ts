@@ -12,6 +12,8 @@ export const User = z.object({
     .enum(['weekly', 'never'])
     .default('never')
     .optional(),
+  promotional_emails_enabled: z.boolean().optional(),
+  is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
 });

@@ -3,8 +3,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { EventNames, stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import {
   emitEvent,
   fetchNewSnapshotProposal,
@@ -15,7 +14,7 @@ import express, { json } from 'express';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
 import v8 from 'v8';
-import { DEFAULT_PORT } from './config';
+import { config } from './config';
 import {
   methodNotAllowedMiddleware,
   registerRoute,
@@ -43,7 +42,6 @@ log.info(
 );
 
 export const app = express();
-const port = process.env.PORT || DEFAULT_PORT;
 app.use(json() as RequestHandler);
 
 registerRoute(app, 'get', '/', (req: Request, res: Response) => {
@@ -123,7 +121,10 @@ registerRoute(app, 'post', '/snapshot', async (req: Request, res: Response) => {
 
 app.use(methodNotAllowedMiddleware());
 
-app.listen(port, async () => {
-  log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
+app.listen(config.PORT, async () => {
+  log.info(
+    `⚡️[server]: Server is running at https://localhost:${config.PORT}`,
+  );
+  config.NODE_ENV !== 'production' && console.log(config);
   isServiceHealthy = true;
 });

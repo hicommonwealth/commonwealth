@@ -16,7 +16,7 @@ class ChainInfo {
   public readonly CommunityStakes: StakeInfo[];
   public CommunityTags: Tag[];
   public readonly tokenName: string;
-  public readonly threadCount: number;
+  public threadCount: number;
   public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;
@@ -125,6 +125,7 @@ class ChainInfo {
     this.CommunityTags = CommunityTags;
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
+    // @ts-expect-error StrictNullChecks
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;

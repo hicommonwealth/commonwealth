@@ -1,6 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
-import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
+import {
+  fromCanvasSignedDataApiArgs,
+  hasCanvasSignedDataApiArgs,
+} from 'shared/canvas/types';
+import { verifyReaction } from 'shared/canvas/verify';
+import { addressSwapper } from 'shared/utils';
+import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 
@@ -10,12 +17,7 @@ const Errors = {
 };
 
 type CreateCommentReactionRequestParams = { id: string };
-type CreateCommentReactionRequestBody = {
-  reaction: string;
-  canvas_action?: any;
-  canvas_session?: any;
-  canvas_hash?: any;
-};
+type CreateCommentReactionRequestBody = { reaction: string };
 type CreateCommentReactionResponse = ReactionAttributes;
 
 export const createCommentReactionHandler = async (
@@ -28,41 +30,55 @@ export const createCommentReactionHandler = async (
   res: TypedResponse<CreateCommentReactionResponse>,
 ) => {
   const { user, address } = req;
-  const {
-    reaction,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
-    canvas_hash: canvasHash,
-  } = req.body;
+  // @ts-expect-error <StrictNullChecks>
+  const { reaction } = req.body;
 
   if (!reaction) {
     throw new AppError(Errors.InvalidReaction);
   }
 
+  // @ts-expect-error StrictNullChecks
   const commentId = parseInt(req.params.id, 10);
   if (!commentId) {
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
-    await verifyReaction(canvasAction, canvasSession, canvasHash, {
-      comment_id: commentId,
-      address: address.address,
-      value: reaction,
-    });
+  const commentReactionFields: CreateCommentReactionOptions = {
+    // @ts-expect-error <StrictNullChecks>
+    user,
+    // @ts-expect-error <StrictNullChecks>
+    address,
+    reaction,
+    commentId,
+  };
+
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    commentReactionFields.canvasSignedData = req.body.canvas_signed_data;
+    commentReactionFields.canvasHash = req.body.canvas_hash;
+
+    if (config.ENFORCE_SESSION_KEYS) {
+      const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+
+      await verifyReaction(canvasSignedData, {
+        comment_id: commentId,
+        address:
+          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
+          'polkadot'
+            ? addressSwapper({
+                currentPrefix: 42,
+                // @ts-expect-error <StrictNullChecks>
+                address: address.address,
+              })
+            : // @ts-expect-error <StrictNullChecks>
+              address.address,
+        value: reaction,
+      });
+    }
   }
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
-    await controllers.comments.createCommentReaction({
-      user,
-      address,
-      reaction,
-      commentId,
-      canvasAction,
-      canvasSession,
-      canvasHash,
-    });
+    await controllers.comments.createCommentReaction(commentReactionFields);
 
   // emit notifications
   for (const n of notificationOptions) {

@@ -21,6 +21,7 @@ import {
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import Long from 'long';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
@@ -38,14 +39,15 @@ const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${idV1}`;
 describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1-local)', () => {
   let lcd: LCD;
   let signer: string;
-  before(async () => {
+
+  beforeAll(async () => {
     await tester.seedDb();
     lcd = await getLCDClient(lcdUrl);
     const { signerAddress } = await setupTestSigner(rpcUrl);
     signer = signerAddress;
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -91,6 +93,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+    // @ts-expect-error StrictNullChecks
     const rawLog = JSON.parse(resp.rawLog);
     const submitProposalEvent = rawLog[0]?.events?.find(
       (e) => e['type'] === 'submit_proposal',
@@ -124,23 +127,23 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   };
 
   describe('Direct Signer', () => {
-    it('creates a text proposal', async () => {
+    test('creates a text proposal', async () => {
       const content = encodeTextProposal(`v1 title`, `v1 description`);
       await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal');
     });
-    it('votes NO on an active proposal', async () => {
+    test('votes NO on an active proposal', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_NO);
     });
-    it('votes NO WITH VETO on an active proposal', async () => {
+    test('votes NO WITH VETO on an active proposal', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_NO_WITH_VETO);
     });
-    it('votes ABSTAIN on an active proposal', async () => {
+    test('votes ABSTAIN on an active proposal', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_ABSTAIN);
     });
-    it('votes YES on an active proposal', async () => {
+    test('votes YES on an active proposal', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_YES);
     });
-    it('creates a community spend proposal', async () => {
+    test('creates a community spend proposal', async () => {
       const content = encodeCommunitySpend(
         `v1 spend title`,
         `v1 spend description`,
@@ -155,25 +158,25 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     });
   });
   describe('Amino Signer', () => {
-    it('creates a text proposal with legacy amino', async () => {
+    test('creates a text proposal with legacy amino', async () => {
       const content = encodeTextProposal(`v1 title`, `v1 description`);
       await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal', true);
     });
-    it('votes NO on an active proposal with legacy amino', async () => {
+    test('votes NO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_NO, true);
     });
-    it('votes NO WITH VETO on an active proposal with legacy amino', async () => {
+    test('votes NO WITH VETO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_NO_WITH_VETO, true);
     });
-    it('votes ABSTAIN on an active proposal with legacy amino', async () => {
+    test('votes ABSTAIN on an active proposal with legacy amino', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_ABSTAIN, true);
     });
-    it('votes YES on an active proposal with legacy amino', async () => {
+    test('votes YES on an active proposal with legacy amino', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_YES, true);
     });
     // TODO: Unsupported. Un-skip this in
     // https://github.com/hicommonwealth/commonwealth/issues/4821
-    it.skip('creates a community spend proposal with legacy amino', async () => {
+    test.skip('creates a community spend proposal with legacy amino', async () => {
       const content = encodeCommunitySpend(
         `v1 spend title amino`,
         `v1 spend description amino`,
@@ -192,7 +195,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   // Cosmos gov v1 query tests
   describe('Cosmos Governance v1 util Tests (csdk-v1-local)', () => {
     describe('getActiveProposals', () => {
-      it('should fetch active proposals', async () => {
+      test('should fetch active proposals', async () => {
         const proposals = await getActiveProposalsV1(lcd);
         expect(proposals.length).to.be.greaterThan(0);
 
@@ -208,7 +211,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     });
 
     describe('getCompletedProposals', () => {
-      it('should fetch completed proposals', async () => {
+      test('should fetch completed proposals', async () => {
         const proposals = await getCompletedProposalsV1(lcd);
 
         proposals.forEach((proposal) => {

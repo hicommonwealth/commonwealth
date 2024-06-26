@@ -1,12 +1,12 @@
-import { MutableRefObject, useEffect } from 'react';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { MutableRefObject, useEffect } from 'react';
 
 // There is no way to apply styles to first element of wrapped element with CSS.
 // This function calculates when the AuthorAndPublishInfo container is becoming
 // multiline and applies the left margin to the first element of each line except
 // the first element in the first line.
 const applyLeftMarginToItems = (
-  containerRef: MutableRefObject<HTMLDivElement>
+  containerRef: MutableRefObject<HTMLDivElement>,
 ) => {
   const container = containerRef.current;
 
@@ -32,6 +32,7 @@ const applyLeftMarginToItems = (
     } else {
       // Apply 'unset' left margin for elements that used to be first, but
       // eg after screen resize, they are not first element in line anymore.
+      // @ts-expect-error <StrictNullChecks/>
       (child as HTMLDivElement).style.marginLeft = index > 0 && 'unset';
     }
   });
@@ -44,7 +45,7 @@ const applyLeftMarginToItems = (
 // screen is changing its size, to make sure that the layout is updated correctly.
 
 const useAuthorMetadataCustomWrap = (
-  containerRef: MutableRefObject<HTMLDivElement>
+  containerRef: MutableRefObject<HTMLDivElement>,
 ) => {
   useEffect(() => {
     applyLeftMarginToItems(containerRef);

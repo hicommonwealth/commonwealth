@@ -1,4 +1,9 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import shape1Url from 'assets/img/shapes/shape1.svg';
+import shape3Url from 'assets/img/shapes/shape3.svg';
+import shape4Url from 'assets/img/shapes/shape4.svg';
+import shape5Url from 'assets/img/shapes/shape5.svg';
+import shape6Url from 'assets/img/shapes/shape6.svg';
 import { useFlag } from 'hooks/useFlag';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -20,31 +25,31 @@ import { DismissModal } from './DismissModal';
 
 const CARD_TYPES = {
   'launch-contest': {
-    iconURL: '/static/img/shapes/shape1.svg',
+    iconURL: shape1Url,
     title: 'Launch a contest',
     description: 'Get your community engaged by launching a weekly contest',
     ctaText: 'Launch contest',
   },
   'create-topic': {
-    iconURL: '/static/img/shapes/shape3.svg',
+    iconURL: shape3Url,
     title: 'Create a topic',
     description: 'Add custom topics to keep your discussions organized',
     ctaText: 'Create topic',
   },
   'make-group': {
-    iconURL: '/static/img/shapes/shape4.svg',
+    iconURL: shape4Url,
     title: 'Make a group',
     description: 'Set user access permissions with custom parameters',
     ctaText: 'Make group',
   },
   'enable-integrations': {
-    iconURL: '/static/img/shapes/shape5.svg',
+    iconURL: shape5Url,
     title: 'Enable integrations',
     description: 'Integrate your Discord, Snapshot, webhooks, etc.',
     ctaText: 'Integrate apps',
   },
   'create-thread': {
-    iconURL: '/static/img/shapes/shape6.svg',
+    iconURL: shape6Url,
     title: 'Create a thread',
     description: 'Organize your discussions with topics',
     ctaText: 'Create thread',
@@ -168,7 +173,7 @@ export const AdminOnboardingSlider = () => {
                 description={CARD_TYPES['launch-contest'].description}
                 iconURL={CARD_TYPES['launch-contest'].iconURL}
                 iconAlt="launch-contest-icon"
-                isActionCompleted={contestsData.length > 0}
+                isActionCompleted={contestsData?.length > 0}
                 onCTAClick={() => redirectToPage('launch-contest')}
               />
             )}

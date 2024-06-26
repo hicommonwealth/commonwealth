@@ -23,7 +23,6 @@ import { fetchActivity } from './helpers';
 export enum DashboardViews {
   ForYou = 'For You',
   Global = 'Global',
-  Chain = 'Chain',
 }
 
 type UserDashboardProps = {
@@ -68,11 +67,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [loggedIn, navigate, type]);
 
   const subpage: DashboardViews =
-    type === 'chain-events'
-      ? DashboardViews.Chain
-      : type === 'global'
-      ? DashboardViews.Global
-      : loggedIn
+    loggedIn && type !== 'global'
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 
@@ -88,6 +83,7 @@ const UserDashboard = (props: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
+        {/*@ts-expect-error StrictNullChecks*/}
         <div ref={setScrollElement} className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
@@ -112,13 +108,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                     navigate('/dashboard/global');
                   }}
                 />
-                <CWTab
-                  label={DashboardViews.Chain}
-                  isSelected={activePage === DashboardViews.Chain}
-                  onClick={() => {
-                    navigate('/dashboard/chain-events');
-                  }}
-                />
               </CWTabsRow>
             </div>
             <>
@@ -127,6 +116,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="Join some communities to see Activity!"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
               )}
@@ -135,16 +125,8 @@ const UserDashboard = (props: UserDashboardProps) => {
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="No Activity"
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                  // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
-                />
-              )}
-              {activePage === DashboardViews.Chain && (
-                <Feed
-                  fetchData={() => fetchActivity(activePage)}
-                  noFeedMessage="Join some communities that have governance to see Chain Events!"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
-                  customScrollParent={scrollElement}
-                  isChainEventsRow={true}
                 />
               )}
             </>

@@ -1,21 +1,15 @@
-import { AppError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
-import type { DB } from '@hicommonwealth/model';
+import { AppError, logger } from '@hicommonwealth/core';
+import { type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { fileURLToPath } from 'url';
-import {
-  LOGIN_RATE_LIMIT_MINS,
-  LOGIN_RATE_LIMIT_TRIES,
-  MAGIC_DEFAULT_CHAIN,
-  MAGIC_SUPPORTED_BASES,
-  SENDGRID_API_KEY,
-} from '../config';
+import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+// @ts-expect-error StrictNullChecks
+sgMail.setApiKey(config.SENDGRID.API_KEY);
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
 
@@ -68,18 +62,21 @@ const startEmailLogin = async (
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
+  const context = req.body.chain
+    ? req.body
+    : { chain: config.AUTH.MAGIC_DEFAULT_CHAIN };
   const [chain] = await validateCommunity(models, context);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
   const isExistingMagicUser =
+    // @ts-expect-error StrictNullChecks
     previousUser && previousUser.Addresses?.length > 0;
   if (
     isExistingMagicUser || // existing magic users should always use magic login, even if they're in the wrong community
     (isNewRegistration &&
       magicChain?.base &&
-      MAGIC_SUPPORTED_BASES.includes(magicChain.base) &&
+      config.AUTH.MAGIC_SUPPORTED_BASES.includes(magicChain.base) &&
       !req.body.forceEmailLogin)
   ) {
     return res.json({
@@ -96,21 +93,24 @@ const startEmailLogin = async (
     where: {
       email,
       created_at: {
-        $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate(),
+        $gte: moment()
+          .subtract(config.LOGIN_RATE_LIMIT_MINS, 'minutes')
+          .toDate(),
       },
     },
   });
-  if (recentTokens.count >= LOGIN_RATE_LIMIT_TRIES) {
+  if (recentTokens.count >= config.LOGIN_RATE_LIMIT_TRIES) {
     return res.json({
       status: 'Error',
       message:
         "You've tried to sign in several times already. " +
-        `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
+        `Check your spam folder, or wait ${config.LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
     });
   }
 
   // create and email the token
   const path = req.body.path;
+  // @ts-expect-error StrictNullChecks
   const tokenObj = await models.LoginToken.createForEmail(email, path);
 
   const loginLink = `${protocol}://${hostname}/api/finishLogin?token=${

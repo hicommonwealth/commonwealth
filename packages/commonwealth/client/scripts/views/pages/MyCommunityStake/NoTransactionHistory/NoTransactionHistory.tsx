@@ -1,3 +1,4 @@
+import noTransactionHistory from 'assets/img/noTransactionHistory.svg';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
@@ -10,10 +11,7 @@ const NoTransactionHistory = () => {
   return (
     <section className="NoTransactionHistory">
       <div className="container">
-        <img
-          src="/static/img/noTransactionHistory.svg"
-          alt="no transaction history icon"
-        />
+        <img src={noTransactionHistory} alt="no transaction history icon" />
         <div className="labels">
           <CWText type="h4" fontWeight="semiBold">
             You have not purchased stake in any communities

@@ -6,18 +6,12 @@
     "outDir": "build",
     "jsx": "react",
     "sourceMap": true,
+    "strictNullChecks": true,
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
-      "*": ["./*", "shared/*", "client/scripts/*"]
-    }
-  },
-  "tsc-alias": {
-    "replacers": {
-      "webpack": {
-        "enabled": true,
-        "file": "./webpackReplacer.cjs"
-      }
-    }
+      "*": ["./*", "shared/*", "client/scripts/*", "client/assets/*"]
+    },
+    "types": ["vite/client"]
   },
   "include": [
     "client",
@@ -34,7 +28,6 @@
     { "path": "../../libs/chains/tsconfig.build.json" },
     { "path": "../../libs/core/tsconfig.build.json" },
     { "path": "../../libs/model/tsconfig.build.json" },
-    { "path": "../../libs/logging/tsconfig.build.json" },
     { "path": "../../libs/schemas/tsconfig.build.json" },
     { "path": "../../libs/shared/tsconfig.build.json" },
     { "path": "../../libs/evm-testing/tsconfig.build.json" }

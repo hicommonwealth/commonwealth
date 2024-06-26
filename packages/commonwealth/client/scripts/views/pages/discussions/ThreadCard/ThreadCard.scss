@@ -81,6 +81,8 @@
       .content-body {
         @include multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
+        font-size: 16px !important;
+        overflow: hidden;
 
         @include extraSmall {
           overflow: hidden !important;
@@ -89,10 +91,16 @@
 
         .MarkdownFormattedText {
           @include caption;
+          overflow: hidden;
+          --line-height: 20px;
+
+          & > div {
+            overflow: hidden;
+          }
 
           @include extraSmall {
             p {
-              line-height: 18px !important;
+              line-height: calc(var(--line-height) - 2) !important;
             }
           }
 
@@ -100,8 +108,46 @@
           h2,
           h3,
           h4,
-          h5 {
-            font-size: 12px;
+          h5,
+          p,
+          a,
+          span,
+          div {
+            font-size: 16px !important;
+            line-height: var(--line-height) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: black !important;
+          }
+
+          strong {
+            font-weight: 500;
+          }
+
+          img {
+            display: none;
+          }
+
+          &.collapsed {
+            div :last-child {
+              color: transparent !important;
+              background: linear-gradient(
+                180deg,
+                rgba(2, 0, 36, 1) 0%,
+                rgba(40, 39, 39, 1) 10%,
+                rgb(179, 174, 180) 100%
+              );
+              background-clip: text;
+            }
+          }
+        }
+
+        .show-more-btn {
+          padding-top: 4px;
+          color: $primary-500 !important;
+
+          &:hover {
+            text-decoration: underline;
           }
         }
       }
@@ -118,6 +164,7 @@
 
         .Text {
           display: inline-block;
+          font-weight: 500 !important;
 
           .Tag.contest {
             display: inline-block;
@@ -167,4 +214,46 @@
       }
     }
   }
+}
+
+.RecentComments {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 8px 72px;
+  padding-left: 8px;
+  border-left: 1px solid $neutral-200 !important;
+
+  @include extraSmall {
+    margin-left: 32px;
+  }
+
+  &.hideReactionButton {
+    margin: 8px 0 8px 48px;
+  }
+
+  .Comment:hover {
+    text-decoration: none;
+    color: unset;
+  }
+
+  .comment-body {
+    padding: 12px;
+    border-radius: 6px;
+
+    &:hover {
+      background: $neutral-50;
+      text-decoration: none;
+      color: unset;
+      cursor: pointer;
+    }
+
+    .comment-content {
+      padding-left: 0px !important;
+    }
+  }
+}
+
+.ThreadDivider {
+  margin-top: 0 !important;
 }

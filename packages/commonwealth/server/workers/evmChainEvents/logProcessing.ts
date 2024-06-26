@@ -1,6 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { stats } from '@hicommonwealth/core';
-import { logger as _logger } from '@hicommonwealth/logging';
+import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
@@ -200,6 +199,7 @@ export async function migrateEvents(
           };
         }
         contracts[contractAddress].sources.push(source);
+        // @ts-expect-error StrictNullChecks
         if (!oldestBlock || oldestBlock > source.created_at_block) {
           oldestBlock = source.created_at_block;
         }
@@ -213,10 +213,12 @@ export async function migrateEvents(
         rpc: evmSource.rpc,
         contracts,
       },
+      // @ts-expect-error StrictNullChecks
       oldestBlock,
       endingBlockNum,
     );
     logger.info('Events migrated', {
+      // @ts-expect-error StrictNullChecks
       startingBlockNum: oldestBlock,
       endingBlockNum,
     });

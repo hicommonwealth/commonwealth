@@ -1,8 +1,5 @@
 import app from 'client/scripts/state';
-import {
-  useFetchSelfProfileQuery,
-  useUpdateProfileByAddressMutation,
-} from 'client/scripts/state/api/profiles';
+import { useUpdateProfileByAddressMutation } from 'client/scripts/state/api/profiles';
 import {
   PreferenceTags,
   usePreferenceTags,
@@ -22,16 +19,13 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
   const { mutateAsync: updateProfile, isLoading: isUpdatingProfile } =
     useUpdateProfileByAddressMutation();
 
-  useFetchSelfProfileQuery({
-    apiCallEnabled: true,
-    updateAddressesOnSuccess: true,
-  });
-
   const handleSavePreferences = () => {
     if (isUpdatingProfile) return;
 
     updateProfile({
+      // @ts-expect-error <StrictNullChecks/>
       address: app.user.activeAccount?.profile?.address,
+      // @ts-expect-error <StrictNullChecks/>
       chain: app.user.activeAccount?.profile?.chain,
       tagIds: preferenceTags
         .filter((tag) => tag.isSelected)

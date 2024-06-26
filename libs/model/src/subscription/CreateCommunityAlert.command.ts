@@ -13,7 +13,7 @@ export function CreateCommunityAlert(): Command<
       const { 0: alert } = await models.CommunityAlert.findOrCreate({
         where: {
           user_id: actor.user.id!,
-          ...payload,
+          community_id: payload.community_id,
         },
       });
       return alert.get({ plain: true });

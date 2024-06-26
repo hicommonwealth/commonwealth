@@ -23,6 +23,7 @@ type UpdateNewProfileReq = {
   avatarUrl: string;
   socials: string;
   backgroundImage: string;
+  promotionalEmailsEnabled?: boolean;
   tag_ids?: number[];
 };
 type UpdateNewProfileResp = {
@@ -38,6 +39,7 @@ const updateNewProfile = async (
 ) => {
   const profile = await models.Profile.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       user_id: req.user.id,
     },
   });
@@ -52,12 +54,14 @@ const updateNewProfile = async (
     avatarUrl,
     socials,
     backgroundImage,
+    promotionalEmailsEnabled,
     tag_ids,
   } = req.body;
 
   let { bio } = req.body;
   bio = sanitizeQuillText(bio);
 
+  // @ts-expect-error StrictNullChecks
   if (profile.user_id !== req.user.id) {
     return next(new Error(Errors.NotAuthorized));
   }
@@ -72,16 +76,38 @@ const updateNewProfile = async (
       ...(avatarUrl && { avatar_url: avatarUrl }),
       ...(socials && { socials: JSON.parse(socials) }),
       ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
+      ...(typeof promotionalEmailsEnabled === 'boolean' && {
+        promotional_emails_enabled: promotionalEmailsEnabled,
+      }),
     },
     {
       where: {
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
       returning: true,
     },
   );
 
+  // @ts-expect-error StrictNullChecks
   await updateTags(tag_ids, models, profile.id, 'profile_id');
+
+  if (process.env.FLAG_USER_ONBOARDING_ENABLED === 'true') {
+    const DEFAULT_NAME = 'Anonymous';
+    const isProfileNameUnset =
+      !profile.profile_name || profile.profile_name === DEFAULT_NAME;
+
+    if (
+      name &&
+      name !== DEFAULT_NAME &&
+      isProfileNameUnset &&
+      req.user &&
+      !req.user.is_welcome_onboard_flow_complete
+    ) {
+      req.user.is_welcome_onboard_flow_complete = true;
+      await req.user.save();
+    }
+  }
 
   if (!updateStatus || !rows) {
     return failure(res.status(400), {

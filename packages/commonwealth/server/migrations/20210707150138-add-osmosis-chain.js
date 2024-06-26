@@ -21,7 +21,7 @@ module.exports = {
             github: 'https://github.com/osmosis-labs/osmosis',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -33,7 +33,7 @@ module.exports = {
             url: 'https://lcd-osmosis.keplr.app',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -43,12 +43,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'osmosis' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['osmosis'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

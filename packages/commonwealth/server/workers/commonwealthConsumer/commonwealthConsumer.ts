@@ -3,18 +3,22 @@ import {
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
+  buildRetryStrategy,
   getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
+  Actor,
   Broker,
   BrokerSubscriptions,
   broker,
+  command,
+  logger,
   stats,
 } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { Contest, ContestWorker } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
-import { RABBITMQ_URI } from '../../config';
+import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,7 +50,10 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.CommonwealthService),
+      getRabbitMQConfig(
+        config.BROKER.RABBITMQ_URI,
+        RascalConfigServices.CommonwealthService,
+      ),
     );
     await rmqAdapter.init();
     broker(rmqAdapter);
@@ -63,6 +70,17 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     ChainEventPolicy(),
   );
 
+  const contestWorkerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestWorkerPolicy,
+    ContestWorker(),
+    buildRetryStrategy(undefined, 20_000),
+  );
+
+  const contestProjectionsSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.ContestProjection,
+    Contest.Contests(),
+  );
+
   if (!chainEventSubRes) {
     log.fatal(
       'Failed to subscribe to chain-events. Requires restart!',
@@ -72,6 +90,42 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       },
     );
   }
+
+  if (!contestWorkerSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest worker events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestWorkerPolicy,
+      },
+    );
+  }
+
+  if (!contestProjectionsSubRes) {
+    log.fatal(
+      'Failed to subscribe to contest projection events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.ContestProjection,
+      },
+    );
+  }
+}
+
+function startRolloverLoop() {
+  log.info('Starting rollover loop');
+
+  // TODO: move to external service triggered via scheduler?
+  setInterval(() => {
+    command(
+      Contest.PerformContestRollovers(),
+      {
+        actor: {} as Actor,
+        payload: {},
+      },
+      false,
+    ).catch(console.error);
+  }, 1_000 * 60);
 }
 
 async function main() {
@@ -79,6 +133,7 @@ async function main() {
     log.info('Starting main consumer');
     await setupCommonwealthConsumer();
     isServiceHealthy = true;
+    startRolloverLoop();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }

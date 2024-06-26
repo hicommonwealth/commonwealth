@@ -1,3 +1,4 @@
+import { decamelize } from '@hicommonwealth/shared';
 import {
   Model,
   Sequelize,
@@ -6,7 +7,6 @@ import {
 } from 'sequelize';
 import type {
   Associable,
-  CompositeKey,
   FkMap,
   ManyToManyOptions,
   OneToManyOptions,
@@ -16,34 +16,56 @@ import type {
 } from './types';
 
 /**
+ * Enforces fk naming convention
+ */
+function getDefaultFK<Source extends State, Target extends State>(
+  source: ModelStatic<Model<Source>>,
+  target: ModelStatic<Model<Target>>,
+) {
+  const fk = decamelize(`${source.name}_${source.primaryKeyAttribute}`);
+  if (!target.getAttributes()[fk])
+    throw Error(
+      `Table "${target.tableName}" missing foreign key field "${fk}" to "${source.tableName}"`,
+    );
+  return fk as keyof Target & string;
+}
+
+/**
  * Builds on-to-one association between two models
  * @param this source model with FK to target
  * @param target target model with FK to source
- * @param keys one-to-one keys [source fk to target, target fk to source]
+ * @param options one-to-one options
  */
 export function oneToOne<Source extends State, Target extends State>(
   this: ModelStatic<Model<Source>> & Associable<Source>,
   target: ModelStatic<Model<Target>> & Associable<Target>,
-  keys: [keyof Source & string, keyof Target & string],
-  options?: OneToOneOptions<Source>,
+  options?: OneToOneOptions<Source, Target>,
 ): ModelStatic<Model<Source>> & Associable<Source> {
-  this.belongsTo(target, {
-    foreignKey: keys[0],
-    as: options?.as,
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
-  });
-  target.belongsTo(this, {
-    foreignKey: keys[1],
-    onUpdate: options?.onUpdate ?? 'NO ACTION',
-    onDelete: options?.onDelete ?? 'NO ACTION',
-  });
+  const foreignKey = options?.foreignKey ?? getDefaultFK(this, target);
 
-  // map fk when source pk === keys[0]
-  if (this.primaryKeyAttribute === keys[0])
-    mapFk(target, this, [[keys[1], keys[0]]], {
-      onUpdate: options?.onUpdate ?? 'NO ACTION',
-      onDelete: options?.onDelete ?? 'NO ACTION',
+  // sequelize is not creating fk when fk = pk
+  foreignKey === target.primaryKeyAttribute
+    ? mapFk(
+        target,
+        this,
+        { primaryKey: [this.primaryKeyAttribute], foreignKey: [foreignKey] },
+        {
+          onUpdate: options?.onUpdate ?? 'NO ACTION',
+          onDelete: options?.onDelete ?? 'NO ACTION',
+        },
+      )
+    : target.belongsTo(this, {
+        foreignKey,
+        as: options?.as,
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      });
+
+  options?.targeyKey &&
+    this.belongsTo(target, {
+      foreignKey: options?.targeyKey,
+      onUpdate: 'NO ACTION',
+      onDelete: 'NO ACTION',
     });
 
   // don't forget to return this (fluent)
@@ -54,15 +76,15 @@ export function oneToOne<Source extends State, Target extends State>(
  * Builds on-to-many association between parent/child models
  * @param this parent model with PK
  * @param child child model with FK
- * @param foreignKey foreign key field in the child model - sequelize defaults the PK
  * @param options one-to-many options
  */
 export function oneToMany<Parent extends State, Child extends State>(
   this: ModelStatic<Model<Parent>> & Associable<Parent>,
   child: ModelStatic<Model<Child>> & Associable<Child>,
-  foreignKey: (keyof Child & string) | Array<keyof Child & string>,
   options?: OneToManyOptions<Parent, Child>,
 ): ModelStatic<Model<Parent>> & Associable<Parent> {
+  const foreignKey = options?.foreignKey ?? getDefaultFK(this, child);
+
   const fk = Array.isArray(foreignKey) ? foreignKey[0] : foreignKey;
   this.hasMany(child, {
     foreignKey: { name: fk, allowNull: options?.optional },
@@ -73,22 +95,35 @@ export function oneToMany<Parent extends State, Child extends State>(
   child.belongsTo(this, { foreignKey: fk, as: options?.asOne });
 
   // map fk when parent has composite pk
-  if (Array.isArray(foreignKey)) {
-    mapFk(child, this as any, foreignKey, {
-      onUpdate: options?.onUpdate ?? 'NO ACTION',
-      onDelete: options?.onDelete ?? 'NO ACTION',
-    });
-  }
-  // map fk when child has composite pk
+  if (Array.isArray(foreignKey))
+    mapFk(
+      child,
+      this,
+      {
+        primaryKey: this.primaryKeyAttributes as Array<keyof Parent & string>,
+        foreignKey,
+      },
+      {
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      },
+    );
+  // map fk when child has composite pk,
+  // or when fk = pk (sequelize is not creating fk when fk = pk)
   else if (
-    child.primaryKeyAttributes.length > 1 &&
-    this.primaryKeyAttributes.length === 1
-  ) {
-    mapFk(child, this, [[foreignKey, this.primaryKeyAttribute]], {
-      onUpdate: options?.onUpdate ?? 'NO ACTION',
-      onDelete: options?.onDelete ?? 'NO ACTION',
-    });
-  }
+    (child.primaryKeyAttributes.length > 1 &&
+      this.primaryKeyAttributes.length === 1) ||
+    foreignKey === child.primaryKeyAttribute
+  )
+    mapFk(
+      child,
+      this,
+      { primaryKey: [this.primaryKeyAttribute], foreignKey: [foreignKey] },
+      {
+        onUpdate: options?.onUpdate ?? 'NO ACTION',
+        onDelete: options?.onDelete ?? 'NO ACTION',
+      },
+    );
 
   // don't forget to return this (fluent)
   return this;
@@ -105,49 +140,62 @@ export function manyToMany<X extends State, A extends State, B extends State>(
   a: ManyToManyOptions<X, A> & Associable<A>,
   b: ManyToManyOptions<X, B> & Associable<B>,
 ): ModelStatic<Model<X>> & Associable<X> {
+  const foreignKeyA = a.foreignKey ?? getDefaultFK(a.model, this);
+  const foreignKeyB = b.foreignKey ?? getDefaultFK(b.model, this);
+
   this.belongsTo(a.model, {
-    foreignKey: { name: a.key, allowNull: false },
+    foreignKey: { name: foreignKeyA, allowNull: false },
     as: a.asOne,
     onUpdate: a.onUpdate ?? 'NO ACTION',
     onDelete: a.onDelete ?? 'NO ACTION',
   });
   this.belongsTo(b.model, {
-    foreignKey: { name: b.key, allowNull: false },
+    foreignKey: { name: foreignKeyB, allowNull: false },
     as: b.asOne,
     onUpdate: b.onUpdate ?? 'NO ACTION',
     onDelete: b.onDelete ?? 'NO ACTION',
   });
   a.model.hasMany(this, {
-    foreignKey: { name: a.key, allowNull: false },
+    foreignKey: { name: foreignKeyA, allowNull: false },
     hooks: a.hooks,
     as: a.as,
   });
   b.model.hasMany(this, {
-    foreignKey: { name: b.key, allowNull: false },
+    foreignKey: { name: foreignKeyB, allowNull: false },
     hooks: b.hooks,
     as: b.as,
   });
   a.model.belongsToMany(b.model, {
     through: this,
-    foreignKey: a.key,
+    foreignKey: foreignKeyA,
     as: a.asMany,
   });
   b.model.belongsToMany(a.model, {
     through: this,
-    foreignKey: b.key,
+    foreignKey: foreignKeyB,
     as: b.asMany,
   });
 
   // map fk when x-ref has composite pk
   if (this.primaryKeyAttributes.length > 1) {
-    mapFk(this, a.model, [[a.key, a.model.primaryKeyAttribute]], {
-      onUpdate: a.onUpdate ?? 'NO ACTION',
-      onDelete: a.onDelete ?? 'NO ACTION',
-    });
-    mapFk(this, b.model, [[b.key, b.model.primaryKeyAttribute]], {
-      onUpdate: b.onUpdate ?? 'NO ACTION',
-      onDelete: b.onDelete ?? 'NO ACTION',
-    });
+    mapFk(
+      this,
+      a.model,
+      { primaryKey: [a.model.primaryKeyAttribute], foreignKey: [foreignKeyA] },
+      {
+        onUpdate: a.onUpdate ?? 'NO ACTION',
+        onDelete: a.onDelete ?? 'NO ACTION',
+      },
+    );
+    mapFk(
+      this,
+      b.model,
+      { primaryKey: [b.model.primaryKeyAttribute], foreignKey: [foreignKeyB] },
+      {
+        onUpdate: b.onUpdate ?? 'NO ACTION',
+        onDelete: b.onDelete ?? 'NO ACTION',
+      },
+    );
   }
 
   // don't forget to return this (fluent)
@@ -158,26 +206,23 @@ export function manyToMany<X extends State, A extends State, B extends State>(
  * Maps composite FK constraints not supported by sequelize, with type safety
  * @param source model with FK
  * @param target model with PK
- * @param keys foreign key fields
  * @param rules optional fk rules
  */
 export function mapFk<Source extends State, Target extends State>(
   source: ModelStatic<Model<Source>> & Associable<Source>,
   target: ModelStatic<Model<Target>>,
-  keys: CompositeKey<Source, Target>,
+  {
+    primaryKey,
+    foreignKey,
+  }: {
+    primaryKey: Array<keyof Target & string>;
+    foreignKey: Array<keyof Source & string>;
+  },
   rules?: RuleOptions,
 ) {
-  const key = keys.map((k) =>
-    Array.isArray(k)
-      ? ([
-          source.getAttributes()[k[0]].field!,
-          target.getAttributes()[k[1]].field!,
-        ] as [string, string])
-      : source.getAttributes()[k].field!,
-  );
   const name = `${source.tableName}_${target.tableName.toLowerCase()}_fkey`;
-  const fk = key.map((k) => (Array.isArray(k) ? k[0] : k));
-  const pk = key.map((k) => (Array.isArray(k) ? k[1] : k));
+  const pk = primaryKey.map((k) => target.getAttributes()[k].field!);
+  const fk = foreignKey.map((k) => source.getAttributes()[k].field!);
   // console.log(
   //   'mapFk:',
   //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
@@ -210,13 +255,9 @@ export const createFk = (
  * Drops composite FK constraints (not supported by sequelize)
  */
 export const dropFk = (sequelize: Sequelize, { source, name }: FkMap) =>
-  sequelize?.query(`
-      DO $$
-      BEGIN
-        IF EXISTS(SELECT 1 FROM pg_constraint WHERE conname = '${name}') THEN
-          ALTER TABLE "${source}" DROP CONSTRAINT "${name}";
-        END IF;
-      END $$;`);
+  sequelize?.query(
+    `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
+  );
 
 /**
  * Model sync hooks that can be used to inspect sequelize generated scripts

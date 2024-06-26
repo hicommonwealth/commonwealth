@@ -1,7 +1,6 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
-import faker from 'faker';
 import React from 'react';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -24,21 +23,26 @@ const iconNames = ['cloud', 'mail', 'sun', 'cow'];
 const range = (len: number) => {
   const arr = [];
   for (let i = 0; i < len; i++) {
+    // @ts-expect-error <StrictNullChecks/>
     arr.push(i);
   }
   return arr;
 };
 
+function getRandomElement(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 const newCommunity = (): any => {
-  const tagType = faker.helpers.shuffle(tagTypes)[0];
-  const iconName = faker.helpers.shuffle(iconNames)[0];
-  const buttonType = faker.helpers.shuffle(buttonTypes)[0];
+  const tagType = getRandomElement(tagTypes);
+  const iconName = getRandomElement(iconNames);
+  const buttonType = getRandomElement(buttonTypes);
 
   return {
-    name: faker.company.companyName(),
-    description: faker.lorem.paragraph(),
-    members: faker.random.number(1000),
-    threads: faker.random.number(1000),
+    name: 'fake company name',
+    description: 'fake description',
+    members: Math.floor(Math.random() * 1000),
+    threads: Math.floor(Math.random() * 1000),
     tags: <CWTag label={tagType} iconName={iconName} type={tagType} />,
     buttons: (
       <CWButton label="button" buttonType={buttonType} iconLeft={iconName} />

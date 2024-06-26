@@ -66,3 +66,10 @@ export const CreateThreadSubscription = {
   }),
   output: ThreadSubscription,
 };
+
+export const RegisterClientRegistrationToken = {
+  input: z.object({
+    token: z.string(),
+  }),
+  output: z.object({}),
+};

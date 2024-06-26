@@ -56,18 +56,6 @@ export const getInitialAccountValue = (
   return activeAddressOption || addressOptions[0];
 };
 
-export const getUniqueUserAddressesForChainBase = (chainBase: string) => {
-  const uniqueChainAddresses = [
-    ...new Set(
-      app.user.addresses
-        .filter((x) => x?.community?.base === chainBase)
-        .map((x) => x.address),
-    ),
-  ];
-
-  return uniqueChainAddresses;
-};
-
 export const getAvailableAddressesForStakeExchange = (
   activeAccounts: Account[],
   userAddresses: AddressInfo[],
@@ -98,6 +86,7 @@ export const setActiveAccountOnTransactionSuccess = async (
     const accountToSet = app.user.activeAccounts.find(
       (account) => account.address === userAddressUsedInTransaction,
     );
+    // @ts-expect-error StrictNullChecks
     return await setActiveAccount(accountToSet);
   }
 };

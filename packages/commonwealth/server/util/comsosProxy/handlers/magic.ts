@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import axios from 'axios';
 import type { Request, Response } from 'express';

@@ -219,6 +219,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClick={async () =>
                   onSocialLogin(
                     WalletSsoSource.Google,
+                    // @ts-expect-error <StrictNullChecks/>
                     useSessionKeyRevalidationFlow,
                   )
                 }
@@ -247,6 +248,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={async () =>
               onSocialLogin(
                 WalletSsoSource.Discord,
+                // @ts-expect-error <StrictNullChecks/>
                 useSessionKeyRevalidationFlow,
               )
             }
@@ -259,6 +261,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Github,
+                // @ts-expect-error <StrictNullChecks/>
                 useSessionKeyRevalidationFlow,
               )
             }
@@ -270,6 +273,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Twitter,
+                // @ts-expect-error <StrictNullChecks/>
                 useSessionKeyRevalidationFlow,
               )
             }

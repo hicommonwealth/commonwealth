@@ -54,6 +54,7 @@ export const useImageUploader = ({
       } catch (err) {
         console.error(err);
       } finally {
+        // @ts-expect-error <StrictNullChecks/>
         editor.enable();
         setIsUploading(false);
       }

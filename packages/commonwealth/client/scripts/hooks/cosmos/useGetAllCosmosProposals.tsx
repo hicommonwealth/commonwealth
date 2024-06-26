@@ -58,8 +58,10 @@ export const useGetAllCosmosProposals = ({
   }, [needToInitAPI, app.chain]);
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     setIsLoadingActiveProposals(isLoadingActiveProps);
     if (!isApiReady && activeCosmosProposals?.length === 0) {
+      // @ts-expect-error <StrictNullChecks/>
       setIsLoadingActiveProposals(true);
     }
   }, [
@@ -70,8 +72,10 @@ export const useGetAllCosmosProposals = ({
   ]);
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     setIsLoadingCompletedProposals(isLoadingCompletedProps);
     if (!isApiReady && completedCosmosProposals?.length === 0) {
+      // @ts-expect-error <StrictNullChecks/>
       setIsLoadingCompletedProposals(true);
     }
   }, [
@@ -82,7 +86,9 @@ export const useGetAllCosmosProposals = ({
   ]);
 
   return {
+    // @ts-expect-error <StrictNullChecks/>
     activeCosmosProposals,
+    // @ts-expect-error <StrictNullChecks/>
     completedCosmosProposals,
   };
 };

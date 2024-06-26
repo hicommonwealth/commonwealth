@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
+
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -59,6 +60,24 @@ export class UserController {
 
   private _setEmailVerified(emailVerified: boolean): void {
     this._emailVerified = emailVerified;
+  }
+
+  private _promotionalEmailsEnabled: boolean;
+  public get promotionalEmailsEnabled(): boolean {
+    return this._promotionalEmailsEnabled;
+  }
+
+  private _isWelcomeOnboardFlowComplete: boolean;
+  public get isWelcomeOnboardFlowComplete(): boolean {
+    return this._isWelcomeOnboardFlowComplete;
+  }
+
+  private _setPromotionalEmailsEnabled(enabled: boolean): void {
+    this._promotionalEmailsEnabled = enabled;
+  }
+
+  private _setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
+    this._isWelcomeOnboardFlowComplete = enabled;
   }
 
   private _knockJWT: string;
@@ -161,6 +180,14 @@ export class UserController {
     this._setEmail(email);
   }
 
+  public setPromotionalEmailsEnabled(enabled: boolean): void {
+    this._setPromotionalEmailsEnabled(enabled);
+  }
+
+  public setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
+    this._setIsWelcomeOnboardFlowComplete(enabled);
+  }
+
   public async updateEmail(
     email: string,
     shouldNotifyFailure = true,
@@ -184,12 +211,20 @@ export class UserController {
     this._setEmailInterval(emailInterval);
   }
 
-  public async updateEmailInterval(emailInterval: string): Promise<void> {
+  public async writeEmailSettings(
+    emailInterval: string,
+    promotionalEmailsEnabled?: boolean,
+  ): Promise<void> {
+    const key = emailInterval
+      ? 'updateEmailInterval'
+      : 'promotional_emails_enabled';
+    const value = emailInterval ? emailInterval : `${promotionalEmailsEnabled}`;
+
     try {
       await axios.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
-        key: 'updateEmailInterval',
-        value: emailInterval,
+        key,
+        value,
       });
       this._setEmailInterval(emailInterval);
     } catch (e) {

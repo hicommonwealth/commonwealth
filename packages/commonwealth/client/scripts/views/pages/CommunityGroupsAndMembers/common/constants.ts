@@ -5,6 +5,8 @@ export const TOKENS = {
   EVM_TOKEN: 'eth_native',
 };
 
+export const SPL_SPECIFICATION = 'spl';
+
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
@@ -37,6 +39,7 @@ export const requirementTypes = [
   { value: ERC_SPECIFICATIONS.ERC_721, label: 'ERC-721' },
   { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
+  { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
 ];
 
 export const conditionTypes = [
@@ -48,9 +51,16 @@ export const conditionTypes = [
 // Get chain id's from the app.config.chains for all eth and cosmos chains
 export const chainTypes = app.config.nodes
   .getAll()
-  .filter((chain) => chain.ethChainId || chain.cosmosChainId)
+  .filter(
+    (chain) =>
+      chain.ethChainId || chain.cosmosChainId || chain.balanceType === 'solana',
+  )
   .map((chain) => ({
-    chainBase: chain.ethChainId ? 'ethereum' : 'cosmos',
-    value: chain.ethChainId || chain.cosmosChainId,
+    chainBase: chain.ethChainId
+      ? 'ethereum'
+      : chain.balanceType === 'solana'
+      ? 'solana'
+      : 'cosmos',
+    value: chain.ethChainId || chain.cosmosChainId || 0,
     label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
   }));

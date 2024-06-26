@@ -17,7 +17,7 @@ export function CancelContestManagerMetadata(): Command<
           contest_address: payload.contest_address,
         },
       });
-      if (mustExist('ContestManager', contestManager)) {
+      if (mustExist('Contest Manager', contestManager)) {
         contestManager.cancelled = true;
         await contestManager.save();
         return {

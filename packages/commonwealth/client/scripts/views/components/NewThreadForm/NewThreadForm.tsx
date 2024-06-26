@@ -2,10 +2,11 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
@@ -20,6 +21,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -31,22 +33,32 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import ContestThreadBanner from './ContestThreadBanner';
 import './NewThreadForm.scss';
-import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import {
+  checkIsTopicInContest,
+  checkNewThreadErrors,
+  useNewThreadForm,
+} from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const contestsEnabled = useFlag('contest');
+
+  const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
 
-  const communityId = app.chain.id;
-  const hasTopics = topics?.length;
-  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+  const { contestsData, isContestAvailable } = useCommunityContests();
 
-  const topicsForSelector = hasTopics ? topics : [];
+  const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
+  const communityId = app.chain.id;
+  const hasTopics = sortedTopics?.length;
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+  const topicsForSelector = hasTopics ? sortedTopics : [];
 
   const {
     threadTitle,
@@ -64,6 +76,8 @@ export const NewThreadForm = () => {
     canShowGatingBanner,
     setCanShowGatingBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
+
+  const isTopicInContest = checkIsTopicInContest(contestsData, threadTopic?.id);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -146,6 +160,7 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
+        // @ts-expect-error <StrictNullChecks/>
         authorProfile: app.user.activeAccount.profile,
       });
 
@@ -167,6 +182,7 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
+      // @ts-expect-error <StrictNullChecks/>
       topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
@@ -177,6 +193,11 @@ export const NewThreadForm = () => {
     isCommunityMember: !!hasJoinedCommunity,
     isThreadTopicGated: isRestrictedMembership,
   });
+
+  const contestThreadBannerVisible =
+    contestsEnabled && isContestAvailable && isTopicInContest;
+  const isDisabledBecauseOfContestsConsent =
+    contestThreadBannerVisible && !submitEntryChecked;
 
   return (
     <>
@@ -198,7 +219,7 @@ export const NewThreadForm = () => {
 
               {!!hasTopics && (
                 <CWSelectList
-                  options={topics.map((topic) => ({
+                  options={sortedTopics.map((topic) => ({
                     label: topic?.name,
                     value: `${topic?.id}`,
                   }))}
@@ -214,6 +235,7 @@ export const NewThreadForm = () => {
                   onChange={(topic) => {
                     setCanShowGatingBanner(true);
                     setThreadTopic(
+                      // @ts-expect-error <StrictNullChecks/>
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
                     );
                   }}
@@ -234,12 +256,19 @@ export const NewThreadForm = () => {
                 setContentDelta={setThreadContentDelta}
                 isDisabled={isRestrictedMembership || !hasJoinedCommunity}
                 tooltipLabel={
-                  !hasJoinedCommunity
-                    ? 'Join community to submit'
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('submit')
                     : disabledActionsTooltipText
                 }
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
+
+              {contestThreadBannerVisible && (
+                <ContestThreadBanner
+                  submitEntryChecked={submitEntryChecked}
+                  onSetSubmitEntryChecked={setSubmitEntryChecked}
+                />
+              )}
 
               <div className="buttons-row">
                 {isPopulated && hasJoinedCommunity && (
@@ -253,7 +282,11 @@ export const NewThreadForm = () => {
                 )}
                 <CWButton
                   label="Create thread"
-                  disabled={isDisabled || !hasJoinedCommunity}
+                  disabled={
+                    isDisabled ||
+                    !hasJoinedCommunity ||
+                    isDisabledBecauseOfContestsConsent
+                  }
                   onClick={handleNewThreadCreation}
                   tabIndex={4}
                   containerClassName="no-pad"

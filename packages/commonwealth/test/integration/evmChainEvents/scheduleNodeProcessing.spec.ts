@@ -2,6 +2,14 @@ import { dispose } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  test,
+} from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
 import {
   getTestAbi,
@@ -18,13 +26,13 @@ describe('scheduleNodeProcessing', () => {
   let singleSourceSuccess = false;
   let models: DB;
 
-  before(async () => {
+  beforeAll(async () => {
     await tester.seedDb();
     const res = await import('@hicommonwealth/model');
     models = res['models'];
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -37,13 +45,13 @@ describe('scheduleNodeProcessing', () => {
     sandbox.restore();
   });
 
-  it('should not schedule anything if there are no event sources', async () => {
+  test('should not schedule anything if there are no event sources', async () => {
     await scheduleNodeProcessing(models, 1000, processChainStub);
     clock.tick(1001);
     expect(processChainStub.called).to.be.false;
   });
 
-  it('should schedule processing for a single source', async () => {
+  test('should schedule processing for a single source', async () => {
     await getTestCommunityContract();
     await getTestSubscription();
     const abi = await getTestAbi();
@@ -61,7 +69,7 @@ describe('scheduleNodeProcessing', () => {
     singleSourceSuccess = true;
   });
 
-  it('should evenly schedule 2 sources per interval', async () => {
+  test('should evenly schedule 2 sources per interval', async () => {
     expect(singleSourceSuccess).to.be.true;
     await getTestCommunityContract('v2');
     await getTestSubscription('v2');

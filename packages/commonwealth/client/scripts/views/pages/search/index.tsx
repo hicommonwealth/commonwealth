@@ -108,6 +108,7 @@ const SearchPage = () => {
   };
 
   const [orderBy, orderDirection] =
+    // @ts-expect-error <StrictNullChecks/>
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
@@ -116,6 +117,7 @@ const SearchPage = () => {
     limit: 20,
     orderBy,
     orderDirection,
+    includeCount: true,
   };
 
   const {
@@ -123,6 +125,7 @@ const SearchPage = () => {
     error: threadsError,
     fetchNextPage: threadsFetchNextPage,
     isLoading: threadsIsLoading,
+    // @ts-expect-error <StrictNullChecks/>
   } = useSearchThreadsQuery({
     ...sharedQueryOptions,
     enabled: activeTab === SearchScope.Threads,
@@ -133,6 +136,7 @@ const SearchPage = () => {
     error: commentsError,
     fetchNextPage: commentsFetchNextPage,
     isLoading: commentsIsLoading,
+    // @ts-expect-error <StrictNullChecks/>
   } = useSearchCommentsQuery({
     ...sharedQueryOptions,
     enabled: activeTab === SearchScope.Replies,
@@ -143,6 +147,7 @@ const SearchPage = () => {
     error: communityError,
     fetchNextPage: chainsFetchNextPage,
     isLoading: communityIsLoading,
+    // @ts-expect-error <StrictNullChecks/>
   } = useSearchChainsQuery({
     ...sharedQueryOptions,
     enabled: activeTab === SearchScope.Communities,
@@ -153,6 +158,7 @@ const SearchPage = () => {
     error: profilesError,
     fetchNextPage: profilesFetchNextPage,
     isLoading: profilesIsLoading,
+    // @ts-expect-error <StrictNullChecks/>
   } = useSearchProfilesQuery({
     ...sharedQueryOptions,
     includeRoles: true,
@@ -314,7 +320,9 @@ const SearchPage = () => {
                         label=""
                         onSelect={handleSortChange}
                         initialValue={{
+                          // @ts-expect-error <StrictNullChecks/>
                           label: queryParams.sort,
+                          // @ts-expect-error <StrictNullChecks/>
                           value: queryParams.sort,
                         }}
                         options={Object.keys(SearchSort).map((k) => ({
@@ -327,6 +335,7 @@ const SearchPage = () => {
                 <div className="search-results-list">
                   {renderSearchResults(
                     results,
+                    // @ts-expect-error <StrictNullChecks/>
                     queryParams.q,
                     activeTab,
                     commonNavigate,

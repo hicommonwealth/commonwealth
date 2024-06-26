@@ -28,6 +28,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public static get(): EthereumChain {
     if (!this._instance) {
       // TODO: Figure out how to inject the app since this method is static
+      // @ts-expect-error StrictNullChecks
       this._instance = new EthereumChain(null);
     }
     return this._instance;
@@ -71,6 +72,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public async initApi(node?: NodeInfo): Promise<Web3> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+    // @ts-expect-error StrictNullChecks
     await this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
@@ -122,6 +124,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       if ((this.api.currentProvider as any)?.connection.connected) {
         await (this._api.currentProvider as any).connection.close();
       }
+      // @ts-expect-error StrictNullChecks
       this._api = null;
     }
   }

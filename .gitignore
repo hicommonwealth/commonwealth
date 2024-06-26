@@ -2,6 +2,7 @@ docker-compose.yaml
 stellar
 node_modules/
 **/build
+**/dist
 **/*.tsbuildinfo
 **/.DS_Store
 *.env
@@ -15,3 +16,5 @@ redis-data
 **/dependency-graph.svg
 .ghostal
 *dump.sql
+**/yarn.lock
+*coverage
