@@ -16,7 +16,7 @@ class ChainInfo {
   public readonly CommunityStakes: StakeInfo[];
   public CommunityTags: Tag[];
   public readonly tokenName: string;
-  public readonly threadCount: number;
+  public threadCount: number;
   public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;

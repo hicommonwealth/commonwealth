@@ -8,7 +8,7 @@ import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
 type CommunityAvatarProps = {
-  community: ChainInfo;
+  community: Pick<ChainInfo, 'iconUrl' | 'name'>;
   onClick?: () => void;
   size?: IconSize;
   showSkeleton?: boolean;
@@ -22,6 +22,7 @@ const CWCommunityAvatarSkeleton = () => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCommunityAvatar = (props: CommunityAvatarProps) => {
   const { community, onClick, size = 'large', showSkeleton } = props;
 

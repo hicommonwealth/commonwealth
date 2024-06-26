@@ -296,7 +296,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // @ts-expect-error <StrictNullChecks/>
     thread.communityId !== app.activeChainId()
   ) {
-    return <PageNotFound />;
+    return <PageNotFound message="Thread not found" />;
   }
 
   // Original posters have full editorial control, while added collaborators

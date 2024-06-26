@@ -2,7 +2,8 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import * as express from 'express';
+import { text, type Router } from 'express';
+import { registerRoute } from '../../middleware/methodNotAllowed';
 import {
   calcCosmosLCDCacheKeyDuration,
   calcCosmosRPCCacheKeyDuration,
@@ -15,13 +16,15 @@ import {
 
 const DEFAULT_CACHE_DURATION = 60 * 10; // 10 minutes
 
-export function setupCosmosProxies(
-  app: express.Express,
+export function setupCosmosProxy(
+  router: Router,
   cacheDecorator: CacheDecorator,
 ) {
-  app.post(
-    '/cosmosAPI/:community_id',
-    express.text() as express.RequestHandler,
+  registerRoute(
+    router,
+    'post',
+    '/cosmosProxy/:community_id',
+    text(),
     calcCosmosRPCCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -30,9 +33,9 @@ export function setupCosmosProxies(
     cosmosHandler.bind(this, 'RPC'),
   );
 
-  app.use(
-    '/cosmosAPI/v1/:community_id',
-    express.text() as express.RequestHandler,
+  router.use(
+    '/cosmosProxy/v1/:community_id',
+    text(),
     calcCosmosLCDCacheKeyDuration,
     cacheDecorator.cacheMiddleware(
       DEFAULT_CACHE_DURATION,
@@ -42,10 +45,13 @@ export function setupCosmosProxies(
   );
 
   // magic
-  app.options('/magicCosmosAPI/:chain', cosmosMagicOptionsHandler.bind(this));
-  app.use(
-    '/magicCosmosAPI/:chain/?(node_info)?',
-    express.text() as express.RequestHandler,
+  router.options(
+    '/magicCosmosProxy/:chain',
+    cosmosMagicOptionsHandler.bind(this),
+  );
+  router.use(
+    '/magicCosmosProxy/:chain/?(node_info)?',
+    text(),
     cosmosMagicNodeInfoProxyHandler.bind(this),
   );
 }

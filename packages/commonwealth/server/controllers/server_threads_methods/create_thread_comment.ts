@@ -46,9 +46,8 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
   discordMeta?: any;
 };
 
@@ -66,8 +65,7 @@ export async function __createThreadComment(
     parentId,
     threadId,
     text,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     discordMeta,
   }: CreateThreadCommentOptions,
@@ -176,8 +174,9 @@ export async function __createThreadComment(
     community_id: thread.community_id,
     // @ts-expect-error StrictNullChecks
     parent_id: null,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    // @ts-expect-error <StrictNullChecks>
+    canvas_signed_data: canvasSignedData,
+    // @ts-expect-error <StrictNullChecks>
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
     reaction_count: 0,

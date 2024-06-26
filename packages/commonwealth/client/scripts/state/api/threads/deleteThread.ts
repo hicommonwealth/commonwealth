@@ -1,9 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signDeleteThread } from 'client/scripts/controllers/server/sessions';
 import { ThreadStage } from 'models/types';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
+import { updateCommunityThreadCount } from './helpers/counts';
 
 interface DeleteThreadProps {
   communityId: string;
@@ -16,11 +19,7 @@ const deleteThread = async ({
   threadId,
   address,
 }: DeleteThreadProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteThread(address, {
+  const canvasSignedData = await signDeleteThread(address, {
     thread_id: threadId,
   });
 
@@ -30,9 +29,7 @@ const deleteThread = async ({
       community_id: communityId,
       address: address,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   });
 };
@@ -51,6 +48,8 @@ const useDeleteThreadMutation = ({
   return useMutation({
     mutationFn: deleteThread,
     onSuccess: async (response) => {
+      removeThreadFromAllCaches(communityId, threadId);
+
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
         ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
@@ -61,7 +60,10 @@ const useDeleteThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
-      removeThreadFromAllCaches(communityId, threadId);
+
+      // decrement communities thread count
+      if (communityId) updateCommunityThreadCount(communityId, 'decrement');
+
       return response.data;
     },
   });

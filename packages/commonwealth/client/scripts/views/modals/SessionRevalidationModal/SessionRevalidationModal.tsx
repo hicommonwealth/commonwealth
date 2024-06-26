@@ -5,6 +5,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
+import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
@@ -50,31 +51,52 @@ const SessionRevalidationModal = ({
     onSuccess: async (signedAddress) => {
       onModalClose();
 
-      // if user tries to sign in with different address than
+      // check if user tries to sign in with different address than
       // expected for session key revalidation
-      if (signedAddress !== walletAddress) {
-        openConfirmation({
-          title: 'Address mismatch',
-          description: (
-            <>
-              Expected the address <b>{formatAddress(walletAddress)}</b>, but
-              the wallet you signed in with has address{' '}
-              {/* @ts-expect-error StrictNullChecks*/}
-              <b>{formatAddress(signedAddress)}</b>.
-              <br />
-              Please try sign again with expected address.
-              <br />
-            </>
-          ),
-          buttons: [],
-          className: 'AddressMismatch',
-        });
-      } else {
+
+      // @ts-expect-error StrictNullChecks
+      const isSubstrate = app.user.activeAccounts.find(
+        (addr) => addr.address === walletAddress,
+      ).community.ss58Prefix;
+      if (
+        signedAddress === walletAddress ||
+        (isSubstrate &&
+          addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
+            signedAddress)
+      ) {
         const updatedAddress = app.user.activeAccounts.find(
           (addr) => addr.address === walletAddress,
         );
-        // @ts-expect-error <StrictNullChecks/>
-        await setActiveAccount(updatedAddress);
+        await setActiveAccount(updatedAddress!);
+      } else {
+        await setActiveAccount(
+          app.user.activeAccounts.find(
+            (addr) => addr.address === signedAddress!,
+          )!,
+        );
+        openConfirmation({
+          title: 'Logged in with unexpected address',
+          description: (
+            <>
+              <p style={{ marginBottom: 6 }}>
+                You tried to sign in as <b>{formatAddress(walletAddress!)}</b>,
+                but your wallet has the address{' '}
+                <b>{formatAddress(signedAddress!)}</b>.
+              </p>
+              <p>
+                We’ve switched your active address to the one in your wallet.
+                You can switch it back in the user menu.
+              </p>
+            </>
+          ),
+          buttons: [
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+            },
+          ],
+          className: 'AddressMismatch',
+        });
       }
     },
   });

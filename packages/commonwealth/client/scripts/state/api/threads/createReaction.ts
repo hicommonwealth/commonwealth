@@ -1,6 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { signThreadReaction } from 'client/scripts/controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
@@ -22,11 +24,7 @@ const createReaction = async ({
   threadId,
   isPWA,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signThreadReaction(address, {
+  const canvasSignedData = await signThreadReaction(address, {
     thread_id: threadId,
     like: reactionType === 'like',
   });
@@ -40,9 +38,7 @@ const createReaction = async ({
       address,
       reaction: reactionType,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
     {
       headers: {

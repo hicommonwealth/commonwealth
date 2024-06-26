@@ -57,11 +57,11 @@ export const NewThreadForm = () => {
 
   const { contestsData, isContestAvailable } = useCommunityContests();
 
+  const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
   const communityId = app.chain.id;
-  const hasTopics = topics?.length;
+  const hasTopics = sortedTopics?.length;
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
-
-  const topicsForSelector = hasTopics ? topics : [];
+  const topicsForSelector = hasTopics ? sortedTopics : [];
 
   const {
     threadTitle,
@@ -223,7 +223,7 @@ export const NewThreadForm = () => {
 
               {!!hasTopics && (
                 <CWSelectList
-                  options={topics.map((topic) => ({
+                  options={sortedTopics.map((topic) => ({
                     label: topic?.name,
                     value: `${topic?.id}`,
                   }))}
