@@ -29,9 +29,8 @@ export type CreateThreadReactionOptions = {
   address: AddressInstance;
   reaction: string;
   threadId: number;
-  canvasAction?: any;
-  canvasSession?: any;
-  canvasHash?: any;
+  canvasSignedData?: string;
+  canvasHash?: string;
 };
 
 export type CreateThreadReactionResult = [ReactionAttributes, TrackOptions];
@@ -43,8 +42,7 @@ export async function __createThreadReaction(
     address,
     reaction,
     threadId,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
   }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
@@ -141,8 +139,7 @@ export async function __createThreadReaction(
     ...reactionWhere,
     // @ts-expect-error StrictNullChecks
     calculated_voting_weight: calculatedVotingWeight,
-    canvas_action: canvasAction,
-    canvas_session: canvasSession,
+    canvas_signed_data: canvasSignedData,
     canvas_hash: canvasHash,
   };
 

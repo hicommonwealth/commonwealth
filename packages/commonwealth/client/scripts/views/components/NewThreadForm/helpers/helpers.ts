@@ -1,4 +1,5 @@
 import { notifyError } from 'controllers/app/notifications';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
@@ -22,4 +23,15 @@ export const checkNewThreadErrors = (
   } else if (threadKind === ThreadKind.Link && !threadUrl) {
     return notifyError(NewThreadErrors.NoUrl);
   }
+};
+
+export const checkIsTopicInContest = (data: Contest[], topicId?: number) => {
+  if (!topicId) {
+    return false;
+  }
+
+  return (data || []).some(
+    (item) =>
+      item?.topics && item?.topics.some((topic) => topic?.id === topicId),
+  );
 };

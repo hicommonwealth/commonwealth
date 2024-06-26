@@ -124,7 +124,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
         );
       }}
       threadHref={discussionLink}
-      onCommentBtnClick={() => navigate(`${discussionLink}?focusEditor=true`)}
+      onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
       customStages={chain.customStages}
       hideReactionButton

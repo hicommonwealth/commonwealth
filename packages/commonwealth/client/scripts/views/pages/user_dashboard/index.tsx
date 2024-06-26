@@ -67,9 +67,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [loggedIn, navigate, type]);
 
   const subpage: DashboardViews =
-    type === 'global'
-      ? DashboardViews.Global
-      : loggedIn
+    loggedIn && type !== 'global'
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 

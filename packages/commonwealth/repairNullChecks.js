@@ -7,7 +7,7 @@ To run this do the following:
 - First record the errors as file and line numbers
 
 npx tsc > /tmp/raw-errors.txt
-cat /tmp/raw-errors.txt |grep -Eo "^(client|server|test|script|shared)/.*\.tsx\([0-9]+,[0-9]+)" > /tmp/errors.txt
+cat /tmp/raw-errors.txt |grep -Eo "^(client|server|test|script|shared)/.*\.ts\([0-9]+,[0-9]+)" > /tmp/errors.txt
 
 - Then run this script, and it will parse out the errors and repair all th files.
 

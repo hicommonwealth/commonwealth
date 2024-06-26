@@ -211,4 +211,7 @@ export const buildAssociations = (db: DB) => {
   db.Reaction.belongsTo(db.Community, {
     foreignKey: 'community_id',
   });
+  db.ContestManager.belongsTo(db.ContestManager, {
+    foreignKey: 'community_id',
+  });
 };

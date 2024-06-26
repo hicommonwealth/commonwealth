@@ -4,7 +4,7 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, safeTruncateBody } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import z from 'zod';
 import { getCommentUrl, getThreadUrl } from '../util';
@@ -58,9 +58,9 @@ export const processUserMentioned: EventHandler<
       object_body:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks
-            payload.thread.body.substring(255)
+            safeTruncateBody(payload.thread.body, 255)
           : // @ts-expect-error StrictNullChecks
-            payload.comment.text.substring(255),
+            safeTruncateBody(payload.comment.text, 255),
       object_url:
         'thread' in payload
           ? // @ts-expect-error StrictNullChecks

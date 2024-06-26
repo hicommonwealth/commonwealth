@@ -1,4 +1,4 @@
-import { ServerError, logger } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
 import type {
   AddressInstance,
   CommunityInstance,
@@ -11,16 +11,12 @@ import { ThreadAttributes, sequelize } from '@hicommonwealth/model';
 import { CommunityCategoryType } from '@hicommonwealth/shared';
 import { Knock } from '@knocklabs/node';
 import jwt from 'jsonwebtoken';
-import { fileURLToPath } from 'node:url';
 import { Op, QueryTypes } from 'sequelize';
 import { config } from '../config';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
 
 type ThreadCountQueryData = {
   communityId: string;
@@ -280,6 +276,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
       promotional_emails_enabled: user.promotional_emails_enabled,
+      is_welcome_onboard_flow_complete: user.is_welcome_onboard_flow_complete,
       jwt: '',
       knockJwtToken: '',
       addresses,
@@ -336,7 +333,7 @@ export const status = async (
       const knockJwtToken = await computeKnockJwtToken(user.id);
 
       user.jwt = jwtToken as string;
-      user.knockJwtToken = knockJwtToken;
+      user.knockJwtToken = knockJwtToken!;
 
       return success(res, {
         recentThreads: threadCountQueryData,
@@ -364,9 +361,6 @@ async function computeKnockJwtToken(userId: number) {
       signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
       expiresInSeconds: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
     });
-  } else {
-    log.warn('No process.env.KNOCK_SIGNING_KEY defined');
-    return '';
   }
 }
 

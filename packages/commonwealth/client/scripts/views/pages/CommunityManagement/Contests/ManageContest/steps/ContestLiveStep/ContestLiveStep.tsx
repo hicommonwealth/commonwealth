@@ -9,6 +9,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CopyAddressInput from '../../../CopyAddressInput';
 import FundContestDrawer from '../../../FundContestDrawer';
 
+import contestSuccess from 'assets/img/contestSuccess.png';
 import './ContestLiveStep.scss';
 
 interface ContestLiveStepProps {
@@ -25,7 +26,7 @@ const ContestLiveStep = ({ createdContestAddress }: ContestLiveStepProps) => {
     <>
       <CWPageLayout>
         <div className="ContestLiveStep" style={animationStyles}>
-          <img src="/static/img/contestSuccess.png" alt="" className="img" />
+          <img src={contestSuccess} alt="" className="img" />
           <CWText type="h4">Your contest is live!</CWText>
           <div className="content-container" style={animationStyles}>
             <CWText type="b1" className="description">

@@ -12,8 +12,7 @@ export const Reaction = z.object({
   thread_id: PG_INT.nullish(),
   comment_id: PG_INT.nullish(),
   proposal_id: z.number().max(255).nullish(),
-  canvas_action: z.any().nullish(),
-  canvas_session: z.any().nullish(),
+  canvas_signed_data: z.any().nullish(),
   canvas_hash: z.string().max(255).nullish(),
   calculated_voting_weight: PG_INT.nullish(),
 });
