@@ -1,6 +1,7 @@
 import {
   AddressInstance,
   commonProtocol,
+  CommunityInstance,
   UserInstance,
 } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
@@ -535,11 +536,7 @@ describe('ServerThreadsController', () => {
           findAll: async () => [],
         },
         CommentSubscription: {
-          create: async (d) => {
-            return {
-              ...d,
-            };
-          },
+          create: (d) => Promise.resolve({ ...d }),
         },
       };
       const banCache = {
@@ -1287,11 +1284,7 @@ describe('ServerThreadsController', () => {
           findAll: async () => [{}], // used in findOneRole
         },
         ThreadSubscription: {
-          create: async (d) => {
-            return {
-              ...d,
-            };
-          },
+          create: (d) => Promise.resolve({ ...d }),
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
@@ -1308,7 +1301,7 @@ describe('ServerThreadsController', () => {
         chain: 'ethereum',
         save: async () => ({}),
       };
-      const chain = {
+      const community = {
         id: 'ethereum',
       };
       const body = 'hello';
@@ -1322,7 +1315,7 @@ describe('ServerThreadsController', () => {
       const [thread] = await serverThreadsController.createThread({
         user: user as unknown as UserInstance,
         address: address as unknown as AddressInstance,
-        community: chain as any,
+        community: community as unknown as CommunityInstance,
         title,
         body,
         kind,
@@ -1341,7 +1334,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          community: chain as any,
+          community: community as unkown as CommunityInstance,
           title,
           body,
           kind,
