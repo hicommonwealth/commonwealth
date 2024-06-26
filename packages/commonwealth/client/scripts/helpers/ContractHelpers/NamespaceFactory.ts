@@ -254,7 +254,7 @@ class NamespaceFactory extends ContractBase {
       const balance: number = Number(
         this.web3.eth.abi.decodeParameter('uint256', result),
       );
-      return String((balance / 10) ^ (decimals ?? 18));
+      return String(balance / (10 ^ (decimals ?? 18)));
     }
   }
 }
