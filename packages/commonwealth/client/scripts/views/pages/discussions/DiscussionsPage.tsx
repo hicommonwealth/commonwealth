@@ -94,10 +94,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   );
   const memoizedTopics = useMemo(() => topics, [topics]);
   const testRoute = '/discussions';
-
+  console.log('splitURLPath: ', splitURLPath);
+  console.log('splitURLPath.length: ', splitURLPath.length);
   //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
   useEffect(() => {
-    if (decodedString && splitURLPath[2] === 'discussions') {
+    if (
+      decodedString &&
+      splitURLPath[2] === 'discussions' &&
+      splitURLPath.length === 4
+    ) {
       const validTopics = memoizedTopics?.some(
         (topic) => topic?.name === decodedString,
       );
