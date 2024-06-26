@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Virtuoso } from 'react-virtuoso';
-
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Virtuoso } from 'react-virtuoso';
 import useFetchThreadsQuery, {
   useDateCursor,
 } from 'state/api/threads/fetchThreads';
@@ -27,7 +26,6 @@ import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
-import { useGetThreadsByIdQuery } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -52,12 +50,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
+
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
   ) as ThreadFeaturedFilterTypes;
+
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange',
   ) as ThreadTimelineFilterTypes;
+
   const { data: topics } = useFetchTopicsQuery({
     communityId,
   });
@@ -72,32 +73,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
-  const getThreadId = location.pathname.match(/\/(\d+)-/);
-
-  const { data: linkedThreads } = useGetThreadsByIdQuery({
-    communityId: app.activeChainId(),
-    // @ts-expect-error StrictNullChecks
-    ids: [getThreadId && Number(getThreadId[1])],
-    apiCallEnabled:
-      // Only call when in discussion pages prevents unnecessary calls.
-      location.pathname.split('/')[1].toLowerCase() === 'discussion',
-  });
-
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!app?.user?.activeAccount?.address,
   });
 
-  const user = app?.user?.addresses?.[0];
-  const profileId = user?.profileId || user?.profile?.id;
-
-  const currentDiscussion = {
-    currentThreadName: linkedThreads?.[0]?.title,
-    currentTopic: linkedThreads?.[0]?.topic.name,
-    // @ts-expect-error StrictNullChecks
-    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
-  };
   const { contestsData } = useCommunityContests();
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -106,33 +87,26 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const pathnames = generateBreadcrumbs(
-    location.pathname,
-    profileId,
-    navigate,
-    app?.isCustomDomain() ? app?.activeChainId() : undefined,
-    currentDiscussion,
+  const splitURLPath = useMemo(() => location.pathname.split('/'), []);
+  const decodedString = useMemo(
+    () => decodeURIComponent(splitURLPath[3]),
+    [splitURLPath],
   );
+  const memoizedTopics = useMemo(() => topics, [topics]);
+  const testRoute = '/discussions';
 
-  //redirects users to discussions if they try to access a topic that doesn't exist
+  //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
   useEffect(() => {
-    if (
-      topics &&
-      pathnames &&
-      topics?.length > 0 &&
-      pathnames?.length > 0 &&
-      pathnames[0]?.label === 'Discussions' &&
-      pathnames[1]?.label !== 'Overview' &&
-      pathnames[1]?.label !== 'archived'
-    ) {
-      const validTopics = topics.some(
-        (topic) => topic.name === pathnames[1].label,
+    if (decodedString && splitURLPath[2] === 'discussions') {
+      const validTopics = memoizedTopics?.some(
+        (topic) => topic?.name === decodedString,
       );
       if (!validTopics) {
-        navigate('/discussions');
+        navigate(testRoute);
       }
     }
-  }, [topics, pathnames, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memoizedTopics, decodedString, splitURLPath]);
 
   const isOnArchivePage =
     location.pathname ===
