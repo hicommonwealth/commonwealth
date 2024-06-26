@@ -1,4 +1,9 @@
-import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
+import {
+  AddressInstance,
+  CommunityInstance,
+  UserInstance,
+  commonProtocol,
+} from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
@@ -580,8 +585,8 @@ describe('ServerCommentsController', () => {
       const commentId = 123;
       const commentBody = 'Hello';
       const [updatedComment] = await serverCommentsController.updateComment({
-        user: user as any,
-        address: address as any,
+        user: user as unknown as UserInstance,
+        address: address as unknown as AddressInstance,
         commentId,
         commentBody,
       });
