@@ -11,6 +11,7 @@ import { GroupResponseValuesType } from '../GroupForm/index.types';
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
+  isAddedToHomeScreen: boolean,
   allowedAddresses?: string[],
 ) => {
   // @ts-expect-error StrictNullChecks
@@ -27,7 +28,7 @@ export const makeGroupDataBaseAPIPayload = (
           formSubmitValues.requirements.length + extraRequrirements
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
-    isPWA: undefined as boolean | undefined,
+    isPWA: isAddedToHomeScreen,
   };
 
   // @ts-expect-error StrictNullChecks

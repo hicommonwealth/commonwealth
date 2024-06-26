@@ -42,7 +42,7 @@ const createCommunity = async ({
     chainBase === ChainBase.CosmosSDK
       ? cosmosChainId
       : baseToNetwork(chainBase);
-  console.log('isPWA from createCOmmunity: ', isPWA);
+
   return await axios.post(
     `${app.serverUrl()}/communities`,
     {

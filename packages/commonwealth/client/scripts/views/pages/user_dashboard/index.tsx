@@ -65,21 +65,14 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
-  useBrowserAnalyticsTrack(
-    isAddedToHomeScreen
-      ? {
-          payload: {
-            event: MixpanelPWAEvent.PWA_USED,
-            isPWA: isAddedToHomeScreen,
-          },
-        }
-      : {
-          payload: {
-            event: MixpanelPWAEvent.PWA_NOT_USED,
-            isPWA: isAddedToHomeScreen,
-          },
-        },
-  );
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: isAddedToHomeScreen
+        ? MixpanelPWAEvent.PWA_USED
+        : MixpanelPWAEvent.PWA_NOT_USED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
   useEffect(() => {
     if (!type) {
       navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);

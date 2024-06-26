@@ -103,7 +103,6 @@ const useJoinCommunity = () => {
     activeChainId?: string;
     isPWA?: boolean;
   }) => {
-    console.log('isPWA: ', isPWA);
     try {
       const res = await linkExistingAddressToChainOrCommunity(
         address,
@@ -190,8 +189,6 @@ const useJoinCommunity = () => {
           activeCommunityId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
-
-        console.log('isAddedToHomeScreen: ', isAddedToHomeScreen);
 
         await linkSpecificAddressToSpecificCommunity({
           address,
