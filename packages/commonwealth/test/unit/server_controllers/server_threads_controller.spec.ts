@@ -1,4 +1,8 @@
-import { commonProtocol } from '@hicommonwealth/model';
+import {
+  AddressInstance,
+  commonProtocol,
+  UserInstance,
+} from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
@@ -1316,8 +1320,8 @@ describe('ServerThreadsController', () => {
       const url = 'http://blah';
 
       const [thread] = await serverThreadsController.createThread({
-        user: user as any,
-        address: address as any,
+        user: user as unknown as UserInstance,
+        address: address as unknown as AddressInstance,
         community: chain as any,
         title,
         body,
