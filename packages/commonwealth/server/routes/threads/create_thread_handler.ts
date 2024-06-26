@@ -84,12 +84,9 @@ export const createThreadHandler = async (
     }
   }
 
-  const [thread, notificationOptions, analyticsOptions] =
-    await controllers.threads.createThread(threadFields);
-
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
+  const [thread, analyticsOptions] = await controllers.threads.createThread(
+    threadFields,
+  );
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 

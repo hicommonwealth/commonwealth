@@ -28,9 +28,6 @@ import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LoginToken from './login_token';
 import Membership from './membership';
-import Notification from './notification';
-import NotificationCategory from './notification_category';
-import NotificationsRead from './notifications_read';
 import Outbox from './outbox';
 import Poll from './poll';
 import Profile from './profile';
@@ -39,7 +36,6 @@ import Reaction from './reaction';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
-import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Template from './template';
@@ -78,9 +74,6 @@ export const Factories = {
   LastProcessedEvmBlock,
   LoginToken,
   Membership,
-  Notification,
-  NotificationCategory,
-  NotificationsRead,
   Outbox,
   Poll,
   Profile,
@@ -89,7 +82,6 @@ export const Factories = {
   SsoToken,
   StakeTransaction,
   StarredCommunity,
-  Subscription,
   Tags,
   SubscriptionPreference,
   Template,

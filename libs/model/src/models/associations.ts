@@ -6,8 +6,6 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.Profile, { onUpdate: 'CASCADE' })
-    .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
-    .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
@@ -61,7 +59,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Notification)
     .withMany(db.Webhook)
     .withMany(db.Ban)
     .withMany(db.CommunityBanner)
@@ -100,8 +97,7 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Reaction, {
       asMany: 'reactions',
     })
-    .withMany(db.Comment)
-    .withMany(db.Notification);
+    .withMany(db.Comment);
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
@@ -131,10 +127,6 @@ export const buildAssociations = (db: DB) => {
     asMany: 'votes',
     onDelete: 'CASCADE',
   });
-
-  db.NotificationCategory.withMany(db.Subscription, {
-    foreignKey: 'category_id',
-  }).withMany(db.Notification, { foreignKey: 'category_id' });
 
   db.Group.withMany(db.GroupPermission);
 
@@ -200,14 +192,6 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     },
   );
-  db.NotificationsRead.withManyToMany(
-    { model: db.Subscription, onDelete: 'CASCADE' },
-    {
-      model: db.Notification,
-      onDelete: 'CASCADE',
-      hooks: true,
-    },
-  );
 
   // 3-way x-ref table
   db.CommunityContractTemplate.belongsTo(db.CommunityContract, {
@@ -226,15 +210,6 @@ export const buildAssociations = (db: DB) => {
   });
   db.Reaction.belongsTo(db.Community, {
     foreignKey: 'community_id',
-  });
-  db.Subscription.belongsTo(db.Community, {
-    foreignKey: 'community_id',
-  });
-  db.Subscription.belongsTo(db.Thread, {
-    foreignKey: 'thread_id',
-  });
-  db.Subscription.belongsTo(db.Comment, {
-    foreignKey: 'comment_id',
   });
   db.ContestManager.belongsTo(db.ContestManager, {
     foreignKey: 'community_id',

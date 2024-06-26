@@ -8,12 +8,7 @@ import type {
   DB,
   ProfileAttributes,
 } from '@hicommonwealth/model';
-import {
-  ChainBase,
-  DynamicTemplate,
-  NotificationCategories,
-  WalletId,
-} from '@hicommonwealth/shared';
+import { ChainBase, DynamicTemplate, WalletId } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import { deserializeCanvas } from 'shared/canvas/types';
@@ -100,18 +95,6 @@ const processAddress = async (
       });
       addressInstance.profile_id = // @ts-expect-error StrictNullChecks
         (newUser.Profiles[0] as ProfileAttributes).id;
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        is_active: true,
-      });
       addressInstance.user_id = newUser.id;
     }
   } else {

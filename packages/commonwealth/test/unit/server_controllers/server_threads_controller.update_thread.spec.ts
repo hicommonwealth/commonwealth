@@ -132,11 +132,10 @@ describe('ServerThreadsController', () => {
       };
 
       const serverThreadsController = new ServerThreadsController(db, banCache);
-      const [updatedThread, notificationOptions, analyticsOptions] =
+      const [updatedThread, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
 
       expect(updatedThread).to.be.ok;
-      expect(notificationOptions).to.have.length(1);
       expect(analyticsOptions).to.have.length(0);
     });
   });

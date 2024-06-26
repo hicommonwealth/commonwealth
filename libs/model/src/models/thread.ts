@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { NotificationAttributes } from './notification';
 import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { TopicAttributes } from './topic';
@@ -16,7 +15,6 @@ export type ThreadAttributes = z.infer<typeof Thread> & {
   Community?: CommunityAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
-  Notifications?: NotificationAttributes[];
   reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
 };

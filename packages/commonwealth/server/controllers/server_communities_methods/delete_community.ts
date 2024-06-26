@@ -132,7 +132,6 @@ export async function __deleteCommunity(
             this.models.Comment,
             // @ts-expect-error StrictNullChecks
             this.models.Topic,
-            this.models.Subscription,
             // @ts-expect-error StrictNullChecks
             this.models.CommunityContract,
             // @ts-expect-error StrictNullChecks
@@ -147,7 +146,6 @@ export async function __deleteCommunity(
             this.models.StarredCommunity,
             // @ts-expect-error StrictNullChecks
             this.models.CommunityBanner,
-            this.models.Notification,
             // @ts-expect-error StrictNullChecks
             this.models.Group,
             // @ts-expect-error StrictNullChecks

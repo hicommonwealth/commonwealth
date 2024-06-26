@@ -23,21 +23,15 @@ export const updateCommentHandler = async (
   // @ts-expect-error StrictNullChecks
   const { body: commentBody, discord_meta: discordMeta } = req.body;
 
-  const [updatedComment, notificationOptions] =
-    await controllers.comments.updateComment({
-      // @ts-expect-error StrictNullChecks
-      user,
-      // @ts-expect-error StrictNullChecks
-      address,
-      commentId,
-      commentBody,
-      discordMeta,
-    });
-
-  // emit notifications
-  for (const n of notificationOptions) {
-    controllers.notifications.emit(n).catch(console.error);
-  }
+  const [updatedComment] = await controllers.comments.updateComment({
+    // @ts-expect-error StrictNullChecks
+    user,
+    // @ts-expect-error StrictNullChecks
+    address,
+    commentId,
+    commentBody,
+    discordMeta,
+  });
 
   return success(res, updatedComment);
 };

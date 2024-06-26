@@ -87,12 +87,6 @@ export class DatabaseCleaner {
     this.log.info('Database clean-up starting...');
 
     try {
-      await this.cleanNotifications(this._oneRunMax);
-    } catch (e) {
-      this.log.error('Failed to clean notifications', e);
-    }
-
-    try {
       await this.cleanSubscriptions(this._oneRunMax);
     } catch (e) {
       this.log.error('Failed to clean subscriptions', e);
@@ -105,78 +99,6 @@ export class DatabaseCleaner {
     }
 
     this.log.info('Database clean-up finished.');
-  }
-
-  /**
-   * Deletes notifications that are older than 3 months. Only 10,000 notifications are deleted at a time to reduce
-   * database load. Between each deletion there is a 5-second pause to again reduce database load and allow other
-   * transactions to complete.
-   * @param oneRunMax If set to true the deletion query will be executed just once (primarily used for testing).
-   */
-  public async cleanNotifications(oneRunMax = false) {
-    // determines the maximum amount of notifications to delete in a single go
-    // if the actual amount of notifications deleted is less than this then the
-    // query will not rerun
-    const DELETE_NOTIF_THRESHOLD = 10000;
-    // the number of notifications deleted in a single execution of the transaction
-    let numNotifDeleted;
-    let totalNotifDeleted = 0;
-
-    // determines whether the query should run again
-    const shouldContinueNotifDelete = () => {
-      // always run at least once
-      if (numNotifDeleted === undefined) return true;
-      else if (oneRunMax) return false;
-      else return numNotifDeleted === DELETE_NOTIF_THRESHOLD;
-    };
-
-    while (shouldContinueNotifDelete()) {
-      await this._models.sequelize.transaction(async (t) => {
-        await this._models.sequelize.query(
-          `
-          CREATE TEMPORARY TABLE notif_ids_to_delete as (
-            SELECT id FROM "Notifications"
-            WHERE created_at < NOW() - interval '3 months'
-            ORDER BY created_at
-            LIMIT ?
-          );
-        `,
-          { replacements: [DELETE_NOTIF_THRESHOLD], transaction: t },
-        );
-
-        await this._models.sequelize.query(
-          `
-          DELETE FROM "NotificationsRead" NR
-              USING notif_ids_to_delete ND
-          WHERE NR.notification_id = ND.id;
-        `,
-          { type: QueryTypes.BULKDELETE, transaction: t },
-        );
-
-        numNotifDeleted = await this._models.sequelize.query(
-          `
-          DELETE FROM "Notifications" N
-              USING notif_ids_to_delete ND
-          WHERE N.id = ND.id;
-        `,
-          { type: QueryTypes.BULKDELETE, transaction: t },
-        );
-
-        await this._models.sequelize.query(
-          `
-          DROP TABLE notif_ids_to_delete;
-        `,
-          { transaction: t },
-        );
-      });
-
-      totalNotifDeleted += numNotifDeleted;
-
-      if (shouldContinueNotifDelete())
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-
-    this.log.info(`Deleted ${totalNotifDeleted} notifications.`);
   }
 
   /**

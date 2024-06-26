@@ -14,7 +14,6 @@ import {
   ChainNetwork,
   ChainType,
   DefaultPage,
-  NotificationCategories,
 } from '@hicommonwealth/shared';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
@@ -537,15 +536,6 @@ export async function __createCommunity(
       0,
       0,
     );
-
-    await this.models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewThread,
-        community_id: createdCommunity.id,
-        is_active: true,
-      },
-    });
   }
 
   return {

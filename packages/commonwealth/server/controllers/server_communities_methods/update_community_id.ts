@@ -87,7 +87,6 @@ export async function __updateCommunityId(
       this.models.Topic,
       // @ts-expect-error StrictNullChecks
       this.models.Thread,
-      this.models.Notification,
       // @ts-expect-error StrictNullChecks
       this.models.Poll,
       // @ts-expect-error StrictNullChecks
@@ -106,7 +105,6 @@ export async function __updateCommunityId(
       this.models.DiscordBotConfig,
       // @ts-expect-error StrictNullChecks
       this.models.Group,
-      this.models.Subscription,
     ];
     for (const model of models) {
       await model.update(

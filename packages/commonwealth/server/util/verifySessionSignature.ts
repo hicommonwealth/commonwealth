@@ -2,7 +2,6 @@ import { Session } from '@canvas-js/interfaces';
 import { fileURLToPath } from 'url';
 
 import { logger } from '@hicommonwealth/core';
-import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { getSessionSignerForAddress } from 'shared/canvas/verify';
 
@@ -66,18 +65,6 @@ const verifySessionSignature = async (
         });
         // @ts-expect-error StrictNullChecks
         addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
-        await models.Subscription.create({
-          // @ts-expect-error StrictNullChecks
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewMention,
-          is_active: true,
-        });
-        await models.Subscription.create({
-          // @ts-expect-error StrictNullChecks
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewCollaboration,
-          is_active: true,
-        });
         addressModel.user_id = user.id;
       }
     }

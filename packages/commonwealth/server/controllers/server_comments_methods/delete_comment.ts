@@ -66,13 +66,6 @@ export async function __deleteComment(
     throw new AppError(Errors.NotOwned);
   }
 
-  // find and delete all associated subscriptions
-  await this.models.Subscription.destroy({
-    where: {
-      comment_id: comment.id,
-    },
-  });
-
   // actually delete
   await comment.destroy();
 }

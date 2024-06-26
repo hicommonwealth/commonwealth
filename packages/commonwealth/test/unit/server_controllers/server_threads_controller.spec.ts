@@ -1,4 +1,9 @@
-import { commonProtocol } from '@hicommonwealth/model';
+import {
+  AddressInstance,
+  commonProtocol,
+  CommunityInstance,
+  UserInstance,
+} from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerThreadsController } from 'server/controllers/server_threads_controller';
@@ -115,7 +120,7 @@ describe('ServerThreadsController', () => {
         banCache as any,
       );
 
-      const [newReaction, notificationOptions, analyticsOptions] =
+      const [newReaction, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
@@ -136,25 +141,6 @@ describe('ServerThreadsController', () => {
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
-
-      expect(notificationOptions).to.have.property('notification');
-      const { notification } = notificationOptions;
-      expect(notification).to.have.property('categoryId', 'new-reaction');
-
-      expect(notification.data).to.have.property('created_at');
-      expect(notification.data).to.include({
-        thread_id: 4,
-        root_title: 'Big Thread!',
-        root_type: 'discussion',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-
-      expect(notificationOptions).to.have.property('excludeAddresses');
-      const { excludeAddresses } = notificationOptions;
-      // @ts-expect-error StrictNullChecks
-      expect(excludeAddresses[0]).to.equal('0x123');
 
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
@@ -549,6 +535,9 @@ describe('ServerThreadsController', () => {
         Group: {
           findAll: async () => [],
         },
+        CommentSubscription: {
+          create: (d) => Promise.resolve({ ...d }),
+        },
       };
       const banCache = {
         checkBan: () => [true, null],
@@ -559,7 +548,7 @@ describe('ServerThreadsController', () => {
         banCache as any,
       );
 
-      const [newComment, notificationOptions, analyticsOptions] =
+      const [newComment, analyticsOptions] =
         await serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
@@ -577,7 +566,6 @@ describe('ServerThreadsController', () => {
         address_id: address.id,
         community_id: 'ethereum',
       });
-      expect(notificationOptions).to.have.length.greaterThan(0);
       expect(analyticsOptions).to.include({
         event: 'Create New Comment',
         community: 'ethereum',
@@ -1295,6 +1283,9 @@ describe('ServerThreadsController', () => {
         Address: {
           findAll: async () => [{}], // used in findOneRole
         },
+        ThreadSubscription: {
+          create: (d) => Promise.resolve({ ...d }),
+        },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
       const serverThreadsController = new ServerThreadsController(
@@ -1310,7 +1301,7 @@ describe('ServerThreadsController', () => {
         chain: 'ethereum',
         save: async () => ({}),
       };
-      const chain = {
+      const community = {
         id: 'ethereum',
       };
       const body = 'hello';
@@ -1321,21 +1312,20 @@ describe('ServerThreadsController', () => {
       const stage = 'stage';
       const url = 'http://blah';
 
-      const [thread, notificationOptions] =
-        await serverThreadsController.createThread({
-          user: user as any,
-          address: address as any,
-          community: chain as any,
-          title,
-          body,
-          kind,
-          readOnly,
-          topicId,
-          stage,
-          url,
-          canvasHash: undefined,
-          canvasSignedData: undefined,
-        });
+      const [thread] = await serverThreadsController.createThread({
+        user: user as unknown as UserInstance,
+        address: address as unknown as AddressInstance,
+        community: community as unknown as CommunityInstance,
+        title,
+        body,
+        kind,
+        readOnly,
+        topicId,
+        stage,
+        url,
+        canvasHash: undefined,
+        canvasSignedData: undefined,
+      });
 
       expect(
         serverThreadsController.createThread({
@@ -1344,7 +1334,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          community: chain as any,
+          community: community as unknown as CommunityInstance,
           title,
           body,
           kind,
@@ -1360,22 +1350,6 @@ describe('ServerThreadsController', () => {
       expect(thread.title).to.equal(title);
       expect(thread.body).to.equal(body);
       expect(thread.stage).to.equal(stage);
-
-      expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.have.property('notification');
-      expect(notificationOptions[0].notification).to.include({
-        categoryId: 'new-thread-creation',
-      });
-      expect(notificationOptions[0].notification.data).to.include({
-        thread_id: 1,
-        root_type: 'discussion',
-        root_title: 'mythread',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-      // @ts-expect-error StrictNullChecks
-      expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });
 });

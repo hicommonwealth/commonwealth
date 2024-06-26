@@ -16,7 +16,6 @@ import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearch
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/create_content_menu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
@@ -54,8 +53,6 @@ const DesktopHeader = ({
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
-
-  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
 
   return (
     <div className="DesktopHeader">
@@ -115,15 +112,9 @@ const DesktopHeader = ({
             />
 
             <HelpMenuPopover />
-
-            {isLoggedIn && !enableKnockInAppNotifications && (
-              <NotificationsMenuPopover />
-            )}
           </div>
 
-          {isLoggedIn && enableKnockInAppNotifications && (
-            <KnockNotifications />
-          )}
+          {isLoggedIn && <KnockNotifications />}
         </div>
 
         {isLoggedIn && (
