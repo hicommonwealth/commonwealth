@@ -1,12 +1,14 @@
 import { memo, useCallback, useEffect, useRef } from 'react';
 import app from 'state';
-import { isWindowSmall } from 'views/components/component_kit/helpers';
+import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import './Mava.scss';
 
 // eslint-disable-next-line no-var, @typescript-eslint/no-explicit-any
 declare var window: any;
 
-const mobile = isWindowSmall(window.innerWidth);
+console.log('FIXME: window.innerWidth: ' + window.innerWidth);
+
+const mobile = isWindowSmallInclusive(window.innerWidth);
 
 export const Mava = memo(function Mava() {
   const initializedRef = useRef(false);
@@ -17,7 +19,15 @@ export const Mava = memo(function Mava() {
   const activateMava = useCallback(() => {
     const chatElement = document.getElementById('mava');
     if (chatElement) {
-      chatElement.style.display = 'block';
+      if (mobile) {
+        console.log('FIXME 1');
+        if (chatElement.firstElementChild) {
+          console.log('FIXME 2', chatElement.firstElementChild);
+          (chatElement.firstElementChild as HTMLElement).style.bottom = '75px';
+        }
+      }
+
+      //chatElement.style.display = 'block'
     }
   }, []);
 
@@ -34,9 +44,7 @@ export const Mava = memo(function Mava() {
           'User Id': userId,
         });
 
-        if (!mobile) {
-          activateMava();
-        }
+        activateMava();
 
         console.log('Identified with mava.');
       }
