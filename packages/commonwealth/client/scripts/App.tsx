@@ -33,7 +33,7 @@ const App = () => {
               {isLoading ? (
                 <Splash />
               ) : (
-                <>
+                <div>
                   <Mava />
                   <RouterProvider router={router(customDomain)} />
                   {isAddedToHomeScreen || isMarketingPage ? null : (
@@ -43,7 +43,7 @@ const App = () => {
                       displayDelayMilliseconds={1000}
                     />
                   )}
-                </>
+                </div>
               )}
 
               <ToastContainer />

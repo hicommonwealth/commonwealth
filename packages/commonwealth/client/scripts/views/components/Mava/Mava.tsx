@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import app from 'state';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import './Mava.scss';
@@ -30,28 +30,38 @@ export const Mava = memo(function Mava() {
       //chatElement.style.display = 'block'
     }
   }, []);
+  //
+  // useEffect(() => {
+  //   if (window.Mava) {
+  //     if (!initializedRef.current) {
+  //       console.log('Initializing Mava');
+  //       window.Mava.initialize();
+  //       initializedRef.current = true;
+  //     }
+  //     if (userId > 0) {
+  //       window.Mava.identify({
+  //         emailAddress: email,
+  //         'User Id': userId,
+  //       });
+  //
+  //       activateMava();
+  //
+  //       console.log('Identified with mava.');
+  //     }
+  //   } else {
+  //     console.warn('No mava');
+  //   }
+  // }, [email, userId, activateMava]);
 
-  useEffect(() => {
-    if (window.Mava) {
-      if (!initializedRef.current) {
-        console.log('Initializing Mava');
-        window.Mava.initialize();
-        initializedRef.current = true;
-      }
-      if (userId > 0) {
-        window.Mava.identify({
-          emailAddress: email,
-          'User Id': userId,
-        });
-
-        activateMava();
-
-        console.log('Identified with mava.');
-      }
-    } else {
-      console.warn('No mava');
-    }
-  }, [email, userId, activateMava]);
-
-  return null;
+  return (
+    <div>
+      <button
+        id="mava-webchat-launcher"
+        onClick={() => window.MavaWebChatToggle()}
+      >
+        click me
+      </button>
+      {/*> click me</button>*/}
+    </div>
+  );
 });
