@@ -120,13 +120,11 @@ const NotificationSettings = () => {
 
             {app.user.addresses.map((current) => {
               return (
-                <div>
-                  <CommunityEntry
-                    key={current.id}
-                    communityInfo={current.community}
-                    communityAlert={communityAlertsIndex[current.community.id]}
-                  />
-                </div>
+                <CommunityEntry
+                  key={current.id}
+                  communityInfo={current.community}
+                  communityAlert={communityAlertsIndex[current.community.id]}
+                />
               );
             })}
           </>
