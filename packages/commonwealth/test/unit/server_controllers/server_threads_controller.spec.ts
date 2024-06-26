@@ -530,6 +530,13 @@ describe('ServerThreadsController', () => {
         Group: {
           findAll: async () => [],
         },
+        CommentSubscription: {
+          create: async (d) => {
+            return {
+              ...d,
+            };
+          },
+        },
       };
       const banCache = {
         checkBan: () => [true, null],
@@ -1274,6 +1281,13 @@ describe('ServerThreadsController', () => {
         },
         Address: {
           findAll: async () => [{}], // used in findOneRole
+        },
+        ThreadSubscription: {
+          create: async (d) => {
+            return {
+              ...d,
+            };
+          },
         },
       };
       const banCache = BAN_CACHE_MOCK_FN('ethereum');
