@@ -16,7 +16,6 @@ import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
@@ -38,8 +37,6 @@ const NotificationSettings = () => {
       z.infer<typeof CommunityAlert>
     >) || [],
   );
-
-  const { bundledSubs } = useNotificationSettings();
 
   const [threadsFilter, setThreadsFilter] = useState<readonly number[]>([]);
   const [section, setSection] =
@@ -121,18 +118,17 @@ const NotificationSettings = () => {
               Get updates on new threads and discussions from these communities
             </CWText>
 
-            {Object.entries(bundledSubs)
-              .sort((x, y) => x[0].localeCompare(y[0]))
-              .map(([communityName]) => {
-                const communityInfo = app?.config.chains.getById(communityName);
-                return (
+            {app.user.addresses.map((current) => {
+              return (
+                <div>
                   <CommunityEntry
-                    key={communityInfo.id}
-                    communityInfo={communityInfo}
-                    communityAlert={communityAlertsIndex[communityInfo.id]}
+                    key={current.id}
+                    communityInfo={current.community}
+                    communityAlert={communityAlertsIndex[current.id]}
                   />
-                );
-              })}
+                </div>
+              );
+            })}
           </>
         )}
 
