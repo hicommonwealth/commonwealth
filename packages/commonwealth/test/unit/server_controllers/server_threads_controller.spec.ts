@@ -1301,21 +1301,20 @@ describe('ServerThreadsController', () => {
       const stage = 'stage';
       const url = 'http://blah';
 
-      const [thread, notificationOptions] =
-        await serverThreadsController.createThread({
-          user: user as any,
-          address: address as any,
-          community: chain as any,
-          title,
-          body,
-          kind,
-          readOnly,
-          topicId,
-          stage,
-          url,
-          canvasHash: undefined,
-          canvasSignedData: undefined,
-        });
+      const [thread] = await serverThreadsController.createThread({
+        user: user as any,
+        address: address as any,
+        community: chain as any,
+        title,
+        body,
+        kind,
+        readOnly,
+        topicId,
+        stage,
+        url,
+        canvasHash: undefined,
+        canvasSignedData: undefined,
+      });
 
       expect(
         serverThreadsController.createThread({
@@ -1340,21 +1339,6 @@ describe('ServerThreadsController', () => {
       expect(thread.title).to.equal(title);
       expect(thread.body).to.equal(body);
       expect(thread.stage).to.equal(stage);
-
-      expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.have.property('notification');
-      expect(notificationOptions[0].notification).to.include({
-        categoryId: 'new-thread-creation',
-      });
-      expect(notificationOptions[0].notification.data).to.include({
-        thread_id: 1,
-        root_type: 'discussion',
-        root_title: 'mythread',
-        community_id: 'ethereum',
-        author_address: '0x123',
-        author_community_id: 'ethereum',
-      });
-      expect(notificationOptions[0].excludeAddresses[0]).to.equal('0x123');
     });
   });
 });
