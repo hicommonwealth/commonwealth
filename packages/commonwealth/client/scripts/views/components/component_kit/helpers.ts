@@ -46,7 +46,7 @@ export const isWindowSmall = (width: number) =>
   width > parseInt(breakpoints.breakpointSmallMin);
 
 export const isWindowExtraSmall = (width: number) =>
-  width <= parseInt(breakpoints.breakpointExtraSmallMax);
+  width < parseInt(breakpoints.breakpointExtraSmallMax);
 
 export const breakpointFnValidator = (
   widthState: boolean,
