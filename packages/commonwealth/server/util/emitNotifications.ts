@@ -10,11 +10,7 @@ import {
 } from '@hicommonwealth/shared';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail,
-} from '../scripts/emails';
+import { SEND_WEBHOOKS_EMAILS } from '../config';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
@@ -134,20 +130,6 @@ export default async function emitNotifications(
     }
   }
 
-  let msg;
-  try {
-    if (category_id !== 'snapshot-proposal') {
-      msg = await createImmediateNotificationEmailObject(
-        notification_data,
-        category_id,
-        models,
-      );
-    }
-  } catch (e) {
-    console.log('Error generating immediate notification email!');
-    console.trace(e);
-  }
-
   let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
@@ -184,17 +166,6 @@ export default async function emitNotifications(
   }
 
   if (SEND_WEBHOOKS_EMAILS) {
-    // emails
-    for (const subscription of subscriptions) {
-      if (msg && isChainEventData && chainEvent.community_id) {
-        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
-      }
-      if (msg && subscription?.immediate_email && subscription?.User) {
-        // kick off async call and immediately return
-        sendImmediateNotificationEmail(subscription.User, msg);
-      }
-    }
-
     // webhooks
     try {
       await dispatchWebhooks(notification_data_and_category);
