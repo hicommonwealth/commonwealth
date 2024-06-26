@@ -43,6 +43,7 @@ const MobileHeader = ({
   onRevalidationModalData,
 }: MobileHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
@@ -94,7 +95,7 @@ const MobileHeader = ({
           )}
           {isLoggedIn ? (
             <>
-              <KnockNotifications />
+              {enableKnockInAppNotifications && <KnockNotifications />}
 
               <div onClick={() => setIsUserDrawerOpen(true)}>
                 <User
