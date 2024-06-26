@@ -115,9 +115,6 @@ export default defineConfig(({ mode }) => {
         env.UNLEASH_FRONTEND_API_TOKEN,
       ),
       'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
-      'process.env.FLAG_KNOCK_INTEGRATION_ENABLED': JSON.stringify(
-        env.FLAG_KNOCK_INTEGRATION_ENABLED,
-      ),
       'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     },
   };

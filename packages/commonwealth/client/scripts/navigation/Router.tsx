@@ -14,7 +14,6 @@ import GeneralRoutes from './GeneralRoutes';
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
   contestEnabled: boolean;
-  knockInAppNotifications: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -25,15 +24,9 @@ const Router = (customDomain: string) => {
   );
   const contestEnabled = client.getBooleanValue('contest', false);
 
-  const knockInAppNotifications = client.getBooleanValue(
-    'knockInAppNotifications',
-    false,
-  );
-
   const flags = {
     proposalTemplatesEnabled,
     contestEnabled,
-    knockInAppNotifications,
   };
 
   return createBrowserRouter(

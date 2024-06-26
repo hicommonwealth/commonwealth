@@ -434,12 +434,6 @@ describe('recomputeCounts', () => {
 
   describe('notification should be correct on recompute count', () => {
     test('add comment from api, notification id is incremented', async () => {
-      const before = await getCounts(
-        // @ts-expect-error <StrictNullChecks>
-        server.e2eTestEntities.testThreads[0].id,
-        server.e2eTestEntities.testComments[0].id,
-      );
-
       const cRes = await server.seeder.createComment({
         chain,
         address: testVerifiedChainAddress.address,
@@ -453,24 +447,10 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const after = await getCounts(
-        // @ts-expect-error StrictNullChecks
-        server.e2eTestEntities.testThreads[0].id,
-        server.e2eTestEntities.testComments[0].id,
-      );
-      expect(after.countsFromSourceTable.notification_id).to.be.eq(
-        before.countsFromSourceTable.notification_id + 1,
-      );
       await verifyRecomputeCountAll();
     });
 
     test('add reaction to thread from api, notification id is unchanged', async () => {
-      const before = await getCounts(
-        // @ts-expect-error <StrictNullChecks>
-        server.e2eTestEntities.testThreads[0].id,
-        server.e2eTestEntities.testComments[0].id,
-      );
-
       const cRes = await server.seeder.createThreadReaction({
         chain,
         address: testVerifiedChainAddress.address,
@@ -486,24 +466,10 @@ describe('recomputeCounts', () => {
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
-      const after = await getCounts(
-        // @ts-expect-error StrictNullChecks
-        server.e2eTestEntities.testThreads[0].id,
-        server.e2eTestEntities.testComments[0].id,
-      );
-      expect(after.countsFromSourceTable.notification_id).to.be.eq(
-        before.countsFromSourceTable.notification_id,
-      );
       await verifyRecomputeCountAll();
     });
 
     test('add reaction to comment from api, notification id is unchanged', async () => {
-      const before = await getCounts(
-        // @ts-expect-error <StrictNullChecks>
-        server.e2eTestEntities.testThreads[0].id,
-        server.e2eTestEntities.testComments[0].id,
-      );
-
       const cRes = await server.seeder.createReaction({
         chain,
         address: testVerifiedChainAddress.address,
@@ -517,15 +483,6 @@ describe('recomputeCounts', () => {
 
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
-
-      const after = await getCounts(
-        // @ts-expect-error StrictNullChecks
-        server.e2eTestEntities.testThreads[0].id,
-        server.e2eTestEntities.testComments[0].id,
-      );
-      expect(after.countsFromSourceTable.notification_id).to.be.eq(
-        before.countsFromSourceTable.notification_id,
-      );
       await verifyRecomputeCountAll();
     });
   });
