@@ -1,4 +1,4 @@
-import { String } from 'aws-sdk/clients/apigateway';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
@@ -29,7 +29,7 @@ class NamespaceFactory extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     const addr = await this.contract.methods.reservationHook().call();
-    if (addr.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
+    if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
         reservationHookAbi as AbiItem[],
         addr,
@@ -64,7 +64,7 @@ class NamespaceFactory extends ContractBase {
       await this.initialize();
     }
     const activeNamespace = await this.getNamespaceAddress(name);
-    if (activeNamespace !== '0x0000000000000000000000000000000000000000') {
+    if (activeNamespace !== ZERO_ADDRESS) {
       return false;
     }
     if (this.reservationHook) {
@@ -80,13 +80,14 @@ class NamespaceFactory extends ContractBase {
    * @param name New Namespace name
    * @param walletAddress an active evm wallet addresss to send tx from
    * @param feeManager wallet or contract address to send community fees
+   * @param chainId The id of the EVM chain
    * @returns txReceipt or Error if name is taken or tx fails
    */
   async deployNamespace(
     name: string,
     walletAddress: string,
     feeManager: string,
-    chainId: String,
+    chainId: string,
   ): Promise<any> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
@@ -139,7 +140,7 @@ class NamespaceFactory extends ContractBase {
           name,
           name + ' Community Stake',
           stakesId,
-          '0x0000000000000000000000000000000000000000',
+          ZERO_ADDRESS,
           2000000,
           0,
         )
@@ -189,7 +190,7 @@ class NamespaceFactory extends ContractBase {
             maxFeePerGas: null,
           });
       } else {
-        txReceipt = await this.contract
+        txReceipt = await this.contract.methods
           .newSingleContest(
             namespaceName,
             contestInterval,
@@ -209,6 +210,52 @@ class NamespaceFactory extends ContractBase {
       throw new Error('Transaction failed');
     }
     return txReceipt;
+  }
+
+  async getFeeManagerBalance(
+    namespace: string,
+    token?: string,
+    decimals?: number,
+  ): Promise<string> {
+    const namespaceAddr = await this.getNamespaceAddress(namespace);
+    const namespaceContract = new this.web3.eth.Contract(
+      [
+        {
+          inputs: [],
+          stateMutability: 'view',
+          type: 'function',
+          name: 'feeManager',
+          outputs: [
+            {
+              internalType: 'address',
+              name: '',
+              type: 'address',
+            },
+          ],
+        },
+      ],
+      namespaceAddr,
+    );
+    const feeManager = await namespaceContract.methods.feeManager().call();
+
+    if (!token) {
+      const balance = await this.web3.eth.getBalance(String(feeManager));
+      return this.web3.utils.fromWei(balance, 'ether');
+    } else {
+      const calldata =
+        '0x70a08231' +
+        this.web3.eth.abi
+          .encodeParameters(['address'], [feeManager])
+          .substring(2);
+      const result = await this.web3.eth.call({
+        to: token,
+        data: calldata,
+      });
+      const balance: number = Number(
+        this.web3.eth.abi.decodeParameter('uint256', result),
+      );
+      return String(balance / (10 ^ (decimals ?? 18)));
+    }
   }
 }
 

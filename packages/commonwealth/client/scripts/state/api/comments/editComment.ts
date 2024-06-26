@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signComment } from 'client/scripts/controllers/server/sessions';
 import Comment from 'models/Comment';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
+import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
 interface EditCommentProps {
@@ -23,11 +26,7 @@ const editComment = async ({
   commentId,
   updatedBody,
 }: EditCommentProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signComment(profile.address, {
+  const canvasSignedData = await signComment(profile.address, {
     thread_id: threadId,
     body: updatedBody,
     parent_comment_id: parentCommentId,
@@ -42,9 +41,7 @@ const editComment = async ({
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );
 
@@ -82,6 +79,13 @@ const useEditCommentMutation = ({
           x.id === updatedComment.id ? updatedComment : x,
         );
       });
+
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        { recentComments: [updatedComment] },
+        'combineAndRemoveDups',
+      );
 
       return updatedComment;
     },

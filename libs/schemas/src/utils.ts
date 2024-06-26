@@ -38,7 +38,10 @@ export const linksSchema = {
 
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
-
+export const zDate = z.preprocess(
+  (arg) => (typeof arg === 'string' ? new Date(arg) : arg),
+  z.date(),
+);
 export const ETHERS_BIG_NUMBER = z.object({
   hex: z.string().regex(/^0x[0-9a-fA-F]+$/),
   type: z.literal('BigNumber'),
@@ -61,25 +64,4 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
       message: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_KB}kb`,
     });
   }
-}
-
-export type ErrorMapperFn = (err: Error) => Error | null;
-
-export async function withErrorMappers<T>(
-  errorMapperFns: ErrorMapperFn[],
-  fn: () => Promise<T>,
-): Promise<T> {
-  let result: T | undefined = undefined;
-  try {
-    result = await fn();
-  } catch (err) {
-    for (const mapper of errorMapperFns) {
-      const mappedError = mapper(err as Error);
-      if (mappedError) {
-        throw mappedError;
-      }
-    }
-    throw err;
-  }
-  return result;
 }

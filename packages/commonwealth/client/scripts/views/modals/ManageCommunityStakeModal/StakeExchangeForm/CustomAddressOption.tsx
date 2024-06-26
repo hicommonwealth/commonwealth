@@ -42,6 +42,7 @@ const CustomAddressOption = ({
   const { data, label } = originalProps;
 
   return (
+    // @ts-expect-error <StrictNullChecks/>
     <components.Option {...originalProps}>
       <CustomAddressOptionElement
         value={data.value}

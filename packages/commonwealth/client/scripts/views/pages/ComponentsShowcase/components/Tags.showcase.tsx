@@ -52,6 +52,7 @@ const TagsShowcase = () => {
             label={dydx.name}
             type="input"
             community={dydx}
+            // @ts-expect-error <StrictNullChecks/>
             onClick={() => setCommunityId(null)}
           />
         )}

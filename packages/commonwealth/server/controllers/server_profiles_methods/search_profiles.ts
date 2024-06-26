@@ -19,6 +19,7 @@ export type SearchProfilesOptions = {
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
   includeGroupIds?: boolean;
+  includeCount?: boolean;
 };
 
 type Profile = {
@@ -46,9 +47,11 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
+    includeCount,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
+    // @ts-expect-error StrictNullChecks
     limit: Math.min(limit, 100) || 10,
     page: page || 1,
     orderDirection,
@@ -121,13 +124,15 @@ export async function __searchProfiles(
       bind,
       type: QueryTypes.SELECT,
     }),
-    this.models.sequelize.query(
-      `SELECT COUNT(*) FROM ( ${sqlWithoutPagination} ) as count`,
-      {
-        bind,
-        type: QueryTypes.SELECT,
-      },
-    ),
+    !includeCount
+      ? [{ count: 0 }]
+      : this.models.sequelize.query(
+          `SELECT COUNT(*) FROM ( ${sqlWithoutPagination} ) as count`,
+          {
+            bind,
+            type: QueryTypes.SELECT,
+          },
+        ),
   ]);
 
   const totalResults = parseInt(count, 10);
@@ -179,6 +184,7 @@ export async function __searchProfiles(
       for (const address of profile.addresses) {
         const addressRoles = addressIdRoles[address.id] || [];
         for (const role of addressRoles) {
+          // @ts-expect-error StrictNullChecks
           profile.roles.push(role.toJSON());
         }
       }

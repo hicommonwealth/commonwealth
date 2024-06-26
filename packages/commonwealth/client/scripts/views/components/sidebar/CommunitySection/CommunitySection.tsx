@@ -12,6 +12,7 @@ import {
 } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { getUniqueTopicIdsIncludedInContest } from 'views/components/sidebar/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -55,10 +56,15 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     activeChainId,
   } = useCommunityStake({
     // if user is not a community member but logged in, use an address that matches community chain base
+    // @ts-expect-error <StrictNullChecks/>
     ...(selectedAddress &&
       !app?.user?.activeAccount && { walletAddress: selectedAddress }),
   });
-  const { isContestAvailable, isContestDataLoading } = useCommunityContests();
+  const { isContestAvailable, isContestDataLoading, contestsData } =
+    useCommunityContests();
+
+  const topicIdsIncludedInContest =
+    getUniqueTopicIdsIncludedInContest(contestsData);
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
@@ -111,6 +117,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         <CWDivider />
         <DiscussionSection
           isContestAvailable={stakeEnabled && isContestAvailable}
+          // @ts-expect-error <StrictNullChecks/>
+          topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
         <GovernanceSection />
@@ -140,11 +148,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         content={
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
             {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setModeOfManageCommunityStakeModal(null)}
         open={!!modeOfManageCommunityStakeModal}
       />

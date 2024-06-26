@@ -5,19 +5,19 @@
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import dotenv from 'dotenv';
 import { TestServer, testServer } from 'server-test';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
+import { afterAll, beforeAll, describe, test } from 'vitest';
+
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
-const V1BETA1_API = `/cosmosAPI`;
-const V1_API = `/cosmosAPI/v1`;
+const V1BETA1_API = `/api/cosmosProxy`;
+const V1_API = `/api/cosmosProxy/v1`;
 
-dotenv.config();
 chai.use(chaiHttp);
 const expect = chai.expect;
 
@@ -36,24 +36,26 @@ describe('Cosmos Cache', () => {
     expect(res).to.have.header('X-Cache', 'HIT');
     const valFromRedis = await server.cacheDecorator.checkCache(key);
     expect(valFromRedis).to.not.be.null;
+    // @ts-expect-error StrictNullChecks
     expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+    // @ts-expect-error StrictNullChecks
     expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
   }
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
     await cache().ready();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await cache().deleteNamespaceKeys(route_namespace);
     await dispose()();
   });
 
-  describe('cosmosAPI', () => {
+  describe('cosmosAPI', { timeout: 5_000 }, () => {
     async function makeRPCRequest(
       body,
-      path = `/cosmosAPI/${V1BETA1_CHAIN_ID}`,
+      path = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}`,
       headers = {
         'content-type': 'text/plain;charset=UTF-8',
         'accept-language': 'en-US,en;q=0.9',
@@ -109,31 +111,31 @@ describe('Cosmos Cache', () => {
 
       await rpcTestIsCached(bodyString, expectedKey);
     };
-    it('should cache passed proposals', async () => {
+    test('should cache passed proposals', async () => {
       await rpcProposalsCacheExpectedTest('0803', 30);
     });
-    it('should cache passed proposals (paginated request - 0803220a0a080000000000000087)', async () => {
+    test('should cache passed proposals (paginated request - 0803220a0a080000000000000087)', async () => {
       await rpcProposalsCacheExpectedTest('0803220a0a080000000000000087', 30);
     });
-    it('should cache passed proposals (paginated request - 0803220a0a080000000000000100)', async () => {
+    test('should cache passed proposals (paginated request - 0803220a0a080000000000000100)', async () => {
       await rpcProposalsCacheExpectedTest('0803220a0a080000000000000100', 30);
     });
-    it('should cache passed proposals (paginated request - 0803220a0a080000000000000189)', async () => {
+    test('should cache passed proposals (paginated request - 0803220a0a080000000000000189)', async () => {
       await rpcProposalsCacheExpectedTest('0803220a0a080000000000000189', 30);
     });
-    it('should cache rejected proposals', async () => {
+    test('should cache rejected proposals', async () => {
       await rpcProposalsCacheExpectedTest('0804', 30);
     });
-    it('should cache failed proposals', async () => {
+    test('should cache failed proposals', async () => {
       await rpcProposalsCacheExpectedTest('0805', 30);
     });
-    it('should cache deposit period proposals', async () => {
+    test('should cache deposit period proposals', async () => {
       await rpcProposalsCacheExpectedTest('0801', 10);
     });
-    it('should cache voting period proposals', async () => {
+    test('should cache voting period proposals', async () => {
       await rpcProposalsCacheExpectedTest('0802', 10);
     });
-    it('should cache an individual proposal', async () => {
+    test('should cache an individual proposal', async () => {
       const body = {
         jsonrpc: '2.0',
         id: 695367312169,
@@ -150,7 +152,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 7);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-    it('should cache individual proposal votes', async () => {
+    test('should cache individual proposal votes', async () => {
       const params = {
         path: '/cosmos.gov.v1beta1.Query/Votes',
         data: '08b502',
@@ -168,7 +170,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-    it('should cache chain params requests', async () => {
+    test('should cache chain params requests', async () => {
       const params = {
         path: '/cosmos.staking.v1beta1.Query/Params',
         data: '',
@@ -186,7 +188,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-    it('should cache chain params requests with specific parameter', async () => {
+    test('should cache chain params requests with specific parameter', async () => {
       const params = {
         path: '/cosmos.staking.v1beta1.Query/Params',
         data: '0a076465706f736974',
@@ -206,7 +208,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-    it('should cache pool requests', async () => {
+    test('should cache pool requests', async () => {
       const params = {
         path: '/cosmos.staking.v1beta1.Query/Pool',
         data: '',
@@ -224,7 +226,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-    it('should cache status requests', async () => {
+    test('should cache status requests', async () => {
       const body = {
         jsonrpc: '2.0',
         id: 927661494768,
@@ -237,7 +239,7 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-    it('should cache block requests', async () => {
+    test('should cache block requests', async () => {
       const body = {
         jsonrpc: '2.0',
         id: 559422771321,
@@ -251,9 +253,9 @@ describe('Cosmos Cache', () => {
       rpcTestKeyAndDuration(body, expectedKey, 6);
       await rpcTestIsCached(bodyString, expectedKey);
     });
-  }).timeout(5000);
+  });
 
-  describe('cosmosAPI/v1', () => {
+  describe(V1_API, () => {
     const lcdProposalsCacheExpectedTest = async (
       proposalStatus: string,
       expectedDuration: number,
@@ -296,44 +298,44 @@ describe('Cosmos Cache', () => {
       expect(duration).to.be.equal(expectedDuration);
     }
 
-    it('should have 7-day duration for an an individual proposal', async () => {
+    test('should have 7-day duration for an an individual proposal', () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1`;
       lcdTestDuration(60 * 60 * 24 * 7, url);
     });
-    it("should have 6-second duration for an an individual proposal's live votes", async () => {
+    test("should have 6-second duration for an an individual proposal's live votes", () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/votes`;
       lcdTestDuration(6, url);
     });
-    it("should have 6-second duration for an individual proposal's live tally", async () => {
+    test("should have 6-second duration for an individual proposal's live tally", () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/tally`;
       lcdTestDuration(6, url);
     });
-    it("should have 6-second duration for an individual proposal's live deposits", async () => {
+    test("should have 6-second duration for an individual proposal's live deposits", () => {
       const url = `${V1_API}/${V1_CHAIN_ID}/cosmos/gov/v1/proposals/1/deposits`;
       lcdTestDuration(6, url);
     });
-    it('should cache deposit period proposals', async () => {
+    test('should cache deposit period proposals', async () => {
       await lcdProposalsCacheExpectedTest('1', 10);
     });
-    it('should cache voting period proposals', async () => {
+    test('should cache voting period proposals', async () => {
       await lcdProposalsCacheExpectedTest('2', 10);
     });
-    it('should cache passed proposals', async () => {
+    test('should cache passed proposals', async () => {
       await lcdProposalsCacheExpectedTest('3', 30);
     });
-    it('should cache rejected proposals', async () => {
+    test('should cache rejected proposals', async () => {
       await lcdProposalsCacheExpectedTest('4', 30);
     });
-    it('should cache failed proposals', async () => {
+    test('should cache failed proposals', async () => {
       await lcdProposalsCacheExpectedTest('5', 30);
     });
-    it('should cache deposit params requests', async () => {
+    test('should cache deposit params requests', async () => {
       await lcdParamsCacheExpectedTest('deposit', 60 * 60 * 24 * 5);
     });
-    it('should cache tallying params requests', async () => {
+    test('should cache tallying params requests', async () => {
       await lcdParamsCacheExpectedTest('tallying', 60 * 60 * 24 * 5);
     });
-    it('should cache voting params requests', async () => {
+    test('should cache voting params requests', async () => {
       await lcdParamsCacheExpectedTest('voting', 60 * 60 * 24 * 5);
     });
   });

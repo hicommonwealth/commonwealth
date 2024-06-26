@@ -21,6 +21,7 @@ interface CWPaginationProps extends UseCWPaginationProps {
  * or (end ellipsis and next button)
  * @param siblingCount number of buttons to show before and after the current page
  * @param onChange onClick handler for pagination
+ * @param selectedPageProp externally modify which page is selected
  * @param className className for pagination container
  */
 const CWPagination = ({
@@ -28,6 +29,7 @@ const CWPagination = ({
   boundaryCount,
   siblingCount,
   onChange,
+  selectedPageProp,
   className,
 }: CWPaginationProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
@@ -37,48 +39,51 @@ const CWPagination = ({
     boundaryCount,
     onChange,
     siblingCount: siblingCount || isWindowExtraSmall ? 0 : 1,
+    selectedPageProp,
   });
 
   return (
     <div className={clsx(ComponentType.Pagination, className)}>
       {items.map((item, index) => {
+        const getButton = (
+          classNameProp: string,
+          children: React.ReactNode,
+        ) => (
+          <button
+            type="button"
+            onClick={item.onClick}
+            disabled={item.disabled}
+            key={index}
+            className={classNameProp}
+          >
+            {children}
+          </button>
+        );
+
         if (item.type === ButtonType.Previous) {
-          return (
-            <button
-              onClick={item.onClick}
-              disabled={item.disabled}
-              key={index}
-              className={ButtonType.Previous}
-            >
+          return getButton(
+            ButtonType.Previous,
+            <>
               <CWIcon iconSize="small" iconName="arrowLeftPhosphor" />
               <CWText type="buttonSm">Previous</CWText>
-            </button>
+            </>,
           );
         }
 
         if (item.type === ButtonType.Next) {
-          return (
-            <button
-              onClick={item.onClick}
-              disabled={item.disabled}
-              key={index}
-              className={ButtonType.Next}
-            >
+          return getButton(
+            ButtonType.Next,
+            <>
               <CWText type="buttonSm">Next</CWText>
               <CWIcon iconSize="small" iconName="arrowRightPhosphor" />
-            </button>
+            </>,
           );
         }
 
         if (item.type === ButtonType.Page) {
-          return (
-            <button
-              onClick={item.onClick}
-              className={clsx({ selected: item.selected })}
-              key={index}
-            >
-              <CWText type="buttonSm">{item.pageNumber}</CWText>
-            </button>
+          return getButton(
+            clsx({ selected: item.selected }),
+            <CWText type="buttonSm">{item.pageNumber}</CWText>,
           );
         }
 

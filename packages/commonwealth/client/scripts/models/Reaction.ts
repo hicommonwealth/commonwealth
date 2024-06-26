@@ -12,8 +12,7 @@ class Reaction {
   public readonly commentId: number | string;
   public readonly proposalId: number | string;
   public readonly author_chain: string;
-  public readonly canvasAction: string;
-  public readonly canvasSession: string;
+  public readonly canvasSignedData: string;
   public readonly canvasHash: string;
   public readonly updatedAt: moment.Moment;
 
@@ -30,8 +29,7 @@ class Reaction {
     proposal_id,
     comment_id,
     author_chain,
-    canvas_action,
-    canvas_session,
+    canvas_signed_data,
     canvas_hash,
     calculated_voting_weight,
     updated_at,
@@ -44,8 +42,7 @@ class Reaction {
     this.commentId = comment_id;
     this.proposalId = proposal_id;
     this.author_chain = author_chain;
-    this.canvasAction = canvas_action;
-    this.canvasSession = canvas_session;
+    this.canvasSignedData = canvas_signed_data;
     this.canvasHash = canvas_hash;
     this.calculatedVotingWeight = calculated_voting_weight || 1;
     this.updatedAt = updated_at;

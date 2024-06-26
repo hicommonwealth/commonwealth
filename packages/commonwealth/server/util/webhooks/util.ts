@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/logging';
+import { logger } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   ProfileAttributes,
@@ -12,7 +12,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import { config } from '../../config';
 import { WebhookDestinations } from './types';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -94,6 +94,7 @@ export async function getPreviewImageUrl(
     notification.categoryId !== NotificationCategories.ThreadEdit &&
     notification.categoryId !== NotificationCategories.CommentEdit
   ) {
+    // @ts-expect-error StrictNullChecks
     const bodytext = decodeURIComponent(notification.data.comment_text);
     const matches = bodytext.match(REGEX_IMAGE);
     if (matches) {
@@ -112,7 +113,7 @@ export async function getPreviewImageUrl(
 
   // case 3: default commonwealth logo
   return {
-    previewImageUrl: DEFAULT_COMMONWEALTH_LOGO,
+    previewImageUrl: config.DEFAULT_COMMONWEALTH_LOGO,
     previewAltText: 'Commonwealth',
   };
 }
@@ -132,7 +133,7 @@ export function getThreadUrlFromNotification(
   }
 
   const data = notification.data;
-  return `${SERVER_URL}/${data.community_id}/discussion/${
+  return `${config.SERVER_URL}/${data.community_id}/discussion/${
     data.thread_id
   }-${slugify(data.root_title)}${commentId}`;
 }

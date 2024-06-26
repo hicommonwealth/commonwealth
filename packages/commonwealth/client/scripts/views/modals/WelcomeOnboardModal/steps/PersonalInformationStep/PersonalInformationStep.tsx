@@ -8,6 +8,7 @@ import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import {
+  useFetchProfileByIdQuery,
   useSearchProfilesQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
@@ -21,7 +22,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
+import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -40,6 +41,11 @@ const PersonalInformationStep = ({
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
+
+  const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
+    apiCallEnabled: true,
+    shouldFetchSelfProfile: true,
+  });
 
   useNecessaryEffect(() => {
     // if user authenticated with SSO, by default we show username granted by the SSO service
@@ -88,9 +94,11 @@ const PersonalInformationStep = ({
 
   const handleGenerateUsername = () => {
     const randomUsername = generateUsername('', 2);
+    // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.setValue('username', randomUsername, {
       shouldDirty: true,
     });
+    // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
   };
@@ -109,7 +117,9 @@ const PersonalInformationStep = ({
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
     await updateProfile({
+      // @ts-expect-error <StrictNullChecks/>
       address: app.user.activeAccount?.profile?.address,
+      // @ts-expect-error <StrictNullChecks/>
       chain: app.user.activeAccount?.profile?.chain,
       name: values.username,
       ...(values.email && {
@@ -127,11 +137,15 @@ const PersonalInformationStep = ({
     // enable/disable promotional emails flag for user
     await app.user.writeEmailSettings('', values.enableProductUpdates);
 
+    // refetch profile data
+    await refetchProfileData().catch(console.error);
+
     onComplete();
   };
 
   return (
     <CWForm
+      // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}

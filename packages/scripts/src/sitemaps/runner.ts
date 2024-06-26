@@ -1,14 +1,11 @@
 import { HotShotsStats } from '@hicommonwealth/adapters';
-import { stats } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { dispose, logger, stats } from '@hicommonwealth/core';
 import {
   createAsyncWriterS3,
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
-import * as dotenv from 'dotenv';
 
-dotenv.config();
 const log = logger(__filename);
 
 async function doExec() {
@@ -37,11 +34,13 @@ async function doExec() {
   ]).exec();
 
   log.info('Sitemap written to: ' + index.location);
-
-  process.exit(0);
 }
 
-doExec().catch((err) => {
-  log.fatal('Unable to process sitemaps: ', err);
-  process.exit(1);
-});
+doExec()
+  .then(() => {
+    dispose()('EXIT', true);
+  })
+  .catch((err) => {
+    log.fatal('Unable to process sitemaps: ', err);
+    dispose()('ERROR', true);
+  });

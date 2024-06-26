@@ -22,12 +22,16 @@ export function useCWTableState({
   initialSortDirection,
 }: UseCWTableStateProps): CWTableState {
   // used for CWTable sorting
-  const [sorting, setSorting] = useState<CWTableSorting>([
-    {
-      id: initialSortColumn as string,
-      desc: initialSortDirection === 'DESC',
-    },
-  ]);
+  const [sorting, setSorting] = useState<CWTableSorting>(
+    initialSortColumn
+      ? [
+          {
+            id: initialSortColumn as string,
+            desc: initialSortDirection === 'DESC',
+          },
+        ]
+      : [],
+  );
 
   // used for API calls
   const { orderBy, orderDirection } = useMemo(() => {
@@ -45,6 +49,7 @@ export function useCWTableState({
 
   return {
     columns,
+    // @ts-expect-error <StrictNullChecks/>
     orderBy,
     orderDirection,
     sorting,

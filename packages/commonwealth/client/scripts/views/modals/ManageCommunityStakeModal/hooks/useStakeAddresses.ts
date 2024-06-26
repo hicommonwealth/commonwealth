@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import app from 'state';
 
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import {
   getAvailableAddressesForStakeExchange,
   getInitialAccountValue,
-  getUniqueUserAddressesForChainBase,
 } from '../utils';
 
 interface UseStakeAddressesProps {
@@ -35,7 +35,9 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
 
   const availableAddresses = (() => {
     // if filtering addresses for a specific community
+    // @ts-expect-error StrictNullChecks
     if (communityAddresses?.length > 0) {
+      // @ts-expect-error StrictNullChecks
       return communityAddresses.map((addr) => ({ address: addr }));
     }
 
@@ -48,7 +50,7 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
     }
 
     // if user is not a community member, we show addressess that match active chain base
-    return getUniqueUserAddressesForChainBase(app?.chain?.base).map(
+    return getUniqueUserAddresses({ forChain: app?.chain?.base }).map(
       (address) => ({ address }),
     );
   })();

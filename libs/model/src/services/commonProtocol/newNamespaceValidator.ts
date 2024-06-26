@@ -2,6 +2,7 @@ import { AppError } from '@hicommonwealth/core';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
+import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
 import { getNamespace } from './contractHelpers';
 
@@ -58,12 +59,12 @@ export const validateNamespace = async (
 
   //validate contract data
   const activeNamespace = await getNamespace(
-    web3,
+    community.ChainNode.url,
     namespace,
     factoryData.factory,
   );
 
-  if (activeNamespace.toLowerCase() !== txReceipt.logs[0].address) {
+  if (!equalEvmAddresses(activeNamespace, txReceipt.logs[0].address)) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 

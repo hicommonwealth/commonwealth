@@ -9,19 +9,18 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "clean": "rm -rf build",
+    "clean": "rm -rf build && rm -rf coverage",
     "check-types": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--import=tsx' NODE_ENV=test mocha './test/**/*.spec.ts'",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
+    "test-dev": "NODE_ENV=test vitest --config ../../vite.config.ts test",
     "generate-stakeholder-groups": "tsx src/generate-stakeholder-groups"
   },
   "dependencies": {
-    "@hicommonwealth/core": "*",
-    "@hicommonwealth/logging": "*",
-    "@hicommonwealth/model": "*",
-    "@hicommonwealth/sitemaps": "*",
-    "sequelize": "^6.32.1",
-    "mocha": "^10.4.0",
+    "@hicommonwealth/core": "workspace:*",
+    "@hicommonwealth/model": "workspace:*",
+    "@hicommonwealth/sitemaps": "workspace:*",
     "moment": "^2.23.0",
+    "sequelize": "^6.32.1",
     "tsx": "^4.7.2"
   }
 }

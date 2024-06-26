@@ -50,7 +50,7 @@ export function formatCompoundBravoProposal(
 
 export async function getCompoundProposals(
   compoundGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
 ): Promise<ProposalDataType[]> {
   const { contract, version: govVersion } =
     await getCompoundGovContractAndVersion(compoundGovAddress, provider);
@@ -94,6 +94,7 @@ export async function getCompoundProposals(
     allProposalData.push({
       rawProposal: proposals[i],
       proposalState: proposalStates[i],
+      // @ts-expect-error StrictNullChecks
       proposalCreatedEvent: proposalCreatedEvents.find((p) =>
         p.id.eq(proposals[i].id),
       ),

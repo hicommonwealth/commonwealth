@@ -63,6 +63,7 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
   }
 
   private deployedExecutors: { [address: string]: Executor } = {};
+  // @ts-expect-error StrictNullChecks
   public async getDeployedExecutor(executorAddress: string): Promise<Executor> {
     if (this.deployedExecutors[executorAddress]) {
       return this.deployedExecutors[executorAddress];

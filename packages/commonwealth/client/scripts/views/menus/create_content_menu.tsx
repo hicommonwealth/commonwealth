@@ -60,6 +60,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             cct.cctmd.display_options === '3'
           ) {
             const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
+            // @ts-expect-error <StrictNullChecks/>
             items.push({
               label: `New ${cct.cctmd.nickname}`,
               iconLeft: 'star',

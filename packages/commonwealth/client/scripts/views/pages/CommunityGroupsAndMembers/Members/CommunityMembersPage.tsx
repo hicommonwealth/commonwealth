@@ -1,12 +1,16 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { trpc } from 'client/scripts/utils/trpcClient';
 import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPageViewEventPayload,
+} from 'shared/analytics/types';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import {
@@ -17,6 +21,7 @@ import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
+import { trpc } from 'utils/trpcClient';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -29,22 +34,21 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import {
-  MixpanelPageViewEvent,
-  MixpanelPageViewEventPayload,
-} from '../../../../../../shared/analytics/types';
 import { useFlag } from '../../../../hooks/useFlag';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
-import { BaseGroupFilter, SearchFilters } from './index.types';
+import { Member } from './MembersSection/MembersSection';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
   { value: 'groups', label: 'Groups' },
 ];
 
-const GROUP_AND_MEMBER_FILTERS: BaseGroupFilter[] = ['All groups', 'Ungrouped'];
+const GROUP_AND_MEMBER_FILTERS = [
+  { label: 'All groups', value: 'all-community' },
+  { label: 'Ungrouped', value: 'not-in-group' },
+];
 
 const CommunityMembersPage = () => {
   const allowlistEnabled = useFlag('allowlist');
@@ -53,9 +57,9 @@ const CommunityMembersPage = () => {
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+  const [searchFilters, setSearchFilters] = useState({
     searchText: '',
-    groupFilter: GROUP_AND_MEMBER_FILTERS[0],
+    groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
 
   const {
@@ -128,11 +132,12 @@ const CommunityMembersPage = () => {
     {
       limit: 30,
       order_by: tableState.orderBy,
+      // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
       include_roles: true,
-      ...(!['All groups', 'Ungrouped'].includes(
+      ...(!['all-community', 'not-in-group'].includes(
         `${searchFilters.groupFilter}`,
       ) &&
         searchFilters.groupFilter && {
@@ -164,11 +169,7 @@ const CommunityMembersPage = () => {
       {
         // base filters
         label: 'Filters',
-        options: GROUP_AND_MEMBER_FILTERS.map((x) => ({
-          id: x,
-          label: x,
-          value: x,
-        })),
+        options: GROUP_AND_MEMBER_FILTERS,
       },
       {
         // filters by group name
@@ -198,6 +199,7 @@ const CommunityMembersPage = () => {
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
+        // @ts-expect-error <StrictNullChecks/>
         role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
@@ -205,6 +207,7 @@ const CommunityMembersPage = () => {
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
+          // @ts-expect-error <StrictNullChecks/>
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
@@ -212,6 +215,7 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
+              // @ts-expect-error <StrictNullChecks/>
               g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
@@ -239,8 +243,9 @@ const CommunityMembersPage = () => {
           : true,
       )
       .filter((group) => {
-        if (searchFilters.groupFilter === 'All groups') return true;
-        if (searchFilters.groupFilter === 'Ungrouped') return !group.isJoined;
+        if (searchFilters.groupFilter === 'all-community') return true;
+        if (searchFilters.groupFilter === 'not-in-group')
+          return !group.isJoined;
         return group.id === parseInt(`${searchFilters.groupFilter}`);
       });
 
@@ -296,6 +301,19 @@ const CommunityMembersPage = () => {
   };
 
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+
+  const extraColumns = (member: Member) => {
+    return {
+      lastActive: {
+        sortValue: moment(member.lastActive).unix(),
+        customElement: (
+          <div className="table-cell">
+            {moment(member.lastActive).fromNow()}
+          </div>
+        ),
+      },
+    };
+  };
 
   return (
     <CWPageLayout>
@@ -390,7 +408,8 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
-                      groupFilter: option.value,
+                      // @ts-expect-error <StrictNullChecks/>
+                      groupFilter: option.value as string,
                     }));
                   }}
                 />
@@ -416,14 +435,17 @@ const CommunityMembersPage = () => {
           />
         ) : (
           <MembersSection
+            // @ts-expect-error <StrictNullChecks/>
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
+              // @ts-expect-error <StrictNullChecks/>
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
                 fetchNextPage?.().catch(console.error);
               }
             }}
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
+            extraColumns={extraColumns}
           />
         )}
       </section>

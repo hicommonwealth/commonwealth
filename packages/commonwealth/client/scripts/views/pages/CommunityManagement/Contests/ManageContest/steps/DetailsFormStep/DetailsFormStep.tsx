@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
+import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import useUpdateContestMutation from 'state/api/contests/updateContest';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -72,6 +75,8 @@ const DetailsFormStep = ({
     initialToggledTopicList: contestFormData?.toggledTopicList,
   });
 
+  const { mutateAsync: updateContest } = useUpdateContestMutation();
+
   const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
   const totalPayoutPercentage = payoutStructure.reduce(
@@ -124,7 +129,7 @@ const DetailsFormStep = ({
     });
   };
 
-  const handleSubmit = (values: ContestFormValidationSubmitValues) => {
+  const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
     if (totalPayoutPercentageError || payoutRowError || topicsEnabledError) {
       return;
     }
@@ -141,8 +146,20 @@ const DetailsFormStep = ({
     };
 
     if (editMode) {
-      // TODO save edit API call
-      goBack();
+      try {
+        await updateContest({
+          id: app.activeChainId(),
+          contest_address: contestAddress,
+          name: values.contestName,
+          image_url: values.contestImage,
+          topic_ids: toggledTopicList.filter((t) => t.checked).map((t) => t.id),
+        });
+
+        goBack();
+      } catch (error) {
+        console.log(error);
+        notifyError('Failed to edit contest');
+      }
     } else {
       onSetContestFormData(formData);
       onSetLaunchContestStep('SignTransactions');
@@ -212,7 +229,6 @@ const DetailsFormStep = ({
                   png)
                 </CWText>
                 <CWCoverImageUploader
-                  uploadCompleteCallback={console.log}
                   canSelectImageBehaviour={false}
                   showUploadAndGenerateText
                   onImageProcessStatusChange={setIsProcessingProfileImage}
@@ -250,13 +266,17 @@ const DetailsFormStep = ({
                     name="feeType"
                     hookToForm
                     disabled={editMode}
+                    onChange={() =>
+                      setValue('contestRecurring', ContestRecurringType.No)
+                    }
                   />
                 </div>
                 {watch('feeType') === ContestFeeType.DirectDeposit && (
                   <>
                     <CWText className="funding-token-address-description">
                       Enter the address of the token you would like to use to
-                      fund your contest
+                      fund your contest (eg: USDT, $degen etc). Leave blank if
+                      using a native token
                     </CWText>
                     <CWTextInput
                       containerClassName="funding-token-address-input"
@@ -273,66 +293,80 @@ const DetailsFormStep = ({
 
               <CWDivider />
 
-              <div className="contest-section contest-section-recurring">
-                <CWText type="h4">Make contest recurring?</CWText>
-                <CWText type="b1">
-                  The remaining prize pool will roll over week to week until you
-                  end the contest.
-                  <br />
-                  {watch('contestRecurring') === ContestRecurringType.Yes && (
-                    <>
-                      Contests run using Community Stake funds must be
-                      recurring.
-                    </>
-                  )}
-                </CWText>
-                <div className="radio-row">
-                  <CWRadioButton
-                    label="Yes"
-                    value={ContestRecurringType.Yes}
-                    name="contestRecurring"
-                    hookToForm
-                    disabled={editMode}
-                  />
-                  <CWRadioButton
-                    label="No"
-                    value={ContestRecurringType.No}
-                    name="contestRecurring"
-                    hookToForm
-                    disabled={
-                      editMode ||
-                      watch('feeType') === ContestFeeType.CommunityStake
-                    }
-                  />
-                </div>
-                {watch('contestRecurring') === ContestRecurringType.Yes && (
-                  <div className="prize-subsection">
-                    <CWText type="h5">
-                      How much of the funds would you like to use weekly?
-                    </CWText>
+              {watch('feeType') === ContestFeeType.CommunityStake && (
+                <>
+                  <div className="contest-section contest-section-recurring">
+                    <CWText type="h4">Make contest recurring?</CWText>
                     <CWText type="b1">
-                      Tip: smaller prizes makes the contest run longer
+                      The remaining prize pool will roll over week to week until
+                      you end the contest.
+                      <br />
+                      {watch('contestRecurring') ===
+                      ContestRecurringType.Yes ? (
+                        <>
+                          Contests run using Community Stake funds must be
+                          recurring.
+                        </>
+                      ) : (
+                        <>
+                          Contests run using Direct deposit funds can not be
+                          recurring.
+                        </>
+                      )}
                     </CWText>
-                    <div className="percentage-buttons">
-                      {prizePercentageOptions.map(({ value, label }) => (
-                        <CWButton
-                          disabled={editMode}
-                          type="button"
-                          key={value}
-                          label={label}
-                          buttonHeight="sm"
-                          onClick={() => setPrizePercentage(value)}
-                          buttonType={
-                            prizePercentage === value ? 'primary' : 'secondary'
-                          }
-                        />
-                      ))}
+                    <div className="radio-row">
+                      <CWRadioButton
+                        label="Yes"
+                        value={ContestRecurringType.Yes}
+                        name="contestRecurring"
+                        hookToForm
+                        disabled={
+                          editMode ||
+                          watch('feeType') === ContestFeeType.DirectDeposit
+                        }
+                      />
+                      <CWRadioButton
+                        label="No"
+                        value={ContestRecurringType.No}
+                        name="contestRecurring"
+                        hookToForm
+                        disabled={
+                          editMode ||
+                          watch('feeType') === ContestFeeType.CommunityStake
+                        }
+                      />
                     </div>
+                    {watch('contestRecurring') === ContestRecurringType.Yes && (
+                      <div className="prize-subsection">
+                        <CWText type="h5">
+                          How much of the funds would you like to use weekly?
+                        </CWText>
+                        <CWText type="b1">
+                          Tip: smaller prizes makes the contest run longer
+                        </CWText>
+                        <div className="percentage-buttons">
+                          {prizePercentageOptions.map(({ value, label }) => (
+                            <CWButton
+                              disabled={editMode}
+                              type="button"
+                              key={value}
+                              label={label}
+                              buttonHeight="sm"
+                              onClick={() => setPrizePercentage(value)}
+                              buttonType={
+                                prizePercentage === value
+                                  ? 'primary'
+                                  : 'secondary'
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-
-              <CWDivider />
+                  <CWDivider />
+                </>
+              )}
 
               <div className="contest-section contest-section-payout">
                 <CWText type="h4">Winners & payouts</CWText>

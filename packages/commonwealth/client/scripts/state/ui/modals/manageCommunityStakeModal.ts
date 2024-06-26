@@ -34,6 +34,7 @@ export const manageCommunityStakeModalStore =
           };
         });
       },
+      // @ts-expect-error StrictNullChecks
       modeOfManageCommunityStakeModal: null,
       setModeOfManageCommunityStakeModal: (modalType) => {
         set((state) => {

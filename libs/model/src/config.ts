@@ -1,12 +1,63 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { configure, config as target } from '@hicommonwealth/core';
+import { z } from 'zod';
 
-export const TEST_DB_NAME = process.env.TEST_DB_NAME || 'common_test';
-export const DATABASE_URI =
-  process.env.NODE_ENV === 'test'
-    ? `postgresql://commonwealth:edgeware@localhost/${TEST_DB_NAME}`
-    : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
+const {
+  TEST_DB_NAME,
+  DATABASE_URL,
+  DATABASE_CLEAN_HOUR,
+  NO_SSL,
+  PRIVATE_KEY,
+  TBC_BALANCE_TTL_SECONDS,
+  ALLOWED_EVENTS,
+  INIT_TEST_DB,
+} = process.env;
 
-export const TESTING = DATABASE_URI.endsWith(TEST_DB_NAME);
+const NAME =
+  target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
+
+export const config = configure(
+  target,
+  {
+    DB: {
+      URI:
+        target.NODE_ENV === 'production'
+          ? DATABASE_URL!
+          : `postgresql://commonwealth:edgeware@localhost/${NAME}`,
+      NAME,
+      NO_SSL: NO_SSL === 'true',
+      CLEAN_HOUR: DATABASE_CLEAN_HOUR
+        ? parseInt(DATABASE_CLEAN_HOUR, 10)
+        : undefined,
+      INIT_TEST_DB: INIT_TEST_DB === 'true',
+    },
+    WEB3: {
+      PRIVATE_KEY: PRIVATE_KEY || '',
+    },
+    TBC: {
+      TTL_SECS: TBC_BALANCE_TTL_SECONDS
+        ? parseInt(TBC_BALANCE_TTL_SECONDS, 10)
+        : 300,
+    },
+    OUTBOX: {
+      ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+    },
+  },
+  z.object({
+    DB: z.object({
+      URI: z.string(),
+      NAME: z.string(),
+      NO_SSL: z.boolean(),
+      CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
+      INIT_TEST_DB: z.boolean(),
+    }),
+    WEB3: z.object({
+      PRIVATE_KEY: z.string(),
+    }),
+    TBC: z.object({
+      TTL_SECS: z.number().int(),
+    }),
+    OUTBOX: z.object({
+      ALLOWED_EVENTS: z.array(z.string()),
+    }),
+  }),
+);

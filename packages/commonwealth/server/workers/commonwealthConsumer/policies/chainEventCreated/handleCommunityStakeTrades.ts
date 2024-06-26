@@ -1,5 +1,4 @@
-import { events } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { events, logger } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import { fileURLToPath } from 'url';
@@ -80,6 +79,7 @@ export async function handleCommunityStakeTrades(
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,
+    // @ts-expect-error StrictNullChecks
     community_id: community.id,
     stake_id: parseInt(stakeId as string),
     stake_amount: parseInt(stakeAmount as string),

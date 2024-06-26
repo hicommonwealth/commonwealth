@@ -1,5 +1,5 @@
 ---
-name: Command Handler Feature Request
+name: "Platform: Command Handler Feature Request"
 about: Use this template for requesting a command handler feature within a user story.
 labels: command, enhancement, needs estimate
 ---

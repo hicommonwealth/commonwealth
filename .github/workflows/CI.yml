@@ -1,10 +1,19 @@
 name: CI
 
 env:
-  ROLLBAR_ENV: 'GitHubCI'
+  IS_CI: true
+  CI: true # ensures Vitest allowOnly option is false so no tests are accidentally skipped
   NODE_ENV: 'test'
+  ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadUpvoted'
+  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted,SubscriptionPreferencesUpdated,CommentCreated,UserMentioned'
+  PRIVATE_KEY: 'web3-pk'
+  USES_DOCKER_PGSQL: true
+  PORT: 8080
+  REDIS_URL: redis://localhost:6379
+  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+  ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+  GITHUB_BASE_REF: ${{ github.base_ref }}
 
 on:
   pull_request:
@@ -17,12 +26,12 @@ jobs:
   # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
   # Its references in this file
   e2e-tests-Parallel:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -46,52 +55,19 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - uses: ./.github/actions/e2e
 
-      - name: Build CI
-        run: yarn build-ci
-
-      - name: Cache browsers
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.cache/ms-playwright/chromium-1045'
-          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
-
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Install proxy
-        run: npm install -g local-ssl-proxy
-
-      - name: Add custom domain to /etc/hosts
-        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
-
-      - name: Run e2e tests (yarn test-e2e)
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+      - name: Run e2e tests
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
-          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e --forbid-only
+          pnpm -F commonwealth e2e-start-server --forbid-only &
+          pnpm -F commonwealth wait-server &&
+          pnpm -F commonwealth test-e2e --forbid-only
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -108,12 +84,12 @@ jobs:
 
   # The tests that this job runs should not be flaky. If they are, move them back into the regular suite.
   e2e-tests-Mature:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -137,52 +113,21 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - uses: ./.github/actions/e2e
 
-      - name: Build CI
-        run: yarn build-ci
-
-      - name: Cache browsers
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.cache/ms-playwright/chromium-1045'
-          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
-
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Install proxy
-        run: npm install -g local-ssl-proxy
-
-      - name: Add custom domain to /etc/hosts
-        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
-
-      - name: Run e2e tests (yarn test-e2e)
-        env:
-          PORT: 8080
-          IS_CI: true
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+      - name: Run e2e tests
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
-          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-mature --forbid-only
+          pnpm -F commonwealth e2e-start-server --forbid-only &
+          pnpm -F commonwealth wait-server &&
+          pnpm -F commonwealth test-e2e-mature --forbid-only
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -198,19 +143,19 @@ jobs:
           path: packages/commonwealth/test-results/
 
   e2e-tests-serial:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
         image: hicommonwealth/cw_postgres:latest
         env:
           POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_DB: common_test
           POSTGRES_PASSWORD: edgeware
         # Set health checks to wait until postgres has started
         options: >-
@@ -227,42 +172,21 @@ jobs:
           - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - uses: ./.github/actions/e2e
 
-      - name: Build CI
-        run: yarn build-ci
+      - name: Build server
+        run: pnpm -F commonwealth build
 
-      - name: Cache browsers
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.cache/ms-playwright/chromium-1045'
-          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
-
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: (cd packages/commonwealth && NODE_ENV=production TEST_DB_NAME=commonwealth NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) & (yarn --cwd packages/commonwealth wait-server && TEST_DB_NAME=commonwealth yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+      - name: Run serial e2e tests
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
@@ -272,106 +196,75 @@ jobs:
 
   # Lint with recommendations
   commonwealth-code-quality-recommendations:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Code Quality Recommendations
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: yarn lint-branch-warnings
-
-  # Lint and Typecheck
-  commonwealth-code-quality:
     strategy:
       matrix:
         node: [ 20 ]
-    name: Code Quality checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
+      - name: Run linter
+        run: pnpm lint-branch-warnings
+
+  # Lint and Typecheck
+  commonwealth-code-quality:
+    name: Code Quality checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    steps:
+      - uses: actions/checkout@v4
         with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
 
-      - name: Add node-gyp
-        run: yarn global add node-gyp
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Assert yarn.lock is correct
+      - name: Assert pnpm-lock.yaml is correct
         run: |
           if ! git diff --quiet; then
-            echo 'You need to update the yarn.lock file (potentially after running: yarn global add node-gyp)'
+            echo 'You need to update the pnpm-lock.yaml file (potentially after installing node-gyp)'
             exit 1
           fi
 
       - name: build
-        run: yarn workspaces run build
+        run: pnpm -r build
 
       - name: check-types
-        run: yarn workspaces run check-types
-
-      - name: Run linter
-        env:
-          GITHUB_BASE_REF: ${{ github.base_ref }}
-        run: yarn lint-branch
+        run: pnpm -r check-types
 
       # To disable eslint-diff just comment the following two lines
       - name: Run eslint-diff
-        run: yarn workspace commonwealth run lint-diff
+        run: pnpm -F commonwealth run lint-diff
 
       - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
-        run: yarn workspace commonwealth run lint-diff-canary
+        run: pnpm -F commonwealth run lint-diff-canary
+
+      # fun the *old* linter last because I want to try to migrate away from
+      # this and JUST to eslint-diff but if this fails we still might be able
+      # to salvage the branch
+      - name: Run linter
+        run: pnpm lint-branch
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
-    strategy:
-      matrix:
-        node: [ 20 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 20 ]
 
     services:
       postgres:
@@ -401,35 +294,45 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache d ependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Build CI
-        run: NO_WEBPACK=true yarn build-ci
+      # TODO: use devmode instead to avoid building
+      - name: Build
+        run: pnpm -r build
 
       - name: Run unit tests
-        run: yarn workspaces run test
+        run: pnpm -r test -- --allowOnly=false
 
-      - name: Run API tests
-        run: yarn --cwd packages/commonwealth test-api --forbid-only
-        env:
-          NO_CLIENT: true
+      - name: Change permissions of coverage files
+        run: |
+          chmod -R 755 ./libs/adapters/coverage/lcov.info
+          chmod -R 755 ./libs/core/coverage/lcov.info
+          chmod -R 755 ./libs/model/coverage/lcov.info
+          chmod -R 755 ./libs/sitemaps/coverage/lcov.info
+          chmod -R 755 ./packages/commonwealth/coverage/lcov.info
+          chmod -R 755 ./packages/discord-bot/coverage/lcov.info
+          chmod -R 755 ./packages/scripts/coverage/lcov.info
+          chmod -R 755 ./packages/snapshot-listener/coverage/lcov.info
 
-      - name: Run util integration tests
-        run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
-        env:
-          NO_CLIENT: true
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: unit-test-coverage
+          parallel: true
+          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/discord-bot/coverage/lcov.info packages/scripts/coverage/lcov.info packages/snapshot-listener/coverage/lcov.info
+
+      - name: Run integration tests
+        run: pnpm -F commonwealth test-integration --allowOnly=false
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: integration-test-coverage
+          parallel: true
+          files: ./packages/commonwealth/coverage/lcov.info
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -438,6 +341,7 @@ jobs:
     strategy:
       matrix:
         node: [ 20 ]
+
     services:
       postgres:
         image: hicommonwealth/cw_postgres:latest
@@ -459,31 +363,23 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Build CI
-        run: yarn global add node-gyp && yarn --ignore-engines
-
       - name: Run EVM Devnet tests
-        run: yarn --cwd packages/commonwealth test-devnet evm --forbid-only
-        env:
-          ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+        run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
+
+      - name: Coveralls parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: evm-devnet-test-coverage
+          parallel: true
+          files: packages/commonwealth/coverage/lcov.info
 
   # These tests run slowly, so run them in a separate job
   commonwealth-cosmos-tests:
@@ -493,6 +389,7 @@ jobs:
     strategy:
       matrix:
         node: [ 20 ]
+
     services:
       postgres:
         image: hicommonwealth/cw_postgres:latest
@@ -512,38 +409,25 @@ jobs:
       cosmos_test_app:
         image: mhagel1/csdk-v1
         ports:
-         - 5051:5051
+          - 5051:5051
       cosmos_beta_test_app:
         image: mhagel1/csdk-beta
         ports:
-         - 5050:5050
+          - 5050:5050
       evmos_test_app:
         image: mhagel1/evmos-dev
         ports:
-         - 5052:5052
+          - 5052:5052
       redis:
         image: redis:latest
         ports:
-         - 6379:6379
+          - 6379:6379
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Build CI
-        run: NO_WEBPACK=true yarn build-ci
 
       ## Cosmos Section:
       # We only run Cosmos devnet tests if any files in the following folders changes
@@ -568,8 +452,33 @@ jobs:
 
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet cosmos --forbid-only)
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
-          REDIS_URL: redis://localhost:6379
+        run: |
+          pnpm -F commonwealth start &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
+
+      - name: Coveralls parallel
+        if: steps.changed-files-specific.outputs.all_changed_files
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: cosmos-devnet-test-coverage
+          parallel: true
+          files: packages/commonwealth/coverage/lcov.info
+
+  report-coverage:
+    name: Upload Test Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ commonwealth-cosmos-tests, commonwealth-evm-tests, commonwealth-unit-integration, e2e-tests-serial, e2e-tests-Parallel, e2e-tests-Mature ]
+    if: always()
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: "cosmos-devnet-test-coverage"
+
+

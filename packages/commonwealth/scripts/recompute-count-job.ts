@@ -1,4 +1,9 @@
+import { dispose, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const log = logger(__filename);
 
 export async function recomputeCounts(
   logging: boolean | ((sql: string, timing?: number) => void) = false,
@@ -148,15 +153,16 @@ export async function recomputeCounts(
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  console.log('recompute job started');
+  log.info('recompute job started');
   recomputeCounts(console.log)
     .then(() => {
-      console.log('recompute job completed successfully');
-      process.exit(0);
+      log.info('Recompute job completed successfully');
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
     })
     .catch((err) => {
-      console.log('recompute job exit with error');
-      console.log(err);
-      process.exit(1);
+      log.error('Recompute job exit with error', err);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
     });
 }

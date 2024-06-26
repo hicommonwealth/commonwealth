@@ -45,8 +45,10 @@ export const updateTags = async (
 
     const [status, newRows] =
       idType === 'profile_id'
-        ? await models.ProfileTags.bulkCreate(createParams)
-        : await models.CommunityTags.bulkCreate(createParams);
+        ? // @ts-expect-error StrictNullChecks
+          await models.ProfileTags.bulkCreate(createParams)
+        : // @ts-expect-error StrictNullChecks
+          await models.CommunityTags.bulkCreate(createParams);
 
     if (!status || !newRows) {
       throw new AppError('Failed');

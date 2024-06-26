@@ -1,5 +1,4 @@
-import { ServerError } from '@hicommonwealth/core';
-import { logger } from '@hicommonwealth/logging';
+import { ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { fileURLToPath } from 'url';
@@ -22,7 +21,9 @@ const starCommunity = async (
   try {
     const [star, created] = await models.StarredCommunity.findOrCreate({
       where: {
+        // @ts-expect-error StrictNullChecks
         community_id: community.id,
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
     });
