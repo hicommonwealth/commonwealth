@@ -124,7 +124,7 @@ const NotificationSettings = () => {
                   <CommunityEntry
                     key={current.id}
                     communityInfo={current.community}
-                    communityAlert={communityAlertsIndex[current.id]}
+                    communityAlert={communityAlertsIndex[current.community.id]}
                   />
                 </div>
               );
