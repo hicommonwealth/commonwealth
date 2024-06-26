@@ -1,3 +1,9 @@
-.Mava {
-  display: none;
+@import '../../../../styles/mixins/breakpoints.module';
+
+#mava {
+  .loadButton {
+    @media only screen and (max-width: $breakpoint-small-max-px) {
+      bottom: 75px !important;
+    }
+  }
 }
