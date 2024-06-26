@@ -36,23 +36,22 @@ export const AndroidPrompt = ({
       try {
         installPromptEvent.prompt();
 
-        // Wait for the user to respond to the prompt
-        installPromptEvent.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            // Hide after install prompt is accepted
-            console.log('User accepted the install prompt');
-            sessionStorage.setItem(HIDE_PROMPT, 'true');
-            setShowPrompt(false);
-          } else {
-            // Hide after install prompt is dismissed
-            sessionStorage.setItem(HIDE_PROMPT, 'true');
-            setShowPrompt(false);
-          }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
+      // Wait for the user to respond to the prompt.
+      // @ts-expect-error StrictNullChecks
+      installPromptEvent.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          // Hide after install prompt is accepted
+          console.log('User accepted the install prompt');
+          sessionStorage.setItem(HIDE_PROMPT, 'true');
+          setShowPrompt(false);
+        } else {
+          // Hide after install prompt is dismissed
+          sessionStorage.setItem(HIDE_PROMPT, 'true');
+          setShowPrompt(false);
+        }
+      });
+    } catch (e) {
+      console.error(e);
       const manualStepsInstructionsEle =
         document.getElementById('manual-install');
       if (manualStepsInstructionsEle) {
