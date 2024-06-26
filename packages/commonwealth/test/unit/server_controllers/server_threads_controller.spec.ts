@@ -1334,7 +1334,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          community: community as unkown as CommunityInstance,
+          community: community as unknown as CommunityInstance,
           title,
           body,
           kind,

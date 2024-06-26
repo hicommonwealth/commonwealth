@@ -3,15 +3,13 @@ import { dispose } from '@hicommonwealth/core';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { Op, QueryTypes } from 'sequelize';
+import { Op } from 'sequelize';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { recomputeCounts } from '../../../scripts/recompute-count-job';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
 chai.use(chaiHttp);
-
-const notif_feed_categories = ['new-thread-creation', 'new-comment-creation'];
 
 let testVerifiedChainAddress;
 const chain = 'alex';
@@ -64,32 +62,10 @@ describe('recomputeCounts', () => {
       commentReactionCounts[crc.comment_id] = crc.count;
     }
 
-    const notifications = (await server.models.sequelize.query(
-      `
-        SELECT nt.thread_id, max(nt.id) as id
-        FROM "Notifications" nt
-        where nt.category_id IN (:categories)
-        GROUP BY nt.thread_id
-    `,
-      {
-        replacements: {
-          categories: notif_feed_categories,
-        },
-        type: QueryTypes.SELECT,
-      },
-    )) as any;
-
-    const notification_ids = {};
-    for (const notification of notifications) {
-      if (!notification.thread_id) continue;
-      notification_ids[notification.thread_id] = notification.id;
-    }
-
     return {
       commentCounts,
       threadReactionCounts,
       commentReactionCounts,
-      notification_ids,
     };
   }
 
@@ -97,7 +73,6 @@ describe('recomputeCounts', () => {
     const threads = await server.models.Thread.findAll();
     const commentCounts = {};
     const threadReactionCounts = {};
-    const notification_ids = {};
     const commentReactionCounts = {};
     for (const thread of threads) {
       if (thread.comment_count) {
@@ -108,12 +83,6 @@ describe('recomputeCounts', () => {
       if (thread.reaction_count) {
         // @ts-expect-error StrictNullChecks
         threadReactionCounts[thread.id] = thread.reaction_count;
-      }
-
-      if (thread.max_notif_id) {
-        if (thread.id) {
-          notification_ids[thread.id] = thread.max_notif_id;
-        }
       }
     }
 
@@ -128,7 +97,6 @@ describe('recomputeCounts', () => {
       commentCounts,
       threadReactionCounts,
       commentReactionCounts,
-      notification_ids,
     };
   }
 
@@ -186,8 +154,6 @@ describe('recomputeCounts', () => {
       threadReactionCount: thread.reaction_count,
       // @ts-expect-error StrictNullChecks
       commentReactionCount: comment.reaction_count,
-      // @ts-expect-error StrictNullChecks
-      notification_id: thread.max_notif_id,
     };
   }
 
@@ -428,61 +394,6 @@ describe('recomputeCounts', () => {
       expect(after.countsFromSourceTable).to.deep.equal(
         after.countsFromPreComputedColumns,
       );
-      await verifyRecomputeCountAll();
-    });
-  });
-
-  describe('notification should be correct on recompute count', () => {
-    test('add comment from api, notification id is incremented', async () => {
-      const cRes = await server.seeder.createComment({
-        chain,
-        address: testVerifiedChainAddress.address,
-        jwt: testJwtToken,
-        text: 'test comment',
-        thread_id: server.e2eTestEntities.testThreads[0].id,
-        session: testVerifiedChainAddress.session,
-        sign: testVerifiedChainAddress.sign,
-      });
-
-      expect(cRes).not.to.be.null;
-      expect(cRes.error).not.to.be.null;
-
-      await verifyRecomputeCountAll();
-    });
-
-    test('add reaction to thread from api, notification id is unchanged', async () => {
-      const cRes = await server.seeder.createThreadReaction({
-        chain,
-        address: testVerifiedChainAddress.address,
-        jwt: testJwtToken,
-        reaction: 'like',
-        // @ts-expect-error StrictNullChecks
-        thread_id: server.e2eTestEntities.testThreads[0].id,
-        author_chain: chain,
-        session: testVerifiedChainAddress.session,
-        sign: testVerifiedChainAddress.sign,
-      });
-
-      expect(cRes).not.to.be.null;
-      expect(cRes.error).not.to.be.null;
-
-      await verifyRecomputeCountAll();
-    });
-
-    test('add reaction to comment from api, notification id is unchanged', async () => {
-      const cRes = await server.seeder.createReaction({
-        chain,
-        address: testVerifiedChainAddress.address,
-        jwt: testJwtToken,
-        reaction: 'like',
-        comment_id: server.e2eTestEntities.testComments[0].id,
-        author_chain: chain,
-        session: testVerifiedChainAddress.session,
-        sign: testVerifiedChainAddress.sign,
-      });
-
-      expect(cRes).not.to.be.null;
-      expect(cRes.error).not.to.be.null;
       await verifyRecomputeCountAll();
     });
   });

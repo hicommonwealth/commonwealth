@@ -125,30 +125,6 @@ export async function recomputeCounts(
       { raw: true, transaction: t, logging },
     );
     logging && console.timeEnd('Add community address count');
-
-    /*
-     *  Thread.max_notif_id
-     */
-    logging && console.log('Add thread max notification id');
-    logging && console.time('Add thread max notification id');
-    await models.sequelize.query(
-      `
-      ;with maxNotificationIdByThread AS (
-        SELECT max(id) as max_id,thread_id
-        FROM "Notifications" n
-        where n.category_id IN ('new-thread-creation', 'new-comment-creation')
-        GROUP BY thread_id
-      )
-
-      Update "Threads"
-      SET max_notif_id=mn.max_id
-      FROM maxNotificationIdByThread mn
-      where mn.thread_id="Threads".id
-
-      `,
-      { raw: true, transaction: t, logging },
-    );
-    logging && console.timeEnd('Add thread max notification id');
   });
 }
 

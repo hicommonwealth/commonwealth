@@ -8,6 +8,9 @@ module.exports = {
       await queryInterface.dropTable('Notifications', { transaction });
       await queryInterface.dropTable('Subscriptions', { transaction });
       await queryInterface.dropTable('NotificationCategories', { transaction });
+      await queryInterface.removeColumn('Threads', 'max_notif_id', {
+        transaction,
+      });
     });
   },
 
@@ -146,6 +149,16 @@ module.exports = {
           create index notifications_read_subscription_id_index
               on "NotificationsRead" (subscription_id);
       `,
+        { transaction },
+      );
+
+      await queryInterface.addColumn(
+        'Threads',
+        'max_notif_id',
+        {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
         { transaction },
       );
     });

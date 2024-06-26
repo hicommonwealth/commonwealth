@@ -29,7 +29,7 @@ However, pre-aggregation is not limited to these metrics. Other tables such as "
 
 We have two viable strategies to maintain the accuracy of these pre-aggregated metrics:
 
-- **Database Triggers:** Triggers can be set up in the database to update the relevant pre-aggregated metrics whenever a new row is inserted, updated, or deleted in the "Reactions", "Comments", or "Notifications" tables.
+- **Database Triggers:** Triggers can be set up in the database to update the relevant pre-aggregated metrics whenever a new row is inserted, updated, or deleted in the "Reactions" or "Comments" tables.
 - **Application-level Changes:** On the other hand, the updates can be managed at the application level. This could involve adjusting functions like `emitNotifications` to update the pertinent pre-aggregated metrics whenever a new thread, comment, or reaction event is triggered.
 
 ## Current Implementation
