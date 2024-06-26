@@ -122,6 +122,7 @@ export const CommentCard = ({
   }, [comment.canvasSignedData]);
 
   useEffect(() => {
+    if (!app.config.enforceSessionKeys) return;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     doVerify();
   }, [doVerify]);
