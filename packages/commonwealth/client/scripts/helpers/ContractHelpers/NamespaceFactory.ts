@@ -251,8 +251,10 @@ class NamespaceFactory extends ContractBase {
         to: token,
         data: calldata,
       });
-      const balance = this.web3.eth.abi.decodeParameter('uint256', result);
-      return this.web3.utils.fromWei(String(balance), decimals!);
+      const balance: number = Number(
+        this.web3.eth.abi.decodeParameter('uint256', result),
+      );
+      return String((balance / 10) ^ (decimals ?? 18));
     }
   }
 }
