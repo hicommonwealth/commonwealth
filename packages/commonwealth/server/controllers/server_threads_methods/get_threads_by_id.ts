@@ -96,7 +96,7 @@ export async function __getThreadsById(
       {
         model: this.models.ContestAction,
         where: {
-          action: 'added',
+          action: 'upvoted',
         },
         required: false,
         attributes: ['content_id', 'thread_id'],
