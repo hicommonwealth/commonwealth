@@ -62,6 +62,12 @@ export const isCommunityAdmin: CommunityMiddleware = async (ctx) => {
   await authorizeAddress(ctx, ['admin']);
 };
 
+export const isSuperAdmin = async (ctx) => {
+  if (!ctx.actor.user.isAdmin) {
+    throw new InvalidActor(ctx.actor, 'Must be a super admin');
+  }
+};
+
 export const isCommunityModerator: CommunityMiddleware = async (ctx) => {
   // super admin is always allowed
   if (ctx.actor.user.isAdmin) return;

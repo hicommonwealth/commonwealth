@@ -12,6 +12,7 @@ import DeleteChainTask from './DeleteChainTask';
 import DownloadMembersListTask from './DownloadMembersListTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
+import RefreshCustomDomainTask from './RefreshCustomDomainTask';
 import TopUsers from './TopUsers';
 
 const AdminPanelPage = () => {
@@ -32,6 +33,7 @@ const AdminPanelPage = () => {
         <CWDivider />
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />
+        <RefreshCustomDomainTask />
         <UpdateCustomDomainTask />
         <UpdateCommunityIdTask />
         <DownloadMembersListTask />

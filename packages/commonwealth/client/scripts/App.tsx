@@ -12,11 +12,17 @@ import { queryClient } from 'state/api/config';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
+import app from './state/index';
 import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import { Mava } from './views/components/Mava';
 
 OpenFeature.setProvider(openFeatureProvider);
+
+console.log(app.user.jwt);
+console.log(app.user.jwt);
+console.log(app.user.jwt);
+console.log(app.user.jwt);
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();

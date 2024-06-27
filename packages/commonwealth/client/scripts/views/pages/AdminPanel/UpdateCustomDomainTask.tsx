@@ -4,7 +4,7 @@ import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { updateCommunityCustomDomain } from 'views/pages/AdminPanel/utils';
+import useUpdateCustomDomainMutation from '../../../state/api/communities/updateCustomDomain';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
@@ -15,6 +15,8 @@ const UpdateCustomDomainTask = () => {
   const [customDomain, setCustomDomain] = useState<string>('');
   const [customDomainValidated, setCustomDomainValidated] =
     useState<boolean>(false);
+
+  const updateCustomDomain = useUpdateCustomDomainMutation();
 
   const openConfirmationModal = () => {
     openConfirmation({
@@ -29,7 +31,8 @@ const UpdateCustomDomainTask = () => {
           onClick: () => {
             void (async () => {
               try {
-                await updateCommunityCustomDomain({
+                await updateCustomDomain.mutate({
+                  id: '',
                   community_id: communityId,
                   custom_domain: customDomain,
                 });
