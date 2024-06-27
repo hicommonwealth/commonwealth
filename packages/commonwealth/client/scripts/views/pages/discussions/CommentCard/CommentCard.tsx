@@ -115,7 +115,9 @@ export const CommentCard = ({
       );
       await verify(canvasSignedData);
       setVerifiedCanvasSignedData(canvasSignedData);
-    } catch (err) {}
+    } catch (err) {
+      // ignore invalid signed comments
+    }
   }, [comment.canvasSignedData]);
 
   useEffect(() => {

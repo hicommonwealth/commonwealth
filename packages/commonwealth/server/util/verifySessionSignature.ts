@@ -1,8 +1,6 @@
 import { Session } from '@canvas-js/interfaces';
 import assert from 'assert';
-import { fileURLToPath } from 'url';
 
-import { logger } from '@hicommonwealth/core';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { getSessionSignerForAddress } from 'shared/canvas/verify';
@@ -13,9 +11,6 @@ import {
   type ProfileAttributes,
 } from '@hicommonwealth/model';
 import { CANVAS_TOPIC } from '../../shared/canvas';
-
-const __filename = fileURLToPath(import.meta.url);
-const log = logger(__filename);
 
 /**
  * Verify the session signature is valid for the address model,
@@ -65,14 +60,15 @@ const verifySessionSignature = async (
         const user = await models.User.createWithProfile?.({
           email: null,
         });
+        if (!user || !user.id) throw new Error('Failed to create user');
         addressModel.profile_id = (user?.Profiles?.[0] as ProfileAttributes).id;
         await models.Subscription.create({
-          subscriber_id: user?.id!,
+          subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
           is_active: true,
         });
         await models.Subscription.create({
-          subscriber_id: user?.id!,
+          subscriber_id: user.id,
           category_id: NotificationCategories.NewCollaboration,
           is_active: true,
         });
