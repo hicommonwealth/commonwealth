@@ -3,13 +3,13 @@ import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import app from 'state';
 
 const useNamespaceFactory = (ethChainId: number) => {
-  const goerliFactoryAddress =
+  const chainFactoryAddress =
     commonProtocol.factoryContracts[ethChainId].factory;
   const chainRpc = app.config.nodes
     .getAll()
     .find((node) => node.ethChainId === ethChainId)?.url;
   // @ts-expect-error StrictNullChecks
-  const namespaceFactory = new NamespaceFactory(goerliFactoryAddress, chainRpc);
+  const namespaceFactory = new NamespaceFactory(chainFactoryAddress, chainRpc);
 
   return { namespaceFactory };
 };
