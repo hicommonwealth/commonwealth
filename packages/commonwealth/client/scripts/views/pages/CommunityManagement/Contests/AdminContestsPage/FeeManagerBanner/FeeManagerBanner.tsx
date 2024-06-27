@@ -32,7 +32,7 @@ const FeeManagerBanner = ({ ethChainId, namespace }: FeeManagerBannerProps) => {
 
   const popoverProps = usePopover();
 
-  const handleBuyStakeClick = async () => {
+  const handleBuyStakeClick = () => {
     setModeOfManageCommunityStakeModal('buy');
   };
 
