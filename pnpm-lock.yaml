@@ -719,6 +719,27 @@ importers:
 
   libs/shared:
     dependencies:
+      '@canvas-js/chain-cosmos':
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/chain-ethereum':
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/chain-solana':
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/chain-substrate':
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/interfaces':
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2
+      '@canvas-js/signatures':
+        specifier: 0.10.0-beta.2
+        version: 0.10.0-beta.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@ipld/dag-json':
+        specifier: ^10.2.0
+        version: 10.2.0
       moment:
         specifier: ^2.23.0
         version: 2.30.1

@@ -16,21 +16,21 @@ import {
   sequelize,
 } from '@hicommonwealth/model';
 import {
+  CANVAS_TOPIC,
   ChainBase,
   NotificationCategories,
   WalletId,
   WalletSsoSource,
+  deserializeCanvas,
+  getSessionSignerForAddress,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
-import { CANVAS_TOPIC } from 'shared/canvas';
-import { deserializeCanvas } from 'shared/canvas/types';
 import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { getSessionSignerForAddress } from '../../shared/canvas/verify';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';

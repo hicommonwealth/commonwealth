@@ -3,10 +3,10 @@ import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import { Session } from '@canvas-js/interfaces';
+import { serializeCanvas } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
-import { serializeCanvas } from 'shared/canvas/types';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';

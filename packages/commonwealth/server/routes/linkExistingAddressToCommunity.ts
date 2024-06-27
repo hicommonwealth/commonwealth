@@ -1,11 +1,11 @@
 import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import type { Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { addressSwapper, bech32ToHex } from '../../shared/utils';
+import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';

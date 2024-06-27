@@ -1,4 +1,9 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  NEAR_MAINNET_CHAIN_ID,
+  WalletId,
+  verifySession,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
 import {
@@ -15,8 +20,6 @@ import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { NEAR_MAINNET_CHAIN_ID } from 'shared/canvas/chainMappings';
-import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';

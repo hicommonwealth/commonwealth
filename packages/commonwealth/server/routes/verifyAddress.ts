@@ -13,12 +13,12 @@ import {
   DynamicTemplate,
   NotificationCategories,
   WalletId,
+  addressSwapper,
+  deserializeCanvas,
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
-import { deserializeCanvas } from 'shared/canvas/types';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { addressSwapper } from '../../shared/utils';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';

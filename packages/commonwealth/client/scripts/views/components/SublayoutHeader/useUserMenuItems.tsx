@@ -23,8 +23,8 @@ import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationMod
 import {
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
-} from 'shared/canvas/chainMappings';
-import { getSessionSigners } from 'shared/canvas/verify';
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 
 import { useCommunityStake } from '../CommunityStake';
 
