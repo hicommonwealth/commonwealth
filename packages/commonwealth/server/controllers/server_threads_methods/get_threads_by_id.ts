@@ -96,7 +96,7 @@ export async function __getThreadsById(
       {
         model: this.models.ContestAction,
         where: {
-          action: 'upvoted',
+          action: 'added',
         },
         required: false,
         attributes: ['content_id', 'thread_id'],
@@ -132,6 +132,7 @@ export async function __getThreadsById(
         ],
       },
     ],
+    logging: true,
   });
 
   const result = threads.map((thread) => {
