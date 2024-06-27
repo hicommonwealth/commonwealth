@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
@@ -29,7 +26,7 @@ describe('Verify Address Routes', () => {
     server = await testServer();
 
     sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
-    const { payload, signer } = await sessionSigner.newSession(CANVAS_TOPIC);
+    const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
     session = payload;
     walletAddress = session.address.split(':')[2];
 
@@ -44,7 +41,6 @@ describe('Verify Address Routes', () => {
         block_info: TEST_BLOCK_INFO_STRING,
       });
 
-    const address_id = res.body.result.id;
     expect(res.body.status).to.be.equal('Success');
     expect(res.body.result.role).to.be.equal('member');
 
@@ -74,8 +70,6 @@ describe('Verify Address Routes', () => {
           wallet_id,
           session: serializeCanvas(session),
         });
-      const user_id = res.body.result.user.id;
-      const email = res.body.result.user.email;
 
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.user.email).to.be.equal(null);
@@ -89,11 +83,8 @@ describe('Verify Address Routes', () => {
         chainId: parseInt(chain_id),
         signer: Wallet.createRandom(),
       });
-      const { payload, signer } = await altSessionSigner.newSession(
-        CANVAS_TOPIC,
-      );
+      const { payload } = await altSessionSigner.newSession(CANVAS_TOPIC);
       const altSession = payload;
-      const altWalletAddress = altSession.address.split(':')[2];
 
       const res = await chai.request
         .agent(server.app)
@@ -114,7 +105,7 @@ describe('Verify Address Routes', () => {
     });
 
     test('should fail to create a new user if session is for wrong topic', async () => {
-      const { payload, signer } = await sessionSigner.newSession('FAKE_TOPIC');
+      const { payload } = await sessionSigner.newSession('FAKE_TOPIC');
       const altSession = payload;
 
       const res = await chai.request
