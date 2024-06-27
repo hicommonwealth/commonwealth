@@ -71,7 +71,7 @@ export const createThreadHandler = async (
           canvasSignedData.actionMessage.payload.did,
           address?.address,
         ),
-        community: community.id,
+        community: community?.id,
         topic: topicId ? parseInt(topicId, 10) : null,
       });
     }

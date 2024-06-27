@@ -15,7 +15,7 @@ import { addressSwapper } from 'shared/utils';
  */
 
 export class CosmosSignerCW extends CosmosSigner {
-  public async getDid(): Promise<string> {
+  public async getDid(): Promise<`did:${string}`> {
     const chainId = await this._signer.getChainId();
     const walletAddress = await this._signer.getAddress(chainId);
     const { data } = fromBech32(walletAddress);
@@ -77,7 +77,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
   // override SubstrateSigner to always use 42 as the ss58 id
   // TODO: Could we pass the ss58prefix to this._signer.getAddress()
   // in packages/chain-substrate instead?
-  public async getDid(): Promise<string> {
+  public async getDid(): Promise<`did:${string}`> {
     const walletAddress = await this._signer.getAddress();
     const finalAddress = addressSwapper({
       currentPrefix: 42,
