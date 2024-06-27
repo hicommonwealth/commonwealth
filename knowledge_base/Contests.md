@@ -38,6 +38,10 @@ Initially, custom vote-weight strategies for the community are not available. Th
 
 NB: In the current off-chain topics, all community members start with 1 vote weight even if they do not have any community stake token. For on-chain contests, the amount of voting weight directly equals the amount of the community stake tokens the user owns.
 
+## Sequence Diagram
+
+![Contests Event Flow v1](./assets/Contests-Event-Flow-v1.png)
+
 ## Change Log
 
 - 240506: Authored by Ege Tekiner and Graham Johnson (#7699).
