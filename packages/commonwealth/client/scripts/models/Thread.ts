@@ -1,11 +1,18 @@
+import {
+  Contest,
+  ContestAction,
+  ContestManager,
+  ContestScore,
+} from '@hicommonwealth/schemas';
 import { ProposalType } from '@hicommonwealth/shared';
 import type MinimumProfile from 'models/MinimumProfile';
-import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
+import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
+import { z } from 'zod';
 import Comment from './Comment';
-import type { IUniqueId } from './interfaces';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
+import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
 function getDecodedString(str: string) {
@@ -19,7 +26,7 @@ function getDecodedString(str: string) {
 
 function processAssociatedContests(
   associatedContests?: AssociatedContest[] | null,
-  contestActions?: ContestActions[] | null,
+  contestActions?: ContestActionT[] | null,
 ): AssociatedContest[] | [] {
   if (associatedContests) {
     return associatedContests;
@@ -129,33 +136,35 @@ function processAssociatedReactions(
   return temp;
 }
 
-type Score = {
-  prize: string;
-  votes: number;
-  content_id: string;
-  creator_address: string;
-};
+const ScoreZ = ContestScore.element.omit({
+  tickerPrize: true,
+});
 
-type ContestManager = {
-  name: string;
-  cancelled: boolean;
-  interval: number;
-};
+const ContestManagerZ = ContestManager.pick({
+  name: true,
+  cancelled: true,
+  interval: true,
+});
 
-type Contest = {
-  contest_id: number;
-  contest_address: string;
-  score: Score[];
-  start_time: string;
-  end_time: string;
-  ContestManager: ContestManager;
-};
+const ContestZ = Contest.pick({
+  contest_id: true,
+  contest_address: true,
+  end_time: true,
+}).extend({
+  score: ScoreZ.array(),
+  ContestManager: ContestManagerZ,
+  start_time: z.string(),
+  end_time: z.string(),
+});
 
-type ContestActions = {
-  content_id: number;
-  thread_id: number;
-  Contest: Contest;
-};
+const ContestActionZ = ContestAction.pick({
+  content_id: true,
+  thread_id: true,
+}).extend({
+  Contest: ContestZ,
+});
+
+type ContestActionT = z.infer<typeof ContestActionZ>;
 
 export interface VersionHistory {
   author?: MinimumProfile & { profile_id: number };
@@ -190,8 +199,8 @@ export type AssociatedContest = {
     content_id: string;
     creator_address: string;
   }[];
-  contest_cancelled: boolean;
-  thread_id: number;
+  contest_cancelled?: boolean | null;
+  thread_id: number | null | undefined;
   content_id: number;
   start_time: string;
   end_time: string;
@@ -375,7 +384,7 @@ export class Thread implements IUniqueId {
     associatedReactions?: AssociatedReaction[];
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
-    ContestActions: ContestActions[];
+    ContestActions: ContestActionT[];
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
