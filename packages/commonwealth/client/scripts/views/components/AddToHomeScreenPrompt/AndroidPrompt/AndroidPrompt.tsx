@@ -32,7 +32,7 @@ export const AndroidPrompt = ({
   });
 
   const handleInstallClick = () => {
-    try {
+    if (installPromptEvent) {
       // @ts-expect-error StrictNullChecks
       installPromptEvent.prompt();
 
@@ -50,7 +50,7 @@ export const AndroidPrompt = ({
           setShowPrompt(false);
         }
       });
-    } catch (e) {
+    } else {
       const manualStepsInstructionsEle =
         document.getElementById('manual-install');
       if (manualStepsInstructionsEle) {
