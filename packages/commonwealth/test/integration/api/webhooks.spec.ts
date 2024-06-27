@@ -235,7 +235,6 @@ describe('Webhook Tests', () => {
       expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
     });
   });
-<<<<<<< HEAD
 
   describe('Integration Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
@@ -294,6 +293,4 @@ describe('Webhook Tests', () => {
       // expect(res.statusCode).to.be.equal(200);
     });
   });
-=======
->>>>>>> 2c4ea3afae (removed Send Feedback from dropdown et al (#8166))
 });
