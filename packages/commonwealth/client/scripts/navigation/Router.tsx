@@ -13,8 +13,8 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
-  communityHomepageEnabled: boolean;
   contestEnabled: boolean;
+  knockInAppNotifications: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -23,15 +23,17 @@ const Router = (customDomain: string) => {
     'proposalTemplates',
     false,
   );
-  const communityHomepageEnabled = client.getBooleanValue(
-    'communityHomepage',
+  const contestEnabled = client.getBooleanValue('contest', false);
+
+  const knockInAppNotifications = client.getBooleanValue(
+    'knockInAppNotifications',
     false,
   );
-  const contestEnabled = client.getBooleanValue('contest', false);
+
   const flags = {
     proposalTemplatesEnabled,
-    communityHomepageEnabled,
     contestEnabled,
+    knockInAppNotifications,
   };
 
   return createBrowserRouter(

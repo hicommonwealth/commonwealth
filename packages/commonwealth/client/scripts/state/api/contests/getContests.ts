@@ -7,6 +7,8 @@ type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input> & {
   enabled: boolean;
 };
 
+const CONTESTS_STALE_TIME = 60 * 1_000; // 60 s
+
 const useGetContestsQuery = ({
   contest_id,
   community_id,
@@ -19,7 +21,7 @@ const useGetContestsQuery = ({
       community_id,
       running,
     },
-    { enabled: enabled && !!community_id },
+    { enabled: enabled && !!community_id, staleTime: CONTESTS_STALE_TIME },
   );
 };
 

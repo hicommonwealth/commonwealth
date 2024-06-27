@@ -2,6 +2,8 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
+import { bootstrap_testing, seed } from 'model/src/tester';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import {
@@ -9,13 +11,13 @@ import {
   DeleteThreadSubscription,
   GetThreadSubscriptions,
 } from '../../src/subscription';
-import { seed } from '../../src/tester';
 
 describe('Thread subscription lifecycle', () => {
   let actor: Actor;
   let threadOne: z.infer<typeof schemas.Thread> | undefined;
   let threadTwo: z.infer<typeof schemas.Thread> | undefined;
-  before(async () => {
+  beforeAll(async () => {
+    await bootstrap_testing(true);
     const [user] = await seed('User', {
       isAdmin: false,
     });
@@ -58,7 +60,7 @@ describe('Thread subscription lifecycle', () => {
     };
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -66,7 +68,7 @@ describe('Thread subscription lifecycle', () => {
     await models.ThreadSubscription.truncate({});
   });
 
-  it('should create a new thread subscription', async () => {
+  test('should create a new thread subscription', async () => {
     const payload = {
       thread_id: threadOne!.id!,
     };
@@ -80,24 +82,35 @@ describe('Thread subscription lifecycle', () => {
     });
   });
 
-  it('should get thread subscriptions', async () => {
+  test('should get thread subscriptions', async () => {
     const [threadSubOne, threadSubTwo] =
       await models.ThreadSubscription.bulkCreate([
         { user_id: actor.user.id!, thread_id: threadOne!.id! },
         { user_id: actor.user.id!, thread_id: threadTwo!.id! },
       ]);
 
+    expect(threadSubOne).to.exist;
+    expect(threadSubTwo).to.exist;
+
     const res = await query(GetThreadSubscriptions(), {
       actor,
       payload: {},
     });
+
+    expect(res).to.exist;
+    expect(res![0]).to.exist;
+    expect(res![1]).to.exist;
+
+    res![0]!.Thread = null!;
+    res![1]!.Thread = null!;
+
     expect(res).to.have.deep.members([
-      threadSubOne.toJSON(),
-      threadSubTwo.toJSON(),
+      { ...threadSubOne.toJSON(), Thread: null },
+      { ...threadSubTwo.toJSON(), Thread: null },
     ]);
   });
 
-  it('should not throw for no thread subscriptions', async () => {
+  test('should not throw for no thread subscriptions', async () => {
     const res = await query(GetThreadSubscriptions(), {
       actor,
       payload: {},
@@ -105,7 +118,7 @@ describe('Thread subscription lifecycle', () => {
     expect(res).to.deep.equal([]);
   });
 
-  it('should delete a thread subscriptions', async () => {
+  test('should delete a thread subscriptions', async () => {
     await models.ThreadSubscription.bulkCreate([
       { user_id: actor.user.id!, thread_id: threadOne!.id! },
       { user_id: actor.user.id!, thread_id: threadTwo!.id! },

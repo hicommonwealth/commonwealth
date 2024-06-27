@@ -79,6 +79,7 @@ type ContentPageProps = {
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
   setThreadBody?: (body: string) => void;
+  editingDisabled?: boolean;
 };
 
 export const CWContentPage = ({
@@ -116,6 +117,7 @@ export const CWContentPage = ({
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
   setThreadBody,
+  editingDisabled,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -186,8 +188,8 @@ export const CWContentPage = ({
         {...(thread?.lockedAt && {
           lockedAt: thread.lockedAt.toISOString(),
         })}
-        {...(thread?.updatedAt && {
-          lastUpdated: thread.updatedAt.toISOString(),
+        {...(thread?.lastEdited && {
+          lastUpdated: (thread?.lastEdited || thread.createdAt).toISOString(),
         })}
         // @ts-expect-error <StrictNullChecks/>
         authorAddress={author?.address}
@@ -276,6 +278,7 @@ export const CWContentPage = ({
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             shareEndpoint={`${window.location.origin}${window.location.pathname}`}
+            editingDisabled={editingDisabled}
           />,
         )}
 

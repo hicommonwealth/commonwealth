@@ -55,7 +55,7 @@ export function formatAaveProposal(
 
 export async function getEthereumAaveProposals(
   aaveGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
 ): Promise<AaveContractProposalsType> {
   // GovernanceV2Helper contract address on Ethereum
   const aaveGovHelperAddress = '0x16ff7583ea21055Bf5F929Ec4b896D997Ff35847';
