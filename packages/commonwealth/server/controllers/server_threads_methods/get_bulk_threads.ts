@@ -221,8 +221,8 @@ export async function __getBulkThreads(
         ))) as "associatedContests"
         FROM "Contests" CON
         JOIN "ContestManagers" CM ON CM.contest_address = CON.contest_address
-        JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id 
-        AND CON.contest_address = CA.contest_address AND CA.action = 'upvoted'
+        JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+        AND CON.contest_address = CA.contest_address AND CA.action = 'added'
         JOIN top_threads TT ON TT.id = CA.thread_id
         GROUP BY TT.id
     )${
