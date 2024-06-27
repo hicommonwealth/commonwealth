@@ -24,11 +24,11 @@ const verifySessionSignature = async (
   session: Session,
 ): Promise<void> => {
   const expectedAddress = addressModel.address;
-  const sessionAddress = session.address.split(':')[2];
 
+  const walletAddress = session.address.split(':')[2];
   assert(
-    sessionAddress === expectedAddress,
-    `session.address (${sessionAddress}) does not match addressModel.address (${expectedAddress})`,
+    walletAddress === expectedAddress,
+    `session.address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
   );
 
   const signer = getSessionSignerForAddress(session.address);
