@@ -2,10 +2,9 @@ import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useCallback, useState } from 'react';
-import app from 'state';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 // eslint-disable-next-line max-len
-import ChainInfo from 'models/ChainInfo';
+import { getUniqueCommunities } from 'helpers/addresses';
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -24,19 +23,6 @@ import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
 
 type NotificationSection = 'community-alerts' | 'subscriptions';
-
-/**
- * Get the unique communities but also sort them.
- */
-function getUniqueCommunities() {
-  const dict: { [id: string]: ChainInfo } = {};
-
-  for (const addr of app.user.addresses) {
-    dict[addr.community.id] = addr.community;
-  }
-
-  return Object.values(dict).sort((a, b) => a.name.localeCompare(b.name));
-}
 
 const NotificationSettings = () => {
   const threadSubscriptions = useThreadSubscriptions();
