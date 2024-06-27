@@ -23,6 +23,9 @@ importers:
       '@aave/aave-token':
         specifier: ^1.0.4
         version: 1.0.4
+      '@cosmjs/encoding':
+        specifier: 0.32.3
+        version: 0.32.3
       '@hicommonwealth/eslint-plugin':
         specifier: workspace:*
         version: link:libs/eslint-plugin
@@ -47,6 +50,12 @@ importers:
       '@playwright/test':
         specifier: ^1.43.1
         version: 1.44.0
+      '@polkadot/util':
+        specifier: 12.6.2
+        version: 12.6.2
+      '@polkadot/util-crypto':
+        specifier: 12.6.2
+        version: 12.6.2(@polkadot/util@12.6.2)
       '@tanstack/eslint-plugin-query':
         specifier: ^4.29.4
         version: 4.38.0(eslint@8.57.0)
@@ -743,6 +752,9 @@ importers:
       moment:
         specifier: ^2.23.0
         version: 2.30.1
+      safe-stable-stringify:
+        specifier: ^2.4.2
+        version: 2.4.3
     devDependencies:
       '@types/moment':
         specifier: ^2.13.0

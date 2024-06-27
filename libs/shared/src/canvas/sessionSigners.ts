@@ -90,7 +90,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
   }
 
   // override AbstractSessionSigner to use ss58 id 42 in hasSession
-  hasSession(topic, address) {
+  hasSession(topic: string, address: string) {
     const [namespace, chainId, walletAddress] = address.split(':');
     const finalAddress = addressSwapper({
       currentPrefix: 42,

@@ -90,7 +90,7 @@ export const verify = async ({
 
 export const verifyComment = async (
   canvasSignedData: CanvasSignedData,
-  fields,
+  fields: any,
 ) => {
   const { thread_id, text, address, parent_comment_id } = fields;
 
@@ -123,7 +123,7 @@ export const verifyComment = async (
 
 export const verifyThread = async (
   canvasSignedData: CanvasSignedData,
-  fields,
+  fields: any,
 ) => {
   const { title, body, address, community, link, topic } = fields;
 
@@ -158,7 +158,7 @@ export const verifyThread = async (
 
 export const verifyReaction = async (
   canvasSignedData: CanvasSignedData,
-  fields,
+  fields: any,
 ) => {
   const { thread_id, comment_id, proposal_id, address, value } = fields;
 
