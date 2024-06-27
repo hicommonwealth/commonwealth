@@ -93,9 +93,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     [splitURLPath],
   );
   const memoizedTopics = useMemo(() => topics, [topics]);
-  const testRoute = '/discussions';
-  console.log('splitURLPath: ', splitURLPath);
-  console.log('splitURLPath.length: ', splitURLPath.length);
+
   //redirects users to All Discussions if they try to access a topic in the url that doesn't exist
   useEffect(() => {
     if (
@@ -107,7 +105,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         (topic) => topic?.name === decodedString,
       );
       if (!validTopics) {
-        navigate(testRoute);
+        navigate('/discussions');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
