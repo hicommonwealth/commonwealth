@@ -44,4 +44,5 @@ NB: In the current off-chain topics, all community members start with 1 vote wei
 
 ## Change Log
 
+- 240627: Sequence diagram added by Ryan Bennett (#7699).
 - 240506: Authored by Ege Tekiner and Graham Johnson (#7699).
