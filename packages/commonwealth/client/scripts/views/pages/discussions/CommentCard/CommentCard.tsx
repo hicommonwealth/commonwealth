@@ -115,10 +115,7 @@ export const CommentCard = ({
       );
       await verify(canvasSignedData);
       setVerifiedCanvasSignedData(canvasSignedData);
-    } catch (err) {
-      console.log('Unexpected error while verifying action/session');
-      return;
-    }
+    } catch (err) {}
   }, [comment.canvasSignedData]);
 
   useEffect(() => {
