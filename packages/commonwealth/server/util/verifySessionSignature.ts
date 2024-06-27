@@ -25,7 +25,7 @@ const log = logger(__filename);
 const verifySessionSignature = async (
   models: DB,
   addressModel: AddressInstance,
-  user_id?: number,
+  user_id: number | undefined | null,
   session: Session,
 ): Promise<void> => {
   const expectedAddress = addressModel.address;
@@ -45,7 +45,7 @@ const verifySessionSignature = async (
 
   addressModel.last_active = new Date();
 
-  if (user_id === null) {
+  if (user_id === null || user_id === undefined) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user
     // @ts-expect-error StrictNullChecks
     addressModel.verification_token_expires = null;
@@ -62,25 +62,21 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        // @ts-expect-error StrictNullChecks
-        const user = await models.User.createWithProfile({
+        const user = await models.User.createWithProfile?.({
           email: null,
         });
-        // @ts-expect-error StrictNullChecks
-        addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
+        addressModel.profile_id = (user?.Profiles?.[0] as ProfileAttributes).id;
         await models.Subscription.create({
-          // @ts-expect-error StrictNullChecks
-          subscriber_id: user.id,
+          subscriber_id: user?.id!,
           category_id: NotificationCategories.NewMention,
           is_active: true,
         });
         await models.Subscription.create({
-          // @ts-expect-error StrictNullChecks
-          subscriber_id: user.id,
+          subscriber_id: user?.id!,
           category_id: NotificationCategories.NewCollaboration,
           is_active: true,
         });
-        addressModel.user_id = user.id;
+        addressModel.user_id = user?.id;
       }
     }
   } else {
@@ -90,8 +86,7 @@ const verifySessionSignature = async (
     addressModel.verified = new Date();
     addressModel.user_id = user_id;
     const profile = await models.Profile.findOne({ where: { user_id } });
-    // @ts-expect-error StrictNullChecks
-    addressModel.profile_id = profile.id;
+    addressModel.profile_id = profile?.id;
   }
   await addressModel.save();
 };
