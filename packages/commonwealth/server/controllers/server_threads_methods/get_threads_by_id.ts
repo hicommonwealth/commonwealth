@@ -132,7 +132,6 @@ export async function __getThreadsById(
         ],
       },
     ],
-    logging: true,
   });
 
   const result = threads.map((thread) => {
