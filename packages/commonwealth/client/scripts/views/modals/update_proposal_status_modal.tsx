@@ -27,6 +27,7 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
 } from '../../../../shared/analytics/types';
+import useAppStatus from '../../hooks/useAppStatus';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { ProposalSelector } from '../components/ProposalSelector';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -83,6 +84,8 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
     // @ts-expect-error <StrictNullChecks/>
   >(getInitialCosmosProposals(thread));
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
@@ -173,6 +176,7 @@ export const UpdateProposalStatusModal = ({
               title: enrichedSnapshot.title,
             },
           ],
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
@@ -210,6 +214,7 @@ export const UpdateProposalStatusModal = ({
             source: LinkSource.Proposal,
             identifier,
           })),
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
@@ -247,6 +252,7 @@ export const UpdateProposalStatusModal = ({
             identifier: identifier,
             title: title,
           })),
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
@@ -271,6 +277,7 @@ export const UpdateProposalStatusModal = ({
 
     trackAnalytics({
       event: MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
+      isPWA: isAddedToHomeScreen,
     });
 
     // @ts-expect-error <StrictNullChecks/>

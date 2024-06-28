@@ -18,6 +18,7 @@ import useDirectoryPageData, {
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import './DirectoryPage.scss';
 
 const DirectoryPage = () => {
@@ -36,6 +37,8 @@ const DirectoryPage = () => {
   )?.directoryPageChainNodeId;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
   const baseChain = app.config.nodes.getById(defaultChainNodeId);
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const {
     tableData,
@@ -56,6 +59,7 @@ const DirectoryPage = () => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DIRECTORY_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 

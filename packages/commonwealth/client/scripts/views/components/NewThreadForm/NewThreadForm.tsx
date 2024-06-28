@@ -22,6 +22,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -47,6 +48,8 @@ export const NewThreadForm = () => {
   const contestsEnabled = useFlag('contest');
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -162,6 +165,7 @@ export const NewThreadForm = () => {
         url: threadUrl,
         // @ts-expect-error <StrictNullChecks/>
         authorProfile: app.user.activeAccount.profile,
+        isPWA: isAddedToHomeScreen,
       });
 
       setThreadContentDelta(createDeltaFromText(''));

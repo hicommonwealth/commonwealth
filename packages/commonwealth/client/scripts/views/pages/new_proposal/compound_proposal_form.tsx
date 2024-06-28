@@ -8,6 +8,7 @@ import app from 'state';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
 import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
@@ -31,6 +32,8 @@ export const CompoundProposalForm = () => {
   const [title, setTitle] = useState('');
 
   const author = app.user.activeAccount;
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -94,6 +97,7 @@ export const CompoundProposalForm = () => {
       notifySuccess(`Proposal ${result} created successfully!`);
       trackAnalytics({
         event: MixpanelGovernanceEvents.COMPOUND_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       notifyError(err.data?.message || err.message);

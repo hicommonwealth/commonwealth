@@ -33,6 +33,7 @@ import {
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { setDarkMode } from '../../../helpers/darkMode';
 import { getAddressFromWallet, loginToNear } from '../../../helpers/wallet';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import { useFlag } from '../../../hooks/useFlag';
 import Account from '../../../models/Account';
@@ -69,6 +70,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -129,6 +132,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isSocialLogin: isSocialLogin,
       loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
       isMobile,
+      isPWA: isAddedToHomeScreen,
     });
   };
 
@@ -545,6 +549,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (joinedCommunity) {
         trackAnalytics({
           event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+          isPWA: isAddedToHomeScreen,
         });
       }
 
