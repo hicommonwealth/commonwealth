@@ -1,3 +1,10 @@
+import type {
+  Action,
+  Awaitable,
+  Message,
+  Session,
+  Signature,
+} from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -14,6 +21,13 @@ describe('Polls', () => {
 
   let userJWT: string;
   let userAddress: string;
+  // the userAddress with the chain and chain id prefix - this is used by canvas
+  let canvasAddress: string;
+  let userSession: {
+    session: Session;
+    sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
+  };
+
   let topicId;
   let threadId = 0;
   let pollId = 0;
@@ -36,11 +50,16 @@ describe('Polls', () => {
       { chain },
       'Alice',
     );
-    userAddress = userRes.address;
+    canvasAddress = userRes.address;
+    userAddress = canvasAddress.split(':')[2];
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       config.AUTH.JWT_SECRET,
     );
+    userSession = {
+      session: userRes.session,
+      sign: userRes.sign,
+    };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
@@ -52,29 +71,15 @@ describe('Polls', () => {
   test('should create a poll for a thread', async () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: 'ethereum',
-      address: userAddress,
+      address: canvasAddress,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',
       kind: 'discussion',
       stage: 'discussion',
       topicId,
-      session: {
-        type: 'session',
-        signature: '',
-        payload: {
-          app: '',
-          chain: '',
-          from: '',
-          sessionAddress: '',
-          sessionDuration: 0,
-          sessionIssued: 0,
-          block: '',
-        },
-      },
-      sign: function (): string {
-        return '';
-      },
+      session: userSession.session,
+      sign: userSession.sign,
     });
 
     const data = {

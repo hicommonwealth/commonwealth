@@ -22,7 +22,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
+import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';

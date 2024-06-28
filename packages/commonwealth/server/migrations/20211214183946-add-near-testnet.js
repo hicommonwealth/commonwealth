@@ -21,7 +21,7 @@ module.exports = {
             github: '',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -32,7 +32,7 @@ module.exports = {
             url: 'https://rpc.testnet.near.org',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -41,12 +41,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'near-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['near-testnet'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

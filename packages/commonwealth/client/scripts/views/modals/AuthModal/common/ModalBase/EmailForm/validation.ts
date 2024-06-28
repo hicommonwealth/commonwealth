@@ -1,4 +1,4 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidationMessages';
+import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 
 const emailValidationSchema = z.object({

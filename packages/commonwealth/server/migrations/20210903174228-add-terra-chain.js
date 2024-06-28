@@ -19,7 +19,7 @@ module.exports = {
               'Terra is a programmable money for the internet that is easier to spend, and more attractive to hold.',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -30,7 +30,7 @@ module.exports = {
             url: 'https://terra.cw-figment.workers.dev',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -39,12 +39,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'terra' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['terra'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

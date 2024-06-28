@@ -44,7 +44,7 @@ module.exports = {
             github: '',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       // TODO: update URL for near mainnet
@@ -57,7 +57,7 @@ module.exports = {
             url: 'https://rpc.mainnet.near.org',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

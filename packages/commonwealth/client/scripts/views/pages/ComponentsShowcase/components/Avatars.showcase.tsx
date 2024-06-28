@@ -113,10 +113,10 @@ const AvatarsShowcase = () => {
     <>
       <CWText type="h5">Avatar</CWText>
       <div className="flex-row">
-        <CWAvatar avatarUrl="/static/img/ghost.svg" size={16} />
-        <CWAvatar avatarUrl="/static/img/ghost.svg" size={20} />
-        <CWAvatar avatarUrl="/static/img/ghost.svg" size={24} />
-        <CWAvatar avatarUrl="/static/img/ghost.svg" size={32} />
+        <CWAvatar avatarUrl="assets/img/ghost.svg" size={16} />
+        <CWAvatar avatarUrl="assets/img/ghost.svg" size={20} />
+        <CWAvatar avatarUrl="assets/img/ghost.svg" size={24} />
+        <CWAvatar avatarUrl="assets/img/ghost.svg" size={32} />
       </div>
 
       <CWText type="h5">Avatar Group</CWText>

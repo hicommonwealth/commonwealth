@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -21,7 +21,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -32,7 +32,7 @@ module.exports = {
           allowNull: false,
           defaultValue: new Date(),
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -43,7 +43,7 @@ module.exports = {
           allowNull: false,
           defaultValue: new Date(),
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.removeColumn('ChainNodes', 'chain_base', {
@@ -167,11 +167,6 @@ module.exports = {
           name: 'Kusama',
           url: 'ws://kusama-rpc.polkadot.io:9944',
           ss58: 2,
-        },
-        {
-          name: 'Edgeware (Testnet)',
-          url: 'ws://beresheet1.edgewa.re:9944',
-          ss58: 7,
         },
         {
           name: 'CLV Chain (Clover)',
@@ -362,9 +357,9 @@ module.exports = {
             'ChainNodes',
             update,
             { url: cn.url },
-            { transaction }
+            { transaction },
           );
-        })
+        }),
       );
 
       // fix two chains and remove duplicates
@@ -372,58 +367,68 @@ module.exports = {
         'Chains',
         { chain_node_id: 17 },
         { id: 'neta-money' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { chain_node_id: 20 },
         { id: 'clandestina' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'CommunityRoles',
         { chain_id: 'ethereum-local' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'CommunityRoles',
         { chain_id: 'ideamarket' },
-        { transaction }
+        { transaction },
+      );
+      await queryInterface.bulkDelete(
+        'CommunityRoles',
+        { chain_id: 'ideamarket-testnet' },
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'CommunityContracts',
         { chain_id: 'ethereum-local' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'CommunityContracts',
         { chain_id: 'ideamarket' },
-        { transaction }
+        { transaction },
+      );
+      await queryInterface.bulkDelete(
+        'CommunityContracts',
+        { chain_id: 'ideamarket-testnet' },
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'ethereum-local' },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'ideamarket' },
-        { transaction }
+        { transaction },
+      );
+      await queryInterface.bulkDelete(
+        'Chains',
+        { id: 'ideamarket-testnet' },
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'Contracts',
         { chain_node_id: 21 },
-        { transaction }
-      );
-      await queryInterface.bulkDelete(
-        'ChainNodes',
-        { id: 18 },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 21 },
-        { transaction }
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `UPDATE "ChainNodes" SET name = REGEXP_REPLACE(url, 'https?://', 'Imported node:');`,
@@ -431,13 +436,13 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
       await queryInterface.changeColumn(
         'ChainNodes',
         'name',
         { type: Sequelize.STRING, allowNull: false },
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -448,13 +453,13 @@ module.exports = {
         'ChainNodes',
         'name',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
         { name: null, description: null },
         {},
-        { transaction }
+        { transaction },
       );
       await queryInterface.removeColumn('ChainNodes', 'ss58', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'bech32', {
@@ -474,7 +479,7 @@ module.exports = {
           allowNull: false,
           defaultValue: '',
         },
-        { transaction }
+        { transaction },
       );
     });
   },

@@ -15,8 +15,8 @@ import { afterAll, beforeAll, describe, test } from 'vitest';
 
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
-const V1BETA1_API = `/cosmosAPI`;
-const V1_API = `/cosmosAPI/v1`;
+const V1BETA1_API = `/api/cosmosProxy`;
+const V1_API = `/api/cosmosProxy/v1`;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -55,7 +55,7 @@ describe('Cosmos Cache', () => {
   describe('cosmosAPI', { timeout: 5_000 }, () => {
     async function makeRPCRequest(
       body,
-      path = `/cosmosAPI/${V1BETA1_CHAIN_ID}`,
+      path = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}`,
       headers = {
         'content-type': 'text/plain;charset=UTF-8',
         'accept-language': 'en-US,en;q=0.9',
@@ -255,7 +255,7 @@ describe('Cosmos Cache', () => {
     });
   });
 
-  describe('cosmosAPI/v1', () => {
+  describe(V1_API, () => {
     const lcdProposalsCacheExpectedTest = async (
       proposalStatus: string,
       expectedDuration: number,
