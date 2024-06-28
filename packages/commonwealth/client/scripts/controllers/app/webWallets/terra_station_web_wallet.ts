@@ -3,6 +3,7 @@ import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
+import app from 'state';
 
 type TerraAddress = {
   address: string;
