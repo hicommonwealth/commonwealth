@@ -46,6 +46,10 @@ Description: Stops and removes all Docker containers created in the [start](#sta
 extension, but the `grafana/xk6:latest` Docker image currently uses version v0.5.0 of `k6` and Typescript support is
 only available in [v0.5.2][2] and upwards.
 
+# TODO
+
+- We allow for a `SERVER_URL` to be defined but not a `DATABASE_URL` that is associated to the `SERVER_URL`
+
 [1]: https://grafana.com/docs/k6/latest/using-k6/javascript-typescript-compatibility-mode/#experimental-enhanced-mode
 [2]: https://github.com/grafana/k6/releases/tag/v0.52.0
 

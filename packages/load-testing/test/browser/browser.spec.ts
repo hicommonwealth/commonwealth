@@ -1,12 +1,9 @@
 import { check } from 'k6';
 import { browser } from 'k6/experimental/browser';
+import { SERVER_URL } from '../../src/config';
 import { temp } from './utils';
 
 temp();
-
-const BASE_URL = __ENV.BASE_URL
-  ? `http://${__ENV.BASE_URL}/`
-  : 'http://localhost:8080/';
 
 export const options = {
   scenarios: {
@@ -50,7 +47,7 @@ export async function dashboard() {
   const page = browser.newPage();
 
   try {
-    await page.goto(BASE_URL);
+    await page.goto(SERVER_URL);
     page.waitForLoadState('load');
 
     check(page, {
@@ -65,7 +62,7 @@ export async function layer_zero() {
   const page = browser.newPage();
 
   try {
-    await page.goto(`${BASE_URL}layerzero/discussion`);
+    await page.goto(`${SERVER_URL}/layerzero/discussion`);
     page.waitForLoadState('load');
 
     check(page, {
@@ -80,7 +77,7 @@ export async function search() {
   const page = browser.newPage();
 
   try {
-    await page.goto(`${BASE_URL}dashboard/global`);
+    await page.goto(`${SERVER_URL}/dashboard/global`);
     page.waitForLoadState('load');
     let searchParm = ['Proto', 'Common', 'Layer0', 'Discussion', 'Dashboard'];
     let randomParm = searchParm[Math.floor(Math.random() * searchParm.length)];
