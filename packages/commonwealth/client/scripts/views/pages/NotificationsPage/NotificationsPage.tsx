@@ -23,5 +23,3 @@ export const NotificationsPage = () => {
     </CWPageLayout>
   );
 };
-
-export default NotificationsPage;
