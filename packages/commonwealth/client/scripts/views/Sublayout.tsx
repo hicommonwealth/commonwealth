@@ -1,5 +1,4 @@
 import 'Sublayout.scss';
-import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -20,7 +19,6 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -221,13 +219,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            headerText="Shape the Future of Crypto with Ideacoin!"
-            bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
-            buttonText="Take the Survey for an NFT"
-            buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
-            growlImage={ideacoinSurveyGrowlImage}
-          />
         </div>
         {userOnboardingEnabled && (
           <WelcomeOnboardModal
