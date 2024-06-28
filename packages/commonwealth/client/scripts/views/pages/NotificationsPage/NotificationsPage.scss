@@ -1,0 +1,17 @@
+.NotificationsPageLayout {
+  display: flex;
+  flex-grow: 1;
+
+  .layout-container {
+    display: flex;
+    flex-grow: 1;
+  }
+
+  .NotificationsPage {
+    flex-grow: 1;
+
+    .rnf-notification-feed {
+      flex-grow: 1;
+    }
+  }
+}

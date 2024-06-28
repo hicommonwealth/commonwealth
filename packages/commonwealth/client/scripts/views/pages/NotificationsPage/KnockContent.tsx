@@ -25,9 +25,7 @@ export const KnockContent = () => {
     >
       {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
       <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
-        <div>
-          <NotificationFeed />
-        </div>
+        <NotificationFeed />
       </KnockFeedProvider>
     </KnockProvider>
   );
