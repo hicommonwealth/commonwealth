@@ -30,7 +30,7 @@ const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
 
-const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const NotificationsPage = lazy(() => import('views/pages/NotificationsPage'));
 
 const NotificationSettingsOld = lazy(
   () => import('views/pages/NotificationSettingsOld'),
@@ -119,6 +119,7 @@ const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   contestEnabled,
   knockInAppNotifications,
+  knockPushNotifications,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
