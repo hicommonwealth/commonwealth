@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { DB, incrementProfileCount } from '@hicommonwealth/model';
 import { ChainBase } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import type { Request, Response } from 'express';
@@ -9,7 +9,6 @@ import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import { incrementProfileCount } from '../util/denormalizedCountUtils';
 import { createRole, findOneRole } from '../util/roles';
 
 const { Op } = Sequelize;
@@ -141,7 +140,6 @@ const linkExistingAddressToCommunity = async (
   } else {
     const newObj = await models.sequelize.transaction(async (transaction) => {
       await incrementProfileCount(
-        models,
         community!.id!,
         originalAddress.user_id,
         transaction,

@@ -12,8 +12,8 @@ import {
   type ProfileAttributes,
 } from '@hicommonwealth/model';
 
+import { incrementProfileCount } from '@hicommonwealth/model';
 import { CANVAS_TOPIC } from '../../shared/canvas';
-import { incrementProfileCount } from './denormalizedCountUtils';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -71,7 +71,6 @@ const verifySessionSignature = async (
           );
 
           await incrementProfileCount(
-            models,
             addressModel.community_id,
             userEntity!.id!,
             transaction,

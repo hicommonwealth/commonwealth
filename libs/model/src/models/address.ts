@@ -1,5 +1,6 @@
 import { Role, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
+import { decrementProfileCount } from '../utils/index';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -160,24 +161,10 @@ export default (
             transaction: options.transaction,
           });
 
-          await sequelize.query(
-            `
-            UPDATE "Communities" as c
-            SET profile_count = profile_count - 1,
-            WHERE c.id = :community_id
-            AND NOT EXISTS (
-                SELECT 1
-                FROM "Addresses" as a
-                WHERE a.community_id = c.id AND a.user_id = :user_id
-            );
-            `,
-            {
-              replacements: {
-                community_id: address.community_id,
-                user_id: address.user_id,
-              },
-              transaction: options.transaction,
-            },
+          await decrementProfileCount(
+            address.community_id,
+            address.user_id!,
+            options.transaction,
           );
         },
       },
