@@ -31,6 +31,9 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/NotificationsPage'));
+const NotificationsPageOld = lazy(
+  () => import('views/pages/NotificationsPageOld'),
+);
 
 const NotificationSettingsOld = lazy(
   () => import('views/pages/NotificationSettingsOld'),
@@ -229,9 +232,12 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/notifications"
     path="/:scope/notifications"
-    element={withLayout(NotificationsPage, {
-      scoped: true,
-    })}
+    element={withLayout(
+      knockInAppNotifications ? NotificationsPage : NotificationsPageOld,
+      {
+        scoped: true,
+      },
+    )}
   />,
   <Route
     key="/notifications"
