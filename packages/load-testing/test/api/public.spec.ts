@@ -1,10 +1,10 @@
 import { check } from 'k6';
 import http from 'k6/http';
-import { URL } from 'url';
+import { SERVER_URL } from '../../src/config';
+// @ts-ignore
+import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 
-// Single API URL for local debugging
-// const BASE_URL = 'http://localhost:8080/api/';
-const BASE_URL = `http://${__ENV.BASE_URL}/` || 'http://localhost:8080/api/';
+const BASE_URL = SERVER_URL + '/api';
 const JWT_token = '';
 
 export const options = {
@@ -49,7 +49,7 @@ export async function threads() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}threads`);
+  const url = new URL(`${BASE_URL}/threads`);
   url.searchParams.append('limit', '100');
   url.searchParams.append('community_id', 'layerzero');
   url.searchParams.append('count', 'true');
@@ -67,7 +67,7 @@ export async function communities() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}communities`);
+  const url = new URL(`${BASE_URL}/communities`);
   //   url.searchParams.append('limit', '10');
   //   url.searchParams.append('community_id', 'layerzero');
   //   url.searchParams.append('count', true);
@@ -86,7 +86,7 @@ export async function groups() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}groups`);
+  const url = new URL(`${BASE_URL}/groups`);
   url.searchParams.append('community_id', 'layerzero');
 
   const res = http.get(url.toString(), header);
@@ -102,7 +102,7 @@ export async function status() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}status`);
+  const url = new URL(`${BASE_URL}/status`);
   url.searchParams.append('community_id', 'layerzero');
 
   const res = http.get(url.toString(), header);
@@ -118,7 +118,7 @@ export async function nodes() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}status`);
+  const url = new URL(`${BASE_URL}/status`);
   url.searchParams.append('community_id', 'layerzero');
 
   const res = http.get(url.toString(), header);

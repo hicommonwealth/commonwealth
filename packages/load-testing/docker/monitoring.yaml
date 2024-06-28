@@ -8,6 +8,7 @@ services:
       - POSTGRES_USER=commonwealth
       - POSTGRES_PASSWORD=edgeware
       - POSTGRES_DB=commonwealth
+    user: '${UID}:${GID}'
     volumes:
       - ./db/psql:/var/lib/postgresql/data
 
@@ -15,6 +16,7 @@ services:
     image: prom/prometheus
     ports:
       - 9090:9090
+    user: '${UID}:${GID}'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
@@ -25,6 +27,7 @@ services:
       - '2000:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=ministar
+    user: '${UID}:${GID}'
     volumes:
       - ./grafana:/var/lib/grafana
 
@@ -34,6 +37,7 @@ services:
       - 9187:9187
     environment:
       - DATA_SOURCE_NAME=${DATABASE_URL}
+    user: '${UID}:${GID}'
     links:
       - postgres
       - prometheus

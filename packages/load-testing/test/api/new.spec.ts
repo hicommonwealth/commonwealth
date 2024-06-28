@@ -1,6 +1,7 @@
 import { check } from 'k6';
 import http from 'k6/http';
-import { URL } from 'url';
+// @ts-ignore
+import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 
 // Single API URL for local debugging
 // const BASE_URL = 'http://localhost:3000/api/v1/rest/';
