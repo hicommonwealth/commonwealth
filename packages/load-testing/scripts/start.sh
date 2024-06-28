@@ -47,5 +47,5 @@ if [ "$ENVIRONMENT" == "local" ]; then
   fi
 else
   echo "Connecting to remote database"
-  DATABASE_URL="$DATABASE_URL" run_docker_command compose -f docker/monitoring.yaml -p load-testing up
+  DATABASE_URL="$DATABASE_URL" run_docker_command compose -f docker/monitoring-no-db.yaml -p load-testing up
 fi

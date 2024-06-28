@@ -7,8 +7,7 @@
     "clean": "sudo rm -rf docker/db && rm -rf docker/grafana && rm -rf k6",
     "check-types": "tsc --noEmit",
     "test": "chmod u+x scripts/k6.sh && ./scripts/k6.sh",
-    "start": "docker compose -f docker/monitoring.yaml up",
-    "start-2": "chmod u+x scripts/start.sh && ./scripts/start.sh",
+    "start": "chmod u+x scripts/start.sh && ./scripts/start.sh",
     "stop": "docker compose -p load-testing down"
   },
   "engines": {

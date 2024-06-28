@@ -1,18 +1,30 @@
 # Quickstart
 
+## Testing from local env
+
+### Local API
 1. Execute `pnpm start` to start up the required services in Docker.
 2. Navigate to `packages/commonwealth` and execute `pnpm db-all` to bootstrap the load test database.
 3. Navigate to `packages/commonwealth` and execute `pnpm start` to start the Commonwealth server.
 4. Execute `pnpm test test/<path_to_test_file>.ts`
 
+### Remote API
+1. Execute `pnpm start <frick | frack | beta>` to start up the required services in Docker and connect them to the
+desired Heroku app.
+2. Execute `pnpm test test/<path_to_test_file>.ts`
+
+## Testing from K6 Cloud
+WIP
+
 # Package Scripts
 
 ### start
 
-Definition: `docker compose -f monitoring.yaml`
+Definition: `chmod u+x scripts/start.sh && ./scripts/start.sh`
 
-Description: Starts all the required services for running k6 load tests locally. This includes Grafana, Prometheus, and
-Postgres.
+Description: Starts all the required services for running k6 load tests from the local environment. This includes 
+Grafana, Prometheus, and the Prometheus-Postgres Exporter. Additionally, if a native local database is not found and a
+remote database is not specified, a Postgres container will be created.
 
 ### test
 
