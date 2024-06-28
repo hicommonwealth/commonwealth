@@ -22,7 +22,10 @@ import { PageLoading } from '../loading';
 import { SubscriptionEntry } from './SubscriptionEntry';
 import './index.scss';
 
-type NotificationSection = 'community-alerts' | 'subscriptions';
+type NotificationSection =
+  | 'community-alerts'
+  | 'subscriptions'
+  | 'push-notifications';
 
 const NotificationSettings = () => {
   const threadSubscriptions = useThreadSubscriptions();
@@ -82,20 +85,14 @@ const NotificationSettings = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {enableKnockPushNotifications && (
-          <div>
-            <CWText type="h5">Push Notifications</CWText>
-
-            <p>
-              <CWButton
-                label="Subscribe to Push Notifications"
-                onClick={handlePushNotificationSubscription}
-              />
-            </p>
-          </div>
-        )}
-
         <CWTabsRow>
+          {enableKnockPushNotifications && (
+            <CWTab
+              label="Push Notifications"
+              isSelected={section === 'push-notifications'}
+              onClick={() => setSection('push-notifications')}
+            />
+          )}
           <CWTab
             label="Community Alerts"
             isSelected={section === 'community-alerts'}
@@ -107,6 +104,17 @@ const NotificationSettings = () => {
             onClick={() => setSection('subscriptions')}
           />
         </CWTabsRow>
+
+        {section === 'push-notifications' && (
+          <div>
+            <p>
+              <CWButton
+                label="Subscribe to Push Notifications"
+                onClick={handlePushNotificationSubscription}
+              />
+            </p>
+          </div>
+        )}
 
         {!communityAlerts.isLoading && section === 'community-alerts' && (
           <>
