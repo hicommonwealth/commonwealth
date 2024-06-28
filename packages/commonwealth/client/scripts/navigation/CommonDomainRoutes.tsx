@@ -119,6 +119,7 @@ const CommonDomainRoutes = ({
   proposalTemplatesEnabled,
   contestEnabled,
   knockInAppNotifications,
+  knockPushNotifications,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
