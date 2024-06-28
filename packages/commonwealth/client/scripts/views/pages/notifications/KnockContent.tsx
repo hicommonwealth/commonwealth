@@ -13,7 +13,7 @@ const KNOCK_PUBLIC_API_KEY =
 const KNOCK_IN_APP_FEED_ID =
   process.env.KNOCK_IN_APP_FEED_ID || 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb';
 
-export const KnockBody = () => {
+export const KnockContent = () => {
   const userId = app.user.id;
   const knockJWT = app.user.knockJWT;
 

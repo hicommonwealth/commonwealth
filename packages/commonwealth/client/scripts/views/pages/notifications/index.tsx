@@ -4,8 +4,8 @@ import React from 'react';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import PageError from 'views/pages/error';
-import { KnockBody } from 'views/pages/notifications/KnockBody';
-import { OldBody } from 'views/pages/notifications/OldBody';
+import { KnockContent } from 'views/pages/notifications/KnockContent';
+import { OldContent } from 'views/pages/notifications/OldContent';
 import { CWText } from '../../components/component_kit/cw_text';
 
 const NotificationsPage = () => {
@@ -22,8 +22,8 @@ const NotificationsPage = () => {
           Notifications
         </CWText>
 
-        {enableKnockInAppNotifications && <KnockBody />}
-        {!enableKnockInAppNotifications && <OldBody />}
+        {enableKnockInAppNotifications && <KnockContent />}
+        {!enableKnockInAppNotifications && <OldContent />}
       </div>
     </CWPageLayout>
   );
