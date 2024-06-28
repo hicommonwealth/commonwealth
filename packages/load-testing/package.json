@@ -4,11 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b ./tsconfig.json && tsc-alias -p ./tsconfig.json",
-    "build2": "vite build",
-    "clean": "rm -rf build && rm -rf coverage",
-    "test-browser:local": "k6 -e BASE_URL=localhost:8080 run build/test/browser/*.spec.js",
-    "test-api:local": "k6 run build/test/api/*.spec.js",
+    "clean": "sudo rm -rf db && rm -rf grafana && rm -rf k6",
+    "test": "chmod u+x scripts/k6.sh && ./scripts/k6.sh",
     "start": "docker compose -f monitoring.yaml up",
     "stop": "docker compose -f monitoring.yaml down"
   },

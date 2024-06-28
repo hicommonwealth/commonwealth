@@ -1,51 +1,51 @@
-# Installation
-
-These steps are required for local development and execution of k6 tests.
-
-Install k6 v0.51.0 in your local environment. See the [K6 docs][1] for instructions. Note that the version is important
-because the k6 types package is installed with PNPM and set to version 0.51.0.
-
 # Quickstart
 
 1. Execute `pnpm start` to start up the required services in Docker.
 2. Navigate to `packages/commonwealth` and execute `pnpm db-all` to bootstrap the load test database.
 3. Navigate to `packages/commonwealth` and execute `pnpm start` to start the Commonwealth server.
-4. Execute `pnpm build` to build the tests. K6 can only execute Javascript tests.
-5. Execute either `pnpm test-api:local` or `pnpm test-browser:local` to run tests.
+4. Execute `pnpm test test/<path_to_test_file>.ts`
 
 # Package Scripts
-
-### build
-
-Definition: `tsc -b ./tsconfig.json && tsc-alias -p ./tsconfig.json`
-
-Description: This builds the files in the `test` directory and outputs them in the `build` directory.
-
-Considerations: K6 can only run JavaScript files so changes must always be built before running the tests.
-
-### test-browser-local
-
-Definition: `k6 -e BASE_URL=localhost:8080 run build/browser/*.spec.js`
-
-Description: Executes the compiled browser tests from `build/browser` in the local environment.
-
-Considerations: Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. See [start](#start).
-Also requires k6 to be installed (see [Installation](#Installation))
-
-### test-api-local
-
-Definition: `k6 run build/api/*.spec.js`
-
-Description: Executes the compiled API tests from `build/api` in the local environment.
-
-Considerations: Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. See [start](#start).
-Also requires k6 to be installed (see [Installation](#Installation))
-
 
 ### start
 
 Definition: `docker compose -f monitoring.yaml`
 
-Description: Starts all the required services for running k6 load tests locally. This includes Grafana, Prometheus, the
-Commonwealth app, and Postgres.
+Description: Starts all the required services for running k6 load tests locally. This includes Grafana, Prometheus, and
+Postgres.
+
+### test
+
+Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file>`
+
+Description: Creates a k6 binary (`load-test/k6`) containing the `xk6-sql` and `xk6-ts` extensions if it does not exist 
+and then executes the k6 binary with the provided test file.
+
+Considerations: Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. See [start](#start).
+
+### clean
+
+Definition: `sudo rm -rf db && rm -rf grafana && rm -rf k6`
+
+Description: Cleans up all files and directories that are not committed with git.
+
+Considerations: This command should not be run on a regular basis like `clean` scripts in other packages. Removing the 
+k6 binary means it needs to be rebuilt the next time you execute a test. Additionally, the db and  grafana directories 
+cannot be removed if the Docker containers are running. `sudo` is required for removing the `db` directory because it
+is created by a Docker instance with root access.
+
+### stop
+
+Definition: `docker compose -f monitoring.yaml down`
+
+Description: Stops and removes all Docker containers created in the [start](#start) script.
+
+# Notes
+
+- There exists an [experimental mode][1] that would allow us to execute Typescript files without using the `xk6-ts`
+extension, but the `grafana/xk6:latest` Docker image currently uses version v0.5.0 of `k6` and Typescript support is
+only available in [v0.5.2][2] and upwards.
+
+[1]: https://grafana.com/docs/k6/latest/using-k6/javascript-typescript-compatibility-mode/#experimental-enhanced-mode
+[2]: https://github.com/grafana/k6/releases/tag/v0.52.0
 

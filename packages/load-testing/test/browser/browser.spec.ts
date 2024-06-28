@@ -1,10 +1,9 @@
 import { check } from 'k6';
 import { browser } from 'k6/experimental/browser';
 import { temp } from './utils';
-// import { config } from '@hicommonwealth/model'
 
-// console.log(config.SERVER_URL);
 temp();
+
 const BASE_URL = __ENV.BASE_URL
   ? `http://${__ENV.BASE_URL}/`
   : 'http://localhost:8080/';
