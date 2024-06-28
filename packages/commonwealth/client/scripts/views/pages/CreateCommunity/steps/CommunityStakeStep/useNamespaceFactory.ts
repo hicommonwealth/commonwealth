@@ -4,7 +4,7 @@ import app from 'state';
 
 const useNamespaceFactory = (ethChainId: number) => {
   const chainFactoryAddress =
-    commonProtocol.factoryContracts[ethChainId].factory;
+    commonProtocol.factoryContracts[ethChainId]?.factory;
   const chainRpc = app.config.nodes
     .getAll()
     .find((node) => node.ethChainId === ethChainId)?.url;

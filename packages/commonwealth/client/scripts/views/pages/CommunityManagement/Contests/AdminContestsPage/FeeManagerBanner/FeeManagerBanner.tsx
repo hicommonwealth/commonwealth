@@ -1,7 +1,6 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 
-import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -15,20 +14,16 @@ import CWPopover, {
 import './FeeManagerBanner.scss';
 
 interface FeeManagerBannerProps {
-  ethChainId: number;
-  namespace: string;
+  feeManagerBalance?: string;
+  isLoading: boolean;
 }
 
-const FeeManagerBanner = ({ ethChainId, namespace }: FeeManagerBannerProps) => {
+const FeeManagerBanner = ({
+  feeManagerBalance,
+  isLoading,
+}: FeeManagerBannerProps) => {
   const { setModeOfManageCommunityStakeModal } =
     useManageCommunityStakeModalStore();
-
-  const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =
-    useGetFeeManagerBalanceQuery({
-      ethChainId: ethChainId,
-      namespace,
-      apiEnabled: !!ethChainId,
-    });
 
   const popoverProps = usePopover();
 
@@ -36,7 +31,7 @@ const FeeManagerBanner = ({ ethChainId, namespace }: FeeManagerBannerProps) => {
     setModeOfManageCommunityStakeModal('buy');
   };
 
-  if (isFeeManagerBalanceLoading) {
+  if (isLoading) {
     return <Skeleton className="FeeManagerBannerSkeleton" />;
   }
 

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -31,6 +32,13 @@ const AdminContestsPage = () => {
     isContestDataLoading,
   } = useCommunityContests();
 
+  const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =
+    useGetFeeManagerBalanceQuery({
+      ethChainId: ethChainId!,
+      namespace,
+      apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
+    });
+
   if (!app.isLoggedIn() || !isAdmin) {
     return <PageNotFound />;
   }
@@ -54,7 +62,10 @@ const AdminContestsPage = () => {
         </div>
 
         {showBanner && (
-          <FeeManagerBanner ethChainId={ethChainId} namespace={namespace} />
+          <FeeManagerBanner
+            feeManagerBalance={feeManagerBalance}
+            isLoading={isFeeManagerBalanceLoading}
+          />
         )}
 
         <ContestsList
@@ -63,6 +74,7 @@ const AdminContestsPage = () => {
           isAdmin={isAdmin}
           isContestAvailable={isContestAvailable}
           stakeEnabled={stakeEnabled}
+          feeManagerBalance={feeManagerBalance}
         />
       </div>
     </CWPageLayout>
