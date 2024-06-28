@@ -27,7 +27,10 @@ const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
 
-const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const NotificationsPage = lazy(() => import('views/pages/NotificationsPage'));
+const NotificationsPageOld = lazy(
+  () => import('views/pages/NotificationsPageOld'),
+);
 
 const NotificationSettingsOld = lazy(
   () => import('views/pages/NotificationSettingsOld'),
@@ -198,10 +201,13 @@ const CustomDomainRoutes = ({
     <Route
       key="/notifications"
       path="/notifications"
-      element={withLayout(NotificationsPage, {
-        scoped: true,
-        type: 'common',
-      })}
+      element={withLayout(
+        knockInAppNotifications ? NotificationsPage : NotificationsPageOld,
+        {
+          scoped: true,
+          type: 'common',
+        },
+      )}
     />,
 
     <Route

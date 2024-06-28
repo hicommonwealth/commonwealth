@@ -15,6 +15,7 @@ export type RouteFeatureFlags = {
   proposalTemplatesEnabled: boolean;
   contestEnabled: boolean;
   knockInAppNotifications: boolean;
+  knockPushNotifications: boolean;
 };
 
 const Router = (customDomain: string) => {
@@ -30,10 +31,16 @@ const Router = (customDomain: string) => {
     false,
   );
 
+  const knockPushNotifications = client.getBooleanValue(
+    'knockPushNotifications',
+    false,
+  );
+
   const flags = {
     proposalTemplatesEnabled,
     contestEnabled,
     knockInAppNotifications,
+    knockPushNotifications,
   };
 
   return createBrowserRouter(

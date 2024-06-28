@@ -22,7 +22,7 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
-import { NotificationRow } from '../pages/notifications/notification_row';
+import { NotificationRow } from '../pages/NotificationsPageOld/notification_row';
 
 export const NotificationsMenu = () => {
   const navigate = useCommonNavigate();

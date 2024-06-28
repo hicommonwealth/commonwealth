@@ -1,0 +1,23 @@
+.NotificationsPageLayout {
+  display: flex;
+  flex-grow: 1;
+
+  .layout-container {
+    display: flex;
+    flex-grow: 1;
+  }
+
+  .NotificationsPage {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .rnf-notification-feed {
+      flex-grow: 1;
+    }
+
+    .rnf-notification-feed__knock-branding {
+      display: none;
+    }
+  }
+}
