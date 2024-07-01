@@ -5,6 +5,7 @@ import IChainAdapter from '../../../models/IChainAdapter';
 import { NearAccounts } from './account';
 import NearChain from './chain';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default class Near extends IChainAdapter<any, any> {
   public base = ChainBase.NEAR;
   public chain: NearChain;

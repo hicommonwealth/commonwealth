@@ -4,6 +4,7 @@ import type ChainInfo from '../../../models/ChainInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount } from './account';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 class NearChain implements IChainModule<any, NearAccount> {
   public get denom() {
     return this.app.chain.currency;
@@ -28,12 +29,13 @@ class NearChain implements IChainModule<any, NearAccount> {
     this._app = app;
   }
 
-  public async init(chain: ChainInfo): Promise<void> {
+  public init(chain: ChainInfo): Promise<void> {
     const networkSuffix = chain.id.split('.').pop();
     this._networkId =
       chain.id === 'near-testnet' || networkSuffix === 'testnet'
         ? 'testnet'
         : 'mainnet';
+    return Promise.resolve();
   }
 
   public async deinit(): Promise<void> {

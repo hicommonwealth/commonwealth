@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import React from 'react';
 
 import 'components/proposals/voting_result_components.scss';
@@ -66,6 +65,7 @@ type CompletedProposalVotingResultProps = {
   yesResults: string;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CompletedProposalVotingResult = (
   props: CompletedProposalVotingResultProps,
 ) => {
@@ -114,6 +114,7 @@ type SimpleYesApprovalVotingResultProps = {
   approvedCount: number;
 } & BaseVotingResultProps;
 
+// eslint-disable-next-line react/no-multi-comp
 export const SimpleYesApprovalVotingResult = (
   props: SimpleYesApprovalVotingResultProps,
 ) => {
@@ -140,6 +141,7 @@ type AaveVotingResultProps = {
   yesVotesCount: number;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const AaveVotingResult = (props: AaveVotingResultProps) => {
   const {
     noBalanceString,
@@ -195,6 +197,7 @@ type YesNoAbstainVetoVotingResultProps = {
   votes: Array<CosmosVote>;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const YesNoAbstainVetoVotingResult = (
   props: YesNoAbstainVetoVotingResultProps,
 ) => {
