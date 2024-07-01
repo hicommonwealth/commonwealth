@@ -44,6 +44,11 @@ export const ContractMethods = {
   GET_FEE_MANAGER_BALANCE: 'getFeeManagerBalance',
 };
 
+// keys that are not (yet) associated with API routes
+export const QueryKeys = {
+  CONFIGURATION: 'configuration',
+};
+
 export const ExternalEndpoints = {
   coinbase: {
     ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',

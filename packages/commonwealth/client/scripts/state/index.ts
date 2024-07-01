@@ -19,6 +19,7 @@ import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
 import StarredCommunity from 'models/StarredCommunity';
+import { queryClient, QueryKeys } from 'state/api/config';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -79,6 +80,7 @@ export interface IApp {
   loginStateEmitter: EventEmitter;
 
   // stored on server-side
+  // TODO
   config: {
     chains: ChainStore;
     redirects: Record<string, string>;
@@ -86,7 +88,7 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     evmTestEnv?: string;
-    enforceSessionKeys?: boolean;
+    // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
@@ -203,8 +205,12 @@ export async function initAppState(
     app.config.nodes.clear();
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
+
     app.config.evmTestEnv = statusRes.result.evmTestEnv;
-    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
+
+    queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+      enforceSessionKeys: statusRes.result.enforceSessionKeys,
+    });
 
     nodesRes.result
       .sort((a, b) => a.id - b.id)
