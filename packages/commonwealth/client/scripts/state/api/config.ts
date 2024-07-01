@@ -29,6 +29,7 @@ export const ApiEndpoints = {
   FETCH_WEBHOOKS: '/getWebhooks',
   FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
+  UPDATE_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,

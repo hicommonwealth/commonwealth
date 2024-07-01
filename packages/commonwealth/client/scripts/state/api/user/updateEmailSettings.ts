@@ -3,6 +3,7 @@ import axios from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import app from 'state';
 import { EmailNotificationInterval, useUserStore } from '../../ui/user/user';
+import { ApiEndpoints } from '../config';
 
 type UseUpdateUserEmailSettingsProps = {
   emailNotificationInterval?: EmailNotificationInterval;
@@ -21,11 +22,14 @@ export const updateUserEmailSettings = async ({
     ? emailNotificationInterval
     : `${promotionalEmailsEnabled}`;
 
-  await axios.post(`${app.serverUrl()}/writeUserSetting`, {
-    jwt: app.user.jwt,
-    key,
-    value,
-  });
+  await axios.post(
+    `${app.serverUrl()}/${ApiEndpoints.UPDATE_EMAIL_INTERVAL_SETTINGS}`,
+    {
+      jwt: app.user.jwt,
+      key,
+      value,
+    },
+  );
 
   return emailNotificationInterval;
 };
