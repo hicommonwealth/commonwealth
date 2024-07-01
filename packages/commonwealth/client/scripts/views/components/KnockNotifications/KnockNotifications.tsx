@@ -7,7 +7,6 @@ import {
 import '@knocklabs/react-notification-feed/dist/index.css';
 import useUserStore from 'client/scripts/state/ui/user';
 import React, { useRef, useState } from 'react';
-import app from 'state';
 import './KnockNotifications.scss';
 
 const KNOCK_PUBLIC_API_KEY =
@@ -19,7 +18,6 @@ const KNOCK_IN_APP_FEED_ID =
 
 export const KnockNotifications = () => {
   const user = useUserStore();
-  const knockJWT = app.user.knockJWT;
   const [isVisible, setIsVisible] = useState(false);
 
   const notifButtonRef = useRef(null);
@@ -28,7 +26,7 @@ export const KnockNotifications = () => {
     return null;
   }
 
-  if (!knockJWT || knockJWT === '') {
+  if (!user.knockJWT) {
     return null;
   }
 
@@ -37,7 +35,7 @@ export const KnockNotifications = () => {
       <KnockProvider
         apiKey={KNOCK_PUBLIC_API_KEY}
         userId={`${user.id}`}
-        userToken={knockJWT}
+        userToken={user.knockJWT}
       >
         {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
         <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">

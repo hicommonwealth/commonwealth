@@ -35,15 +35,6 @@ export class UserController {
     this._emailInterval = emailInterval;
   }
 
-  private _knockJWT: string;
-  public get knockJWT(): string {
-    return this._knockJWT;
-  }
-
-  private _setKnockJWT(knockJWT: string): void {
-    this._knockJWT = knockJWT;
-  }
-
   private _jwt: string;
   public get jwt(): string {
     return this._jwt;
@@ -146,10 +137,6 @@ export class UserController {
       console.log(e);
       notifyError('Unable to set email interval');
     }
-  }
-
-  public setKnockJWT(knockJWT: string): void {
-    this._setKnockJWT(knockJWT);
   }
 
   public setJWT(JWT: string): void {

@@ -263,13 +263,12 @@ export function updateActiveUser(data) {
     userStore.getState().setData({
       id: 0,
       email: '',
+      knockJWT: '',
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
     });
-    // @ts-expect-error StrictNullChecks
-    app.user.setKnockJWT(null);
     // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
@@ -284,13 +283,13 @@ export function updateActiveUser(data) {
     userStore.getState().setData({
       id: data.id || 0,
       email: data.email || '',
+      knockJWT: data.knockJwtToken || '',
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
     });
-    app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 
     app.user.setAddresses(
