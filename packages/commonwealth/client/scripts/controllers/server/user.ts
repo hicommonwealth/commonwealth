@@ -53,18 +53,9 @@ export class UserController {
     this._emailInterval = emailInterval;
   }
 
-  private _promotionalEmailsEnabled: boolean;
-  public get promotionalEmailsEnabled(): boolean {
-    return this._promotionalEmailsEnabled;
-  }
-
   private _isWelcomeOnboardFlowComplete: boolean;
   public get isWelcomeOnboardFlowComplete(): boolean {
     return this._isWelcomeOnboardFlowComplete;
-  }
-
-  private _setPromotionalEmailsEnabled(enabled: boolean): void {
-    this._promotionalEmailsEnabled = enabled;
   }
 
   private _setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
@@ -160,10 +151,6 @@ export class UserController {
 
   public setEmail(email: string): void {
     this._setEmail(email);
-  }
-
-  public setPromotionalEmailsEnabled(enabled: boolean): void {
-    this._setPromotionalEmailsEnabled(enabled);
   }
 
   public setIsWelcomeOnboardFlowComplete(enabled: boolean): void {

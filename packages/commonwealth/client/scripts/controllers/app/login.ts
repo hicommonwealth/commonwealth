@@ -261,9 +261,8 @@ export function updateActiveUser(data) {
     userStore.getState().setData({
       isSiteAdmin: false,
       isEmailVerified: false,
+      isPromotionalEmailEnabled: false,
     });
-    // @ts-expect-error StrictNullChecks
-    app.user.setPromotionalEmailsEnabled(null);
     app.user.setIsWelcomeOnboardFlowComplete(false);
     // @ts-expect-error StrictNullChecks
     app.user.setKnockJWT(null);
@@ -283,8 +282,8 @@ export function updateActiveUser(data) {
     userStore.getState().setData({
       isSiteAdmin: !!data.isAdmin, // always add a boolean - no undefined values
       isEmailVerified: !!data.emailVerified, // always add a boolean - no undefined values
+      isPromotionalEmailEnabled: !!data.promotional_emails_enabled, // always add a boolean - no undefined values
     });
-    app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
     app.user.setIsWelcomeOnboardFlowComplete(
       data.is_welcome_onboard_flow_complete,
     );
