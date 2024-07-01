@@ -65,15 +65,11 @@ export const NewThreadForm = () => {
   const {
     threadTitle,
     setThreadTitle,
-    threadKind,
     threadTopic,
     setThreadTopic,
-    threadUrl,
-    setThreadUrl,
     threadContentDelta,
     setThreadContentDelta,
     setIsSaving,
-    isDisabled,
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
@@ -107,11 +103,6 @@ export const NewThreadForm = () => {
     handleClose: resetCreateThreadMutation,
     error: createThreadError,
   });
-
-  console.log('threadTopic => ', threadTopic);
-  console.log('threadKind => ', threadKind);
-
-  const isDiscussion = threadKind === ThreadKind.Discussion;
 
   const isPopulated = useMemo(() => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
@@ -152,8 +143,6 @@ export const NewThreadForm = () => {
   const isDisabledBecauseOfContestsConsent =
     contestThreadBannerVisible && !submitEntryChecked;
 
-  console.log('threadTopic => ', threadTopic);
-
   const initialValues = {
     ...(!!location.search &&
       threadTopic?.name &&
@@ -193,7 +182,7 @@ export const NewThreadForm = () => {
     try {
       const thread = await createThread({
         address: app.user.activeAccount.address,
-        kind: threadKind,
+        kind: ThreadKind.Discussion,
         stage: app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]
           : ThreadStage.Discussion,
@@ -201,7 +190,7 @@ export const NewThreadForm = () => {
         title: values.title,
         topic: topics.find((x) => x.name === values.topic?.label) as any,
         body: serializeDelta(values.body),
-        url: threadUrl,
+        url: '',
         // @ts-expect-error <StrictNullChecks/>
         authorProfile: app.user.activeAccount.profile,
         isPWA: isAddedToHomeScreen,
@@ -233,12 +222,6 @@ export const NewThreadForm = () => {
       );
     }
   };
-
-  console.log('x => ', {
-    isDisabled,
-    '!hasJoinedCommunity': !hasJoinedCommunity,
-    isDisabledBecauseOfContestsConsent,
-  });
 
   return (
     <>
@@ -273,14 +256,6 @@ export const NewThreadForm = () => {
                   placeholder="Select topic"
                   hookToForm
                   name="topic"
-                />
-              )}
-
-              {!isDiscussion && (
-                <CWTextInput
-                  placeholder="https://"
-                  value={threadUrl}
-                  onInput={(e) => setThreadUrl(e.target.value)}
                 />
               )}
 

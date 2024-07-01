@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDraft } from 'hooks/useDraft';
 import { useSearchParams } from 'react-router-dom';
 import type Topic from '../../../../models/Topic';
-import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
 
 type NewThreadDraft = {
@@ -42,10 +41,6 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     );
   }, [restoredDraft, topicsForSelector, topicIdFromUrl]);
 
-  const [threadKind, setThreadKind] = useState<ThreadKind>(
-    ThreadKind.Discussion,
-  );
-  const [threadUrl, setThreadUrl] = useState('');
   // @ts-expect-error StrictNullChecks
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
@@ -56,20 +51,14 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
 
   const editorText = getTextFromDelta(threadContentDelta);
 
-  const isDiscussion = threadKind === ThreadKind.Discussion;
   const disableSave = isSaving;
   const hasTopics = !!topicsForSelector?.length;
   const topicMissing = hasTopics && !threadTopic;
   const titleMissing = !threadTitle;
-  const linkContentMissing = !isDiscussion && !threadUrl;
   const contentMissing = editorText.length === 0;
 
   const isDisabled =
-    disableSave ||
-    titleMissing ||
-    topicMissing ||
-    linkContentMissing ||
-    contentMissing;
+    disableSave || titleMissing || topicMissing || contentMissing;
 
   // on content updated, save draft
   useEffect(() => {
@@ -100,14 +89,10 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
 
   return {
-    threadKind,
-    setThreadKind,
     threadTitle,
     setThreadTitle,
     threadTopic,
     setThreadTopic,
-    threadUrl,
-    setThreadUrl,
     threadContentDelta,
     setThreadContentDelta,
     isSaving,
