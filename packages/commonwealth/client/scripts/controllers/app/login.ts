@@ -259,6 +259,7 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.setEmailInterval(null);
     userStore.getState().setData({
+      isSiteAdmin: false,
       isEmailVerified: false,
     });
     // @ts-expect-error StrictNullChecks
@@ -270,8 +271,6 @@ export function updateActiveUser(data) {
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-
-    app.user.setSiteAdmin(false);
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
@@ -282,6 +281,7 @@ export function updateActiveUser(data) {
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     userStore.getState().setData({
+      isSiteAdmin: !!data.isAdmin, // always add a boolean - no undefined values
       isEmailVerified: !!data.emailVerified, // always add a boolean - no undefined values
     });
     app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
@@ -307,7 +307,6 @@ export function updateActiveUser(data) {
       ),
     );
 
-    app.user.setSiteAdmin(data.isAdmin);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }
