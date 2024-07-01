@@ -66,7 +66,7 @@ export const EditCollaboratorsModal = ({
     ?.pages?.[0]?.results
     ? profiles.pages[0].results
         .map((profile) => ({
-          ...profile!.roles[0],
+          ...profile!.roles?.[0],
           Address: profile.addresses[0],
         }))
         .filter(
@@ -202,6 +202,12 @@ export const EditCollaboratorsModal = ({
                     }),
                   },
                 });
+                updatedThread.collaborators?.forEach((c) =>
+                  c.User.Profiles.forEach((p: any) => {
+                    p.avatarUrl = p.avatar_url;
+                    p.name = p.profile_name;
+                  }),
+                );
                 notifySuccess('Collaborators updated');
                 onCollaboratorsUpdated &&
                   // @ts-expect-error <StrictNullChecks/>
