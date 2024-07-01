@@ -1,23 +1,26 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
-import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
+import {
+  ChainBase,
+  WalletId,
+  WalletSsoSource,
+  chainBaseToCanvasChainId,
+} from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 
-import { getSessionSigners } from 'shared/canvas/verify';
+import { getSessionSigners } from '@hicommonwealth/shared';
 import { initAppState } from 'state';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
+import { CANVAS_TOPIC, serializeCanvas } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { Magic } from 'magic-sdk';
-import { CANVAS_TOPIC } from 'shared/canvas';
-import { serializeCanvas } from 'shared/canvas/types';
 
 import axios from 'axios';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';

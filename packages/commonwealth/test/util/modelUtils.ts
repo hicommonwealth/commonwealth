@@ -15,22 +15,24 @@ import type {
   DB,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { type Link, type LinkSource, type Role } from '@hicommonwealth/shared';
+import {
+  CANVAS_TOPIC,
+  CanvasSignResult,
+  CanvasSignedData,
+  SubstrateSignerCW,
+  serializeCanvas,
+  toCanvasSignedDataApiArgs,
+  type Link,
+  type LinkSource,
+  type Role,
+} from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import chai from 'chai';
 import NotificationSubscription from 'client/scripts/models/NotificationSubscription';
 import type { Application } from 'express';
-import { SubstrateSignerCW } from 'shared/canvas/sessionSigners';
-import {
-  CanvasSignResult,
-  CanvasSignedData,
-  serializeCanvas,
-  toCanvasSignedDataApiArgs,
-} from 'shared/canvas/types';
 import { createRole, findOneRole } from '../../server/util/roles';
 import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { CANVAS_TOPIC } from '../../shared/canvas';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {

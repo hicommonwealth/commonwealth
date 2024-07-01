@@ -1,12 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
-import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
 import {
+  addressSwapper,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-} from 'shared/canvas/types';
-import { verifyComment } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+  verifyComment,
+} from '@hicommonwealth/shared';
+import { CreateThreadCommentOptions } from 'server/controllers/server_threads_methods/create_thread_comment';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';

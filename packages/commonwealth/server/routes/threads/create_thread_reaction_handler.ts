@@ -1,12 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
-import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
 import {
+  addressSwapper,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-} from 'shared/canvas/types';
-import { verifyReaction } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+  verifyReaction,
+} from '@hicommonwealth/shared';
+import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';

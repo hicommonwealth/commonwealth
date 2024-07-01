@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 
-import { WalletSsoSource } from '@hicommonwealth/shared';
+import { addressSwapper, WalletSsoSource } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
+import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import WebWalletController from 'controllers/app/web_wallets';
-import { addressSwapper } from 'shared/utils';
 import app from 'state';
 import _ from 'underscore';
-import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
+import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,

@@ -1,11 +1,11 @@
 import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
-import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
 import {
+  addressSwapper,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
-} from 'shared/canvas/types';
-import { verifyThread } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+  verifyThread,
+} from '@hicommonwealth/shared';
+import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';

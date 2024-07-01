@@ -2,7 +2,7 @@ import { CosmosSigner } from '@canvas-js/chain-cosmos';
 import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import { AbstractSessionData, Session } from '@canvas-js/interfaces';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
-import { addressSwapper } from 'shared/utils';
+import { addressSwapper } from '@hicommonwealth/shared';
 
 /**
  * In Canvas, the default behaviour is that a SessionSigner saves a session key in localStorage for
@@ -90,7 +90,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
   }
 
   // override AbstractSessionSigner to use ss58 id 42 in hasSession
-  hasSession(topic, address) {
+  hasSession(topic: string, address: string) {
     const [namespace, chainId, walletAddress] = address.split(':');
     const finalAddress = addressSwapper({
       currentPrefix: 42,

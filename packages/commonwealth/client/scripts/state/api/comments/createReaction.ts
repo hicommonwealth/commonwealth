@@ -1,9 +1,9 @@
+import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { signCommentReaction } from 'client/scripts/controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import Reaction from 'models/Reaction';
-import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';

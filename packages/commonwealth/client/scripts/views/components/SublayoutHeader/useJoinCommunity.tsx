@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { addressSwapper, ChainBase } from '@hicommonwealth/shared';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -7,7 +7,6 @@ import { isSameAccount } from 'helpers';
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
-import { addressSwapper } from 'utils';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import TOSModal from 'views/modals/TOSModal';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';

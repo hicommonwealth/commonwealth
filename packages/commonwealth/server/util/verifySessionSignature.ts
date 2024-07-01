@@ -2,16 +2,18 @@ import { Session } from '@canvas-js/interfaces';
 import { fileURLToPath } from 'url';
 
 import { logger } from '@hicommonwealth/core';
-import { NotificationCategories } from '@hicommonwealth/shared';
+import {
+  NotificationCategories,
+  getSessionSignerForAddress,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { getSessionSignerForAddress } from 'shared/canvas/verify';
 
 import {
   type AddressInstance,
   type DB,
   type ProfileAttributes,
 } from '@hicommonwealth/model';
-import { CANVAS_TOPIC } from '../../shared/canvas';
+import { CANVAS_TOPIC } from '@hicommonwealth/shared';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);

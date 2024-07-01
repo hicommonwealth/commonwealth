@@ -1,18 +1,18 @@
 import type { Action, Message, Session } from '@canvas-js/interfaces';
-import { CANVAS_TOPIC } from 'canvas';
-
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
+import { CANVAS_TOPIC } from '@hicommonwealth/shared';
+import {
+  addressSwapper,
+  CanvasSignResult,
+  ChainBase,
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+  CosmosSignerCW,
+  getSessionSigners,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
 import app from 'client/scripts/state';
-import {
-  chainBaseToCaip2,
-  chainBaseToCanvasChainId,
-} from 'shared/canvas/chainMappings';
-import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
-import { CanvasSignResult } from 'shared/canvas/types';
-import { getSessionSigners } from 'shared/canvas/verify';
-import { addressSwapper } from '../../../../shared/utils';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 
