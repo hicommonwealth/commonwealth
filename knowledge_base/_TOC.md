@@ -18,7 +18,6 @@
 ## Common App
 
 - [App Initialization Flow](./App-Initialization-Flow.md)
-- [Contract Action Templates](./Contract-Action-Templates.md)
 - [Custom Domains](./Custom-Domains.md)
 - [Feature Flags](./Feature-Flags.md): Unleash.
 - [Gating](./Gating.md)
