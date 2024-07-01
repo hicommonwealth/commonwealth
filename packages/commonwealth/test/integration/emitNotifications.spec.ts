@@ -4,7 +4,6 @@ import {
   NotificationDataAndCategory,
   ProposalType,
   SnapshotEventType,
-  SupportedNetwork,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -447,52 +446,6 @@ describe('emitNotifications tests', () => {
         },
       });
 
-      expect(notifRead).to.exist;
-    });
-  });
-
-  describe('Chain Event Notifications', () => {
-    test('should generate a notification and notification reads for a new chain event', async () => {
-      const subscription = await server.models.Subscription.create({
-        subscriber_id: userId,
-        category_id: NotificationCategories.ChainEvent,
-        community_id: chain,
-      });
-
-      const chainEventId = -1;
-      const notification_data = {
-        id: chainEventId,
-        block_number: 10,
-        event_data: '',
-        queued: 1,
-        network: SupportedNetwork.Compound,
-        community_id: chain,
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-
-      await emitNotifications(server.models, {
-        categoryId: NotificationCategories.ChainEvent,
-        data: notification_data,
-      });
-
-      const notif = await server.models.Notification.findOne({
-        where: {
-          community_id: chain,
-          category_id: NotificationCategories.ChainEvent,
-          chain_event_id: chainEventId,
-        },
-      });
-      expect(notif).to.exist;
-
-      const notifRead = await server.models.NotificationsRead.findOne({
-        where: {
-          subscription_id: subscription.id,
-          // @ts-expect-error StrictNullChecks
-          notification_id: notif.id,
-          user_id: userId,
-        },
-      });
       expect(notifRead).to.exist;
     });
   });

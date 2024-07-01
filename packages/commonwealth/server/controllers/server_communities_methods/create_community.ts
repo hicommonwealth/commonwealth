@@ -384,7 +384,7 @@ export async function __createCommunity(
     // @ts-expect-error StrictNullChecks
     chain_node_id: node.id,
     token_name,
-    has_chain_events_listener: network === 'aave' || network === 'compound',
+    has_chain_events_listener: false,
     default_page: DefaultPage.Homepage,
     has_homepage: 'true',
   });

@@ -5,16 +5,11 @@ import { formatCoin } from 'adapters/currency';
 
 import 'components/proposals/vote_listing.scss';
 import { CosmosVote } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
-import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { VotingUnit } from '../../../models/types';
 import { BinaryVote, DepositVote } from '../../../models/votes';
 
-import app from 'state';
 import Account from '../../../models/Account';
 import { User } from '../../components/user/user';
 import { CWText } from '../component_kit/cw_text';
@@ -32,21 +27,13 @@ const getBalance = (vote: IVote<any>) => {
   } else {
     // fetch balance and store in cache
     balancesCacheInitialized = { [vote.account.address]: true };
-    if (vote instanceof AaveProposalVote) {
-      balance = vote.power;
-      balancesCache = { [vote.account.address]: vote.format() };
-    } else if (vote instanceof CompoundProposalVote) {
-      balance = formatCoin(app.chain.chain.coins(vote.power), true);
-      balancesCache = { [vote.account.address]: balance };
-    } else {
-      vote.account.balance.then((b) => {
-        balance = b;
-        balancesCache = {
-          [vote.account.address]: formatCoin(b, true),
-        };
-      });
-      balance = '--';
-    }
+    vote.account.balance.then((b) => {
+      balance = b;
+      balancesCache = {
+        [vote.account.address]: formatCoin(b, true),
+      };
+    });
+    balance = '--';
   }
 
   return balance;
@@ -67,13 +54,6 @@ export const VoteListing = (props: VoteListingProps) => {
 
   // TODO: show turnout if specific votes not found
   const sortedVotes = votes;
-
-  if (proposal instanceof AaveProposal) {
-    (sortedVotes as AaveProposalVote[]).sort((v1, v2) =>
-      v2.power.cmp(v1.power),
-    );
-  }
-
   const VoterInfo = ({
     voter,
     shouldShowPopover = true,
@@ -117,34 +97,6 @@ export const VoteListing = (props: VoteListingProps) => {
                   {balanceWeighted && balance && <CWText>{balance}</CWText>}
                 </div>
               );
-            case vote instanceof CompoundProposalVote:
-              return (
-                <div className="vote" key={i}>
-                  <VoterInfo voter={vote.account} shouldShowPopover={false} />
-                  {balance && typeof balance === 'string' && (
-                    <div className="vote-right-container">
-                      <CWText noWrap title={balance}>
-                        {balance}
-                      </CWText>
-                    </div>
-                  )}
-                </div>
-              );
-
-            case vote instanceof AaveProposalVote:
-              return (
-                <div className="vote" key={i}>
-                  <VoterInfo voter={vote.account} shouldShowPopover={false} />
-                  {balance && typeof balance === 'string' && (
-                    <div className="vote-right-container">
-                      <CWText noWrap title={balance}>
-                        {balance}
-                      </CWText>
-                    </div>
-                  )}
-                </div>
-              );
-
             case vote instanceof BinaryVote:
               return (
                 <div className="vote" key={i}>

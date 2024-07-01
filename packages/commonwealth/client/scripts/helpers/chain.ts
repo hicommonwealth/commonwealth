@@ -74,15 +74,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     const Near = (await import('../controllers/chain/near/adapter')).default;
     newChain = new Near(chain, app);
     initApi = true;
-  } else if (chain.network === ChainNetwork.Compound) {
-    const Compound = (
-      await import('../controllers/chain/ethereum/compound/adapter')
-    ).default;
-    newChain = new Compound(chain, app);
-  } else if (chain.network === ChainNetwork.Aave) {
-    const Aave = (await import('../controllers/chain/ethereum/aave/adapter'))
-      .default;
-    newChain = new Aave(chain, app);
   } else if (
     chain.base === ChainBase.Solana ||
     chain.network === ChainNetwork.SPL
@@ -94,7 +85,9 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
     chain.network === ChainNetwork.Ethereum ||
     chain.network === ChainNetwork.ERC721 ||
-    chain.network === ChainNetwork.ERC20
+    chain.network === ChainNetwork.ERC20 ||
+    chain.network === ChainNetwork.Compound ||
+    chain.network === ChainNetwork.Aave
   ) {
     const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
       .default;

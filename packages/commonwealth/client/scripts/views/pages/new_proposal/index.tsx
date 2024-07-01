@@ -14,8 +14,6 @@ import { PageLoading } from 'views/pages/loading';
 import type ProposalModule from '../../../models/ProposalModule';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
-import { AaveProposalForm } from './aave_proposal_form';
-import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 
 type NewProposalPageProps = {
@@ -85,10 +83,6 @@ const NewProposalPage = (props: NewProposalPageProps) => {
 
   const getForm = (typeEnum) => {
     switch (typeEnum) {
-      case ProposalType.AaveProposal:
-        return <AaveProposalForm />;
-      case ProposalType.CompoundProposal:
-        return <CompoundProposalForm />;
       case ProposalType.CosmosProposal:
         return <CosmosProposalForm />;
       default:

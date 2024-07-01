@@ -2,8 +2,6 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { communityStakesAbi } from './abi/CommunityStakesAbi';
 import { namespaceFactoryAbi } from './abi/NamespaceFactoryAbi';
-import aave_gov_abi from './abi/aaveGov';
-import comp_gov_abi from './abi/compGov';
 import dex_abi from './abi/dex';
 import erc_1155_abi from './abi/erc1155';
 import erc20_abi from './abi/erc20';
@@ -15,14 +13,6 @@ export const erc20 = (address: string, provider: Web3) => {
 
 export const uniswapV2 = (address: string, provider: Web3) => {
   return new provider.eth.Contract(dex_abi as AbiItem[], address);
-};
-
-export const comp_gov = (address: string, provider: Web3) => {
-  return new provider.eth.Contract(comp_gov_abi as AbiItem[], address);
-};
-
-export const aave_gov = (address: string, provider: Web3) => {
-  return new provider.eth.Contract(aave_gov_abi as AbiItem[], address);
 };
 
 export const erc_721 = (address: string, provider: Web3) => {
