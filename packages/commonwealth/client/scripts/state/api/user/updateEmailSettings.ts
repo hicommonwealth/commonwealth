@@ -2,21 +2,24 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import app from 'state';
+import { EmailNotificationInterval } from '../../ui/user/user';
 
 type UseUpdateUserEmailSettingsProps = {
-  emailInterval?: 'weekly' | 'never';
+  emailNotificationInterval?: EmailNotificationInterval;
   promotionalEmailsEnabled?: boolean;
 };
 
 export const updateUserEmailSettings = async ({
-  emailInterval,
+  emailNotificationInterval,
   promotionalEmailsEnabled,
 }: UseUpdateUserEmailSettingsProps) => {
   // TODO: api endpoint for this should be cleaned up
-  const key = emailInterval
+  const key = emailNotificationInterval
     ? 'updateEmailInterval'
     : 'promotional_emails_enabled';
-  const value = emailInterval ? emailInterval : `${promotionalEmailsEnabled}`;
+  const value = emailNotificationInterval
+    ? emailNotificationInterval
+    : `${promotionalEmailsEnabled}`;
 
   await axios.post(`${app.serverUrl()}/writeUserSetting`, {
     jwt: app.user.jwt,
@@ -24,14 +27,14 @@ export const updateUserEmailSettings = async ({
     value,
   });
 
-  return emailInterval;
+  return emailNotificationInterval;
 };
 
 const useUpdateUserEmailSettingsMutation = () => {
   return useMutation({
     mutationFn: updateUserEmailSettings,
-    onSuccess: (emailInterval) =>
-      app.user.setEmailInterval(emailInterval || ''),
+    onSuccess: (emailNotificationInterval) =>
+      app.user.setEmailInterval(emailNotificationInterval || ''),
     onError: () => notifyError('Unable to set email interval'),
   });
 };
