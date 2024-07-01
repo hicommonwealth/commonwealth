@@ -5,6 +5,7 @@ import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
 } from '../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import CWBanner from '../new_designs/CWBanner';
 import { CWTag } from '../new_designs/CWTag';
 
@@ -18,6 +19,9 @@ const CWGatedTopicBanner = ({
   onClose = () => {},
 }: CWGatedTopicBannerProps) => {
   const navigate = useCommonNavigate();
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
       onAction: true,
@@ -41,6 +45,7 @@ const CWGatedTopicBanner = ({
           onClick: () => {
             trackAnalytics({
               event: MixpanelClickthroughEvent.VIEW_THREAD_TO_MEMBERS_PAGE,
+              isPWA: isAddedToHomeScreen,
             });
             navigate('/members?tab=groups');
           },

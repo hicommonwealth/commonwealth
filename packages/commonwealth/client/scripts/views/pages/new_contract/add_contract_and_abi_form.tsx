@@ -11,6 +11,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { isAddress } from 'web3-utils';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import useAppStatus from '../../../hooks/useAppStatus';
 
 const AddContractAndAbiForm = () => {
   const navigate = useCommonNavigate();
@@ -21,6 +22,8 @@ const AddContractAndAbiForm = () => {
     abi: '',
   });
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const handleAddContract = async () => {
     try {
       setSaving(true);
@@ -30,6 +33,7 @@ const AddContractAndAbiForm = () => {
         chain_node_id: chainNodeId,
         abi: form.abi,
         address: form.address,
+        isPWA: isAddedToHomeScreen,
       });
 
       navigate(`/contracts`);

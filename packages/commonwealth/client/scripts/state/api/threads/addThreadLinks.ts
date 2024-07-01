@@ -8,11 +8,13 @@ interface AddThreadLinksProps {
   communityId: string;
   threadId: number;
   links: Link[];
+  isPWA?: boolean;
 }
 
 const addThreadLinks = async ({
   threadId,
   links,
+  isPWA,
 }: AddThreadLinksProps): Promise<Thread> => {
   const response = await axios.post(
     `${app.serverUrl()}/linking/addThreadLinks`,
@@ -20,6 +22,11 @@ const addThreadLinks = async ({
       thread_id: threadId,
       links,
       jwt: app.user.jwt,
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
     },
   );
 
@@ -29,6 +36,7 @@ const addThreadLinks = async ({
 interface UseAddThreadLinksMutationProps {
   communityId: string;
   threadId: number;
+  isPWA?: boolean;
 }
 
 const useAddThreadLinksMutation = ({

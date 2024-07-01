@@ -25,12 +25,14 @@ interface UseGetContestBalanceQueryProps {
   contestAddress: string;
   chainRpc: string;
   ethChainId: number;
+  apiEnabled?: boolean;
 }
 
 const useGetContestBalanceQuery = ({
   contestAddress,
   chainRpc,
   ethChainId,
+  apiEnabled = true,
 }: UseGetContestBalanceQueryProps) => {
   return useQuery({
     queryKey: [
@@ -41,7 +43,7 @@ const useGetContestBalanceQuery = ({
     ],
     queryFn: () => getContestBalance({ contestAddress, chainRpc, ethChainId }),
     staleTime: GET_CONTEST_BALANCE_STALE_TIME,
-    enabled: !!contestAddress,
+    enabled: !!contestAddress && apiEnabled,
   });
 };
 

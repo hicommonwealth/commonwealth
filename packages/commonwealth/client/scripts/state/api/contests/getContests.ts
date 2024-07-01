@@ -7,7 +7,7 @@ type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input> & {
   enabled: boolean;
 };
 
-const CONTESTS_STALE_TIME = 60 * 1_000; // 60 s
+const CONTESTS_STALE_TIME = 10 * 1_000; // 10 s
 
 const useGetContestsQuery = ({
   contest_id,
