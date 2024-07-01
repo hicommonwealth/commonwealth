@@ -326,7 +326,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
       // @ts-expect-error StrictNullChecks
-      await account.validate(session, false);
+      await account.validate(session);
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>

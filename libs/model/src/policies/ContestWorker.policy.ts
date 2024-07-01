@@ -132,8 +132,12 @@ export function ContestWorker(): Policy<typeof inputs> {
             JOIN "ContestManagers" cm ON cm.community_id = c.id
             JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
             JOIN "Contests" co ON cm.contest_address = co.contest_address
+              AND co.contest_id = (
+                SELECT MAX(contest_id) AS max_id
+                FROM "Contests" c1
+                WHERE c1.contest_address = cm.contest_address
+              )
             JOIN "ContestActions" added on co.contest_address = added.contest_address
-              AND co.contest_id = added.contest_id
               AND added.thread_id = :thread_id
               AND added.action = 'added'
             WHERE ct.topic_id = :topic_id
