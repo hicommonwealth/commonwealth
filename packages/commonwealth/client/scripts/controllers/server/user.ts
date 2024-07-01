@@ -2,14 +2,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
-import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
 import StarredCommunity from '../../models/StarredCommunity';
 
 // eslint-disable-next-line
-import axios from 'axios';
 import { EventEmitter } from 'events';
 import NotificationsController from './notifications';
 
@@ -142,28 +140,6 @@ export class UserController {
 
   public setSelectedCommunity(selectedCommunity: ChainInfo): void {
     this._setSelectedCommunity(selectedCommunity);
-  }
-
-  public async selectCommunity(options: { community: string }): Promise<void> {
-    try {
-      const res = await axios.post(`${app.serverUrl()}/selectCommunity`, {
-        community_id: options.community,
-        auth: true,
-        jwt: this._jwt,
-      });
-
-      if (res.data.status !== 'Success') {
-        throw new Error(`got unsuccessful status: ${res.data.status}`);
-      } else {
-        const community = app.config.chains.getById(options.community);
-        if (!community) {
-          throw new Error('unexpected community');
-        }
-        this.setSelectedCommunity(community);
-      }
-    } catch (error) {
-      console.error('Failed to select node on server', error);
-    }
   }
 
   public setNotifications(notifications: NotificationsController): void {

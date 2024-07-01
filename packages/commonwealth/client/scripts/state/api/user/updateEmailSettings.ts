@@ -10,7 +10,7 @@ type UseUpdateUserEmailSettingsProps = {
   promotionalEmailsEnabled?: boolean;
 };
 
-export const updateUserEmailSettings = async ({
+const updateUserEmailSettings = async ({
   emailNotificationInterval,
   promotionalEmailsEnabled,
 }: UseUpdateUserEmailSettingsProps) => {
@@ -23,7 +23,7 @@ export const updateUserEmailSettings = async ({
     : `${promotionalEmailsEnabled}`;
 
   await axios.post(
-    `${app.serverUrl()}/${ApiEndpoints.UPDATE_EMAIL_INTERVAL_SETTINGS}`,
+    `${app.serverUrl()}/${ApiEndpoints.UPDATE_USER_EMAIL_INTERVAL_SETTINGS}`,
     {
       jwt: app.user.jwt,
       key,

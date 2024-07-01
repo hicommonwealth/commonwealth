@@ -26,7 +26,9 @@ export const deinitChainOrCommunity = async () => {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
+export const loadCommunityChainInfo = async (
+  chain?: ChainInfo,
+): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
     if (app.user.selectedCommunity) {
@@ -133,13 +135,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses({ chain });
-
-  // Update default on server if logged in
-  if (app.isLoggedIn()) {
-    await app.user.selectCommunity({
-      community: chain.id,
-    });
-  }
 
   return true;
 };

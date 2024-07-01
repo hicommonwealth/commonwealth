@@ -1,4 +1,9 @@
+import useUpdateUserActiveCommunityMutation from './updateActiveCommunity';
 import useUpdateUserEmailMutation from './updateEmail';
 import useUpdateUserEmailSettingsMutation from './updateEmailSettings';
 
-export { useUpdateUserEmailMutation, useUpdateUserEmailSettingsMutation };
+export {
+  useUpdateUserActiveCommunityMutation,
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+};
