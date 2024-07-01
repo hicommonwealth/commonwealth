@@ -66,7 +66,7 @@ export const EditCollaboratorsModal = ({
     ?.pages?.[0]?.results
     ? profiles.pages[0].results
         .map((profile) => ({
-          ...profile.roles[0],
+          ...profile!.roles[0],
           Address: profile.addresses[0],
         }))
         .filter(
