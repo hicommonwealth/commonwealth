@@ -24,7 +24,7 @@ export type GetProposalsResult =
 export async function __getProposals(
   this: ServerProposalsController,
   { communityId }: GetProposalsOptions,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
   contractInfo: ContractInfo,
 ): Promise<GetProposalsResult> {
   let formattedProposals: GetProposalsResult = [];

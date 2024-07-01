@@ -34,6 +34,7 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import { useFlag } from '../../../../hooks/useFlag';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
@@ -61,6 +62,8 @@ const CommunityMembersPage = () => {
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const {
     shouldShowGroupMutationBannerForCommunities,
@@ -273,6 +276,7 @@ const CommunityMembersPage = () => {
 
     trackAnalytics({
       event: eventType,
+      isPWA: isAddedToHomeScreen,
     });
   };
 

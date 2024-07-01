@@ -7,6 +7,7 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
+import useAppStatus from '../../hooks/useAppStatus';
 import app from '../../state';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -45,6 +46,8 @@ export const ConfirmSnapshotVoteModal = (
 
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const handleVote = async (e) => {
@@ -65,6 +68,7 @@ export const ConfirmSnapshotVoteModal = (
       });
       trackAnalytics({
         event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log(err);

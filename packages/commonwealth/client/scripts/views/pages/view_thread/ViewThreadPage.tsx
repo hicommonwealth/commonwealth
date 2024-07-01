@@ -33,6 +33,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useFlag } from '../../../hooks/useFlag';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
@@ -104,6 +105,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -203,6 +206,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -292,7 +296,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // @ts-expect-error <StrictNullChecks/>
     thread.communityId !== app.activeChainId()
   ) {
-    return <PageNotFound />;
+    return <PageNotFound message="Thread not found" />;
   }
 
   // Original posters have full editorial control, while added collaborators

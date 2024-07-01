@@ -8,11 +8,14 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from '../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../../hooks/useBrowserAnalyticsTrack';
 import './CreateCommunityButton.scss';
 
 const CreateCommunityButton = () => {
   const navigate = useCommonNavigate();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -23,6 +26,7 @@ const CreateCommunityButton = () => {
   const handleCreateCommunity = () => {
     trackAnalytics({
       event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+      isPWA: isAddedToHomeScreen,
     });
     navigate('/createCommunity', {}, null);
   };

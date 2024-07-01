@@ -12,6 +12,7 @@ import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
+import { updateCommunityThreadCount } from './helpers/counts';
 
 interface CreateThreadProps {
   address: string;
@@ -24,6 +25,7 @@ interface CreateThreadProps {
   url?: string;
   readOnly?: boolean;
   authorProfile: MinimumProfile;
+  isPWA?: boolean;
 }
 
 const createThread = async ({
@@ -37,6 +39,7 @@ const createThread = async ({
   url,
   readOnly,
   authorProfile,
+  isPWA,
 }: CreateThreadProps): Promise<Thread> => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
@@ -46,23 +49,31 @@ const createThread = async ({
     topic: topic.id,
   });
 
-  const response = await axios.post(`${app.serverUrl()}/threads`, {
-    author_community_id: communityId,
-    community_id: communityId,
-    address,
-    author: JSON.stringify(authorProfile),
-    title: encodeURIComponent(title),
-    // @ts-expect-error StrictNullChecks
-    body: encodeURIComponent(body),
-    kind,
-    stage,
-    topic_name: topic.name,
-    topic_id: topic.id,
-    url,
-    readOnly,
-    jwt: app.user.jwt,
-    ...toCanvasSignedDataApiArgs(canvasSignedData),
-  });
+  const response = await axios.post(
+    `${app.serverUrl()}/threads`,
+    {
+      author_community_id: communityId,
+      community_id: communityId,
+      address,
+      author: JSON.stringify(authorProfile),
+      title: encodeURIComponent(title),
+      // @ts-expect-error StrictNullChecks
+      body: encodeURIComponent(body),
+      kind,
+      stage,
+      topic_name: topic.name,
+      topic_id: topic.id,
+      url,
+      readOnly,
+      jwt: app.user.jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
+    },
+  );
 
   return new Thread(response.data.result);
 };
@@ -79,6 +90,7 @@ const useCreateThreadMutation = ({
     onSuccess: async (newThread) => {
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
+
       // Update community level thread counters variables
       EXCEPTION_CASE_threadCountersStore.setState(
         ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
@@ -89,6 +101,9 @@ const useCreateThreadMutation = ({
               : totalThreadsInCommunityForVoting,
         }),
       );
+
+      // increment communities thread count
+      if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
       if (userOnboardingEnabled) {
         const profileId = app?.user?.addresses?.[0]?.profile?.id;

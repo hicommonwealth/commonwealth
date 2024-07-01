@@ -89,10 +89,21 @@ describe('Thread subscription lifecycle', () => {
         { user_id: actor.user.id!, thread_id: threadTwo!.id! },
       ]);
 
+    expect(threadSubOne).to.exist;
+    expect(threadSubTwo).to.exist;
+
     const res = await query(GetThreadSubscriptions(), {
       actor,
       payload: {},
     });
+
+    expect(res).to.exist;
+    expect(res![0]).to.exist;
+    expect(res![1]).to.exist;
+
+    res![0]!.Thread = null!;
+    res![1]!.Thread = null!;
+
     expect(res).to.have.deep.members([
       { ...threadSubOne.toJSON(), Thread: null },
       { ...threadSubTwo.toJSON(), Thread: null },

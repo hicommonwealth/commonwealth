@@ -9,7 +9,11 @@ import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPWAEvent,
+} from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -17,8 +21,8 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
-import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 import { fetchActivity } from './helpers';
+import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -46,9 +50,12 @@ const UserDashboard = (props: UserDashboardProps) => {
     DashboardViews.Global,
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DASHBOARD_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -58,6 +65,14 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: isAddedToHomeScreen
+        ? MixpanelPWAEvent.PWA_USED
+        : MixpanelPWAEvent.PWA_NOT_USED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
   useEffect(() => {
     if (!type) {
       navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
