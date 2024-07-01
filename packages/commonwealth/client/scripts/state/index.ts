@@ -263,13 +263,11 @@ export async function initAppState(
       app.loginStateEmitter.emit('redraw');
     }
 
-    app.user.setStarredCommunities(
-      statusRes.result.user?.starredCommunities
-        ? statusRes.result.user?.starredCommunities.map(
-            (c) => new StarredCommunity(c),
-          )
-        : [],
-    );
+    userStore.getState().setData({
+      starredCommunities: (statusRes.result.user?.starredCommunities || []).map(
+        (c) => new StarredCommunity(c),
+      ),
+    });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (

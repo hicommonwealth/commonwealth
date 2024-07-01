@@ -4,6 +4,7 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import ChainInfo from '../../../models/ChainInfo';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -24,6 +25,8 @@ export const SidebarQuickSwitcher = ({
   const { isLoggedIn } = useUserLoggedIn();
   const { setMenu } = useSidebarStore();
 
+  const user = useUserStore();
+
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -34,7 +37,10 @@ export const SidebarQuickSwitcher = ({
   const starredCommunities = allCommunities.filter((item) => {
     // filter out non-starred communities
     return !(
-      item instanceof ChainInfo && !app.user.isCommunityStarred(item.id)
+      item instanceof ChainInfo &&
+      !user.starredCommunities.find(
+        (starCommunity) => starCommunity.community_id === item.id,
+      )
     );
   });
 

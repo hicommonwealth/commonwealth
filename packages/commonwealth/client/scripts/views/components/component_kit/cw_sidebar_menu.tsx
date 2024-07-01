@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
@@ -152,10 +153,13 @@ type SidebarMenuProps = {
   menuItems: Array<MenuItem>;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+
+  const user = useUserStore();
 
   return (
     <div
@@ -179,8 +183,11 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             ...item,
             isStarred:
               item.type === 'community'
-                ? // @ts-expect-error <StrictNullChecks/>
-                  app.user.isCommunityStarred(item.community.id)
+                ? !!user.starredCommunities.find(
+                    (starCommunity) =>
+                      starCommunity.community_id ===
+                      (item?.community?.id || ''),
+                  )
                 : false,
           };
 

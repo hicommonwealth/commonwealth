@@ -4,7 +4,6 @@
 
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import StarredCommunity from '../../models/StarredCommunity';
 
 // eslint-disable-next-line
 import { EventEmitter } from 'events';
@@ -65,15 +64,6 @@ export class UserController {
     this._notifications = notifications;
   }
 
-  private _starredCommunities: StarredCommunity[];
-  public get starredCommunities(): StarredCommunity[] {
-    return this._starredCommunities;
-  }
-
-  private _setStarredCommunities(starredCommunities: StarredCommunity[]): void {
-    this._starredCommunities = starredCommunities;
-  }
-
   private _unseenPosts: object;
   public get unseenPosts(): object {
     return this._unseenPosts;
@@ -130,29 +120,6 @@ export class UserController {
 
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
-  }
-
-  public setStarredCommunities(star: StarredCommunity[]): void {
-    this._setStarredCommunities(star);
-  }
-
-  public isCommunityStarred(community_id: string): boolean {
-    return (
-      this._starredCommunities.findIndex((c) => {
-        return c.community_id === community_id;
-      }) !== -1
-    );
-  }
-
-  public addStarredCommunity(star: StarredCommunity): void {
-    this._starredCommunities.push(star);
-  }
-
-  public removeStarredCommunity(community_id: string, userId: number): void {
-    const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === userId && s.community_id === community_id,
-    );
-    this._starredCommunities.splice(index, 1);
   }
 
   public setUnseenPosts(unseenPosts: object): void {

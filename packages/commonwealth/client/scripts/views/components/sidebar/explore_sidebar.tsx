@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import 'components/sidebar/explore_sidebar.scss';
 import React from 'react';
 import app from 'state';
@@ -13,6 +14,8 @@ export const ExploreCommunitiesSidebar = ({
   isInsideCommunity: boolean;
 }) => {
   const { setMenu } = useSidebarStore();
+
+  const user = useUserStore();
 
   const allCommunities = app.config.chains
     .getAll()
@@ -33,11 +36,20 @@ export const ExploreCommunitiesSidebar = ({
   };
 
   const starredCommunities = allCommunities.filter((c) => {
-    return c instanceof ChainInfo && app.user.isCommunityStarred(c.id);
+    return (
+      c instanceof ChainInfo &&
+      user.starredCommunities.find(
+        (starCommunity) => starCommunity.community_id === c.id,
+      )
+    );
   });
 
   const joinedCommunities = allCommunities.filter(
-    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id),
+    (c) =>
+      isInCommunity(c) &&
+      !user.starredCommunities.find(
+        (starCommunity) => starCommunity.community_id === c.id,
+      ),
   );
 
   const communityList: MenuItem[] = [
