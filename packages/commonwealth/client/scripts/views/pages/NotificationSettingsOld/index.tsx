@@ -1,5 +1,8 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { useUpdateUserEmailMutation } from 'client/scripts/state/api/user';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'client/scripts/state/api/user';
 import useUserStore from 'client/scripts/state/ui/user';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
@@ -42,6 +45,8 @@ const NotificationSettingsPage = () => {
   const user = useUserStore();
 
   const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
+  const { mutateAsync: updateEmailSettings } =
+    useUpdateUserEmailSettingsMutation();
 
   const {
     email,
@@ -106,7 +111,9 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Once a week',
                   onClick: () => {
-                    app.user.writeEmailSettings('weekly').catch(console.log);
+                    updateEmailSettings({
+                      emailInterval: 'weekly',
+                    }).catch(console.log);
                     setCurrentFrequency('weekly');
                     forceRerender();
                   },
@@ -114,7 +121,9 @@ const NotificationSettingsPage = () => {
                 {
                   label: 'Never',
                   onClick: () => {
-                    app.user.writeEmailSettings('never').catch(console.log);
+                    updateEmailSettings({
+                      emailInterval: 'never',
+                    }).catch(console.log);
                     setCurrentFrequency('never');
                     forceRerender();
                   },

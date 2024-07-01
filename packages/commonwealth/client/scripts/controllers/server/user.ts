@@ -7,7 +7,6 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
 import StarredCommunity from '../../models/StarredCommunity';
-import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import axios from 'axios';
@@ -115,28 +114,6 @@ export class UserController {
 
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
-  }
-
-  public async writeEmailSettings(
-    emailInterval: string,
-    promotionalEmailsEnabled?: boolean,
-  ): Promise<void> {
-    const key = emailInterval
-      ? 'updateEmailInterval'
-      : 'promotional_emails_enabled';
-    const value = emailInterval ? emailInterval : `${promotionalEmailsEnabled}`;
-
-    try {
-      await axios.post(`${app.serverUrl()}/writeUserSetting`, {
-        jwt: app.user.jwt,
-        key,
-        value,
-      });
-      this._setEmailInterval(emailInterval);
-    } catch (e) {
-      console.log(e);
-      notifyError('Unable to set email interval');
-    }
   }
 
   public setJWT(JWT: string): void {

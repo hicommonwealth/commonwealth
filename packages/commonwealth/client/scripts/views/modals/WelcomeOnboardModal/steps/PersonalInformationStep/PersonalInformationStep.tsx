@@ -3,7 +3,10 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
-import { useUpdateUserEmailMutation } from 'client/scripts/state/api/user';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'client/scripts/state/api/user';
 import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
@@ -46,6 +49,8 @@ const PersonalInformationStep = ({
 
   const user = useUserStore();
   const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
+  const { mutateAsync: updateEmailSettings } =
+    useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
     shouldFetchSelfProfile: true,
@@ -139,7 +144,9 @@ const PersonalInformationStep = ({
     // enable/disable all in-app notifications for user
     await toggleAllInAppNotifications(values.enableAccountNotifications);
     // enable/disable promotional emails flag for user
-    await app.user.writeEmailSettings('', values.enableProductUpdates);
+    await updateEmailSettings({
+      promotionalEmailsEnabled: values.enableProductUpdates,
+    });
 
     // refetch profile data
     await refetchProfileData().catch(console.error);
