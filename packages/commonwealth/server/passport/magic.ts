@@ -338,6 +338,10 @@ async function loginExistingMagicUser({
       // should always exist, but check for it to avoid null check error
       if (replacementAddress) {
         // update data objects and delete ghost address
+        await models.Collaboration.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
         await models.Comment.update(
           { address_id: replacementAddress.id },
           { where: { address_id: ghost.id }, transaction },
@@ -350,6 +354,15 @@ async function loginExistingMagicUser({
           { address_id: replacementAddress.id },
           { where: { address_id: ghost.id }, transaction },
         );
+        // should be no memberships or SsoTokens, but handle case for completeness sake
+        await models.Membership.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.SsoToken.destroy({
+          where: { id: ghost.id },
+          transaction,
+        });
         await models.Address.destroy({
           where: { id: ghost.id },
           transaction,
