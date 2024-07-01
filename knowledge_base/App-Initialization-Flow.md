@@ -45,8 +45,7 @@ The goal of this document is to describe the current state of the app initializa
         - If ChainBase is Substrate, import the Substrate adapter.
         - If ChainBase is Cosmos, import the Cosmos adapter.
         - If Network is Ethereum, import the (ETH) tokenAdapter.
-        - If Network is NEAR or NEARTestnet, import the NEAR adapter.
-        - If Network is Sputnik, import the Sputnik adapter (NEAR + gov).
+        - If Network is NEAR or NEARTestnet or Sputnik, import the NEAR adapter.
         - If Network is Compound, import the Compound adapter (ETH).
         - If Network is Aave, import the Aave adapter (ETH).
         - If Network is ERC20, import the (ETH) tokenAdapter.

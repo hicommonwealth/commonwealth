@@ -45,7 +45,6 @@ export const getNotificationUrlPath = (
 
 export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
   if (c.base === ChainBase.CosmosSDK) return ProposalType.CosmosProposal;
-  if (c.network === ChainNetwork.Sputnik) return ProposalType.SputnikProposal;
   if (c.network === ChainNetwork.Compound) return ProposalType.CompoundProposal;
   if (c.network === ChainNetwork.Aave) return ProposalType.AaveProposal;
   throw new Error(`Cannot determine proposal slug from chain ${c.id}.`);
@@ -68,9 +67,6 @@ export const proposalSlugToClass = () => {
   if (app.chain.network === ChainNetwork.Aave) {
     mmap.set(ProposalType.AaveProposal, (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Sputnik) {
-    mmap.set(ProposalType.SputnikProposal, (app.chain as any).dao);
-  }
   return mmap;
 };
 
@@ -87,7 +83,6 @@ export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
   [ProposalType.CompoundProposal, 'Proposal'],
   [ProposalType.CosmosProposal, 'Proposal'],
   [ProposalType.AaveProposal, 'Proposal'],
-  [ProposalType.SputnikProposal, 'Proposal'],
 ]);
 
 export const idToProposal = (slug: string, id: string | number) => {
@@ -101,9 +96,6 @@ export const idToProposal = (slug: string, id: string | number) => {
 };
 
 export const chainEntityTypeToProposalSlug = (): ProposalType => {
-  if (app.chain.network === ChainNetwork.Sputnik) {
-    return ProposalType.SputnikProposal;
-  }
   if (app.chain.network === ChainNetwork.Compound) {
     return ProposalType.CompoundProposal;
   }
@@ -117,9 +109,6 @@ export const chainEntityTypeToProposalSlug = (): ProposalType => {
 };
 
 export const chainEntityTypeToProposalName = (): string => {
-  if (app.chain.network === ChainNetwork.Sputnik) {
-    return 'Sputnik Proposal';
-  }
   if (app.chain.network === ChainNetwork.Compound) {
     return 'On-Chain Proposal';
   }

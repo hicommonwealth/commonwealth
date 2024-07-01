@@ -1,12 +1,11 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import type { NearToken } from 'adapters/chain/near/types';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';
 import { NearAccounts } from './account';
 import NearChain from './chain';
 
-export default class Near extends IChainAdapter<NearToken, any> {
+export default class Near extends IChainAdapter<any, any> {
   public base = ChainBase.NEAR;
   public chain: NearChain;
   public accounts: NearAccounts;

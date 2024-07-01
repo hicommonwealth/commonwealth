@@ -16,12 +16,6 @@ import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import type { NearAccount } from 'controllers/chain/near/account';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import {
-  NearSputnikVote,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useEffect, useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
@@ -87,8 +81,6 @@ export const VotingActions = (props: VotingActionsProps) => {
     proposal instanceof AaveProposal
   ) {
     user = app.user.activeAccount as EthereumAccount;
-  } else if (proposal instanceof NearSputnikProposal) {
-    user = app.user.activeAccount as NearAccount;
   } else {
     return <CannotVote label="Unrecognized proposal type" />;
   }
@@ -152,19 +144,6 @@ export const VotingActions = (props: VotingActionsProps) => {
       } catch (err) {
         notifyError(err.toString());
       }
-    } else if (proposal instanceof NearSputnikProposal) {
-      try {
-        await proposal.submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Approve),
-        );
-        emitRedraw();
-        trackAnalytics({
-          event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
-          isPWA: isAddedToHomeScreen,
-        });
-      } catch (err) {
-        notifyError(err.toString());
-      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
@@ -208,19 +187,6 @@ export const VotingActions = (props: VotingActionsProps) => {
         emitRedraw();
         trackAnalytics({
           event: MixpanelGovernanceEvents.AAVE_VOTE_OCCURRED,
-          isPWA: isAddedToHomeScreen,
-        });
-      } catch (err) {
-        notifyError(err.toString());
-      }
-    } else if (proposal instanceof NearSputnikProposal) {
-      try {
-        await proposal.submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Reject),
-        );
-        emitRedraw();
-        trackAnalytics({
-          event: MixpanelGovernanceEvents.SPUTNIK_VOTE_OCCURRED,
           isPWA: isAddedToHomeScreen,
         });
       } catch (err) {
@@ -276,35 +242,12 @@ export const VotingActions = (props: VotingActionsProps) => {
     }
   };
 
-  const voteRemove = (e) => {
-    e.preventDefault();
-    toggleVotingModal(true);
-
-    if (proposal instanceof NearSputnikProposal) {
-      proposal
-        .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Remove),
-        )
-        .then(() => {
-          onModalClose();
-        })
-        .catch((err) => {
-          onModalClose();
-          notifyError(err.toString());
-        });
-    } else {
-      toggleVotingModal(false);
-      return notifyError('Invalid proposal type');
-    }
-  };
-
   const {
     hasVotedYes,
     hasVotedNo,
     hasVotedAbstain,
     hasVotedVeto,
     hasVotedForAnyChoice,
-    hasVotedRemove,
     // @ts-expect-error <StrictNullChecks/>
   } = getVotingResults(proposal, user);
 
@@ -356,15 +299,6 @@ export const VotingActions = (props: VotingActionsProps) => {
     />
   );
 
-  // near: remove
-  const removeButton = proposal instanceof NearSputnikProposal && (
-    <CWButton
-      disabled={!canVote || votingModalOpen}
-      onClick={voteRemove}
-      label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
-    />
-  );
-
   let votingActionObj;
 
   if (proposal instanceof AaveProposal) {
@@ -373,34 +307,6 @@ export const VotingActions = (props: VotingActionsProps) => {
         {yesButton}
         {noButton}
       </div>
-    );
-  } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
-    votingActionObj = (
-      <>
-        <div className="button-row">
-          {yesButton}
-          {noButton}
-        </div>
-        <ProposalExtensions proposal={proposal} />
-      </>
-    );
-  } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
-    votingActionObj = (
-      <>
-        <div className="button-row">
-          {yesButton}
-          {noButton}
-        </div>
-        <ProposalExtensions
-          proposal={proposal}
-          setDemocracyVoteConviction={(c) => {
-            setConviction(c);
-          }}
-          setDemocracyVoteAmount={(c) => {
-            setAmount(c);
-          }}
-        />
-      </>
     );
   } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
     votingActionObj = (
@@ -448,14 +354,6 @@ export const VotingActions = (props: VotingActionsProps) => {
           proposal={proposal as CompoundProposal}
           votingModalOpen={votingModalOpen}
         />
-      </div>
-    );
-  } else if (proposal.votingType === VotingType.YesNoReject) {
-    votingActionObj = (
-      <div className="button-row">
-        {yesButton}
-        {noButton}
-        {removeButton}
       </div>
     );
   } else if (proposal.votingType === VotingType.RankedChoiceVoting) {

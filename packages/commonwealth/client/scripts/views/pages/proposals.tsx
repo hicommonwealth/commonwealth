@@ -3,7 +3,6 @@ import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/proposals.scss';
 import React, { useEffect, useState } from 'react';
@@ -39,7 +38,6 @@ const ProposalsPage = () => {
 
   const onCompound = app.chain?.network === ChainNetwork.Compound;
   const onAave = app.chain?.network === ChainNetwork.Aave;
-  const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
   const { data: cachedAaveProposals } = useAaveProposalsQuery({
@@ -132,22 +130,13 @@ const ProposalsPage = () => {
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
-  const activeSputnikProposals =
-    onSputnik &&
-    (app.chain as NearSputnik).dao.store
-      .getAll()
-      .filter((p) => !p.completed)
-      .sort((p1, p2) => p2.data.id - p1.data.id);
-
   const activeProposalContent = isLoadingCosmosActiveProposals ? (
     <CWCircleMultiplySpinner />
   ) : !activeCosmosProposals?.length &&
     // @ts-expect-error <StrictNullChecks/>
     !activeCompoundProposals?.length &&
     // @ts-expect-error <StrictNullChecks/>
-    !activeAaveProposals?.length &&
-    // @ts-expect-error <StrictNullChecks/>
-    !activeSputnikProposals?.length ? (
+    !activeAaveProposals?.length ? (
     [
       <div key="no-active" className="no-proposals">
         No active proposals
@@ -178,11 +167,6 @@ const ProposalsPage = () => {
           />
         )),
       )
-      .concat(
-        (activeSputnikProposals || []).map((proposal, i) => (
-          <ProposalCard key={i} proposal={proposal} />
-        )),
-      )
   );
 
   // lazy-loaded in useGetCompletedProposals
@@ -202,13 +186,6 @@ const ProposalsPage = () => {
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
-  const inactiveSputnikProposals =
-    onSputnik &&
-    (app.chain as NearSputnik).dao.store
-      .getAll()
-      .filter((p) => p.completed)
-      .sort((p1, p2) => p2.data.id - p1.data.id);
-
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWCircleMultiplySpinner />
   ) : // @ts-expect-error <StrictNullChecks/>
@@ -216,9 +193,7 @@ const ProposalsPage = () => {
     // @ts-expect-error <StrictNullChecks/>
     !inactiveCompoundProposals?.length &&
     // @ts-expect-error <StrictNullChecks/>
-    !inactiveAaveProposals?.length &&
-    // @ts-expect-error <StrictNullChecks/>
-    !inactiveSputnikProposals?.length ? (
+    !inactiveAaveProposals?.length ? (
     [
       <div key="no-inactive" className="no-proposals">
         No past proposals
@@ -252,12 +227,6 @@ const ProposalsPage = () => {
               />
             }
           />
-        )),
-      )
-      .concat(
-        // @ts-expect-error <StrictNullChecks/>
-        (inactiveSputnikProposals || []).map((proposal, i) => (
-          <ProposalCard key={i} proposal={proposal} />
         )),
       )
   );

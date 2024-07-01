@@ -37,8 +37,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
-  const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
-
   const showOnChainProposalItem =
     (app.chain?.base === ChainBase.CosmosSDK &&
       app.chain?.network !== ChainNetwork.Terra &&
@@ -87,20 +85,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               navigate('/new/proposal');
             },
             iconLeft: 'star',
-          },
-        ]
-      : [];
-
-  const getSputnikProposalItem = (): PopoverMenuItem[] =>
-    showSputnikProposalItem
-      ? [
-          {
-            label: 'New Sputnik proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal');
-            },
-            iconLeft: 'democraticProposal',
           },
         ]
       : [];
@@ -203,7 +187,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
-          ...getSputnikProposalItem(),
           ...getSnapshotProposalItem(),
           ...getTemplateItems(),
           ...getDiscordBotConnectionItems(),
