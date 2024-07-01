@@ -11,8 +11,8 @@ import {
 import './DismissModal.scss';
 
 interface DismissModalProps {
-  onModalClose: () => any;
-  onDismiss: (shouldDismissPermanently: boolean) => any;
+  onModalClose: () => void;
+  onDismiss: (shouldDismissPermanently: boolean) => void;
   label: string;
   description: string;
   showDismissCheckbox?: boolean;
