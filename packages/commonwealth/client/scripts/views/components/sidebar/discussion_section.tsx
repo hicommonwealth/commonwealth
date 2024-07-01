@@ -149,7 +149,6 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
-    // @ts-expect-error <StrictNullChecks/>
     ...(contestsEnabled && isContestAvailable
       ? [
           {
@@ -179,7 +178,6 @@ export const DiscussionSection = ({
           },
         ]
       : []),
-    // @ts-expect-error <StrictNullChecks/>
     {
       title: 'Overview',
       containsChildren: false,
