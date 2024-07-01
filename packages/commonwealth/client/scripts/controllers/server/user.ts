@@ -122,15 +122,6 @@ export class UserController {
     this._selectedCommunity = selectedCommunity;
   }
 
-  private _isSiteAdmin: boolean;
-  public get isSiteAdmin(): boolean {
-    return this._isSiteAdmin;
-  }
-
-  private _setSiteAdmin(isAdmin: boolean): void {
-    this._isSiteAdmin = isAdmin;
-  }
-
   private _notifications: NotificationsController =
     new NotificationsController();
   public get notifications(): NotificationsController {
@@ -289,10 +280,6 @@ export class UserController {
     } catch (error) {
       console.error('Failed to select node on server', error);
     }
-  }
-
-  public setSiteAdmin(isAdmin: boolean): void {
-    this._setSiteAdmin(isAdmin);
   }
 
   public setNotifications(notifications: NotificationsController): void {
