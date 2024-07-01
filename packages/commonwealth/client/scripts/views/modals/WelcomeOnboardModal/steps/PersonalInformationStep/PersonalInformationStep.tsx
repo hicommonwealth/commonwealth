@@ -4,6 +4,7 @@ import {
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
 import { useUpdateUserEmailMutation } from 'client/scripts/state/api/user';
+import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -43,6 +44,7 @@ const PersonalInformationStep = ({
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
+  const user = useUserStore();
   const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
@@ -65,8 +67,8 @@ const PersonalInformationStep = ({
         formMethodsRef.current.trigger('username').catch(console.error);
       }
 
-      if (app?.user?.email) {
-        formMethodsRef.current.setValue('email', app.user.email, {
+      if (user.email) {
+        formMethodsRef.current.setValue('email', user.email, {
           shouldDirty: true,
         });
         formMethodsRef.current.trigger('email').catch(console.error);
@@ -87,8 +89,8 @@ const PersonalInformationStep = ({
       orderDirection: APIOrderDirection.Desc,
     });
 
-  const existingUsernames = (profiles?.pages?.[0]?.results || []).map((user) =>
-    user?.profile_name?.trim?.().toLowerCase(),
+  const existingUsernames = (profiles?.pages?.[0]?.results || []).map(
+    (userResult) => userResult?.profile_name?.trim?.().toLowerCase(),
   );
   const isUsernameTaken = existingUsernames.includes(
     currentUsername.toLowerCase(),

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import app from 'state';
+import { userStore } from '../../ui/user';
 import { ApiEndpoints } from '../config';
 
 export const updateEmail = async ({ email }: { email: string }) => {
@@ -13,7 +14,8 @@ export const updateEmail = async ({ email }: { email: string }) => {
   return email;
 };
 
-export const onUpdateEmailSuccess = (email: string) => app.user.setEmail(email);
+export const onUpdateEmailSuccess = (email: string) =>
+  userStore.getState().setData({ email });
 export const onUpdateEmailError = (shouldNotifyFailure: boolean) =>
   shouldNotifyFailure && notifyError('Unable to update email');
 

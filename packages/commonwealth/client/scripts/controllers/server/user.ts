@@ -26,15 +26,6 @@ export class UserController {
     this._activeAccount = account;
   }
 
-  private _email: string;
-  public get email(): string {
-    return this._email;
-  }
-
-  private _setEmail(email: string): void {
-    this._email = email;
-  }
-
   private _emailInterval: string;
   public get emailInterval(): string {
     return this._emailInterval;
@@ -129,10 +120,6 @@ export class UserController {
   public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
     this.isFetched.emit('redraw');
-  }
-
-  public setEmail(email: string): void {
-    this._setEmail(email);
   }
 
   public setEmailInterval(emailInterval: string): void {

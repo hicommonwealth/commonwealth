@@ -2,6 +2,7 @@ import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import app from 'client/scripts/state';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
+import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -23,6 +24,8 @@ export const UserTrainingSlider = () => {
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
   >();
+
+  const user = useUserStore();
 
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
@@ -110,7 +113,7 @@ export const UserTrainingSlider = () => {
           (link) => link.trim().length > 0,
         )?.length > 0;
       if (
-        (hasSocialLinks || app?.user?.email) &&
+        (hasSocialLinks || user.email) &&
         !trainingActionPermanentlyHidden?.[profileId]?.includes(
           UserTrainingCardTypes.FinishProfile,
         )

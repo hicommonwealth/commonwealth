@@ -259,11 +259,10 @@ export async function updateActiveAddresses({
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     // @ts-expect-error StrictNullChecks
-    app.user.setEmail(null);
-    // @ts-expect-error StrictNullChecks
     app.user.setEmailInterval(null);
     userStore.getState().setData({
       id: 0,
+      email: '',
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
@@ -281,10 +280,10 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);
   } else {
-    app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     userStore.getState().setData({
       id: data.id || 0,
+      email: data.email || '',
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
@@ -622,7 +621,7 @@ export async function handleSocialLoginCallback({
 
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
-      if (!app.user.email && ssoEmail && profiles?.length === 1) {
+      if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
         await updateEmail({ email: ssoEmail })
           .then(onUpdateEmailSuccess)
           .catch(() => onUpdateEmailError(false));

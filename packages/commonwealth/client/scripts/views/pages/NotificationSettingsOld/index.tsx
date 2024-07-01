@@ -127,7 +127,7 @@ const NotificationSettingsPage = () => {
             </CWText>
           )}
         </div>
-        {(!app.user.email || !user.isEmailVerified) && (
+        {(!user.email || !user.isEmailVerified) && (
           <div className="email-input-section">
             <CWCard fullWidth className="email-card">
               {sentEmail ? (

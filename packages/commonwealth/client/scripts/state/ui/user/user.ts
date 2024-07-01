@@ -4,6 +4,7 @@ import { createBoundedUseStore } from '../utils';
 
 type CommonProps = {
   id: number;
+  email: string;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -18,6 +19,7 @@ export const userStore = createStore<UserStoreProps>()(
   devtools((set) => ({
     // default values when user is not signed in
     id: 0,
+    email: '',
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,
