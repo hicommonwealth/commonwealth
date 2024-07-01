@@ -7,6 +7,7 @@ import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
@@ -46,6 +47,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     initialAllowlist ?? [],
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useEffect(() => {
     if (initialAllowlist) {
       setAllowedAddresses(initialAllowlist);
@@ -53,7 +56,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   }, [initialAllowlist]);
 
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
+    },
   });
 
   if (
@@ -121,7 +127,11 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
+          const payload = makeGroupDataBaseAPIPayload(
+            values,
+            isAddedToHomeScreen,
+            allowedAddresses,
+          );
           const finalPayload = {
             ...payload,
             groupId: groupId,

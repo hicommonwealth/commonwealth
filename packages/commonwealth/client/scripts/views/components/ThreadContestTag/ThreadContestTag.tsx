@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React from 'react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -10,34 +11,36 @@ import './ThreadContestTag.scss';
 
 interface ThreadContestTagProps {
   date: string;
-  isRecurring: boolean;
-  round?: number;
+  round: number | null;
+  title: string;
+  prize: number;
 }
 
 const ThreadContestTag = ({
   date,
-  isRecurring,
   round,
+  title,
+  prize,
 }: ThreadContestTagProps) => {
   const popoverProps = usePopover();
 
   return (
     <div className="ThreadContestTag">
       <CWTag
-        label="1st"
+        label={moment.localeData().ordinal(prize)}
         type="contest"
-        classNames="prize-1"
+        classNames={`prize-${prize}`}
         // @ts-expect-error <StrictNullChecks/>
         onMouseEnter={popoverProps.handleInteraction}
         onMouseLeave={popoverProps.handleInteraction}
       />
       <CWPopover
         className="contest-popover"
-        title="Contest Title"
+        title={title}
         body={
           <div>
             <CWText>{date}</CWText>
-            {isRecurring && <CWText>Round {round}</CWText>}
+            {round && <CWText>Round {round}</CWText>}
           </div>
         }
         {...popoverProps}
