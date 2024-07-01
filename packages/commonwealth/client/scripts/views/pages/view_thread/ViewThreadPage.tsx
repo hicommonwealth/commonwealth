@@ -306,8 +306,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   // @ts-expect-error <StrictNullChecks/>
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
-  // @ts-expect-error <StrictNullChecks/>
-  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
