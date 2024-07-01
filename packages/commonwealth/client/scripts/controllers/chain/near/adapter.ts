@@ -17,7 +17,7 @@ export default class Near extends IChainAdapter<any, any> {
   }
 
   public async initApi() {
-    await this.chain.init(this.meta, this.accounts);
+    await this.chain.init(this.meta);
     await this.accounts.init(this.chain);
     await super.initApi();
   }
