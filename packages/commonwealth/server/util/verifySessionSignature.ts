@@ -72,7 +72,7 @@ const verifySessionSignature = async (
           category_id: NotificationCategories.NewCollaboration,
           is_active: true,
         });
-        addressModel.user_id = user?.id;
+        addressModel.user_id = user!.id;
       }
     }
   } else {
