@@ -45,7 +45,6 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
-  const [, setConviction] = useState<number>();
 
   const { isAddedToHomeScreen } = useAppStatus();
 

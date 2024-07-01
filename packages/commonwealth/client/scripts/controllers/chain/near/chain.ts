@@ -1,16 +1,15 @@
-import BN from 'bn.js';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
-import type { NearAccount, NearAccounts } from './account';
+import type { NearAccount } from './account';
 
 class NearChain implements IChainModule<any, NearAccount> {
   public get denom() {
     return this.app.chain.currency;
   }
 
-  public coins(n: number | string | BN, inDollars = false) {
+  public coins() {
     throw new Error('not implemented');
   }
 
@@ -29,7 +28,7 @@ class NearChain implements IChainModule<any, NearAccount> {
     this._app = app;
   }
 
-  public async init(chain: ChainInfo, accounts: NearAccounts): Promise<void> {
+  public async init(chain: ChainInfo): Promise<void> {
     const networkSuffix = chain.id.split('.').pop();
     this._networkId =
       chain.id === 'near-testnet' || networkSuffix === 'testnet'
