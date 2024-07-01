@@ -44,8 +44,8 @@ export const EditCollaboratorsModal = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const [collaborators, setCollaborators] = useState<
-    Array<IThreadCollaboratorWithId>
-  >(thread.collaborators as any);
+    IThreadCollaboratorWithId[]
+  >(thread.collaborators as IThreadCollaboratorWithId[]);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId(),
