@@ -13,7 +13,7 @@ import assert from 'assert';
 
 import { CosmosSignerCW, SubstrateSignerCW } from './sessionSigners';
 import { CanvasSignedData } from './types';
-import { CANVAS_TOPIC, assertMatches, caip2AddressEquals } from './utils';
+import { CANVAS_TOPIC, assertMatches, didEquals } from './utils';
 
 export const getSessionSigners = () => {
   return [
@@ -24,26 +24,24 @@ export const getSessionSigners = () => {
   ];
 };
 
-export const getSessionSignerForAddress = (address: string) => {
+export const getSessionSignerForDid = (did: string) => {
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
-    if (signer.match(address)) {
+    if (signer.match(did)) {
       return signer;
     }
   }
 };
 
-export async function verifySession(session: Session) {
-  for (const signer of getSessionSigners()) {
-    if (signer.match(session.address)) {
-      await signer.verifySession(CANVAS_TOPIC, session);
-      return;
-    }
+export const verifySession = async (session: Session) => {
+  const signer = getSessionSignerForDid(session.did);
+
+  if (!signer) {
+    throw new Error(`No signer found for session with address ${session.did}`);
   }
-  throw new Error(
-    `No signer found for session with address ${session.address}`,
-  );
-}
+
+  await signer.verifySession(CANVAS_TOPIC, session);
+};
 
 type VerifyArgs = {
   actionMessage: Message<Action>;
@@ -62,10 +60,7 @@ export const verify = async ({
 
   // assert address matches
   assert(
-    caip2AddressEquals(
-      actionMessage.payload.address,
-      sessionMessage.payload.address,
-    ),
+    didEquals(actionMessage.payload.did, sessionMessage.payload.did),
     'Action message must be signed by wallet address',
   );
 
@@ -73,17 +68,19 @@ export const verify = async ({
   ed25519.verify(actionMessageSignature, actionMessage);
   ed25519.verify(sessionMessageSignature, sessionMessage);
 
-  if (sessionMessage.payload.duration !== null) {
+  if (sessionMessage.payload.context.duration !== undefined) {
     // if the session has an expiry, assert that the session is not expired
     const sessionExpirationTime =
-      sessionMessage.payload.timestamp + sessionMessage.payload.duration;
+      sessionMessage.payload.context.timestamp +
+      (sessionMessage.payload.context.duration ?? 0);
     assert(
-      actionMessage.payload.timestamp < sessionExpirationTime,
+      actionMessage.payload.context.timestamp < sessionExpirationTime,
       'Invalid action: Signed by a session that was expired at the time of action',
     );
   }
   assert(
-    actionMessage.payload.timestamp >= sessionMessage.payload.timestamp,
+    actionMessage.payload.context.timestamp >=
+      sessionMessage.payload.context.timestamp,
     'Invalid action: Signed by a session after the action',
   );
 };
@@ -92,7 +89,7 @@ export const verifyComment = async (
   canvasSignedData: CanvasSignedData,
   fields,
 ) => {
-  const { thread_id, text, address, parent_comment_id } = fields;
+  const { thread_id, text, did, parent_comment_id } = fields;
 
   await verify(canvasSignedData);
 
@@ -112,20 +109,14 @@ export const verifyComment = async (
     'parent',
   );
 
-  assertMatches(
-    address,
-    actionMessage.payload.address.split(':')[2],
-    'comment',
-    'origin',
-  );
-  // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
+  assertMatches(did, actionMessage.payload.did, 'comment', 'origin');
 };
 
 export const verifyThread = async (
   canvasSignedData: CanvasSignedData,
   fields,
 ) => {
-  const { title, body, address, community, link, topic } = fields;
+  const { title, body, did, community, link, topic } = fields;
 
   await verify(canvasSignedData);
 
@@ -147,20 +138,14 @@ export const verifyThread = async (
     'topic',
   );
 
-  assertMatches(
-    address,
-    actionMessage.payload.address.split(':')[2],
-    'thread',
-    'origin',
-  );
-  // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
+  assertMatches(did, actionMessage.payload.did, 'thread', 'origin');
 };
 
 export const verifyReaction = async (
   canvasSignedData: CanvasSignedData,
   fields,
 ) => {
-  const { thread_id, comment_id, proposal_id, address, value } = fields;
+  const { thread_id, comment_id, proposal_id, did, value } = fields;
 
   await verify(canvasSignedData);
 
@@ -178,11 +163,5 @@ export const verifyReaction = async (
   );
   assertMatches(value, actionMessage.payload.args.value, 'reaction', 'value');
 
-  assertMatches(
-    address,
-    actionMessage.payload.address.split(':')[2],
-    'reaction',
-    'origin',
-  );
-  // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
+  assertMatches(did, actionMessage.payload.did, 'reaction', 'origin');
 };

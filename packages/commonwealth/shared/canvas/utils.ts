@@ -1,3 +1,4 @@
+import { DidIdentifier } from '@canvas-js/interfaces';
 import { configure } from 'safe-stable-stringify';
 
 export const CANVAS_TOPIC = 'canvas:commonwealth';
@@ -27,5 +28,5 @@ export const stringify = configure({
   deterministic: true,
 });
 
-export const caip2AddressEquals = (address1: string, address2: string) =>
-  address1 === address2;
+export const didEquals = (did1: DidIdentifier, did2: DidIdentifier) =>
+  did1 === did2;

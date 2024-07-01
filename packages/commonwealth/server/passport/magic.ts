@@ -30,7 +30,7 @@ import { CANVAS_TOPIC } from 'shared/canvas';
 import { deserializeCanvas } from 'shared/canvas/types';
 import { fileURLToPath } from 'url';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { getSessionSignerForAddress } from '../../shared/canvas/verify';
+import { getSessionSignerForDid } from '../../shared/canvas/verify';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
@@ -541,7 +541,7 @@ async function magicLoginRoute(
         });
       } else if (
         communityToJoin.base === ChainBase.Ethereum &&
-        session.address.startsWith('eip155:')
+        session.did.startsWith('did:pkh:eip155:')
       ) {
         generatedAddresses.push({
           // @ts-expect-error StrictNullChecks
@@ -559,7 +559,7 @@ async function magicLoginRoute(
 
     if (config.ENFORCE_SESSION_KEYS) {
       // verify the session signature using session signer
-      const sessionSigner = getSessionSignerForAddress(session.address);
+      const sessionSigner = getSessionSignerForDid(session.did);
       if (!sessionSigner) {
         throw new Error('No session signer found for address');
       }

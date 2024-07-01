@@ -21,7 +21,7 @@ describe('createReaction Integration Tests', () => {
   const deleteReaction = async (reactionId, jwtToken, address) => {
     const validRequest = {
       jwt: jwtToken,
-      address: address.split(':')[2],
+      address: address.split(':')[4],
       author_chain: 'ethereum',
       chain: 'ethereum',
     };
@@ -55,7 +55,7 @@ describe('createReaction Integration Tests', () => {
     );
     userAddress = res.address;
     Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
-      () => ({ [userAddress.split(':')[2]]: 300 }),
+      () => ({ [userAddress.split(':')[4]]: 300 }),
     );
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },

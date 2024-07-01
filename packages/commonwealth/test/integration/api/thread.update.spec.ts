@@ -45,7 +45,7 @@ describe('Thread Patch Update', () => {
     );
     {
       adminCanvasAddress = adminRes.address;
-      adminAddress = adminCanvasAddress.split(':')[2];
+      adminAddress = adminCanvasAddress.split(':')[4];
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
         config.AUTH.JWT_SECRET,
@@ -66,7 +66,7 @@ describe('Thread Patch Update', () => {
     );
     {
       canvasAddress = userRes.address;
-      userAddress = canvasAddress.split(':')[2];
+      userAddress = canvasAddress.split(':')[4];
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
         config.AUTH.JWT_SECRET,

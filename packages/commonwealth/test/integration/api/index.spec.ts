@@ -36,7 +36,7 @@ describe('API Tests', () => {
     test('should create an ETH address', async () => {
       const wallet = new SIWESigner({ chainId: 1 });
       const { payload: session } = await wallet.newSession(CANVAS_TOPIC);
-      const address = session.address.split(':')[2];
+      const address = session.address.split(':')[4];
 
       const chain = 'ethereum';
       const wallet_id = 'metamask';
@@ -87,7 +87,7 @@ describe('API Tests', () => {
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
       const { payload: session } = await sessionSigner.newSession(CANVAS_TOPIC);
-      const address = session.address.split(':')[2];
+      const address = session.address.split(':')[4];
 
       const community_id = 'ethereum';
       const wallet_id = 'metamask';

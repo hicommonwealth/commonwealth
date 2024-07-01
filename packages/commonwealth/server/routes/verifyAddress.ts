@@ -34,7 +34,6 @@ export const Errors = {
   InvalidSignature: 'Invalid signature, please re-register',
   NoEmail: 'No email to alert',
   InvalidArguments: 'Invalid arguments',
-  CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
   BadToken: 'Invalid sign in token',
   WrongWallet: 'Verified with different wallet than created',
@@ -70,19 +69,15 @@ const processAddress = async (
 
   // verify the signature matches the session information = verify ownership
   try {
-    const valid = await verifySessionSignature(
+    await verifySessionSignature(
       models,
       addressInstance,
-      // @ts-expect-error StrictNullChecks
       user ? user.id : null,
       session,
     );
-    if (!valid) {
-      throw new AppError(Errors.InvalidSignature);
-    }
   } catch (e) {
     log.warn(`Failed to verify signature for ${address}: ${e.stack}`);
-    throw new AppError(Errors.CouldNotVerifySignature);
+    throw new AppError(Errors.InvalidSignature);
   }
 
   addressInstance.last_active = new Date();

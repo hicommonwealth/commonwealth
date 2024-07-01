@@ -116,12 +116,12 @@ export const CommentCard = ({
       await verify(canvasSignedData);
       setVerifiedCanvasSignedData(canvasSignedData);
     } catch (err) {
-      console.log('Unexpected error while verifying action/session');
-      return;
+      // ignore invalid signed comments
     }
   }, [comment.canvasSignedData]);
 
   useEffect(() => {
+    if (!app.config.enforceSessionKeys) return;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     doVerify();
   }, [doVerify]);

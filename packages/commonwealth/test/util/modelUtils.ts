@@ -260,7 +260,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     const { payload: session, signer } = await sessionSigner.newSession(
       CANVAS_TOPIC,
     );
-    const walletAddress = session.address.split(':')[2];
+    const walletAddress = session.address.split(':')[4];
 
     let res = await chai.request
       .agent(app)
@@ -354,7 +354,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         author_chain: chainId,
         chain: chainId,
-        address: address.split(':')[2],
+        address: address.split(':')[4],
         title: encodeURIComponent(title),
         // @ts-expect-error StrictNullChecks
         body: encodeURIComponent(body),
@@ -432,7 +432,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       .send({
         author_chain: chain,
         chain,
-        address: address.split(':')[2],
+        address: address.split(':')[4],
         parent_id: parentCommentId || null,
         thread_id,
         text,
@@ -486,7 +486,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
-    const walletAddress = address.split(':')[2];
+    const walletAddress = address.split(':')[4];
     const res = await chai.request
       .agent(app)
       .post(`/api/comments/${comment_id}/reactions`)
@@ -529,7 +529,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       sign,
       action,
     });
-    const walletAddress = address.split(':')[2];
+    const walletAddress = address.split(':')[4];
     const res = await chai.request
       .agent(app)
       .post(`/api/threads/${thread_id}/reactions`)
@@ -656,7 +656,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         .post('/api/linkExistingAddressToCommunity')
         .set('Accept', 'application/json')
         .send({
-          address: address.split(':')[2],
+          address: address.split(':')[4],
           community_id: chain,
           originChain,
           jwt,

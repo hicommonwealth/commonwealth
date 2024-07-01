@@ -6,7 +6,7 @@ import {
   hasCanvasSignedDataApiArgs,
 } from 'shared/canvas/types';
 import { verifyComment } from 'shared/canvas/verify';
-import { addressSwapper } from 'shared/utils';
+import { canonicalizeDid } from 'shared/utils';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
@@ -73,16 +73,10 @@ export const createThreadCommentHandler = async (
       await verifyComment(canvasSignedData, {
         thread_id: parseInt(threadId, 10) || undefined,
         text,
-        address:
-          canvasSignedData.actionMessage.payload.address.split(':')[0] ==
-          'polkadot'
-            ? addressSwapper({
-                currentPrefix: 42,
-                // @ts-expect-error <StrictNullChecks>
-                address: address.address,
-              })
-            : // @ts-expect-error <StrictNullChecks>
-              address.address,
+        did: canonicalizeDid(
+          canvasSignedData.actionMessage.payload.did,
+          address?.address,
+        ),
         parent_comment_id: parentId,
       });
     }

@@ -7,6 +7,27 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 
+export const canonicalizeDid = (
+  did: string,
+  walletAddress: string | null | undefined,
+) => {
+  const [_did, _pkh, chainBase, chainId, address] = did.split(':');
+
+  if (address !== walletAddress) {
+    throw new Error('invalid DID URI for this address');
+  }
+
+  const canonicalAddress =
+    chainBase === 'polkadot'
+      ? addressSwapper({
+          currentPrefix: 42,
+          address,
+        })
+      : address;
+
+  return `did:pkh:${chainBase}:${chainId}:${canonicalAddress}`;
+};
+
 export const slugifyPreserveDashes = (str: string): string => {
   // Remove any character that isn't a alphanumeric character, a
   // space, or a dash, and then replace any sequence of spaces with a single dash.
