@@ -20,6 +20,7 @@ import useUserMenuItems from '../useUserMenuItems';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import KnockNotifications from 'views/components/KnockNotifications';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
@@ -42,6 +43,7 @@ const MobileHeader = ({
   onRevalidationModalData,
 }: MobileHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const enableKnockInAppNotifications = useFlag('knockInAppNotifications');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
@@ -91,16 +93,19 @@ const MobileHeader = ({
               onClick={() => isSetModalOpen(true)}
             />
           )}
-
           {isLoggedIn ? (
-            <div onClick={() => setIsUserDrawerOpen(true)}>
-              <User
-                shouldShowAvatarOnly
-                avatarSize={24}
-                userAddress={user?.address}
-                userCommunityId={user?.community?.id}
-              />
-            </div>
+            <>
+              {enableKnockInAppNotifications && <KnockNotifications />}
+
+              <div onClick={() => setIsUserDrawerOpen(true)}>
+                <User
+                  shouldShowAvatarOnly
+                  avatarSize={24}
+                  userAddress={user?.address}
+                  userCommunityId={user?.community?.id}
+                />
+              </div>
+            </>
           ) : userOnboardingEnabled ? (
             <></>
           ) : (
