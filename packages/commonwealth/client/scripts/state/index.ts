@@ -21,6 +21,7 @@ import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
 import StarredCommunity from 'models/StarredCommunity';
 import { ChainStore, NodeStore } from 'stores';
+import { userStore } from './ui/user';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -276,9 +277,11 @@ export async function initAppState(
       statusRes.result.user &&
       statusRes.result.user.selectedCommunity
     ) {
-      app.user.setSelectedCommunity(
-        ChainInfo.fromJSON(statusRes.result.user.selectedCommunity),
-      );
+      userStore.getState().setData({
+        activeCommunity: ChainInfo.fromJSON(
+          statusRes.result.user.selectedCommunity,
+        ),
+      });
     }
 
     if (statusRes.result.user) {

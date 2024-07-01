@@ -4,7 +4,6 @@
 
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import ChainInfo from '../../models/ChainInfo';
 import StarredCommunity from '../../models/StarredCommunity';
 
 // eslint-disable-next-line
@@ -54,15 +53,6 @@ export class UserController {
     if (shouldRedraw) {
       this.isFetched.emit('redraw');
     }
-  }
-
-  private _selectedCommunity: ChainInfo;
-  public get selectedCommunity(): ChainInfo {
-    return this._selectedCommunity;
-  }
-
-  private _setSelectedCommunity(selectedCommunity: ChainInfo): void {
-    this._selectedCommunity = selectedCommunity;
   }
 
   private _notifications: NotificationsController =
@@ -136,10 +126,6 @@ export class UserController {
       this._activeAccounts.findIndex((a) => a.address === address.address),
       1,
     );
-  }
-
-  public setSelectedCommunity(selectedCommunity: ChainInfo): void {
-    this._setSelectedCommunity(selectedCommunity);
   }
 
   public setNotifications(notifications: NotificationsController): void {

@@ -1,3 +1,4 @@
+import ChainInfo from 'client/scripts/models/ChainInfo';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
@@ -9,6 +10,7 @@ type CommonProps = {
   email: string;
   emailNotificationInterval: EmailNotificationInterval | '';
   knockJWT: string;
+  activeCommunity: ChainInfo | null;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -26,6 +28,7 @@ export const userStore = createStore<UserStoreProps>()(
     email: '',
     emailNotificationInterval: '',
     knockJWT: '',
+    activeCommunity: null,
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,

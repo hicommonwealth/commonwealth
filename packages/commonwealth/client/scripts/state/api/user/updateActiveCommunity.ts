@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import app from 'state';
+import useUserStore from '../../ui/user';
 import { ApiEndpoints } from '../config';
 
 type UpdateActiveCommunityProps = {
@@ -28,10 +29,14 @@ export const updateActiveCommunity = async ({
 };
 
 const useUpdateUserActiveCommunityMutation = () => {
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: updateActiveCommunity,
     onSuccess: (community: ChainInfo) =>
-      app.user.setSelectedCommunity(community),
+      user.setData({
+        activeCommunity: community,
+      }),
     onError: (error) =>
       console.error(`Failed to update active community: ${error}`),
   });

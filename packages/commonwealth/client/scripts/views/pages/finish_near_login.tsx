@@ -1,6 +1,7 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import BN from 'bn.js';
+import useUserStore from 'client/scripts/state/ui/user';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -72,14 +73,15 @@ const FinishNearLogin = () => {
   const [isNewAccount, setIsNewAccount] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
+  const user = useUserStore();
+
   const validate = async (wallet: WalletConnection) => {
     try {
       // TODO: do we need to do this every time, or only on first connect?
       const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
       const community =
-        app.user.selectedCommunity ||
-        app.config.chains.getById(app.activeChainId());
+        user.activeCommunity || app.config.chains.getById(app.activeChainId());
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
