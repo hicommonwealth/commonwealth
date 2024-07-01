@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 
 import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -60,6 +60,8 @@ const BasicInformationForm = ({
     updateAndValidateSocialLinkAtIndex,
   } = useSocialLinks();
 
+  const { data: configurationData } = useFetchConfigurationQuery();
+
   const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
@@ -74,7 +76,7 @@ const BasicInformationForm = ({
   } = useCreateCommunityMutation();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  let isCommunityNameTaken = !!app.config.redirects[communityId];
+  let isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
   if (!isCommunityNameTaken) {
     isCommunityNameTaken = !!existingCommunityIds.find(
       (id) => id === communityId,

@@ -2,11 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 
 import { queryClient, QueryKeys } from '../config';
 
+export type Configuration = {
+  enforceSessionKeys: boolean;
+  evmTestEnv: string;
+  redirects: Record<string, string>;
+};
+
 export const fetchConfiguration = async () => {
-  return queryClient.getQueryData<{
-    enforceSessionKeys: boolean;
-    evmTestEnv: string;
-  }>([QueryKeys.CONFIGURATION]);
+  return queryClient.getQueryData<Configuration>([QueryKeys.CONFIGURATION]);
 };
 
 const useFetchConfigurationQuery = () => {

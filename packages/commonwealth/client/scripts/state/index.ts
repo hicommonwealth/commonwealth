@@ -20,6 +20,7 @@ import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
 import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys } from 'state/api/config';
+import { Configuration } from 'state/api/configuration';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -222,8 +223,19 @@ export async function initAppState(
           ...c.community,
         });
         app.config.chains.add(chainInfo);
+
         if (chainInfo.redirect) {
-          app.config.redirects[chainInfo.redirect] = chainInfo.id;
+          const cachedConfig = queryClient.getQueryData<Configuration>([
+            QueryKeys.CONFIGURATION,
+          ]);
+
+          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+            ...cachedConfig,
+            redirects: {
+              ...cachedConfig?.redirects,
+              [chainInfo.redirect]: chainInfo.id,
+            },
+          });
         }
       });
 
