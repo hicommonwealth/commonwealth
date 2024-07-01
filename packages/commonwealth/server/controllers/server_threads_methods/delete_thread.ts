@@ -76,7 +76,7 @@ export async function __deleteThread(
   }
 
   // check if thread is part of a contest topic
-  const contestManagers = await this.models.sequelize.query<any>(
+  const contestManagers = await this.models.sequelize.query(
     `
     SELECT cm.contest_address FROM "Threads" t
     JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
