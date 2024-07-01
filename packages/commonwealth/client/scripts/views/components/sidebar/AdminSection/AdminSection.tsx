@@ -48,10 +48,6 @@ const AdminSection = () => {
     [{ path: '/analytics' }, { path: ':scope/analytics' }],
     location,
   );
-  const matchesContractsRoute = matchRoutes(
-    [{ path: '/contracts' }, { path: ':scope/contracts' }],
-    location,
-  );
 
   const adminGroupData: SectionGroupAttrs[] = [
     {
