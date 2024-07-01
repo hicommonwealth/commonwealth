@@ -1,11 +1,18 @@
+import {
+  Contest,
+  ContestAction,
+  ContestManager,
+  ContestScore,
+} from '@hicommonwealth/schemas';
 import { ProposalType } from '@hicommonwealth/shared';
 import type MinimumProfile from 'models/MinimumProfile';
-import { addressToUserProfile, UserProfile } from 'models/MinimumProfile';
+import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
+import { z } from 'zod';
 import Comment from './Comment';
-import type { IUniqueId } from './interfaces';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
+import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
 function getDecodedString(str: string) {
@@ -15,6 +22,32 @@ function getDecodedString(str: string) {
     console.error(`Could not decode str: "${str}"`);
     return str;
   }
+}
+
+function processAssociatedContests(
+  associatedContests?: AssociatedContest[] | null,
+  contestActions?: ContestActionT[] | null,
+): AssociatedContest[] | [] {
+  if (associatedContests) {
+    return associatedContests;
+  }
+
+  if (contestActions) {
+    return contestActions.map((action) => ({
+      contest_id: action.Contest.contest_id,
+      contest_name: action.Contest.ContestManager.name,
+      contest_address: action.Contest.contest_address,
+      score: action.Contest.score,
+      contest_cancelled: action.Contest.ContestManager.cancelled,
+      thread_id: action.thread_id,
+      content_id: action.content_id,
+      start_time: action.Contest.start_time,
+      end_time: action.Contest.end_time,
+      contest_interval: action.Contest.ContestManager.interval,
+    }));
+  }
+
+  return [];
 }
 
 function processVersionHistory(versionHistory: any[]) {
@@ -103,6 +136,36 @@ function processAssociatedReactions(
   return temp;
 }
 
+const ScoreZ = ContestScore.element.omit({
+  tickerPrize: true,
+});
+
+const ContestManagerZ = ContestManager.pick({
+  name: true,
+  cancelled: true,
+  interval: true,
+});
+
+const ContestZ = Contest.pick({
+  contest_id: true,
+  contest_address: true,
+  end_time: true,
+}).extend({
+  score: ScoreZ.array(),
+  ContestManager: ContestManagerZ,
+  start_time: z.string(),
+  end_time: z.string(),
+});
+
+const ContestActionZ = ContestAction.pick({
+  content_id: true,
+  thread_id: true,
+}).extend({
+  Contest: ContestZ,
+});
+
+type ContestActionT = z.infer<typeof ContestActionZ>;
+
 export interface VersionHistory {
   author?: MinimumProfile & { profile_id: number };
   timestamp: Moment;
@@ -126,12 +189,22 @@ export type AssociatedReaction = {
   last_active?: string;
 };
 
-type AssociatedContest = {
-  id: number;
-  thread_id: number;
+export type AssociatedContest = {
+  contest_id: number;
+  contest_name: string;
+  contest_address: string;
+  score: {
+    prize: string;
+    votes: number;
+    content_id: string;
+    creator_address: string;
+  }[];
+  contest_cancelled?: boolean | null;
+  thread_id: number | null | undefined;
   content_id: number;
   start_time: string;
   end_time: string;
+  contest_interval: number;
 };
 
 type RecentComment = {
@@ -183,8 +256,7 @@ export class Thread implements IUniqueId {
   public stage: ThreadStage;
   public readOnly: boolean;
 
-  public readonly canvasAction: string;
-  public readonly canvasSession: string;
+  public readonly canvasSignedData: string;
   public readonly canvasHash: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
@@ -255,8 +327,7 @@ export class Thread implements IUniqueId {
     reactedProfileName,
     reactedProfileAvatarUrl,
     reactedAddressLastActive,
-    canvasAction,
-    canvasSession,
+    canvasSignedData,
     canvasHash,
     links,
     discord_meta,
@@ -267,6 +338,7 @@ export class Thread implements IUniqueId {
     associatedReactions,
     associatedContests,
     recentComments,
+    ContestActions,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -278,8 +350,7 @@ export class Thread implements IUniqueId {
     url?: string;
     pinned?: boolean;
     links?: Link[];
-    canvasAction?: string;
-    canvasSession?: string;
+    canvasSignedData?: string;
     canvasHash?: string;
     plaintext?: string;
     collaborators?: any[];
@@ -313,6 +384,7 @@ export class Thread implements IUniqueId {
     associatedReactions?: AssociatedReaction[];
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
+    ContestActions: ContestActionT[];
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
@@ -352,10 +424,8 @@ export class Thread implements IUniqueId {
     this.lockedAt = locked_at ? moment(locked_at) : null;
     this.numberOfComments = numberOfComments || 0;
     // @ts-expect-error StrictNullChecks
-    this.canvasAction = canvasAction;
-    // @ts-expect-error StrictNullChecks
-    this.canvasSession = canvasSession;
-    // @ts-expect-error StrictNullChecks
+    this.canvasSignedData = canvasSignedData;
+    // @ts-expect-error <StrictNullChecks>
     this.canvasHash = canvasHash;
     this.links = links || [];
     this.discord_meta = discord_meta;
@@ -375,7 +445,10 @@ export class Thread implements IUniqueId {
         reactedProfileAvatarUrl,
         reactedAddressLastActive,
       );
-    this.associatedContests = associatedContests || [];
+    this.associatedContests = processAssociatedContests(
+      associatedContests,
+      ContestActions,
+    );
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({
@@ -409,9 +482,8 @@ export class Thread implements IUniqueId {
           reactions: [],
           version_history: [],
           reaction_weights_sum: 0,
-          canvas_action: null,
+          canvas_signed_data: null,
           canvas_hash: null,
-          canvas_session: null,
         }),
     );
     this.latestActivity = last_commented_on

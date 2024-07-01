@@ -211,6 +211,52 @@ class NamespaceFactory extends ContractBase {
     }
     return txReceipt;
   }
+
+  async getFeeManagerBalance(
+    namespace: string,
+    token?: string,
+    decimals?: number,
+  ): Promise<string> {
+    const namespaceAddr = await this.getNamespaceAddress(namespace);
+    const namespaceContract = new this.web3.eth.Contract(
+      [
+        {
+          inputs: [],
+          stateMutability: 'view',
+          type: 'function',
+          name: 'feeManager',
+          outputs: [
+            {
+              internalType: 'address',
+              name: '',
+              type: 'address',
+            },
+          ],
+        },
+      ],
+      namespaceAddr,
+    );
+    const feeManager = await namespaceContract.methods.feeManager().call();
+
+    if (!token) {
+      const balance = await this.web3.eth.getBalance(String(feeManager));
+      return this.web3.utils.fromWei(balance, 'ether');
+    } else {
+      const calldata =
+        '0x70a08231' +
+        this.web3.eth.abi
+          .encodeParameters(['address'], [feeManager])
+          .substring(2);
+      const result = await this.web3.eth.call({
+        to: token,
+        data: calldata,
+      });
+      const balance: number = Number(
+        this.web3.eth.abi.decodeParameter('uint256', result),
+      );
+      return String(balance / (10 ^ (decimals ?? 18)));
+    }
+  }
 }
 
 export default NamespaceFactory;

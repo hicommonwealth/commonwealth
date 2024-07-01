@@ -71,9 +71,8 @@ export default (
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
       has_poll: { type: Sequelize.BOOLEAN, allowNull: true },
 
-      // signed data
-      canvas_action: { type: Sequelize.JSONB, allowNull: true },
-      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      // canvas-related columns
+      canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_hash: { type: Sequelize.STRING, allowNull: true },
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },

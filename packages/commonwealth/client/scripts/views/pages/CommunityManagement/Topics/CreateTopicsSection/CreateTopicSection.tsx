@@ -19,6 +19,7 @@ import {
 import { DeltaStatic } from 'quill';
 import React, { useMemo, useState } from 'react';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CreateTopicSection.scss';
 import { FormSubmitValues } from './types';
 import { topicCreationValidationSchema } from './validation';
@@ -41,6 +42,8 @@ export const CreateTopicSection = () => {
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const handleCreateTopic = async (values: FormSubmitValues) => {
     try {
       await createTopic({
@@ -50,6 +53,7 @@ export const CreateTopicSection = () => {
         featuredInSidebar,
         featuredInNewPost: false,
         defaultOffchainTemplate: '',
+        isPWA: isAddedToHomeScreen,
       });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
@@ -73,7 +77,7 @@ export const CreateTopicSection = () => {
   };
 
   useMemo(() => {
-    if (descriptionDelta?.ops[0]?.insert?.length > 250) {
+    if ((descriptionDelta?.ops || [])?.[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
       setDescErrorMsg(null);
@@ -109,7 +113,7 @@ export const CreateTopicSection = () => {
           />
           <div className="description-char-count">
             <CWText type="caption">
-              {descriptionDelta.ops[0].insert.length} / 250
+              {descriptionDelta?.ops?.[0].insert.length / 250 || 0}
             </CWText>
           </div>
           <CWText type="caption">

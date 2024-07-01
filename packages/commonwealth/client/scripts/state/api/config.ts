@@ -41,6 +41,7 @@ export const ContractMethods = {
   GET_BUY_PRICE: 'getBuyPrice',
   GET_SELL_PRICE: 'getSellPrice',
   GET_CONTEST_BALANCE: 'getContestBalance',
+  GET_FEE_MANAGER_BALANCE: 'getFeeManagerBalance',
 };
 
 export const ExternalEndpoints = {

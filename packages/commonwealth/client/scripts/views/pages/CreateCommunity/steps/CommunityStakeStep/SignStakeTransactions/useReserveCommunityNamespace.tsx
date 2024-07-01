@@ -6,6 +6,7 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import { useUpdateCommunityMutation } from 'state/api/communities';
+import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 
@@ -29,6 +30,8 @@ const useReserveCommunityNamespace = ({
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -66,6 +69,7 @@ const useReserveCommunityNamespace = ({
         // @ts-expect-error <StrictNullChecks/>
         userId: app.user.activeAccount.profile.id,
         userAddress: userAddress,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log(err);

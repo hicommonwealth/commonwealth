@@ -22,8 +22,8 @@ interface SearchProfilesProps {
   communityId: string;
   searchTerm: string;
   limit: number;
-  orderBy: APIOrderBy;
-  orderDirection: APIOrderDirection;
+  orderBy?: APIOrderBy;
+  orderDirection?: APIOrderDirection;
   includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;

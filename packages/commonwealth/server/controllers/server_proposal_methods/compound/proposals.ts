@@ -50,7 +50,7 @@ export function formatCompoundBravoProposal(
 
 export async function getCompoundProposals(
   compoundGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
 ): Promise<ProposalDataType[]> {
   const { contract, version: govVersion } =
     await getCompoundGovContractAndVersion(compoundGovAddress, provider);

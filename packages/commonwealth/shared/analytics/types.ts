@@ -85,6 +85,11 @@ export const enum MixpanelGovernanceEvents {
   COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
 }
 
+export const enum MixpanelPWAEvent {
+  PWA_USED = 'PWA in use',
+  PWA_NOT_USED = 'PWA NOT in use',
+}
+
 export type MixpanelEvents =
   | MixpanelLoginEvent
   | MixpanelUserSignupEvent
@@ -95,12 +100,15 @@ export type MixpanelEvents =
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent
   | MixpanelClickthroughEvent
-  | MixpanelGovernanceEvents;
+  | MixpanelGovernanceEvents
+  | MixpanelPWAEvent;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 
 export interface AnalyticsPayload {
   event: AnalyticsEvent; // base event type
+  isPWA?: boolean;
+  test?: boolean;
 }
 
 export interface BaseMixpanelPayload extends AnalyticsPayload {
@@ -112,6 +120,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   communitySelected?: string;
   proposalType?: string;
   chainBase?: ChainBase;
+  isPWA?: boolean;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {

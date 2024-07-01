@@ -49,14 +49,6 @@ export enum ContentType {
   // Proposal = 'proposal',
 }
 
-export enum SearchContentType {
-  Thread = 'thread',
-  Comment = 'comment',
-  Chain = 'chain',
-  Token = 'token',
-  Member = 'member',
-}
-
 export const DynamicTemplate = {
   ImmediateEmailNotification: 'd-3f30558a95664528a2427b40292fec51',
   BatchNotifications: 'd-468624f3c2d7434c86ae0ed0e1d2227e',

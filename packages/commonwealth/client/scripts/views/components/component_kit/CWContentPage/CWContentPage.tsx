@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
-import ThreadContestTag from 'views/components/ThreadContestTag';
+import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -79,6 +79,7 @@ type ContentPageProps = {
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
   setThreadBody?: (body: string) => void;
+  editingDisabled?: boolean;
 };
 
 export const CWContentPage = ({
@@ -116,6 +117,7 @@ export const CWContentPage = ({
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
   setThreadBody,
+  editingDisabled,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -186,8 +188,8 @@ export const CWContentPage = ({
         {...(thread?.lockedAt && {
           lockedAt: thread.lockedAt.toISOString(),
         })}
-        {...(thread?.updatedAt && {
-          lastUpdated: thread.updatedAt.toISOString(),
+        {...(thread?.lastEdited && {
+          lastUpdated: (thread?.lastEdited || thread.createdAt).toISOString(),
         })}
         // @ts-expect-error <StrictNullChecks/>
         authorAddress={author?.address}
@@ -220,27 +222,14 @@ export const CWContentPage = ({
     isThreadTopicGated: isRestrictedMembership,
   });
 
-  const contestWinners = [
-    { date: '03/09/2024', round: 7, isRecurring: true },
-    { date: '03/10/2024', isRecurring: false },
-    {
-      date: '03/10/2024',
-      round: 8,
-      isRecurring: true,
-    },
-  ];
-  const showContestWinnerTag = false;
-  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
-
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
           <h1 className="title">
-            {showContestWinnerTag &&
-              contestWinners?.map((winner, index) => (
-                <ThreadContestTag key={index} {...winner} />
-              ))}
+            <ThreadContestTagContainer
+              associatedContests={thread?.associatedContests}
+            />
             {truncate(title)}
           </h1>
         ) : (
@@ -276,6 +265,7 @@ export const CWContentPage = ({
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             shareEndpoint={`${window.location.origin}${window.location.pathname}`}
+            editingDisabled={editingDisabled}
           />,
         )}
 

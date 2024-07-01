@@ -1,4 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import ChainInfo from 'client/scripts/models/ChainInfo';
+import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -29,6 +31,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
 import {
@@ -40,9 +43,6 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from './CustomAddressOption';
-
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -119,6 +119,8 @@ const StakeExchangeForm = ({
 
   const communityId = community?.id || app.activeChainId();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
   });
@@ -167,6 +169,7 @@ const StakeExchangeForm = ({
         community: communityId,
         userId: app?.user?.activeAccount?.profile?.id,
         userAddress: selectedAddress?.value,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log('Error buying: ', err);
@@ -202,6 +205,7 @@ const StakeExchangeForm = ({
         community: communityId,
         userId: app?.user?.activeAccount?.profile?.id,
         userAddress: selectedAddress?.value,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log('Error selling: ', err);

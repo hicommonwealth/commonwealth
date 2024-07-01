@@ -9,7 +9,11 @@ import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPWAEvent,
+} from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -17,13 +21,12 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
-import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 import { fetchActivity } from './helpers';
+import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 
 export enum DashboardViews {
   ForYou = 'For You',
   Global = 'Global',
-  Chain = 'Chain',
 }
 
 type UserDashboardProps = {
@@ -47,9 +50,12 @@ const UserDashboard = (props: UserDashboardProps) => {
     DashboardViews.Global,
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DASHBOARD_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -59,6 +65,14 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: isAddedToHomeScreen
+        ? MixpanelPWAEvent.PWA_USED
+        : MixpanelPWAEvent.PWA_NOT_USED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
   useEffect(() => {
     if (!type) {
       navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
@@ -68,11 +82,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [loggedIn, navigate, type]);
 
   const subpage: DashboardViews =
-    type === 'chain-events'
-      ? DashboardViews.Chain
-      : type === 'global'
-      ? DashboardViews.Global
-      : loggedIn
+    loggedIn && type !== 'global'
       ? DashboardViews.ForYou
       : DashboardViews.Global;
 
@@ -113,13 +123,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                     navigate('/dashboard/global');
                   }}
                 />
-                <CWTab
-                  label={DashboardViews.Chain}
-                  isSelected={activePage === DashboardViews.Chain}
-                  onClick={() => {
-                    navigate('/dashboard/chain-events');
-                  }}
-                />
               </CWTabsRow>
             </div>
             <>
@@ -139,16 +142,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                   onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
-                />
-              )}
-              {activePage === DashboardViews.Chain && (
-                <Feed
-                  fetchData={() => fetchActivity(activePage)}
-                  noFeedMessage="Join some communities that have governance to see Chain Events!"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
-                  // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
-                  isChainEventsRow={true}
                 />
               )}
             </>

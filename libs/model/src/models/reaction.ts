@@ -20,8 +20,8 @@ export type ReactionAttributes = {
 
   calculated_voting_weight: number;
 
-  canvas_action: string;
-  canvas_session: string;
+  // canvas-related columns
+  canvas_signed_data: string;
   canvas_hash: string;
 
   created_at?: Date;
@@ -47,9 +47,8 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: false },
       reaction: { type: Sequelize.ENUM('like'), allowNull: false },
       calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
-      // signed data
-      canvas_action: { type: Sequelize.JSONB, allowNull: true },
-      canvas_session: { type: Sequelize.JSONB, allowNull: true },
+      // canvas-related columns
+      canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_hash: { type: Sequelize.STRING, allowNull: true },
     },
     {

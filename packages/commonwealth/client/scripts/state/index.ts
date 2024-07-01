@@ -12,8 +12,6 @@ import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
-import SearchController from 'controllers/server/search';
-import SessionsController from 'controllers/server/sessions';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
@@ -61,10 +59,6 @@ export interface IApp {
   // Proposals
   proposalEmitter: EventEmitter;
 
-  // Search
-  search: SearchController;
-  searchAddressCache: any;
-
   // Contracts
   contracts: ContractsController;
 
@@ -75,7 +69,6 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  sessions: SessionsController;
 
   // Web3
   snapshot: SnapshotController;
@@ -150,10 +143,6 @@ const app: IApp = {
   // Discord
   discord: new DiscordController(),
 
-  // Search
-  search: new SearchController(),
-  searchAddressCache: {},
-
   // Web3
   snapshot: new SnapshotController(),
 
@@ -161,7 +150,6 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
   loginStateEmitter: new EventEmitter(),
 

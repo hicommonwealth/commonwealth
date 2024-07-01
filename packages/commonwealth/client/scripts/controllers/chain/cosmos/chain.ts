@@ -60,9 +60,11 @@ export type CosmosApiType = QueryClient &
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
   private _lcd: LCD;
+
   public get api() {
     return this._api;
   }
+
   public get lcd() {
     return this._lcd;
   }
@@ -95,7 +97,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _tmClient: Tendermint34Client;
 
   public async init(chain: ChainInfo, reset = false) {
-    const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
+    const url = `${window.location.origin}${this.app.serverUrl()}/cosmosProxy/${
+      chain.id
+    }`;
 
     // TODO: configure broadcast mode
     try {
@@ -123,7 +127,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         CosmosGovernanceVersion.v1beta1Failed
     ) {
       try {
-        const lcdUrl = `${window.location.origin}/cosmosAPI/v1/${chain.id}`;
+        const lcdUrl = `${
+          window.location.origin
+        }${this.app.serverUrl()}/cosmosProxy/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
         const lcd = await getLCDClient(lcdUrl);
         this._lcd = lcd;
@@ -227,9 +233,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (cosmosEvmChains.some((c) => c === dbId)) {
       const chainId = wallet.getChainId();
 
-      client = await EthSigningClient(
+      client = EthSigningClient(
         {
-          restUrl: `${window.location.origin}/cosmosAPI/v1/${dbId}`,
+          restUrl: `${
+            window.location.origin
+          }${this.app.serverUrl()}/cosmosProxy/v1/${dbId}`,
           chainId,
           path: dbId,
         },

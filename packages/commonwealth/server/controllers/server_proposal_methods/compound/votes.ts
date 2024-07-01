@@ -23,7 +23,7 @@ export function formatCompoundProposalVote(
 
 export async function getCompoundProposalVotes(
   compoundGovAddress: string,
-  provider: providers.Web3Provider,
+  provider: providers.JsonRpcProvider,
   proposalId: string,
 ): Promise<CompoundVoteEvents[]> {
   const { contract, version: govVersion } =

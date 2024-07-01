@@ -27,10 +27,13 @@ import {
 } from 'state/api/threads';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useFlag } from '../../../hooks/useFlag';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
@@ -103,6 +106,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
@@ -122,6 +127,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [threadBody, setThreadBody] = useState(thread?.body);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+
+  const { contestsData } = useCommunityContests();
+  const isTopicInContest = checkIsTopicInContest(
+    contestsData,
+    thread?.topic?.id,
+  );
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
@@ -195,6 +206,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -284,7 +296,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // @ts-expect-error <StrictNullChecks/>
     thread.communityId !== app.activeChainId()
   ) {
-    return <PageNotFound />;
+    return <PageNotFound message="Thread not found" />;
   }
 
   // Original posters have full editorial control, while added collaborators
@@ -740,6 +752,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               />
             </>
           }
+          editingDisabled={isTopicInContest}
           sidebarComponents={
             [
               ...(showLinkedProposalOptions || showLinkedThreadOptions
