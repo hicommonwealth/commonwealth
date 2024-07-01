@@ -442,6 +442,8 @@ export async function __createCommunity(
         },
       ],
     });
+  } else if (createdCommunity.base === ChainBase.NEAR) {
+    throw new AppError(Errors.InvalidBase);
   } else if (createdCommunity.base === ChainBase.Solana) {
     // @ts-expect-error StrictNullChecks
     addressToBeAdmin = await this.models.Address.scope(
