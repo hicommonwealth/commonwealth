@@ -125,8 +125,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
-          /* eslint-disable require-await */
-          query: async () => [],
+          query: new Promise((resolve) => resolve([])),
         },
       };
       const banCache: any = {
