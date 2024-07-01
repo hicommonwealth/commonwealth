@@ -23,6 +23,7 @@ import axios from 'axios';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
+import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -257,8 +258,9 @@ export function updateActiveUser(data) {
     app.user.setEmail(null);
     // @ts-expect-error StrictNullChecks
     app.user.setEmailInterval(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmailVerified(null);
+    userStore.getState().setData({
+      isEmailVerified: false,
+    });
     // @ts-expect-error StrictNullChecks
     app.user.setPromotionalEmailsEnabled(null);
     app.user.setIsWelcomeOnboardFlowComplete(false);
@@ -279,7 +281,9 @@ export function updateActiveUser(data) {
     app.user.setId(data.id);
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
-    app.user.setEmailVerified(data.emailVerified);
+    userStore.getState().setData({
+      isEmailVerified: !!data.emailVerified, // always add a boolean - no undefined values
+    });
     app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
     app.user.setIsWelcomeOnboardFlowComplete(
       data.is_welcome_onboard_flow_complete,

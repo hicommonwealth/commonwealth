@@ -53,15 +53,6 @@ export class UserController {
     this._emailInterval = emailInterval;
   }
 
-  private _emailVerified: boolean;
-  public get emailVerified(): boolean {
-    return this._emailVerified;
-  }
-
-  private _setEmailVerified(emailVerified: boolean): void {
-    this._emailVerified = emailVerified;
-  }
-
   private _promotionalEmailsEnabled: boolean;
   public get promotionalEmailsEnabled(): boolean {
     return this._promotionalEmailsEnabled;
@@ -231,10 +222,6 @@ export class UserController {
       console.log(e);
       notifyError('Unable to set email interval');
     }
-  }
-
-  public setEmailVerified(verified: boolean): void {
-    this._setEmailVerified(verified);
   }
 
   public setKnockJWT(knockJWT: string): void {

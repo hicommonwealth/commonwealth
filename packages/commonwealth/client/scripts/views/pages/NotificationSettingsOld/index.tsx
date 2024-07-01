@@ -1,4 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -37,6 +38,7 @@ const emailIntervalFrequencyMap = {
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const user = useUserStore();
 
   const {
     email,
@@ -87,7 +89,7 @@ const NotificationSettingsPage = () => {
               you need it.
             </CWText>
           </div>
-          {app.user.emailVerified ? (
+          {user.isEmailVerified ? (
             <PopoverMenu
               renderTrigger={(onclick) => (
                 <CWButton
@@ -122,7 +124,7 @@ const NotificationSettingsPage = () => {
             </CWText>
           )}
         </div>
-        {(!app.user.email || !app.user.emailVerified) && (
+        {(!app.user.email || !user.isEmailVerified) && (
           <div className="email-input-section">
             <CWCard fullWidth className="email-card">
               {sentEmail ? (
