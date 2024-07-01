@@ -19,7 +19,6 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
     `new-thread-${communityId}-info`,
   );
-  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
@@ -47,18 +46,14 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
     restoredDraft?.body,
   );
-  const [isSaving, setIsSaving] = useState(false);
-
   const editorText = getTextFromDelta(threadContentDelta);
 
-  const disableSave = isSaving;
   const hasTopics = !!topicsForSelector?.length;
   const topicMissing = hasTopics && !threadTopic;
   const titleMissing = !threadTitle;
   const contentMissing = editorText.length === 0;
 
-  const isDisabled =
-    disableSave || titleMissing || topicMissing || contentMissing;
+  const isDisabled = titleMissing || topicMissing || contentMissing;
 
   // on content updated, save draft
   useEffect(() => {
@@ -95,12 +90,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     setThreadTopic,
     threadContentDelta,
     setThreadContentDelta,
-    isSaving,
-    setIsSaving,
     isDisabled,
     clearDraft,
-    canShowGatingBanner,
-    setCanShowGatingBanner,
   };
 };
 

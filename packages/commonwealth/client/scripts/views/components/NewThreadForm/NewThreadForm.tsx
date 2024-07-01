@@ -6,7 +6,7 @@ import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
@@ -31,11 +31,7 @@ import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWForm } from '../component_kit/new_designs/CWForm';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { ReactQuillEditor } from '../react_quill_editor';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  serializeDelta,
-} from '../react_quill_editor/utils';
+import { serializeDelta } from '../react_quill_editor/utils';
 import ContestThreadBanner from './ContestThreadBanner';
 import './NewThreadForm.scss';
 import { checkIsTopicInContest, useNewThreadForm } from './helpers';
@@ -62,18 +58,12 @@ export const NewThreadForm = () => {
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
   const topicsForSelector = hasTopics ? sortedTopics : [];
 
-  const {
-    threadTitle,
-    setThreadTitle,
-    threadTopic,
-    setThreadTopic,
-    threadContentDelta,
-    setThreadContentDelta,
-    setIsSaving,
-    clearDraft,
-    canShowGatingBanner,
-    setCanShowGatingBanner,
-  } = useNewThreadForm(communityId, topicsForSelector);
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
+
+  const { threadTopic, setThreadTopic, clearDraft } = useNewThreadForm(
+    communityId,
+    topicsForSelector,
+  );
 
   const isTopicInContest = checkIsTopicInContest(contestsData, threadTopic?.id);
 
@@ -92,6 +82,7 @@ export const NewThreadForm = () => {
   });
 
   const {
+    isLoading: isSubmitting,
     mutateAsync: createThread,
     error: createThreadError,
     reset: resetCreateThreadMutation,
@@ -103,10 +94,6 @@ export const NewThreadForm = () => {
     handleClose: resetCreateThreadMutation,
     error: createThreadError,
   });
-
-  const isPopulated = useMemo(() => {
-    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
-  }, [threadContentDelta, threadTitle]);
 
   const isTopicGated = !!(memberships || []).find((membership) =>
     membership.topicIds.includes(threadTopic?.id),
@@ -124,12 +111,10 @@ export const NewThreadForm = () => {
     !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleCancel = () => {
-    setThreadTitle('');
     setThreadTopic(
       ((topicsForSelector || [])?.find((t) => t?.name?.includes('General')) ||
         null) as any,
     );
-    setThreadContentDelta(createDeltaFromText(''));
   };
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
@@ -177,8 +162,6 @@ export const NewThreadForm = () => {
     //   !!hasTopics,
     // );
 
-    setIsSaving(true);
-
     try {
       const thread = await createThread({
         address: app.user.activeAccount.address,
@@ -190,13 +173,11 @@ export const NewThreadForm = () => {
         title: values.title,
         topic: topics.find((x) => x.name === values.topic?.label) as any,
         body: serializeDelta(values.body),
-        url: '',
         // @ts-expect-error <StrictNullChecks/>
         authorProfile: app.user.activeAccount.profile,
         isPWA: isAddedToHomeScreen,
       });
 
-      // setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
       navigate(`/discussion/${thread.id}`);
@@ -206,8 +187,6 @@ export const NewThreadForm = () => {
       }
       console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -238,84 +217,88 @@ export const NewThreadForm = () => {
             onWatch={handleWatch}
             className="new-thread-body"
           >
-            <div className="new-thread-form-inputs">
-              <CWTextInput
-                fullWidth
-                autoFocus
-                placeholder="Title"
-                hookToForm
-                name="title"
-              />
-
-              {!!hasTopics && (
-                <CWSelectList
-                  options={sortedTopics.map((topic) => ({
-                    label: topic?.name,
-                    value: `${topic?.id}`,
-                  }))}
-                  placeholder="Select topic"
+            {({ formState }) => (
+              <div className="new-thread-form-inputs">
+                <CWTextInput
+                  fullWidth
+                  autoFocus
+                  placeholder="Title"
                   hookToForm
-                  name="topic"
+                  name="title"
                 />
-              )}
 
-              <ReactQuillEditor
-                isDisabled={isRestrictedMembership || !hasJoinedCommunity}
-                tooltipLabel={
-                  typeof disabledActionsTooltipText === 'function'
-                    ? disabledActionsTooltipText?.('submit')
-                    : disabledActionsTooltipText
-                }
-                placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                name="body"
-                hookToForm
-              />
-
-              {contestThreadBannerVisible && (
-                <ContestThreadBanner
-                  submitEntryChecked={submitEntryChecked}
-                  onSetSubmitEntryChecked={setSubmitEntryChecked}
-                />
-              )}
-
-              <div className="buttons-row">
-                {isPopulated && hasJoinedCommunity && (
-                  <CWButton
-                    buttonType="tertiary"
-                    onClick={handleCancel}
-                    label="Cancel"
-                    containerClassName="no-pad"
-                    type="button"
+                {!!hasTopics && (
+                  <CWSelectList
+                    options={sortedTopics.map((topic) => ({
+                      label: topic?.name,
+                      value: `${topic?.id}`,
+                    }))}
+                    placeholder="Select topic"
+                    hookToForm
+                    name="topic"
                   />
                 )}
-                <CWButton
-                  label="Create thread"
-                  // disabled={
-                  //   isDisabled ||
-                  //   !hasJoinedCommunity ||
-                  //   isDisabledBecauseOfContestsConsent
-                  // }
-                  containerClassName="no-pad"
-                  type="submit"
-                />
-              </div>
 
-              {showBanner && (
-                <JoinCommunityBanner
-                  onClose={handleCloseBanner}
-                  onJoin={handleJoinCommunity}
+                <ReactQuillEditor
+                  isDisabled={isRestrictedMembership || !hasJoinedCommunity}
+                  tooltipLabel={
+                    typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('submit')
+                      : disabledActionsTooltipText
+                  }
+                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                  name="body"
+                  hookToForm
                 />
-              )}
 
-              {isRestrictedMembership && canShowGatingBanner && (
-                <div>
-                  <CWGatedTopicBanner
-                    groupNames={gatedGroupNames}
-                    onClose={() => setCanShowGatingBanner(false)}
+                {contestThreadBannerVisible && (
+                  <ContestThreadBanner
+                    submitEntryChecked={submitEntryChecked}
+                    onSetSubmitEntryChecked={setSubmitEntryChecked}
+                  />
+                )}
+
+                <div className="buttons-row">
+                  {formState.isDirty && hasJoinedCommunity && (
+                    <CWButton
+                      buttonType="tertiary"
+                      onClick={handleCancel}
+                      label="Cancel"
+                      containerClassName="no-pad"
+                      type="button"
+                      disabled={isSubmitting}
+                    />
+                  )}
+                  <CWButton
+                    label="Create thread"
+                    disabled={isSubmitting}
+                    // disabled={
+                    //   isDisabled ||
+                    //   !hasJoinedCommunity ||
+                    //   isDisabledBecauseOfContestsConsent
+                    // }
+                    containerClassName="no-pad"
+                    type="submit"
                   />
                 </div>
-              )}
-            </div>
+
+                {showBanner && (
+                  <JoinCommunityBanner
+                    onClose={handleCloseBanner}
+                    onJoin={handleJoinCommunity}
+                  />
+                )}
+
+                {isRestrictedMembership && canShowGatingBanner && (
+                  <div>
+                    <CWGatedTopicBanner
+                      groupNames={gatedGroupNames}
+                      onClose={() => setCanShowGatingBanner(false)}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </CWForm>
         </div>
       </CWPageLayout>
