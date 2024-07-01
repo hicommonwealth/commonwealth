@@ -203,9 +203,9 @@ export const EditCollaboratorsModal = ({
                   },
                 });
                 updatedThread.collaborators?.forEach((c) =>
-                  c.User.Profiles.forEach((p: any) => {
-                    p.avatarUrl = p.avatar_url;
-                    p.name = p.profile_name;
+                  c.User.Profiles.forEach((p) => {
+                    p.avatarUrl = (p as { avatar_url: string }).avatar_url;
+                    p.name = (p as { profile_name: string }).profile_name;
                   }),
                 );
                 notifySuccess('Collaborators updated');
