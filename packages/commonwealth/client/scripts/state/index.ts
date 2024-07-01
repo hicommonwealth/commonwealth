@@ -86,7 +86,6 @@ export interface IApp {
     redirects: Record<string, string>;
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
-    defaultChain: string;
     // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
@@ -161,7 +160,6 @@ const app: IApp = {
     chains: new ChainStore(),
     redirects: {},
     nodes: new NodeStore(),
-    defaultChain: 'edgeware',
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
