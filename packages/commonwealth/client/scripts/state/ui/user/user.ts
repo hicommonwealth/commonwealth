@@ -3,6 +3,7 @@ import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
 
 type CommonProps = {
+  id: number;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -16,6 +17,7 @@ type UserStoreProps = CommonProps & {
 export const userStore = createStore<UserStoreProps>()(
   devtools((set) => ({
     // default values when user is not signed in
+    id: 0,
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,

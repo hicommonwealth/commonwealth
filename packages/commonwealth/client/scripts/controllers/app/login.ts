@@ -253,12 +253,12 @@ export async function updateActiveAddresses({
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
-    app.user.setId(0);
     // @ts-expect-error StrictNullChecks
     app.user.setEmail(null);
     // @ts-expect-error StrictNullChecks
     app.user.setEmailInterval(null);
     userStore.getState().setData({
+      id: 0,
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
@@ -276,10 +276,10 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);
   } else {
-    app.user.setId(data.id);
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     userStore.getState().setData({
+      id: data.id || 0,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
