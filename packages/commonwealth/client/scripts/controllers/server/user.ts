@@ -53,15 +53,6 @@ export class UserController {
     this._emailInterval = emailInterval;
   }
 
-  private _isWelcomeOnboardFlowComplete: boolean;
-  public get isWelcomeOnboardFlowComplete(): boolean {
-    return this._isWelcomeOnboardFlowComplete;
-  }
-
-  private _setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
-    this._isWelcomeOnboardFlowComplete = enabled;
-  }
-
   private _knockJWT: string;
   public get knockJWT(): string {
     return this._knockJWT;
@@ -151,10 +142,6 @@ export class UserController {
 
   public setEmail(email: string): void {
     this._setEmail(email);
-  }
-
-  public setIsWelcomeOnboardFlowComplete(enabled: boolean): void {
-    this._setIsWelcomeOnboardFlowComplete(enabled);
   }
 
   public async updateEmail(

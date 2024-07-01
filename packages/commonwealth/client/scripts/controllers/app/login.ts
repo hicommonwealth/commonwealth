@@ -262,8 +262,8 @@ export function updateActiveUser(data) {
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
+      isWelcomeOnboardFlowComplete: false,
     });
-    app.user.setIsWelcomeOnboardFlowComplete(false);
     // @ts-expect-error StrictNullChecks
     app.user.setKnockJWT(null);
     // @ts-expect-error StrictNullChecks
@@ -280,13 +280,12 @@ export function updateActiveUser(data) {
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
     userStore.getState().setData({
-      isSiteAdmin: !!data.isAdmin, // always add a boolean - no undefined values
-      isEmailVerified: !!data.emailVerified, // always add a boolean - no undefined values
-      isPromotionalEmailEnabled: !!data.promotional_emails_enabled, // always add a boolean - no undefined values
+      // add boolean values as boolean -- not undefined
+      isSiteAdmin: !!data.isAdmin,
+      isEmailVerified: !!data.emailVerified,
+      isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
+      isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
     });
-    app.user.setIsWelcomeOnboardFlowComplete(
-      data.is_welcome_onboard_flow_complete,
-    );
     app.user.setKnockJWT(data.knockJwtToken);
     app.user.setJWT(data.jwt);
 
@@ -625,7 +624,7 @@ export async function handleSocialLoginCallback({
       // if account is newly created and user has not completed onboarding flow
       // then open the welcome modal.
       const profileId = profiles?.[0]?.id;
-      if (profileId && !app.user.isWelcomeOnboardFlowComplete) {
+      if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
         }, 1000);
