@@ -1,43 +1,6 @@
-import { formatCoin } from 'adapters/currency';
-import {
-  CosmosProposal,
-  CosmosVote,
-} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import type { IVote } from '../../../models/interfaces';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { AnyProposal } from '../../../models/types';
-import { ProposalStatus, VotingUnit } from '../../../models/types';
-
-export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
-  const balancesCache = {};
-  const balancesCacheInitialized = {};
-
-  const balanceWeighted =
-    proposal.votingUnit === VotingUnit.CoinVote ||
-    proposal.votingUnit === VotingUnit.ConvictionCoinVote ||
-    proposal.votingUnit === VotingUnit.PowerVote;
-
-  let balance;
-
-  if (balanceWeighted && !(vote instanceof CosmosVote)) {
-    // fetch and display balances
-    if (balancesCache[vote.account.address]) {
-      balance = balancesCache[vote.account.address];
-    } else if (balancesCacheInitialized[vote.account.address]) {
-      // do nothing, fetch already in progress
-      balance = '--';
-    } else {
-      // fetch balance and store in cache
-      balancesCacheInitialized[vote.account.address] = true;
-      vote.account.balance.then((b) => {
-        balance = b;
-        balancesCache[vote.account.address] = formatCoin(b, true);
-      });
-      balance = '--';
-    }
-  }
-
-  return balance;
-};
+import { ProposalStatus } from '../../../models/types';
 
 export const getCanVote = (
   proposal: AnyProposal,

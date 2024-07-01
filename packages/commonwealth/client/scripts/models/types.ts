@@ -52,28 +52,19 @@ export enum ThreadTimelineFilterTypes {
 export enum ProposalStatus {
   Passing = 'pass',
   Failing = 'fail',
-  Canceled = 'canceled',
   Passed = 'passed',
   Failed = 'failed',
   None = 'none',
 }
 
 export enum VotingType {
-  ConvictionYesNoVoting = 'binary_conviction',
   SimpleYesApprovalVoting = 'approval',
   YesNoAbstainVeto = 'yes_no_abstain_veto',
-  RankedChoiceVoting = 'rankedchoice',
-  MultiOptionVoting = 'multioption',
   None = 'none',
-  MolochYesNo = 'moloch',
 }
 
 export enum VotingUnit {
-  OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
-  ConvictionCoinVote = 'conviction_coin',
-  PowerVote = 'power',
-  None = 'none',
 }
 
 export type ProposalEndTime =

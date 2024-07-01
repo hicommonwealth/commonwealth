@@ -251,10 +251,6 @@ export const VotingActions = (props: VotingActionsProps) => {
         <ProposalExtensions proposal={proposal} />
       </>
     );
-  } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-    votingActionObj = <CannotVote label="Unsupported proposal type" />;
-  } else if (proposal.votingType === VotingType.None) {
-    votingActionObj = <CannotVote label="Unsupported proposal type" />;
   } else {
     votingActionObj = <CannotVote label="Unsupported proposal type" />;
   }

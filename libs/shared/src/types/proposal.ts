@@ -1,8 +1,6 @@
 export enum ProposalType {
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
-  CompoundProposal = 'compoundproposal',
-  AaveProposal = 'onchainproposal',
 }
 
 export type SnapshotProposalAttributes = {

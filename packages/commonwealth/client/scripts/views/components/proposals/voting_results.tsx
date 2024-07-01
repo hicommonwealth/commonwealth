@@ -12,7 +12,6 @@ import app from 'state';
 import {
   CompletedProposalVotingResult,
   SimpleYesApprovalVotingResult,
-  VotingResult,
   YesNoAbstainVetoVotingResult,
 } from './voting_result_components';
 
@@ -45,15 +44,7 @@ export const VotingResults = (props: VotingResultsProps) => {
   const votes = proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
-  if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
-    return (
-      <VotingResult
-        yesVotes={votes.filter((v) => v.choice === true)}
-        noVotes={votes.filter((v) => v.choice === false)}
-        proposal={proposal}
-      />
-    );
-  } else if (
+  if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
     (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
@@ -115,9 +106,6 @@ export const VotingResults = (props: VotingResultsProps) => {
         />
       );
     }
-  } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-    // to be implemented
-    return null;
   } else {
     // to be implemented
     return null;
