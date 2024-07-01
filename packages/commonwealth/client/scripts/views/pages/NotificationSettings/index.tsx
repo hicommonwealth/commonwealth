@@ -1,8 +1,8 @@
 import { CommunityAlert, ThreadSubscription } from '@hicommonwealth/schemas';
+import { getUniqueCommunities } from 'helpers/addresses';
 import { useFlag } from 'hooks/useFlag';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useCallback, useState } from 'react';
-import app from 'state';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 // eslint-disable-next-line max-len
 import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subscription/useRegisterClientRegistrationTokenMutation';
@@ -16,7 +16,6 @@ import { PageNotFound } from 'views/pages/404';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
@@ -38,8 +37,6 @@ const NotificationSettings = () => {
       z.infer<typeof CommunityAlert>
     >) || [],
   );
-
-  const { bundledSubs } = useNotificationSettings();
 
   const [threadsFilter, setThreadsFilter] = useState<readonly number[]>([]);
   const [section, setSection] =
@@ -121,18 +118,15 @@ const NotificationSettings = () => {
               Get updates on new threads and discussions from these communities
             </CWText>
 
-            {Object.entries(bundledSubs)
-              .sort((x, y) => x[0].localeCompare(y[0]))
-              .map(([communityName]) => {
-                const communityInfo = app?.config.chains.getById(communityName);
-                return (
-                  <CommunityEntry
-                    key={communityInfo.id}
-                    communityInfo={communityInfo}
-                    communityAlert={communityAlertsIndex[communityInfo.id]}
-                  />
-                );
-              })}
+            {getUniqueCommunities().map((community) => {
+              return (
+                <CommunityEntry
+                  key={community.id}
+                  communityInfo={community}
+                  communityAlert={communityAlertsIndex[community.id]}
+                />
+              );
+            })}
           </>
         )}
 

@@ -29,6 +29,7 @@ export const createThreadHandler = async (
   res: TypedResponse<CreateThreadResponse>,
 ) => {
   const { user, address, community } = req;
+
   const {
     topic_id: topicId,
     title,
@@ -83,7 +84,6 @@ export const createThreadHandler = async (
       });
     }
   }
-
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread(threadFields);
 

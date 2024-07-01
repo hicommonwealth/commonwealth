@@ -5,6 +5,7 @@ import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 
+import useAppStatus from '../../../hooks/useAppStatus';
 import type {
   PollCardProps,
   VoteInformation,
@@ -28,9 +29,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
   const {
     disableVoteButton = false,
     hasVoted,
-    incrementalVoteCast,
     isPreview,
-    onVoteCast,
     onSnapshotVoteCast,
     pollEnded,
     proposalTitle,
@@ -58,6 +57,8 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
 
   const resultString = 'Results';
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const castVote = () => {
@@ -65,6 +66,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
     onSnapshotVoteCast(selectedOptions[0]);
     trackAnalytics({
       event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+      isPWA: isAddedToHomeScreen,
     });
   };
 

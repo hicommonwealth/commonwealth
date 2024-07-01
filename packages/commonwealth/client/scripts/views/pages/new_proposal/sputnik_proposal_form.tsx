@@ -6,6 +6,7 @@ import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import app from 'state';
 import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -37,6 +38,9 @@ export const SputnikProposalForm = () => {
     sputnikProposalOptions[0].value,
   );
   const [tokenId, setTokenId] = useState('');
+
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const handleSendTransaction = async (e) => {
@@ -74,6 +78,7 @@ export const SputnikProposalForm = () => {
       await (app.chain as NearSputnik).dao.proposeTx(description, propArgs);
       trackAnalytics({
         event: MixpanelGovernanceEvents.SPUTNIK_PROPOSAL_CREATED,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       notifyError(err.message);

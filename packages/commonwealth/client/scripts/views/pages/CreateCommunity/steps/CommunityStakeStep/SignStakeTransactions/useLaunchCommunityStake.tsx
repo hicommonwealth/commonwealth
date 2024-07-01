@@ -7,6 +7,7 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
+import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 
@@ -30,6 +31,8 @@ const useLaunchCommunityStake = ({
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunityStake } = useUpdateCommunityStake();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -65,6 +68,7 @@ const useLaunchCommunityStake = ({
         // @ts-expect-error <StrictNullChecks/>
         userId: app.user.activeAccount.profile.id,
         userAddress: selectedAddress,
+        isPWA: isAddedToHomeScreen,
       });
 
       goToSuccessStep();
