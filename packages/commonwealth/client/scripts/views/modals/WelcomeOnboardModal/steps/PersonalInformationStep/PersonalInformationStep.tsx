@@ -3,6 +3,7 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import { useUpdateUserEmailMutation } from 'client/scripts/state/api/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -42,6 +43,7 @@ const PersonalInformationStep = ({
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
+  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
     shouldFetchSelfProfile: true,
@@ -129,7 +131,7 @@ const PersonalInformationStep = ({
 
     // set email for notifications
     if (values.email) {
-      await app.user.updateEmail(values.email);
+      await updateEmail({ email: values.email });
     }
 
     // enable/disable all in-app notifications for user

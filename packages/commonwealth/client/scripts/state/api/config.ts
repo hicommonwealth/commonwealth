@@ -28,6 +28,7 @@ export const ApiEndpoints = {
   REFRESH_MEMBERSHIP: '/refresh-membership',
   FETCH_WEBHOOKS: '/getWebhooks',
   FETCH_TAGS: '/tags',
+  UPDATE_USER_EMAIL: '/updateEmail',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,

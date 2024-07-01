@@ -1,4 +1,5 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
+import { useUpdateUserEmailMutation } from 'client/scripts/state/api/user';
 import useUserStore from 'client/scripts/state/ui/user';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
@@ -39,6 +40,8 @@ const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const user = useUserStore();
+
+  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
 
   const {
     email,
@@ -168,14 +171,11 @@ const NotificationSettingsPage = () => {
                       buttonHeight="sm"
                       disabled={!emailValidated}
                       onClick={() => {
-                        try {
-                          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                          app.user.updateEmail(email);
-                          setSentEmail(true);
-                          // forceRerender();
-                        } catch (e) {
-                          console.log(e);
-                        }
+                        updateEmail({ email })
+                          .then(() => {
+                            setSentEmail(true);
+                          })
+                          .catch((e) => console.log(e));
                       }}
                     />
                   </div>

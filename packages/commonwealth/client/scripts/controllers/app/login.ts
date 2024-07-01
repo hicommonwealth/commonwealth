@@ -21,6 +21,11 @@ import { serializeCanvas } from 'shared/canvas/types';
 
 import axios from 'axios';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
+import {
+  onUpdateEmailError,
+  onUpdateEmailSuccess,
+  updateEmail,
+} from 'client/scripts/state/api/user/updateEmail';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'client/scripts/state/ui/user';
@@ -618,7 +623,9 @@ export async function handleSocialLoginCallback({
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
       if (!app.user.email && ssoEmail && profiles?.length === 1) {
-        await app.user.updateEmail(ssoEmail, false);
+        await updateEmail({ email: ssoEmail })
+          .then(onUpdateEmailSuccess)
+          .catch(() => onUpdateEmailError(false));
       }
 
       // if account is newly created and user has not completed onboarding flow
