@@ -89,11 +89,14 @@ const ReactQuillEditor = ({
   const formContext = useFormContext();
   const formFieldContext =
     hookToForm && name ? formContext.register(name) : undefined;
-  const formFieldErrorMessage =
-    hookToForm &&
-    name &&
-    (formContext?.formState?.errors?.[name] as SerializableDeltaStatic)
-      ?.ops?.[0]?.insert?.message;
+  const formFieldErrorMessage = (() => {
+    if (!hookToForm || !name) return;
+    const errorState = formContext?.formState?.errors?.[name];
+    return (
+      (errorState as SerializableDeltaStatic)?.ops?.[0]?.insert?.message ||
+      errorState?.message
+    );
+  })();
 
   const isHookedToFormProper = hookToForm && name && formContext;
 
@@ -246,6 +249,8 @@ const ReactQuillEditor = ({
   }, []);
 
   const showTooltip = isDisabled && isHovering;
+
+  console.log('formFieldErrorMessage => ', formFieldErrorMessage);
 
   return (
     <div className="CWEditor">
