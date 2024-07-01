@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import app from 'state';
-import { EmailNotificationInterval } from '../../ui/user/user';
+import { EmailNotificationInterval, useUserStore } from '../../ui/user/user';
 
 type UseUpdateUserEmailSettingsProps = {
   emailNotificationInterval?: EmailNotificationInterval;
@@ -31,10 +31,14 @@ export const updateUserEmailSettings = async ({
 };
 
 const useUpdateUserEmailSettingsMutation = () => {
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: updateUserEmailSettings,
     onSuccess: (emailNotificationInterval) =>
-      app.user.setEmailInterval(emailNotificationInterval || ''),
+      user.setData({
+        emailNotificationInterval: emailNotificationInterval || '',
+      }),
     onError: () => notifyError('Unable to set email interval'),
   });
 };

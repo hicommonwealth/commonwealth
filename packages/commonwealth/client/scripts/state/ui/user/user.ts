@@ -2,9 +2,12 @@ import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
 
+export type EmailNotificationInterval = 'weekly' | 'never';
+
 type CommonProps = {
   id: number;
   email: string;
+  emailNotificationInterval: EmailNotificationInterval | '';
   knockJWT: string;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
@@ -21,6 +24,7 @@ export const userStore = createStore<UserStoreProps>()(
     // default values when user is not signed in
     id: 0,
     email: '',
+    emailNotificationInterval: '',
     knockJWT: '',
     isSiteAdmin: false,
     isEmailVerified: false,

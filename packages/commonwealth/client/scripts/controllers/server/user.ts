@@ -25,15 +25,6 @@ export class UserController {
     this._activeAccount = account;
   }
 
-  private _emailInterval: string;
-  public get emailInterval(): string {
-    return this._emailInterval;
-  }
-
-  private _setEmailInterval(emailInterval: string): void {
-    this._emailInterval = emailInterval;
-  }
-
   private _jwt: string;
   public get jwt(): string {
     return this._jwt;
@@ -110,10 +101,6 @@ export class UserController {
   public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
     this.isFetched.emit('redraw');
-  }
-
-  public setEmailInterval(emailInterval: string): void {
-    this._setEmailInterval(emailInterval);
   }
 
   public setJWT(JWT: string): void {
