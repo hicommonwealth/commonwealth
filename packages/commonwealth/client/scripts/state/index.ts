@@ -87,7 +87,6 @@ export interface IApp {
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    evmTestEnv?: string;
     // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
@@ -206,10 +205,9 @@ export async function initAppState(
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
 
-    app.config.evmTestEnv = statusRes.result.evmTestEnv;
-
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
       enforceSessionKeys: statusRes.result.enforceSessionKeys,
+      evmTestEnv: statusRes.result.evmTestEnv,
     });
 
     nodesRes.result

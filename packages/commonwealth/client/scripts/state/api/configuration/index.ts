@@ -1,3 +1,5 @@
-import useFetchConfigurationQuery from './fetchConfiguration';
+import useFetchConfigurationQuery, {
+  fetchConfiguration,
+} from './fetchConfiguration';
 
-export { useFetchConfigurationQuery };
+export { fetchConfiguration, useFetchConfigurationQuery };
