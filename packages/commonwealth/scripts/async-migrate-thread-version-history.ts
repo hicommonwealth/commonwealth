@@ -24,7 +24,9 @@ async function run() {
         versionHistories: { timestamp: string; body: string; author: string }[];
       }[] = (
         await models.sequelize.query(
-          `SELECT id, address_id, version_history FROM "Threads" where version_history_updated = false AND address_id is not NULL LIMIT 10`,
+          `SELECT id, address_id, version_history FROM "Threads" 
+           WHERE version_history_updated = false
+           AND address_id is not NULL LIMIT 10`,
           {
             raw: true,
             type: QueryTypes.SELECT,
