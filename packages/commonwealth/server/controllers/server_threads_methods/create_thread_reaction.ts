@@ -1,4 +1,4 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   AddressInstance,
   ReactionAttributes,
@@ -114,16 +114,16 @@ export async function __createThreadReaction(
       const node = await this.models.ChainNode.findByPk(
         community.chain_node_id,
       );
+
+      if (!node || !node.eth_chain_id) {
+        throw new ServerError(`Invalid chain node ${node ? node.id : ''}`);
+      }
       const stakeBalances =
         await commonProtocolService.contractHelpers.getNamespaceBalance(
-          // @ts-expect-error StrictNullChecks
-          community.namespace_address,
+          community.namespace_address!,
           stake.stake_id,
-          // @ts-expect-error StrictNullChecks
           node.eth_chain_id,
           [address.address],
-          // @ts-expect-error StrictNullChecks
-          node.url,
         );
       calculatedVotingWeight = commonProtocol.calculateVoteWeight(
         stakeBalances[address.address],

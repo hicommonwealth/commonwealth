@@ -56,6 +56,7 @@ export const seedDb = async () => {
         },
         ethereum: {
           url: 'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
+          private_url: 'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
           name: 'Ethereum Mainnet',
           eth_chain_id: 1,
           balance_type: BalanceType.Ethereum,
@@ -63,6 +64,7 @@ export const seedDb = async () => {
         sepolia: {
           id: 1263,
           url: 'https://ethereum-sepolia.publicnode.com',
+          private_url: 'https://ethereum-sepolia.publicnode.com',
           name: 'Sepolia Testnet',
           eth_chain_id: 11155111,
           balance_type: BalanceType.Ethereum,

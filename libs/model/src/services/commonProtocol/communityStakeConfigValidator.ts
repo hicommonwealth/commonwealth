@@ -1,4 +1,5 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3, { AbiFunctionFragment } from 'web3';
 import { CommunityAttributes } from '../../models/community';
@@ -7,18 +8,34 @@ export const validateCommunityStakeConfig = async (
   community: CommunityAttributes,
   id: number,
 ) => {
-  if (!community.ChainNode?.eth_chain_id || !community.namespace) {
-    throw new AppError('Invalid community');
+  if (!community.chain_node_id || !community.namespace) {
+    throw new AppError(`Community ${community.id} is invalid`);
   }
-  const chain_id = community.ChainNode.eth_chain_id;
+
+  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      id: community.chain_node_id,
+    },
+  });
+
+  if (!chainNode) {
+    throw new ServerError(`ChainNode not found`);
+  }
+
+  if (!chainNode.eth_chain_id || !chainNode.private_url) {
+    throw new AppError(`ChainNode ${chainNode.id} is invalid`);
+  }
+
+  const chain_id = chainNode.eth_chain_id;
   if (!Object.values(commonProtocol.ValidChains).includes(chain_id)) {
     throw new AppError(
       "Community Stakes not configured for community's chain node",
     );
   }
+
   const factoryData =
     commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
-  const web3 = new Web3(community.ChainNode.url);
+  const web3 = new Web3(chainNode.private_url);
 
   const abiItem = {
     inputs: [
