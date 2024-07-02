@@ -22,19 +22,18 @@ export const validateCommunityStakeConfig = async (
     throw new ServerError(`ChainNode not found`);
   }
 
-  if (!chainNode.eth_chain_id || !chainNode.private_url) {
-    throw new AppError(`ChainNode ${chainNode.id} is invalid`);
-  }
-
-  const chain_id = chainNode.eth_chain_id;
-  if (!Object.values(commonProtocol.ValidChains).includes(chain_id)) {
-    throw new AppError(
-      "Community Stakes not configured for community's chain node",
-    );
+  if (
+    !chainNode.eth_chain_id ||
+    !chainNode.private_url ||
+    !Object.values(commonProtocol.ValidChains).includes(chainNode.eth_chain_id)
+  ) {
+    throw new AppError(`Community Stakes not available on ${chainNode.name}`);
   }
 
   const factoryData =
-    commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
+    commonProtocol.factoryContracts[
+      chainNode.eth_chain_id as commonProtocol.ValidChains
+    ];
   const web3 = new Web3(chainNode.private_url);
 
   const abiItem = {
