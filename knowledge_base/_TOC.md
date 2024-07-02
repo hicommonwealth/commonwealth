@@ -30,7 +30,6 @@
 
 ## Chain Tools
 
-- [Ethereum Name Spaces](./Ethereum-Name-Spaces.md)
 - [EVM Testing](./EVM-Testing.md)
 - [Cosmos Devnets](./Cosmos-Devnets.md)
 - [Testing Environments](./Testing-Environments.md)
