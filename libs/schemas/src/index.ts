@@ -3,6 +3,7 @@ import * as entities from './entities';
 export type Entities = keyof typeof entities;
 export type Aggregates = Extract<
   Entities,
+  | 'Poll'
   | 'ChainNode'
   | 'Comment'
   | 'Community'
