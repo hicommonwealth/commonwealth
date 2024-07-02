@@ -14,6 +14,7 @@ import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import { userStore } from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
@@ -82,7 +83,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       userOnboardingEnabled &&
       !isWelcomeOnboardModalOpen &&
       profileId &&
-      !app.user.isWelcomeOnboardFlowComplete
+      !userStore.getState().isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
     }

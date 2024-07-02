@@ -4,6 +4,7 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import useUserStore from '../../ui/user';
 
 interface UpdateProfileByAddressProps {
   address: string;
@@ -71,6 +72,7 @@ const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
 }: UseUpdateProfileByAddressMutation = {}) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const user = useUserStore();
 
   return useMutation({
     mutationFn: updateProfileByAddress,
@@ -106,9 +108,9 @@ const useUpdateProfileByAddressMutation = ({
           userOnboardingEnabled &&
           updatedProfile.name &&
           updatedProfile.name !== 'Anonymous' &&
-          !app.user.isWelcomeOnboardFlowComplete
+          !user.isWelcomeOnboardFlowComplete
         ) {
-          app.user.setIsWelcomeOnboardFlowComplete(true);
+          user.setData({ isWelcomeOnboardFlowComplete: true });
         }
       }
 

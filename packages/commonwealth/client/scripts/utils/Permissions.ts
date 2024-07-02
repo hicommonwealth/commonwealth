@@ -1,6 +1,7 @@
 import app from 'state';
 import Account from '../models/Account';
 import Thread from '../models/Thread';
+import { userStore } from '../state/ui/user';
 
 const ROLES = {
   ADMIN: 'admin',
@@ -10,7 +11,7 @@ const ROLES = {
 const isSiteAdmin = () => {
   return (
     (app?.user?.activeAccount || app?.user?.addresses?.length > 0) &&
-    app.user.isSiteAdmin
+    userStore.getState().isSiteAdmin
   );
 };
 

@@ -2,6 +2,7 @@ import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
+import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -15,8 +16,9 @@ export const deinitChainOrCommunity = async () => {
     app.chain = null;
   }
 
-  // @ts-expect-error StrictNullChecks
-  app.user.setSelectedCommunity(null);
+  userStore.getState().setData({
+    activeCommunity: null,
+  });
   app.user.setActiveAccounts([]);
   // @ts-expect-error StrictNullChecks
   app.user.ephemerallySetActiveAccount(null);
@@ -26,11 +28,14 @@ export const deinitChainOrCommunity = async () => {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
+export const loadCommunityChainInfo = async (
+  chain?: ChainInfo,
+): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
-    if (app.user.selectedCommunity) {
-      chain = app.user.selectedCommunity;
+    const activeCommunity = userStore.getState().activeCommunity;
+    if (activeCommunity) {
+      chain = activeCommunity;
     } else {
       chain = app.config.chains.getById(app.config.defaultChain);
     }
@@ -133,13 +138,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses({ chain });
-
-  // Update default on server if logged in
-  if (app.isLoggedIn()) {
-    await app.user.selectCommunity({
-      community: chain.id,
-    });
-  }
 
   return true;
 };

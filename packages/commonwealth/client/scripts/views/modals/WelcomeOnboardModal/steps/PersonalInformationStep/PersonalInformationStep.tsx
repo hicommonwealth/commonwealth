@@ -3,6 +3,11 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'client/scripts/state/api/user';
+import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -42,6 +47,10 @@ const PersonalInformationStep = ({
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
+  const user = useUserStore();
+  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
+  const { mutateAsync: updateEmailSettings } =
+    useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
     shouldFetchSelfProfile: true,
@@ -63,8 +72,8 @@ const PersonalInformationStep = ({
         formMethodsRef.current.trigger('username').catch(console.error);
       }
 
-      if (app?.user?.email) {
-        formMethodsRef.current.setValue('email', app.user.email, {
+      if (user.email) {
+        formMethodsRef.current.setValue('email', user.email, {
           shouldDirty: true,
         });
         formMethodsRef.current.trigger('email').catch(console.error);
@@ -85,8 +94,8 @@ const PersonalInformationStep = ({
       orderDirection: APIOrderDirection.Desc,
     });
 
-  const existingUsernames = (profiles?.pages?.[0]?.results || []).map((user) =>
-    user?.profile_name?.trim?.().toLowerCase(),
+  const existingUsernames = (profiles?.pages?.[0]?.results || []).map(
+    (userResult) => userResult?.profile_name?.trim?.().toLowerCase(),
   );
   const isUsernameTaken = existingUsernames.includes(
     currentUsername.toLowerCase(),
@@ -129,13 +138,15 @@ const PersonalInformationStep = ({
 
     // set email for notifications
     if (values.email) {
-      await app.user.updateEmail(values.email);
+      await updateEmail({ email: values.email });
     }
 
     // enable/disable all in-app notifications for user
     await toggleAllInAppNotifications(values.enableAccountNotifications);
     // enable/disable promotional emails flag for user
-    await app.user.writeEmailSettings('', values.enableProductUpdates);
+    await updateEmailSettings({
+      promotionalEmailsEnabled: values.enableProductUpdates,
+    });
 
     // refetch profile data
     await refetchProfileData().catch(console.error);

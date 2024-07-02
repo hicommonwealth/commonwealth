@@ -21,8 +21,14 @@ import { serializeCanvas } from 'shared/canvas/types';
 
 import axios from 'axios';
 import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
+import {
+  onUpdateEmailError,
+  onUpdateEmailSuccess,
+  updateEmail,
+} from 'client/scripts/state/api/user/updateEmail';
 import { authModal } from 'client/scripts/state/ui/modals/authModal';
 import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
+import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -252,39 +258,37 @@ export async function updateActiveAddresses({
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
-    app.user.setId(0);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmail(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmailInterval(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setEmailVerified(null);
-    // @ts-expect-error StrictNullChecks
-    app.user.setPromotionalEmailsEnabled(null);
-    app.user.setIsWelcomeOnboardFlowComplete(false);
-    // @ts-expect-error StrictNullChecks
-    app.user.setKnockJWT(null);
+    userStore.getState().setData({
+      id: 0,
+      email: '',
+      emailNotificationInterval: '',
+      knockJWT: '',
+      isSiteAdmin: false,
+      isEmailVerified: false,
+      isPromotionalEmailEnabled: false,
+      isWelcomeOnboardFlowComplete: false,
+    });
     // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-
-    app.user.setSiteAdmin(false);
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
     // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);
   } else {
-    app.user.setId(data.id);
-    app.user.setEmail(data.email);
-    app.user.setEmailInterval(data.emailInterval);
-    app.user.setEmailVerified(data.emailVerified);
-    app.user.setPromotionalEmailsEnabled(data.promotional_emails_enabled);
-    app.user.setIsWelcomeOnboardFlowComplete(
-      data.is_welcome_onboard_flow_complete,
-    );
-    app.user.setKnockJWT(data.knockJwtToken);
+    userStore.getState().setData({
+      id: data.id || 0,
+      email: data.email || '',
+      emailNotificationInterval: data.emailInterval || '',
+      knockJWT: data.knockJwtToken || '',
+      // add boolean values as boolean -- not undefined
+      isSiteAdmin: !!data.isAdmin,
+      isEmailVerified: !!data.emailVerified,
+      isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
+      isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
+    });
     app.user.setJWT(data.jwt);
 
     app.user.setAddresses(
@@ -303,7 +307,6 @@ export function updateActiveUser(data) {
       ),
     );
 
-    app.user.setSiteAdmin(data.isAdmin);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }
@@ -605,9 +608,9 @@ export async function handleSocialLoginCallback({
     // This is code from before desiredChain was implemented, and
     // may not be necessary anymore:
     if (app.chain) {
-      const c = app.user.selectedCommunity
-        ? app.user.selectedCommunity
-        : app.config.chains.getById(app.activeChainId());
+      const c =
+        userStore.getState().activeCommunity ||
+        app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
 
@@ -616,14 +619,16 @@ export async function handleSocialLoginCallback({
 
       // if email is not set, set the SSO email as the default email
       // only if its a standalone account (no account linking)
-      if (!app.user.email && ssoEmail && profiles?.length === 1) {
-        await app.user.updateEmail(ssoEmail, false);
+      if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
+        await updateEmail({ email: ssoEmail })
+          .then(onUpdateEmailSuccess)
+          .catch(() => onUpdateEmailError(false));
       }
 
       // if account is newly created and user has not completed onboarding flow
       // then open the welcome modal.
       const profileId = profiles?.[0]?.id;
-      if (profileId && !app.user.isWelcomeOnboardFlowComplete) {
+      if (profileId && !userStore.getState().isWelcomeOnboardFlowComplete) {
         setTimeout(() => {
           welcomeOnboardModal.getState().setIsWelcomeOnboardModalOpen(true);
         }, 1000);

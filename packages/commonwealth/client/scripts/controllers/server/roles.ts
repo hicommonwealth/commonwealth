@@ -1,4 +1,5 @@
 import { AccessLevel } from '@hicommonwealth/shared';
+import Permissions from 'client/scripts/utils/Permissions';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
@@ -201,7 +202,7 @@ export class RolesController {
    */
   public isAdminOfEntity(options: { community?: string }): boolean {
     if (!this.User.activeAccount) return false;
-    if (app.user.isSiteAdmin) return true;
+    if (Permissions.isSiteAdmin()) return true;
 
     const adminRole = this.roles.find((role) => {
       return (

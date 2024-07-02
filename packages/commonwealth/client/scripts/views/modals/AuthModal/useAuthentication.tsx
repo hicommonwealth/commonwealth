@@ -1,6 +1,7 @@
 import type { Session } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import axios from 'axios';
+import useUserStore from 'client/scripts/state/ui/user';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -72,6 +73,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const user = useUserStore();
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -240,7 +243,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
       if (app.chain) {
         const community =
-          app.user.selectedCommunity ||
+          user.activeCommunity ||
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,
