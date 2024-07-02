@@ -108,31 +108,32 @@ const Profile = ({ profileId }: ProfileProps) => {
     }
 
     return (
-      <CWPageLayout>
-        <div
-          className="Profile"
-          style={
-            profile.backgroundImage
-              ? {
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundRepeat: `${
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'no-repeat'
-                      : 'repeat'
-                  }`,
-                  backgroundSize:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'cover'
-                      : '100px',
-                  backgroundPosition:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'center'
-                      : '56px 56px',
-                  backgroundAttachment: 'fixed',
-                }
-              : {}
-          }
-        >
+      <div
+        className="Profile"
+        style={
+          profile.backgroundImage
+            ? {
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
+                }`,
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
+            : {}
+        }
+      >
+        <div className="fixed-slug-header"></div>
+        <CWPageLayout>
           <div className="header">
             <CWText type="h2" fontWeight="medium">
               {profile.name
@@ -156,8 +157,8 @@ const Profile = ({ profileId }: ProfileProps) => {
               addresses={addresses}
             />
           </div>
-        </div>
-      </CWPageLayout>
+        </CWPageLayout>
+      </div>
     );
   } else {
     return (
