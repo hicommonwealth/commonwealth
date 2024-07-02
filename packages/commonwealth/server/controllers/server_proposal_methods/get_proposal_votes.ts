@@ -2,7 +2,6 @@ import { ChainNetwork } from '@hicommonwealth/shared';
 import { IAaveVoteResponse } from 'adapters/chain/aave/types';
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { providers } from 'ethers';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import {
   ContractInfo,
   ServerProposalsController,
@@ -44,7 +43,7 @@ export async function __getProposalVotes(
     );
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {
-    throw new ServerError(
+    throw new Error(
       `Proposal fetching not supported for community ${communityId} on network ${contractInfo.type}`,
     );
   }

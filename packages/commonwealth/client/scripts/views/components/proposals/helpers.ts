@@ -11,11 +11,6 @@ import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import {
-  NearSputnikProposalStatus,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
 import { ProposalState } from '../../../../../shared/chain/types/compound';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
@@ -122,12 +117,6 @@ export const getCanVote = (
     proposal.state !== ProposalState.Active
   ) {
     canVote = false;
-  } else if (
-    proposal instanceof NearSputnikProposal &&
-    (proposal.data.status !== NearSputnikProposalStatus.InProgress ||
-      hasVotedForAnyChoice)
-  ) {
-    canVote = false;
   } else if (hasVotedForAnyChoice) {
     canVote = false;
   }
@@ -223,38 +212,6 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .getVotes()
         .find((vote) => !vote.choice && vote.account.address === user.address);
     hasVotedForAnyChoice = hasVotedYes || hasVotedNo;
-  } else if (proposal instanceof NearSputnikProposal) {
-    hasVotedYes =
-      user &&
-      proposal
-        .getVotes()
-        .find(
-          (vote) =>
-            vote.choice === NearSputnikVoteString.Approve &&
-            vote.account.address === user.address,
-        );
-
-    hasVotedNo =
-      user &&
-      proposal
-        .getVotes()
-        .find(
-          (vote) =>
-            vote.choice === NearSputnikVoteString.Reject &&
-            vote.account.address === user.address,
-        );
-
-    hasVotedRemove =
-      user &&
-      proposal
-        .getVotes()
-        .find(
-          (vote) =>
-            vote.choice === NearSputnikVoteString.Remove &&
-            vote.account.address === user.address,
-        );
-
-    hasVotedForAnyChoice = hasVotedYes || hasVotedNo || hasVotedRemove;
   }
 
   return {

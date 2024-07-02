@@ -17,7 +17,6 @@ import { PageNotFound } from '../404';
 import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
-import { SputnikProposalForm } from './sputnik_proposal_form';
 
 type NewProposalPageProps = {
   type: ProposalType;
@@ -92,8 +91,6 @@ const NewProposalPage = (props: NewProposalPageProps) => {
         return <CompoundProposalForm />;
       case ProposalType.CosmosProposal:
         return <CosmosProposalForm />;
-      case ProposalType.SputnikProposal:
-        return <SputnikProposalForm />;
       default:
         return <CWText>Invalid proposal type</CWText>;
     }

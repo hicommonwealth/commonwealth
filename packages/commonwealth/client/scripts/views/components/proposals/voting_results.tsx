@@ -6,7 +6,6 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
-import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
@@ -25,7 +24,6 @@ import {
   SimpleYesApprovalVotingResult,
   VotingResult,
   YesNoAbstainVetoVotingResult,
-  YesNoRejectVotingResult,
 } from './voting_result_components';
 
 type VotingResultsProps = { proposal: AnyProposal };
@@ -70,10 +68,7 @@ export const VotingResults = (props: VotingResultsProps) => {
   const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
-  if (
-    proposal.votingType === VotingType.SimpleYesNoVoting ||
-    proposal.votingType === VotingType.ConvictionYesNoVoting
-  ) {
+  if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
     return (
       <VotingResult
         yesVotes={votes.filter((v) => v.choice === true)}
@@ -193,13 +188,6 @@ export const VotingResults = (props: VotingResultsProps) => {
         />
       );
     }
-  } else if (proposal.votingType === VotingType.YesNoReject) {
-    return (
-      <YesNoRejectVotingResult
-        proposal={proposal as NearSputnikProposal}
-        votes={votes}
-      />
-    );
   } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
     // to be implemented
     return null;
