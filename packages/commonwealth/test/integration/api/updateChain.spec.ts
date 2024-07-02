@@ -93,7 +93,7 @@ describe('UpdateChain Tests', () => {
     }
   });
 
-  test.only('Fails if chain node of community does not match supported chain', async () => {
+  test('Fails if chain node of community does not match supported chain', async () => {
     // @ts-expect-error StrictNullChecks
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
