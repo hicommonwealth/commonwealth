@@ -6,7 +6,7 @@
   + [M1 Support](./M1-Support.md): For configuring M1 Macs.
 - [Ways of Working](./Ways-Of-Working.md): Sprint cadence, meeting schedule, org structure.
 - [Glossary](./Glossary.md): Team-specific engineering and business terms.
-- [Code Style](./Code-Style.md): House style guide. (under construction)
+- [Code Style](./Code-Style.md): House style guide. (Under construction.)
 - [Environment Variables](./Environment-Variables.md): Configure your `.env` file.
 - [Package Scripts](./Package-Scripts.md): `Package.JSON` script documentation.
 
@@ -38,7 +38,7 @@
 
 - [Database ERD](./Database-ERD.md)
 - [Database Monitoring](./Database-Monitoring.md)
-- [Database Migration Best Practices](./Database-Migrations.md)
+- [Database Migrations: Best Practices](./Database-Migrations.md)
 - [Database Optimization](./Database-Optimization.md)
 - [Enabling Community Governance](./Enabling-Community-Governance.md): Migrating a community from offchain to chain-integrated.
 - [Sequelize](./Sequelize.md)

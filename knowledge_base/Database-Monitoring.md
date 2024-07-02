@@ -9,8 +9,6 @@ _See also the [Datadog](./Datadog.md) and [Heroku](./Heroku.md) entries._
 - [Local Database Monitoring](#local-database-monitoring)
   * [PGAdmin4](#pgadmin4)
   * [Helper Queries](#helper-queries)
-    + [Major Tables](#major-tables)
-    + [Queries Using Tables Above](#queries-using-tables-above)
 - [Change Log](#change-log)
 
 ## Heroku Database Monitoring
@@ -76,13 +74,9 @@ You can use PGAdmin4 for local database monitoring. It provides various features
 
 ### Helper Queries
 
-Here are some helpful queries for monitoring the database:
-
-#### Major Tables
+Major tables:
 
 ```SQL
-
-
 -- Current database activity
 SELECT * FROM pg_stat_activity;
 
@@ -98,7 +92,7 @@ FROM pg_stat_all_tables
 WHERE schemaname = 'public';
 ```
 
-#### Queries Using Tables Above
+Queries using the tables above:
 
 ```SQL
 -- Top 10 queries by total execution time

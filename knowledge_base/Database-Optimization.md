@@ -1,8 +1,21 @@
 # Query Optimization
 
+_See also [Database Monitoring](./Database-Monitoring.md) and [Database Migrations](./Database-Migrations.md) entries._
+
+This entry provides a set of best practices for writing database queries.
+
+## Contents
+
+- [Limit Columns and Data Pulled by Sequelize](#limit-columns-and-data-pulled-by-sequelize)
+- [Frequent Queries](#frequent-queries)
+- [Slow Deletes](#slow-deletes)
+- [Slow Reads](#slow-reads)
+- [Slow Inserts](#slow-inserts)
+- [Change Log](#change-log)
+
 ## Limit Columns and Data Pulled by Sequelize
 
-When using Sequelize for database queries, it's important to limit the columns and data pulled from the database. This can improve query performance and reduce the amount of data transferred over the network. For example, in the `/viewSubscriptions` endpoint, consider fetching only the necessary columns and data required for the response. This can be achieved by specifying the attributes in the Sequelize query. Refer to the [GitHub issue comment](https://github.com/hicommonwealth/commonwealth/issues/3429#issuecomment-1552327071) for more details.
+When using Sequelize for database queries, it's important to limit both the number of columns and amount of data pulled from the database. This can improve query performance and reduce the amount of data transferred over the network. For example, in the `/viewSubscriptions` endpoint, consider fetching only the necessary columns and data required for the response. This can be achieved by specifying the attributes in the Sequelize query. Refer to the [GitHub issue comment](https://github.com/hicommonwealth/commonwealth/issues/3429#issuecomment-1552327071) for historical context.
 
 ## Frequent Queries
 
@@ -10,7 +23,7 @@ For queries that are executed frequently, there may be a caching opportunity. If
 
 ## Slow Deletes
 
-If you're experiencing slow deletes due to cascading foreign key constraints, consider refactoring the constraints to prevent the slow cascade delete. Slow deletes can occur when there are multiple levels of cascading deletes that need to be executed. To improve performance, review the foreign key constraints and adjust them accordingly. Refer to the [GitHub issue](https://github.com/hicommonwealth/commonwealth/issues/3437) for more information on how to handle slow deletes.
+If you're experiencing slow deletes due to cascading foreign key constraints, consider refactoring the constraints to prevent the slow cascade delete. Slow deletes can occur when there are multiple levels of cascading deletes that need to be executed. To improve performance, review the foreign key constraints and adjust them accordingly. Refer to the [GitHub issue](https://github.com/hicommonwealth/commonwealth/issues/3437) for historical context.
 
 ## Slow Reads
 
@@ -18,7 +31,7 @@ If you're encountering slow reads when querying JSONB attributes, it's recommend
 
 ## Slow Inserts
 
-If you're experiencing slow inserts due to calculating the maximum value every time a new entry is made, consider optimizing the insertion process. Calculating the maximum value can be an expensive operation, especially as the number of entries grows. Instead, you can store the maximum value separately and update it only when necessary. This can help improve the insert performance. Refer to the [GitHub issue](https://github.com/hicommonwealth/commonwealth/issues/3438) for more information on optimizing inserts involving maximum value calculation.
+If you're experiencing slow inserts due to calculating the maximum value every time a new entry is made, consider optimizing the insertion process. Calculating the maximum value can be an expensive operation, especially as the number of entries grows. Instead, you can store the maximum value separately and update it only when necessary. This can help improve the insert performance. Refer to the [GitHub issue](https://github.com/hicommonwealth/commonwealth/issues/3438) for historical context.
 
 ## Change Log
 
