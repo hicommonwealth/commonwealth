@@ -3,6 +3,7 @@ import axios from 'axios';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import useUserStore from '../../ui/user';
 
 const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
@@ -61,6 +62,8 @@ const useFetchProfileByIdQuery = ({
   shouldFetchSelfProfile,
   apiCallEnabled = true,
 }: UseFetchProfileByIdQuery & UseFetchProfileByIdQueryCommonProps) => {
+  const user = useUserStore();
+
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [ApiEndpoints.FETCH_PROFILES_BY_ID, profileId],
@@ -74,7 +77,7 @@ const useFetchProfileByIdQuery = ({
       // update user addresses when
       // - self profile is fetched
       // - or `profileId` is matches auth user's profile id
-      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const userProfileId = user.addresses?.[0]?.profile?.id;
       const doesProfileIdMatch =
         userProfileId && userProfileId === response?.profile?.id;
       if (
@@ -82,8 +85,8 @@ const useFetchProfileByIdQuery = ({
         response?.addresses?.length > 0 &&
         (shouldFetchSelfProfile || doesProfileIdMatch)
       ) {
-        app.user.setAddresses(
-          response.addresses.map(
+        user.setData({
+          addresses: response.addresses.map(
             (a) =>
               new AddressInfo({
                 id: a?.id,
@@ -97,7 +100,7 @@ const useFetchProfileByIdQuery = ({
                 walletSsoSource: a?.wallet_sso_source,
               }),
           ),
-        );
+        });
       }
     },
     staleTime: PROFILE_STALE_TIME,

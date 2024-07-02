@@ -1,4 +1,5 @@
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -49,6 +50,7 @@ const EditProfile = () => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -393,12 +395,15 @@ const EditProfile = () => {
                 // @ts-expect-error <StrictNullChecks/>
                 addresses={addresses}
                 profile={profile}
-                refreshProfiles={(address: string) => {
+                refreshProfiles={(addressInfo) => {
                   refetch().catch(console.error);
-                  app.user.removeAddress(
-                    // @ts-expect-error <StrictNullChecks/>
-                    addresses.find((a) => a.address === address),
-                  );
+                  user.setData({
+                    addresses: [...user.addresses].filter(
+                      (addr) =>
+                        addr.community.id !== addressInfo.community.id &&
+                        addr.address !== addressInfo.address,
+                    ),
+                  });
                 }}
               />
               <CWText type="caption" fontWeight="medium">

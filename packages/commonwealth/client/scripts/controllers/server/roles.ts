@@ -1,4 +1,5 @@
 import { AccessLevel } from '@hicommonwealth/shared';
+import { userStore } from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import app from 'state';
 import Account from '../../models/Account';
@@ -88,7 +89,7 @@ export class RolesController {
     // @ts-expect-error StrictNullChecks
     if (!account) return;
 
-    const address_id = this.User.addresses.find((a) => {
+    const address_id = userStore.getState().addresses.find((a) => {
       return (
         a.address === account.address && a.community.id === account.community.id
       );
@@ -114,7 +115,7 @@ export class RolesController {
     if (
       !this.User.activeAccount ||
       !app.isLoggedIn() ||
-      this.User.addresses.length === 0 ||
+      userStore.getState().addresses.length === 0 ||
       this.roles.length === 0
     )
       // @ts-expect-error StrictNullChecks
@@ -122,9 +123,9 @@ export class RolesController {
     // @ts-expect-error StrictNullChecks
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
-      const referencedAddress = this.User.addresses.find(
-        (address) => address.id === r.address_id,
-      );
+      const referencedAddress = userStore
+        .getState()
+        .addresses.find((address) => address.id === r.address_id);
       if (!referencedAddress) return;
       const isSame =
         this.User?.activeAccount?.address === referencedAddress.address;
@@ -161,8 +162,10 @@ export class RolesController {
    */
   public getJoinableAddresses(options: { community?: string }): AddressInfo[] {
     return options.community
-      ? this.User.addresses.filter((a) => a.community.id === options.community)
-      : this.User.addresses;
+      ? userStore
+          .getState()
+          .addresses.filter((a) => a.community.id === options.community)
+      : userStore.getState().addresses;
   }
 
   public getActiveAccountsByRole(): [Account, RoleInfo][] {
@@ -228,7 +231,7 @@ export class RolesController {
   }): boolean {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
-        ? this.User.addresses.find(
+        ? userStore.getState().addresses.find(
             (a) =>
               // @ts-expect-error StrictNullChecks
               options.account.address === a.address &&
@@ -253,6 +256,6 @@ export class RolesController {
     });
 
     if (!role) return;
-    return this.User.addresses.find((a) => a.id === role.address_id);
+    return userStore.getState().addresses.find((a) => a.id === role.address_id);
   }
 }

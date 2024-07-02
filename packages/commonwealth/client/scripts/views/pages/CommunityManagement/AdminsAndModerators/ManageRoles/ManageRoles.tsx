@@ -1,4 +1,5 @@
 import axios from 'axios';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -22,6 +23,7 @@ export const ManageRoles = ({
   roledata,
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const removeRole = async (role: RoleInfo) => {
     try {
@@ -62,7 +64,7 @@ export const ManageRoles = ({
       role.Address.address === app.user.activeAccount?.address &&
       role.community_id === app.user.activeAccount?.community.id;
 
-    const roleBelongsToUser = !!app.user.addresses.filter(
+    const roleBelongsToUser = !!user.addresses.filter(
       // @ts-expect-error <StrictNullChecks/>
       (addr_) => addr_.id === (role.address_id || role.Address.id),
     ).length;
@@ -76,7 +78,7 @@ export const ManageRoles = ({
     const adminsAndMods = res.data.result;
 
     const userAdminsAndMods = adminsAndMods.filter((role_) => {
-      const belongsToUser = !!app.user.addresses.filter(
+      const belongsToUser = !!user.addresses.filter(
         (addr_) => addr_.id === role_.address_id,
       ).length;
       return belongsToUser;

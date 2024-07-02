@@ -119,11 +119,13 @@ export async function setActiveAccount(
 
 export async function completeClientLogin(account: Account) {
   try {
-    let addressInfo = app.user.addresses.find(
-      (a) =>
-        a.address === account.address &&
-        a.community.id === account.community.id,
-    );
+    let addressInfo = userStore
+      .getState()
+      .addresses.find(
+        (a) =>
+          a.address === account.address &&
+          a.community.id === account.community.id,
+      );
 
     if (!addressInfo && account.addressId) {
       addressInfo = new AddressInfo({
@@ -133,7 +135,7 @@ export async function completeClientLogin(account: Account) {
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
-      app.user.addresses.push(addressInfo);
+      userStore.getState().addresses.push(addressInfo);
     }
 
     // link the address to the community
@@ -180,8 +182,9 @@ export async function updateActiveAddresses({
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
-    app.user.addresses
-      // @ts-expect-error StrictNullChecks
+    userStore
+      .getState()
+      .addresses // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
       .map((addr) => {
         const tempAddr = app.chain?.accounts.get(
@@ -211,13 +214,18 @@ export async function updateActiveAddresses({
   } else {
     // Find all addresses in the current community for this account, sorted by last used date/time
     const communityAddressesSortedByLastUsed = [
-      // @ts-expect-error StrictNullChecks
-      ...(app.user.addresses.filter((a) => a.community.id === chain.id) || []),
-      // @ts-expect-error StrictNullChecks
-    ].sort((a, b) => b.lastActive?.diff(a.lastActive));
+      ...(userStore
+        .getState()
+        .addresses.filter((a) => a.community.id === chain?.id) || []),
+    ].sort((a, b) => {
+      if (b.lastActive && a.lastActive) return b.lastActive.diff(a.lastActive);
+      if (!b.lastActive && !a.lastActive) return 0; // no change
+      if (!b.lastActive) return -1; // move b towards end
+      return 1; // move a towards end
+    });
 
     // From the sorted adddress in the current community, find an address which has an active session key
-    let foundAddressWithActiveSessionKey = null;
+    let foundAddressWithActiveSessionKey: AddressInfo | null = null;
 
     const sessionSigners = getSessionSigners();
     for (const communityAccount of communityAddressesSortedByLastUsed) {
@@ -233,7 +241,6 @@ export async function updateActiveAddresses({
       });
 
       if (session !== null) {
-        // @ts-expect-error <StrictNullChecks>
         foundAddressWithActiveSessionKey = communityAccount;
         break;
       }
@@ -263,6 +270,7 @@ export function updateActiveUser(data) {
       email: '',
       emailNotificationInterval: '',
       knockJWT: '',
+      addresses: [],
       starredCommunities: [],
       joinedCommunitiesWithNewContent: [],
       isSiteAdmin: false,
@@ -273,31 +281,46 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
-    app.user.setAddresses([]);
-
     app.user.setActiveAccounts([]);
     // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);
   } else {
+    const addresses = data.addresses.map(
+      (a) =>
+        new AddressInfo({
+          id: a.id,
+          address: a.address,
+          communityId: a.community_id,
+          keytype: a.keytype,
+          walletId: a.wallet_id,
+          walletSsoSource: a.wallet_sso_source,
+          ghostAddress: a.ghost_address,
+          lastActive: a.last_active,
+        }),
+    );
+
+    const joinedCommunitiesWithNewContent = (() => {
+      if (!data.unseenPosts) return [];
+
+      const communityIds: string[] = [];
+
+      // TODO: cleanup this unseenposts extra stuff on api
+      Object.keys(data.unseenPosts).map(
+        (c) =>
+          (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
+          communityIds.push(c),
+      );
+
+      return communityIds;
+    })();
+
     userStore.getState().setData({
       id: data.id || 0,
       email: data.email || '',
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
-      joinedCommunitiesWithNewContent: (() => {
-        if (!data.unseenPosts) return [];
-
-        const communityIds: string[] = [];
-
-        // TODO: cleanup this unseenposts extra stuff on api
-        Object.keys(data.unseenPosts).map(
-          (c) =>
-            (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
-            communityIds.push(c),
-        );
-
-        return communityIds;
-      })(),
+      addresses,
+      joinedCommunitiesWithNewContent,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
@@ -305,22 +328,6 @@ export function updateActiveUser(data) {
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
     });
     app.user.setJWT(data.jwt);
-
-    app.user.setAddresses(
-      data.addresses.map(
-        (a) =>
-          new AddressInfo({
-            id: a.id,
-            address: a.address,
-            communityId: a.community_id,
-            keytype: a.keytype,
-            walletId: a.wallet_id,
-            walletSsoSource: a.wallet_sso_source,
-            ghostAddress: a.ghost_address,
-            lastActive: a.last_active,
-          }),
-      ),
-    );
   }
 }
 

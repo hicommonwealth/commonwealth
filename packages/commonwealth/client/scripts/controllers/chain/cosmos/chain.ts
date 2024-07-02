@@ -15,6 +15,7 @@ import {
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 
+import { userStore } from 'client/scripts/state/ui/user';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
@@ -192,9 +193,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
 
     const activeAddress = this._app.user.activeAccount?.address;
-    const walletId = this._app.user.addresses?.find(
-      (a) => a.address === activeAddress && a.community?.id === chain.id,
-    )?.walletId;
+    const walletId = userStore
+      .getState()
+      .addresses.find(
+        (a) => a.address === activeAddress && a.community?.id === chain.id,
+      )?.walletId;
     const isKeplr = walletId === WalletId.Keplr;
     const isKeplrEvm = walletId === WalletId.KeplrEthereum;
     const isLeap = walletId === WalletId.Leap;

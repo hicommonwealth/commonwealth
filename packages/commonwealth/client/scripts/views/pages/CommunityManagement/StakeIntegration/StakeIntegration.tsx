@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -15,6 +16,7 @@ import Status from './Status';
 
 const StakeIntegration = () => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
   const { stakeEnabled, refetchStakeQuery } = useCommunityStake();
 
   const handleStepChange = () => {
@@ -35,7 +37,7 @@ const StakeIntegration = () => {
   const communityChainId = `${
     community.ChainNode?.ethChainId || community.ChainNode?.cosmosChainId
   }`;
-  const selectedAddress = app.user.addresses.find(
+  const selectedAddress = user.addresses.find(
     (x) =>
       x.address === app.user.activeAccount.address &&
       x.community.id === community.id,

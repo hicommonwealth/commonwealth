@@ -1,3 +1,4 @@
+import AddressInfo from 'client/scripts/models/AddressInfo';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import StarredCommunity from 'client/scripts/models/StarredCommunity';
 import { devtools } from 'zustand/middleware';
@@ -11,6 +12,7 @@ type CommonProps = {
   email: string;
   emailNotificationInterval: EmailNotificationInterval | '';
   knockJWT: string;
+  addresses: AddressInfo[];
   activeCommunity: ChainInfo | null;
   starredCommunities: StarredCommunity[];
   joinedCommunitiesWithNewContent: string[]; // names of all communities which have new content since user last visited
@@ -31,6 +33,7 @@ export const userStore = createStore<UserStoreProps>()(
     email: '',
     emailNotificationInterval: '',
     knockJWT: '',
+    addresses: [],
     activeCommunity: null,
     starredCommunities: [],
     joinedCommunitiesWithNewContent: [],

@@ -8,6 +8,7 @@ import type momentType from 'moment';
 import moment from 'moment';
 import { serializeCanvas } from 'shared/canvas/types';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import { userStore } from '../state/ui/user';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
@@ -186,14 +187,16 @@ class Account {
 
     if (res.data.result.status === 'Success') {
       // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(
-        ({ address, ghostAddress, community }) =>
-          ghostAddress &&
-          this.community.id === community.id &&
-          app.user.activeAccounts.some(
-            (account) => account.address === address,
-          ),
-      );
+      const hasGhostAddress = userStore
+        .getState()
+        .addresses.some(
+          ({ address, ghostAddress, community }) =>
+            ghostAddress &&
+            this.community.id === community.id &&
+            app.user.activeAccounts.some(
+              (account) => account.address === address,
+            ),
+        );
 
       if (hasGhostAddress) {
         const response = await axios.post(
@@ -203,11 +206,13 @@ class Account {
 
         if (response.data.success && response.data.ghostAddressId) {
           // remove ghost address from addresses
-          app.user.setAddresses(
-            app.user.addresses.filter(({ ghostAddress }) => {
-              return !ghostAddress;
-            }),
-          );
+          userStore.getState().setData({
+            addresses: userStore
+              .getState()
+              .addresses.filter(({ ghostAddress }) => {
+                return !ghostAddress;
+              }),
+          });
           app.user.setActiveAccounts([], shouldRedraw);
         }
       }

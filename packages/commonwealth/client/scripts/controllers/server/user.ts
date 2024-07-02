@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
 import Account from '../../models/Account';
-import AddressInfo from '../../models/AddressInfo';
 
 // eslint-disable-next-line
 import { EventEmitter } from 'events';
@@ -28,15 +27,6 @@ export class UserController {
 
   private _setJWT(JWT: string): void {
     this._jwt = JWT;
-  }
-
-  private _addresses: AddressInfo[] = [];
-  public get addresses(): AddressInfo[] {
-    return this._addresses;
-  }
-
-  private _setAddresses(addresses: AddressInfo[]): void {
-    this._addresses = addresses;
   }
 
   private _activeAccounts: Account[] = [];
@@ -74,21 +64,6 @@ export class UserController {
 
   public setJWT(JWT: string): void {
     this._setJWT(JWT);
-  }
-
-  public setAddresses(addresses: AddressInfo[]): void {
-    this._setAddresses(addresses);
-  }
-
-  public addAddress(address: AddressInfo): void {
-    this._addresses.push(address);
-  }
-
-  public removeAddress(address: AddressInfo): void {
-    this._addresses.splice(
-      this._addresses.findIndex((a) => a.address === address.address),
-      1,
-    );
   }
 
   public setActiveAccounts(

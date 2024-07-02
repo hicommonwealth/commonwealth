@@ -1,5 +1,6 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -88,7 +89,7 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
-    if (app.user.addresses[0].walletId === 'magic') {
+    if (userStore.getState().addresses?.[0]?.walletId === 'magic') {
       throw new Error(
         'On-chain Transactions not currently available for magic',
       );

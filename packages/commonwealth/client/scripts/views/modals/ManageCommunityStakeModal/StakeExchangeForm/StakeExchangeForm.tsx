@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import ChainInfo from 'client/scripts/models/ChainInfo';
+import useUserStore from 'client/scripts/state/ui/user';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
@@ -84,6 +85,8 @@ const StakeExchangeForm = ({
     ? selectedAddress?.value
     : app?.user?.activeAccount?.address;
 
+  const user = useUserStore();
+
   const {
     buyPriceData,
     ethUsdRate,
@@ -152,7 +155,7 @@ const StakeExchangeForm = ({
       onSetModalState(ManageCommunityStakeModalState.Success);
 
       // join user to community if not already a member
-      const isMemberOfCommunity = app.user.addresses.find(
+      const isMemberOfCommunity = user.addresses.find(
         (x) => x.community.id === communityId,
       );
       if (!isMemberOfCommunity) {

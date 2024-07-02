@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
@@ -21,12 +22,14 @@ const useJoinCommunity = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
+  const user = useUserStore();
+
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
   const activeCommunityId = activeChainInfo?.id;
 
-  const samebaseAddresses = app.user.addresses.filter((a, idx) => {
+  const samebaseAddresses = user.addresses.filter((a, idx) => {
     // if no active chain, add all addresses
     if (!activeBase) {
       return true;
@@ -39,7 +42,7 @@ const useJoinCommunity = () => {
     }
 
     // // ensure doesn't already exist
-    const addressExists = !!app.user.addresses.slice(idx + 1).find(
+    const addressExists = !!user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
         (app.config.chains.getById(prev.community.id)?.base ===
@@ -110,8 +113,8 @@ const useJoinCommunity = () => {
           res.data.result;
 
         // update addresses
-        app.user.setAddresses(
-          addresses.map((a) => {
+        user.setData({
+          addresses: addresses.map((a) => {
             return new AddressInfo({
               id: a.id,
               address: a.address,
@@ -120,10 +123,10 @@ const useJoinCommunity = () => {
               walletId: a.wallet_id,
             });
           }),
-        );
+        });
 
         // get newly added address info
-        const addressInfo = app.user.addresses.find(
+        const addressInfo = user.addresses.find(
           (a) => a.address === encodedAddress && a.community.id === communityId,
         );
 

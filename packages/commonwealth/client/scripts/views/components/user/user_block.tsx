@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable no-script-url */
 import { WalletId } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import 'components/user/user.scss';
 import _ from 'lodash';
 import React from 'react';
@@ -129,8 +130,10 @@ export const UserBlock = ({
 const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
   const [address, setAddress] = React.useState<AddressInfo>();
 
+  const loggedInUser = useUserStore();
+
   React.useEffect(() => {
-    const matchingAddress = app.user.addresses.find(
+    const matchingAddress = loggedInUser.addresses.find(
       (a) =>
         a.community.id === user.community?.id && a.address === user.address,
     );

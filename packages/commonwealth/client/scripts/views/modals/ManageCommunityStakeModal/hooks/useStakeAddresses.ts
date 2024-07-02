@@ -3,6 +3,7 @@ import app from 'state';
 
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import ChainInfo from 'client/scripts/models/ChainInfo';
+import useUserStore from 'client/scripts/state/ui/user';
 import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
 import {
   getAvailableAddressesForStakeExchange,
@@ -14,14 +15,16 @@ interface UseStakeAddressesProps {
 }
 
 const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
+  const user = useUserStore();
+
   const communityAddresses = (() => {
     if (community) {
       // get all the addresses of the user that matches base chain of selected `community`
-      const userAddresses = (app?.user?.addresses || [])
-        ?.filter(
+      const userAddresses = user.addresses
+        .filter(
           (addr) => addr.community.base === (community as ChainInfo)?.base,
         )
-        ?.map((addr) => addr.address);
+        .map((addr) => addr.address);
 
       // return all the unique addresses
       return [...new Set(userAddresses)];
@@ -45,7 +48,7 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
     if (app?.user?.activeAccount) {
       return getAvailableAddressesForStakeExchange(
         app.user.activeAccounts,
-        app.user.addresses,
+        user.addresses,
       );
     }
 

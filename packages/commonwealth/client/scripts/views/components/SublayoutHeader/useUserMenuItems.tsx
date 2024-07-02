@@ -28,6 +28,7 @@ import { getSessionSigners } from 'shared/canvas/verify';
 
 import { useCommunityStake } from '../CommunityStake';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -96,12 +97,14 @@ const useUserMenuItems = ({
     error: sessionKeyRevalidationError,
   });
 
+  const userData = useUserStore();
+
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
   const { selectedAddress, setSelectedAddress } =
     useManageCommunityStakeModalStore();
 
-  const user = app.user?.addresses?.[0];
+  const user = userData.addresses?.[0];
   // @ts-expect-error <StrictNullChecks/>
   const profileId = user?.profileId || user?.profile.id;
 
@@ -147,7 +150,7 @@ const useUserMenuItems = ({
 
       const signed = authenticatedAddresses[caip2Address];
       const isActive = app.user.activeAccount?.address === account.address;
-      const walletSsoSource = app.user.addresses.find(
+      const walletSsoSource = userData.addresses.find(
         (address) => address.address === account.address,
       )?.walletSsoSource;
 
