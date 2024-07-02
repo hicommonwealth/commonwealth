@@ -1,0 +1,43 @@
+services:
+  postgres:
+    container_name: psql
+    image: postgres:16-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=commonwealth
+      - POSTGRES_PASSWORD=edgeware
+      - POSTGRES_DB=commonwealth
+    user: '${UID}:${GID}'
+    volumes:
+      - ./db/psql:/var/lib/postgresql/data
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    user: '${UID}:${GID}'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - '2000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=ministar
+    user: '${UID}:${GID}'
+    volumes:
+      - ./grafana:/var/lib/grafana
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - 9187:9187
+    environment:
+      - DATA_SOURCE_NAME=${DATABASE_URL}
+    user: '${UID}:${GID}'
+    links:
+      - postgres
+      - prometheus

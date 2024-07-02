@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "typeRoots": ["test/types.d.ts"]
+  },
+  "include": ["test", "src"]
+}
