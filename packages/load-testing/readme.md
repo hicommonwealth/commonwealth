@@ -66,13 +66,12 @@ Description: Checks the types of `/test` and `/src`.
 
 # Notes
 
+- Explicitly `async` test lifecycle functions are not supported by k6. To implement k6 async functionality use callback
+syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment-1443462207.
 - There exists an [experimental mode][1] that would allow us to execute Typescript files without using the `xk6-ts`
 extension, but the `grafana/xk6:latest` Docker image currently uses version v0.5.0 of `k6` and Typescript support is
 only available in [v0.5.2][2] and upwards.
 
-# TODO
-
-- We allow for a `SERVER_URL` to be defined but not a `DATABASE_URL` that is associated to the `SERVER_URL`
 
 [1]: https://grafana.com/docs/k6/latest/using-k6/javascript-typescript-compatibility-mode/#experimental-enhanced-mode
 [2]: https://github.com/grafana/k6/releases/tag/v0.52.0
