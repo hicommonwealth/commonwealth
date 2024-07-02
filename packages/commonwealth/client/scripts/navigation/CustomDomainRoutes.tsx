@@ -21,8 +21,6 @@ const CreateMembersGroupPage = lazy(
 const UpdateMembersGroupPage = lazy(
   () => import('views/pages/CommunityGroupsAndMembers/Groups/Update'),
 );
-const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
-const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
@@ -167,21 +165,6 @@ const CustomDomainRoutes = ({
       key="/directory"
       path="/directory"
       element={withLayout(DirectoryPage, { scoped: true })}
-    />,
-    <Route
-      key="/sputnik-daos"
-      path="/sputnik-daos"
-      element={withLayout(SputnikDaosPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
-      key="/finishNearLogin"
-      path="/finishNearLogin"
-      element={withLayout(FinishNearLoginPage, {
-        scoped: true,
-        type: 'common',
-      })}
     />,
     <Route
       key="/finishsociallogin"
@@ -509,16 +492,6 @@ const CustomDomainRoutes = ({
       key="/:scope/members"
       path="/:scope/members"
       element={<Navigate to="/members" />}
-    />,
-    <Route
-      key="/:scope/sputnik-daos"
-      path="/:scope/sputnik-daos"
-      element={<Navigate to="/sputnik-daos" />}
-    />,
-    <Route
-      key="/:scope/finishNearLogin"
-      path="/:scope/finishNearLogin"
-      element={<Navigate to="/finishNearLogin" />}
     />,
     <Route
       key="/:scope/finishsociallogin"
