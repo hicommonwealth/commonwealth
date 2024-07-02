@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import IWebWallet from 'client/scripts/models/IWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
+import { getWeb3Instance } from 'utils/web3';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -41,7 +42,7 @@ abstract class ContractBase {
           this.walletEnabled = true;
         }
 
-        this.web3 = new Web3(provider);
+        this.web3 = getWeb3Instance(provider);
         this.contract = new this.web3.eth.Contract(
           this.abi as AbiItem[],
           this.contractAddress,
