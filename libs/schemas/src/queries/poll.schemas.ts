@@ -51,15 +51,15 @@ export const DeletePoll = {
 export const GetPollVote = {
   input: z.object({
     poll_id: z.number(),
-    address: z.string(),
   }),
   output: Vote.array(),
 };
 
-export const PutPollVote = {
+export const UpdatePollVote = {
   input: z.object({
     poll_id: z.number(),
     address: z.string(),
+    option: z.string(),
   }),
   output: Vote,
 };

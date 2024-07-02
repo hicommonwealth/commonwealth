@@ -1,4 +1,4 @@
-import { AppError, InvalidActor, type Query } from '@hicommonwealth/core';
+import { AppError, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
@@ -19,7 +19,7 @@ export function DeletePoll(): Query<typeof schemas.DeletePoll> {
       const query: QueryType[] = (
         await models.sequelize.query(
           `
-             SELECT t.id as thread_id, a.user_id FROM "Polls" p
+             SELECT t.id as thread_id FROM "Polls" p
              JOIN "Threads" t ON t.id = p.thread_id
              JOIN "Addresses" a ON t.address_id = a.id
              WHERE a.user_id = :user_id AND p.id = :poll_id
@@ -34,11 +34,7 @@ export function DeletePoll(): Query<typeof schemas.DeletePoll> {
       )?.[0];
 
       if (!query) {
-        throw new AppError('Poll does not exist');
-      }
-
-      if (actor.user.id !== query.user_id) {
-        throw new InvalidActor(actor, 'User does not own the poll');
+        throw new AppError('Poll does not exist or User does not own poll');
       }
 
       await models.sequelize.transaction(async (transaction) => {
