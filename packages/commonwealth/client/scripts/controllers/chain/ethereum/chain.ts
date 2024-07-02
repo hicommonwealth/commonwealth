@@ -5,8 +5,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { getWeb3Instance } from 'utils/web3';
-import { Web3, Web3BaseProvider } from 'web3';
+import Web3, { Web3BaseProvider } from 'web3';
 import type ChainInfo from '../../../models/ChainInfo';
 import type NodeInfo from '../../../models/NodeInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
@@ -57,7 +56,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public async _initApi(node: NodeInfo): Promise<Web3> {
     try {
-      this._api = getWeb3Instance(node.url);
+      const provider =
+        node.url.slice(0, 4) == 'http'
+          ? new Web3.providers.HttpProvider(node.url)
+          : new Web3.providers.WebsocketProvider(node.url);
+
+      this._api = new Web3(provider);
       return this._api;
     } catch (error) {
       console.log(`Could not connect to Ethereum on ${node.url}`);
