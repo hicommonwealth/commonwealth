@@ -17,7 +17,6 @@ import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
-import NotificationCategory from 'models/NotificationCategory';
 import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
@@ -86,7 +85,6 @@ export interface IApp {
     chains: ChainStore;
     redirects: Record<string, string>;
     nodes: NodeStore;
-    notificationCategories?: NotificationCategory[];
     // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
@@ -240,10 +238,6 @@ export async function initAppState(
       });
 
     app.roles.setRoles(statusRes.result.roles);
-    app.config.notificationCategories =
-      statusRes.result.notificationCategories.map((json) =>
-        NotificationCategory.fromJSON(json),
-      );
     app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
 
     // add recentActivity
