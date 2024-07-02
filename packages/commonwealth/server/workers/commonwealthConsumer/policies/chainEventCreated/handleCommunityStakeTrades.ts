@@ -42,7 +42,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const chainNode = await models.ChainNode.findOne({
+  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       id: event.eventSource.chainNodeId,
     },
@@ -52,6 +52,13 @@ export async function handleCommunityStakeTrades(
       event,
     });
     return;
+  }
+
+  if (!chainNode.private_url) {
+    log.error('ChainNode is missing a private url', undefined, {
+      event,
+      chainNode: chainNode.toJSON(),
+    });
   }
 
   if (community.chain_node_id != chainNode.id) {
