@@ -164,7 +164,7 @@ export default (
           await decrementProfileCount(
             address.community_id,
             address.user_id!,
-            options.transaction,
+            options.transaction!,
           );
         },
       },
