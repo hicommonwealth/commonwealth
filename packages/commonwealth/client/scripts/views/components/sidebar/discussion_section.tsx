@@ -78,10 +78,6 @@ export const DiscussionSection = ({
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
     location,
   );
-  const matchesSputnikDaosRoute = matchRoutes(
-    [{ path: '/sputnik-daos' }, { path: ':scope/sputnik-daos' }],
-    location,
-  );
 
   const { data: topicsData } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
@@ -111,11 +107,6 @@ export const DiscussionSection = ({
           All: {
             toggledState: false,
           },
-          ...(app.activeChainId() === 'near' && {
-            SputnikDaos: {
-              toggledState: false,
-            },
-          }),
         },
       };
     }
@@ -158,7 +149,6 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
-    // @ts-expect-error <StrictNullChecks/>
     ...(contestsEnabled && isContestAvailable
       ? [
           {
@@ -188,7 +178,6 @@ export const DiscussionSection = ({
           },
         ]
       : []),
-    // @ts-expect-error <StrictNullChecks/>
     {
       title: 'Overview',
       containsChildren: false,
@@ -206,34 +195,6 @@ export const DiscussionSection = ({
           app.activeChainId(),
           () => {
             setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-          },
-        );
-      },
-      displayData: null,
-    },
-    // @ts-expect-error <StrictNullChecks/>
-    app.activeChainId() === 'near' && {
-      title: 'Sputnik Daos',
-      containsChildren: false,
-      hasDefaultToggle: false,
-      isVisible: true,
-      isUpdated: true,
-      isActive:
-        !!matchesSputnikDaosRoute &&
-        (app.chain ? app.chain.serverLoaded : true),
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/sputnik-daos`,
-          app.activeChainId(),
-          () => {
-            setDiscussionsToggleTree(
-              `children.SputnikDAOs.toggledState`,
-              toggle,
-            );
           },
         );
       },
