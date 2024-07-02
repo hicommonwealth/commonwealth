@@ -68,9 +68,6 @@ const SignTransactionsStep = ({
     const contestLength = devContest
       ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
-    console.log('devContest', devContest);
-
-    console.log('contestLength', contestLength);
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
