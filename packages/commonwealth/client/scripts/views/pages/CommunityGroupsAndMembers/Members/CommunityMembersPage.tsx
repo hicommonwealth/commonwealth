@@ -161,7 +161,7 @@ const CommunityMembersPage = () => {
     },
   );
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
@@ -283,8 +283,8 @@ const CommunityMembersPage = () => {
   useEffect(() => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
+    refetch();
+  }, [refetch]);
 
   useEffect(() => {
     // Set the active tab based on URL
