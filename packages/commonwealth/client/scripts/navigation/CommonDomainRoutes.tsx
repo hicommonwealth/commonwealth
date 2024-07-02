@@ -4,7 +4,6 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
-const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
@@ -127,13 +126,6 @@ const CommonDomainRoutes = ({
     key="/createCommunity"
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
-  />,
-  <Route
-    key="/whyCommonwealth"
-    path="/whyCommonwealth"
-    element={withLayout(WhyCommonwealthPage, {
-      type: 'common',
-    })}
   />,
   <Route
     key="/dashboard"

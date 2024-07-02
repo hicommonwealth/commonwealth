@@ -45,7 +45,6 @@ The goal of this document is to describe the current state of the app initializa
         - If ChainBase is Substrate, import the Substrate adapter.
         - If ChainBase is Cosmos, import the Cosmos adapter.
         - If Network is Ethereum, import the (ETH) tokenAdapter.
-        - If Network is NEAR or NEARTestnet or Sputnik, import the NEAR adapter.
         - If Network is Compound, import the Compound adapter (ETH).
         - If Network is Aave, import the Aave adapter (ETH).
         - If Network is ERC20, import the (ETH) tokenAdapter.
@@ -56,7 +55,7 @@ The goal of this document is to describe the current state of the app initializa
         - Otherwise, throw an “invalid chain” error.
     5. `initServer()` is called the returned `IChainAdapter` instance, which clears local storage and makes a call to `/bulkOffchain`, whose data is used to initialize community content.
     6. Dark mode preferences are set, and forum data (e.g. threads, admins, banners, recent activity) is populated. The `app.chain` state variable is set globally to the now-server-initialized `IChainAdapter` instance.
-    7. If the `initChain` argument is `true` (e.g. in the case of NEAR communities), we then proceed to `initChain()`.
+    7. If the `initChain` argument is `true`, we then proceed to `initChain()`.
         1. If `selectChain` has not been called, or if chain is already loaded, immediately exit the function.
         2. If the chain's API is not initialized, `app.chain.initApi()` is fired.
             - This triggers chain-specific setup of communication with the blockchain endpoint, defined in e.g. controllers/chain/cosmos/adapter.ts. Often this initializes the “chain” (holds the core functionality and chain connections) and “accounts” modules (deals with user-specific logic, rarely used now), but it specifically does not initialize governance modules.

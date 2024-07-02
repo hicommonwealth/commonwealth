@@ -28,10 +28,10 @@ export const deserializeCanvas = (serializedData: string): any => {
 };
 
 export const toCanvasSignedDataApiArgs = (
-  data: undefined | CanvasSignResult,
+  data: null | undefined | CanvasSignResult,
 ): CanvasSignedDataApiArgs => {
   // ignore undefined data
-  if (data === undefined) {
+  if (data === undefined || data === null) {
     // @ts-expect-error <StrictNullChecks>
     return;
   }

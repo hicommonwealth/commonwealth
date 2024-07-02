@@ -25,7 +25,8 @@
 - [Groups](./Groups.md)
 - [Notifications](./Notifications.md)
 - [Notifications QA](./Notifications-QA.md)
-- [Stake](./Stake.md).
+- [Stake](./Stake.md)
+- [Web Wallets & SSO](./Web-Wallets.md): Sign-in and onboarding flow.
 
 ## Chain Tools
 
