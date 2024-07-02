@@ -1,5 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import { AddressInstance, UserInstance } from '@hicommonwealth/model';
+import { QueryTypes } from 'sequelize';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -7,6 +8,7 @@ import { ServerThreadsController } from '../server_threads_controller';
 export const Errors = {
   ThreadNotFound: 'Thread not found',
   NotOwned: 'Not owned by this user',
+  ContestLock: 'Cannot edit thread that is in a contest',
 };
 
 export type DeleteThreadOptions = {
@@ -71,6 +73,25 @@ export async function __deleteThread(
   });
   if (!isOwnerOrAdmin) {
     throw new AppError(Errors.NotOwned);
+  }
+
+  // check if thread is part of a contest topic
+  const contestManagers = await this.models.sequelize.query(
+    `
+    SELECT cm.contest_address FROM "Threads" t
+    JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
+    JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
+    WHERE t.id = :thread_id
+  `,
+    {
+      type: QueryTypes.SELECT,
+      replacements: {
+        thread_id: thread!.id,
+      },
+    },
+  );
+  if (contestManagers.length > 0) {
+    throw new AppError(Errors.ContestLock);
   }
 
   await this.models.sequelize.transaction(async (transaction) => {
