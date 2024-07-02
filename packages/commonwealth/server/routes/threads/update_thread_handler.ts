@@ -9,7 +9,7 @@ export const Errors = {
 
 type UpdateThreadRequestBody = {
   title?: string;
-  body?: string;
+  body: string;
   stage?: string;
   url?: string;
   locked?: boolean;

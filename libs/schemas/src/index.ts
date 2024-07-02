@@ -5,10 +5,12 @@ export type Aggregates = Extract<
   Entities,
   | 'ChainNode'
   | 'Comment'
+  | 'CommentVersionHistory'
   | 'Community'
   | 'NotificationCategory'
   | 'Subscription'
   | 'Thread'
+  | 'ThreadVersionHistory'
   | 'Reaction'
   | 'User'
   | 'StakeTransaction'

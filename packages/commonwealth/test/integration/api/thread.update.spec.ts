@@ -165,6 +165,7 @@ describe('Thread Patch Update', () => {
             // @ts-expect-error StrictNullChecks
             chain: thread.community_id,
             address: userAddress,
+            body: 'body1',
             jwt: userJWT,
             pinned: true,
             topicId,
@@ -199,7 +200,7 @@ describe('Thread Patch Update', () => {
         address: canvasAddress,
         jwt: userJWT,
         title: 'test2',
-        body: 'body2',
+        body: 'body1',
         kind: 'discussion',
         stage: 'discussion',
         topicId,
@@ -221,6 +222,7 @@ describe('Thread Patch Update', () => {
             chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
+            body: 'body1',
             pinned: true,
             topicId,
           });
@@ -242,6 +244,7 @@ describe('Thread Patch Update', () => {
             chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
+            body: 'body1',
             spam: true,
             topicId,
           });

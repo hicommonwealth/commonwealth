@@ -33,6 +33,7 @@ export type CommentAttributes = {
   deleted_at?: Date;
   marked_as_spam_at?: Date;
   discord_meta?: IDiscordMeta;
+  version_history_updated?: boolean;
 
   // associations
   Community?: CommunityAttributes;
@@ -96,6 +97,11 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+      version_history_updated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
     {
