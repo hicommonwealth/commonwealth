@@ -63,7 +63,7 @@ module.exports = {
     });
   },
 
-  async down(queryInterface) {
+  async down() {
     // TODO: Can we reverse this?
   },
 };
