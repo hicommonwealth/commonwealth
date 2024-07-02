@@ -55,14 +55,6 @@ const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect'),
 );
 
-const ContractsPage = lazy(() => import('views/pages/contracts'));
-const NewContractPage = lazy(() => import('views/pages/new_contract'));
-const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
-const NewContractTemplatePage = lazy(
-  () => import('views/pages/new_contract_template'),
-);
-const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
-
 const DiscordCallbackPage = lazy(
   () =>
     import('views/pages/CommunityManagement/Integrations/Discord/CallbackPage'),
@@ -113,7 +105,6 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CommonDomainRoutes = ({
-  proposalTemplatesEnabled,
   contestEnabled,
   knockInAppNotifications,
 }: RouteFeatureFlags) => [
@@ -339,48 +330,6 @@ const CommonDomainRoutes = ({
     })}
   />,
   // DISCUSSIONS END
-
-  // CONTRACTS
-  ...(proposalTemplatesEnabled
-    ? [
-        <Route
-          key="/:scope/contracts"
-          path="/:scope/contracts"
-          element={withLayout(ContractsPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/new/contract"
-          path="/:scope/new/contract"
-          element={withLayout(NewContractPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/new/contract_template/:contract_id"
-          path="/:scope/new/contract_template/:contract_id"
-          element={withLayout(NewContractTemplatePage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/contract/:contractAddress"
-          path="/:scope/contract/:contractAddress"
-          element={withLayout(GeneralContractPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/:contract_address/:slug"
-          path="/:scope/:contract_address/:slug"
-          element={withLayout(ViewTemplatePage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
-  // CONTRACTS END
 
   // SITE ADMIN
   <Route
