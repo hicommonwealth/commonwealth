@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
+import { ChainNodeInstance } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { fileURLToPath } from 'url';
-import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
@@ -24,7 +24,7 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
     return {};
   }
 
-  const rpcEndpoint = options.chainNode.private_url!;
+  const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
     return await getEthBalance(
       options.chainNode.eth_chain_id!,
