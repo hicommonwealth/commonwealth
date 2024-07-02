@@ -83,7 +83,6 @@ export interface IApp {
   // TODO
   config: {
     chains: ChainStore;
-    redirects: Record<string, string>;
     nodes: NodeStore;
     // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
@@ -157,7 +156,6 @@ const app: IApp = {
 
   config: {
     chains: new ChainStore(),
-    redirects: {},
     nodes: new NodeStore(),
   },
   // TODO: Collect all getters into an object
