@@ -13,6 +13,7 @@ type CommonProps = {
   knockJWT: string;
   activeCommunity: ChainInfo | null;
   starredCommunities: StarredCommunity[];
+  joinedCommunitiesWithNewContent: string[]; // names of all communities which have new content since user last visited
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -32,6 +33,7 @@ export const userStore = createStore<UserStoreProps>()(
     knockJWT: '',
     activeCommunity: null,
     starredCommunities: [],
+    joinedCommunitiesWithNewContent: [],
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,

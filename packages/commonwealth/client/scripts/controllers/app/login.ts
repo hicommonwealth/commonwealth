@@ -263,6 +263,8 @@ export function updateActiveUser(data) {
       email: '',
       emailNotificationInterval: '',
       knockJWT: '',
+      starredCommunities: [],
+      joinedCommunitiesWithNewContent: [],
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
@@ -272,7 +274,6 @@ export function updateActiveUser(data) {
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-    app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
     // @ts-expect-error StrictNullChecks
@@ -283,6 +284,20 @@ export function updateActiveUser(data) {
       email: data.email || '',
       emailNotificationInterval: data.emailInterval || '',
       knockJWT: data.knockJwtToken || '',
+      joinedCommunitiesWithNewContent: (() => {
+        if (!data.unseenPosts) return [];
+
+        const communityIds: string[] = [];
+
+        // TODO: cleanup this unseenposts extra stuff on api
+        Object.keys(data.unseenPosts).map(
+          (c) =>
+            (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
+            communityIds.push(c),
+        );
+
+        return communityIds;
+      })(),
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
@@ -306,8 +321,6 @@ export function updateActiveUser(data) {
           }),
       ),
     );
-
-    app.user.setUnseenPosts(data.unseenPosts);
   }
 }
 

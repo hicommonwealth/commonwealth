@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -7,6 +8,7 @@ import './TrendingCommunitiesPreview.scss';
 
 export const TrendingCommunitiesPreview = () => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const sortedCommunities = app.config.chains
     .getAll()
@@ -32,14 +34,15 @@ export const TrendingCommunitiesPreview = () => {
         account: app.user.activeAccount,
         community: community.id,
       });
-      const { unseenPosts } = app.user;
-      const hasVisitedCommunity = !!unseenPosts[community.id];
 
       return {
         community,
         monthlyThreadCount,
         isMember,
-        hasUnseenPosts: app.isLoggedIn() && !hasVisitedCommunity,
+        // TODO: should we remove the new label once user visits the community? -- ask from product
+        hasUnseenPosts: user.joinedCommunitiesWithNewContent.includes(
+          community.id,
+        ),
         onClick: () => navigate(`/${community.id}`),
       };
     });

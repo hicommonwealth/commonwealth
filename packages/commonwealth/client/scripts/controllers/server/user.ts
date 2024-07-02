@@ -64,15 +64,6 @@ export class UserController {
     this._notifications = notifications;
   }
 
-  private _unseenPosts: object;
-  public get unseenPosts(): object {
-    return this._unseenPosts;
-  }
-
-  private _setUnseenPosts(unseenPosts: object): void {
-    this._unseenPosts = unseenPosts;
-  }
-
   constructor() {}
 
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
@@ -120,9 +111,5 @@ export class UserController {
 
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
-  }
-
-  public setUnseenPosts(unseenPosts: object): void {
-    this._setUnseenPosts(unseenPosts);
   }
 }
