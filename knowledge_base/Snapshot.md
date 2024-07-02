@@ -4,43 +4,33 @@
 
 ### Requirements
 
-- The Ethereum wallet you use must have an ENS (Ethereum Name Service) domain ([see how to create one](https://github.com/hicommonwealth/commonwealth/wiki/Setup-ENS))
-- Snapshots only work with Ethereum communities, you must be an admin of an Ethereum-based community to work with the new snapshot space
+- Snapshot is only compatible with Ethereum communities. You must be an admin of an Ethereum-based community to work with the new Snapshot space.
+
+- The Ethereum wallet you use must have an ENS (Ethereum Name Service) domain. Domains can be set up at <https://app.ens.domains/>. To register a domain, you must have Eth in a wallet connected to Mainnet, and will be prompted to perform a series of timed transactions.
 
 ### Setup
 
-1. Change your wallet address to Eth Mainnet
-2. Go to <https://snapshot.org/#/setup?step=0> and connect your wallet from the "Connect wallet" button, and click on Get started
+1. Change your wallet address to Eth Mainnet.
 
-<img width="500" alt="Screenshot 2023-07-12 at 10 08 20 AM" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/5125097f-f821-4696-aa58-4fe88a7d14da">
+2. Go to <https://snapshot.org/#/setup?step=0>, connect your wallet via the "Connect wallet" button, and select "Get started."
 
-3. Enter your ENS domain and click 'register'
+3. Enter your ENS domain and select "Register."
 
-<img width="500" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/8acb9401-d89b-4b86-9eb9-007cb4bdfb97">
+4. Fill in profile info and continue.
 
-3. Fill in your profile info and continue
-4. On the strategy step, choose, 1-person 1-vote, and click next
+5. On the strategy step, choose, 1-person 1-vote, and click "Next."
 
-<img width="500" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/8bdb8f1b-5c90-43ca-8c93-1bcbb92915a9">
+6. Select "Whitelist voting" and add your wallet address (or any other address you'd like to whitelist).
 
-Choose "Whitelist voting" and add your wallet address (or any other address you want to whitelist)
+7. Click "Next" and add the addresses of any members (including your own) who will have permission to manage the space and create proposals. Click "Create".
 
-<img width="500" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/5cc67450-6a0e-4edd-8e65-197d0cfdf3cb">
+8. Navigate to a community on Commonwealth in which you are an admin. Navigate to Manage Community Settings, and in the Snapshots field, add your ENS.
 
-Click "next" and add members address (you can also add your own), and click continue
-
-<img width="500" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/7b685c6a-a6d8-4c75-845a-deb5f437ad10">
-
-Important: If you want someone else to use your snapshot space, then add their address as an author here. Now your space is created.
-
-5. Go to your community on commonwealth (you must be admin), go to manage community setting, and in the "Snapshot/s" field add your ens.
-
-<img width="500" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/e93a3210-8216-41e1-b075-b082137e4b4c">
-
-Now you should be able to create snapshot proposals with this test space.
+You should now be able to create Snapshot proposals with this test space.
 
 ## Change Log
 
+- 240702: Tidied and merged with `Ethereum-Name-Spaces.md` by Graham Johnson (#8336).
 - 240415: Renamed and generalized by Graham Johnson from `Setup-Snapshot-Space.md` to `Snapshot.md`.
 - 231012: Flagged by Graham Johnson for asset transfer.
 - 230712: Authored by Malik Zulqurnain.
