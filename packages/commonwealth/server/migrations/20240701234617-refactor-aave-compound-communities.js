@@ -54,6 +54,26 @@ module.exports = {
       `,
         { transaction },
       );
+
+      // remove proposal links in EVM communities
+      await queryInterface.sequelize.query(
+        `
+            UPDATE "Threads" T
+            SET "links" = (
+                SELECT jsonb_agg(link)
+                FROM jsonb_array_elements(T."links") AS link
+                WHERE link ->> 'source' <> 'proposal'
+            )
+            FROM "Communities" C
+            WHERE T.community_id = C.id
+              AND EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements(T."links") AS link
+                WHERE link ->> 'source' = 'proposal'
+            ) AND C.base = 'ethereum';
+      `,
+        { transaction },
+      );
     });
   },
 
