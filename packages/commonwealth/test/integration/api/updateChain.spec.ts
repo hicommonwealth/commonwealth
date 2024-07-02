@@ -101,13 +101,19 @@ describe('UpdateChain Tests', () => {
       userAttributes: { email: '', id: 2, isAdmin: false },
     }) as UserInstance;
 
+    const incorrectChainNode = await models.ChainNode.findOne({
+      where: {
+        name: 'Edgeware Mainnet',
+      },
+    });
+
     try {
       await controller.updateCommunity({
         ...baseRequest,
         user: user,
         namespace: 'tempNamespace',
         transactionHash: '0x1234',
-        chain_node_id: 100000,
+        chain_node_id: incorrectChainNode!.id!,
       });
     } catch (e) {
       assert.equal(e.message, 'Namespace not supported on selected chain');

@@ -145,16 +145,15 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           throw new InvalidState(Errors.StakeholderGroup);
         }
         const node = await models.ChainNode.findByPk(community.chain_node_id);
-        if (!node) {
+        if (!node || !node.eth_chain_id) {
           throw new InvalidState(Errors.ChainNodeNotFound);
         }
         const addresses = allCommunityProfiles.map((p) => p.addresses).flat();
         const balances = await contractHelpers.getNamespaceBalance(
           community.namespace_address!,
           stake.stake_id,
-          node.eth_chain_id!,
+          node.eth_chain_id,
           addresses,
-          node.url,
         );
         // add balances to profiles
         for (const profile of allCommunityProfiles) {
