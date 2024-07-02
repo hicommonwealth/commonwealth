@@ -76,11 +76,12 @@ export async function search() {
   try {
     await page.goto(`${SERVER_URL}/dashboard/global`);
     page.waitForLoadState('load');
-    let searchParm = ['Proto', 'Common', 'Layer0', 'Discussion', 'Dashboard'];
-    let randomParm = searchParm[Math.floor(Math.random() * searchParm.length)];
+    const searchParm = ['Proto', 'Common', 'Layer0', 'Discussion', 'Dashboard'];
+    const randomParm =
+      searchParm[Math.floor(Math.random() * searchParm.length)];
 
     // Random search
-    let searchBox = page.locator('input[placeholder="Search Common"]');
+    const searchBox = page.locator('input[placeholder="Search Common"]');
     searchBox.type(randomParm);
     searchBox.press('Enter');
     page.waitForLoadState('load');

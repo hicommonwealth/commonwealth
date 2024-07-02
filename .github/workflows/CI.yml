@@ -304,7 +304,7 @@ jobs:
         run: pnpm -r build
 
       - name: Run unit tests
-        run: pnpm -r test -- --allowOnly=false
+        run: pnpm -r test --filter '!load-testing' -- --allowOnly=false
 
       - name: Change permissions of coverage files
         run: |

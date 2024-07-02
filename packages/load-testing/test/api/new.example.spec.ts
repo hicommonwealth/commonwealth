@@ -48,12 +48,12 @@ export async function GetMembers() {
 }
 
 export async function GetBulkThreads() {
-  const header = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${JWT_token}`,
-    },
-  };
+  // const header = {
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     Authorization: `Bearer ${JWT_token}`,
+  //   },
+  // };
   const url = new URL(`${TRPC_API_URL}/query/GetMembers`);
   url.searchParams.append('limit', '10');
   url.searchParams.append('community_id', 'layerzero');
@@ -63,12 +63,12 @@ export async function GetBulkThreads() {
 }
 
 export async function GetGlobalActivity() {
-  const header = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${JWT_token}`,
-    },
-  };
+  // const header = {
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     Authorization: `Bearer ${JWT_token}`,
+  //   },
+  // };
   const url = new URL(`${TRPC_API_URL}/query/GetMembers`);
   url.searchParams.append('limit', '10');
   url.searchParams.append('community_id', 'layerzero');
