@@ -1,7 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 
 export const COSMOS_CHAIN_ID = 'cosmoshub-1';
-export const NEAR_MAINNET_CHAIN_ID = 'mainnet';
 export const SOLANA_MAINNET_CHAIN_ID = '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
 export const SUBSTRATE_CHAIN_ID = '42';
 
@@ -11,8 +10,6 @@ export function chainBaseToCaip2(chainBase: ChainBase): string {
     return 'cosmos';
   } else if (chainBase === ChainBase.Ethereum) {
     return 'eip155';
-  } else if (chainBase === ChainBase.NEAR) {
-    return 'near';
   } else if (chainBase === ChainBase.Solana) {
     return 'solana';
   } else if (chainBase === ChainBase.Substrate) {
@@ -28,8 +25,6 @@ export function caip2ToChainBase(caip2: string): ChainBase {
     return ChainBase.Ethereum;
   } else if (prefix === 'cosmos') {
     return ChainBase.CosmosSDK;
-  } else if (prefix === 'near') {
-    return ChainBase.NEAR;
   } else if (prefix === 'solana') {
     return ChainBase.Solana;
   } else if (prefix === 'polkadot') {
@@ -52,8 +47,6 @@ export function chainBaseToCanvasChainId(
     return idOrPrefix ? idOrPrefix.toString() : '1';
   } else if (chainBase === ChainBase.CosmosSDK) {
     return COSMOS_CHAIN_ID;
-  } else if (chainBase === ChainBase.NEAR) {
-    return NEAR_MAINNET_CHAIN_ID;
   } else if (chainBase === ChainBase.Solana) {
     return SOLANA_MAINNET_CHAIN_ID;
   } else if (chainBase === ChainBase.Substrate) {

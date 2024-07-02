@@ -59,7 +59,6 @@ export enum ProposalStatus {
 }
 
 export enum VotingType {
-  SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',
   SimpleYesApprovalVoting = 'approval',
   YesNoAbstainVeto = 'yes_no_abstain_veto',
@@ -69,7 +68,6 @@ export enum VotingType {
   MolochYesNo = 'moloch',
   CompoundYesNo = 'compound_yes_no',
   CompoundYesNoAbstain = 'compound_yes_no_abstain',
-  YesNoReject = 'yes_no_reject',
 }
 
 export enum VotingUnit {

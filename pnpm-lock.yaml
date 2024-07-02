@@ -1146,9 +1146,6 @@ importers:
       moment:
         specifier: ^2.23.0
         version: 2.30.1
-      near-api-js:
-        specifier: ^0.42.0
-        version: 0.42.0
       node-fetch:
         specifier: '2'
         version: 2.7.0
@@ -8305,12 +8302,6 @@ packages:
         integrity: sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==,
       }
 
-  bn.js@5.2.0:
-    resolution:
-      {
-        integrity: sha512-D7iWRBvnZE8ecXiLj/9wbxH7Tk79fAh8IHaTNq1RWRixsS02W+5qS+iE9yq6RYl0asXx5tw0bLhmT5pIfbSquw==,
-      }
-
   bn.js@5.2.1:
     resolution:
       {
@@ -8328,12 +8319,6 @@ packages:
     resolution:
       {
         integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==,
-      }
-
-  borsh@0.4.0:
-    resolution:
-      {
-        integrity: sha512-aX6qtLya3K0AkT66CmYWCCDr77qsE9arV05OmdFpmat9qu8Pg9J5tBUPDztAW5fNh/d/MyVG/OYziP52Ndzx1g==,
       }
 
   borsh@0.7.0:
@@ -8628,12 +8613,6 @@ packages:
     resolution:
       {
         integrity: sha512-RrBgVL5qCEDIXpJ6NrzyRNoTnXxYarqm/cS/W6ERhUJts5UQtt/XPEosGN3rqUkZ4fjBArlnCbsISJ+KCFnIAg==,
-      }
-
-  capability@0.2.5:
-    resolution:
-      {
-        integrity: sha512-rsJZYVCgXd08sPqwmaIqjAd5SUTfonV0z/gDJ8D6cN8wQphky1kkAYEqQ+hmDxTw7UihvBfjUVUSY+DBEe44jg==,
       }
 
   caseless@0.12.0:
@@ -10103,12 +10082,6 @@ packages:
     resolution:
       {
         integrity: sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==,
-      }
-
-  error-polyfill@0.1.3:
-    resolution:
-      {
-        integrity: sha512-XHJk60ufE+TG/ydwp4lilOog549iiQF2OAPhkk9DdiYWMrltz5yhDz/xnKuenNwP7gy3dsibssO5QpVhkrSzzg==,
       }
 
   error-stack-parser@1.3.6:
@@ -11788,13 +11761,6 @@ packages:
       }
     engines: { node: '>=6.0.0' }
 
-  http-errors@1.8.1:
-    resolution:
-      {
-        integrity: sha512-Kpk9Sm7NmI+RHhnj6OIWDI1d6fIoFAtFt9RLaTMRlg/8w49juAStsrBgp0Dp4OdxdVbRIeKhtCUvoi/RuAhO4g==,
-      }
-    engines: { node: '>= 0.6' }
-
   http-errors@2.0.0:
     resolution:
       {
@@ -12825,12 +12791,6 @@ packages:
         integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==,
       }
     engines: { node: '>=14' }
-
-  js-sha256@0.9.0:
-    resolution:
-      {
-        integrity: sha512-sga3MHh9sgQN2+pJ9VYZ+1LPwXOxuBJBA5nrR5/ofPfuiJBE2hnjsaN8se8JznOmGLN2p49Pe5U/ttafcs/apA==,
-      }
 
   js-sha3@0.8.0:
     resolution:
@@ -13960,13 +13920,6 @@ packages:
         integrity: sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==,
       }
 
-  mustache@4.2.0:
-    resolution:
-      {
-        integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==,
-      }
-    hasBin: true
-
   mylas@2.1.13:
     resolution:
       {
@@ -14015,12 +13968,6 @@ packages:
       }
     engines: { node: '>=10' }
     hasBin: true
-
-  near-api-js@0.42.0:
-    resolution:
-      {
-        integrity: sha512-YtDR0sXHL2CclXZdscqUIjoc4Vp/o09CSY1lQ6mygSNbWp5ghLAR1kNBQnALGGQhYC6NLBCzJQJZMb2IQr2WzA==,
-      }
 
   negotiator@0.6.3:
     resolution:
@@ -14272,12 +14219,6 @@ packages:
       }
     engines: { node: '>=8.9' }
     hasBin: true
-
-  o3@1.0.3:
-    resolution:
-      {
-        integrity: sha512-f+4n+vC6s4ysy7YO7O2gslWZBUu8Qj2i2OUJOvjRxQva7jVjYjB29jrr9NCjmxZQR0gzrOcv1RnqoYOeMs5VRQ==,
-      }
 
   oauth-sign@0.9.0:
     resolution:
@@ -17053,13 +16994,6 @@ packages:
       }
     engines: { node: '>=10.0.0' }
 
-  statuses@1.5.0:
-    resolution:
-      {
-        integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==,
-      }
-    engines: { node: '>= 0.6' }
-
   statuses@2.0.1:
     resolution:
       {
@@ -18099,12 +18033,6 @@ packages:
     resolution:
       {
         integrity: sha512-ofhi8kjIje6npGozTip9Fr8iecmYfEbS06i0JnIg+rh51KakryWF4+jX8lLKZVhy6N+ID45WYSFCxPOdTWCzNg==,
-      }
-
-  u3@0.1.1:
-    resolution:
-      {
-        integrity: sha512-+J5D5ir763y+Am/QY6hXNRlwljIeRMZMGs0cT6qqZVVzzT3X3nFPXVyPOFRMOR4kupB0T8JnCdpWdp6Q/iXn3w==,
       }
 
   ua-parser-js@1.0.37:
@@ -25180,8 +25108,6 @@ snapshots:
 
   bn.js@4.12.0: {}
 
-  bn.js@5.2.0: {}
-
   bn.js@5.2.1: {}
 
   body-parser@1.20.2:
@@ -25202,13 +25128,6 @@ snapshots:
       - supports-color
 
   boolbase@1.0.0: {}
-
-  borsh@0.4.0:
-    dependencies:
-      '@types/bn.js': 4.11.6
-      bn.js: 5.2.1
-      bs58: 4.0.1
-      text-encoding-utf-8: 1.0.2
 
   borsh@0.7.0:
     dependencies:
@@ -25399,8 +25318,6 @@ snapshots:
   canvas-renderer@2.2.1:
     dependencies:
       '@types/node': 20.12.10
-
-  capability@0.2.5: {}
 
   caseless@0.12.0: {}
 
@@ -26313,12 +26230,6 @@ snapshots:
   error-ex@1.3.2:
     dependencies:
       is-arrayish: 0.2.1
-
-  error-polyfill@0.1.3:
-    dependencies:
-      capability: 0.2.5
-      o3: 1.0.3
-      u3: 0.1.1
 
   error-stack-parser@1.3.6:
     dependencies:
@@ -27701,14 +27612,6 @@ snapshots:
       http-response-object: 3.0.2
       parse-cache-control: 1.0.1
 
-  http-errors@1.8.1:
-    dependencies:
-      depd: 1.1.2
-      inherits: 2.0.4
-      setprototypeof: 1.2.0
-      statuses: 1.5.0
-      toidentifier: 1.0.1
-
   http-errors@2.0.0:
     dependencies:
       depd: 2.0.0
@@ -28292,8 +28195,6 @@ snapshots:
       nopt: 7.2.1
 
   js-cookie@3.0.5: {}
-
-  js-sha256@0.9.0: {}
 
   js-sha3@0.8.0: {}
 
@@ -28968,8 +28869,6 @@ snapshots:
 
   multiformats@9.9.0: {}
 
-  mustache@4.2.0: {}
-
   mylas@2.1.13: {}
 
   nan@2.19.0: {}
@@ -28989,22 +28888,6 @@ snapshots:
       readable-stream: 3.6.2
       split2: 3.2.2
       through2: 4.0.2
-
-  near-api-js@0.42.0:
-    dependencies:
-      bn.js: 5.2.0
-      borsh: 0.4.0
-      bs58: 4.0.1
-      depd: 2.0.0
-      error-polyfill: 0.1.3
-      http-errors: 1.8.1
-      js-sha256: 0.9.0
-      mustache: 4.2.0
-      node-fetch: 2.7.0
-      text-encoding-utf-8: 1.0.2
-      tweetnacl: 1.0.3
-    transitivePeerDependencies:
-      - encoding
 
   negotiator@0.6.3: {}
 
@@ -29219,10 +29102,6 @@ snapshots:
       yargs: 15.4.1
     transitivePeerDependencies:
       - supports-color
-
-  o3@1.0.3:
-    dependencies:
-      capability: 0.2.5
 
   oauth-sign@0.9.0: {}
 
@@ -31081,8 +30960,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  statuses@1.5.0: {}
-
   statuses@2.0.1: {}
 
   std-env@3.7.0: {}
@@ -31800,8 +31677,6 @@ snapshots:
   typescript@5.4.5: {}
 
   typical@2.6.1: {}
-
-  u3@0.1.1: {}
 
   ua-parser-js@1.0.37: {}
 
