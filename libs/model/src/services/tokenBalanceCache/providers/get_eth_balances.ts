@@ -24,7 +24,7 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
     return {};
   }
 
-  const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
+  const rpcEndpoint = options.chainNode.private_url!;
   if (options.addresses.length === 1) {
     return await getEthBalance(
       options.chainNode.eth_chain_id!,

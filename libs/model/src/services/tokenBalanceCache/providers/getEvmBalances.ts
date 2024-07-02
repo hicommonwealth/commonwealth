@@ -42,6 +42,11 @@ export async function getEvmBalances(
     return {};
   }
 
+  if (!chainNode.private_url) {
+    log.error(`ChainNode ${chainNode.id} does not have a private url`);
+    return {};
+  }
+
   let freshBalances: Balances = {};
   switch (options.balanceSourceType) {
     case BalanceSourceType.ETHNative:
