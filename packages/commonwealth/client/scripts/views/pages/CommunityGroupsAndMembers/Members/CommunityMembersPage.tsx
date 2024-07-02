@@ -283,7 +283,7 @@ const CommunityMembersPage = () => {
   useEffect(() => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    refetch();
+    refetch().catch((e) => console.log(e));
   }, [refetch]);
 
   useEffect(() => {
