@@ -16,6 +16,12 @@ desired Heroku app.
 ## Testing from K6 Cloud
 WIP
 
+# Adding Remote Modules
+K6 supports loading some compatible remote modules. A list of compatible modules can be found [here][3]. These modules
+generally will not have types, but it may be worth looking for some in the @types repository. If none can be found, it
+is recommended to declare the module types in `test/types.d.ts`. If declaring custom types is too complex you can add
+`//@ts-ignore` above the import to ignore the type error. More information can be found in the [K6 documentation][4].
+
 # Package Scripts
 
 ### start
@@ -52,6 +58,12 @@ Definition: `docker compose -f monitoring.yaml down`
 
 Description: Stops and removes all Docker containers created in the [start](#start) script.
 
+### check-types
+
+Definition: `tsc --noEmit`
+
+Description: Checks the types of `/test` and `/src`.
+
 # Notes
 
 - There exists an [experimental mode][1] that would allow us to execute Typescript files without using the `xk6-ts`
@@ -64,4 +76,6 @@ only available in [v0.5.2][2] and upwards.
 
 [1]: https://grafana.com/docs/k6/latest/using-k6/javascript-typescript-compatibility-mode/#experimental-enhanced-mode
 [2]: https://github.com/grafana/k6/releases/tag/v0.52.0
+[3]: https://jslib.k6.io/
+[4]: https://k6.io/docs/using-k6/modules/#remote-http-s-modules
 

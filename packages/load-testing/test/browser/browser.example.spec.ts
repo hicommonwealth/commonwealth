@@ -1,9 +1,6 @@
 import { check } from 'k6';
 import { browser } from 'k6/experimental/browser';
 import { SERVER_URL } from '../../src/config';
-import { temp } from './utils';
-
-temp();
 
 export const options = {
   scenarios: {

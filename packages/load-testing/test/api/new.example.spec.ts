@@ -1,12 +1,8 @@
+import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check } from 'k6';
 import http from 'k6/http';
-// @ts-ignore
-import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
+import { TRPC_API_URL } from '../../src/config';
 
-// Single API URL for local debugging
-// const BASE_URL = 'http://localhost:3000/api/v1/rest/';
-const BASE_URL =
-  `http://${__ENV.BASE_URL}/` || 'http://localhost:3000/api/v1/rest/';
 const JWT_token = '';
 
 export const options = {
@@ -15,7 +11,7 @@ export const options = {
       executor: 'constant-vus',
       exec: 'GetMembers',
       vus: 3,
-      duration: '3s',
+      duration: '1s',
     },
     GetBulkThreads: {
       executor: 'constant-vus',
@@ -39,7 +35,7 @@ export async function GetMembers() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}rest/query/GetMembers`);
+  const url = new URL(`${TRPC_API_URL}/query/GetMembers`);
   url.searchParams.append('limit', '10');
   url.searchParams.append('community_id', 'layerzero');
   url.searchParams.append('cursor', '1');
@@ -58,7 +54,7 @@ export async function GetBulkThreads() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}rest/query/GetMembers`);
+  const url = new URL(`${TRPC_API_URL}/query/GetMembers`);
   url.searchParams.append('limit', '10');
   url.searchParams.append('community_id', 'layerzero');
   url.searchParams.append('cursor', '1');
@@ -73,7 +69,7 @@ export async function GetGlobalActivity() {
       Authorization: `Bearer ${JWT_token}`,
     },
   };
-  const url = new URL(`${BASE_URL}rest/query/GetMembers`);
+  const url = new URL(`${TRPC_API_URL}/query/GetMembers`);
   url.searchParams.append('limit', '10');
   url.searchParams.append('community_id', 'layerzero');
   url.searchParams.append('cursor', '1');
