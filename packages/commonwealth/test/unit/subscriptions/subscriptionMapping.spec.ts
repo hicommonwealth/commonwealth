@@ -3,7 +3,6 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
   SnapshotEventType,
-  SupportedNetwork,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -157,24 +156,6 @@ describe('Subscription Mapping Tests', () => {
       expect(uniqueSubData).to.deep.equal({
         category_id: NotificationCategories.NewCollaboration,
         subscriber_id: userId,
-      });
-    });
-
-    test('should map a chain event notification to subscriptions', () => {
-      const notification: NotificationDataAndCategory = {
-        categoryId: NotificationCategories.ChainEvent,
-        data: {
-          id: 1,
-          block_number: 1,
-          event_data: {},
-          network: SupportedNetwork.Aave,
-          community_id: chain,
-        },
-      };
-      const uniqueSubData = mapNotificationsDataToSubscriptions(notification);
-      expect(uniqueSubData).to.deep.equal({
-        category_id: NotificationCategories.ChainEvent,
-        community_id: chain,
       });
     });
 

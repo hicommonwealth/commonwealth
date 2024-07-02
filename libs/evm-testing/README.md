@@ -45,14 +45,4 @@ Token\
 `POST /erc20/balance`\
 `POST /erc20/transfer`\
 `POST /erc20/approve`\
-`POST /erc20/dex/getTokens`\
-Governance Routes\
-`GET /gov/compound/createProposal`\
-`POST /gov/compound/cancelProposal`\
-`POST /gov/compound/castVote`\
-`POST /gov/compound/castVote`\
-`POST /gov/compound/proposalDetails`\
-`POST /gov/compound/getVotes`\
-`POST /gov/compound/queue`\
-`POST /gov/compound/execute`\
-`GET /gov/compound/runFullCylce`\
+`POST /erc20/dex/getTokens`

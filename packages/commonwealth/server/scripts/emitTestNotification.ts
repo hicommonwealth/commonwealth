@@ -29,21 +29,11 @@ function getMockNotification(
   chain?: string,
   snapshot?: string,
 ) {
-  const constantBlockNumber = 987654321;
   const constantPropId = 999999999;
 
   const randomInt = () => Math.floor(Math.random() * (2 ** 31 - 1)) + 1;
 
   const ceNotifications = {
-    [SupportedNotificationChains.dydx]: {
-      block_number: randomData ? randomInt() : constantBlockNumber,
-      event_data: {
-        id: randomData ? randomInt() : constantPropId,
-        kind: 'proposal-created',
-      },
-      network: 'aave',
-      chain: 'dydx',
-    },
     [SupportedNotificationChains.kyve]: {
       chain: 'kyve',
       network: 'cosmos',

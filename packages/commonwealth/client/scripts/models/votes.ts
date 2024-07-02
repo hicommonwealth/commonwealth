@@ -10,24 +10,3 @@ export class DepositVote<C extends Coin> implements IVote<C> {
     this.deposit = deposit;
   }
 }
-
-export class BinaryVote<C extends Coin> implements IVote<C> {
-  public readonly account: IBalanceAccount<C>;
-  public readonly choice: boolean;
-  public readonly amount: number;
-  public readonly weight: number;
-
-  constructor(
-    account: IBalanceAccount<C>,
-    choice: boolean,
-    amount?: number,
-    weight?: number,
-  ) {
-    this.account = account;
-    this.choice = choice;
-    // @ts-expect-error StrictNullChecks
-    this.amount = amount;
-    // @ts-expect-error StrictNullChecks
-    this.weight = weight;
-  }
-}

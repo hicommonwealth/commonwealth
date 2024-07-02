@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
 import 'components/ProposalCard/ProposalCard.scss';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 
@@ -38,15 +37,6 @@ export const ProposalCard = ({
     if (metadata?.title) setTitle(metadata?.title);
   }, [metadata]);
 
-  useEffect(() => {
-    if (proposal instanceof AaveProposal) {
-      proposal.ipfsDataReady.once('ready', () => {
-        // triggers render of shortDescription too
-        setTitle(proposal?.ipfsData.title);
-      });
-    }
-  }, [proposal]);
-
   return (
     <CWCard
       elevation="elevation-2"
@@ -75,12 +65,6 @@ export const ProposalCard = ({
         <CWText title={title} fontWeight="semiBold" noWrap>
           {title}
         </CWText>
-        {proposal instanceof AaveProposal &&
-          proposal.ipfsData?.shortDescription && (
-            <CWText type="caption">
-              {proposal.ipfsData?.shortDescription}
-            </CWText>
-          )}
       </div>
       {injectedContent ? (
         <>

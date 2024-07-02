@@ -4,7 +4,6 @@ import {
   NotificationCategories,
   NotificationDataAndCategory,
   ProposalType,
-  SupportedNetwork,
   WebhookCategory,
 } from '@hicommonwealth/shared';
 import yargs from 'yargs';
@@ -131,115 +130,96 @@ async function main() {
   }
 
   let notification: NotificationDataAndCategory;
-  if (argv.notificationCategory === NotificationCategories.ChainEvent) {
+  const thread = await models.Thread.findOne({
+    where: {
+      // @ts-expect-error StrictNullChecks
+      community_id: community.id,
+    },
+    include: {
+      model: models.Address,
+      required: true,
+      as: 'Address',
+    },
+  });
+
+  const baseNotifData = {
+    // @ts-expect-error StrictNullChecks
+    created_at: thread.created_at,
+    // @ts-expect-error StrictNullChecks
+    thread_id: thread.id,
+    // @ts-expect-error StrictNullChecks
+    root_title: thread.title,
+    root_type: ProposalType.Thread,
+    // @ts-expect-error StrictNullChecks
+    community_id: thread.community_id,
+    // @ts-expect-error StrictNullChecks
+    author_address: thread.Address.address,
+    // @ts-expect-error StrictNullChecks
+    author_community_id: thread.Address.community_id,
+  };
+
+  if (argv.notificationCategory === NotificationCategories.NewThread) {
     notification = {
-      categoryId: NotificationCategories.ChainEvent,
+      categoryId: NotificationCategories.NewThread,
       data: {
-        event_data: {
-          id: 1,
-          kind: 'proposal-created',
-        },
-        network: SupportedNetwork.Aave,
+        ...baseNotifData,
         // @ts-expect-error StrictNullChecks
-        community_id: community.id,
+        comment_text: thread.body,
       },
     };
-  } else {
-    const thread = await models.Thread.findOne({
+  } else if (argv.notificationCategory === NotificationCategories.NewComment) {
+    const [comment] = await models.Comment.findOrCreate({
+      // @ts-expect-error StrictNullChecks
+      where: {
+        // @ts-expect-error StrictNullChecks
+        community_id: community.id,
+        // @ts-expect-error StrictNullChecks
+        thread_id: thread.id,
+      },
+      // @ts-expect-error StrictNullChecks
+      defaults: {
+        // @ts-expect-error StrictNullChecks
+        address_id: thread.address_id,
+        text: 'This is a comment',
+      },
+    });
+
+    notification = {
+      categoryId: NotificationCategories.NewComment,
+      data: {
+        ...baseNotifData,
+        comment_text: comment.text,
+        // @ts-expect-error StrictNullChecks
+        comment_id: comment.id,
+      },
+    };
+  } else if (argv.notificationCategory === NotificationCategories.NewReaction) {
+    const anotherAddress = await models.Address.findOne({
       where: {
         // @ts-expect-error StrictNullChecks
         community_id: community.id,
       },
-      include: {
-        model: models.Address,
-        required: true,
-        as: 'Address',
+    });
+    await models.Reaction.findOrCreate({
+      // @ts-expect-error StrictNullChecks
+      where: {
+        // @ts-expect-error StrictNullChecks
+        community_id: community.id,
+        // @ts-expect-error StrictNullChecks
+        thread_id: thread.id,
+        // @ts-expect-error StrictNullChecks
+        address_id: anotherAddress.id,
+        reaction: 'like',
       },
     });
 
-    const baseNotifData = {
+    notification = {
+      categoryId: NotificationCategories.NewReaction,
       // @ts-expect-error StrictNullChecks
-      created_at: thread.created_at,
-      // @ts-expect-error StrictNullChecks
-      thread_id: thread.id,
-      // @ts-expect-error StrictNullChecks
-      root_title: thread.title,
-      root_type: ProposalType.Thread,
-      // @ts-expect-error StrictNullChecks
-      community_id: thread.community_id,
-      // @ts-expect-error StrictNullChecks
-      author_address: thread.Address.address,
-      // @ts-expect-error StrictNullChecks
-      author_community_id: thread.Address.community_id,
+      data: {
+        ...baseNotifData,
+      },
     };
-
-    if (argv.notificationCategory === NotificationCategories.NewThread) {
-      notification = {
-        categoryId: NotificationCategories.NewThread,
-        data: {
-          ...baseNotifData,
-          // @ts-expect-error StrictNullChecks
-          comment_text: thread.body,
-        },
-      };
-    } else if (
-      argv.notificationCategory === NotificationCategories.NewComment
-    ) {
-      const [comment] = await models.Comment.findOrCreate({
-        // @ts-expect-error StrictNullChecks
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          // @ts-expect-error StrictNullChecks
-          thread_id: thread.id,
-        },
-        // @ts-expect-error StrictNullChecks
-        defaults: {
-          // @ts-expect-error StrictNullChecks
-          address_id: thread.address_id,
-          text: 'This is a comment',
-        },
-      });
-
-      notification = {
-        categoryId: NotificationCategories.NewComment,
-        data: {
-          ...baseNotifData,
-          comment_text: comment.text,
-          // @ts-expect-error StrictNullChecks
-          comment_id: comment.id,
-        },
-      };
-    } else if (
-      argv.notificationCategory === NotificationCategories.NewReaction
-    ) {
-      const anotherAddress = await models.Address.findOne({
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-        },
-      });
-      await models.Reaction.findOrCreate({
-        // @ts-expect-error StrictNullChecks
-        where: {
-          // @ts-expect-error StrictNullChecks
-          community_id: community.id,
-          // @ts-expect-error StrictNullChecks
-          thread_id: thread.id,
-          // @ts-expect-error StrictNullChecks
-          address_id: anotherAddress.id,
-          reaction: 'like',
-        },
-      });
-
-      notification = {
-        categoryId: NotificationCategories.NewReaction,
-        // @ts-expect-error StrictNullChecks
-        data: {
-          ...baseNotifData,
-        },
-      };
-    }
   }
 
   // @ts-expect-error StrictNullChecks

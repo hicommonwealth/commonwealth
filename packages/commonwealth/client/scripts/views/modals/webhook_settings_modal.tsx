@@ -1,6 +1,5 @@
 import {
   ChainBase,
-  ChainNetwork,
   NotificationCategories,
   WebhookCategory,
 } from '@hicommonwealth/shared';
@@ -34,13 +33,6 @@ export const WebhookSettingsModal = ({
 
   let supportsChainEvents = false;
   if (app.chain.base === ChainBase.CosmosSDK) {
-    supportsChainEvents = true;
-  } else if (
-    // TODO: @Timothee update once event labeling is implemented
-    app.chain.base === ChainBase.Ethereum &&
-    (app.chain.network === ChainNetwork.Compound ||
-      app.chain.network === ChainNetwork.Aave)
-  ) {
     supportsChainEvents = true;
   }
 

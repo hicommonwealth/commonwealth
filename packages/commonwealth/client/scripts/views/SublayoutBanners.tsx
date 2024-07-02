@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import React, { useState } from 'react';
 import app from 'state';
@@ -35,8 +35,7 @@ export const SublayoutBanners = ({
       )}
       {!!chain &&
         app.isLoggedIn() &&
-        ([ChainNetwork.Aave, ChainNetwork.Compound].includes(chain.network) ||
-          chain.base === ChainBase.CosmosSDK) &&
+        chain.base === ChainBase.CosmosSDK &&
         [ChainType.DAO, ChainType.Chain].includes(chain.type as ChainType)}
       {isNonEmptyString(terms) && <TermsBanner terms={terms} />}
     </>
