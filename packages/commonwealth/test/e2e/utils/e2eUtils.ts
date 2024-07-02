@@ -19,7 +19,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
   const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
   const e2eEntities = await tester.e2eTestEntities(testDb);
 
-  const createAddress = async function (chain, profileId, userId) {
+  const createAddress = async function (chain, userId) {
     const blockInfo =
       '{"number":17693949,"hash":' +
       '"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}';
@@ -36,7 +36,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       is_councillor,
       is_validator,
       ghost_address,
-      profile_id,
       wallet_id,
       block_info,
       is_user_default,
@@ -53,7 +52,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       false,
       false,
       false,
-      ${profileId},
       'metamask',
       '${blockInfo}',
       false,
@@ -147,12 +145,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         FROM "Addresses"
         WHERE address = '${testAddress}'
     );
-    DELETE FROM "Profiles"
-    WHERE user_id IN (
-      SELECT user_id
-      FROM "Addresses"
-      WHERE address = '${testAddress}'
-    );
     DELETE FROM "Addresses"
     WHERE address = '${testAddress}';
 `;
@@ -189,26 +181,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       ) RETURNING id`);
 
       // @ts-expect-error StrictNullChecks
-      const profileId = (
-        await testDb.sequelize.query(`
-    INSERT INTO "Profiles" (
-        user_id,
-        created_at,
-        updated_at,
-        profile_name,
-        socials
-      ) VALUES (
-        ${userId[0][0]!['id']},
-        '2023-07-14 13:03:56.203-07',
-        '2023-07-14 13:03:56.415-07',
-        'TestAddress',
-        '{}'
-      ) RETURNING id
-    `)
-      )[0][0]['id'];
-
-      // @ts-expect-error StrictNullChecks
-      await createAddress('ethereum', profileId, userId[0][0]['id']);
+      await createAddress('ethereum', userId[0][0]['id']);
     },
 
     // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
@@ -222,8 +195,8 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (addresses.length && addresses.some((u) => u['chain'] === chain))
         return;
 
-      const profile = e2eEntities.testProfiles[0];
-      await createAddress(chain, profile.id, profile.user_id);
+      const user = e2eEntities.testUsers[0];
+      await createAddress(chain, user.id);
     },
   };
 };

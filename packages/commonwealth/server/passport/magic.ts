@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { ServerError, logger } from '@hicommonwealth/core';
-import type {
-  DB,
-  ProfileAttributes,
-  ProfileInstance,
-} from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model';
 import {
   AddressAttributes,
   AddressInstance,
@@ -61,8 +57,6 @@ async function createMagicAddressInstances(
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
-  // @ts-expect-error StrictNullChecks
-  const profile_id = (user.Profiles[0] as ProfileAttributes).id;
 
   for (const { community_id, address } of generatedAddresses) {
     log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
@@ -74,7 +68,6 @@ async function createMagicAddressInstances(
       },
       defaults: {
         user_id,
-        profile_id,
         verification_token: decodedMagicToken.claim.tid, // to prevent re-use
         // @ts-expect-error StrictNullChecks
         verification_token_expires: null,
@@ -125,8 +118,7 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
-    // @ts-expect-error StrictNullChecks
-    const newUser = await models.User.createWithProfile(
+    const newUser = await models.User.create(
       {
         // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
         // so it is safe to set emails from magic as part of User data, even though they may be unverified.
@@ -137,22 +129,13 @@ async function createNewMagicUser({
         // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
         // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
         emailVerified: !!magicUserMetadata.email,
+        profile: {
+          name: profileMetadata?.username,
+          avatar_url: profileMetadata?.avatarUrl,
+        },
       },
       { transaction },
     );
-
-    // update profile with metadata if exists
-    // @ts-expect-error StrictNullChecks
-    const newProfile = newUser.Profiles[0] as ProfileInstance;
-    if (profileMetadata?.username) {
-      newProfile.profile_name = profileMetadata.username;
-    }
-    if (profileMetadata?.avatarUrl) {
-      newProfile.avatar_url = profileMetadata.avatarUrl;
-    }
-    if (profileMetadata?.username || profileMetadata?.avatarUrl) {
-      await newProfile.save({ transaction });
-    }
 
     const addressInstances: AddressAttributes[] =
       await createMagicAddressInstances(
@@ -253,13 +236,12 @@ async function loginExistingMagicUser({
       // - they only have profile_id set, no issuer or address_id
       // we will locate an existing SsoToken by profile_id, and migrate it to use addresses instead.
       // if none exists, we will create it
-      // @ts-expect-error StrictNullChecks
       malformedSsoToken = await models.SsoToken.scope(
         'withPrivateData',
       ).findOne({
         where: {
           // @ts-expect-error StrictNullChecks
-          profile_id: existingUserInstance.Profiles[0].id,
+          user_id: existingUserInstance.id,
         },
         transaction,
       });
@@ -272,8 +254,6 @@ async function loginExistingMagicUser({
             `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
           );
         }
-        // @ts-expect-error StrictNullChecks
-        malformedSsoToken.profile_id = null;
         (malformedSsoToken.issuer = decodedMagicToken.issuer),
           (malformedSsoToken.issued_at = decodedMagicToken.claim.iat);
         malformedSsoToken.updated_at = new Date();
@@ -386,8 +366,6 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
     {
       // @ts-expect-error StrictNullChecks
       user_id: loggedInUser.id,
-      // @ts-expect-error StrictNullChecks
-      profile_id: loggedInUser.Profiles[0].id,
       verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
@@ -508,11 +486,6 @@ async function magicLoginRoute(
       // @ts-expect-error StrictNullChecks
       loggedInUser = await models.User.findOne({
         where: { id },
-        include: [
-          {
-            model: models.Profile,
-          },
-        ],
       });
       log.trace(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
@@ -611,9 +584,6 @@ async function magicLoginRoute(
           },
           required: true,
         },
-        {
-          model: models.Profile,
-        },
       ],
     },
   );
@@ -631,9 +601,6 @@ async function magicLoginRoute(
     existingUserInstance = await models.User.scope('withPrivateData').findOne({
       where: { email: magicUserMetadata.email },
       include: [
-        {
-          model: models.Profile,
-        },
         {
           // guarantee that we only access ghost addresses as part of this query
           model: models.Address,

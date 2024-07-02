@@ -45,13 +45,8 @@ export async function __getActiveThreads(
       attributes: ['id', 'address', 'community_id'],
       include: [
         {
-          model: this.models.Profile,
-          attributes: [
-            ['id', 'profile_id'],
-            'profile_name',
-            ['avatar_url', 'profile_avatar_url'],
-            'user_id',
-          ],
+          model: this.models.User,
+          attributes: ['id', 'profile'],
         },
       ],
     },
@@ -81,13 +76,8 @@ export async function __getActiveThreads(
           attributes: ['address'],
           include: [
             {
-              model: this.models.Profile,
-              attributes: [
-                ['id', 'profile_id'],
-                'profile_name',
-                ['avatar_url', 'profile_avatar_url'],
-                'user_id',
-              ],
+              model: this.models.User,
+              attributes: ['id', 'profile_id'],
             },
           ],
         },

@@ -135,19 +135,15 @@ export async function createAddressHelper(
       ((!existingAddress.verified && isExpired) || isDisowned || isCurrUser)
         ? user.id
         : null;
+    if (updatedId) {
+      existingAddress.user_id = updatedId;
+    }
 
     // Address.updateWithToken
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(
       +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
-    if (updatedId) {
-      existingAddress.user_id = updatedId;
-      const profileId = await models.Profile.findOne({
-        where: { user_id: updatedId },
-      });
-      existingAddress.profile_id = profileId?.id;
-    }
     existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
@@ -192,7 +188,6 @@ export async function createAddressHelper(
       +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     const last_active = new Date();
-    let profile_id: number | undefined;
     let user_id = user ? user.id : null;
 
     // @ts-expect-error StrictNullChecks
@@ -200,25 +195,11 @@ export async function createAddressHelper(
       user_id = existingAddressWithHex.user_id;
     }
 
-    if (user_id) {
-      const profile = await models.Profile.findOne({
-        attributes: ['id'],
-        where: { user_id },
-      });
-      profile_id = profile?.id;
-    }
-
-    // @ts-expect-error StrictNullChecks
-    if (existingAddressWithHex && !profile_id) {
-      profile_id = existingAddressWithHex.profile_id;
-    }
-
     const newObj = await models.sequelize.transaction(async (transaction) => {
       return models.Address.create(
         {
           // @ts-expect-error StrictNullChecks
           user_id,
-          profile_id,
           // @ts-expect-error StrictNullChecks
           community_id: req.community_id,
           address: encodedAddress,

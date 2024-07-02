@@ -56,7 +56,7 @@ const createComment = async ({
   );
 
   response.data.result.Address.User = {
-    Profiles: [profile],
+    profile,
   };
 
   return new Comment(response.data.result);

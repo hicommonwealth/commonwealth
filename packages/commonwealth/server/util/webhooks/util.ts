@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import {
   CommunityInstance,
-  ProfileAttributes,
+  UserAttributes,
   WebhookInstance,
   models,
 } from '@hicommonwealth/model';
@@ -51,7 +51,7 @@ export async function getActorProfile(
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
-): Promise<ProfileAttributes | null> {
+): Promise<UserAttributes | null> {
   if (notif.categoryId === NotificationCategories.ChainEvent) {
     return null;
   }
@@ -61,7 +61,7 @@ export async function getActorProfile(
       address: notif.data.author_address,
       community_id: notif.data.community_id,
     },
-    include: [models.Profile],
+    include: [models.User],
   });
 
   if (!address) {
@@ -72,13 +72,13 @@ export async function getActorProfile(
     return null;
   }
 
-  if (!address.Profile) {
+  if (!address.User) {
     // TODO: rollbar?
     log.warn(`Could not find profile for address ${JSON.stringify(address)}`);
     return null;
   }
 
-  return address.Profile;
+  return address.User;
 }
 
 export async function getPreviewImageUrl(

@@ -61,13 +61,13 @@ export async function __searchProfiles(
     case 'created_at':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Profiles".created_at`,
+        orderBy: `"Users".created_at`,
       };
       break;
     case 'profile_name':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Profiles".profile_name`,
+        orderBy: `"Users".profile_name`,
       };
       break;
     default:
@@ -94,28 +94,26 @@ export async function __searchProfiles(
 
   const sqlWithoutPagination = `
     SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
+      "Users".id,
+      "Users"id as user_id,
+      "Users".profile->>'name' as profile_name,
+      "Users".profile->>'avatar_url' as avatar_url,
+      "Users".created_at,
       array_agg("Addresses".id) as address_ids,
       array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
     FROM
-      "Profiles"
-    JOIN
-      "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      "Users" JOIN "Addresses" ON "Users".id = "Addresses".user_id
     WHERE
       ${communityWhere}
       (
-        "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
+        "Users".profile->>'name' ILIKE '%' || $searchTerm || '%'
         OR
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
     GROUP BY
-      "Profiles".id
+      "Users".id
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([

@@ -58,13 +58,12 @@ export default class DatabaseValidationService {
       return next(new AppError('Approved Bot Only Endpoint'));
     }
     //2. Get Bot User and inject
-    const profile = await this.models.Profile.findOne({
+    // @ts-expect-error StrictNullChecks
+    req.user = await this.models.User.findOne({
       where: {
-        profile_name: 'Discord Bot',
+        email: 'discord@common.xyz',
       },
     });
-    // @ts-expect-error StrictNullChecks
-    req.user = await profile.getUser();
     next();
   };
 

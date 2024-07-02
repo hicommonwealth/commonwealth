@@ -33,13 +33,12 @@ const authCallback = async (
   }
 
   // TODO: selectable profile -- currently user only has one
-  const profile = await models.Profile.findOne({
+  const user = await models.User.findOne({
     where: {
-      // id: req.query.profile_id,
-      user_id: req.user.id,
+      id: req.user.id,
     },
   });
-  if (!profile) {
+  if (!user) {
     throw new ServerError('User profile should exist but missing');
   }
 
@@ -66,7 +65,6 @@ const authCallback = async (
       state_id: stateToken,
     },
     defaults: {
-      profile_id: profile.id,
       issued_at: Math.floor(iat / 1000), // convert to seconds
       created_at: new Date(),
       updated_at: new Date(),
@@ -81,14 +79,13 @@ const authCallback = async (
   // TODO: filter addresses by base/community/etc, if provided by CMN Bot
   const allAddresses = await models.Address.findAll({
     where: {
-      profile_id: profile.id,
+      user_id: user.id,
     },
   });
 
   const responseObject = {
     // TODO: filter duplicates
     addresses: allAddresses.map((a) => a.address),
-    profileId: profile.id,
     stateToken,
   };
 

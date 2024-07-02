@@ -91,7 +91,7 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.community_id AS topic_community_id,
         topics.telegram AS topic_telegram,
-        collaborators, pr.id as profile_id, pr.profile_name, pr.avatar_url, addr.last_active as address_last_active
+        collaborators, us.profile->>'name' as profile_name, us.profile->>'avatar-url' as avatar_url, addr.last_active as address_last_active
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -125,20 +125,16 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
             STRING_AGG(r.id::text, ',') AS reaction_ids,
             STRING_AGG(r.created_at::text, ',') AS reaction_timestamps,
             STRING_AGG(COALESCE(r.calculated_voting_weight::text, '0'), ',') AS reaction_weights,
-            STRING_AGG(COALESCE(pr.profile_name::text, ''), ',') AS reacted_profile_name,
-            STRING_AGG(COALESCE(pr.avatar_url::text, ''), ',') AS reacted_profile_avatar_url,
+            STRING_AGG(COALESCE(us.profile->>'name'::text, ''), ',') AS reacted_profile_name,
+            STRING_AGG(COALESCE(us.profile->>'avatar_url'::text, ''), ',') AS reacted_profile_avatar_url,
             STRING_AGG(COALESCE(ad.last_active::text, ''), ',') AS reacted_address_last_active
             FROM "Reactions" as r
             JOIN "Threads" t2
             ON r.thread_id = t2.id and t2.community_id = $community_id ${
               topicId ? ` AND t2.topic_id = $topic_id ` : ''
             }
-            LEFT JOIN "Addresses" ad
-            ON r.address_id = ad.id
-            LEFT JOIN "Users" us
-            ON us.id = ad.user_id
-            LEFT JOIN "Profiles" pr
-            ON pr.user_id = us.id
+            LEFT JOIN "Addresses" ad ON r.address_id = ad.id
+            LEFT JOIN "Users" us ON us.id = ad.user_id
             where r.community_id = $community_id
             GROUP BY thread_id
         ) reactions
@@ -157,12 +153,8 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
           ORDER BY t.pinned DESC, t.max_notif_id DESC
         ) threads
       ON threads.address_id = addr.id
-      LEFT JOIN "Users" us
-      ON us.id = addr.user_id
-      LEFT JOIN "Profiles" pr
-      ON pr.user_id = us.id
-      LEFT JOIN "Topics" topics
-      ON threads.topic_id = topics.id
+      LEFT JOIN "Users" us ON us.id = addr.user_id
+      LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
       ${fromDate ? ' WHERE threads.thread_created > $from_date ' : ''}
       ${
         toDate
@@ -241,7 +233,6 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
           marked_as_spam_at: t.marked_as_spam_at,
           archived_at: t.archived_at,
           latest_activity: t.latest_activity,
-          profile_id: t.profile_id,
           avatar_url: t.avatar_url,
           address_last_active: t.address_last_active,
           profile_name: t.profile_name,

@@ -47,14 +47,14 @@ const exportMembersList = async (
       `
       SELECT 
           "a"."address", 
-          "p"."profile_name", 
+          "u".profile->>'name' as "profile_name", 
           COUNT(DISTINCT "t"."id") AS thread_count, 
           COUNT(DISTINCT "c"."id") AS comment_count, 
           COUNT(DISTINCT "r"."id") AS reaction_count
       FROM 
           "Addresses" "a"
       LEFT JOIN 
-          "Profiles" "p" ON "a"."profile_id" = "p"."id"
+          "Users" "u" ON "a"."user_id" = "u"."id"
       LEFT JOIN 
           "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :communityId
       LEFT JOIN 
@@ -64,7 +64,7 @@ const exportMembersList = async (
       WHERE 
           "a"."community_id" = :communityId
       GROUP BY 
-          "a"."address", "p"."profile_name"
+          "a"."address", "u".profile->>'name'
     `,
       {
         replacements: { communityId },

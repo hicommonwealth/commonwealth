@@ -6,7 +6,6 @@ import Account from './Account';
 class AddressInfo extends Account {
   public readonly keytype: string;
   public readonly id: number;
-  public readonly profileId: number;
 
   constructor({
     id,
@@ -16,7 +15,6 @@ class AddressInfo extends Account {
     walletId,
     walletSsoSource,
     ghostAddress,
-    profileId,
     lastActive,
   }: {
     id: number | null | undefined;
@@ -26,7 +24,6 @@ class AddressInfo extends Account {
     walletId?: WalletId;
     walletSsoSource?: WalletSsoSource;
     ghostAddress?: boolean;
-    profileId?: number;
     lastActive?: string | moment.Moment;
   }) {
     const chain = app.config.chains.getById(communityId);
@@ -46,8 +43,6 @@ class AddressInfo extends Account {
     this.id = id;
     // @ts-expect-error StrictNullChecks
     this.keytype = keytype;
-    // @ts-expect-error StrictNullChecks
-    this.profileId = profileId;
   }
 }
 

@@ -88,7 +88,6 @@ const useFetchProfileByIdQuery = ({
               new AddressInfo({
                 id: a?.id,
                 walletId: a?.wallet_id,
-                profileId: a?.profile_id,
                 communityId: a?.community_id,
                 keytype: a?.keytype,
                 address: a?.address,

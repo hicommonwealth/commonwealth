@@ -82,7 +82,6 @@ export const GetBulkThreads = {
             chainId: z.string(),
           })
           .optional(),
-        profile_id: PG_INT,
         avatar_url: z.string().nullable(),
         address_last_active: z.date().nullable(),
         profile_name: z.string().nullable(),

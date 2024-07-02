@@ -269,8 +269,6 @@ export async function __updateThread(
       // @ts-expect-error StrictNullChecks
       authorUserId: user.id,
       authorAddress: address.address,
-      // @ts-expect-error StrictNullChecks
-      authorProfileId: address.profile_id,
       mentions: mentionedAddresses,
       thread,
     });
@@ -304,15 +302,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -324,15 +314,7 @@ export async function __updateThread(
             model: this.models.User,
             as: 'User',
             required: true,
-            attributes: ['id'],
-            include: [
-              {
-                model: this.models.Profile,
-                as: 'Profiles',
-                required: true,
-                attributes: ['id', 'avatar_url', 'profile_name'],
-              },
-            ],
+            attributes: ['id', 'profile'],
           },
         ],
       },
@@ -350,15 +332,7 @@ export async function __updateThread(
                 model: this.models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id'],
-                include: [
-                  {
-                    model: this.models.Profile,
-                    as: 'Profiles',
-                    required: true,
-                    attributes: ['id', 'avatar_url', 'profile_name'],
-                  },
-                ],
+                attributes: ['id', 'profile'],
               },
             ],
           },
@@ -385,13 +359,8 @@ export async function __updateThread(
             attributes: ['address'],
             include: [
               {
-                model: this.models.Profile,
-                attributes: [
-                  ['id', 'profile_id'],
-                  'profile_name',
-                  ['avatar_url', 'profile_avatar_url'],
-                  'user_id',
-                ],
+                model: this.models.User,
+                attributes: ['id', 'profile'],
               },
             ],
           },
@@ -441,7 +410,7 @@ export async function __updateThread(
   ).map((c) => {
     const temp = {
       ...c,
-      ...(c?.Address?.Profile || {}),
+      profile_name: c?.Address?.User?.profile.name,
       address: c?.Address?.address || '',
     };
 

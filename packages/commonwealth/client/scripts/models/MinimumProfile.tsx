@@ -1,7 +1,6 @@
 import jdenticon from 'jdenticon';
 
 export type UserProfile = {
-  id: number;
   name: string;
   address: string;
   lastActive: string;
@@ -9,14 +8,13 @@ export type UserProfile = {
 };
 
 export function addressToUserProfile(address): UserProfile {
-  const profile = address?.User?.Profiles[0];
+  const profile = address?.User?.profile;
   if (!profile) {
     // @ts-expect-error <StrictNullChecks/>
     return undefined;
   }
 
   return {
-    id: profile.id,
     avatarUrl: profile?.avatar_url,
     name: profile?.profile_name || profile?.name,
     address: address?.address,
@@ -28,7 +26,6 @@ class MinimumProfile {
   private _name: string;
   private _address: string;
   private _avatarUrl: string;
-  private _id: number;
   private _chain: string;
   private _lastActive: Date;
   private _initialized: boolean;
@@ -44,10 +41,6 @@ class MinimumProfile {
 
   get avatarUrl() {
     return this._avatarUrl;
-  }
-
-  get id() {
-    return this._id;
   }
 
   get lastActive() {
@@ -67,11 +60,10 @@ class MinimumProfile {
     this._chain = chain;
   }
 
-  public initialize(name, address, avatarUrl, id, chain, lastActive) {
+  public initialize(name, address, avatarUrl, chain, lastActive) {
     this._name = name;
     this._address = address;
     this._avatarUrl = avatarUrl;
-    this._id = id;
     this._chain = chain;
     this._lastActive = lastActive;
     this._initialized = true;

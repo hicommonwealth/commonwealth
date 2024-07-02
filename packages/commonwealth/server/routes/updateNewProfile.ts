@@ -1,8 +1,9 @@
 import type { DB } from '@hicommonwealth/model';
-import { ProfileAttributes } from '@hicommonwealth/model';
+import { Profile } from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { sanitizeQuillText } from 'server/util/sanitizeQuillText';
 import { updateTags } from 'server/util/updateTags';
+import { z } from 'zod';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
 
@@ -28,7 +29,7 @@ type UpdateNewProfileReq = {
 };
 type UpdateNewProfileResp = {
   status: string;
-  profile: ProfileAttributes;
+  profile: z.infer<typeof Profile>;
 };
 
 const updateNewProfile = async (
@@ -37,14 +38,14 @@ const updateNewProfile = async (
   res: TypedResponse<UpdateNewProfileResp>,
   next: NextFunction,
 ) => {
-  const profile = await models.Profile.findOne({
+  const user = await models.User.findOne({
     where: {
       // @ts-expect-error StrictNullChecks
-      user_id: req.user.id,
+      id: req.user.id,
     },
   });
 
-  if (!profile) return next(new Error(Errors.NoProfileFound));
+  if (!user) return next(new Error(Errors.NoProfileFound));
 
   const {
     email,
@@ -66,16 +67,20 @@ const updateNewProfile = async (
     return next(new Error(Errors.NotAuthorized));
   }
 
-  const [updateStatus, rows] = await models.Profile.update(
+  const [updateStatus, rows] = await models.User.update(
     {
-      ...((email || email === '') && { email }),
-      ...(slug && { slug }),
-      ...(name && { profile_name: name }),
-      ...((bio || bio === '') && { bio }),
-      ...(website && { website }),
-      ...(avatarUrl && { avatar_url: avatarUrl }),
-      ...(socials && { socials: JSON.parse(socials) }),
-      ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
+      profile: {
+        ...((email || email === '') && { email }),
+        ...(slug && { slug }),
+        ...(name && { name }),
+        ...((bio || bio === '') && { bio }),
+        ...(website && { website }),
+        ...(avatarUrl && { avatar_url: avatarUrl }),
+        ...(socials && { socials: JSON.parse(socials) }),
+        ...(backgroundImage && {
+          background_image: JSON.parse(backgroundImage),
+        }),
+      },
       ...(typeof promotionalEmailsEnabled === 'boolean' && {
         promotional_emails_enabled: promotionalEmailsEnabled,
       }),
@@ -83,7 +88,7 @@ const updateNewProfile = async (
     {
       where: {
         // @ts-expect-error StrictNullChecks
-        user_id: req.user.id,
+        id: req.user.id,
       },
       returning: true,
     },
@@ -95,7 +100,7 @@ const updateNewProfile = async (
   if (process.env.FLAG_USER_ONBOARDING_ENABLED === 'true') {
     const DEFAULT_NAME = 'Anonymous';
     const isProfileNameUnset =
-      !profile.profile_name || profile.profile_name === DEFAULT_NAME;
+      !user.profile.name || user.profile.name === DEFAULT_NAME;
 
     if (
       name &&

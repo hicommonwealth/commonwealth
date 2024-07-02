@@ -1,14 +1,12 @@
-import { AppError } from '@hicommonwealth/core';
 import type {
   AddressAttributes,
   CommentAttributes,
   DB,
-  ProfileInstance,
   ProfileTagsAttributes,
   TagsAttributes,
   ThreadAttributes,
 } from '@hicommonwealth/model';
-import { Tag } from '@hicommonwealth/schemas';
+import { Profile, Tag } from '@hicommonwealth/schemas';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import z from 'zod';
@@ -24,7 +22,7 @@ type GetNewProfileReq = {
   profileId?: string;
 };
 type GetNewProfileResp = {
-  profile: ProfileInstance;
+  profile: z.infer<typeof Profile>;
   totalUpvotes: number;
   addresses: AddressAttributes[];
   threads: ThreadAttributes[];
@@ -42,33 +40,14 @@ const getNewProfile = async (
   res: TypedResponse<GetNewProfileResp>,
   next: NextFunction,
 ) => {
-  const { profileId } = req.query;
+  const user = await models.User.findOne({
+    where: {
+      // @ts-expect-error StrictNullChecks
+      user_id: req.user.id,
+    },
+  });
 
-  let profile: ProfileInstance;
-
-  if (profileId) {
-    const parsedInt = parseInt(profileId);
-    if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
-      throw new AppError('Invalid profile id');
-    }
-
-    // @ts-expect-error StrictNullChecks
-    profile = await models.Profile.findOne({
-      where: {
-        id: profileId,
-      },
-    });
-  } else {
-    // @ts-expect-error StrictNullChecks
-    profile = await models.Profile.findOne({
-      where: {
-        // @ts-expect-error StrictNullChecks
-        user_id: req.user.id,
-      },
-    });
-  }
-
-  if (!profile) return next(new Error(Errors.NoProfileFound));
+  if (!user) return next(new Error(Errors.NoProfileFound));
 
   const inActiveCommunities = (
     await models.Community.findAll({
@@ -79,7 +58,7 @@ const getNewProfile = async (
     })
   ).map((c) => c.id);
 
-  const addresses = await profile.getAddresses({
+  const addresses = await user.getAddresses({
     where: {
       community_id: {
         [Op.notIn]: inActiveCommunities,
@@ -141,7 +120,7 @@ const getNewProfile = async (
 
   const profileTags = await models.ProfileTags.findAll({
     where: {
-      profile_id: profileId || profile.id,
+      user_id: user.id,
     },
     include: [
       {
@@ -151,13 +130,13 @@ const getNewProfile = async (
   });
 
   return success(res, {
-    profile,
+    profile: user.profile,
     totalUpvotes,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
-    isOwner: req.user?.id === profile.user_id,
+    isOwner: true,
     tags: profileTags
       .map((t) => t.toJSON())
       .map((t) => (t as ProfileWithTags).Tag),

@@ -41,7 +41,6 @@ type ActivityResponse = {
     stage: ThreadStage;
     marked_as_spam_at?: string;
     discord_meta?: string;
-    profile_id: number;
     profile_name: string;
     profile_avatar_url?: string;
     user_id: number;
@@ -205,7 +204,6 @@ export const Feed = ({
             (x: ActivityResponse) =>
               new Thread({
                 id: x.thread.id,
-                profile_id: x.thread.profile_id,
                 // @ts-expect-error <StrictNullChecks/>
                 avatar_url: x.thread.profile_avatar_url,
                 profile_name: x.thread.profile_name,

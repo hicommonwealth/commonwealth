@@ -86,29 +86,27 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
 
       const sqlWithoutPagination = `
     SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
-      array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as community_ids,
-      array_agg("Addresses".address) as addresses,
-      MAX("Addresses".last_active) as last_active
+      U.id,
+      A.user_id,
+      U.profile->>'name' as profile_name,
+      U.profile->>'avatar_url' as avatar_url,
+      U.created_at,
+      array_agg(A.id) as address_ids,
+      array_agg(A.community_id) as community_ids,
+      array_agg(A.address) as addresses,
+      MAX(A.last_active) as last_active
     FROM
-      "Profiles"
-    JOIN
-      "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      "Users" U JOIN "Addresses" A ON U.id = A.user_id
     WHERE
       ${communityWhere}
       (
-        "Profiles".profile_name ILIKE '%' || :searchTerm || '%'
+        U.profile->>'name' ILIKE '%' || :searchTerm || '%'
         OR
-        "Addresses".address ILIKE '%' || :searchTerm || '%'
+        A.address ILIKE '%' || :searchTerm || '%'
       )
       ${membershipsWhere}
     GROUP BY
-      "Profiles".id
+      U.id
   `;
 
       const allCommunityProfiles = await models.sequelize.query<{

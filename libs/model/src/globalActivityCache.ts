@@ -31,17 +31,16 @@ export async function getActivityFeed(models: DB, id = 0) {
                                              'has_poll', T.has_poll,
                                              'marked_as_spam_at', T.marked_as_spam_at::text,
                                              'discord_meta', T.discord_meta,
-                                             'profile_id', P.id,
-                                             'profile_name', P.profile_name,
-                                             'profile_avatar_url', P.avatar_url,
-                                             'user_id', P.user_id,
+                                             'profile_name', U.profile->>'name',
+                                             'profile_avatar_url', U.profile->>'avatar_url',
+                                             'user_id', U.id,
                                              'user_address', A.address,
                                              'topic', Tp,
                                              'community_id', T.community_id
                                      )            as thread
                               FROM "Threads" T
                                        JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
-                                       JOIN "Profiles" P ON P.user_id = A.user_id
+                                       JOIN "Users" U ON U.id = A.user_id
                                        JOIN "Topics" Tp ON Tp.id = T.topic_id
                                   ${
                                     id > 0
@@ -64,10 +63,9 @@ export async function getActivityFeed(models: DB, id = 0) {
                               'deleted_at', C.deleted_at::text,
                               'marked_as_spam_at', C.marked_as_spam_at::text,
                               'discord_meta', C.discord_meta,
-                              'profile_id', P.id,
-                              'profile_name', P.profile_name,
-                              'profile_avatar_url', P.avatar_url,
-                              'user_id', P.user_id
+                              'profile_name', U.profile->>'name',
+                              'profile_avatar_url', U.profile->>'avatar_url',
+                              'user_id', U.id
                                                 ))) as "recentComments"
                FROM (Select tempC.*
                      FROM "Comments" tempC
@@ -77,7 +75,7 @@ export async function getActivityFeed(models: DB, id = 0) {
                      LIMIT 3 -- Optionally a prop can be added for this
                     ) C
                         JOIN "Addresses" A ON A.id = C.address_id
-                        JOIN "Profiles" P ON P.user_id = A.user_id
+                        JOIN "Users" U ON U.id = A.user_id
                GROUP BY C.thread_id)
       SELECT RTS."thread"        as thread,
              RC."recentComments" as recentComments

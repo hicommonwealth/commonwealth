@@ -39,7 +39,7 @@ const getAddressProfiles = async (
     },
     include: [
       {
-        model: models.Profile,
+        model: models.User,
         required: true,
       },
     ],
@@ -47,13 +47,12 @@ const getAddressProfiles = async (
 
   const profiles = addressEntities.map((address) => {
     return {
-      profileId: address.profile_id,
       // @ts-expect-error StrictNullChecks
-      name: address.Profile.profile_name,
+      name: address.User.profile.name,
       address: address.address,
       lastActive: address.last_active,
       // @ts-expect-error StrictNullChecks
-      avatarUrl: address.Profile.avatar_url,
+      avatarUrl: address.User.profile.avatar_url,
     };
   });
 

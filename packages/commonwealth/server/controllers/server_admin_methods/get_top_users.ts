@@ -24,9 +24,9 @@ export async function __getTopUsers(
   const sql = `
   WITH Stats as (
     SELECT
-      p.id as profile_id,
-      p.profile_name AS profile_name,
-      p.user_id as user_id,
+      u.id as profile_id,
+      u.profile->>'name' AS profile_name,
+      u.id as user_id,
       COUNT(DISTINCT t.id) AS thread_count,
       COUNT(DISTINCT c.id) AS comment_count,
       COUNT(DISTINCT c.id) + COUNT(DISTINCT t.id) AS total_activity,
@@ -35,13 +35,12 @@ export async function __getTopUsers(
       MAX(a.last_active) as last_active,
       MAX(t.created_at) as last_thread_created_at,
       MAX(c.created_at) as last_comment_created_at
-    FROM "Profiles" AS p
-    LEFT JOIN "Users" AS u ON u.id = p.user_id
-    LEFT JOIN "Addresses" AS a ON p.id = a.profile_id
+    FROM "Users" AS u
+    LEFT JOIN "Addresses" AS a ON u.id = a.user_id
     LEFT JOIN "Threads" AS t ON a.id = t.address_id
     LEFT JOIN "Comments" AS c ON a.id = c.address_id
     WHERE u."isAdmin" = FALSE
-    GROUP BY p.id
+    GROUP BY u.id
     ORDER BY total_activity DESC
     LIMIT 150
   )

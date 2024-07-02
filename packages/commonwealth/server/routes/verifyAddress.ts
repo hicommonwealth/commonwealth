@@ -3,11 +3,7 @@ import { fileURLToPath } from 'url';
 
 import { Session } from '@canvas-js/interfaces';
 import { AppError, logger } from '@hicommonwealth/core';
-import type {
-  CommunityInstance,
-  DB,
-  ProfileAttributes,
-} from '@hicommonwealth/model';
+import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
@@ -89,21 +85,17 @@ const processAddress = async (
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      // @ts-expect-error StrictNullChecks
-      const newUser = await models.User.createWithProfile({
+      const newUser = await models.User.create({
         email: null,
+        profile: {},
       });
-      addressInstance.profile_id = // @ts-expect-error StrictNullChecks
-        (newUser.Profiles[0] as ProfileAttributes).id;
       await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
+        subscriber_id: newUser.id!,
         category_id: NotificationCategories.NewMention,
         is_active: true,
       });
       await models.Subscription.create({
-        // @ts-expect-error StrictNullChecks
-        subscriber_id: newUser.id,
+        subscriber_id: newUser.id!,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,
       });
@@ -115,11 +107,6 @@ const processAddress = async (
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
-    const profile = await models.Profile.findOne({
-      where: { user_id: user.id },
-    });
-    // @ts-expect-error StrictNullChecks
-    addressInstance.profile_id = profile.id;
   }
   await addressInstance.save();
 
@@ -139,7 +126,6 @@ const processAddress = async (
     await models.Address.update(
       {
         user_id: addressInstance.user_id,
-        profile_id: addressInstance.profile_id,
       },
       {
         // @ts-expect-error StrictNullChecks

@@ -17,7 +17,6 @@ export const ThreadFeed = {
               id: PG_INT,
               address: z.string(),
               community_id: z.string(),
-              profile_id: PG_INT,
             }),
           ),
         }),

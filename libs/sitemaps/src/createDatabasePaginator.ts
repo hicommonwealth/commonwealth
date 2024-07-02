@@ -1,8 +1,4 @@
-import {
-  models,
-  ProfileAttributes,
-  ThreadInstance,
-} from '@hicommonwealth/model';
+import { models, ThreadInstance, UserAttributes } from '@hicommonwealth/model';
 import { getThreadUrl } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 
@@ -93,8 +89,8 @@ function createThreadsTableAdapter(): TableAdapter {
 }
 
 function createProfilesTableAdapter(): TableAdapter {
-  type ProfileInstancePartial = Required<Pick<ProfileAttributes, 'id'>> &
-    Pick<ProfileAttributes, 'updated_at'>;
+  type ProfileInstancePartial = Required<Pick<UserAttributes, 'id'>> &
+    Pick<UserAttributes, 'updated_at'>;
 
   function toRecord(obj: object) {
     const profile = obj as ProfileInstancePartial;
@@ -115,7 +111,7 @@ function createProfilesTableAdapter(): TableAdapter {
     ptr: number,
     limit: number,
   ): Promise<ReadonlyArray<object>> {
-    return await models.Profile.findAll({
+    return await models.User.findAll({
       attributes: ['id', 'updated_at'],
       where: {
         id: { [Op.gt]: ptr },

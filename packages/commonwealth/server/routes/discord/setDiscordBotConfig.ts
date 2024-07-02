@@ -120,9 +120,9 @@ const setDiscordBotConfig = async (
   }
 
   await models.sequelize.transaction(async (transaction) => {
-    const profile = await models.Profile.findOne({
+    const discord_user = await models.User.findOne({
       where: {
-        profile_name: 'Discord Bot',
+        email: 'discord@common.xyz',
       },
       transaction,
     });
@@ -130,9 +130,7 @@ const setDiscordBotConfig = async (
     const [address, created] = await models.Address.findOrCreate({
       where: {
         // @ts-expect-error StrictNullChecks
-        user_id: profile.user_id,
-        // @ts-expect-error StrictNullChecks
-        profile_id: profile.id,
+        user_id: discord_user.id,
         address: '0xdiscordbot',
         community_id,
       },

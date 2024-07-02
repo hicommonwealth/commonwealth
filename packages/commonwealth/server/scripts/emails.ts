@@ -68,14 +68,9 @@ const getForumNotificationCopy = async (
     address: author_address,
     community_id: author_community_id || null,
   };
-  const authorProfile = await models.Profile.findOne({
-    include: [
-      {
-        model: models.Address,
-        where: addressWhere,
-        required: true,
-      },
-    ],
+  const author = await models.Address.findOne({
+    where: addressWhere,
+    include: [{ model: models.User, attributes: ['profile'] }],
   });
   let authorName;
   const author_addr_short = formatAddressShort(
@@ -85,7 +80,7 @@ const getForumNotificationCopy = async (
   );
   try {
     // @ts-expect-error StrictNullChecks
-    authorName = authorProfile.profile_name || author_addr_short;
+    authorName = author?.User.profile.name || author_addr_short;
   } catch (e) {
     authorName = author_addr_short;
   }

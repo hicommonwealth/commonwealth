@@ -44,8 +44,6 @@ const deleteAddress = async (
   }
 
   // @ts-expect-error StrictNullChecks
-  addressObj.profile_id = null;
-  // @ts-expect-error StrictNullChecks
   addressObj.user_id = null;
   // @ts-expect-error StrictNullChecks
   addressObj.verified = null;

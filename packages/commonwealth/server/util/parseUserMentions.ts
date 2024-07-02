@@ -88,10 +88,7 @@ export const queryMentionedUsers = async (
 
   try {
     // Create an array of tuples for the replacements
-    const tuples = mentions.map(({ profileId, profileName }) => [
-      profileId,
-      profileName,
-    ]);
+    const tuples = mentions.map(({ profileName }) => profileName);
 
     return await models.sequelize.query<{
       address_id: number;
@@ -102,10 +99,9 @@ export const queryMentionedUsers = async (
     }>(
       `
           SELECT a.id as address_id, a.address, a.user_id, p.id as profile_id, p.profile_name
-          FROM "Addresses" as a
-                   INNER JOIN "Profiles" as p ON a.profile_id = p.id
+          FROM "Addresses" as a JOIN "Users" as u ON a.user_id = u.id
           WHERE a.user_id IS NOT NULL
-            AND (p.id, p.profile_name) IN (:tuples)
+            AND u.profile->>'name' IN (:tuples)
       `,
       {
         type: QueryTypes.SELECT,
@@ -174,7 +170,6 @@ type EmitMentionsData = {
   authorAddressId: number;
   authorUserId: number;
   authorAddress: string;
-  authorProfileId: number;
   mentions: UserMentionQuery;
 } & (
   | {
@@ -200,7 +195,6 @@ export const emitMentions = async (
         authorAddressId: data.authorAddressId,
         authorUserId: data.authorUserId,
         authorAddress: data.authorAddress,
-        authorProfileId: data.authorProfileId,
         mentionedUserId: user_id,
         communityId:
           'comment' in data

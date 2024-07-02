@@ -7,14 +7,14 @@ export const Image = z.object({
 });
 
 export const Profile = z.object({
-  name: z.string().max(255).optional(),
-  email: z.string().max(255).optional(),
-  website: z.string().max(255).optional(),
-  bio: z.string().optional(),
-  avatar_url: z.string().max(255).optional(),
-  slug: z.string().max(255).optional(),
-  socials: z.array(z.string()).optional(),
-  background_image: Image.optional(),
+  name: z.string().max(255).nullish(),
+  email: z.string().max(255).nullish(),
+  website: z.string().max(255).nullish(),
+  bio: z.string().nullish(),
+  avatar_url: z.string().max(255).nullish(),
+  slug: z.string().max(255).nullish(),
+  socials: z.array(z.string()).nullish(),
+  background_image: Image.nullish(),
 });
 
 export const User = z.object({
@@ -48,7 +48,6 @@ export const Address = z.object({
   is_councillor: z.boolean().optional(),
   is_validator: z.boolean().optional(),
   ghost_address: z.boolean().optional(),
-  profile_id: PG_INT.nullish().optional(),
   wallet_id: z.string().max(255).optional(),
   block_info: z.string().max(255).optional(),
   is_user_default: z.boolean().optional(),

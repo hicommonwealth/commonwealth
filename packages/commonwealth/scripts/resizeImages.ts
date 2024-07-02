@@ -103,25 +103,26 @@ async function resizeChains() {
 }
 
 async function resizeProfiles() {
-  const updateProfile = async (id, location, transaction) => {
-    await models.Profile.update(
-      { avatar_url: location },
-      { where: { id: id }, transaction },
-    );
-  };
+  const updateProfile = async () => ({}); // TODO; find in users
+  //  const updateProfile = async (id, location, transaction) => {
+  //   await models.Profile.update(
+  //     { avatar_url: location },
+  //     { where: { id: id }, transaction },
+  //   );
+  // };
 
-  const getNthProfile = async (n) =>
-    await models.Profile.findAll({
-      // @ts-expect-error StrictNullChecks
-      where: {
-        avatar_url: {
-          [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
-        },
-      },
-      offset: n,
-      limit: 1,
-      order: [['id', 'DESC']],
-    });
+  const getNthProfile = async (n) => []; // TODO: find in users
+  // await models.Profile.findAll({
+  //   // @ts-expect-error StrictNullChecks
+  //   where: {
+  //     avatar_url: {
+  //       [Op.or]: [{ [Op.ne]: null }, { [Op.ne]: '' }],
+  //     },
+  //   },
+  //   offset: n,
+  //   limit: 1,
+  //   order: [['id', 'DESC']],
+  // });
 
   await uploadToS3AndReplace(
     getNthProfile,

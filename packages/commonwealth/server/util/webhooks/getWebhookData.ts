@@ -43,7 +43,7 @@ export async function getWebhookData(
       previewImageAltText: previewImage.previewAltText,
     };
   } else {
-    const profile = await getActorProfile(notification);
+    const user = await getActorProfile(notification);
 
     let titlePrefix: string;
     switch (notification.categoryId) {
@@ -93,11 +93,9 @@ export async function getWebhookData(
       previewImageAltText: previewImage.previewAltText,
 
       // @ts-expect-error StrictNullChecks
-      profileName: profile?.profile_name,
+      profileName: user?.name,
       // @ts-expect-error StrictNullChecks
-      profileUrl: profile
-        ? `${config.SERVER_URL}/profile/id/${profile.id}`
-        : null,
+      profileUrl: user ? `${config.SERVER_URL}/profile/id/${user.id}` : null,
       // @ts-expect-error StrictNullChecks
       profileAvatarUrl: profile?.avatar_url,
 
