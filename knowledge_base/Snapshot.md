@@ -30,7 +30,7 @@ You should now be able to create Snapshot proposals with this test space.
 
 ## Change Log
 
-- 240702: Tidied and merged with `Ethereum-Name-Spaces.md` by Graham Johnson.
+- 240702: Tidied and merged with `Ethereum-Name-Spaces.md` by Graham Johnson (#8336).
 - 240415: Renamed and generalized by Graham Johnson from `Setup-Snapshot-Space.md` to `Snapshot.md`.
 - 231012: Flagged by Graham Johnson for asset transfer.
 - 230712: Authored by Malik Zulqurnain.
