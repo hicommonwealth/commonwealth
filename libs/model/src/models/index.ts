@@ -67,7 +67,6 @@ export * from './notification_category';
 export * from './notifications_read';
 export * from './outbox';
 export * from './poll';
-export * from './profile';
 export * from './profile_tags';
 export * from './reaction';
 export * from './role';

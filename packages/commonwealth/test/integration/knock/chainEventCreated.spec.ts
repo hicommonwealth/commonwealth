@@ -60,9 +60,6 @@ describe('chainEventCreated Event Handler', () => {
       { mock: false },
     );
     [user] = await tester.seed('User', {});
-    [userProfile] = await tester.seed('Profile', {
-      user_id: user!.id,
-    });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode!.id,
       namespace_address: namespaceAddress,

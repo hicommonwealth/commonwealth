@@ -2,8 +2,7 @@ import Sequelize from 'sequelize';
 import type { ModelInstance } from './types';
 
 export type ProfileTagsAttributes = {
-  id?: number;
-  profile_id: number;
+  user_id: number;
   tag_id: number;
   created_at?: Date;
   updated_at?: Date;
@@ -17,7 +16,7 @@ export default (sequelize: Sequelize.Sequelize) =>
   <ProfileTagsModelStatic>sequelize.define<ProfileTagsInstance>(
     'ProfileTags',
     {
-      profile_id: {
+      user_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,

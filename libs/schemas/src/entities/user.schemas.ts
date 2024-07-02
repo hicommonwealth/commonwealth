@@ -1,6 +1,22 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
+export const Image = z.object({
+  url: z.string(),
+  imageBehavior: z.string(),
+});
+
+export const Profile = z.object({
+  name: z.string().max(255).optional(),
+  email: z.string().max(255).optional(),
+  website: z.string().max(255).optional(),
+  bio: z.string().optional(),
+  avatar_url: z.string().max(255).optional(),
+  slug: z.string().max(255).optional(),
+  socials: z.array(z.string()).optional(),
+  background_image: Image.optional(),
+});
+
 export const User = z.object({
   id: PG_INT.optional(),
   email: z.string().max(255).email().nullish(),
@@ -14,25 +30,9 @@ export const User = z.object({
     .optional(),
   promotional_emails_enabled: z.boolean().optional(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+  profile: Profile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
-});
-
-export const Profile = z.object({
-  id: PG_INT,
-  user_id: PG_INT,
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  profile_name: z.string().max(255).optional(),
-  email: z.string().max(255).optional(),
-  website: z.string().max(255).optional(),
-  bio: z.string().optional(),
-  avatar_url: z.string().max(255).optional(),
-  slug: z.string().max(255).optional(),
-  socials: z.array(z.string()).optional(),
-  background_image: z.any().optional(),
-  bio_backup: z.string().optional(),
-  profile_name_backup: z.string().max(255).optional(),
 });
 
 export const Address = z.object({

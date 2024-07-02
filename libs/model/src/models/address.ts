@@ -2,7 +2,6 @@ import { Role, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
-import type { ProfileAttributes, ProfileInstance } from './profile';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';
 import type { UserAttributes, UserInstance } from './user';
@@ -29,12 +28,10 @@ export type AddressAttributes = {
   // hex is derived from bech32 address using bech32ToHex function in
   // packages/commonwealth/shared/utils.ts
   hex?: string;
-  profile_id?: number;
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
   // associations
   Community?: CommunityAttributes;
-  Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
   Memberships?: MembershipAttributes[];
@@ -43,7 +40,6 @@ export type AddressAttributes = {
 export type AddressInstance = ModelInstance<AddressAttributes> & {
   getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
-  getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -89,7 +85,6 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
-      profile_id: { type: Sequelize.INTEGER, allowNull: true },
       wallet_id: { type: Sequelize.STRING, allowNull: true },
       wallet_sso_source: { type: Sequelize.STRING, allowNull: true },
       block_info: { type: Sequelize.STRING, allowNull: true },

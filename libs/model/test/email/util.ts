@@ -17,7 +17,6 @@ import {
   Address,
   Comment,
   Community,
-  Profile,
   Thread,
   User,
 } from '@hicommonwealth/schemas';
@@ -28,7 +27,6 @@ type ArrayItemType<T> = T extends Array<infer U> ? U : never;
 
 export function generateDiscussionData(
   authorUser: z.infer<typeof User>,
-  authorProfile: z.infer<typeof Profile>,
   authorAddress: z.infer<typeof Address>,
   recipientUser: z.infer<typeof User>,
   community: z.infer<typeof Community>,
@@ -49,10 +47,9 @@ export function generateDiscussionData(
   ];
 } {
   const userMentionedNotification: z.infer<typeof UserMentionedNotification> = {
-    author: authorProfile.profile_name!,
+    author: authorUser.profile.name!,
     author_address: authorAddress.address,
     author_address_id: authorAddress.id!,
-    author_profile_id: authorProfile.id,
     author_user_id: authorUser.id!,
     community_id: community.id!,
     community_name: community.name,
@@ -62,7 +59,7 @@ export function generateDiscussionData(
 
   const commentCreatedNotification: z.infer<typeof CommentCreatedNotification> =
     {
-      author: authorProfile.profile_name!,
+      author: authorUser.profile.name!,
       comment_parent_name: comment.parent_id ? 'comment' : 'thread',
       community_name: community.name,
       comment_body: 'Testing',
@@ -74,14 +71,14 @@ export function generateDiscussionData(
     typeof EnrichedUserMentionedNotification
   > = {
     ...userMentionedNotification,
-    author_avatar_url: authorProfile.avatar_url!,
+    author_avatar_url: authorUser.profile.avatar_url!,
   };
 
   const enrichedCommentCreatedNotification: z.infer<
     typeof EnrichedCommentCreatedNotification
   > = {
     ...commentCreatedNotification,
-    author_avatar_url: authorProfile.avatar_url!,
+    author_avatar_url: authorUser.profile.avatar_url!,
   };
 
   const date = new Date();

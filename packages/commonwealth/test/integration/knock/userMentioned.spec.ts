@@ -42,18 +42,13 @@ describe('userMentioned Event Handler', () => {
       { mock: false },
     );
     [user] = await tester.seed('User', {});
-    [author] = await tester.seed('User', {});
-    [authorProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: author.id,
-    });
+    [author] = await tester.seed('User', { profile: { name: 'user-name' } });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       Addresses: [
         {
           role: 'member',
           user_id: author!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
@@ -111,7 +106,6 @@ describe('userMentioned Event Handler', () => {
         authorUserId: author!.id,
         // @ts-expect-error StrictNullChecks
         authorAddress: community!.Addresses[0].address,
-        authorProfileId: authorProfile!.id,
         mentionedUserId: user!.id,
         // @ts-expect-error StrictNullChecks
         communityId: community!.id,
@@ -135,10 +129,9 @@ describe('userMentioned Event Handler', () => {
         author_address_id: community!.Addresses![0].id,
         author_user_id: author!.id,
         author_address: community!.Addresses![0].address,
-        author_profile_id: authorProfile!.id,
         community_id: community!.id,
         community_name: community!.name,
-        author: authorProfile!.profile_name,
+        author: user.profile.name,
         object_body: safeTruncateBody(thread!.body!, 255),
         object_url: getThreadUrl(community!.id!, thread!.id!),
       },
@@ -159,7 +152,6 @@ describe('userMentioned Event Handler', () => {
           authorUserId: author!.id,
           // @ts-expect-error StrictNullChecks
           authorAddress: community!.Addresses[0].address,
-          authorProfileId: authorProfile!.id,
           mentionedUserId: user!.id,
           // @ts-expect-error StrictNullChecks
           communityId: community!.id,

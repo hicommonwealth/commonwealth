@@ -7,7 +7,6 @@ export type SsoTokenAttributes = {
   issued_at?: number;
   issuer?: string;
   address_id?: number;
-  profile_id?: number;
   state_id?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -26,7 +25,6 @@ export default (
       issued_at: { type: Sequelize.INTEGER, allowNull: true },
       issuer: { type: Sequelize.STRING, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
-      profile_id: { type: Sequelize.INTEGER, allowNull: true },
       state_id: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },

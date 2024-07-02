@@ -54,26 +54,16 @@ describe('CommentCreated Event Handler', () => {
     );
     [author] = await tester.seed('User', {});
     [subscriber] = await tester.seed('User', {});
-    [authorProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: author.id,
-    });
-    [subscriberProfile] = await tester.seed('Profile', {
-      // @ts-expect-error StrictNullChecks
-      user_id: subscriber.id,
-    });
     [community] = await tester.seed('Community', {
       chain_node_id: chainNode?.id,
       Addresses: [
         {
           role: 'member',
           user_id: author!.id,
-          profile_id: authorProfile!.id,
         },
         {
           role: 'member',
           user_id: subscriber!.id,
-          profile_id: subscriberProfile!.id,
         },
       ],
     });
