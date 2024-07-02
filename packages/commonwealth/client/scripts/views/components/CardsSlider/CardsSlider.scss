@@ -1,13 +1,13 @@
 @import '../../../../styles/shared';
 
-.AdminOnboardingSliderPageLayout {
+.CardsSliderPageLayout {
   padding-top: 36px;
 
   @include extraSmall {
     padding-top: 0;
   }
 
-  .AdminOnboardingSlider {
+  .CardsSlider {
     width: 100%;
     display: flex;
     gap: 16px;
@@ -23,6 +23,12 @@
       align-items: center;
       gap: 32px;
       width: 100%;
+
+      .left-section {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
       .dismissBtn {
         &:focus-within {

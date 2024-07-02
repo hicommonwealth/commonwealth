@@ -11,31 +11,36 @@ import {
 import './DismissModal.scss';
 
 interface DismissModalProps {
-  onModalClose: () => any;
-  onDismiss: (shouldDismissPermanently: boolean) => any;
+  onModalClose: () => void;
+  onDismiss: (shouldDismissPermanently: boolean) => void;
+  label: string;
+  description: string;
+  showDismissCheckbox?: boolean;
 }
 
-const DismissModal = ({ onModalClose, onDismiss }: DismissModalProps) => {
+const DismissModal = ({
+  onModalClose,
+  onDismiss,
+  label,
+  description,
+  showDismissCheckbox,
+}: DismissModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
     <div className="DismissModal">
-      <CWModalHeader
-        label="Setting up your community"
-        onModalClose={onModalClose}
-      />
+      <CWModalHeader label={label} onModalClose={onModalClose} />
       <CWModalBody>
         <CWText type="b1" className="description">
-          You can access all of these features from the admin capabilities
-          section of the side panel in your community. We will remind you to
-          complete these tasks next time you log in unless you select
-          &quot;Don&apos;t show this again.&quot;
+          {description}
         </CWText>
-        <CWCheckbox
-          checked={isChecked}
-          label="Don't show this again"
-          onChange={() => setIsChecked((prevChecked) => !prevChecked)}
-        />
+        {showDismissCheckbox && (
+          <CWCheckbox
+            checked={isChecked}
+            label="Don't show this again"
+            onChange={() => setIsChecked((prevChecked) => !prevChecked)}
+          />
+        )}
       </CWModalBody>
       <CWModalFooter>
         <CWButton

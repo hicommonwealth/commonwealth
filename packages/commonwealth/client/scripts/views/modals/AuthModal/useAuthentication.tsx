@@ -336,7 +336,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error <StrictNullChecks>
       if (walletToUse.chain !== 'near') {
         // @ts-expect-error StrictNullChecks
-        await account.validate(session, false);
+        await account.validate(session);
         // @ts-expect-error StrictNullChecks
         await verifySession(session);
       }

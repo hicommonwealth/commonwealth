@@ -60,6 +60,7 @@ const redirectToNextPage = (navigate) => {
   navigate('/', { replace: true });
 };
 
+// XXX: this is completely broken and should be deprecated or rewritten
 const FinishNearLogin = () => {
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
@@ -131,6 +132,8 @@ const FinishNearLogin = () => {
 
       await acct.validate(
         signature,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         canvasSessionPayload.sessionIssued,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
