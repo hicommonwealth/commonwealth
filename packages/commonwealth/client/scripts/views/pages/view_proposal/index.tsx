@@ -31,8 +31,6 @@ import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { JSONDisplay } from './JSONDisplay';
-import { AaveViewProposalDetail } from './aave_summary';
-import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 
 type ViewProposalPageAttrs = {
