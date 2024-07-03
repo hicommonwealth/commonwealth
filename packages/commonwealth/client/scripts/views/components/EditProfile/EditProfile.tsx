@@ -162,8 +162,6 @@ const EditProfile = () => {
         addresses[0].address,
         avatarUrl,
         // @ts-expect-error <StrictNullChecks/>
-        profile.id,
-        // @ts-expect-error <StrictNullChecks/>
         addresses[0].community.name,
         null,
       );
@@ -225,7 +223,6 @@ const EditProfile = () => {
         tagIds: preferenceTags
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
-        profileId: profile?.id,
         address: app.user?.activeAccount?.address,
         chain: app.user?.activeAccount?.community?.id,
       })
@@ -271,7 +268,7 @@ const EditProfile = () => {
         <div className="EditProfile">
           <CWForm
             initialValues={{
-              username: data?.profile?.profile_name || '',
+              username: data?.profile?.name || '',
               email: data?.profile?.email || '',
               backgroundImg: data?.profile?.background_image?.url || '',
               bio: deserializeDelta(data?.profile?.bio),

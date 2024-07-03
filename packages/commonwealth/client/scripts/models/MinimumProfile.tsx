@@ -16,7 +16,7 @@ export function addressToUserProfile(address): UserProfile {
 
   return {
     avatarUrl: profile?.avatar_url,
-    name: profile?.profile_name || profile?.name,
+    name: profile?.name,
     address: address?.address,
     lastActive: address?.last_active,
   };

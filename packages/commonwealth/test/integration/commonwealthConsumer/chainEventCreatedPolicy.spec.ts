@@ -91,7 +91,6 @@ describe('ChainEventCreated Policy', () => {
         {
           role: 'admin',
           user_id: user!.id,
-          profile_id: undefined,
         },
       ],
       CommunityStakes: [

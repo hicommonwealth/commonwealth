@@ -53,7 +53,7 @@ class NewProfile {
   }
 
   constructor({
-    profile_name,
+    name,
     email,
     website,
     bio,
@@ -64,7 +64,7 @@ class NewProfile {
     is_owner,
     background_image,
   }) {
-    this._name = profile_name;
+    this._name = name;
     this._email = email;
     this._website = website;
     this._bio = bio;

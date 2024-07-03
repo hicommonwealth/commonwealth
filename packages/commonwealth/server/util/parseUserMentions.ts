@@ -15,7 +15,6 @@ export type UserMentionQuery = {
   address_id: number;
   address: string;
   user_id: number;
-  profile_id: number;
   profile_name: string;
 }[];
 
@@ -94,11 +93,10 @@ export const queryMentionedUsers = async (
       address_id: number;
       address: string;
       user_id: number;
-      profile_id: number;
       profile_name: string;
     }>(
       `
-          SELECT a.id as address_id, a.address, a.user_id, p.id as profile_id, p.profile_name
+          SELECT a.id as address_id, a.address, a.user_id, p.profile_name
           FROM "Addresses" as a JOIN "Users" as u ON a.user_id = u.id
           WHERE a.user_id IS NOT NULL
             AND u.profile->>'name' IN (:tuples)

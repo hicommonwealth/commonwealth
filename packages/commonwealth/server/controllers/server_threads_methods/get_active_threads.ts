@@ -77,7 +77,7 @@ export async function __getActiveThreads(
           include: [
             {
               model: this.models.User,
-              attributes: ['id', 'profile_id'],
+              attributes: ['id', 'profile'],
             },
           ],
         },
@@ -111,15 +111,12 @@ export async function __getActiveThreads(
     tempThread = {
       ...tempThread,
       numberOfComments: tempThread.comment_count || 0,
-      ...(tempThread?.Address?.Profile || {}),
     };
-    if (tempThread?.Address?.Profile) delete tempThread.Address.Profile;
 
     if (withXRecentComments) {
       tempThread.recentComments = (tempThread.Comments || []).map((c) => {
         const temp = {
           ...c,
-          ...(c?.Address?.Profile || {}),
           address: c?.Address?.address || '',
         };
 

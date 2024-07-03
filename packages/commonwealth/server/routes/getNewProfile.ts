@@ -43,7 +43,7 @@ const getNewProfile = async (
   const user = await models.User.findOne({
     where: {
       // @ts-expect-error StrictNullChecks
-      user_id: req.user.id,
+      id: req.user.id,
     },
   });
 

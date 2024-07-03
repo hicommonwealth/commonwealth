@@ -62,11 +62,6 @@ const updateNewProfile = async (
   let { bio } = req.body;
   bio = sanitizeQuillText(bio);
 
-  // @ts-expect-error StrictNullChecks
-  if (profile.user_id !== req.user.id) {
-    return next(new Error(Errors.NotAuthorized));
-  }
-
   const [updateStatus, rows] = await models.User.update(
     {
       profile: {
@@ -95,7 +90,7 @@ const updateNewProfile = async (
   );
 
   // @ts-expect-error StrictNullChecks
-  await updateTags(tag_ids, models, profile.id, 'profile_id');
+  await updateTags(tag_ids, models, user.id, 'user_id');
 
   if (process.env.FLAG_USER_ONBOARDING_ENABLED === 'true') {
     const DEFAULT_NAME = 'Anonymous';

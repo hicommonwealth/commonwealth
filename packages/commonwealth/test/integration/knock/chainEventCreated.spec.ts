@@ -148,7 +148,6 @@ describe('chainEventCreated Event Handler', () => {
         community_id: community!.id,
         role: 'admin',
         user_id: user!.id,
-        profile_id: userProfile!.id,
       });
 
       const res = await processChainEventCreated({
@@ -186,7 +185,6 @@ describe('chainEventCreated Event Handler', () => {
         community_id: community!.id,
         role: 'admin',
         user_id: user!.id,
-        profile_id: userProfile!.id,
       });
 
       await expect(

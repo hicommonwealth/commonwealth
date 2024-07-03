@@ -6,7 +6,7 @@ export const updateTags = async (
   tag_ids: number[],
   models: DB,
   id: number | string,
-  idType: 'profile_id' | 'community_id',
+  idType: 'user_id' | 'community_id',
 ) => {
   // tag_ids should be defined, even if its an empty array, then we remove existing tags
   if (!tag_ids) return;
@@ -32,7 +32,7 @@ export const updateTags = async (
       [idType]: id,
     },
   };
-  idType === 'profile_id'
+  idType === 'user_id'
     ? await models.ProfileTags.destroy(deleteParams)
     : await models.CommunityTags.destroy(deleteParams);
 
@@ -40,11 +40,11 @@ export const updateTags = async (
   if (tag_ids.length > 0) {
     const createParams = tag_ids.map((tag_id) => ({
       tag_id: tag_id,
-      [idType]: idType === 'profile_id' ? Number(`${id}`) : `${id}`,
+      [idType]: idType === 'user_id' ? Number(`${id}`) : `${id}`,
     }));
 
     const [status, newRows] =
-      idType === 'profile_id'
+      idType === 'user_id'
         ? // @ts-expect-error StrictNullChecks
           await models.ProfileTags.bulkCreate(createParams)
         : // @ts-expect-error StrictNullChecks

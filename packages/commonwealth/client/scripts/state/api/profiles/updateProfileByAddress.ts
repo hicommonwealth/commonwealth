@@ -8,7 +8,6 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
 interface UpdateProfileByAddressProps {
   address: string;
   chain: string;
-  profileId?: number;
   name?: string;
   email?: string;
   bio?: string;
@@ -21,7 +20,6 @@ interface UpdateProfileByAddressProps {
 const updateProfileByAddress = async ({
   address,
   chain,
-  profileId,
   bio,
   name,
   email,
@@ -32,7 +30,6 @@ const updateProfileByAddress = async ({
 }: UpdateProfileByAddressProps) => {
   // TODO: ideally this should return a response
   const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
-    profileId,
     bio,
     name,
     email,
@@ -48,10 +45,9 @@ const updateProfileByAddress = async ({
   const responseProfile = response.data.result.profile;
   const updatedProfile = new MinimumProfile(address, chain);
   updatedProfile.initialize(
-    responseProfile.name || responseProfile.profile_name,
+    responseProfile.name,
     address,
     responseProfile.avatarUrl,
-    profileId || responseProfile.id,
     chain,
     responseProfile.lastActive,
   );
@@ -86,30 +82,22 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
-      const doesProfileIdMatch =
-        userProfileId && userProfileId === updatedProfile?.id;
-      if (doesProfileIdMatch) {
-        // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
-        const keys = [
-          [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
-          [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
-        ];
-        keys.map((key) => {
-          queryClient.cancelQueries(key).catch(console.error);
-          queryClient.refetchQueries(key).catch(console.error);
-        });
+      // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
+      const keys = [[ApiEndpoints.FETCH_PROFILES_BY_ID, undefined]];
+      keys.map((key) => {
+        queryClient.cancelQueries(key).catch(console.error);
+        queryClient.refetchQueries(key).catch(console.error);
+      });
 
-        // if `profileId` matches auth user's profile id, and user profile has a defined name, then
-        // set welcome onboard step as complete
-        if (
-          userOnboardingEnabled &&
-          updatedProfile.name &&
-          updatedProfile.name !== 'Anonymous' &&
-          !app.user.isWelcomeOnboardFlowComplete
-        ) {
-          app.user.setIsWelcomeOnboardFlowComplete(true);
-        }
+      // if `profileId` matches auth user's profile id, and user profile has a defined name, then
+      // set welcome onboard step as complete
+      if (
+        userOnboardingEnabled &&
+        updatedProfile.name &&
+        updatedProfile.name !== 'Anonymous' &&
+        !app.user.isWelcomeOnboardFlowComplete
+      ) {
+        app.user.setIsWelcomeOnboardFlowComplete(true);
       }
 
       return updatedProfile;

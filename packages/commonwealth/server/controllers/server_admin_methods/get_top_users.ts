@@ -24,7 +24,6 @@ export async function __getTopUsers(
   const sql = `
   WITH Stats as (
     SELECT
-      u.id as profile_id,
       u.profile->>'name' AS profile_name,
       u.id as user_id,
       COUNT(DISTINCT t.id) AS thread_count,
@@ -46,7 +45,6 @@ export async function __getTopUsers(
   )
   SELECT
     profile_name as "Profile Name",
-    profile_id as "Profile ID",
     CAST(thread_count as INTEGER) as "Threads Count",
     CAST(comment_count as INTEGER) as "Comments Count",
     CAST(total_activity as INTEGER) as "Total Activity",

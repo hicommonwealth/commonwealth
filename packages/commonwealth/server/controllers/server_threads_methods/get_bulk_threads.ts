@@ -151,7 +151,7 @@ export async function __getBulkThreads(
                 'address', A.address,
                 'community_id', A.community_id
             ) as "Address",
-            A.user_id as profile_id, A.last_active as address_last_active,
+            A.last_active as address_last_active,
             U.profile->>'avatar_url' as avatar_url, 
             U.profile->>'name' as profile_name
         FROM top_threads TH
@@ -242,7 +242,6 @@ export async function __getBulkThreads(
               'deleted_at', COM.deleted_at::text,
               'marked_as_spam_at', COM.marked_as_spam_at::text,
               'discord_meta', COM.discord_meta,
-              'profile_id', U.id,
               'profile_name', U.profile->>'name',
               'profile_avatar_url', U.profile->>'avatar_url',
               'user_id', P.user_id
