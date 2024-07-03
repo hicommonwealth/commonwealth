@@ -187,6 +187,15 @@ export async function main(
     }),
   );
 
+  app.use(
+    '/brand_assets',
+    express.static(path.join(__dirname, 'brand_assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
+
   app.get('*', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/index.html`);
   });
