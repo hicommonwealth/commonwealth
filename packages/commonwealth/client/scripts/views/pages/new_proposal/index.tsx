@@ -49,13 +49,12 @@ const NewProposalPage = () => {
   // special case for initializing cosmos governance
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
   if (onCosmos) {
-    if (app.chain?.governance && !app.chain.governance.ready) {
-      if (!app.chain.governance.initializing) {
-        app.chain.governance
-          .init(app.chain.chain, app.chain.accounts)
-          .then(() => {
-            app.chainModuleReady.emit('ready');
-          });
+    const governance = (app.chain as any)?.governance;
+    if (governance && !governance.ready) {
+      if (!governance.initializing) {
+        governance.init(app.chain.chain, app.chain.accounts).then(() => {
+          app.chainModuleReady.emit('ready');
+        });
       }
       return <PageLoading />;
     }

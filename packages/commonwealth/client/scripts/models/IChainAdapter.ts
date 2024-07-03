@@ -10,7 +10,6 @@ import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import ProposalModule from './ProposalModule';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -34,7 +33,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<A>;
-  public abstract governance?: ProposalModule<any, any, any>;
 
   protected _serverLoaded: boolean;
   public get serverLoaded() {
