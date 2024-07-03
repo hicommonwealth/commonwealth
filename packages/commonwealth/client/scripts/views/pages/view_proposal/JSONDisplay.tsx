@@ -1,6 +1,8 @@
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { CoinObject } from 'client/scripts/controllers/chain/cosmos/types';
 import 'components/proposals/json_display.scss';
 import React from 'react';
+import app from 'state';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -20,18 +22,12 @@ type JSONDisplayProps = {
 };
 
 export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
+  const isKYVE = app.chain.network === ChainNetwork.Kyve;
   const handleExport = () => {
     const dataTitle = data.title || 'Proposal';
-    let markdownContent = `# ${dataTitle}\n\n`;
+    const proposalDetails = data.details || '';
 
-    Object.keys(data).forEach((key) => {
-      const value = data[key];
-
-      markdownContent += `${key}\n\n`;
-      markdownContent += `${value}\n\n`;
-    });
-
-    const blob = new Blob([markdownContent], { type: 'text/markdown' });
+    const blob = new Blob([proposalDetails], { type: 'text/markdown' });
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -54,37 +50,39 @@ export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
             <CWText type="b2" fontWeight="medium" className="labelText">
               {title}
             </CWText>
-            <CWTooltip
-              placement="top"
-              content="Export as markdown file"
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  className="cta-button-container"
-                >
-                  <CWButton
-                    label="Export"
-                    onClick={() => {
-                      openConfirmation({
-                        title: 'Warning',
-                        description:
-                          'A markdown file will be downloaded automatically',
-                        buttons: [
-                          {
-                            label: 'Export markdown file',
-                            buttonType: 'primary',
-                            buttonHeight: 'sm',
-                            onClick: handleExport,
-                          },
-                        ],
-                      });
-                    }}
-                    buttonHeight="sm"
-                  />
-                </div>
-              )}
-            ></CWTooltip>
+            {isKYVE && (
+              <CWTooltip
+                placement="top"
+                content="Export as markdown file"
+                renderTrigger={(handleInteraction) => (
+                  <div
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                    className="cta-button-container"
+                  >
+                    <CWButton
+                      label="Export"
+                      onClick={() => {
+                        openConfirmation({
+                          title: 'Warning',
+                          description:
+                            'A markdown file will be downloaded automatically',
+                          buttons: [
+                            {
+                              label: 'Export markdown file',
+                              buttonType: 'primary',
+                              buttonHeight: 'sm',
+                              onClick: handleExport,
+                            },
+                          ],
+                        });
+                      }}
+                      buttonHeight="sm"
+                    />
+                  </div>
+                )}
+              ></CWTooltip>
+            )}
           </div>
           <CWDivider />
         </>
