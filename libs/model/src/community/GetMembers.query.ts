@@ -19,6 +19,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
   return {
     ...schemas.GetCommunityMembers,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const community = await models.Community.findByPk(payload.community_id);
       if (!community) {
