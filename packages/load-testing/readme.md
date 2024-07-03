@@ -32,7 +32,7 @@ Description: Starts all the required services for running k6 load tests from the
 Grafana, Prometheus, and the Prometheus-Postgres Exporter. Additionally, if a native local database is not found and a
 remote database is not specified, a Postgres container will be created.
 
-### test
+### test-load
 
 Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file>`
 
