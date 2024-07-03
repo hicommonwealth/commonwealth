@@ -16,10 +16,10 @@ import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
-import NodeInfo from 'models/NodeInfo';
 import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
+import { fetchNodesQuery } from 'state/api/nodes';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -188,15 +188,14 @@ export async function initAppState(
   shouldRedraw = true,
 ): Promise<void> {
   try {
-    const [{ data: statusRes }, { data: communities }, { data: nodesRes }] =
-      await Promise.all([
-        axios.get(`${app.serverUrl()}/status`),
-        axios.get(`${app.serverUrl()}/communities`),
-        axios.get(`${app.serverUrl()}/nodes`),
-      ]);
+    const [{ data: statusRes }, { data: communities }] = await Promise.all([
+      axios.get(`${app.serverUrl()}/status`),
+      axios.get(`${app.serverUrl()}/communities`),
+    ]);
+
+    const nodesData = await fetchNodesQuery();
 
     app.config.chains.clear();
-    app.config.nodes.clear();
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
 
@@ -205,17 +204,11 @@ export async function initAppState(
       evmTestEnv: statusRes.result.evmTestEnv,
     });
 
-    nodesRes.result
-      .sort((a, b) => a.id - b.id)
-      .forEach((node) => {
-        app.config.nodes.add(NodeInfo.fromJSON(node));
-      });
-
     communities.result
       .filter((c) => c.community.active)
       .forEach((c) => {
         const chainInfo = ChainInfo.fromJSON({
-          ChainNode: app.config.nodes.getById(c.community.chain_node_id),
+          ChainNode: nodesData.find((n) => n.id === c.community.chain_node_id),
           ...c.community,
         });
         app.config.chains.add(chainInfo);

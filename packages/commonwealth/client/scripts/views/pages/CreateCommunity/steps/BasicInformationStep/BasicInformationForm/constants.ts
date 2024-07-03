@@ -1,6 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
 import app from 'state';
+import { fetchCachedNodes } from 'state/api/nodes';
 
 // used for default chain dropdown options
 export const POLYGON_ETH_CHAIN_ID = 137;
@@ -46,10 +47,9 @@ const chainIdsWithStakeEnabled = Object.values(
 ).map((c) => c.chainId);
 
 // Get chain id's from the app.config.chains for all eth and cosmos chains
-export const chainTypes = app.config.nodes
-  .getAll()
-  .filter(particularChainNodes)
-  .map((chain) => ({
+export const chainTypes = fetchCachedNodes()
+  ?.filter(particularChainNodes)
+  ?.map((chain) => ({
     chainBase: chain.ethChainId
       ? 'ethereum'
       : chain.cosmosChainId
@@ -65,7 +65,7 @@ export const chainTypes = app.config.nodes
   }));
 
 // Sort chains alphabetically by labels
-export const alphabeticallySortedChains = [...chainTypes].sort((a, b) =>
+export const alphabeticallySortedChains = [...(chainTypes || [])].sort((a, b) =>
   (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
 );
 

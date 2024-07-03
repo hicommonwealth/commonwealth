@@ -2,7 +2,9 @@ import { WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
+import NodeInfo from 'models/NodeInfo';
 import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 
 export const convertEthToUsd = (
   ethAmount: string | number,
@@ -20,9 +22,13 @@ export const convertEthToUsd = (
 };
 
 export const buildEtherscanLink = (txHash: string, chainNodeId?: number) => {
-  const url = chainNodeId
-    ? app.config.nodes.getById(chainNodeId).block_explorer
-    : app.chain?.meta?.ChainNode?.block_explorer ?? 'https://basescan.org/';
+  const blockExplorer = chainNodeId
+    ? queryClient
+        .getQueryData<NodeInfo[]>([ApiEndpoints.FETCH_NODES])
+        ?.find((n) => n?.id === chainNodeId)?.block_explorer
+    : app.chain?.meta?.ChainNode?.block_explorer;
+
+  const url = blockExplorer ?? 'https://basescan.org/';
 
   return `${url}tx/${txHash}`;
 };

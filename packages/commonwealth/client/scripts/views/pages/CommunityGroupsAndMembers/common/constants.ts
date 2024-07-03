@@ -1,4 +1,4 @@
-import app from 'state';
+import { fetchCachedNodes } from 'state/api/nodes';
 
 export const TOKENS = {
   COSMOS_TOKEN: 'cosmos_native',
@@ -49,13 +49,12 @@ export const conditionTypes = [
 ];
 
 // Get chain id's from the app.config.chains for all eth and cosmos chains
-export const chainTypes = app.config.nodes
-  .getAll()
-  .filter(
+export const chainTypes = fetchCachedNodes()
+  ?.filter(
     (chain) =>
       chain.ethChainId || chain.cosmosChainId || chain.balanceType === 'solana',
   )
-  .map((chain) => ({
+  ?.map((chain) => ({
     chainBase: chain.ethChainId
       ? 'ethereum'
       : chain.balanceType === 'solana'
