@@ -59,23 +59,12 @@ export enum ProposalStatus {
 }
 
 export enum VotingType {
-  ConvictionYesNoVoting = 'binary_conviction',
   SimpleYesApprovalVoting = 'approval',
   YesNoAbstainVeto = 'yes_no_abstain_veto',
-  RankedChoiceVoting = 'rankedchoice',
-  MultiOptionVoting = 'multioption',
-  None = 'none',
-  MolochYesNo = 'moloch',
-  CompoundYesNo = 'compound_yes_no',
-  CompoundYesNoAbstain = 'compound_yes_no_abstain',
 }
 
 export enum VotingUnit {
-  OnePersonOneVote = '1p1v',
   CoinVote = 'coin',
-  ConvictionCoinVote = 'conviction_coin',
-  PowerVote = 'power',
-  None = 'none',
 }
 
 export type ProposalEndTime =
