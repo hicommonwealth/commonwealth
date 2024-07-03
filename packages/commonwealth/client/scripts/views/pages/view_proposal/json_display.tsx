@@ -24,33 +24,25 @@ export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
     const dataTitle = data.title || 'Proposal';
     let markdownContent = `# ${dataTitle}\n\n`;
 
-    // Iterate over all keys in data object
     Object.keys(data).forEach((key) => {
       const value = data[key];
 
-      // Append key-value pair to markdown content
       markdownContent += `${key}\n\n`;
       markdownContent += `${value}\n\n`;
     });
 
-    // Create a Blob from the markdown content
     const blob = new Blob([markdownContent], { type: 'text/markdown' });
 
-    // Create a temporary link element
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${dataTitle}.md`;
 
-    // Append the link to the body (required for Firefox)
     document.body.appendChild(link);
 
-    // Trigger the download
     link.click();
 
-    // Remove the link from the document
     document.body.removeChild(link);
 
-    // Release the object URL
     URL.revokeObjectURL(link.href);
   };
 
