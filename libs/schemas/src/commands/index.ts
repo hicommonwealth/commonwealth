@@ -1,4 +1,5 @@
 export * from './address.schemas';
+export * from './chainEvent.schemas';
 export * from './chainNode.schemas';
 export * from './comment.schemas';
 export * from './community.schemas';
