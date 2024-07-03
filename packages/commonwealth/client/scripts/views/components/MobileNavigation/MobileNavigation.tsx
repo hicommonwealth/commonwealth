@@ -27,8 +27,8 @@ const MobileNavigation = () => {
   const navigationConfig: NavigationButtonProps[] = [
     {
       type: 'home',
-      onClick: () => navigate('/dashboard', {}, null),
-      selected: !!matchesDashboard,
+      onClick: () => navigate('/', {}, null),
+      selected: !!matchesExplore,
     },
     ...(isLoggedIn
       ? [
@@ -41,8 +41,8 @@ const MobileNavigation = () => {
       : []),
     {
       type: 'explore',
-      onClick: () => navigate('/communities', {}, null),
-      selected: !!matchesExplore,
+      onClick: () => navigate('/dashboard', {}, null),
+      selected: !!matchesDashboard,
     },
     ...(isLoggedIn
       ? [

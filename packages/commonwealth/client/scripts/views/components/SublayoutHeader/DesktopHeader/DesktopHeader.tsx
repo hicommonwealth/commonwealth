@@ -69,9 +69,9 @@ const DesktopHeader = ({
               navigate('/', {}, null);
             } else {
               if (isLoggedIn) {
-                navigate('/dashboard/for-you', {}, null);
+                navigate('/communities', {}, null);
               } else {
-                navigate('/dashboard/global', {}, null);
+                navigate('/communities', {}, null);
               }
             }
           }}

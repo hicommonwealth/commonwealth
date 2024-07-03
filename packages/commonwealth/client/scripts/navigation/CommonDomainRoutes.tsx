@@ -111,7 +111,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/"
     path="/"
-    element={withLayout(DashboardPage, { type: 'common' })}
+    element={withLayout(CommunitiesPage, { type: 'common' })}
   />,
   <Route
     key="/createCommunity"
@@ -127,13 +127,6 @@ const CommonDomainRoutes = ({
     key="/dashboard/:type"
     path="/dashboard/:type"
     element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/communities"
-    path="/communities"
-    element={withLayout(CommunitiesPage, {
-      type: 'common',
-    })}
   />,
   <Route
     key="/search"
