@@ -234,11 +234,11 @@ const useUserMenuItems = ({
         type: 'header',
         label: 'Settings',
       },
-      {
-        type: 'default',
-        label: 'View profile',
-        onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
-      },
+      // {
+      //   type: 'default',
+      //   label: 'View profile',
+      //   onClick: () => navigate(`/profile/id/${profileId}`, {}, null),
+      // },
       {
         type: 'default',
         label: 'Edit profile',

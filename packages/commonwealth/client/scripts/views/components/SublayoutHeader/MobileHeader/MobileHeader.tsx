@@ -21,6 +21,7 @@ import useUserMenuItems from '../useUserMenuItems';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './MobileHeader.scss';
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 
 interface MobileHeaderProps {
   onMobile: boolean;
@@ -47,6 +48,8 @@ const MobileHeader = ({
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
   const user = app?.user?.addresses?.[0];
+  const navigate = useCommonNavigate();
+  const profileId = user?.profileId;
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
@@ -59,7 +62,7 @@ const MobileHeader = ({
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
   });
-
+  
   const mobileItems = [
     ...userMenuItems,
     { type: 'divider' },
@@ -93,8 +96,8 @@ const MobileHeader = ({
           )}
 
           {isLoggedIn ? (
-            <div onClick={() => setIsUserDrawerOpen(true)}>
-              <User
+            <div onClick={() => navigate(`/profile/id/${profileId}`, {}, null)}>
+            <User
                 shouldShowAvatarOnly
                 avatarSize={24}
                 userAddress={user?.address}

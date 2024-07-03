@@ -30,15 +30,15 @@ const MobileNavigation = () => {
       onClick: () => navigate('/', {}, null),
       selected: !!matchesExplore,
     },
-    ...(isLoggedIn
-      ? [
-          {
-            type: 'create' as const,
-            onClick: () => setIsDrawerOpen(true),
-            selected: false,
-          },
-        ]
-      : []),
+    // ...(isLoggedIn
+    //   ? [
+    //       {
+    //         type: 'create' as const,
+    //         onClick: () => setIsDrawerOpen(true),
+    //         selected: false,
+    //       },
+    //     ]
+    //   : []),
     {
       type: 'leaderboard',
       onClick: () => navigate('/dashboard', {}, null),
