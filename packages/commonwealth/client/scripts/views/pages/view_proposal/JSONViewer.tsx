@@ -1,10 +1,7 @@
 import React from 'react';
 import ReactJson from 'react-json-view';
 
-interface DataType {
-  [key: string]: any;
-}
-const JSONViewer = ({ data }: { data: DataType }) => {
+const JSONViewer = ({ data }: { data: Record<string, any> }) => {
   return (
     <div className="Blob">
       <ReactJson
