@@ -28,10 +28,12 @@ type VotingActionsProps = {
   proposal: AnyProposal;
   toggleVotingModal: (newModalState: boolean) => void;
   votingModalOpen: boolean;
+  redrawProposals: React.Dispatch<React.SetStateAction<{}>>;
 };
 
 export const VotingActions = (props: VotingActionsProps) => {
-  const { proposal, toggleVotingModal, votingModalOpen } = props;
+  const { proposal, toggleVotingModal, votingModalOpen, redrawProposals } =
+    props;
 
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
@@ -70,7 +72,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   }
 
   const emitRedraw = () => {
-    app.proposalEmitter.emit('redraw');
+    redrawProposals({});
   };
 
   const voteYes = async (e) => {

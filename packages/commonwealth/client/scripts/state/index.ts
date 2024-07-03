@@ -56,9 +56,6 @@ export interface IApp {
   // Polls
   polls: PollsController;
 
-  // Proposals
-  proposalEmitter: EventEmitter;
-
   // Contracts
   contracts: ContractsController;
 
@@ -133,9 +130,6 @@ const app: IApp = {
 
   // Polls
   polls: new PollsController(),
-
-  // Proposals
-  proposalEmitter: new EventEmitter(),
 
   // Contracts
   contracts: new ContractsController(),
