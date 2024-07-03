@@ -49,6 +49,7 @@ const NewProposalPage = () => {
   // special case for initializing cosmos governance
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
   if (onCosmos) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const governance = (app.chain as any)?.governance;
     if (governance && !governance.ready) {
       if (!governance.initializing) {

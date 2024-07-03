@@ -34,6 +34,7 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         app.snapshot.init(space.id).then(() => {
           navigate(`/snapshot/${space.id}`);
         });
