@@ -499,7 +499,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
                 })
               : address,
           community_id: app.activeChainId() ?? wallet.chain,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         });
 
         if (res.data.result.exists && res.data.result.belongsToUser) {

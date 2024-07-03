@@ -44,7 +44,7 @@ export function linkExistingAddressToChainOrCommunity(
     address,
     community_id: community,
     originChain, // not used
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 }
 
@@ -86,7 +86,7 @@ export async function setActiveAccount(
       address: account.address,
       author_community_id: account.community.id,
       community_id: community,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       auth: true,
     });
 
@@ -276,13 +276,12 @@ export function updateActiveUser(data) {
       addresses: [],
       starredCommunities: [],
       joinedCommunitiesWithNewContent: [],
+      jwt: null,
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
     });
-    // @ts-expect-error StrictNullChecks
-    app.user.setJWT(null);
 
     userStore.getState().setData({ accounts: [], activeAccount: null });
   } else {
@@ -322,13 +321,13 @@ export function updateActiveUser(data) {
       knockJWT: data.knockJwtToken || '',
       addresses,
       joinedCommunitiesWithNewContent,
+      jwt: data.jwt || null,
       // add boolean values as boolean -- not undefined
       isSiteAdmin: !!data.isAdmin,
       isEmailVerified: !!data.emailVerified,
       isPromotionalEmailEnabled: !!data.promotional_emails_enabled,
       isWelcomeOnboardFlowComplete: !!data.is_welcome_onboard_flow_complete,
     });
-    app.user.setJWT(data.jwt);
   }
 }
 
@@ -347,7 +346,7 @@ export async function createUserWithAddress(
   const response = await axios.post(`${app.serverUrl()}/createAddress`, {
     address,
     community_id: chain,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     wallet_id: walletId,
     wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
@@ -608,7 +607,7 @@ export async function handleSocialLoginCallback({
     {
       data: {
         community_id: desiredChain?.id,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         username: profileMetadata?.username,
         avatarUrl: profileMetadata?.avatarUrl,
         magicAddress,

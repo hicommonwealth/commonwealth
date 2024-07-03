@@ -12,7 +12,7 @@ export const trpcClient = trpc.createClient({
       url: '/api/v1',
       async headers() {
         return {
-          authorization: app.user.jwt,
+          authorization: userStore.getState().jwt || '',
           address_id: userStore.getState().activeAccount?.address,
         };
       },

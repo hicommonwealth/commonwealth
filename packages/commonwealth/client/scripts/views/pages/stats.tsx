@@ -7,6 +7,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import { CWText } from '../components/component_kit/cw_text';
+import { userStore } from 'client/scripts/state/ui/user';
 
 type Batchable = {
   date: string;
@@ -98,7 +99,7 @@ const StatsPage = () => {
         const response = await axios.get(`${app.serverUrl()}/communityStats`, {
           params: {
             chain: app.activeChainId(),
-            jwt: app.user?.jwt,
+            jwt: userStore.getState().jwt,
           },
         });
 
@@ -137,7 +138,7 @@ const StatsPage = () => {
       }
     };
 
-    if (app.user && app.activeChainId()) {
+    if (app.activeChainId()) {
       fetch();
     }
   }, []);

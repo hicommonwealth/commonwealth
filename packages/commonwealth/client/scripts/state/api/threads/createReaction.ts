@@ -38,7 +38,7 @@ const createReaction = async ({
       community_id: app.chain.id,
       address,
       reaction: reactionType,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
     {

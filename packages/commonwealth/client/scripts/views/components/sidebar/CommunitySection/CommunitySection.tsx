@@ -71,7 +71,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
-  const showAdmin = app.user && (isAdmin || isMod);
+  const showAdmin = isAdmin || isMod;
 
   return (
     <>

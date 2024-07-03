@@ -25,7 +25,7 @@ const editTopic = async ({ topic, featuredOrder, isPWA }: EditTopicProps) => {
       default_offchain_template: topic.defaultOffchainTemplate,
       featured_order: featuredOrder,
       address: userStore.getState().activeAccount?.address,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
     {
       headers: {

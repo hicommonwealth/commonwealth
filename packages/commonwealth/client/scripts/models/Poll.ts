@@ -3,6 +3,7 @@ import type moment from 'moment';
 import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
 import Vote from './Vote';
+import { userStore } from '../state/ui/user';
 
 class Poll {
   public readonly id: number;
@@ -78,7 +79,7 @@ class Poll {
         author_chain: authorChain,
         option: selectedOption,
         address,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       }
     );
     // TODO Graham 5/3/22: We should have a dedicated controller + store

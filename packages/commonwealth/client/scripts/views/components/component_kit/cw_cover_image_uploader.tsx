@@ -18,6 +18,7 @@ import { getClasses } from './helpers';
 import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
 import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from './new_designs/cw_radio_button';
+import useUserStore from 'client/scripts/state/ui/user';
 
 // TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
 // pick it up like the rest of CWForm hooked components do. Add suport for it when needed.
@@ -67,6 +68,7 @@ export const CWCoverImageUploader = ({
   onImageBehaviourChange,
   onImageProcessStatusChange = () => {},
 }: CoverImageUploaderProps) => {
+  const user = useUserStore();
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
   const [uploadStatus, setUploadStatus] = React.useState<
@@ -142,7 +144,7 @@ export const CWCoverImageUploader = ({
           name: file.name,
           mimetype: file.type,
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       );
       if (signatureResponse.data.status !== 'Success') throw new Error();
@@ -170,7 +172,7 @@ export const CWCoverImageUploader = ({
       setImageURL('');
       const res = await axios.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
 
       const generatedImageURL = res.data.result.imageUrl;

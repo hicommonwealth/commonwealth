@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints, queryClient } from '../config';
+import { userStore } from '../../ui/user';
 
 interface EditGroupProps {
   groupId: string;
@@ -25,7 +26,7 @@ const editGroup = async ({
   requirements,
 }: EditGroupProps) => {
   return await axios.put(`${app.serverUrl()}/groups/${groupId}`, {
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     community_id: communityId,
     author_community_id: communityId,
     address,

@@ -6,6 +6,7 @@ import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
+import { userStore } from 'client/scripts/state/ui/user';
 
 export const modelFromServer = (poll) => {
   const {
@@ -97,7 +98,7 @@ class PollsController {
         community_id: app.activeChainId(),
         author_chain: authorCommunity,
         address,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         prompt,
         options,
         custom_duration: customDuration?.split(' ')[0],
@@ -127,7 +128,7 @@ class PollsController {
           community_id: app.activeChainId(),
           author_chain: authorCommunity,
           address,
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
           poll_id: pollId,
         },
       });

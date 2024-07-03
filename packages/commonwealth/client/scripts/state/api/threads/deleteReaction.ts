@@ -4,6 +4,7 @@ import { signDeleteThreadReaction } from 'client/scripts/controllers/server/sess
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
+import { userStore } from '../../ui/user';
 
 interface UseDeleteThreadReactionMutationProps {
   communityId: string;
@@ -32,7 +33,7 @@ const deleteReaction = async ({
         author_community_id: communityId,
         address: address,
         community_id: app.chain.id,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     },

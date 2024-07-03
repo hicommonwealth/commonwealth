@@ -3,7 +3,7 @@ import axios from 'axios';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import useUserStore from '../../ui/user';
+import useUserStore, { userStore } from '../../ui/user';
 
 const PROFILE_STALE_TIME = 30 * 1_000; // 3 minutes
 
@@ -27,7 +27,7 @@ const fetchProfileById = async ({
         ...(profileId
           ? { profileId }
           : {
-              jwt: app.user.jwt,
+              jwt: userStore.getState().jwt,
             }),
       },
     },

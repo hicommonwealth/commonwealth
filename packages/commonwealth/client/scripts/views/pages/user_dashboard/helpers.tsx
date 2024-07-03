@@ -5,6 +5,7 @@ import type NotificationSubscription from '../../../models/NotificationSubscript
 import axios from 'axios';
 import app from 'state';
 import { DashboardViews } from '.';
+import { userStore } from 'client/scripts/state/ui/user';
 
 // Subscriptions
 export const subscribeToThread = async (
@@ -50,7 +51,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
   let activity;
   if (requestType === DashboardViews.ForYou) {
     const response = await axios.post(`${app.serverUrl()}/viewUserActivity`, {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     });
 
     activity = response.data;

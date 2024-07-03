@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import app from 'state';
-import useUserStore from '../../ui/user';
+import useUserStore, { userStore } from '../../ui/user';
 import { ApiEndpoints } from '../config';
 
 type UpdateActiveCommunityProps = {
@@ -18,7 +18,7 @@ export const updateActiveCommunity = async ({
     `${app.serverUrl()}/${ApiEndpoints.UPDATE_USER_ACTIVE_COMMUNTY}`,
     {
       community_id: communityId,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       auth: true,
     },
   );

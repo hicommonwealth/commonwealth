@@ -8,6 +8,7 @@ import { ApiEndpoints } from 'state/api/config';
 import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
+import { userStore } from '../../ui/user';
 
 interface EditCommentProps {
   profile: UserProfile;
@@ -40,7 +41,7 @@ const editComment = async ({
       id: commentId,
       community_id: communityId,
       body: encodeURIComponent(updatedBody),
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   );

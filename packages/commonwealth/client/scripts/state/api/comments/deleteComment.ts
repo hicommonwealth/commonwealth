@@ -33,7 +33,7 @@ const deleteComment = async ({
 
   await axios.delete(`${app.serverUrl()}/comments/${commentId}`, {
     data: {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       address: address,
       community_id: communityId,
       author_community_id: communityId,

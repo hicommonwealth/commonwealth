@@ -14,10 +14,11 @@ import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
 import { z } from 'zod';
 import Notification from '../../models/Notification';
+import { userStore } from 'client/scripts/state/ui/user';
 
 const post = async (route, args, callback) => {
   try {
-    args['jwt'] = app.user.jwt;
+    args['jwt'] = userStore.getState().jwt;
     const response = await axios.post(app.serverUrl() + route, args);
 
     if (response.data.status === 'Success') {
@@ -32,7 +33,7 @@ const post = async (route, args, callback) => {
 
 const get = async (route, args, callback) => {
   try {
-    args['jwt'] = app.user.jwt;
+    args['jwt'] = userStore.getState().jwt;
     const response = await axios.get(app.serverUrl() + route, { params: args });
 
     if (response.data.status === 'Success') {
@@ -319,7 +320,7 @@ class NotificationsController {
   }
 
   public getChainEventNotifications() {
-    if (!app.user || !app.user.jwt) {
+    if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
 
@@ -337,7 +338,7 @@ class NotificationsController {
   }
 
   public getDiscussionNotifications() {
-    if (!app.user || !app.user.jwt) {
+    if (!userStore.getState().jwt) {
       throw new Error('must be signed in to refresh notifications');
     }
     // @ts-expect-error StrictNullChecks

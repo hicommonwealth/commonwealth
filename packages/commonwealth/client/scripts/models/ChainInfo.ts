@@ -8,6 +8,7 @@ import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
 import Tag from './Tag';
+import { userStore } from '../state/ui/user';
 
 class ChainInfo {
   public readonly id: string;
@@ -326,7 +327,7 @@ class ChainInfo {
         directory_page_enabled,
         directory_page_chain_node_id,
         type,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
       {
         headers: {

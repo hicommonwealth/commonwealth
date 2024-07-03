@@ -9,6 +9,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type Stats = {
   numCommentsLastMonth: number;
@@ -34,13 +35,14 @@ const Analytics = () => {
   const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
   const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
+  const user = useUserStore()
 
   const getCommunityAnalytics = async (communityId: string) => {
     axios
       .get(`${app.serverUrl()}/admin/analytics?community_id=${communityId}`, {
         params: {
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       })
       .then((response) => {
@@ -60,7 +62,7 @@ const Analytics = () => {
         .get(`${app.serverUrl()}/admin/analytics`, {
           params: {
             auth: true,
-            jwt: app.user.jwt,
+            jwt: user.jwt,
           },
         })
         .then((response) => {

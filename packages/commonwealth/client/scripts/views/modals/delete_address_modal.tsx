@@ -19,6 +19,7 @@ import {
 
 import axios from 'axios';
 import '../../../styles/modals/delete_address_modal.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;
@@ -29,6 +30,8 @@ type DeleteAddressModalAttrs = {
 };
 
 export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
+  const user = useUserStore();
+
   const onDeleteAddress = async (
     e: React.MouseEvent,
     passedProps: Partial<DeleteAddressModalAttrs>,
@@ -48,7 +51,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       const response = await axios.post(`${app.serverUrl()}/deleteAddress`, {
         address,
         chain,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
       // remove deleted role from app.roles
       // @ts-expect-error <StrictNullChecks/>

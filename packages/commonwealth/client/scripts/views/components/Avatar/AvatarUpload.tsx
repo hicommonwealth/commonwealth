@@ -12,6 +12,7 @@ import Account from '../../../models/Account';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
+import useUserStore from 'client/scripts/state/ui/user';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {
   const options = {
@@ -49,6 +50,7 @@ export const AvatarUpload = ({
   uploadStartedCallback,
 }: AvatarUploadProps) => {
   const [files, setFiles] = useState([]);
+  const user = useUserStore();
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 10000000,
@@ -77,7 +79,7 @@ export const AvatarUpload = ({
             name: acceptedFiles[0].name, // imageName.png
             mimetype: acceptedFiles[0].type, // image/png
             auth: true,
-            jwt: app.user.jwt,
+            jwt: user.jwt,
           },
         );
         if (response.data.status !== 'Success') throw new Error();

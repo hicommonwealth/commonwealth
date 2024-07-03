@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import app from 'state';
-import { EmailNotificationInterval, useUserStore } from '../../ui/user/user';
+import { EmailNotificationInterval, useUserStore, userStore } from '../../ui/user/user';
 import { ApiEndpoints } from '../config';
 
 type UseUpdateUserEmailSettingsProps = {
@@ -25,7 +25,7 @@ const updateUserEmailSettings = async ({
   await axios.post(
     `${app.serverUrl()}/${ApiEndpoints.UPDATE_USER_EMAIL_INTERVAL_SETTINGS}`,
     {
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       key,
       value,
     },

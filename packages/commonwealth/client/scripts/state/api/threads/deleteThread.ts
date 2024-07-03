@@ -7,6 +7,7 @@ import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { removeThreadFromAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
+import { userStore } from '../../ui/user';
 
 interface DeleteThreadProps {
   communityId: string;
@@ -28,7 +29,7 @@ const deleteThread = async ({
       author_community_id: communityId,
       community_id: communityId,
       address: address,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
   });

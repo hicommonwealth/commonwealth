@@ -11,6 +11,7 @@ import {
   updateThreadTopicInAllCaches,
 } from './helpers/cache';
 import { updateThreadCountsByStageChange } from './helpers/counts';
+import { userStore } from '../../ui/user';
 
 interface EditThreadProps {
   address: string;
@@ -77,7 +78,7 @@ const editThread = async ({
     author_community_id: communityId,
     address: address,
     community_id: communityId,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     // for edit profile
     ...(url && { url }),
     ...(newBody && { body: encodeURIComponent(newBody) }),

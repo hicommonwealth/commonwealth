@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import StarredCommunity from 'models/StarredCommunity';
 import app from 'state';
-import useUserStore from '../../ui/user';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface ToggleCommunityStarProps {
   community: string;
@@ -14,7 +14,7 @@ const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
   const response = await axios.post(`${app.serverUrl()}/starCommunity`, {
     chain: community,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return {

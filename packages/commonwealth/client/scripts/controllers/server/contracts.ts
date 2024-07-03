@@ -60,7 +60,7 @@ class ContractsController {
       `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
       {
         address,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
     );
     const resultContract = response.data.result.contract;
@@ -74,7 +74,7 @@ class ContractsController {
       {
         address,
         chain_node_id: app.chain.meta.ChainNode.id,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
     );
 
@@ -200,7 +200,7 @@ class ContractsController {
         {
           community_id: app.activeChainId(),
           chain_node_id,
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
           address,
           abi,
         },
@@ -253,7 +253,7 @@ class ContractsController {
       const response = await axios.post(
         `${app.serverUrl()}/contract/template`,
         {
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
           community_id: app.activeChainId(),
           name,
           template,
@@ -278,7 +278,7 @@ class ContractsController {
     try {
       await axios.delete(`${app.serverUrl()}/contract/template`, {
         params: {
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
           template_id: templateId,
         },
       });
@@ -292,7 +292,7 @@ class ContractsController {
     try {
       const res = await axios.get(`${app.serverUrl()}/contract/template`, {
         params: {
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
           contract_id: contractId,
         },
       });
@@ -312,7 +312,7 @@ class ContractsController {
         {
           ...communityContractTemplateAndMetadata,
           community_id: app.activeChainId(),
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
         },
       );
 
@@ -339,7 +339,7 @@ class ContractsController {
           params: {
             ...communityContractTemplateMetadata,
             community_id: app.activeChainId(),
-            jwt: app.user.jwt,
+            jwt: userStore.getState().jwt,
           },
         },
       );
@@ -367,7 +367,7 @@ class ContractsController {
         {
           params: {
             ...contract,
-            jwt: app.user.jwt,
+            jwt: userStore.getState().jwt,
             community_id: app.activeChainId(),
           },
         },
@@ -402,7 +402,7 @@ class ContractsController {
         {
           params: {
             ...contract,
-            jwt: app.user.jwt,
+            jwt: userStore.getState().jwt,
             community_id: app.activeChainId(),
           },
         },

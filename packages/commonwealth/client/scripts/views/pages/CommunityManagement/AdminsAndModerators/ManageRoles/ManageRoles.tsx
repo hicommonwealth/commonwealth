@@ -32,7 +32,7 @@ export const ManageRoles = ({
         new_role: 'member',
         // @ts-expect-error <StrictNullChecks/>
         address: role.Address.address,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
 
       if (res.data.status !== 'Success') {

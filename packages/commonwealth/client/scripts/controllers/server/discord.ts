@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
 
 class DiscordController {
@@ -7,7 +8,7 @@ class DiscordController {
       await axios.post(`${app.serverUrl()}/createDiscordBotConfig`, {
         community_id: app.activeChainId(),
         verification_token,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       });
     } catch (e) {
       console.log(e);
@@ -24,7 +25,7 @@ class DiscordController {
         `${app.serverUrl()}/topics/${topicId}/channels/${channelId}`,
         {
           chain: app.activeChainId(),
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
         },
       );
     } catch (e) {

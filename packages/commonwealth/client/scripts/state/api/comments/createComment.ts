@@ -11,7 +11,7 @@ import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types
 import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
-import useUserStore from '../../ui/user';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface CreateCommentProps {
   profile: UserProfile;
@@ -46,7 +46,7 @@ const createComment = async ({
       address: profile.address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
     {

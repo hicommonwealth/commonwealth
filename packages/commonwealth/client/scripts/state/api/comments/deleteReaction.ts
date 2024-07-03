@@ -5,6 +5,7 @@ import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
+import { userStore } from '../../ui/user';
 
 interface DeleteReactionProps {
   communityId: string;
@@ -28,7 +29,7 @@ const deleteReaction = async ({
         author_community_id: communityId,
         address: address,
         community_id: communityId,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     })

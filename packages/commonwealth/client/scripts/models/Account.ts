@@ -177,7 +177,7 @@ class Account {
     const params = {
       address: this.address,
       community_id: this.community.id,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       session: serializeCanvas(session),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,

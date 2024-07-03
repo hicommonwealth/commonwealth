@@ -12,6 +12,7 @@ import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import ProposalModule from './ProposalModule';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
+import { userStore } from '../state/ui/user';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -48,7 +49,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         params: {
           chain: this.id,
           community: null,
-          jwt: this.app.user.jwt,
+          jwt: userStore.getState().jwt,
         },
       }),
     ]);

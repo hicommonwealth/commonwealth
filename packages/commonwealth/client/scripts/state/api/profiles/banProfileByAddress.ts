@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { userStore } from '../../ui/user';
 
 interface BanProfileByAddressProps {
   address: string;
@@ -12,7 +13,7 @@ const banProfileByAddress = async ({
   communityId,
 }: BanProfileByAddressProps) => {
   return await axios.post('/api/banAddress', {
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     address: address,
     community_id: communityId,
   });

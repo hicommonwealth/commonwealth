@@ -3,6 +3,7 @@ import axios from 'axios';
 import Thread, { Link } from 'models/Thread';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
+import { userStore } from '../../ui/user';
 
 interface AddThreadLinksProps {
   communityId: string;
@@ -21,7 +22,7 @@ const addThreadLinks = async ({
     {
       thread_id: threadId,
       links,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
     {
       headers: {

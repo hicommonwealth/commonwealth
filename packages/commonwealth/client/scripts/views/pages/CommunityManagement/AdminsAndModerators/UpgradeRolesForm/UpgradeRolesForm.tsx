@@ -10,6 +10,7 @@ import { CWButton } from '../../../../components/component_kit/new_designs/CWBut
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../../../components/members_search_bar';
 import './UpgradeRolesForm.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
@@ -30,6 +31,8 @@ export const UpgradeRolesForm = ({
     { id: 1, checked: false },
     { id: 2, checked: false },
   ]);
+
+  const userData = useUserStore();
 
   const zeroOutRadioButtons = () => {
     const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
@@ -84,7 +87,7 @@ export const UpgradeRolesForm = ({
         // @ts-expect-error <StrictNullChecks/>
         address: _user.Address.address,
         community_id: app.activeChainId(),
-        jwt: app.user.jwt,
+        jwt: userData.jwt,
       });
 
       if (response.data.status === 'Success') {

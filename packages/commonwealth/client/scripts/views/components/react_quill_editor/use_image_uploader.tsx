@@ -5,6 +5,7 @@ import { SerializableDeltaStatic, uploadFileToS3 } from './utils';
 
 import app from 'state';
 import { compressImage } from 'utils/ImageCompression';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type UseImageUploaderProps = {
   editorRef: MutableRefObject<ReactQuill>;
@@ -17,6 +18,8 @@ export const useImageUploader = ({
   setIsUploading,
   setContentDelta,
 }: UseImageUploaderProps) => {
+  const user = useUserStore();
+
   const handleImageUploader = useCallback(
     async (file: File) => {
       const editor = editorRef.current?.editor;
@@ -39,7 +42,7 @@ export const useImageUploader = ({
         const uploadedFileUrl = await uploadFileToS3(
           compressedFile,
           app.serverUrl(),
-          app.user.jwt,
+          user.jwt || '',
         );
 
         // insert image op at the selected index

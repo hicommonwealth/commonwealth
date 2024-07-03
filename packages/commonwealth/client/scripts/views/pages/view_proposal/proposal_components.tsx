@@ -17,6 +17,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { cancelProposal } from '../../components/proposals/helpers';
 import { ThreadLink } from './proposal_header_links';
+import { userStore } from 'client/scripts/state/ui/user';
 
 type BaseCancelButtonProps = {
   onModalClose?: () => void;
@@ -93,7 +94,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
             source: LinkSource.Proposal,
             identifier: proposal.identifier,
           },
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
         })
         .then((response) => {
           setLinkedThreads(response.data.result.threads);

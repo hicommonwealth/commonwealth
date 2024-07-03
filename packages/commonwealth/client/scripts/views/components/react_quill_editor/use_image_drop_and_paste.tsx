@@ -10,6 +10,7 @@ import {
   base64ToFile,
   uploadFileToS3,
 } from './utils';
+import useUserStore from 'client/scripts/state/ui/user';
 
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 
@@ -24,6 +25,8 @@ export const useImageDropAndPaste = ({
   setIsUploading,
   setContentDelta,
 }: UseImageDropAndPasteProps) => {
+  const user = useUserStore();
+
   // must be memoized or else infinite loop
   const handleImageDropAndPaste = useCallback(
     async (imageDataUrl, imageType) => {
@@ -64,7 +67,7 @@ export const useImageDropAndPaste = ({
         const uploadedFileUrl = await uploadFileToS3(
           file,
           app.serverUrl(),
-          app.user.jwt,
+          user.jwt || '',
         );
 
         const selectedIndex = editor.getSelection()?.index;

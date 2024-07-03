@@ -5,6 +5,7 @@ import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
+import { userStore } from '../../ui/user';
 
 interface ToggleCommentSpamStatusProps {
   communityId: string;
@@ -21,7 +22,7 @@ const toggleCommentSpamStatus = async ({
 }: ToggleCommentSpamStatusProps) => {
   const method = isSpam ? 'put' : 'delete';
   const body = {
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
     chain_id: communityId,
     address: address,
     author_chain: communityId,

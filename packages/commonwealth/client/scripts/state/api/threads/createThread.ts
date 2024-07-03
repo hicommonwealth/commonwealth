@@ -13,7 +13,7 @@ import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
-import useUserStore from '../../ui/user';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface CreateThreadProps {
   address: string;
@@ -66,7 +66,7 @@ const createThread = async ({
       topic_id: topic.id,
       url,
       readOnly,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
     },
     {

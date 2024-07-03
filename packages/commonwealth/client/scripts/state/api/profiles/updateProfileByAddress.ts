@@ -4,7 +4,7 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
-import useUserStore from '../../ui/user';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface UpdateProfileByAddressProps {
   address: string;
@@ -43,7 +43,7 @@ const updateProfileByAddress = async ({
     ...(tagIds && {
       tag_ids: tagIds,
     }),
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   const responseProfile = response.data.result.profile;

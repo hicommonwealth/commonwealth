@@ -8,7 +8,7 @@ import { ApiEndpoints } from '../config';
 export const updateEmail = async ({ email }: { email: string }) => {
   await axios.post(`${app.serverUrl()}/${ApiEndpoints.UPDATE_USER_EMAIL}`, {
     email: email,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return email;
