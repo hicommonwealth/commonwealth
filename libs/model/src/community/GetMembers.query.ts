@@ -19,6 +19,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
   return {
     ...schemas.GetCommunityMembers,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const community = await models.Community.findByPk(payload.community_id);
       if (!community) {
@@ -115,7 +116,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       array_agg("Addresses".community_id) as community_ids,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
-      FROM "Profiles" p
+      FROM "Profiles"
       JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
       WHERE ${communityWhere} 
       ("Addresses".address ILIKE '%' || :searchTerm || '%')

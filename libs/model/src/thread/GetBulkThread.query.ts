@@ -23,6 +23,7 @@ export function GetBulkThreads(): Query<typeof schemas.GetBulkThreads> {
   return {
     ...schemas.GetBulkThreads,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const {
         community_id,
