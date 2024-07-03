@@ -30,7 +30,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { JSONDisplay } from './json_display';
+import { JSONDisplay } from './JSONDisplay';
 import { ProposalSubheader } from './proposal_components';
 
 type ViewProposalPageAttrs = {
