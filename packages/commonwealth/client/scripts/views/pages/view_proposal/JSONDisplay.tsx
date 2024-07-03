@@ -6,7 +6,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import JSONViewer from './json_viewer';
+import JSONViewer from './JSONViewer';
 
 interface DataType {
   title?: string;
