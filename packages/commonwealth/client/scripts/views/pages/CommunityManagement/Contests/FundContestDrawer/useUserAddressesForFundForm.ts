@@ -1,11 +1,13 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 
 const useUserAddressesForFundForm = () => {
   const { activeAccount } = useUserActiveAccount();
+  const user = useUserStore();
 
-  const addressOptions = app?.user?.activeAccounts?.map((account) => ({
+  const addressOptions = user.activeAccounts.map((account) => ({
     value: String(account.address),
     label: account.address,
   }));

@@ -13,6 +13,7 @@ import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import { Web3BaseProvider } from 'web3';
+import { userStore } from 'client/scripts/state/ui/user';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -202,7 +203,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        const updatedAddress = app.user.activeAccounts.find(
+        const updatedAddress = userStore.getState().activeAccounts.find(
           (addr) => addr.address === accounts[0],
         );
         if (!updatedAddress) return;

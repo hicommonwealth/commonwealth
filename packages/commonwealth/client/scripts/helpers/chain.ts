@@ -18,8 +18,8 @@ export const deinitChainOrCommunity = async () => {
 
   userStore.getState().setData({
     activeCommunity: null,
+    activeAccounts: [],
   });
-  app.user.setActiveAccounts([]);
   // @ts-expect-error StrictNullChecks
   app.user.ephemerallySetActiveAccount(null);
   document.title = 'Common';

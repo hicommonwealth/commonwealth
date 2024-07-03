@@ -193,7 +193,7 @@ class Account {
           ({ address, ghostAddress, community }) =>
             ghostAddress &&
             this.community.id === community.id &&
-            app.user.activeAccounts.some(
+            userStore.getState().activeAccounts.some(
               (account) => account.address === address,
             ),
         );
@@ -212,8 +212,8 @@ class Account {
               .addresses.filter(({ ghostAddress }) => {
                 return !ghostAddress;
               }),
+            activeAccounts: [],
           });
-          app.user.setActiveAccounts([], shouldRedraw);
         }
       }
     }

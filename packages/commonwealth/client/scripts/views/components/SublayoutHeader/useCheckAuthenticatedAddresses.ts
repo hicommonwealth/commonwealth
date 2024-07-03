@@ -5,6 +5,7 @@ import { CANVAS_TOPIC, chainBaseToCanvasChainId } from 'canvas';
 import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
 import { getSessionSigners } from 'shared/canvas/verify';
 import app from 'state';
+import useUserStore from 'client/scripts/state/ui/user';
 
 interface UseCheckAuthenticatedAddressesProps {
   recheck: boolean;
@@ -13,7 +14,7 @@ interface UseCheckAuthenticatedAddressesProps {
 const useCheckAuthenticatedAddresses = ({
   recheck,
 }: UseCheckAuthenticatedAddressesProps) => {
-  const userActiveAccounts = app.user.activeAccounts;
+  const user = useUserStore()
   const chainBase = app.chain?.base;
   const idOrPrefix =
     chainBase === ChainBase.CosmosSDK
@@ -30,7 +31,7 @@ const useCheckAuthenticatedAddresses = ({
 
     const newAuthenticatedAddresses: Record<string, boolean> = {};
 
-    for (const account of userActiveAccounts) {
+    for (const account of user.activeAccounts) {
       const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
 
       const communityIdOrPrefix =
@@ -60,7 +61,7 @@ const useCheckAuthenticatedAddresses = ({
     }
 
     setAuthenticatedAddresses(newAuthenticatedAddresses);
-  }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
+  }, [canvasChainId, chainBase, user.activeAccounts, recheck]);
 
   return { authenticatedAddresses };
 };

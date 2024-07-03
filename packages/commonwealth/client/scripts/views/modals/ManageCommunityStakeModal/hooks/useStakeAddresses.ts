@@ -47,7 +47,7 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
     // if user is a community member, we show active accounts connected to community
     if (app?.user?.activeAccount) {
       return getAvailableAddressesForStakeExchange(
-        app.user.activeAccounts,
+        user.activeAccounts,
         user.addresses,
       );
     }

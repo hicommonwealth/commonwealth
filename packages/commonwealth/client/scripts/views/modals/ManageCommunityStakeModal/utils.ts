@@ -1,4 +1,5 @@
 import { WalletId } from '@hicommonwealth/shared';
+import { userStore } from 'client/scripts/state/ui/user';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -83,7 +84,7 @@ export const setActiveAccountOnTransactionSuccess = async (
     app?.user?.activeAccount &&
     app.user.activeAccount.address !== userAddressUsedInTransaction
   ) {
-    const accountToSet = app.user.activeAccounts.find(
+    const accountToSet = userStore.getState().activeAccounts.find(
       (account) => account.address === userAddressUsedInTransaction,
     );
     // @ts-expect-error StrictNullChecks

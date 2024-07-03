@@ -161,12 +161,12 @@ const useJoinCommunity = () => {
           // update active accounts
           if (
             account &&
-            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+            user.activeAccounts.filter((a) => isSameAccount(a, account))
               .length === 0
           ) {
-            app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account]),
-            );
+            user.setData({
+              activeAccounts: [...user.activeAccounts, account]
+            })
           }
         }
       } else {

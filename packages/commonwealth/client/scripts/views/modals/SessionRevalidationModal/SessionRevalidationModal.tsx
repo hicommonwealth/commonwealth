@@ -22,6 +22,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import useAuthentication from '../AuthModal/useAuthentication'; // TODO: This modal should be absorbed into AuthModal
 import './SessionRevalidationModal.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -34,6 +35,8 @@ const SessionRevalidationModal = ({
   walletAddress,
 }: SessionRevalidationModalProps) => {
   const [connectWithEmail, setConnectWithEmail] = useState(false);
+
+  const user = useUserStore();
 
   const {
     onWalletAddressSelect,
@@ -55,7 +58,7 @@ const SessionRevalidationModal = ({
       // expected for session key revalidation
 
       // @ts-expect-error StrictNullChecks
-      const isSubstrate = app.user.activeAccounts.find(
+      const isSubstrate = user.activeAccounts.find(
         (addr) => addr.address === walletAddress,
       ).community.ss58Prefix;
       if (
@@ -64,13 +67,13 @@ const SessionRevalidationModal = ({
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
-        const updatedAddress = app.user.activeAccounts.find(
+        const updatedAddress = user.activeAccounts.find(
           (addr) => addr.address === walletAddress,
         );
         await setActiveAccount(updatedAddress!);
       } else {
         await setActiveAccount(
-          app.user.activeAccounts.find(
+          user.activeAccounts.find(
             (addr) => addr.address === signedAddress!,
           )!,
         );

@@ -339,12 +339,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // @ts-expect-error <StrictNullChecks>
       if (walletToUse.chain !== 'near') {
         // @ts-expect-error StrictNullChecks
-        await account.validate(session, false);
+        await account.validate(session, false); // TODO: test if this ready does need to block user activeAccounts refresh
         // @ts-expect-error StrictNullChecks
         await verifySession(session);
       }
       // @ts-expect-error <StrictNullChecks>
-      await onLogInWithAccount(account, false, true, false);
+      await onLogInWithAccount(account, false, true, false); // TODO: test if this ready does need to block user activeAccounts refresh
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api

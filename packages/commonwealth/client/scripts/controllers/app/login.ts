@@ -58,13 +58,12 @@ export async function setActiveAccount(
   if (!role) {
     app.user.ephemerallySetActiveAccount(account);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(
-        app.user.activeAccounts.concat([account]),
-        shouldRedraw,
-      );
+      userStore.getState().setData({
+        activeAccounts: [...userStore.getState().activeAccounts, account],
+      });
     }
 
     // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
@@ -100,13 +99,12 @@ export async function setActiveAccount(
 
     app.user.ephemerallySetActiveAccount(account);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(
-        app.user.activeAccounts.concat([account]),
-        shouldRedraw,
-      );
+      userStore.getState().setData({
+        activeAccounts: [...userStore.getState().activeAccounts, account],
+      });
     }
   } catch (err) {
     // Failed to set the user's active address to this account.
@@ -162,10 +160,12 @@ export async function completeClientLogin(account: Account) {
     // set the address as active
     await setActiveAccount(account);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      userStore.getState().setData({
+        activeAccounts: [...userStore.getState().activeAccounts, account],
+      });
     }
   } catch (e) {
     console.trace(e);
@@ -181,8 +181,8 @@ export async function updateActiveAddresses({
 }) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
-  app.user.setActiveAccounts(
-    userStore
+  userStore.getState().setData({
+    activeAccounts: userStore
       .getState()
       .addresses // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
@@ -197,11 +197,10 @@ export async function updateActiveAddresses({
         return tempAddr;
       })
       .filter((addr) => addr),
-    shouldRedraw,
-  );
+  });
 
   // select the address that the new chain should be initialized with
-  const memberAddresses = app.user.activeAccounts.filter((account) => {
+  const memberAddresses = userStore.getState().activeAccounts.filter((account) => {
     // @ts-expect-error StrictNullChecks
     return app.roles.isMember({ community: chain.id, account });
   });
@@ -209,7 +208,7 @@ export async function updateActiveAddresses({
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
     await setActiveAccount(memberAddresses[0], shouldRedraw);
-  } else if (app.user.activeAccounts.length === 0) {
+  } else if (userStore.getState().activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
     // Find all addresses in the current community for this account, sorted by last used date/time
@@ -251,7 +250,7 @@ export async function updateActiveAddresses({
       foundAddressWithActiveSessionKey || communityAddressesSortedByLastUsed[0];
 
     if (addressToUse) {
-      const account = app.user.activeAccounts.find((a) => {
+      const account = userStore.getState().activeAccounts.find((a) => {
         return (
           a.community.id === addressToUse.community.id &&
           a.address === addressToUse.address
@@ -281,7 +280,8 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
-    app.user.setActiveAccounts([]);
+    userStore.getState().setData({ activeAccounts: [] });
+
     // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);
   } else {

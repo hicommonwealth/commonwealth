@@ -8,6 +8,7 @@ import type IWebWallet from '../../../models/IWebWallet';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import { userStore } from 'client/scripts/state/ui/user';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import { Web3BaseProvider } from 'web3';
@@ -181,7 +182,7 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        const updatedAddress = app.user.activeAccounts.find(
+        const updatedAddress = userStore.getState().activeAccounts.find(
           (addr) => addr.address === accounts[0],
         );
         if (!updatedAddress) return;
