@@ -1,4 +1,4 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
@@ -55,53 +55,38 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
   document.title = `Common – ${chain.name}`;
 
   // Import top-level chain adapter lazily, to facilitate code split.
-  let newChain;
-  let initApi; // required for NEAR
-
-  if (chain.base === ChainBase.Substrate) {
-    const Substrate = (await import('../controllers/chain/substrate/adapter'))
-      .default;
-    newChain = new Substrate(chain, app);
-  } else if (chain.base === ChainBase.CosmosSDK) {
-    const Cosmos = (await import('../controllers/chain/cosmos/adapter'))
-      .default;
-    newChain = new Cosmos(chain, app);
-  } else if (
-    chain.network === ChainNetwork.NEAR ||
-    chain.network === ChainNetwork.NEARTestnet ||
-    chain.network === ChainNetwork.Sputnik
-  ) {
-    const Near = (await import('../controllers/chain/near/adapter')).default;
-    newChain = new Near(chain, app);
-    initApi = true;
-  } else if (chain.network === ChainNetwork.Compound) {
-    const Compound = (
-      await import('../controllers/chain/ethereum/compound/adapter')
-    ).default;
-    newChain = new Compound(chain, app);
-  } else if (chain.network === ChainNetwork.Aave) {
-    const Aave = (await import('../controllers/chain/ethereum/aave/adapter'))
-      .default;
-    newChain = new Aave(chain, app);
-  } else if (
-    chain.base === ChainBase.Solana ||
-    chain.network === ChainNetwork.SPL
-  ) {
-    const Solana = (await import('../controllers/chain/solana/adapter'))
-      .default;
-    newChain = new Solana(chain, app);
-  } else if (
-    (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
-    chain.network === ChainNetwork.Ethereum ||
-    chain.network === ChainNetwork.ERC721 ||
-    chain.network === ChainNetwork.ERC20
-  ) {
-    const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
-      .default;
-    newChain = new Ethereum(chain, app);
-  } else {
-    throw new Error('Invalid chain');
-  }
+  const newChain = await (async (base: ChainBase) => {
+    switch (base) {
+      case ChainBase.Substrate: {
+        const Substrate = (
+          await import('../controllers/chain/substrate/adapter')
+        ).default;
+        return new Substrate(chain, app);
+      }
+      case ChainBase.CosmosSDK: {
+        const Cosmos = (await import('../controllers/chain/cosmos/adapter'))
+          .default;
+        return new Cosmos(chain, app);
+      }
+      case ChainBase.NEAR: {
+        const Near = (await import('../controllers/chain/near/adapter'))
+          .default;
+        return new Near(chain, app);
+      }
+      case ChainBase.Solana: {
+        const Solana = (await import('../controllers/chain/solana/adapter'))
+          .default;
+        return new Solana(chain, app);
+      }
+      case ChainBase.Ethereum: {
+        const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
+          .default;
+        return new Ethereum(chain, app);
+      }
+      default:
+        throw new Error('Invalid Chain');
+    }
+  })(chain.base);
 
   // Load server data without initializing modules/chain connection.
   const finalizeInitialization = await newChain.initServer();
@@ -119,10 +104,6 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     return false;
   } else {
     app.chain = newChain;
-  }
-
-  if (initApi) {
-    await app.chain.initApi(); // required for loading NearAccounts
   }
 
   app.chainPreloading = false;

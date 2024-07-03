@@ -38,12 +38,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
   const showOnChainProposalItem =
-    (app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain?.network !== ChainNetwork.Terra &&
-      app.chain?.network !== ChainNetwork.Kava) ||
-    (app.chain?.base === ChainBase.Ethereum &&
-      app.chain?.network === ChainNetwork.Aave) ||
-    app.chain?.network === ChainNetwork.Compound;
+    app.chain?.base === ChainBase.CosmosSDK &&
+    app.chain?.network !== ChainNetwork.Terra &&
+    app.chain?.network !== ChainNetwork.Kava;
 
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
