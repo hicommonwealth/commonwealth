@@ -34,7 +34,7 @@ const App = () => {
                 <Splash />
               ) : (
                 <>
-                  <Mava />
+                  {/* <Mava /> */}
                   <RouterProvider router={router(customDomain)} />
                   {isAddedToHomeScreen || isMarketingPage ? null : (
                     <AddToHomeScreenPrompt

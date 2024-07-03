@@ -7,7 +7,7 @@ import { typeToIconAndName } from './utils';
 import './NavigationButton.scss';
 
 export interface NavigationButtonProps {
-  type: 'home' | 'create' | 'explore' | 'notifications';
+  type: 'home' | 'create' | 'leaderboard' | 'explore' | 'notifications';
   selected: boolean;
   onClick: () => void;
 }

@@ -21,7 +21,8 @@ coverage/
 cache/
 stats.json
 serviceAccountKey.json
-
+/android
+/ios
 
 # Database downloads
 latest.dump

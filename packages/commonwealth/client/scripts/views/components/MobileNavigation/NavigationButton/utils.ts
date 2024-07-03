@@ -13,8 +13,10 @@ export const typeToIconAndName = (
       return ['house', 'Home'];
     case 'create':
       return ['plusCirclePhosphor', 'Create'];
+    case 'leaderboard':
+      return ['trophy', 'Leaderboard'];
     case 'explore':
-      return ['compassPhosphor', 'Explore'];
+      return ['compassPhosphor', 'Activity'];
     case 'notifications':
       return ['bell', 'Notifications'];
   }

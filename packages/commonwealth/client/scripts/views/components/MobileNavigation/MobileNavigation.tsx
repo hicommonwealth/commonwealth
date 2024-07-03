@@ -40,6 +40,11 @@ const MobileNavigation = () => {
         ]
       : []),
     {
+      type: 'leaderboard',
+      onClick: () => navigate('/dashboard', {}, null),
+      selected: !!matchesDashboard,
+    },
+    {
       type: 'explore',
       onClick: () => navigate('/dashboard', {}, null),
       selected: !!matchesDashboard,
