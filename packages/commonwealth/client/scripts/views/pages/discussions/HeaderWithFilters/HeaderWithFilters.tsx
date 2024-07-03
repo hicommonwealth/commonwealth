@@ -2,7 +2,6 @@ import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -28,6 +27,7 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useCommunityStakeStore from 'state/ui/communityStake';
@@ -73,12 +73,13 @@ export const HeaderWithFilters = ({
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
   const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
   const { stakeEnabled } = useCommunityStake();
   const { dismissBanner, isBannerVisible } = useCommunityStakeStore();
   const { isContestAvailable, contestsData } = useCommunityContests();
+
+  const user = useUserStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -138,12 +139,12 @@ export const HeaderWithFilters = ({
 
   const stages = !customStages
     ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
-      ]
+      ThreadStage.Discussion,
+      ThreadStage.ProposalInReview,
+      ThreadStage.Voting,
+      ThreadStage.Passed,
+      ThreadStage.Failed,
+    ]
     : parseCustomStages(customStages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
@@ -174,35 +175,35 @@ export const HeaderWithFilters = ({
     if (matchesArchivedRoute && !pickedTopic) {
       navigate(
         `/archived?` +
-          Object.keys(urlParams)
-            .map((x) => `${x}=${urlParams[x]}`)
-            .join('&'),
+        Object.keys(urlParams)
+          .map((x) => `${x}=${urlParams[x]}`)
+          .join('&'),
       );
     } else if (filterKey === 'contest') {
       navigate(
         `/discussions?` +
-          Object.keys(urlParams)
-            .map((param) => {
-              if (param === 'stage') {
-                return false;
-              }
-              return `${param}=${urlParams[param]}`;
-            })
-            .filter(Boolean)
-            .join('&'),
+        Object.keys(urlParams)
+          .map((param) => {
+            if (param === 'stage') {
+              return false;
+            }
+            return `${param}=${urlParams[param]}`;
+          })
+          .filter(Boolean)
+          .join('&'),
       );
     } else {
       navigate(
         `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-          Object.keys(urlParams)
-            .map((param) => {
-              if (pickedTopic && (param === 'contest' || param === 'status')) {
-                return false;
-              }
-              return `${param}=${urlParams[param]}`;
-            })
-            .filter(Boolean)
-            .join('&'),
+        Object.keys(urlParams)
+          .map((param) => {
+            if (pickedTopic && (param === 'contest' || param === 'status')) {
+              return false;
+            }
+            return `${param}=${urlParams[param]}`;
+          })
+          .filter(Boolean)
+          .join('&'),
       );
     }
   };
@@ -260,12 +261,11 @@ export const HeaderWithFilters = ({
               iconLeft="plus"
               onClick={() => {
                 navigate(
-                  `/new/discussion${
-                    topic ? `?topic=${selectedTopic?.id}` : ''
+                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''
                   }`,
                 );
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>
@@ -378,9 +378,9 @@ export const HeaderWithFilters = ({
                     })),
                     ...(contestFiltersVisible
                       ? [
-                          { type: 'header-divider', label: 'Contests' },
-                          ...contestNameOptions,
-                        ]
+                        { type: 'header-divider', label: 'Contests' },
+                        ...contestNameOptions,
+                      ]
                       : []),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
@@ -449,11 +449,10 @@ export const HeaderWithFilters = ({
                       ...stages.map((s) => ({
                         id: s,
                         value: s,
-                        label: `${threadStageToLabel(s)} ${
-                          s === ThreadStage.Voting
+                        label: `${threadStageToLabel(s)} ${s === ThreadStage.Voting
                             ? totalThreadsInCommunityForVoting
                             : ''
-                        }`,
+                          }`,
                       })),
                     ]}
                     dropdownPosition={rightFiltersDropdownPosition}

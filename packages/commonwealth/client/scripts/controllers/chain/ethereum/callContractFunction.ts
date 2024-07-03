@@ -8,6 +8,8 @@ import type Web3 from 'web3';
 import type { TransactionReceipt } from 'web3';
 import { AbiFunctionFragment, Transaction, Web3BaseProvider } from 'web3';
 import WebWalletController from '../../app/web_wallets';
+import { userStore } from 'client/scripts/state/ui/user';
+import Account from 'client/scripts/models/Account';
 
 async function sendFunctionCall({
   fn,
@@ -77,7 +79,7 @@ export async function callContractFunction({
   inputArgs: string[];
   tx_options?: any;
 }): Promise<TransactionReceipt | any> {
-  const sender = app.user.activeAccount;
+  const sender = userStore.getState().activeAccount as Account;
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,

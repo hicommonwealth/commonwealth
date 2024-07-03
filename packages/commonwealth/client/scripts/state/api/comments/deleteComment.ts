@@ -8,6 +8,7 @@ import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
+import { userStore } from '../../ui/user';
 
 interface DeleteCommentProps {
   address: string;
@@ -24,7 +25,7 @@ const deleteComment = async ({
   canvasHash,
 }: DeleteCommentProps) => {
   const canvasSignedData = await signDeleteComment(
-    app.user.activeAccount.address,
+    userStore.getState().activeAccount?.address || '',
     {
       comment_id: canvasHash,
     },

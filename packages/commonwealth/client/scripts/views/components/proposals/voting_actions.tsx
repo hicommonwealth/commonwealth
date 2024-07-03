@@ -38,6 +38,7 @@ import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type VotingActionsProps = {
   onModalClose: () => void;
@@ -55,6 +56,8 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const userData = useUserStore();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   useEffect(() => {
@@ -69,9 +72,9 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   if (!isLoggedIn) {
     return <CannotVote label="Sign in to vote" />;
-  } else if (!app.user.activeAccount) {
+  } else if (!userData.activeAccount) {
     return <CannotVote label="Connect an address to vote" />;
-  } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
+  } else if (!proposal.canVoteFrom(userData.activeAccount)) {
     return <CannotVote label="Cannot vote from this address" />;
   }
 
@@ -81,14 +84,14 @@ export const VotingActions = (props: VotingActionsProps) => {
     proposal instanceof CosmosProposal ||
     proposal instanceof CosmosProposalV1
   ) {
-    user = app.user.activeAccount as CosmosAccount;
+    user = userData.activeAccount as CosmosAccount;
   } else if (
     proposal instanceof CompoundProposal ||
     proposal instanceof AaveProposal
   ) {
-    user = app.user.activeAccount as EthereumAccount;
+    user = userData.activeAccount as EthereumAccount;
   } else if (proposal instanceof NearSputnikProposal) {
-    user = app.user.activeAccount as NearAccount;
+    user = userData.activeAccount as NearAccount;
   } else {
     return <CannotVote label="Unrecognized proposal type" />;
   }

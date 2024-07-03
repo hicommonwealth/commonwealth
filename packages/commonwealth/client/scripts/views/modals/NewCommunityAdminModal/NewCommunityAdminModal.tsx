@@ -20,6 +20,7 @@ import {
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './NewCommunityAdminModal.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 interface NewCommunityAdminModalProps {
   onModalClose: () => void;
@@ -34,7 +35,8 @@ const NewCommunityAdminModal = ({
   handleClickContinue,
   selectedCommunity,
 }: NewCommunityAdminModalProps) => {
-  const availableAddressesOnSelectedChain = app.user?.addresses?.filter(
+  const user = useUserStore();
+  const availableAddressesOnSelectedChain = user.addresses?.filter(
     (addressInfo) => addressInfo.community.base === selectedCommunity.chainBase,
   );
 

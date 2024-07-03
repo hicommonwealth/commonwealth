@@ -18,6 +18,7 @@ import { AuthModal } from 'views/modals/AuthModal';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -40,13 +41,14 @@ export const ReactionButton = ({
   const reactors = thread?.associatedReactions?.map((t) => t.address);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
       (acc, curr) => acc + (curr.voting_weight || 1),
       0,
     ) || 0;
-  const activeAddress = app.user.activeAccount?.address;
+  const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
   );
@@ -71,7 +73,7 @@ export const ReactionButton = ({
     reset: resetDeleteThreadReactionMutation,
   } = useDeleteThreadReactionMutation({
     communityId: app.activeChainId(),
-    address: app.user.activeAccount?.address,
+    address: user.activeAccount?.address || '',
     threadId: thread.id,
   });
 
@@ -92,7 +94,7 @@ export const ReactionButton = ({
     event.preventDefault();
     if (isLoading || disabled) return;
 
-    if (!app.isLoggedIn() || !app.user.activeAccount) {
+    if (!app.isLoggedIn() || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }
@@ -104,7 +106,7 @@ export const ReactionButton = ({
 
       deleteThreadReaction({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount?.address,
+        address: user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
@@ -116,7 +118,7 @@ export const ReactionButton = ({
     } else {
       createThreadReaction({
         communityId: app.activeChainId(),
-        address: activeAddress,
+        address: activeAddress || '',
         threadId: thread.id,
         reactionType: 'like',
         isPWA: isAddedToHomeScreen,

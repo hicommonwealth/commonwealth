@@ -61,8 +61,8 @@ export const ManageRoles = ({
   const handleDeleteRole = async (role: RoleInfo) => {
     const isSelf =
       // @ts-expect-error <StrictNullChecks/>
-      role.Address.address === app.user.activeAccount?.address &&
-      role.community_id === app.user.activeAccount?.community.id;
+      role.Address.address === user.activeAccount?.address &&
+      role.community_id === user.activeAccount?.community.id;
 
     const roleBelongsToUser = !!user.addresses.filter(
       // @ts-expect-error <StrictNullChecks/>

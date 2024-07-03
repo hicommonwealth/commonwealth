@@ -11,6 +11,8 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 import { ApiEndpoints } from 'state/api/config';
 import AaveProposal from './proposal';
+import { userStore } from 'client/scripts/state/ui/user';
+import Account from 'client/scripts/models/Account';
 
 export interface AaveProposalArgs {
   executor: string;
@@ -43,7 +45,7 @@ export default class AaveGovernance extends ProposalModule<
 
   // METHODS
   public async propose(args: AaveProposalArgs) {
-    const address = this.app.user.activeAccount.address;
+    const address = userStore.getState().activeAccount?.address || '';
     const {
       executor,
       targets,
@@ -93,7 +95,7 @@ export default class AaveGovernance extends ProposalModule<
 
     // send transaction
     const contract = await attachSigner(
-      this.app.user.activeAccount,
+      userStore.getState().activeAccount as Account,
       this._api.Governance,
     );
     const tx = await contract.create(

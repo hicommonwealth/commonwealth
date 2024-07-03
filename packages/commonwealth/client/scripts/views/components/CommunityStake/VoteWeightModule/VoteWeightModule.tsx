@@ -11,6 +11,7 @@ import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStake
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
+import useUserStore from 'client/scripts/state/ui/user';
 import app from 'state';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './VoteWeightModule.scss';
@@ -30,8 +31,10 @@ export const VoteWeightModule = ({
   denomination,
   onOpenStakeModal,
 }: VoteWeightModuleProps) => {
+  const user = useUserStore();
+
   // allow user to buy stake if they have a connected address that matches active community base chain
-  const canBuyStake = !!app?.user?.addresses?.find?.(
+  const canBuyStake = !!user.addresses.find?.(
     (address) => address?.community?.base === app?.chain?.base,
   );
 

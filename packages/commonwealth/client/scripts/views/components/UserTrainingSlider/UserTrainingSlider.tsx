@@ -1,5 +1,4 @@
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import app from 'client/scripts/state';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -19,13 +18,12 @@ import { UserTrainingCardTypes } from './types';
 export const UserTrainingSlider = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+  const user = useUserStore();
+  const profileId = user.addresses?.[0]?.profile?.id;
 
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
   >();
-
-  const user = useUserStore();
 
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({

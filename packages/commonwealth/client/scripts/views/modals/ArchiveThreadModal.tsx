@@ -10,6 +10,7 @@ import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type ArchiveThreadModalProps = {
   onModalClose: () => void;
@@ -26,13 +27,14 @@ export const ArchiveThreadModal = ({
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
   });
+  const user = useUserStore();
 
   const handleArchiveThread = async () => {
     editThread({
       threadId: thread.id,
       communityId: app.activeChainId(),
       archived: !thread.archivedAt,
-      address: app.user?.activeAccount?.address,
+      address: user.activeAccount?.address || '',
       pinned: false,
     })
       .then(() => {

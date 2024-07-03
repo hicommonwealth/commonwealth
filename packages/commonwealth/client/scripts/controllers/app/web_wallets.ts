@@ -55,7 +55,7 @@ export default class WebWalletController {
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
   public async _setWalletId(account: Account, wallet: WalletId): Promise<void> {
-    if (app.user.activeAccount.address !== account.address) {
+    if (userStore.getState().activeAccount?.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
     }

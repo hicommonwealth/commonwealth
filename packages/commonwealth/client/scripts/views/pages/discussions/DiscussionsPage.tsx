@@ -1,4 +1,3 @@
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -34,6 +33,7 @@ import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -73,15 +73,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
+  const user = useUserStore();
+
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   const { contestsData } = useCommunityContests();
-
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -187,7 +187,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!hasJoinedCommunity,
+            isCommunityMember: !!user.activeAccount,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,

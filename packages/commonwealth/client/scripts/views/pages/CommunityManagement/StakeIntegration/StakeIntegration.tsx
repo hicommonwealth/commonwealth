@@ -39,7 +39,7 @@ const StakeIntegration = () => {
   }`;
   const selectedAddress = user.addresses.find(
     (x) =>
-      x.address === app.user.activeAccount.address &&
+      x.address === user.activeAccount?.address &&
       x.community.id === community.id,
   );
 

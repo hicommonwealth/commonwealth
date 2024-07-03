@@ -18,6 +18,8 @@ import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import CompoundProposal from './proposal';
+import { userStore } from 'client/scripts/state/ui/user';
+import Account from 'client/scripts/models/Account';
 
 export interface CompoundProposalArgs {
   targets: string[];
@@ -75,9 +77,9 @@ export default class CompoundGovernance extends ProposalModule<
   }
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
-    const address = this.app.user.activeAccount.address;
+    const address = userStore.getState().activeAccount?.address || '';
     const contract = await attachSigner(
-      this.app.user.activeAccount,
+      userStore.getState().activeAccount as Account,
       this._api.Contract,
     );
 

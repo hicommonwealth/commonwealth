@@ -1,7 +1,7 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
+import useUserStore from 'client/scripts/state/ui/user';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
@@ -23,36 +23,36 @@ import './Allowlist.scss';
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
 ) => [
-  {
-    key: 'name',
-    header: 'Users',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'address',
-    header: 'Address',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'stakeBalance',
-    header: 'Stake',
-    hasCustomSortValue: true,
-    numeric: true,
-    sortable: true,
-    hidden: !isStakedCommunity,
-  },
-  {
-    key: 'groups',
-    header: 'Groups',
-    hasCustomSortValue: true,
-    numeric: false,
-    sortable: false,
-  },
-];
+    {
+      key: 'name',
+      header: 'Users',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'address',
+      header: 'Address',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'stakeBalance',
+      header: 'Stake',
+      hasCustomSortValue: true,
+      numeric: true,
+      sortable: true,
+      hidden: !isStakedCommunity,
+    },
+    {
+      key: 'groups',
+      header: 'Groups',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: false,
+    },
+  ];
 
 type AllowlistProps = {
   allowedAddresses: string[];
@@ -77,8 +77,7 @@ const Allowlist = ({
   allowedAddresses,
   setAllowedAddresses,
 }: AllowlistProps) => {
-  useUserActiveAccount();
-
+  const user = useUserStore();
   const [searchFilters, setSearchFilters] = useState({
     searchText: '',
     groupFilter: 'all-community',
@@ -88,8 +87,8 @@ const Allowlist = ({
 
   const { data: memberships } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   const isStakedCommunity = !!app.config.chains.getById(app.activeChainId())

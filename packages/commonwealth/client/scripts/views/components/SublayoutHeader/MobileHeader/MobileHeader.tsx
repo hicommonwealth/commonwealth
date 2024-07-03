@@ -21,6 +21,7 @@ import useUserMenuItems from '../useUserMenuItems';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './MobileHeader.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 interface MobileHeaderProps {
   onMobile: boolean;
@@ -46,7 +47,8 @@ const MobileHeader = ({
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
-  const user = app?.user?.addresses?.[0];
+  const userData = useUserStore();
+  const user = userData.addresses?.[0];
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity

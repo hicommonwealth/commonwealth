@@ -10,6 +10,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { JoinCommunityCard } from './JoinCommunityCard';
 import './JoinCommunityStep.scss';
 import { findSuggestedCommunities } from './helpers';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type JoinCommunityStepProps = {
   onComplete: () => void;
@@ -20,7 +21,8 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   const [suggestedCommunities, setSuggestedCommunities] = useState<
     { community: ChainInfo; isJoined: boolean }[]
   >([]);
-  const userAddress = useRef(app?.user?.addresses?.[0]);
+  const user = useUserStore();
+  const userAddress = useRef(user.addresses?.[0]);
   const areCommunitiesSuggested = useRef(false);
 
   const { data: profile, isLoading: isLoadingProfile } =

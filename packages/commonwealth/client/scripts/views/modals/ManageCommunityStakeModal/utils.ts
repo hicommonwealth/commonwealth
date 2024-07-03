@@ -81,8 +81,8 @@ export const setActiveAccountOnTransactionSuccess = async (
   userAddressUsedInTransaction: string,
 ) => {
   if (
-    app?.user?.activeAccount &&
-    app.user.activeAccount.address !== userAddressUsedInTransaction
+    userStore.getState().activeAccount &&
+    userStore.getState().activeAccount?.address !== userAddressUsedInTransaction
   ) {
     const accountToSet = userStore.getState().accounts.find(
       (account) => account.address === userAddressUsedInTransaction,

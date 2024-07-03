@@ -1,8 +1,8 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import useUserStore from 'client/scripts/state/ui/user';
 import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -53,9 +53,9 @@ const GROUP_AND_MEMBER_FILTERS = [
 
 const CommunityMembersPage = () => {
   const allowlistEnabled = useFlag('allowlist');
-  useUserActiveAccount();
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState({
@@ -77,8 +77,8 @@ const CommunityMembersPage = () => {
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -144,8 +144,8 @@ const CommunityMembersPage = () => {
         `${searchFilters.groupFilter}`,
       ) &&
         searchFilters.groupFilter && {
-          memberships: `in-group:${searchFilters.groupFilter}`,
-        }),
+        memberships: `in-group:${searchFilters.groupFilter}`,
+      }),
       ...(searchFilters.groupFilter === 'Ungrouped' && {
         memberships: 'not-in-group',
       }),
@@ -157,14 +157,14 @@ const CommunityMembersPage = () => {
     {
       initialCursor: 1,
       getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+      enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled: user.activeAccount?.address ? !!memberships : true,
   });
 
   const filterOptions = useMemo(
@@ -218,10 +218,10 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-              // @ts-expect-error <StrictNullChecks/>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-            ) ||
-            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            // @ts-expect-error <StrictNullChecks/>
+            g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
+          ) ||
+          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
           : true,
       );
 
@@ -241,8 +241,8 @@ const CommunityMembersPage = () => {
       .filter((group) =>
         searchFilters.searchText
           ? group.name
-              .toLowerCase()
-              .includes(searchFilters.searchText.toLowerCase())
+            .toLowerCase()
+            .includes(searchFilters.searchText.toLowerCase())
           : true,
       )
       .filter((group) => {
@@ -362,8 +362,8 @@ const CommunityMembersPage = () => {
 
         {/* Filter section */}
         {selectedTab === TABS[1].value &&
-        groups?.length === 0 &&
-        !allowlistEnabled ? (
+          groups?.length === 0 &&
+          !allowlistEnabled ? (
           <></>
         ) : (
           <section
@@ -381,9 +381,8 @@ const CommunityMembersPage = () => {
             <CWTextInput
               size="large"
               fullWidth
-              placeholder={`Search ${
-                selectedTab === TABS[0].value ? 'members' : 'groups'
-              }`}
+              placeholder={`Search ${selectedTab === TABS[0].value ? 'members' : 'groups'
+                }`}
               containerClassName="search-input-container"
               inputClassName="search-input"
               iconLeft={<CWIcon iconName="search" className="search-icon" />}
@@ -394,7 +393,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {app.user.activeAccount && (
+            {user.activeAccount && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter

@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import useUserStore, { userStore } from 'client/scripts/state/ui/user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -35,7 +35,7 @@ const resetSidebarState = () => {
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
-    app.user.activeAccount && !!app.chain?.meta.snapshot.length;
+    userStore.getState().activeAccount && !!app.chain?.meta.snapshot.length;
 
   const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 
@@ -80,50 +80,50 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
       ? [
-          {
-            label: 'New On-Chain Proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal');
-            },
-            iconLeft: 'star',
+        {
+          label: 'New On-Chain Proposal',
+          onClick: () => {
+            resetSidebarState();
+            navigate('/new/proposal');
           },
-        ]
+          iconLeft: 'star',
+        },
+      ]
       : [];
 
   const getSputnikProposalItem = (): PopoverMenuItem[] =>
     showSputnikProposalItem
       ? [
-          {
-            label: 'New Sputnik proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal');
-            },
-            iconLeft: 'democraticProposal',
+        {
+          label: 'New Sputnik proposal',
+          onClick: () => {
+            resetSidebarState();
+            navigate('/new/proposal');
           },
-        ]
+          iconLeft: 'democraticProposal',
+        },
+      ]
       : [];
 
   const getSnapshotProposalItem = (): PopoverMenuItem[] =>
     showSnapshotOptions
       ? [
-          {
-            label: 'New Snapshot Proposal',
-            iconLeft: 'democraticProposal',
-            onClick: () => {
-              resetSidebarState();
-              const snapshotSpaces = app.chain.meta.snapshot;
-              if (snapshotSpaces.length > 1) {
-                navigate('/multiple-snapshots', {
-                  action: 'create-proposal',
-                });
-              } else {
-                navigate(`/new/snapshot/${snapshotSpaces}`);
-              }
-            },
+        {
+          label: 'New Snapshot Proposal',
+          iconLeft: 'democraticProposal',
+          onClick: () => {
+            resetSidebarState();
+            const snapshotSpaces = app.chain.meta.snapshot;
+            if (snapshotSpaces.length > 1) {
+              navigate('/multiple-snapshots', {
+                action: 'create-proposal',
+              });
+            } else {
+              navigate(`/new/snapshot/${snapshotSpaces}`);
+            }
           },
-        ]
+        },
+      ]
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
@@ -157,13 +157,11 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               const isCustomDomain = app.isCustomDomain();
 
               window.open(
-                `https://discord.com/oauth2/authorize?client_id=${
-                  process.env.DISCORD_CLIENT_ID
+                `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID
                 }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-                  `${
-                    !isCustomDomain
-                      ? window.location.origin
-                      : 'https://commonwealth.im'
+                  `${!isCustomDomain
+                    ? window.location.origin
+                    : 'https://commonwealth.im'
                   }`,
                 )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                   JSON.stringify({
@@ -190,24 +188,24 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   return [
     ...(app.activeChainId()
       ? [
-          {
-            type: 'header',
-            label: 'Create Within Community',
-          } as PopoverMenuItem,
-          {
-            label: 'New Thread',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/discussion');
-            },
-            iconLeft: 'pencil',
-          } as PopoverMenuItem,
-          ...getOnChainProposalItem(),
-          ...getSputnikProposalItem(),
-          ...getSnapshotProposalItem(),
-          ...getTemplateItems(),
-          ...getDiscordBotConnectionItems(),
-        ]
+        {
+          type: 'header',
+          label: 'Create Within Community',
+        } as PopoverMenuItem,
+        {
+          label: 'New Thread',
+          onClick: () => {
+            resetSidebarState();
+            navigate('/new/discussion');
+          },
+          iconLeft: 'pencil',
+        } as PopoverMenuItem,
+        ...getOnChainProposalItem(),
+        ...getSputnikProposalItem(),
+        ...getSnapshotProposalItem(),
+        ...getTemplateItems(),
+        ...getDiscordBotConnectionItems(),
+      ]
       : []),
     {
       type: 'header',
@@ -257,13 +255,13 @@ export const CreateContentSidebar = ({
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   if (
     !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
-    !hasJoinedCommunity
+    !user.activeAccount
   ) {
     return;
   }

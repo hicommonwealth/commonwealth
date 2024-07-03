@@ -228,8 +228,8 @@ const EditProfile = () => {
           .filter((tag) => tag.isSelected)
           .map((tag) => tag.item.id),
         profileId: profile?.id,
-        address: app.user?.activeAccount?.address,
-        chain: app.user?.activeAccount?.community?.id,
+        address: user.activeAccount?.address || '',
+        chain: user.activeAccount?.community?.id || '',
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);

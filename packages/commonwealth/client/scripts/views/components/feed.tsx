@@ -11,7 +11,6 @@ import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 import { slugify } from '@hicommonwealth/shared';
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
 import Topic from 'client/scripts/models/Topic';
@@ -22,6 +21,7 @@ import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 import Permissions from 'client/scripts/utils/Permissions';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type ActivityResponse = {
   thread: {
@@ -65,6 +65,7 @@ const DEFAULT_COUNT = 10;
 
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
@@ -77,10 +78,9 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
-    // @ts-expect-error <StrictNullChecks/>
-    Permissions.isCommunityAdmin(null, thread.communityId);
+    Permissions.isCommunityAdmin(undefined, thread.communityId);
 
-  const account = app?.user?.addresses?.find(
+  const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
   );
 
@@ -143,7 +143,6 @@ export const Feed = ({
   customScrollParent,
   isChainEventsRow,
 }: FeedProps) => {
-  useUserActiveAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<

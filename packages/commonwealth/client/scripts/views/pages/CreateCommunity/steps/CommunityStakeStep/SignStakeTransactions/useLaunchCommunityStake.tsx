@@ -1,11 +1,11 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
-import app from 'state';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
@@ -33,6 +33,8 @@ const useLaunchCommunityStake = ({
   const { mutateAsync: updateCommunityStake } = useUpdateCommunityStake();
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const user = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -65,8 +67,7 @@ const useLaunchCommunityStake = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.LAUNCHED_COMMUNITY_STAKE,
         community: chainId,
-        // @ts-expect-error <StrictNullChecks/>
-        userId: app.user.activeAccount.profile.id,
+        userId: user.activeAccount?.profile?.id,
         userAddress: selectedAddress,
         isPWA: isAddedToHomeScreen,
       });

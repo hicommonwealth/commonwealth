@@ -1,6 +1,7 @@
 import moment from 'moment';
 import type Poll from '../../../models/Poll';
 
+import { userStore } from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import React from 'react';
 import app from 'state';
@@ -12,11 +13,13 @@ export const handlePollVote = async (
   isSelected: boolean,
   callback: () => any,
 ) => {
-  const { activeAccount } = app.user;
+  if (!app.isLoggedIn() || !userStore.getState().activeAccount || isSelected)
+    return;
 
-  if (!app.isLoggedIn() || !activeAccount || isSelected) return;
-
-  const userInfo = [activeAccount.community.id, activeAccount.address] as const;
+  const userInfo = [
+    userStore.getState().activeAccount?.community?.id || '',
+    userStore.getState().activeAccount?.address || '',
+  ] as const;
 
   const confirmationText = poll.getUserVote(...userInfo)
     ? `Change your vote to '${option}'?`

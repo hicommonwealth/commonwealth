@@ -9,18 +9,10 @@ import { EventEmitter } from 'events';
 import NotificationsController from './notifications';
 
 export class UserController {
-  private _activeAccount: Account;
-  public get activeAccount(): Account {
-    return this._activeAccount;
-  }
-  private _setActiveAccount(account: Account): void {
-    this._activeAccount = account;
-  }
-  // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
-  public ephemerallySetActiveAccount(account: Account): void {
-    this._setActiveAccount(account);
-    this.isFetched.emit('redraw');
-  }
+  // private _activeAccount: Account;
+  // public get activeAccount(): Account {
+  //   return this._activeAccount;
+  // }
 
   public isFetched = new EventEmitter();
 

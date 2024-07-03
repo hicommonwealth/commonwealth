@@ -1,6 +1,6 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
@@ -21,7 +21,7 @@ const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
@@ -51,7 +51,7 @@ const OverviewPage = () => {
 
   const topicsSorted = anyTopicsFeatured
     ? // @ts-expect-error <StrictNullChecks/>
-      topicsFiltered.sort((a, b) => a.order - b.order)
+    topicsFiltered.sort((a, b) => a.order - b.order)
     : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
   const topicSummaryRows: Array<{
@@ -105,7 +105,7 @@ const OverviewPage = () => {
               onClick={() => {
                 navigate('/new/discussion');
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>

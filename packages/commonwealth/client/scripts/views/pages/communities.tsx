@@ -28,6 +28,7 @@ import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import useUserStore from 'client/scripts/state/ui/user';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -75,6 +76,8 @@ const CommunitiesPage = () => {
     React.useState<ChainInfo>(null);
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
+
+  const user = useUserStore();
 
   const { data: historicalPrices, isLoading: historicalPriceLoading } =
     trpc.community.getStakeHistoricalPrice.useQuery({
@@ -184,7 +187,7 @@ const CommunitiesPage = () => {
       })
       .map((community: CommunityInfo, i) => {
         // allow user to buy stake if they have a connected address that matches this community's base chain
-        const canBuyStake = !!app?.user?.addresses?.find?.(
+        const canBuyStake = !!user.addresses.find?.(
           (address) => address?.community?.base === community?.base,
         );
 

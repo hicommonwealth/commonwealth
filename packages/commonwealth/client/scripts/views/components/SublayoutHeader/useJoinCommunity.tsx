@@ -208,7 +208,7 @@ const useJoinCommunity = () => {
     if (
       sameBaseAddressesRemoveDuplicates.length === 0 ||
       app.chain?.meta?.id === 'injective' ||
-      (app.user.activeAccount?.address?.slice(0, 3) === 'inj' &&
+      (user.activeAccount?.address?.slice(0, 3) === 'inj' &&
         app.chain?.meta.id !== 'injective')
     ) {
       setIsAuthModalOpen(true);

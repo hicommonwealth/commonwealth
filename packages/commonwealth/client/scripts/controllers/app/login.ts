@@ -56,7 +56,9 @@ export async function setActiveAccount(
   const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
-    app.user.ephemerallySetActiveAccount(account);
+    userStore.getState().setData({
+      activeAccount: account,
+    });
     if (
       userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
@@ -68,8 +70,8 @@ export async function setActiveAccount(
 
     // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
     // Emit a force re-render on cosmos chains to make sure
-    // that app.user.activeAccount is set - this is required for many actions
-    // There is a race condition b/w the app accessing app.user.activeAccount
+    // that user.activeAccount (in useUserStore) is set - this is required for many actions
+    // There is a race condition b/w the app accessing user.activeAccount (in useUserStore)
     // and updating it. A proper solution would be to fix this race condition
     // for cosmos chains - since the issue happens only on that chain
     if (app.chain.base === 'cosmos') {
@@ -97,7 +99,9 @@ export async function setActiveAccount(
       throw Error(`Unsuccessful status: ${response.status}`);
     }
 
-    app.user.ephemerallySetActiveAccount(account);
+    userStore.getState().setData({
+      activeAccount: account,
+    });
     if (
       userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
@@ -280,10 +284,7 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
-    userStore.getState().setData({ accounts: [] });
-
-    // @ts-expect-error StrictNullChecks
-    app.user.ephemerallySetActiveAccount(null);
+    userStore.getState().setData({ accounts: [], activeAccount: null });
   } else {
     const addresses = data.addresses.map(
       (a) =>

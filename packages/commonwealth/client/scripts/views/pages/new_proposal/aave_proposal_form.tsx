@@ -24,6 +24,7 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
+import useUserStore from 'client/scripts/state/ui/user';
 
 export const AaveProposalForm = () => {
   const [aaveProposalState, setAaveProposalState] = useState<
@@ -36,7 +37,8 @@ export const AaveProposalForm = () => {
   const [tabCount, setTabCount] = useState(1);
   const [executorList, setExecutorList] = useState<AaveExecutor[]>([]);
 
-  const author = app.user.activeAccount;
+  const user = useUserStore()
+  const author = user.activeAccount;
   const aave = app.chain as Aave;
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -65,7 +67,7 @@ export const AaveProposalForm = () => {
   const handleSendTransaction = async (e) => {
     e.preventDefault();
 
-    setProposer(app.user?.activeAccount?.address);
+    setProposer(user.activeAccount?.address || '');
 
     if (!proposer) {
       throw new Error('Invalid address / not signed in');
@@ -134,7 +136,7 @@ export const AaveProposalForm = () => {
       <div className="row-with-label">
         <CWLabel label="Proposer (you)" />
         <User
-          userAddress={author?.address}
+          userAddress={author?.address || ''}
           // @ts-expect-error StrictNullChecks
           userCommunityId={author?.community?.id || author?.profile?.chain}
           shouldShowAsDeleted={

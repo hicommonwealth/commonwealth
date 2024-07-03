@@ -2,7 +2,6 @@ import moment from 'moment';
 import React from 'react';
 
 import useRerender from 'hooks/useRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetContestBalanceQuery } from 'state/api/contests';
@@ -21,6 +20,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -72,7 +72,7 @@ const ContestCard = ({
   isRecurring,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
 
@@ -223,7 +223,7 @@ const ContestCard = ({
             )}
           />
 
-          {isActive && hasJoinedCommunity && (
+          {isActive && user.activeAccount && (
             <CWThreadAction
               label="Fund"
               action="fund"

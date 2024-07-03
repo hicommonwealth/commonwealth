@@ -38,6 +38,8 @@ import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import type CompoundGovernance from './governance';
+import { userStore } from 'client/scripts/state/ui/user';
+import Account from 'client/scripts/models/Account';
 
 export enum BravoVote {
   NO = 0,
@@ -329,7 +331,7 @@ export default class CompoundProposal extends Proposal<
 
     let tx: ContractTransaction;
     const contract = await attachSigner(
-      this._Gov.app.user.activeAccount,
+      userStore.getState().activeAccount as Account,
       this._Gov.api.Contract,
     );
     try {
@@ -347,7 +349,7 @@ export default class CompoundProposal extends Proposal<
         this._Gov.api.Provider,
       );
       const ozContract = await attachSigner(
-        this._Gov.app.user.activeAccount,
+        userStore.getState().activeAccount as Account,
         contractNoSigner,
       );
       const descriptionHash = utils.keccak256(
@@ -389,7 +391,7 @@ export default class CompoundProposal extends Proposal<
     }
 
     const contract = await attachSigner(
-      this._Gov.app.user.activeAccount,
+      userStore.getState().activeAccount as Account,
       this._Gov.api.Contract,
     );
 
@@ -434,7 +436,7 @@ export default class CompoundProposal extends Proposal<
     }
 
     const contract = await attachSigner(
-      this._Gov.app.user.activeAccount,
+      userStore.getState().activeAccount as Account,
       this._Gov.api.Contract,
     );
 

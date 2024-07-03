@@ -31,7 +31,7 @@ export const TrendingCommunitiesPreview = () => {
         community.id,
       );
       const isMember = app.roles.isMember({
-        account: app.user.activeAccount,
+        account: user.activeAccount || undefined,
         community: community.id,
       });
 

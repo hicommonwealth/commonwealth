@@ -58,7 +58,7 @@ const PersonalInformationStep = ({
 
   useNecessaryEffect(() => {
     // if user authenticated with SSO, by default we show username granted by the SSO service
-    const addresses = app?.user?.addresses;
+    const addresses = user.addresses;
     const defaultSSOUsername =
       addresses?.length === 1 && addresses?.[0]?.walletId === WalletId.Magic
         ? addresses?.[0]?.profile?.name
@@ -126,10 +126,8 @@ const PersonalInformationStep = ({
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
     await updateProfile({
-      // @ts-expect-error <StrictNullChecks/>
-      address: app.user.activeAccount?.profile?.address,
-      // @ts-expect-error <StrictNullChecks/>
-      chain: app.user.activeAccount?.profile?.chain,
+      address: user.activeAccount?.profile?.address || '',
+      chain: user.activeAccount?.profile?.chain || '',
       name: values.username,
       ...(values.email && {
         email: values.email,

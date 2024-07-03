@@ -24,6 +24,7 @@ import {
 import { User } from '../components/user/user';
 
 import '../../../styles/modals/edit_collaborators_modal.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -42,6 +43,7 @@ export const EditCollaboratorsModal = ({
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+  const user = useUserStore();
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId(),
@@ -76,7 +78,7 @@ export const EditCollaboratorsModal = ({
             }))
             .filter(
               (role) =>
-                role.Address.address !== app.user.activeAccount?.address,
+                role.Address.address !== user.activeAccount?.address,
             );
 
         setSearchResults(results);
@@ -210,7 +212,7 @@ export const EditCollaboratorsModal = ({
                 const updatedThread = await editThread({
                   threadId: thread.id,
                   communityId: app.activeChainId(),
-                  address: app.user.activeAccount.address,
+                  address: user.activeAccount?.address || '',
                   collaborators: {
                     ...(newCollaborators.length > 0 && {
                       toAdd: newCollaborators.map((x) => x.id),

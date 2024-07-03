@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
@@ -26,8 +27,10 @@ export const ThreadPollCard = ({
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const user = useUserStore();
+
   const getTooltipErrorMessage = () => {
-    if (!app.user.activeAccount)
+    if (!user.activeAccount)
       return 'Error: You must join this community to vote.';
     if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
     return '';
@@ -39,20 +42,23 @@ export const ThreadPollCard = ({
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={
-          app.user.activeAccount &&
-          !!poll.getUserVote(
-            app.user.activeAccount?.community?.id,
-            app.user.activeAccount?.address,
+          !!(
+            user.activeAccount?.community?.id &&
+            user.activeAccount?.address &&
+            poll.getUserVote(
+              user.activeAccount?.community?.id,
+              user.activeAccount?.address,
+            )
           )
         }
-        disableVoteButton={
-          !app.user.activeAccount || isTopicMembershipRestricted
-        }
+        disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
         // @ts-expect-error <StrictNullChecks/>
         votedFor={
+          user.activeAccount?.community?.id &&
+          user.activeAccount?.address &&
           poll.getUserVote(
-            app.user.activeAccount?.community?.id,
-            app.user.activeAccount?.address,
+            user.activeAccount?.community?.id,
+            user.activeAccount?.address,
           )?.option
         }
         proposalTitle={poll.prompt}
@@ -87,8 +93,8 @@ export const ThreadPollCard = ({
             await app.polls.deletePoll({
               threadId: poll.threadId,
               pollId: poll.id,
-              address: app.user.activeAccount.address,
-              authorCommunity: app.user.activeAccount.community.id,
+              address: user.activeAccount?.address || '',
+              authorCommunity: user.activeAccount?.community.id || '',
             });
             if (onDelete) onDelete();
             notifySuccess('Poll deleted');

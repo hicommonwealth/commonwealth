@@ -1,8 +1,8 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
+import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
@@ -67,6 +67,8 @@ export const CommentTree = ({
   const urlParams = new URLSearchParams(location.search);
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
 
+  const user = useUserStore();
+
   useEffect(() => {
     let timeout;
 
@@ -128,7 +130,6 @@ export const CommentTree = ({
       threadId: thread.id,
     });
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const [edits, setEdits] = useState<{
@@ -213,7 +214,7 @@ export const CommentTree = ({
                 commentId: comment.id,
                 canvasHash: comment.canvasHash,
                 communityId: app.activeChainId(),
-                address: app.user.activeAccount.address,
+                address: user.activeAccount?.address || '',
                 existingNumberOfComments: thread.numberOfComments,
               });
             } catch (err) {
@@ -353,63 +354,57 @@ export const CommentTree = ({
     comment: CommentType<any>,
     newDelta: DeltaStatic,
   ) => {
-    {
+    setEdits((p) => ({
+      ...p,
+      [comment.id]: {
+        // @ts-expect-error <StrictNullChecks/>
+        ...(p[comment.id] || {}),
+        isSavingEdit: true,
+      },
+    }));
+
+    try {
+      await editComment({
+        commentId: comment.id,
+        updatedBody: serializeDelta(newDelta) || comment.text,
+        threadId: thread.id,
+        parentCommentId: comment.parentComment,
+        communityId: app.activeChainId(),
+        profile: {
+          id: user.activeAccount?.profile?.id || 0,
+          address: user.activeAccount?.address || '',
+          avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
+          name: user.activeAccount?.profile?.name || '',
+          lastActive: user.activeAccount?.profile?.lastActive.toString() || '',
+        },
+      });
       setEdits((p) => ({
         ...p,
         [comment.id]: {
           // @ts-expect-error <StrictNullChecks/>
           ...(p[comment.id] || {}),
-          isSavingEdit: true,
+          isEditing: false,
         },
       }));
 
-      try {
-        await editComment({
-          commentId: comment.id,
-          updatedBody: serializeDelta(newDelta) || comment.text,
-          threadId: thread.id,
-          parentCommentId: comment.parentComment,
-          communityId: app.activeChainId(),
-          profile: {
-            // @ts-expect-error <StrictNullChecks/>
-            id: app.user.activeAccount.profile.id,
-            address: app.user.activeAccount.address,
-            // @ts-expect-error <StrictNullChecks/>
-            avatarUrl: app.user.activeAccount.profile.avatarUrl,
-            // @ts-expect-error <StrictNullChecks/>
-            name: app.user.activeAccount.profile.name,
-            // @ts-expect-error <StrictNullChecks/>
-            lastActive: app.user.activeAccount.profile.lastActive?.toString(),
-          },
-        });
-        setEdits((p) => ({
-          ...p,
-          [comment.id]: {
-            // @ts-expect-error <StrictNullChecks/>
-            ...(p[comment.id] || {}),
-            isEditing: false,
-          },
-        }));
-
-        // @ts-expect-error <StrictNullChecks/>
-        setIsGloballyEditing(false);
-        clearEditingLocalStorage(comment.id, ContentType.Comment);
-      } catch (err) {
-        if (err instanceof SessionKeyError) {
-          return;
-        }
-        console.error(err?.responseJSON?.error || err?.message);
-        notifyError('Failed to edit comment');
-      } finally {
-        setEdits((p) => ({
-          ...p,
-          [comment.id]: {
-            // @ts-expect-error <StrictNullChecks/>
-            ...(p[comment.id] || {}),
-            isSavingEdit: false,
-          },
-        }));
+      // @ts-expect-error <StrictNullChecks/>
+      setIsGloballyEditing(false);
+      clearEditingLocalStorage(comment.id, ContentType.Comment);
+    } catch (err) {
+      if (err instanceof SessionKeyError) {
+        return;
       }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to edit comment');
+    } finally {
+      setEdits((p) => ({
+        ...p,
+        [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
+          ...(p[comment.id] || {}),
+          isSavingEdit: false,
+        },
+      }));
     }
   };
 
@@ -462,7 +457,7 @@ export const CommentTree = ({
                 commentId: comment.id,
                 isSpam: !comment.markedAsSpamAt,
                 communityId: app.activeChainId(),
-                address: app.user.activeAccount.address,
+                address: user.activeAccount?.address || '',
               });
             } catch (err) {
               console.log(err);
@@ -507,7 +502,7 @@ export const CommentTree = ({
                   disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
                   canReply={
-                    !!hasJoinedCommunity &&
+                    !!user.activeAccount &&
                     !thread.archivedAt &&
                     !thread.lockedAt &&
                     canReply
@@ -515,7 +510,7 @@ export const CommentTree = ({
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
-                    (!!hasJoinedCommunity || isAdmin) &&
+                    (!!user.activeAccount || isAdmin) &&
                     canReact
                   }
                   canEdit={

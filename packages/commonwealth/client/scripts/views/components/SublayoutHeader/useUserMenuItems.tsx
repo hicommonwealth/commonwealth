@@ -114,12 +114,12 @@ const useUserMenuItems = ({
   const shouldShowAddressesSwitcherForNonMember =
     stakeEnabled &&
     app.activeChainId() &&
-    !app?.user?.activeAccount &&
+    !userData?.activeAccount &&
     uniqueChainAddresses?.length > 0;
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
-    // matches active chain base. This address should show be set to app.user.activeAccount.
+    // matches active chain base. This address should show be set to user.activeAccount in useUserStore().
     if (!selectedAddress && shouldShowAddressesSwitcherForNonMember) {
       setSelectedAddress(uniqueChainAddresses[0]);
     }
@@ -149,7 +149,7 @@ const useUserMenuItems = ({
       const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
       const signed = authenticatedAddresses[caip2Address];
-      const isActive = app.user.activeAccount?.address === account.address;
+      const isActive = userData.activeAccount?.address === account.address;
       const walletSsoSource = userData.addresses.find(
         (address) => address.address === account.address,
       )?.walletSsoSource;
@@ -204,7 +204,7 @@ const useUserMenuItems = ({
     RevalidationModal,
     userMenuItems: [
       // if a user is in a stake enabled community without membership, show user addresses that
-      // match active chain base in the dropdown. This address should show be set to app.user.activeAccount.
+      // match active chain base in the dropdown. This address should show be set to user.activeAccount of useUserStore().
       ...(shouldShowAddressesSwitcherForNonMember
         ? ([
             {

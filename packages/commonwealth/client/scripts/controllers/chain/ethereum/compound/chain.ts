@@ -7,6 +7,8 @@ import type ChainInfo from '../../../../models/ChainInfo';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';
+import { userStore } from 'client/scripts/state/ui/user';
+import Account from 'client/scripts/models/Account';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -61,7 +63,7 @@ export default class CompoundChain extends EthereumChain {
     }
     try {
       const contract = await attachSigner(
-        this.app.user.activeAccount,
+        userStore.getState().activeAccount as Account,
         this.compoundApi.Token,
       );
       if (this.compoundApi.isTokenMPond(contract)) {
@@ -98,7 +100,7 @@ export default class CompoundChain extends EthereumChain {
       return null;
     } else {
       const delegate = await token.delegates(
-        this.app.user.activeAccount.address,
+        userStore.getState().activeAccount?.address || '',
       );
       return delegate;
     }

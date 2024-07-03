@@ -10,6 +10,7 @@ import { User } from 'views/components/user/user';
 import useUserMenuItems from '../../useUserMenuItems';
 
 import './UserDropdown.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 interface UserDropdownProps {
   onAuthModalOpen: () => void;
@@ -34,7 +35,9 @@ const UserDropdown = ({
     isMenuOpen: isOpen,
   });
 
-  const user = app.user?.addresses?.[0];
+  const userData = useUserStore();
+
+  const user = userData.addresses?.[0];
 
   return (
     <>

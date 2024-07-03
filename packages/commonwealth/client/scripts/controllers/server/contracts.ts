@@ -3,6 +3,7 @@ import axios from 'axios';
 import app from 'state';
 import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
+import { userStore } from 'client/scripts/state/ui/user';
 
 type AddCommunityContractTemplateAttributes = {
   slug: string;
@@ -258,7 +259,7 @@ class ContractsController {
           template,
           contract_id,
           description,
-          created_by: app.user.activeAccount.address,
+          created_by: userStore.getState().activeAccount?.address,
           created_for_community: community,
         },
       );

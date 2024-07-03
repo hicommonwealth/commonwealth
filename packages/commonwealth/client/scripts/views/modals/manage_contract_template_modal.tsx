@@ -18,6 +18,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 
 import '../../../styles/modals/manage_contract_template_modal.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },
@@ -71,6 +72,7 @@ const ManageContractTemplateModal = ({
   onModalClose,
 }: ManageContractTemplateModalProps) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const [form, setForm] = useState(getInitForm(templateId, template));
 
@@ -98,7 +100,7 @@ const ManageContractTemplateModal = ({
       community_id: communityId,
       template_id: templateIdForm,
       contract_id: contractId,
-      enabled_by: app.user.activeAccount.address,
+      enabled_by: user.activeAccount?.address || '',
     };
 
     try {

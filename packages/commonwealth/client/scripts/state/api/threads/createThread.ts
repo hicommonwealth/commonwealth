@@ -13,6 +13,7 @@ import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import { addThreadInAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
+import useUserStore from '../../ui/user';
 
 interface CreateThreadProps {
   address: string;
@@ -85,6 +86,8 @@ const useCreateThreadMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: createThread,
     onSuccess: async (newThread) => {
@@ -106,10 +109,9 @@ const useCreateThreadMutation = ({
       if (communityId) updateCommunityThreadCount(communityId, 'increment');
 
       if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
+        const profileId = user.addresses?.[0]?.profile?.id;
+        profileId && markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

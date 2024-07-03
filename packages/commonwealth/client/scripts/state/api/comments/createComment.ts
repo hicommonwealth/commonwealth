@@ -11,6 +11,7 @@ import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types
 import { UserProfile } from '../../../models/MinimumProfile';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
+import useUserStore from '../../ui/user';
 
 interface CreateCommentProps {
   profile: UserProfile;
@@ -76,6 +77,8 @@ const useCreateCommentMutation = ({
     threadId,
   });
 
+  const user = useUserStore()
+
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -101,10 +104,9 @@ const useCreateCommentMutation = ({
       );
 
       if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
+        const profileId = user.addresses?.[0]?.profile?.id;
+        profileId && markTrainingActionAsComplete(
           UserTrainingCardTypes.CreateContent,
-          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

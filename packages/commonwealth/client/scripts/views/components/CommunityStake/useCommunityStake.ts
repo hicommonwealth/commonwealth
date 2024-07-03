@@ -9,6 +9,7 @@ import {
 } from 'state/api/communityStake';
 import { useFlag } from '../../../hooks/useFlag';
 import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
+import useUserStore from 'client/scripts/state/ui/user';
 
 interface UseCommunityStakeProps {
   community?: ChainInfo | CommunityData;
@@ -26,6 +27,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
   const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   const activeCommunityId = community?.id || app?.chain?.id;
   const activeCommunityNamespace =
@@ -34,7 +36,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
   const ethChainId =
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
-  const activeAccountAddress = app?.user?.activeAccount?.address;
+  const activeAccountAddress = user.activeAccount?.address || '';
   const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
 
   const {

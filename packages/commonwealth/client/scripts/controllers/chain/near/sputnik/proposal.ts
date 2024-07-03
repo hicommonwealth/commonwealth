@@ -32,6 +32,7 @@ import {
   isTransfer,
   isWeight,
 } from './types';
+import { userStore } from 'client/scripts/state/ui/user';
 
 export default class NearSputnikProposal extends Proposal<
   NearApi,
@@ -258,7 +259,7 @@ export default class NearSputnikProposal extends Proposal<
   }
 
   public async submitVoteWebTx(vote: NearSputnikVote) {
-    const account = this._Dao.app.user.activeAccount as NearAccount;
+    const account = userStore.getState().activeAccount as NearAccount;
     if (account.address !== vote.account.address) {
       throw new Error('Invalid vote address!');
     }

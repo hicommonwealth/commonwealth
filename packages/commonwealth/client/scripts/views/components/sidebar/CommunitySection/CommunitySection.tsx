@@ -1,6 +1,6 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -40,7 +40,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount } = useUserActiveAccount();
+  const user = useUserStore();
   const {
     selectedAddress,
     selectedCommunity,
@@ -56,9 +56,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     activeChainId,
   } = useCommunityStake({
     // if user is not a community member but logged in, use an address that matches community chain base
-    // @ts-expect-error <StrictNullChecks/>
     ...(selectedAddress &&
-      !app?.user?.activeAccount && { walletAddress: selectedAddress }),
+      !user.activeAccount && { walletAddress: selectedAddress }),
   });
   const { isContestAvailable, isContestDataLoading, contestsData } =
     useCommunityContests();
@@ -80,8 +79,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         {app.isLoggedIn() && (
           <>
             <AccountConnectionIndicator
-              connected={!!activeAccount}
-              address={activeAccount?.address}
+              connected={!!user.activeAccount}
+              address={user.activeAccount?.address || ''}
             />
 
             {communityStakeEnabled && stakeEnabled && (

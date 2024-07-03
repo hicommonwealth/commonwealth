@@ -88,7 +88,7 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const userProfileId = user.addresses?.[0]?.profile?.id;
       const doesProfileIdMatch =
         userProfileId && userProfileId === updatedProfile?.id;
       if (doesProfileIdMatch) {

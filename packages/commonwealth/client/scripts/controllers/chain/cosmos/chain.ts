@@ -192,7 +192,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       throw new Error('Tx not yet supported on Terra');
     }
 
-    const activeAddress = this._app.user.activeAccount?.address;
+    const activeAddress = userStore.getState().activeAccount?.address;
     const walletId = userStore
       .getState()
       .addresses.find(

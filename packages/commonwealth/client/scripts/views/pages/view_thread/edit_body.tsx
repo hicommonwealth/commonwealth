@@ -13,6 +13,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type EditBodyProps = {
   title: string;
@@ -39,6 +40,8 @@ export const EditBody = (props: EditBodyProps) => {
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
+
+  const user = useUserStore();
 
   const {
     mutateAsync: editThread,
@@ -102,8 +105,8 @@ export const EditBody = (props: EditBodyProps) => {
         newBody: JSON.stringify(contentDelta) || thread.body,
         newTitle: title || thread.title,
         threadId: thread.id,
-        authorProfile: app.user.activeAccount.profile,
-        address: app.user.activeAccount.address,
+        authorProfile: user.activeAccount?.profile,
+        address: user.activeAccount?.address || '',
         communityId: app.activeChainId(),
       });
       clearEditingLocalStorage(thread.id, ContentType.Thread);

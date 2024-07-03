@@ -8,7 +8,6 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
@@ -69,6 +68,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -104,7 +104,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const user = useUserStore();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -147,8 +148,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
@@ -338,7 +339,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
+  const canComment = !!user.activeAccount && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -383,7 +384,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     .filter((c) => !c.parentComment)
     .sort((a, b) => commentsByDate(a, b, commentSortType));
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
     // @ts-expect-error <StrictNullChecks/>
     thread.discord_meta !== null && thread.discord_meta !== undefined;
@@ -408,7 +409,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,

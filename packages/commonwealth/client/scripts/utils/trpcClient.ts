@@ -2,6 +2,7 @@ import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import type { ApiV1 } from '../../../server/api/index';
 import app from '../state/index';
+import { userStore } from '../state/ui/user';
 
 export const trpc = createTRPCReact<ApiV1>();
 
@@ -12,7 +13,7 @@ export const trpcClient = trpc.createClient({
       async headers() {
         return {
           authorization: app.user.jwt,
-          address_id: app?.user?.activeAccount?.address,
+          address_id: userStore.getState().activeAccount?.address,
         };
       },
     }),

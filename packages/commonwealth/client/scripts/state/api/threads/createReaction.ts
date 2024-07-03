@@ -7,6 +7,7 @@ import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { updateThreadInAllCaches } from './helpers/cache';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface IuseCreateThreadReactionMutation {
   threadId: number;
@@ -32,7 +33,7 @@ const createReaction = async ({
   return await axios.post(
     `${app.serverUrl()}/threads/${threadId}/reactions`,
     {
-      author_community_id: app.user.activeAccount.community.id,
+      author_community_id: userStore.getState().activeAccount?.community?.id,
       thread_id: threadId,
       community_id: app.chain.id,
       address,
@@ -57,6 +58,8 @@ const useCreateThreadReactionMutation = ({
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: createReaction,
     onSuccess: async (response) => {
@@ -75,10 +78,9 @@ const useCreateThreadReactionMutation = ({
       );
 
       if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
+        const profileId = user.addresses?.[0]?.profile?.id;
+        profileId && markTrainingActionAsComplete(
           UserTrainingCardTypes.GiveUpvote,
-          // @ts-expect-error StrictNullChecks
           profileId,
         );
       }

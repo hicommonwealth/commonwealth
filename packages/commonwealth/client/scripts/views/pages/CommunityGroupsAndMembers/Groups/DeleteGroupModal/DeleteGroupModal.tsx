@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -26,16 +27,17 @@ export const DeleteGroupModal = ({
   groupName,
   gatedTopics,
   isOpen,
-  onClose = () => {},
+  onClose = () => { },
 }: DeleteGroupModalAttrs) => {
   const navigate = useCommonNavigate();
   const { mutateAsync: deleteGroup } = useDeleteGroupMutation({
     communityId: app.activeChainId(),
   });
+  const user = useUserStore();
 
   const handleDelete = async () => {
     await deleteGroup({
-      address: app.user.activeAccount.address,
+      address: user.activeAccount?.address || '',
       communityId: app.activeChainId(),
       groupId: groupId,
     })

@@ -1,8 +1,8 @@
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
 import app from 'client/scripts/state';
 import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
+import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -27,13 +27,13 @@ export const TopicSummaryRow = ({
   topic,
   isLoading,
 }: TopicSummaryRowProps) => {
-  useUserActiveAccount();
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   if (isLoading) return <TopicSummaryRowSkeleton />;

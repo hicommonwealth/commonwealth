@@ -24,6 +24,7 @@ import {
 } from '../../components/react_quill_editor';
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
@@ -55,6 +56,7 @@ export const NewSnapshotProposalForm = ({
   const [errorMessage, setErrorMessage] = useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
 
   const location = useLocation();
   const pathVars = useMemo(() => {
@@ -176,7 +178,7 @@ export const NewSnapshotProposalForm = ({
       const snapshotSpace = app.snapshot.space;
       const scoreResponse = await getScore(
         snapshotSpace,
-        app.user.activeAccount.address,
+        user.activeAccount?.address || '',
       );
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
@@ -195,7 +197,7 @@ export const NewSnapshotProposalForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const author = app.user.activeAccount;
+  const author = user.activeAccount;
 
   const isMember =
     author &&

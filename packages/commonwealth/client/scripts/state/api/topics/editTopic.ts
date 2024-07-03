@@ -3,6 +3,7 @@ import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface EditTopicProps {
   topic: Topic;
@@ -23,7 +24,7 @@ const editTopic = async ({ topic, featuredOrder, isPWA }: EditTopicProps) => {
       featured_in_new_post: topic.featuredInNewPost,
       default_offchain_template: topic.defaultOffchainTemplate,
       featured_order: featuredOrder,
-      address: app.user.activeAccount.address,
+      address: userStore.getState().activeAccount?.address,
       jwt: app.user.jwt,
     },
     {

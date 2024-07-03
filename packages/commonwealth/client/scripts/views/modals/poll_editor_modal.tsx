@@ -22,6 +22,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 
 import '../../../styles/modals/poll_editor_modal.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 const getPollDurationCopy = (
   customDuration: string,
@@ -63,6 +64,7 @@ export const PollEditorModal = ({
   const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
   const [prompt, setPrompt] = useState('');
   const modalContainerRef = useRef(null);
+  const user = useUserStore();
 
   const handleInputChange = (value: string, index: number) => {
     setOptions((prevState) => {
@@ -110,8 +112,8 @@ export const PollEditorModal = ({
         options,
         // @ts-expect-error <StrictNullChecks/>
         customDuration: customDurationEnabled ? customDuration : null,
-        address: app.user.activeAccount.address,
-        authorCommunity: app.user.activeAccount.community.id,
+        address: user.activeAccount?.address || '',
+        authorCommunity: user.activeAccount?.community?.id || '',
       });
       notifySuccess('Poll creation succeeded');
       onPollCreate();

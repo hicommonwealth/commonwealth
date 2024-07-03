@@ -12,6 +12,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { TopicSelector } from '../components/topic_selector';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type ChangeThreadTopicModalProps = {
   onModalClose: () => void;
@@ -26,6 +27,7 @@ export const ChangeThreadTopicModal = ({
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+  const user = useUserStore();
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
@@ -47,7 +49,7 @@ export const ChangeThreadTopicModal = ({
     try {
       await editThread({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address || '',
         threadId: thread.id,
         topicId: activeTopic.id,
       });

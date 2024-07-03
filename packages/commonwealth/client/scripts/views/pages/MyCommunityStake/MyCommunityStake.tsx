@@ -1,4 +1,5 @@
 import useTransactionHistory from 'client/scripts/hooks/useTransactionHistory';
+import useUserStore from 'client/scripts/state/ui/user';
 import { formatAddressShort } from 'helpers';
 import { getCommunityStakeSymbol } from 'helpers/stakes';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -33,15 +34,14 @@ const MyCommunityStake = () => {
     searchText: '',
     selectedAddress: BASE_ADDRESS_FILTER,
   });
+  const user = useUserStore();
 
   const ADDRESS_FILTERS = [
     BASE_ADDRESS_FILTER,
-    ...[...new Set((app?.user?.addresses || []).map((x) => x.address))].map(
-      (address) => ({
-        label: formatAddressShort(address, 5, 6),
-        value: address,
-      }),
-    ),
+    ...[...new Set(user.addresses.map((x) => x.address))].map((address) => ({
+      label: formatAddressShort(address, 5, 6),
+      value: address,
+    })),
   ];
 
   const possibleAddresses = ADDRESS_FILTERS.filter((a) => a.value !== '').map(

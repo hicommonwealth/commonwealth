@@ -5,7 +5,6 @@ import shape4Url from 'assets/img/shapes/shape4.svg';
 import shape5Url from 'assets/img/shapes/shape5.svg';
 import shape6Url from 'assets/img/shapes/shape6.svg';
 import { useFlag } from 'hooks/useFlag';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -79,8 +78,6 @@ export const AdminOnboardingSlider = () => {
     shouldHideAdminCardsPermanently,
     setShouldHideAdminOnboardingCardsForCommunity,
   } = useAdminOnboardingSliderMutationStore();
-
-  useUserActiveAccount();
 
   const { contestsData, isContestDataLoading } = useCommunityContests();
 

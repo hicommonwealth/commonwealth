@@ -16,6 +16,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;
@@ -42,7 +43,9 @@ export const ConfirmSnapshotVoteModal = (
     totalScore,
   } = props;
 
-  const author = app.user.activeAccount;
+  const user = useUserStore();
+
+  const author = user.activeAccount;
 
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
@@ -61,7 +64,7 @@ export const ConfirmSnapshotVoteModal = (
       metadata: JSON.stringify({}),
     };
     try {
-      castVote(author.address, votePayload).then(async () => {
+      castVote(author?.address || '', votePayload).then(async () => {
         await app.snapshot.refreshProposals();
         onModalClose();
         successCallback();

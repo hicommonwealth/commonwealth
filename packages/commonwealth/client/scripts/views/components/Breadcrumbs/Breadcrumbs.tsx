@@ -8,10 +8,12 @@ import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
 import { breadCrumbURLS } from './data';
 import { generateBreadcrumbs } from './utils';
+import useUserStore from 'client/scripts/state/ui/user';
 
 export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const userData = useUserStore();
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
@@ -24,15 +26,13 @@ export const Breadcrumbs = () => {
       location.pathname.split('/')[1].toLowerCase() === 'discussion',
   });
 
-  const user = app?.user?.addresses?.[0];
-  // @ts-expect-error StrictNullChecks
-  const profileId = user?.profileId || user?.profile.id;
+  const user = userData.addresses?.[0];
+  const profileId = user?.profileId || user?.profile?.id || 0;
 
   const currentDiscussion = {
-    currentThreadName: linkedThreads?.[0]?.title,
-    currentTopic: linkedThreads?.[0]?.topic.name,
-    // @ts-expect-error StrictNullChecks
-    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
+    currentThreadName: linkedThreads?.[0]?.title || '',
+    currentTopic: linkedThreads?.[0]?.topic?.name || '',
+    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` || '',
   };
 
   let standalone = false;
@@ -60,8 +60,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     profileId,
     navigate,
-    // @ts-expect-error StrictNullChecks
-    app.isCustomDomain() ? app.activeChainId() : undefined,
+    app.isCustomDomain() ? app.activeChainId() : '',
     currentDiscussion,
   );
 

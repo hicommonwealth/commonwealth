@@ -19,6 +19,7 @@ type CommonProps = {
   joinedCommunitiesWithNewContent: string[]; // names of all communities which have new content since user last visited
   accounts: Account[]; // contains full accounts list of the user - when in a active chain/community scope, only
   // contains accounts specific to that community
+  activeAccount: null | Account;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -41,6 +42,7 @@ export const userStore = createStore<UserStoreProps>()(
     starredCommunities: [],
     joinedCommunitiesWithNewContent: [],
     accounts: [],
+    activeAccount: null,
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,

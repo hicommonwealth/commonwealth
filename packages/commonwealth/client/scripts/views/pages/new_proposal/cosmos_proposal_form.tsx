@@ -32,6 +32,7 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from '../../components/react_quill_editor';
+import useUserStore from 'client/scripts/state/ui/user';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
@@ -51,7 +52,9 @@ export const CosmosProposalForm = () => {
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
-  const author = app.user.activeAccount as CosmosAccount;
+  const user = useUserStore();
+
+  const author = user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
   const meta = cosmos.meta;
 
@@ -166,7 +169,7 @@ export const CosmosProposalForm = () => {
       {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
           label="Recipient"
-          placeholder={app.user.activeAccount.address}
+          placeholder={user.activeAccount?.address}
           defaultValue=""
           onInput={(e) => {
             setRecipient(e.target.value);

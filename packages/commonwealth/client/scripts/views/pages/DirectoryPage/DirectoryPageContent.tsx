@@ -10,6 +10,7 @@ import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/
 import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import './DirectoryPageContent.scss';
+import useUserStore from 'client/scripts/state/ui/user';
 
 type RowType = {
   community: JSX.Element;
@@ -83,6 +84,8 @@ const DirectoryPageContent = ({
   tableData,
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
+  const user = useUserStore();
+
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'members',
@@ -126,7 +129,7 @@ const DirectoryPageContent = ({
         const chain = app.config.chains.getById(community.id);
 
         // allow user to buy stake if they have a connected address that matches active community base chain
-        const canBuyStake = !!app?.user?.addresses?.find?.(
+        const canBuyStake = !!user.addresses.find?.(
           (address) => address?.community?.base === chain?.base,
         );
 

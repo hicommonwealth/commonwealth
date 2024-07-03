@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import app from 'state';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
+import useUserStore from 'client/scripts/state/ui/user';
 
 export type SnapshotInfo = {
   snapshotId: string;
@@ -23,8 +24,10 @@ const useNotificationSettings = () => {
   const [sentEmail, setSentEmail] = useState(false);
   const [snapshotsInfo, setSnapshotsInfo] = useState(null);
 
+  const user = useUserStore();
+
   const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval,
+    user.emailNotificationInterval,
   );
 
   useEffect(() => {
@@ -102,7 +105,7 @@ const useNotificationSettings = () => {
     app?.user.notifications.chainEventSubscribedChainIds;
 
   // communities the user has addresses for but does not have existing subscriptions for
-  const relevantSubscribedCommunities = app?.user?.addresses
+  const relevantSubscribedCommunities = user.addresses
     ?.map?.((x) => x?.community)
     ?.filter?.(
       (x) =>
