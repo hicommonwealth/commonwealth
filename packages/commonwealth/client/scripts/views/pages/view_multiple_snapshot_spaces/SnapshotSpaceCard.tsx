@@ -3,8 +3,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/snapshot/SnapshotSpaceCard.scss';
 import React from 'react';
 import app from 'state';
-import { REDIRECT_ACTIONS } from '.';
-import type Thread from '../../../models/Thread';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { SnapshotSpaceCardSkeleton } from './SnapshotSpaceCardSkeleton';
 
@@ -13,15 +11,13 @@ function countActiveProposals(proposals: SnapshotProposal[]): number {
 }
 
 type SnapshotSpaceCardProps = {
-  proposal: null | Thread;
   proposals: SnapshotProposal[];
-  redirectAction: string;
   space: SnapshotSpace;
   showSkeleton?: boolean;
 };
 
 export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
-  const { space, proposals, redirectAction, proposal, showSkeleton } = props;
+  const { space, proposals, showSkeleton } = props;
   const navigate = useCommonNavigate();
 
   if (showSkeleton) return <SnapshotSpaceCardSkeleton />;
@@ -29,26 +25,6 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
   if (!space || !proposals) return;
 
   const numActiveProposals = countActiveProposals(proposals);
-
-  function handleClicks() {
-    if (redirectAction === REDIRECT_ACTIONS.ENTER_SPACE) {
-      app.snapshot.init(space.id).then(() => {
-        navigate(`/snapshot/${space.id}`);
-      });
-    } else if (redirectAction === REDIRECT_ACTIONS.NEW_PROPOSAL) {
-      app.snapshot.init(space.id).then(() => {
-        navigate(`/new/snapshot/${space.id}`);
-      });
-    } else if (redirectAction === REDIRECT_ACTIONS.NEW_FROM_THREAD) {
-      app.snapshot.init(space.id).then(() => {
-        navigate(
-          `/new/snapshot/${app.chain.meta.snapshot}` +
-            // @ts-expect-error <StrictNullChecks/>
-            `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`,
-        );
-      });
-    }
-  }
 
   return (
     <CWCard
@@ -58,7 +34,9 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
-        handleClicks();
+        app.snapshot.init(space.id).then(() => {
+          navigate(`/snapshot/${space.id}`);
+        });
       }}
     >
       <div className="space-card-container">

@@ -34,6 +34,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<A>;
+  public abstract governance?: ProposalModule<any, any, any>;
 
   protected _serverLoaded: boolean;
   public get serverLoaded() {
@@ -114,19 +115,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       !localStorage.getItem('user-dark-mode-state')
     ) {
       setDarkMode(false);
-    }
-  }
-
-  public async loadModules(modules: ProposalModule<any, any, any>[]) {
-    if (!this.loaded) {
-      throw new Error('secondary loading cmd called before chain load');
-    }
-    // TODO: does this need debouncing?
-    if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
-      await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts)),
-      );
-      this.app.chainModuleReady.emit('ready');
     }
   }
 

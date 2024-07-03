@@ -2,7 +2,6 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { idToProposal } from 'identifiers';
 import _ from 'lodash';
 import Thread from 'models/Thread';
 import moment from 'moment';
@@ -126,27 +125,6 @@ export const NewSnapshotProposalForm = ({
         type: 'single-choice',
       };
 
-      if (pathVars.fromProposalType && pathVars.fromProposalId) {
-        const fromProposalId =
-          typeof pathVars.fromProposalId === 'number'
-            ? pathVars.fromProposalId
-            : pathVars.fromProposalId.toString();
-
-        const fromProposalType = pathVars.fromProposalType.toString();
-
-        const fromProposal = idToProposal(fromProposalType, fromProposalId);
-
-        initialForm.name = fromProposal.title;
-
-        if (fromProposal.body) {
-          try {
-            const parsedBody = JSON.parse(fromProposal.body);
-            initialForm.body = parsedBody.ops[0].insert;
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      }
       if (thread && thread.body) {
         const currentPath = window.location.pathname;
         if (currentPath.includes('/discussion/')) {

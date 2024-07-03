@@ -1,13 +1,8 @@
 import { slugify } from '@hicommonwealth/shared';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import {
-  chainToProposalSlug,
-  getProposalUrlPath,
-  idToProposal,
-} from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
 import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -21,7 +16,6 @@ import {
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import type { AnyProposal } from '../../../models/types';
@@ -38,10 +32,7 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-const ViewProposalPage = ({
-  identifier,
-  type: typeProp,
-}: ViewProposalPageAttrs) => {
+const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
@@ -53,7 +44,6 @@ const ViewProposalPage = ({
   const [description, setDescription] = useState<string>(proposal?.description);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
-  const [error, setError] = useState(null);
   const { data: cosmosProposal } = useCosmosProposalQuery({
     isApiReady: !!app.chain.apiInitialized,
     proposalId,
@@ -91,42 +81,16 @@ const ViewProposalPage = ({
 
   useManageDocumentTitle('View proposal', proposal?.title);
 
-  const getProposalFromStore = () => {
-    let resolvedType = typeProp;
-    if (!typeProp) {
-      resolvedType = chainToProposalSlug(app.chain.meta);
-    }
-    // @ts-expect-error <StrictNullChecks/>
-    return idToProposal(resolvedType, proposalId);
-  };
-
   useNecessaryEffect(() => {
-    const afterAdapterLoaded = async () => {
-      try {
-        const proposalFromStore = getProposalFromStore();
-        setProposal(proposalFromStore);
-        setError(null);
-      } catch (e) {
-        console.log(`#${proposalId} Not found in store. `, e);
-      }
-    };
-
     if (!isAdapterLoaded) {
       app.chainAdapterReady.on('ready', () => {
         setIsAdapterLoaded(true);
-        afterAdapterLoaded();
       });
-    } else {
-      afterAdapterLoaded();
     }
   }, [isAdapterLoaded, proposalId]);
 
   if (!isAdapterLoaded) {
     return <PageLoading message="Loading..." />;
-  }
-
-  if (error) {
-    return <PageNotFound message={error} />;
   }
 
   const proposalTitle = title || proposal?.title;
@@ -180,21 +144,18 @@ const ViewProposalPage = ({
             {!_.isEmpty(proposal?.data?.messages) && (
               <JSONDisplay data={proposal.data.messages} title="Messages" />
             )}
-            {proposal instanceof CosmosProposal &&
-              proposal?.data?.type === 'communitySpend' && (
-                <JSONDisplay
-                  data={{
-                    recipient: proposal.data?.spendRecipient,
-                    amount: proposal.data?.spendAmount,
-                  }}
-                  title="Community Spend Proposal"
-                />
-              )}
-            {/* @ts-expect-error StrictNullChecks*/}
+            {proposal?.data?.type === 'communitySpend' && (
+              <JSONDisplay
+                data={{
+                  recipient: proposal.data?.spendRecipient,
+                  amount: proposal.data?.spendAmount,
+                }}
+                title="Community Spend Proposal"
+              />
+            )}
             <VotingResults proposal={proposal} />
             <VotingActions
               onModalClose={onModalClose}
-              // @ts-expect-error <StrictNullChecks/>
               proposal={proposal}
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={votingModalOpen}
