@@ -58,11 +58,11 @@ export async function setActiveAccount(
   if (!role) {
     app.user.ephemerallySetActiveAccount(account);
     if (
-      userStore.getState().activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
       userStore.getState().setData({
-        activeAccounts: [...userStore.getState().activeAccounts, account],
+        accounts: [...userStore.getState().accounts, account],
       });
     }
 
@@ -99,11 +99,11 @@ export async function setActiveAccount(
 
     app.user.ephemerallySetActiveAccount(account);
     if (
-      userStore.getState().activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
       userStore.getState().setData({
-        activeAccounts: [...userStore.getState().activeAccounts, account],
+        accounts: [...userStore.getState().accounts, account],
       });
     }
   } catch (err) {
@@ -160,11 +160,11 @@ export async function completeClientLogin(account: Account) {
     // set the address as active
     await setActiveAccount(account);
     if (
-      userStore.getState().activeAccounts.filter((a) => isSameAccount(a, account))
+      userStore.getState().accounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
       userStore.getState().setData({
-        activeAccounts: [...userStore.getState().activeAccounts, account],
+        accounts: [...userStore.getState().accounts, account],
       });
     }
   } catch (e) {
@@ -182,7 +182,7 @@ export async function updateActiveAddresses({
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   userStore.getState().setData({
-    activeAccounts: userStore
+    accounts: userStore
       .getState()
       .addresses // @ts-expect-error StrictNullChecks
       .filter((a) => a.community.id === chain.id)
@@ -200,7 +200,7 @@ export async function updateActiveAddresses({
   });
 
   // select the address that the new chain should be initialized with
-  const memberAddresses = userStore.getState().activeAccounts.filter((account) => {
+  const memberAddresses = userStore.getState().accounts.filter((account) => {
     // @ts-expect-error StrictNullChecks
     return app.roles.isMember({ community: chain.id, account });
   });
@@ -208,7 +208,7 @@ export async function updateActiveAddresses({
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
     await setActiveAccount(memberAddresses[0], shouldRedraw);
-  } else if (userStore.getState().activeAccounts.length === 0) {
+  } else if (userStore.getState().accounts.length === 0) {
     // no addresses - preview the community
   } else {
     // Find all addresses in the current community for this account, sorted by last used date/time
@@ -250,7 +250,7 @@ export async function updateActiveAddresses({
       foundAddressWithActiveSessionKey || communityAddressesSortedByLastUsed[0];
 
     if (addressToUse) {
-      const account = userStore.getState().activeAccounts.find((a) => {
+      const account = userStore.getState().accounts.find((a) => {
         return (
           a.community.id === addressToUse.community.id &&
           a.address === addressToUse.address
@@ -280,7 +280,7 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.setJWT(null);
 
-    userStore.getState().setData({ activeAccounts: [] });
+    userStore.getState().setData({ accounts: [] });
 
     // @ts-expect-error StrictNullChecks
     app.user.ephemerallySetActiveAccount(null);

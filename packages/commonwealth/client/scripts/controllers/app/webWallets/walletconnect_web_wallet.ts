@@ -138,7 +138,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = userStore.getState().activeAccounts.find(
+      const updatedAddress = userStore.getState().accounts.find(
         (addr) => addr.address === accounts[0],
       );
       if (!updatedAddress) return;

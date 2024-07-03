@@ -193,7 +193,7 @@ class Account {
           ({ address, ghostAddress, community }) =>
             ghostAddress &&
             this.community.id === community.id &&
-            userStore.getState().activeAccounts.some(
+            userStore.getState().accounts.some(
               (account) => account.address === address,
             ),
         );
@@ -212,7 +212,7 @@ class Account {
               .addresses.filter(({ ghostAddress }) => {
                 return !ghostAddress;
               }),
-            activeAccounts: [],
+            accounts: [],
           });
         }
       }

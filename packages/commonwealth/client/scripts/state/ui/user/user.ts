@@ -1,11 +1,10 @@
+import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import ChainInfo from 'models/ChainInfo';
 import StarredCommunity from 'models/StarredCommunity';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
-import Account from 'models/Account';
-
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
@@ -18,7 +17,8 @@ type CommonProps = {
   activeCommunity: ChainInfo | null;
   starredCommunities: StarredCommunity[];
   joinedCommunitiesWithNewContent: string[]; // names of all communities which have new content since user last visited
-  activeAccounts: Account[];
+  accounts: Account[]; // contains full accounts list of the user - when in a active chain/community scope, only
+  // contains accounts specific to that community
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -40,7 +40,7 @@ export const userStore = createStore<UserStoreProps>()(
     activeCommunity: null,
     starredCommunities: [],
     joinedCommunitiesWithNewContent: [],
-    activeAccounts: [],
+    accounts: [],
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,

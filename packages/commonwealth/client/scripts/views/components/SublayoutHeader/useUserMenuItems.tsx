@@ -134,7 +134,7 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const addresses: PopoverMenuItem[] = userData.activeAccounts.map(
+  const addresses: PopoverMenuItem[] = userData.accounts.map(
     (account) => {
       const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
       const communityIdOrPrefix =
@@ -215,7 +215,7 @@ const useUserMenuItems = ({
             { type: 'divider' },
           ] as PopoverMenuItem[])
         : []),
-      ...(userData.activeAccounts.length > 0
+      ...(userData.accounts.length > 0
         ? ([
             {
               type: 'header',

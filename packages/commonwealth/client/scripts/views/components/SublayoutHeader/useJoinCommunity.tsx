@@ -161,11 +161,11 @@ const useJoinCommunity = () => {
           // update active accounts
           if (
             account &&
-            user.activeAccounts.filter((a) => isSameAccount(a, account))
+            user.accounts.filter((a) => isSameAccount(a, account))
               .length === 0
           ) {
             user.setData({
-              activeAccounts: [...user.activeAccounts, account]
+              accounts: [...user.accounts, account]
             })
           }
         }

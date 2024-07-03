@@ -31,7 +31,7 @@ const useCheckAuthenticatedAddresses = ({
 
     const newAuthenticatedAddresses: Record<string, boolean> = {};
 
-    for (const account of user.activeAccounts) {
+    for (const account of user.accounts) {
       const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
 
       const communityIdOrPrefix =
@@ -61,7 +61,7 @@ const useCheckAuthenticatedAddresses = ({
     }
 
     setAuthenticatedAddresses(newAuthenticatedAddresses);
-  }, [canvasChainId, chainBase, user.activeAccounts, recheck]);
+  }, [canvasChainId, chainBase, user.accounts, recheck]);
 
   return { authenticatedAddresses };
 };

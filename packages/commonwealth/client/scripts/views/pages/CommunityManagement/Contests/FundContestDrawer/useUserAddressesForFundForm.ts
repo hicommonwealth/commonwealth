@@ -7,7 +7,7 @@ const useUserAddressesForFundForm = () => {
   const { activeAccount } = useUserActiveAccount();
   const user = useUserStore();
 
-  const addressOptions = user.activeAccounts.map((account) => ({
+  const addressOptions = user.accounts.map((account) => ({
     value: String(account.address),
     label: account.address,
   }));

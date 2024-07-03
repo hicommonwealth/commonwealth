@@ -169,7 +169,7 @@ export class RolesController {
   }
 
   public getActiveAccountsByRole(): [Account, RoleInfo][] {
-    const activeAccountsByRole = userStore.getState().activeAccounts.map((account) => {
+    const activeAccountsByRole = userStore.getState().accounts.map((account) => {
       const role = this.getRoleInCommunity({
         account,
         community: app.activeChainId(),

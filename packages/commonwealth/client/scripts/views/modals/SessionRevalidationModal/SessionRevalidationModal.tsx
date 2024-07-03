@@ -58,7 +58,7 @@ const SessionRevalidationModal = ({
       // expected for session key revalidation
 
       // @ts-expect-error StrictNullChecks
-      const isSubstrate = user.activeAccounts.find(
+      const isSubstrate = user.accounts.find(
         (addr) => addr.address === walletAddress,
       ).community.ss58Prefix;
       if (
@@ -67,13 +67,13 @@ const SessionRevalidationModal = ({
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
-        const updatedAddress = user.activeAccounts.find(
+        const updatedAddress = user.accounts.find(
           (addr) => addr.address === walletAddress,
         );
         await setActiveAccount(updatedAddress!);
       } else {
         await setActiveAccount(
-          user.activeAccounts.find(
+          user.accounts.find(
             (addr) => addr.address === signedAddress!,
           )!,
         );
