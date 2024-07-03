@@ -8,8 +8,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
 import { DeltaStatic } from 'quill';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
@@ -54,16 +53,6 @@ export const NewSnapshotProposalForm = ({
   const [errorMessage, setErrorMessage] = useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
-
-  const location = useLocation();
-  const pathVars = useMemo(() => {
-    const search = new URLSearchParams(location.search);
-    const params: Record<string, any> = {};
-    for (const [key, value] of search) {
-      params[key] = value;
-    }
-    return params;
-  }, [location]);
 
   const clearLocalStorage = () => {
     localStorage.removeItem(

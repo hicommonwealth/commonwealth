@@ -1,4 +1,4 @@
-import { ChainBase, ProposalType } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/new_proposal/index.scss';
@@ -10,15 +10,10 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 
-type NewProposalPageProps = {
-  type: ProposalType;
-};
-
 /// NOTE: THIS PAGE IS ONLY ACCESSIBLE FOR COSMOS CHAINS, FOLLOWING
 /// DEPRECATION OF OTHER GOVERNANCE FORMS, AND IS CONSIDERED LEGACY.
 
-const NewProposalPage = (props: NewProposalPageProps) => {
-  const { type } = props;
+const NewProposalPage = () => {
   const forceRerender = useForceRerender();
   const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
   useInitChainIfNeeded(app);
