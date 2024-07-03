@@ -124,7 +124,6 @@ import { ServerGroupsController } from '../controllers/server_groups_controller'
 import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerPollsController } from '../controllers/server_polls_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
-import { ServerProposalsController } from '../controllers/server_proposals_controller';
 import { ServerReactionsController } from '../controllers/server_reactions_controller';
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
@@ -160,8 +159,6 @@ import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
-import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
@@ -191,7 +188,6 @@ export type ServerControllers = {
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
   communities: ServerCommunitiesController;
-  proposals: ServerProposalsController;
   polls: ServerPollsController;
   groups: ServerGroupsController;
   topics: ServerTopicsController;
@@ -223,7 +219,6 @@ function setupRouter(
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models, banCache),
     polls: new ServerPollsController(models),
-    proposals: new ServerProposalsController(models),
     groups: new ServerGroupsController(models, banCache),
     topics: new ServerTopicsController(models, banCache),
     admin: new ServerAdminController(models),
@@ -1206,21 +1201,6 @@ function setupRouter(
     'post',
     '/getSubscribedCommunities',
     getSubscribedCommunities.bind(this, models),
-  );
-
-  // Proposal routes
-  registerRoute(
-    router,
-    'get',
-    '/proposals',
-    getProposalsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/proposalVotes',
-    getProposalVotesHandler.bind(this, serverControllers),
   );
 
   // Group routes
