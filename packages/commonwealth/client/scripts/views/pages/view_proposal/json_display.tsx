@@ -74,7 +74,6 @@ export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
                   <CWButton
                     label="Export"
                     onClick={() => {
-                      console.log('data: ', data);
                       openConfirmation({
                         title: 'Warning',
                         description:
