@@ -94,21 +94,6 @@ import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 import { getSubscribedCommunities } from '../routes/getSubscribedCommunities';
 
-import {
-  createCommunityContractTemplateAndMetadata,
-  deleteCommunityContractTemplate,
-  deleteCommunityContractTemplateMetadata,
-  getCommunityContractTemplate,
-  getCommunityContractTemplateMetadata,
-  updateCommunityContractTemplate,
-  updateCommunityContractTemplateMetadata,
-} from '../routes/proposalTemplate';
-import {
-  createTemplate,
-  deleteTemplate,
-  getTemplates,
-} from '../routes/templates';
-
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
@@ -524,80 +509,6 @@ function setupRouter(
     'get',
     '/polls/:id/votes',
     getPollVotesHandler.bind(this, serverControllers),
-  );
-
-  // Templates
-  registerRoute(
-    router,
-    'post',
-    '/contract/template',
-    passport.authenticate('jwt', { session: false }),
-    createTemplate.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/contract/template',
-    passport.authenticate('jwt', { session: false }),
-    getTemplates.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/contract/template',
-    passport.authenticate('jwt', { session: false }),
-    deleteTemplate.bind(this, models),
-  );
-
-  // community contract
-  registerRoute(
-    router,
-    'post',
-    '/contract/community_template_and_metadata',
-    passport.authenticate('jwt', { session: false }),
-    createCommunityContractTemplateAndMetadata.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/contract/community_template',
-    getCommunityContractTemplate.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/contract/community_template',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityContractTemplate.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/contract/community_template',
-    passport.authenticate('jwt', { session: false }),
-    deleteCommunityContractTemplate.bind(this, models),
-  );
-
-  // community contract metadata
-  registerRoute(
-    router,
-    'get',
-    '/contract/community_template/metadata',
-    getCommunityContractTemplateMetadata.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/contract/community_template/metadata',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityContractTemplateMetadata.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/contract/community_template/metadata',
-    passport.authenticate('jwt', { session: false }),
-    deleteCommunityContractTemplateMetadata.bind(this, models),
   );
 
   registerRoute(
