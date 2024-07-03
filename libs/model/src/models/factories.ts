@@ -40,7 +40,6 @@ import StarredCommunity from './starred_community';
 import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
-import Template from './template';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
 import Topic from './topic';
@@ -88,7 +87,6 @@ export const Factories = {
   Subscription,
   Tags,
   SubscriptionPreference,
-  Template,
   Thread,
   ThreadSubscription,
   Topic,

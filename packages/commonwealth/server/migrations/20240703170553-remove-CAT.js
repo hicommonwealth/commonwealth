@@ -10,6 +10,9 @@ module.exports = {
       await queryInterface.dropTable('CommunityContractTemplate', {
         transaction,
       });
+      await queryInterface.dropTable('Template', {
+        transaction,
+      });
     });
   },
 

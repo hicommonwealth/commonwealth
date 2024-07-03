@@ -134,14 +134,8 @@ const createContract = async (
         contract_id: oldContract.id,
       },
     });
-    const globalTemplate = await models.Template.findOne({
-      where: {
-        abi_id: oldContract.abi_id,
-      },
-    });
     return success(res, {
       contract: oldContract.toJSON(),
-      hasGlobalTemplate: !!globalTemplate,
     });
   }
 
@@ -186,17 +180,9 @@ const createContract = async (
       );
     });
 
-    const globalTemplate = await models.Template.findOne({
-      where: {
-        // @ts-expect-error StrictNullChecks
-        abi_id: contract.abi_id,
-      },
-    });
-
     return success(res, {
       // @ts-expect-error StrictNullChecks
       contract: contract.toJSON(),
-      hasGlobalTemplate: !!globalTemplate,
     });
   } else {
     // transactionalize contract creation
@@ -222,17 +208,9 @@ const createContract = async (
       );
     });
 
-    const globalTemplate = await models.Template.findOne({
-      where: {
-        // @ts-expect-error StrictNullChecks
-        abi_id: contract.abi_id,
-      },
-    });
-
     return success(res, {
       // @ts-expect-error StrictNullChecks
       contract: contract.toJSON(),
-      hasGlobalTemplate: !!globalTemplate,
     });
   }
 };

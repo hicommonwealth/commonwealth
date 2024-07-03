@@ -37,9 +37,10 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock);
 
-  db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' })
-    .withMany(db.EvmEventSource, { foreignKey: 'abi_id' })
-    .withMany(db.Template, { foreignKey: 'abi_id', onUpdate: 'CASCADE' });
+  db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
+    db.EvmEventSource,
+    { foreignKey: 'abi_id' },
+  );
 
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {
@@ -65,7 +66,6 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Webhook)
     .withMany(db.Ban)
     .withMany(db.CommunityBanner)
-    .withMany(db.Template, { foreignKey: 'created_for_community' })
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })

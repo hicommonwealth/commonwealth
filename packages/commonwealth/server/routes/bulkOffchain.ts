@@ -80,7 +80,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
         });
         const contractsWithTemplates: Array<{
           contract: ContractInstance;
-          hasGlobalTemplate: boolean;
         }> = [];
         for (const cc of communityContracts) {
           const contract = await models.Contract.findOne({
@@ -95,17 +94,8 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
             ],
           });
 
-          const globalTemplate = await models.Template.findOne({
-            where: {
-              // @ts-expect-error StrictNullChecks
-              abi_id: contract.abi_id,
-            },
-          });
-
-          const hasGlobalTemplate = !!globalTemplate;
-
           // @ts-expect-error StrictNullChecks
-          contractsWithTemplates.push({ contract, hasGlobalTemplate });
+          contractsWithTemplates.push({ contract });
         }
         resolve(contractsWithTemplates);
       } catch (e) {
