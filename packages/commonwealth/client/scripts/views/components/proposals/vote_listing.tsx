@@ -27,6 +27,7 @@ const getBalance = (vote: IVote<any>) => {
   } else {
     // fetch balance and store in cache
     balancesCacheInitialized = { [vote.account.address]: true };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     vote.account.balance.then((b) => {
       balance = b;
       balancesCache = {
