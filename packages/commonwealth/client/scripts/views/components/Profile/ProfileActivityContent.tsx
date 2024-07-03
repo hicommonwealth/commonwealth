@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import 'components/Profile/Profile.scss';
 
@@ -6,25 +6,74 @@ import { CWText } from '../component_kit/cw_text';
 import type Thread from 'models/Thread';
 import ProfileActivityRow from './ProfileActivityRow';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
+import Stakes from '../../pages/MyCommunityStake/Stakes';
+import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
 
 enum ProfileActivityType {
   Addresses,
   Comments,
   Communities,
   Threads,
+  Portfolio
 }
 
 type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
+  portfolioData: any[]; // We'll refine this type later
+  isLoading
 };
 
 const ProfileActivityContent = ({
   option,
   comments,
   threads,
+  portfolioData,
+  isLoading
 }: ProfileActivityContentProps) => {
+  const updatedPortfolioData = useMemo(() => {
+    if (option === ProfileActivityType.Portfolio && portfolioData) {
+      return portfolioData.map(transaction => ({
+        ...transaction,
+        address: transaction.address || '',
+        price: transaction.price?.toString() || '0',
+        stake: transaction.stake?.toString() || '0',
+        voteWeight: transaction.voteWeight?.toString() || '0',
+        action: transaction.action || '',
+        totalPrice: transaction.totalPrice?.toString() || '0',
+        avgPrice: transaction.avgPrice?.toString() || '0',
+        etherscanLink: transaction.etherscanLink || '',
+        community: {
+          id: transaction.community.id,
+          name: transaction.community.name,
+          default_symbol: transaction.community.default_symbol || '',
+          icon_url: transaction.community.icon_url || '',
+          chain_node_id: transaction.community.chain_node_id
+        }
+      }));
+    }
+    return [];
+  }, [option, portfolioData]);
+
+  if (option === ProfileActivityType.Portfolio) {
+    if (isLoading) {
+      return <CWCircleMultiplySpinner />;
+    }
+
+    if (!portfolioData || portfolioData.length === 0) {
+      return (
+        <div className="empty-state">
+          <CWText className="empty-state-text">
+            You currently have no portfolio data.
+          </CWText>
+        </div>
+      );
+    }
+
+    return <Stakes transactions={updatedPortfolioData} />;
+  }
+
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
       return (
