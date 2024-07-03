@@ -20,7 +20,7 @@ import StarredCommunity from 'models/StarredCommunity';
 import { queryClient, QueryKeys } from 'state/api/config';
 import { Configuration } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
-import { ChainStore, NodeStore } from 'stores';
+import { ChainStore } from 'stores';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -80,10 +80,8 @@ export interface IApp {
   loginStateEmitter: EventEmitter;
 
   // stored on server-side
-  // TODO
   config: {
     chains: ChainStore;
-    nodes: NodeStore;
     // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
@@ -156,7 +154,6 @@ const app: IApp = {
 
   config: {
     chains: new ChainStore(),
-    nodes: new NodeStore(),
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
