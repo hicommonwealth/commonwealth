@@ -216,9 +216,6 @@ export const buildAssociations = (db: DB) => {
   db.CommunityContractTemplate.belongsTo(db.Template, {
     foreignKey: 'template_id',
   });
-  db.CommunityContractTemplate.belongsTo(db.CommunityContractTemplateMetadata, {
-    foreignKey: 'cctmd_id',
-  });
 
   // "loose" FKs
   db.Comment.belongsTo(db.Community, {

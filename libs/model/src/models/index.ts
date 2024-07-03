@@ -50,7 +50,6 @@ export * from './community';
 export * from './community_banner';
 export * from './community_contract';
 export * from './community_contract_template';
-export * from './community_contract_template_metadata';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';

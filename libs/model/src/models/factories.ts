@@ -12,7 +12,6 @@ import CommunityAlert from './community_alerts';
 import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
 import CommunityContractTemplate from './community_contract_template';
-import CommunityContractTemplateMetadata from './community_contract_template_metadata';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
@@ -62,7 +61,6 @@ export const Factories = {
   CommunityBanner,
   CommunityContract,
   CommunityContractTemplate,
-  CommunityContractTemplateMetadata,
   CommunityStake,
   CommunityTags,
   Contest,
