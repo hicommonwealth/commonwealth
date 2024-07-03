@@ -68,15 +68,11 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
     newChain = new Cosmos(chain, app);
   } else if (
     chain.network === ChainNetwork.NEAR ||
-    chain.network === ChainNetwork.NEARTestnet
+    chain.network === ChainNetwork.NEARTestnet ||
+    chain.network === ChainNetwork.Sputnik
   ) {
     const Near = (await import('../controllers/chain/near/adapter')).default;
     newChain = new Near(chain, app);
-    initApi = true;
-  } else if (chain.network === ChainNetwork.Sputnik) {
-    const Sputnik = (await import('../controllers/chain/near/sputnik/adapter'))
-      .default;
-    newChain = new Sputnik(chain, app);
     initApi = true;
   } else if (chain.network === ChainNetwork.Compound) {
     const Compound = (

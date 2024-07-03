@@ -12,7 +12,7 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ThreadContestTag from 'views/components/ThreadContestTag';
+import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -111,18 +111,6 @@ export const ThreadCard = ({
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
 
-  const contestWinners = [
-    { date: '03/09/2024', round: 7, isRecurring: true },
-    { date: '03/10/2024', isRecurring: false },
-    {
-      date: '03/10/2024',
-      round: 8,
-      isRecurring: true,
-    },
-  ];
-  const showContestWinnerTag = false;
-  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
-
   return (
     <>
       <Link
@@ -180,10 +168,9 @@ export const ThreadCard = ({
             {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
             <div className="content-title">
               <CWText type="h5" fontWeight="semiBold">
-                {showContestWinnerTag &&
-                  contestWinners?.map((winner, index) => (
-                    <ThreadContestTag key={index} {...winner} />
-                  ))}
+                <ThreadContestTagContainer
+                  associatedContests={thread.associatedContests}
+                />
                 {thread.title}
               </CWText>
             </div>

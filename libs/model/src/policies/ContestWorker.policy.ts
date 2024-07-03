@@ -132,15 +132,14 @@ export function ContestWorker(): Policy<typeof inputs> {
             JOIN "ContestManagers" cm ON cm.community_id = c.id
             JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
             JOIN "Contests" co ON cm.contest_address = co.contest_address
+              AND co.contest_id = (
+                SELECT MAX(contest_id) AS max_id
+                FROM "Contests" c1
+                WHERE c1.contest_address = cm.contest_address
+              )
             JOIN "ContestActions" added on co.contest_address = added.contest_address
-              AND co.contest_id = added.contest_id
               AND added.thread_id = :thread_id
               AND added.action = 'added'
-            LEFT JOIN "ContestActions" ca ON co.contest_address = ca.contest_address
-              AND co.contest_id = ca.contest_id
-              AND ca.thread_id = :thread_id
-              AND ca.actor_address = :actor_address
-              AND ca.action = 'upvoted'
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
@@ -149,7 +148,22 @@ export function ContestWorker(): Policy<typeof inputs> {
               OR
               cm.interval > 0
             )
-            AND ca.action IS NULL;
+          -- content cannot be a winner in a previous contest
+          AND NOT EXISTS (
+            WITH max_contest AS (
+              SELECT MAX(contest_id) AS max_id
+              FROM "Contests" c1
+              WHERE c1.contest_address = cm.contest_address
+            )
+            SELECT c2.score
+            FROM "Contests" c2,
+                jsonb_array_elements(c2.score) AS score_result
+            WHERE
+                c2.contest_address = cm.contest_address AND
+                (score_result->>'content_id')::int = added.content_id::int AND
+                (score_result->>'prize')::float > 0 AND
+                c2.contest_id != (SELECT max_id FROM max_contest)
+          )
         `,
           {
             type: QueryTypes.SELECT,

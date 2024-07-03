@@ -9,6 +9,12 @@ import { AbiItem } from 'web3-utils';
 import { Balances, getBalances, TokenAttributes } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
 
+/**
+ * Retrieves a namespace.
+ * @param rpcNodeUrl Note this MUST be a private_url with no associated whitelist.
+ * @param namespace
+ * @param factoryAddress
+ */
 export const getNamespace = async (
   rpcNodeUrl: string,
   namespace: string,
@@ -53,7 +59,6 @@ export const getNamespace = async (
  * @param tokenId ERC1155 id(ie 0 for admin token, default 2 for CommunityStake)
  * @param chain chainNode to use(must be chain with deployed protocol)
  * @param addresses User address to check balance
- * @param rpcNodeUrl The RPC url of the node
  * @returns balance in wei
  */
 export const getNamespaceBalance = async (
@@ -61,30 +66,27 @@ export const getNamespaceBalance = async (
   tokenId: number,
   chain: commonProtocol.ValidChains,
   addresses: string[],
-  rpcNodeUrl: string,
 ): Promise<Balances> => {
   const factoryData = commonProtocol.factoryContracts[chain];
-  if (rpcNodeUrl) {
-    if (!namespaceAddress) {
-      throw new AppError('No namespace provided!');
-    }
-    return await getBalances({
-      balanceSourceType: BalanceSourceType.ERC1155,
-      addresses,
-      sourceOptions: {
-        contractAddress: namespaceAddress,
-        evmChainId: factoryData.chainId,
-        tokenId: tokenId,
-      },
-      cacheRefresh: true,
-    });
-  } else {
-    throw new AppError('ChainNode not found');
+  if (!namespaceAddress) {
+    throw new AppError('No namespace provided!');
   }
+  return await getBalances({
+    balanceSourceType: BalanceSourceType.ERC1155,
+    addresses,
+    sourceOptions: {
+      contractAddress: namespaceAddress,
+      evmChainId: factoryData.chainId,
+      tokenId: tokenId,
+    },
+    cacheRefresh: true,
+  });
 };
 
 /**
  * Gets token ticker and decimal places to wei
+ * @param contestAddress
+ * @param rpcNodeUrl Note this MUST be a private_url with no associated whitelist.
  */
 export const getTokenAttributes = async (
   contestAddress: string,

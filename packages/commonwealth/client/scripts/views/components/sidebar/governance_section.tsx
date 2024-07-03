@@ -57,7 +57,6 @@ export const GovernanceSection = () => {
   const hasProposals =
     app.chain &&
     (app.chain.base === ChainBase.CosmosSDK ||
-      app.chain.network === ChainNetwork.Sputnik ||
       app.chain.network === ChainNetwork.Compound ||
       app.chain.network === ChainNetwork.Aave ||
       // app.chain.network === ChainNetwork.CommonProtocol ||
@@ -73,7 +72,6 @@ export const GovernanceSection = () => {
     (isNotOffchain &&
       app.chain?.base === ChainBase.CosmosSDK &&
       app.chain.network !== ChainNetwork.Terra) ||
-    app.chain?.network === ChainNetwork.Sputnik ||
     app.chain?.network === ChainNetwork.Compound ||
     app.chain?.network === ChainNetwork.Aave;
 

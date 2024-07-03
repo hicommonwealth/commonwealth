@@ -21,7 +21,7 @@ import {
   fetchEtherscanContract,
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
-import finishEmailLogin from '../routes/finishEmailLogin';
+import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
@@ -31,7 +31,6 @@ import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommu
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
-import startEmailLogin from '../routes/startEmailLogin';
 import { status } from '../routes/status';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
@@ -85,7 +84,6 @@ import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import setAddressWallet from '../routes/setAddressWallet';
-import updateAddress from '../routes/updateAddress';
 import type BanCache from '../util/banCheckCache';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -241,16 +239,6 @@ function setupRouter(
   // Routes API
   app.use('/api', apiRouter);
 
-  // Updating the address
-  registerRoute(
-    router,
-    'post',
-    '/updateAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
-    updateAddress.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
@@ -841,6 +829,12 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateEmail.bind(this, models),
   );
+  registerRoute(
+    router,
+    'get',
+    '/finishUpdateEmail',
+    finishUpdateEmail.bind(this, models),
+  );
 
   // community banners (update or create)
   registerRoute(
@@ -1177,14 +1171,6 @@ function setupRouter(
   );
 
   // login
-  registerRoute(router, 'post', '/login', startEmailLogin.bind(this, models));
-  registerRoute(
-    router,
-    'get',
-    '/finishLogin',
-    finishEmailLogin.bind(this, models),
-  );
-
   registerRoute(
     router,
     'post',

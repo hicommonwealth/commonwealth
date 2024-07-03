@@ -18,14 +18,14 @@
 ## Common App
 
 - [App Initialization Flow](./App-Initialization-Flow.md)
-- [Contract Action Templates](./Contract-Action-Templates.md)
 - [Custom Domains](./Custom-Domains.md)
 - [Feature Flags](./Feature-Flags.md): Unleash.
 - [Gating](./Gating.md)
 - [Groups](./Groups.md)
 - [Notifications](./Notifications.md)
 - [Notifications QA](./Notifications-QA.md)
-- [Stake](./Stake.md).
+- [Stake](./Stake.md)
+- [Web Wallets & SSO](./Web-Wallets.md): Sign-in and onboarding flow.
 
 ## Chain Tools
 

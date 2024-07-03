@@ -16,7 +16,7 @@ class ChainInfo {
   public readonly CommunityStakes: StakeInfo[];
   public CommunityTags: Tag[];
   public readonly tokenName: string;
-  public readonly threadCount: number;
+  public threadCount: number;
   public readonly addressCount: number;
   public readonly default_symbol: string;
   public name: string;
@@ -280,6 +280,7 @@ class ChainInfo {
     directory_page_enabled,
     directory_page_chain_node_id,
     type,
+    isPWA,
   }: {
     name?: string;
     description?: string;
@@ -300,30 +301,40 @@ class ChainInfo {
     directory_page_enabled?: boolean;
     directory_page_chain_node_id?: number;
     type?: string;
+    isPWA?: boolean;
   }) {
     const id = app.activeChainId() ?? this.id;
-    const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
-      id,
-      name,
-      description,
-      social_links,
-      stages_enabled: stagesEnabled,
-      custom_stages: customStages,
-      custom_domain: customDomain,
-      snapshot,
-      terms,
-      icon_url: iconUrl,
-      default_summary_view: defaultOverview,
-      default_page: defaultPage,
-      has_homepage: hasHomepage,
-      chain_node_id,
-      cosmos_gov_version,
-      discord_bot_webhooks_enabled,
-      directory_page_enabled,
-      directory_page_chain_node_id,
-      type,
-      jwt: app.user.jwt,
-    });
+    const r = await axios.patch(
+      `${app.serverUrl()}/communities/${id}`,
+      {
+        id,
+        name,
+        description,
+        social_links,
+        stages_enabled: stagesEnabled,
+        custom_stages: customStages,
+        custom_domain: customDomain,
+        snapshot,
+        terms,
+        icon_url: iconUrl,
+        default_summary_view: defaultOverview,
+        default_page: defaultPage,
+        has_homepage: hasHomepage,
+        chain_node_id,
+        cosmos_gov_version,
+        discord_bot_webhooks_enabled,
+        directory_page_enabled,
+        directory_page_chain_node_id,
+        type,
+        jwt: app.user.jwt,
+      },
+      {
+        headers: {
+          isPWA: isPWA?.toString(),
+        },
+      },
+    );
+
     const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;

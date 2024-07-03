@@ -37,8 +37,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
-  const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
-
   const showOnChainProposalItem =
     (app.chain?.base === ChainBase.CosmosSDK &&
       app.chain?.network !== ChainNetwork.Terra &&
@@ -46,36 +44,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     (app.chain?.base === ChainBase.Ethereum &&
       app.chain?.network === ChainNetwork.Aave) ||
     app.chain?.network === ChainNetwork.Compound;
-
-  const getTemplateItems = (): PopoverMenuItem[] => {
-    const contracts = app.contracts.getCommunityContracts();
-
-    const items = [];
-
-    contracts.forEach((contract) => {
-      if (contract.ccts) {
-        for (const cct of contract.ccts) {
-          if (
-            cct.cctmd.display_options === '2' ||
-            cct.cctmd.display_options === '3'
-          ) {
-            const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
-            // @ts-expect-error <StrictNullChecks/>
-            items.push({
-              label: `New ${cct.cctmd.nickname}`,
-              iconLeft: 'star',
-              onClick: () => {
-                resetSidebarState();
-                navigate(`/${contract.address}/${slugWithSlashRemoved}`);
-              },
-            });
-          }
-        }
-      }
-    });
-
-    return items;
-  };
 
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
@@ -87,20 +55,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               navigate('/new/proposal');
             },
             iconLeft: 'star',
-          },
-        ]
-      : [];
-
-  const getSputnikProposalItem = (): PopoverMenuItem[] =>
-    showSputnikProposalItem
-      ? [
-          {
-            label: 'New Sputnik proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal');
-            },
-            iconLeft: 'democraticProposal',
           },
         ]
       : [];
@@ -203,9 +157,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
-          ...getSputnikProposalItem(),
           ...getSnapshotProposalItem(),
-          ...getTemplateItems(),
           ...getDiscordBotConnectionItems(),
         ]
       : []),

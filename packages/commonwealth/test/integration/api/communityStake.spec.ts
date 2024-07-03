@@ -146,17 +146,10 @@ describe('POST communityStakes Tests', () => {
       where: {
         id: 'common-protocol',
       },
-      include: [
-        {
-          model: server.models.ChainNode,
-          attributes: ['eth_chain_id', 'url'],
-        },
-      ],
-      attributes: ['namespace', 'namespace_address'],
     });
+    assert.isNotNull(community);
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
-      // @ts-expect-error StrictNullChecks
-      community,
+      community!,
       2,
     );
   });

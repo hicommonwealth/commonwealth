@@ -36,7 +36,7 @@ export async function getCosmosClient<
   } else {
     const tmClient = await tm.Tendermint34Client.connect(
       // @ts-expect-error StrictNullChecks
-      community.ChainNode.url || community.ChainNode.private_url,
+      community.ChainNode.private_url || community.ChainNode.url,
     );
     // @ts-expect-error StrictNullChecks
     CosmosClients[community.id] = QueryClient.withExtensions(

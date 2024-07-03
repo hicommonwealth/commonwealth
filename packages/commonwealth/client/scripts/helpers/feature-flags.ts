@@ -23,7 +23,6 @@ const buildFlag = (env: string | undefined) => {
 const featureFlags = {
   allowlist: buildFlag(process.env.FLAG_ALLOWLIST),
   contest: buildFlag(process.env.FLAG_CONTEST),
-  proposalTemplates: buildFlag(process.env.FLAG_PROPOSAL_TEMPLATES),
   communityHomepage: buildFlag(process.env.FLAG_COMMUNITY_HOMEPAGE),
   communityStake: buildFlag(process.env.FLAG_COMMUNITY_STAKE),
   userOnboardingEnabled: buildFlag(process.env.FLAG_USER_ONBOARDING_ENABLED),
