@@ -7,7 +7,6 @@ import { ServerError } from '@hicommonwealth/core';
 //
 import type {
   CommunityBannerInstance,
-  CommunityContractTemplateInstance,
   ContractInstance,
   DB,
 } from '@hicommonwealth/model';
@@ -38,7 +37,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
-          ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
         }>,
       ]
@@ -82,7 +80,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
         });
         const contractsWithTemplates: Array<{
           contract: ContractInstance;
-          ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
         }> = [];
         for (const cc of communityContracts) {
@@ -127,7 +124,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
         return {
           contract: c.contract.toJSON(),
-          ccts: c.ccts,
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),

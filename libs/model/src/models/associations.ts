@@ -209,14 +209,6 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
-  // 3-way x-ref table
-  db.CommunityContractTemplate.belongsTo(db.CommunityContract, {
-    foreignKey: 'community_contract_id',
-  });
-  db.CommunityContractTemplate.belongsTo(db.Template, {
-    foreignKey: 'template_id',
-  });
-
   // "loose" FKs
   db.Comment.belongsTo(db.Community, {
     foreignKey: 'community_id',
