@@ -1,6 +1,5 @@
 import {
   Comment,
-  ContestManager,
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
   Reaction,
@@ -11,10 +10,10 @@ import {
 import { z } from 'zod';
 
 export const ThreadCreated = Thread.extend({
-  contestManagers: z.array(ContestManager).nullish(),
+  contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const ThreadUpvoted = Reaction.extend({
-  contestManagers: z.array(ContestManager).nullish(),
+  contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const CommentCreated = Comment;
 export const GroupCreated = z.object({

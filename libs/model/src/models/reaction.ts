@@ -1,8 +1,6 @@
 import { EventNames, logger, stats } from '@hicommonwealth/core';
-import { ContestManager } from '@hicommonwealth/schemas';
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { z } from 'zod';
 import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
@@ -78,24 +76,12 @@ export default (
                   const { topic_id, community_id } = thread.get({
                     plain: true,
                   });
-                  const contestManagers = await sequelize.query<
-                    z.infer<typeof ContestManager>
-                  >(
+                  const contestManagers = await sequelize.query<{
+                    contest_address: string;
+                  }>(
                     `
                     SELECT
-                      cm.contest_address,
-                      cm.community_id,
-                      cm.name,
-                      cm.image_url,
-                      cm.funding_token_address,
-                      cm.prize_percentage,
-                      cm.payout_structure,
-                      cm.interval,
-                      cm.ticker,
-                      cm.decimals,
-                      cm.created_at,
-                      cm.cancelled,
-                      cm.ended
+                      cm.contest_address
                     FROM "Communities" c
                     JOIN "ContestManagers" cm ON cm.community_id = c.id
                     JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
