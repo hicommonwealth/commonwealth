@@ -13,14 +13,9 @@ import {
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
-import createContract from '../routes/contracts/createContract';
 import createAddress from '../routes/createAddress';
 import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
-import {
-  fetchEtherscanContract,
-  fetchEtherscanContractAbi,
-} from '../routes/etherscanAPI';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressProfile, {
   getAddressProfileValidation,
@@ -379,28 +374,6 @@ function setupRouter(
     createCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
-  // ----
-  registerRoute(
-    router,
-    'post',
-    '/contract',
-    passport.authenticate('jwt', { session: false }),
-    createContract.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/etherscanAPI/fetchEtherscanContract',
-    passport.authenticate('jwt', { session: false }),
-    fetchEtherscanContract.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/etherscanAPI/fetchEtherscanContractAbi',
-    passport.authenticate('jwt', { session: false }),
-    fetchEtherscanContractAbi.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
