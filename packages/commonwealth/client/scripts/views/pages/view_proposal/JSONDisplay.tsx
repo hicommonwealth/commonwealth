@@ -66,7 +66,7 @@ export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
                         openConfirmation({
                           title: 'Warning',
                           description:
-                            'A markdown file will be downloaded automatically',
+                            'A markdown file will be downloaded automatically.',
                           buttons: [
                             {
                               label: 'Export markdown file',
