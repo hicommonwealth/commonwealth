@@ -2,6 +2,7 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { config } from '../config';
+import * as chainEvents from './chain-events';
 import * as community from './community';
 import * as contest from './contest';
 import * as email from './emails';
@@ -20,6 +21,7 @@ const artifacts = {
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
   subscription: subscription.trpcRouter,
+  chainEvents: chainEvents.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

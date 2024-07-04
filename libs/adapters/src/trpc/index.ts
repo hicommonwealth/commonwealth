@@ -113,6 +113,7 @@ export enum Tag {
   Query = 'Query',
   Integration = 'Integration',
   Subscription = 'Subscription',
+  ChainEvent = 'ChainEvent',
 }
 
 export const command = <Input extends ZodObject<any>, Output extends ZodSchema>(
