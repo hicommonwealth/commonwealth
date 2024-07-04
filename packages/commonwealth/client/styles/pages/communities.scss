@@ -4,7 +4,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 16px;
 
   .header-section {
     display: flex;
@@ -21,7 +20,7 @@
 
   .communities-list {
     display: grid;
-    grid-gap: 28px;
+    grid-gap: 14px;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     justify-content: center;
     padding-top: 24px;

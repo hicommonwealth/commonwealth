@@ -21,6 +21,8 @@ import { CWButton } from '../CWButton';
 import { CWTooltip } from '../CWTooltip';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
+import { isWindowExtraSmall } from '../../helpers';
+import { truncate } from 'client/scripts/helpers/truncate';
 
 type CWRelatedCommunityCardProps = {
   community: ChainInfo;
@@ -121,7 +123,7 @@ export const CWRelatedCommunityCard = ({
                 </CWText>
               </div>
 
-              {!!stakeValue && (
+              {(
                 <div className="stake-info">
                   <CWText type="h5" className="stake-value">
                     ${stakeValue}
@@ -142,7 +144,9 @@ export const CWRelatedCommunityCard = ({
             </div>
             {community.description && (
               <CWText className="description" type="b2">
-                {addPeriodToText(community.description)}
+                {!!isWindowExtraSmall
+                  ? truncate(community.description, 40)
+                  : addPeriodToText(community.description)}
               </CWText>
             )}
           </div>
@@ -154,9 +158,11 @@ export const CWRelatedCommunityCard = ({
               {Number(memberCount).toLocaleString('en-US')}
             </CWText>
 
-            <CWText className="text" type="caption">
-              {pluralizeWithoutNumberPrefix(Number(memberCount), 'member')}
-            </CWText>
+            {!isWindowExtraSmall && (
+              <CWText className="text" type="caption">
+                {pluralizeWithoutNumberPrefix(Number(memberCount), 'member')}
+              </CWText>
+            )}
           </div>
 
           <div className="divider">
@@ -168,9 +174,11 @@ export const CWRelatedCommunityCard = ({
             <CWText className="count" type="caption">
               {threadCount.toLocaleString('en-US')}
             </CWText>
-            <CWText className="text" type="caption">
-              {pluralizeWithoutNumberPrefix(Number(threadCount), 'thread')}
-            </CWText>
+            {!isWindowExtraSmall && (
+              <CWText className="text" type="caption">
+                {pluralizeWithoutNumberPrefix(Number(threadCount), 'thread')}
+              </CWText>
+            )}
           </div>
         </div>
         {stakeEnabled && (

@@ -2,6 +2,10 @@
 
 .RelatedCommunityCard {
   padding: 24px;
+
+  @include extraSmall {
+    padding: 12px;
+  }
   display: flex;
   border-radius: 6px;
   border: 1px solid $neutral-100;
@@ -121,6 +125,46 @@
       display: flex;
       gap: 12px;
       margin-top: auto;
+    }
+  }
+
+  @include extraSmall {
+    .content-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+      height: 100%; // Add this to make the container take full height
+  
+
+      .top-content {
+        flex-direction: column;
+
+        .community-info {
+          .header {
+            flex-direction: column;
+            align-items: flex-start;
+
+            .community-name {
+              margin-bottom: 8px;
+            }
+          }
+        }
+      }
+
+      .metadata {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        margin-top: auto; // Add this to push metadata to the bottom
+  
+        // ... existing code ...
+      }
+
+      .actions {
+        display: none;
+      }
     }
   }
 }
