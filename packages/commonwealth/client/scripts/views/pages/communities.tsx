@@ -28,6 +28,8 @@ import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { CommunityLaunchCard } from '../components/CommunityLaunchCard';
+import useCreateCommunity from './CreateCommunity/useCreateCommunity';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -41,6 +43,45 @@ const communityNetworks = Object.keys(ChainNetwork).filter(
   (val) => val === 'ERC20',
 ); // We only are allowing ERC20 for now
 const communityBases = Object.keys(ChainBase);
+
+// const {
+//   handleCompleteBasicInformationStep,
+//   createdCommunityId,
+//   createdCommunityName,
+// } = useCreateCommunity();
+
+const handleLaunchIdea = async (name: string, image?: File) => {
+  // TODO: Implement OpenAI call to generate missing fields
+  // const generatedFields = await generateMissingFields(name);
+
+  // const communityData = {
+  //   name,
+  //   base: 'ethereum', // Default to Ethereum base
+  //   ...generatedFields,
+  //   icon_url: image ? await uploadImage(image) : generatedFields.icon_url,
+  // };
+
+  // await handleCompleteBasicInformationStep(communityData);
+
+  console.log('clicked')
+  // TODO: Handle success, maybe redirect to the new community page
+};
+
+const generateMissingFields = async (name: string) => {
+  // TODO: Implement OpenAI API call to generate missing fields
+  // This is a placeholder implementation
+  return {
+    description: `A community for ${name}`,
+    icon_url: 'https://example.com/default-icon.png',
+    // Add other required fields here
+  };
+};
+
+const uploadImage = async (file: File): Promise<string> => {
+  // TODO: Implement image upload logic
+  // This is a placeholder implementation
+  return 'https://example.com/uploaded-image.png';
+};
 
 const getInitialFilterMap = (): Record<string, unknown> => {
   const filterMapCommunityCategories = communityCategories.map((c) => ({
@@ -220,19 +261,8 @@ const CommunitiesPage = () => {
     <CWPageLayout>
       <div className="CommunitiesPage">
         <div className="header-section">
-          <div className="description">
-            <CWText type="h2" fontWeight="semiBold">
-              Explore communities
-            </CWText>
-            <div className="actions">
-              <CWText type="caption" className="communities-count">
-                {activeCommunities &&
-                  buildCommunityString(activeCommunities.totalCommunitiesCount)}
-              </CWText>
-              <CreateCommunityButton />
-            </div>
-          </div>
-          <div className="filters">
+          <CommunityLaunchCard onLaunch={handleLaunchIdea} />
+          {/* <div className="filters">
             <CWIcon iconName="funnelSimple" />
             <CWButton
               label={STAKE_FILTER_KEY}
@@ -283,7 +313,17 @@ const CommunitiesPage = () => {
                 />
               );
             })}
-          </div>
+          </div> */}
+        </div>
+        <div className="trending-header">
+          <CWText type="h2" fontWeight="semiBold">
+            Trending
+          </CWText>
+          <CWIcon iconName="dot" iconSize="xxs" />
+          <CWText type="caption" className="communities-count">
+            {activeCommunities &&
+              buildCommunityString(activeCommunities.totalCommunitiesCount)}
+          </CWText>
         </div>
         {isLoading ? (
           <CWCircleMultiplySpinner />

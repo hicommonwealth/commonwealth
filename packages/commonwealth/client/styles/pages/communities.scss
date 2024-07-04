@@ -4,52 +4,17 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  padding: 16px;
 
   .header-section {
     display: flex;
     flex-direction: column;
-
-    gap: 24px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: $white;
+    gap: 16px;
+    margin-bottom: 16px;
 
     .description {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-
       .actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .communities-count {
-          color: $neutral-500;
-          height: fit-content;
-        }
-
-        .CreateCommunityButton {
-          padding: 0 0 0 16px;
-        }
-      }
-    }
-
-    .filters {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-
-      @include extraSmall {
-        gap: 12px;
-      }
-
-      .Divider {
-        height: 40px;
+        width: 100%;
       }
     }
   }
@@ -57,16 +22,72 @@
   .communities-list {
     display: grid;
     grid-gap: 28px;
-    grid-template-columns: repeat(auto-fit, 506px);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     justify-content: center;
     padding-top: 24px;
+  
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  
+    @media (max-width: 767px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    @include extraSmall {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 
-    @include mediumSmall {
-      grid-template-columns: 1fr 1fr;
+  // .CommunityPoolCard {
+  //   background: linear-gradient(to right, #ff9966, #ff5e62);
+  //   border-radius: 12px;
+  //   padding: 16px;
+  //   color: white;
+  //   margin-bottom: 24px;
+
+  //   .pool-header {
+  //     display: flex;
+  //     justify-content: space-between;
+  //     align-items: center;
+  //     margin-bottom: 8px;
+  //   }
+
+  //   .pool-amount {
+  //     font-size: 24px;
+  //     font-weight: bold;
+  //   }
+
+  //   .pool-percentage {
+  //     color: #4caf50;
+  //   }
+
+  //   .pool-description {
+  //     font-size: 14px;
+  //   }
+  // }
+
+  .trending-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+
+  .trending-section {
+    h2 {
+      margin-bottom: 8px;
     }
 
-    @include extraSmall {
-      grid-template-columns: 1fr;
+    .communities-count {
+      color: $neutral-500;
+      margin-bottom: 16px;
     }
   }
 }

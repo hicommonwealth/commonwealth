@@ -1,0 +1,68 @@
+@import '../../../../styles/shared';
+
+.launch-card {
+  width: 100%;
+
+  .Card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; // Set the gap to 16px for all direct children
+    padding: 16px;
+  }
+
+  .Text.h4 {
+    margin-bottom: 8px; // Additional space below the title
+  }
+
+  .CWTextInput {
+    margin-bottom: 16px;
+  }
+
+  .image-uploader-container {
+    margin-top: 16px;
+
+    .CWButton {
+      width: auto;
+    }
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    margin-top: 16px; // Add some space above the bottom row
+    width: 100%;
+
+    .left-icon {
+      .image-toggle-button {
+        // Styles for the image upload icon button
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+    }
+
+    .right-buttons {
+      display: flex;
+      gap: 8px;
+
+      .CWButton {
+        &[label="Random"] {
+          background-color: #333333; // Dark background for Random button
+          color: white;
+        }
+
+        &[label="Launch"] {
+          background-color: #E0E0E0; // Light gray background for Launch button
+          color: #333333;
+        }
+
+        // Ensure buttons have consistent height and width
+        height: 36px; // Adjust as needed
+        padding: 0 16px; // Adjust horizontal padding as needed
+      }
+    }
+  }
+}
