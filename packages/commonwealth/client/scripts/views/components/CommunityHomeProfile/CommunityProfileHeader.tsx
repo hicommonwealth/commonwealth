@@ -1,5 +1,5 @@
 import React from 'react';
-import 'components/CommunityHomeProfile/ProfileHeader.scss';
+import 'components/CommunityHomeProfile/CommunityProfileHeader.scss';
 import { CWText } from '../component_kit/cw_text';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { SocialAccounts } from '../social_accounts';
@@ -14,9 +14,12 @@ export interface ProfileHeaderProps {
   threadCount: number;
   addressCount: number;
   defaultSymbol: string;
+  stakeEnabled: boolean;
+  stakeValue: string;
+  stakeChange: number;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+const CommunityProfileHeader: React.FC<ProfileHeaderProps> = ({
   name,
   iconUrl,
   description,
@@ -24,11 +27,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   threadCount,
   addressCount,
   defaultSymbol,
+  stakeEnabled,
+  stakeValue,
+  stakeChange,
 }) => {
   const subHeaderData = {
-    mcap: '$5.6k', // This is a dummy value, replace with actual data if available
-    coin: `$0.10`,
-    change24h: '0.00%', // This is a dummy value, replace with actual data if available
+    mcap: '$5.6k', // This is still a dummy value, replace if you have actual data
+    coin: stakeEnabled ? `$${stakeValue}` : `$0.00`,
+    change24h: stakeEnabled ? `${stakeChange.toFixed(2)}%` : '0.00%',
     members: addressCount,
     threads: threadCount,
   };
@@ -90,4 +96,4 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   );
 };
 
-export default ProfileHeader;
+export default CommunityProfileHeader;

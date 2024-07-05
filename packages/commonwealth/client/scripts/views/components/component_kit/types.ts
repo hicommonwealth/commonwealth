@@ -36,6 +36,7 @@ export enum ComponentType {
   PopoverMenu = 'PopoverMenu',
   Popover = 'Popover',
   ProgressBar = 'ProgressBar',
+  QuestCard = 'QuestCard',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   RelatedCommunityCard = 'RelatedCommunityCard',

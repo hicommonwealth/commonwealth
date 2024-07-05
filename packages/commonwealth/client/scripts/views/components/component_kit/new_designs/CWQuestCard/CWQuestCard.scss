@@ -1,0 +1,85 @@
+@import '../../../../../../styles/shared.scss';
+
+.QuestCard {
+  display: flex;
+  padding: 16px 0;
+  border-bottom: 1px solid $neutral-200;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .quest-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $neutral-100;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .quest-info {
+    flex: 1;
+
+    .quest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+
+      .reward-info {
+        text-align: right;
+
+        .reward-value {
+          color: $neutral-900;
+        }
+
+        .reward-description {
+          color: $neutral-600;
+        }
+      }
+    }
+
+    .description {
+      color: $neutral-700;
+      margin-bottom: 8px;
+    }
+
+    .metadata {
+      display: flex;
+      align-items: center;
+
+      .member-data,
+      .thread-data {
+        display: flex;
+        align-items: center;
+
+        .Icon {
+          margin-right: 4px;
+          color: $neutral-500;
+        }
+
+        .count {
+          color: $neutral-600;
+        }
+      }
+
+      .divider {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: $neutral-400;
+        margin: 0 8px;
+      }
+    }
+  }
+}

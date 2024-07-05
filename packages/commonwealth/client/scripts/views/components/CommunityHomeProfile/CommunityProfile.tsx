@@ -1,13 +1,35 @@
-import 'components/CommunityHomeProfile/Profile.scss';
+import 'components/CommunityHomeProfile/CommunityProfile.scss';
 import React from 'react';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWText } from '../component_kit/cw_text';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
-import ProfileHeader, { ProfileHeaderProps } from './ProfileHeader';
+import CommunityProfileHeader, { ProfileHeaderProps } from './CommunityProfileHeader';
+import CommunityProfileActivity from './CommunityProfileActivity';
+import { useCommunityCardPrice } from '../../../hooks/useCommunityCardPrice';
+import { useFetchEthUsdRateQuery } from '../../../state/api/communityStake';
+import { trpc } from '../../../utils/trpcClient';
 
 const CommunityProfile = () => {
   const chainInfo = app.chain.meta;
+
+  // Fetch ETH/USD rate
+  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
+  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+
+  // Fetch historical price
+  const oneDayAgo = React.useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
+  const { data: historicalPrices } = trpc.community.getStakeHistoricalPrice.useQuery({
+    past_date_epoch: oneDayAgo.current / 1000,
+  });
+
+  // Get community card price data
+  const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
+    community: chainInfo,
+    ethUsdRate: ethUsdRate || '',
+    stakeId: 2,
+    historicalPrice: historicalPrices?.[chainInfo.id]?.old_price || '',
+  });
 
   const profile = {
     name: chainInfo.name,
@@ -25,6 +47,9 @@ const CommunityProfile = () => {
     threadCount: chainInfo.threadCount,
     addressCount: chainInfo.addressCount,
     defaultSymbol: chainInfo.default_symbol,
+    stakeEnabled,
+    stakeValue,
+    stakeChange,
   };
 
   return (
@@ -49,8 +74,8 @@ const CommunityProfile = () => {
           </CWText>
         </div>
         <div className={profile.backgroundImage.url ? 'ProfilePageContainer' : 'ProfilePageContainer smaller-margins'}>
-          <ProfileHeader {...profileHeaderProps} />
-          {/* <ProfileActivity /> */}
+          <CommunityProfileHeader {...profileHeaderProps} />
+          <CommunityProfileActivity />
         </div>
       </div>
     </CWPageLayout>

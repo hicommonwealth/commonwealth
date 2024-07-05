@@ -5,7 +5,7 @@ import 'components/CommunityHomeProfile/Profile.scss';
 import { CWText } from '../component_kit/cw_text';
 import type Thread from 'models/Thread';
 import ProfileActivityRow from './ProfileActivityRow';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
+import type { CommentWithAssociatedThread } from './CommunityProfileActivity';
 import Stakes from '../../pages/MyCommunityStake/Stakes';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
 

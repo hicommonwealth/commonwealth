@@ -14,7 +14,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
+import type { CommentWithAssociatedThread } from './CommunityProfileActivity';
 
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
