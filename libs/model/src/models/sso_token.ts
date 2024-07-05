@@ -14,7 +14,7 @@ export default (
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       issued_at: { type: Sequelize.INTEGER, allowNull: false },
       issuer: { type: Sequelize.STRING, allowNull: false },
-      address_id: { type: Sequelize.INTEGER, allowNull: false },
+      address_id: { type: Sequelize.INTEGER },
       state_id: { type: Sequelize.STRING },
       created_at: { type: Sequelize.DATE },
       updated_at: { type: Sequelize.DATE },

@@ -46,11 +46,13 @@ const authCallback = async (
   // 2. decode request
   let stateToken: string;
   let iat: number;
+  let issuer: string;
   try {
     const decryptedToken = await decryptWithJWE(req.query.token);
     const tokenObj = JSON.parse(decryptedToken);
     stateToken = tokenObj.token;
     iat = +tokenObj.iat;
+    issuer = tokenObj.issuer;
   } catch (err) {
     log.info(`Failed to decrypt JWE: ${err.message}`);
     throw new AppError(Errors.RegistrationError);
@@ -66,7 +68,7 @@ const authCallback = async (
       state_id: stateToken,
     },
     defaults: {
-      profile_id: profile.id,
+      issuer,
       issued_at: Math.floor(iat / 1000), // convert to seconds
       created_at: new Date(),
       updated_at: new Date(),
