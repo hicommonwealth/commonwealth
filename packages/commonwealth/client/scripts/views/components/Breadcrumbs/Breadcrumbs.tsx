@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
@@ -8,7 +9,6 @@ import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
 import { breadCrumbURLS } from './data';
 import { generateBreadcrumbs } from './utils';
-import useUserStore from 'client/scripts/state/ui/user';
 
 export const Breadcrumbs = () => {
   const location = useLocation();
@@ -32,7 +32,8 @@ export const Breadcrumbs = () => {
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title || '',
     currentTopic: linkedThreads?.[0]?.topic?.name || '',
-    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` || '',
+    topicURL:
+      `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` || '',
   };
 
   let standalone = false;

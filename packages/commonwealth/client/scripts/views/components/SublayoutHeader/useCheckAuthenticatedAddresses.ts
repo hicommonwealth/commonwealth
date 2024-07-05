@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { ChainBase } from '@hicommonwealth/shared';
 import { CANVAS_TOPIC, chainBaseToCanvasChainId } from 'canvas';
+import useUserStore from 'client/scripts/state/ui/user';
 import { chainBaseToCaip2 } from 'shared/canvas/chainMappings';
 import { getSessionSigners } from 'shared/canvas/verify';
 import app from 'state';
-import useUserStore from 'client/scripts/state/ui/user';
 
 interface UseCheckAuthenticatedAddressesProps {
   recheck: boolean;
@@ -14,7 +14,7 @@ interface UseCheckAuthenticatedAddressesProps {
 const useCheckAuthenticatedAddresses = ({
   recheck,
 }: UseCheckAuthenticatedAddressesProps) => {
-  const user = useUserStore()
+  const user = useUserStore();
   const chainBase = app.chain?.base;
   const idOrPrefix =
     chainBase === ChainBase.CosmosSDK

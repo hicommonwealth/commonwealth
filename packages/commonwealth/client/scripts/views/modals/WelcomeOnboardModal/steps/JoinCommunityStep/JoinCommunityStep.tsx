@@ -1,8 +1,8 @@
 import { ChainNetwork } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import ChainInfo from 'models/ChainInfo';
 import React, { useEffect, useRef, useState } from 'react';
-import app from 'state';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -10,7 +10,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { JoinCommunityCard } from './JoinCommunityCard';
 import './JoinCommunityStep.scss';
 import { findSuggestedCommunities } from './helpers';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type JoinCommunityStepProps = {
   onComplete: () => void;

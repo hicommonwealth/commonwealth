@@ -3,6 +3,7 @@ import 'components/Avatar/AvatarUpload.scss';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
 import { compressImage } from 'utils/ImageCompression';
@@ -12,7 +13,6 @@ import Account from '../../../models/Account';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
-import useUserStore from 'client/scripts/state/ui/user';
 
 const uploadToS3 = async (file: File, signedUrl: string) => {
   const options = {

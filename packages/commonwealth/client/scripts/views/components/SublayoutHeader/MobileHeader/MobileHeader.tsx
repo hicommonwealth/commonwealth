@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
@@ -19,9 +18,9 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 import useUserMenuItems from '../useUserMenuItems';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import useUserStore from 'client/scripts/state/ui/user';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import './MobileHeader.scss';
-import useUserStore from 'client/scripts/state/ui/user';
 
 interface MobileHeaderProps {
   onMobile: boolean;

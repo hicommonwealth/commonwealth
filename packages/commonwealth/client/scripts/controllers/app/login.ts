@@ -48,10 +48,7 @@ export function linkExistingAddressToChainOrCommunity(
   });
 }
 
-export async function setActiveAccount(
-  account: Account,
-  shouldRedraw = true,
-): Promise<void> {
+export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, community });
 
@@ -176,13 +173,7 @@ export async function completeClientLogin(account: Account) {
   }
 }
 
-export async function updateActiveAddresses({
-  chain,
-  shouldRedraw = true,
-}: {
-  chain?: ChainInfo;
-  shouldRedraw?: boolean;
-}) {
+export async function updateActiveAddresses({ chain }: { chain?: ChainInfo }) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   userStore.getState().setData({
@@ -211,7 +202,7 @@ export async function updateActiveAddresses({
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
-    await setActiveAccount(memberAddresses[0], shouldRedraw);
+    await setActiveAccount(memberAddresses[0]);
   } else if (userStore.getState().accounts.length === 0) {
     // no addresses - preview the community
   } else {
@@ -260,7 +251,7 @@ export async function updateActiveAddresses({
           a.address === addressToUse.address
         );
       });
-      if (account) await setActiveAccount(account, shouldRedraw);
+      if (account) await setActiveAccount(account);
     }
   }
 }

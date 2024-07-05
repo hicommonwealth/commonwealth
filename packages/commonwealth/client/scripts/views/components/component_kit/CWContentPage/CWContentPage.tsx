@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import { IThreadCollaborator } from 'models/Thread';
@@ -22,7 +23,6 @@ import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
 import './CWContentPage.scss';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
-import useUserStore from 'client/scripts/state/ui/user';
 
 export type ContentPageSidebarItem = {
   label: string;

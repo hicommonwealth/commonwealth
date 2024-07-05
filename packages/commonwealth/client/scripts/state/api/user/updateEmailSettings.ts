@@ -2,7 +2,11 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import app from 'state';
-import { EmailNotificationInterval, useUserStore, userStore } from '../../ui/user/user';
+import {
+  EmailNotificationInterval,
+  useUserStore,
+  userStore,
+} from '../../ui/user/user';
 import { ApiEndpoints } from '../config';
 
 type UseUpdateUserEmailSettingsProps = {

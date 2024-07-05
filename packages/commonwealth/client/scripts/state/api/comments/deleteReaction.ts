@@ -4,8 +4,8 @@ import { signDeleteCommentReaction } from 'client/scripts/controllers/server/ses
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import useFetchCommentsQuery from './fetchComments';
 import { userStore } from '../../ui/user';
+import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
   communityId: string;

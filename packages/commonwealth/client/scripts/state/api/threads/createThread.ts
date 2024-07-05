@@ -11,9 +11,9 @@ import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
+import useUserStore, { userStore } from '../../ui/user';
 import { addThreadInAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
-import useUserStore, { userStore } from '../../ui/user';
 
 interface CreateThreadProps {
   address: string;
@@ -110,10 +110,11 @@ const useCreateThreadMutation = ({
 
       if (userOnboardingEnabled) {
         const profileId = user.addresses?.[0]?.profile?.id;
-        profileId && markTrainingActionAsComplete(
-          UserTrainingCardTypes.CreateContent,
-          profileId,
-        );
+        profileId &&
+          markTrainingActionAsComplete(
+            UserTrainingCardTypes.CreateContent,
+            profileId,
+          );
       }
 
       return newThread;

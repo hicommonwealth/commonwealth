@@ -1,4 +1,5 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import useUserStore from 'client/scripts/state/ui/user';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import app from 'state';
@@ -10,7 +11,6 @@ import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/
 import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import './DirectoryPageContent.scss';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type RowType = {
   community: JSX.Element;

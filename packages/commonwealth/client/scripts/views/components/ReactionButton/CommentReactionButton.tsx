@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import React, { useState } from 'react';
@@ -11,7 +12,6 @@ import {
 } from '../../../state/api/comments';
 import { AuthModal } from '../../modals/AuthModal';
 import { getDisplayedReactorsForPopup } from './helpers';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;

@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
@@ -18,7 +19,6 @@ import { AuthModal } from 'views/modals/AuthModal';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type ReactionButtonProps = {
   thread: Thread;

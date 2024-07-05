@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
-import { ApiEndpoints, queryClient } from '../config';
 import { userStore } from '../../ui/user';
+import { ApiEndpoints, queryClient } from '../config';
 
 interface DeleteGroupProps {
   groupId: number;

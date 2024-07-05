@@ -10,7 +10,6 @@ import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
 import {
   useFetchProfileByIdQuery,
   useUpdateProfileByAddressMutation,

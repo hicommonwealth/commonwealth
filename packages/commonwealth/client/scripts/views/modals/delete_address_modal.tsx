@@ -18,8 +18,8 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 
 import axios from 'axios';
-import '../../../styles/modals/delete_address_modal.scss';
 import useUserStore from 'client/scripts/state/ui/user';
+import '../../../styles/modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;

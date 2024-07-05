@@ -84,9 +84,11 @@ export const setActiveAccountOnTransactionSuccess = async (
     userStore.getState().activeAccount &&
     userStore.getState().activeAccount?.address !== userAddressUsedInTransaction
   ) {
-    const accountToSet = userStore.getState().accounts.find(
-      (account) => account.address === userAddressUsedInTransaction,
-    );
+    const accountToSet = userStore
+      .getState()
+      .accounts.find(
+        (account) => account.address === userAddressUsedInTransaction,
+      );
     // @ts-expect-error StrictNullChecks
     return await setActiveAccount(accountToSet);
   }

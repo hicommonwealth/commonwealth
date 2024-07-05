@@ -128,7 +128,8 @@ export class RolesController {
         .addresses.find((address) => address.id === r.address_id);
       if (!referencedAddress) return;
       const isSame =
-      userStore.getState().activeAccount?.address === referencedAddress.address;
+        userStore.getState().activeAccount?.address ===
+        referencedAddress.address;
       const ofCommunity = r.community_id === options.community;
       return permission && referencedAddress && isSame && ofCommunity;
     });
@@ -169,13 +170,15 @@ export class RolesController {
   }
 
   public getActiveAccountsByRole(): [Account, RoleInfo][] {
-    const activeAccountsByRole = userStore.getState().accounts.map((account) => {
-      const role = this.getRoleInCommunity({
-        account,
-        community: app.activeChainId(),
+    const activeAccountsByRole = userStore
+      .getState()
+      .accounts.map((account) => {
+        const role = this.getRoleInCommunity({
+          account,
+          community: app.activeChainId(),
+        });
+        return [account, role];
       });
-      return [account, role];
-    });
     const filteredActiveAccountsByRole = activeAccountsByRole.reduce(
       (arr: [Account, RoleInfo][], current: [Account, RoleInfo]) => {
         const index = arr.findIndex(

@@ -6,9 +6,9 @@ import { IUniqueId } from 'models/interfaces';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
-import { userStore } from '../../ui/user';
 
 interface DeleteCommentProps {
   address: string;

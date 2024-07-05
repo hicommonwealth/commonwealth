@@ -9,9 +9,9 @@ import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
+import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
-import useUserStore, { userStore } from '../../ui/user';
 
 interface CreateCommentProps {
   profile: UserProfile;
@@ -77,7 +77,7 @@ const useCreateCommentMutation = ({
     threadId,
   });
 
-  const user = useUserStore()
+  const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
@@ -105,10 +105,11 @@ const useCreateCommentMutation = ({
 
       if (userOnboardingEnabled) {
         const profileId = user.addresses?.[0]?.profile?.id;
-        profileId && markTrainingActionAsComplete(
-          UserTrainingCardTypes.CreateContent,
-          profileId,
-        );
+        profileId &&
+          markTrainingActionAsComplete(
+            UserTrainingCardTypes.CreateContent,
+            profileId,
+          );
       }
 
       return newComment;

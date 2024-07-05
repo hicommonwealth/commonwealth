@@ -5,9 +5,9 @@ import { ThreadStage } from 'models/types';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
+import { userStore } from '../../ui/user';
 import { removeThreadFromAllCaches } from './helpers/cache';
 import { updateCommunityThreadCount } from './helpers/counts';
-import { userStore } from '../../ui/user';
 
 interface DeleteThreadProps {
   communityId: string;

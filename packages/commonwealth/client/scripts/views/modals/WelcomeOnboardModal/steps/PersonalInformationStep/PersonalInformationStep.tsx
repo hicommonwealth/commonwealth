@@ -11,7 +11,6 @@ import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import app from 'state';
 import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,

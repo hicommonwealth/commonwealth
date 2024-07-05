@@ -18,10 +18,10 @@ import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import app from 'client/scripts/state';
 import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
+import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type ActivityResponse = {
   thread: {

@@ -3,9 +3,9 @@ import { MutableRefObject, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import { SerializableDeltaStatic, uploadFileToS3 } from './utils';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import app from 'state';
 import { compressImage } from 'utils/ImageCompression';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type UseImageUploaderProps = {
   editorRef: MutableRefObject<ReactQuill>;

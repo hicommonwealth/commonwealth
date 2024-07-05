@@ -3,9 +3,9 @@ import { notifySuccess } from 'controllers/app/notifications';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import axios from 'axios';
+import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
 import { DashboardViews } from '.';
-import { userStore } from 'client/scripts/state/ui/user';
 
 // Subscriptions
 export const subscribeToThread = async (

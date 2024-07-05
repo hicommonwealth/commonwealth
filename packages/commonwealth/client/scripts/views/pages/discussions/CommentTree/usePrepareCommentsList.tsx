@@ -1,9 +1,8 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { commentsByDate } from 'helpers/dates';
 import type { IUniqueId } from 'models/interfaces';
 import { CommentsFeaturedFilterTypes } from 'models/types';
-import app from 'state';
 import type { Comment as CommentType } from '../../../../models/Comment';
-import useUserStore from 'client/scripts/state/ui/user';
 
 const MAX_THREAD_LEVEL = 8;
 

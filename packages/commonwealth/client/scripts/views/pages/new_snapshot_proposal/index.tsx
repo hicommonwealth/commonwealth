@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
@@ -24,7 +25,6 @@ import {
 } from '../../components/react_quill_editor';
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type NewSnapshotProposalFormProps = {
   snapshotId: string;

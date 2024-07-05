@@ -1,4 +1,5 @@
 import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -32,7 +33,6 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from '../../components/react_quill_editor';
-import useUserStore from 'client/scripts/state/ui/user';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<

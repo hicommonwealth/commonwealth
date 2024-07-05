@@ -1,4 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
+import Account from 'client/scripts/models/Account';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -15,8 +17,6 @@ import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { ArchiveMsg } from './ArchiveMsg';
 import { CommentEditor } from './CommentEditor';
-import useUserStore from 'client/scripts/state/ui/user';
-import Account from 'client/scripts/models/Account';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -58,8 +58,12 @@ export const CreateComment = ({
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
   const { data: profile } = useFetchProfilesByAddressesQuery({
-    profileChainIds: user.activeAccount?.community?.id ? [user.activeAccount?.community?.id] : [],
-    profileAddresses: user.activeAccount?.address ? [user.activeAccount?.address] : [],
+    profileChainIds: user.activeAccount?.community?.id
+      ? [user.activeAccount?.community?.id]
+      : [],
+    profileAddresses: user.activeAccount?.address
+      ? [user.activeAccount?.address]
+      : [],
     currentChainId: app.activeChainId(),
     apiCallEnabled: !!user.activeAccount?.profile,
   });
@@ -95,7 +99,7 @@ export const CreateComment = ({
         threadId: rootThread.id,
         communityId,
         profile: {
-          id: user.activeAccount?.profile?.id ||0,
+          id: user.activeAccount?.profile?.id || 0,
           address: user.activeAccount?.address || '',
           avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
           name: user.activeAccount?.profile?.name || '',

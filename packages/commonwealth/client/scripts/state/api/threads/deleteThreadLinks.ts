@@ -2,8 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Thread, { Link } from 'models/Thread';
 import app from 'state';
-import { updateThreadInAllCaches } from './helpers/cache';
 import { userStore } from '../../ui/user';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface DeleteThreadLinksProps {
   communityId: string;

@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import app from 'state';
 import { userStore } from '../../ui/user';
 
 interface BanProfileByAddressProps {

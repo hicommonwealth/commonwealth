@@ -1,5 +1,5 @@
-import app from 'client/scripts/state';
 import { useUpdateProfileByAddressMutation } from 'client/scripts/state/api/profiles';
+import useUserStore from 'client/scripts/state/ui/user';
 import {
   PreferenceTags,
   usePreferenceTags,
@@ -8,7 +8,6 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React from 'react';
 import './PreferencesStep.scss';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type PreferencesStepProps = {
   onComplete: () => void;

@@ -7,6 +7,7 @@ import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/CWButton';
 
 import axios from 'axios';
+import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
@@ -18,7 +19,6 @@ import { getClasses } from './helpers';
 import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
 import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from './new_designs/cw_radio_button';
-import useUserStore from 'client/scripts/state/ui/user';
 
 // TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
 // pick it up like the rest of CWForm hooked components do. Add suport for it when needed.

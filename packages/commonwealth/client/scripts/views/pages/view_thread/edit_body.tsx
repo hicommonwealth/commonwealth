@@ -1,4 +1,5 @@
 import { ContentType } from '@hicommonwealth/shared';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -13,7 +14,6 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type EditBodyProps = {
   title: string;

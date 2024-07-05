@@ -3,9 +3,9 @@ import axios from 'axios';
 import moment from 'moment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
-import { userStore } from '../../ui/user';
 
 interface ToggleCommentSpamStatusProps {
   communityId: string;

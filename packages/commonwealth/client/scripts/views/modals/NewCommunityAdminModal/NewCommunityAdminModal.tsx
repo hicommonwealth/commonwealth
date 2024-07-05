@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import { formatAddressShort } from 'helpers';
 import _ from 'lodash';
-import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
@@ -20,7 +20,6 @@ import {
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './NewCommunityAdminModal.scss';
-import useUserStore from 'client/scripts/state/ui/user';
 
 interface NewCommunityAdminModalProps {
   onModalClose: () => void;

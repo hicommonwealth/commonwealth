@@ -1,7 +1,6 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import type { ApiV1 } from '../../../server/api/index';
-import app from '../state/index';
 import { userStore } from '../state/ui/user';
 
 export const trpc = createTRPCReact<ApiV1>();

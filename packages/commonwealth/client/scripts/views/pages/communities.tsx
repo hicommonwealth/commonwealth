@@ -5,6 +5,7 @@ import {
 } from '@hicommonwealth/shared';
 import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
 import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
+import useUserStore from 'client/scripts/state/ui/user';
 import { findDenominationString } from 'helpers/findDenomination';
 import numeral from 'numeral';
 import 'pages/communities.scss';
@@ -28,7 +29,6 @@ import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import useUserStore from 'client/scripts/state/ui/user';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000

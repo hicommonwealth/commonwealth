@@ -1,5 +1,6 @@
 import { AccessLevel } from '@hicommonwealth/shared';
 import axios from 'axios';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import React, { useMemo, useState } from 'react';
@@ -10,7 +11,6 @@ import { CWButton } from '../../../../components/component_kit/new_designs/CWBut
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
 import { MembersSearchBar } from '../../../../components/members_search_bar';
 import './UpgradeRolesForm.scss';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type UpgradeRolesFormProps = {
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;

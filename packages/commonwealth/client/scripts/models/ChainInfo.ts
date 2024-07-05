@@ -4,11 +4,11 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
+import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
 import Tag from './Tag';
-import { userStore } from '../state/ui/user';
 
 class ChainInfo {
   public readonly id: string;

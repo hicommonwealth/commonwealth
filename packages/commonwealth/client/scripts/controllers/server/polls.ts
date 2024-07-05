@@ -1,12 +1,12 @@
 /* eslint-disable no-restricted-globals */
 import axios from 'axios';
+import { userStore } from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import app from 'state';
 import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
-import { userStore } from 'client/scripts/state/ui/user';
 
 export const modelFromServer = (poll) => {
   const {

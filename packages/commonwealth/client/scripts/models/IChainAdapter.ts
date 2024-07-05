@@ -8,11 +8,11 @@ import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
+import { userStore } from '../state/ui/user';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import ProposalModule from './ProposalModule';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
-import { userStore } from '../state/ui/user';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.

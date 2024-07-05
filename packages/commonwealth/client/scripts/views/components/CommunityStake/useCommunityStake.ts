@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import ChainInfo from 'client/scripts/models/ChainInfo';
+import useUserStore from 'client/scripts/state/ui/user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import app from 'state';
 import {
@@ -9,7 +10,6 @@ import {
 } from 'state/api/communityStake';
 import { useFlag } from '../../../hooks/useFlag';
 import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
-import useUserStore from 'client/scripts/state/ui/user';
 
 interface UseCommunityStakeProps {
   community?: ChainInfo | CommunityData;

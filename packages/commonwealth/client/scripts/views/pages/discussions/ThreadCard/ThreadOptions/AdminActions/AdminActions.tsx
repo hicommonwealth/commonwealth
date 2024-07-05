@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -23,7 +24,6 @@ import type { IThreadCollaborator } from '../../../../../../models/Thread';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
-import useUserStore from 'client/scripts/state/ui/user';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -201,7 +201,7 @@ export const AdminActions = ({
 
   const handleThreadLockToggle = () => {
     editThread({
-      address: user.activeAccount?.address ||'',
+      address: user.activeAccount?.address || '',
       threadId: thread.id,
       readOnly: !thread.readOnly,
       communityId: app.activeChainId(),

@@ -1,3 +1,4 @@
+import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
 import {
   CW_SPECIFICATIONS,
@@ -7,7 +8,6 @@ import {
 } from '../../../common/constants';
 import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
 import { GroupResponseValuesType } from '../GroupForm/index.types';
-import { userStore } from 'client/scripts/state/ui/user';
 
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (

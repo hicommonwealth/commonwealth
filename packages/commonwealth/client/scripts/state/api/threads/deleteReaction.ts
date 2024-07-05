@@ -3,8 +3,8 @@ import axios from 'axios';
 import { signDeleteThreadReaction } from 'client/scripts/controllers/server/sessions';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
-import { updateThreadInAllCaches } from './helpers/cache';
 import { userStore } from '../../ui/user';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
   communityId: string;

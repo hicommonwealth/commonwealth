@@ -1,3 +1,5 @@
+import MinimumProfile from 'client/scripts/models/MinimumProfile';
+import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -40,8 +42,6 @@ import {
   checkNewThreadErrors,
   useNewThreadForm,
 } from './helpers';
-import useUserStore from 'client/scripts/state/ui/user';
-import MinimumProfile from 'client/scripts/models/MinimumProfile';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();

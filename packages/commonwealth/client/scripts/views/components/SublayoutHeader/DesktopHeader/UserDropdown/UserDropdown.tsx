@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
-import app from 'state';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -9,8 +8,8 @@ import { User } from 'views/components/user/user';
 
 import useUserMenuItems from '../../useUserMenuItems';
 
-import './UserDropdown.scss';
 import useUserStore from 'client/scripts/state/ui/user';
+import './UserDropdown.scss';
 
 interface UserDropdownProps {
   onAuthModalOpen: () => void;

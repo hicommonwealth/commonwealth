@@ -245,7 +245,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,
-          shouldRedraw: shouldRedrawApp,
         });
       }
     }
@@ -329,11 +328,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
       // @ts-expect-error StrictNullChecks
-      await account.validate(session); // TODO: test if this ready does need to block user app.user.activeAccounts aka `user.accounts` refresh
+      await account.validate(session); // TODO: test if this ready does need to block user
+      // app.user.activeAccounts aka `user.accounts` refresh
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
-      await onLogInWithAccount(account, false, true, false); // TODO: test if this ready does need to block user app.user.activeAccounts aka `user.accounts` refresh
+      await onLogInWithAccount(account, false, true, false); // TODO: test if this ready
+      // does need to block user app.user.activeAccounts aka `user.accounts` refresh
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api

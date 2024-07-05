@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from '../../state';
@@ -12,7 +13,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { TopicSelector } from '../components/topic_selector';
-import useUserStore from 'client/scripts/state/ui/user';
 
 type ChangeThreadTopicModalProps = {
   onModalClose: () => void;

@@ -3,6 +3,7 @@ import imageDropAndPaste from 'quill-image-drop-and-paste';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 
+import useUserStore from 'client/scripts/state/ui/user';
 import app from 'state';
 import {
   SerializableDeltaStatic,
@@ -10,7 +11,6 @@ import {
   base64ToFile,
   uploadFileToS3,
 } from './utils';
-import useUserStore from 'client/scripts/state/ui/user';
 
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 

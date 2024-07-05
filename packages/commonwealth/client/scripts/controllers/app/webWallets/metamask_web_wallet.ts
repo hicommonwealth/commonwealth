@@ -10,10 +10,10 @@ import { hexToNumber } from 'web3-utils';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import { userStore } from 'client/scripts/state/ui/user';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import { Web3BaseProvider } from 'web3';
-import { userStore } from 'client/scripts/state/ui/user';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -203,9 +203,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        const updatedAddress = userStore.getState().accounts.find(
-          (addr) => addr.address === accounts[0],
-        );
+        const updatedAddress = userStore
+          .getState()
+          .accounts.find((addr) => addr.address === accounts[0]);
         if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
       },

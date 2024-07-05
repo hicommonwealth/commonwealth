@@ -6,8 +6,8 @@ import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
-import { updateThreadInAllCaches } from './helpers/cache';
 import useUserStore, { userStore } from '../../ui/user';
+import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
   threadId: number;
@@ -79,10 +79,11 @@ const useCreateThreadReactionMutation = ({
 
       if (userOnboardingEnabled) {
         const profileId = user.addresses?.[0]?.profile?.id;
-        profileId && markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+        profileId &&
+          markTrainingActionAsComplete(
+            UserTrainingCardTypes.GiveUpvote,
+            profileId,
+          );
       }
     },
   });

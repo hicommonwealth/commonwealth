@@ -10,11 +10,11 @@ import app from 'state';
 
 import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
+import { userStore } from 'client/scripts/state/ui/user';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { NotificationStore } from 'stores';
 import { z } from 'zod';
 import Notification from '../../models/Notification';
-import { userStore } from 'client/scripts/state/ui/user';
 
 const post = async (route, args, callback) => {
   try {
