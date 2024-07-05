@@ -64,11 +64,13 @@ export const ConfirmSnapshotVoteModal = (
       metadata: JSON.stringify({}),
     };
     try {
-      castVote(author?.address || '', votePayload).then(async () => {
-        await app.snapshot.refreshProposals();
-        onModalClose();
-        successCallback();
-      });
+      castVote(author?.address || '', votePayload)
+        .then(async () => {
+          await app.snapshot.refreshProposals();
+          onModalClose();
+          successCallback();
+        })
+        .catch(console.error);
       trackAnalytics({
         event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
         isPWA: isAddedToHomeScreen,

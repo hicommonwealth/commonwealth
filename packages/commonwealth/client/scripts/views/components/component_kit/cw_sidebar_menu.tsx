@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 import React, { useState } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -35,9 +34,11 @@ const resetSidebarState = () => {
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
+  // eslint-disable-next-line react/destructuring-assignment
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   if (props.type === 'default') {
     const {
       disabled,
@@ -84,13 +85,17 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'header') {
     return (
       <div className="SidebarMenuItem header">
+        {/* eslint-disable-next-line react/destructuring-assignment */}
         <CWText type="caption">{props.label}</CWText>
       </div>
     );
+    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'community') {
+    /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
     // @ts-expect-error <StrictNullChecks/>
     const roles = app.roles.getAllRolesInCommunity({ community: item.id });

@@ -30,22 +30,24 @@ export const deinitChainOrCommunity = async () => {
 export const loadCommunityChainInfo = async (
   chain?: ChainInfo,
 ): Promise<boolean> => {
+  let tempChain = chain;
+
   // Select the default node, if one wasn't provided
-  if (!chain) {
+  if (!tempChain) {
     const activeCommunity = userStore.getState().activeCommunity;
     if (activeCommunity) {
-      chain = activeCommunity;
+      tempChain = activeCommunity;
     } else {
-      chain = app.config.chains.getById(app.config.defaultChain);
+      tempChain = app.config.chains.getById(app.config.defaultChain);
     }
 
-    if (!chain) {
+    if (!tempChain) {
       throw new Error('no chain available');
     }
   }
 
   // Check for valid chain selection, and that we need to switch
-  if (app.chain && chain === app.chain.meta) {
+  if (app.chain && tempChain === app.chain.meta) {
     // @ts-expect-error StrictNullChecks
     return;
   }
@@ -56,7 +58,7 @@ export const loadCommunityChainInfo = async (
     app.skipDeinitChain = false;
   }
   app.chainPreloading = true;
-  document.title = `Common – ${chain.name}`;
+  document.title = `Common – ${tempChain.name}`;
 
   // Import top-level chain adapter lazily, to facilitate code split.
   const newChain = await (async (base: ChainBase) => {
@@ -65,32 +67,32 @@ export const loadCommunityChainInfo = async (
         const Substrate = (
           await import('../controllers/chain/substrate/adapter')
         ).default;
-        return new Substrate(chain, app);
+        return new Substrate(tempChain, app);
       }
       case ChainBase.CosmosSDK: {
         const Cosmos = (await import('../controllers/chain/cosmos/adapter'))
           .default;
-        return new Cosmos(chain, app);
+        return new Cosmos(tempChain, app);
       }
       case ChainBase.NEAR: {
         const Near = (await import('../controllers/chain/near/adapter'))
           .default;
-        return new Near(chain, app);
+        return new Near(tempChain, app);
       }
       case ChainBase.Solana: {
         const Solana = (await import('../controllers/chain/solana/adapter'))
           .default;
-        return new Solana(chain, app);
+        return new Solana(tempChain, app);
       }
       case ChainBase.Ethereum: {
         const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
           .default;
-        return new Ethereum(chain, app);
+        return new Ethereum(tempChain, app);
       }
       default:
         throw new Error('Invalid Chain');
     }
-  })(chain.base);
+  })(tempChain.base);
 
   // Load server data without initializing modules/chain connection.
   const finalizeInitialization = await newChain.initServer();

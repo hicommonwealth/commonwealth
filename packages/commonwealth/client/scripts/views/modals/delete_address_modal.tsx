@@ -112,7 +112,7 @@ export const DeleteAddressModal = ({
         <CWButton
           label="Delete"
           buttonType="destructive"
-          onClick={onDeleteAddress}
+          onClick={async (e) => await onDeleteAddress(e).catch(console.error)}
           buttonHeight="sm"
         />
       </CWModalFooter>
