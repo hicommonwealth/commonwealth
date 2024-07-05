@@ -84,5 +84,5 @@ models.Community.findAll({
 
 ## Change Log
 
-- 240705: Historicized and abridged by Graham Johnson.
+- 240705: Historicized and abridged by Graham Johnson (#8376).
 - 230602: Authored by Nakul Manchanda.

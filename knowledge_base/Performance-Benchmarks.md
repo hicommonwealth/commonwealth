@@ -59,5 +59,5 @@ These dashboards serve a key role in prioritizing improvements by highlighting h
 
 ## Change Log
 
-- 240705: Abridged by Graham Johnson, removing outdated information.
+- 240705: Abridged by Graham Johnson, removing outdated information (#8376).
 - 230724: Authored by Nakul Manchanda.
