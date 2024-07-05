@@ -13,9 +13,9 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.Profile.withMany(db.Address)
-    .withMany(db.SsoToken)
-    .withMany(db.ProfileTags, { onDelete: 'CASCADE' });
+  db.Profile.withMany(db.Address).withMany(db.ProfileTags, {
+    onDelete: 'CASCADE',
+  });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
