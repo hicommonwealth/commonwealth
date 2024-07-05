@@ -6,7 +6,7 @@
   + [M1 Support](./M1-Support.md): For configuring M1 Macs.
 - [Ways of Working](./Ways-Of-Working.md): Sprint cadence, meeting schedule, org structure.
 - [Glossary](./Glossary.md): Team-specific engineering and business terms.
-- [Code Style](./Code-Style.md): House style guide. (Under construction.)
+- [Code Style](./Code-Style.md): House style guide; under construction.
 - [Environment Variables](./Environment-Variables.md): Configure your `.env` file.
 - [Package Scripts](./Package-Scripts.md): `Package.JSON` script documentation.
 
@@ -38,8 +38,8 @@
 
 - [Database ERD](./Database-ERD.md)
 - [Database Monitoring](./Database-Monitoring.md)
-- [Database Migrations: Best Practices](./Database-Migrations.md)
-- [Database Optimization](./Database-Optimization.md)
+- [Database Migrations](./Database-Migrations.md): Best practices.
+- [Database Optimization](./Database-Optimization.md): Best practices.
 - [Enabling Community Governance](./Enabling-Community-Governance.md): Migrating a community from offchain to chain-integrated.
 - [Sequelize](./Sequelize.md)
 
@@ -65,14 +65,14 @@
 - [Performance Benchmarks](./Performance-Benchmarks.md)
 - [Request Handler Optimization](./Request-Handler-Optimization.md)
 
-## Platform Guidelines
+## Platform Guides
 
 - [Complex Functions](./Complex-Functions.md): Mitigating code complexity.
 - [Over-Fetching](./Over-Fetching.md): Retrieving more data than is required.
 - [Pagination](./Pagination.md): Best practices for paginating API routes.
 - [Platform Coding Guidelines](./Platform-Coding-Guidelines.md): Best practices on the backend.
 
-## Product (PENG) Guidelines
+## Product (PENG) Guides
 
 - [Component Kit](./Component-Kit.md)
 - [React Best Practices](./React-Best-Practices-And-Improvements.md)
