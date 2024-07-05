@@ -105,6 +105,7 @@ export const AvatarUpload = ({
   useEffect(() => {
     // @ts-expect-error StrictNullChecks
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const avatarSize = size === 'small' ? 60 : 108;

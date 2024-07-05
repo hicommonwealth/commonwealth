@@ -27,7 +27,7 @@ export const DeleteGroupModal = ({
   groupName,
   gatedTopics,
   isOpen,
-  onClose = () => { },
+  onClose = () => {},
 }: DeleteGroupModalAttrs) => {
   const navigate = useCommonNavigate();
   const { mutateAsync: deleteGroup } = useDeleteGroupMutation({

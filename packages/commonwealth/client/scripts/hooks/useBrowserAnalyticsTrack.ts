@@ -36,7 +36,7 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
         console.log('Failed to track event:', e.message);
       }
     }
-  }, [onAction, payload]);
+  }, [onAction, payload, user.addresses, user.activeAccount]);
 
   // Fire on action
   const trackAnalytics = useCallback(
@@ -53,7 +53,7 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
         }
       }
     },
-    [onAction],
+    [onAction, user.activeAccount],
   );
 
   return { trackAnalytics };

@@ -29,18 +29,18 @@ type DeleteAddressModalAttrs = {
   closeModal: () => void;
 };
 
-export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
+export const DeleteAddressModal = ({
+  address,
+  addresses,
+  chain,
+  closeModal,
+  profile,
+}: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
-  const onDeleteAddress = async (
-    e: React.MouseEvent,
-    passedProps: Partial<DeleteAddressModalAttrs>,
-  ) => {
-    const { addresses, address, chain } = passedProps;
-
+  const onDeleteAddress = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // @ts-expect-error <StrictNullChecks/>
     if (addresses.length === 1) {
       notifyError(
         'You must have at least one address linked to a profile. Please add another address before removing this one.',
@@ -54,12 +54,10 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         jwt: user.jwt,
       });
       // remove deleted role from app.roles
-      // @ts-expect-error <StrictNullChecks/>
       const foundAddressInfo = addresses.find((a) => a.address === address);
       app.roles.deleteRole({
         // @ts-expect-error <StrictNullChecks/>
         address: foundAddressInfo,
-        // @ts-expect-error <StrictNullChecks/>
         community: chain,
       });
 
@@ -73,9 +71,8 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
     closeModal();
   };
 
-  const { profile, address, closeModal } = props;
   const { name } = profile;
-  const defaultAvatar = jdenticon.toSvg(props.profile.id, 90);
+  const defaultAvatar = jdenticon.toSvg(profile.id, 90);
 
   return (
     <div className="DeleteAddressModal">
@@ -115,7 +112,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         <CWButton
           label="Delete"
           buttonType="destructive"
-          onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
+          onClick={onDeleteAddress}
           buttonHeight="sm"
         />
       </CWModalFooter>

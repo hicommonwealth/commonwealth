@@ -140,7 +140,7 @@ const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
     if (matchingAddress) {
       setAddress(matchingAddress);
     }
-  }, [user.address, user.community?.id]);
+  }, [user.address, user.community?.id, loggedInUser.addresses]);
 
   return (
     <>

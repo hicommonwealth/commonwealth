@@ -51,7 +51,7 @@ const OverviewPage = () => {
 
   const topicsSorted = anyTopicsFeatured
     ? // @ts-expect-error <StrictNullChecks/>
-    topicsFiltered.sort((a, b) => a.order - b.order)
+      topicsFiltered.sort((a, b) => a.order - b.order)
     : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
   const topicSummaryRows: Array<{

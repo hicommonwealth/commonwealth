@@ -132,6 +132,7 @@ export const UserTrainingSlider = () => {
       }
     }
   }, [
+    user.email,
     isLoggedIn,
     isLoadingProfile,
     profile,

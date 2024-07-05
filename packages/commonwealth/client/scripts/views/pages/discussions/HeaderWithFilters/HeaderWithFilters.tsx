@@ -139,12 +139,12 @@ export const HeaderWithFilters = ({
 
   const stages = !customStages
     ? [
-      ThreadStage.Discussion,
-      ThreadStage.ProposalInReview,
-      ThreadStage.Voting,
-      ThreadStage.Passed,
-      ThreadStage.Failed,
-    ]
+        ThreadStage.Discussion,
+        ThreadStage.ProposalInReview,
+        ThreadStage.Voting,
+        ThreadStage.Passed,
+        ThreadStage.Failed,
+      ]
     : parseCustomStages(customStages);
 
   const selectedStage = stages.find((s) => s === (stage as ThreadStage));
@@ -175,35 +175,35 @@ export const HeaderWithFilters = ({
     if (matchesArchivedRoute && !pickedTopic) {
       navigate(
         `/archived?` +
-        Object.keys(urlParams)
-          .map((x) => `${x}=${urlParams[x]}`)
-          .join('&'),
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&'),
       );
     } else if (filterKey === 'contest') {
       navigate(
         `/discussions?` +
-        Object.keys(urlParams)
-          .map((param) => {
-            if (param === 'stage') {
-              return false;
-            }
-            return `${param}=${urlParams[param]}`;
-          })
-          .filter(Boolean)
-          .join('&'),
+          Object.keys(urlParams)
+            .map((param) => {
+              if (param === 'stage') {
+                return false;
+              }
+              return `${param}=${urlParams[param]}`;
+            })
+            .filter(Boolean)
+            .join('&'),
       );
     } else {
       navigate(
         `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-        Object.keys(urlParams)
-          .map((param) => {
-            if (pickedTopic && (param === 'contest' || param === 'status')) {
-              return false;
-            }
-            return `${param}=${urlParams[param]}`;
-          })
-          .filter(Boolean)
-          .join('&'),
+          Object.keys(urlParams)
+            .map((param) => {
+              if (pickedTopic && (param === 'contest' || param === 'status')) {
+                return false;
+              }
+              return `${param}=${urlParams[param]}`;
+            })
+            .filter(Boolean)
+            .join('&'),
       );
     }
   };
@@ -261,7 +261,8 @@ export const HeaderWithFilters = ({
               iconLeft="plus"
               onClick={() => {
                 navigate(
-                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''
+                  `/new/discussion${
+                    topic ? `?topic=${selectedTopic?.id}` : ''
                   }`,
                 );
               }}
@@ -378,9 +379,9 @@ export const HeaderWithFilters = ({
                     })),
                     ...(contestFiltersVisible
                       ? [
-                        { type: 'header-divider', label: 'Contests' },
-                        ...contestNameOptions,
-                      ]
+                          { type: 'header-divider', label: 'Contests' },
+                          ...contestNameOptions,
+                        ]
                       : []),
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
@@ -449,10 +450,11 @@ export const HeaderWithFilters = ({
                       ...stages.map((s) => ({
                         id: s,
                         value: s,
-                        label: `${threadStageToLabel(s)} ${s === ThreadStage.Voting
+                        label: `${threadStageToLabel(s)} ${
+                          s === ThreadStage.Voting
                             ? totalThreadsInCommunityForVoting
                             : ''
-                          }`,
+                        }`,
                       })),
                     ]}
                     dropdownPosition={rightFiltersDropdownPosition}

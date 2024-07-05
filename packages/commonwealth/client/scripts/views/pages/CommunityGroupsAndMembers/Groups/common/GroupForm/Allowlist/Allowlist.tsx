@@ -23,36 +23,36 @@ import './Allowlist.scss';
 const tableColumns: (isStakedCommunity: boolean) => CWTableColumnInfo[] = (
   isStakedCommunity,
 ) => [
-    {
-      key: 'name',
-      header: 'Users',
-      hasCustomSortValue: true,
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'address',
-      header: 'Address',
-      hasCustomSortValue: true,
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'stakeBalance',
-      header: 'Stake',
-      hasCustomSortValue: true,
-      numeric: true,
-      sortable: true,
-      hidden: !isStakedCommunity,
-    },
-    {
-      key: 'groups',
-      header: 'Groups',
-      hasCustomSortValue: true,
-      numeric: false,
-      sortable: false,
-    },
-  ];
+  {
+    key: 'name',
+    header: 'Users',
+    hasCustomSortValue: true,
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'address',
+    header: 'Address',
+    hasCustomSortValue: true,
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'stakeBalance',
+    header: 'Stake',
+    hasCustomSortValue: true,
+    numeric: true,
+    sortable: true,
+    hidden: !isStakedCommunity,
+  },
+  {
+    key: 'groups',
+    header: 'Groups',
+    hasCustomSortValue: true,
+    numeric: false,
+    sortable: false,
+  },
+];
 
 type AllowlistProps = {
   allowedAddresses: string[];

@@ -202,7 +202,8 @@ const useUserMenuItems = ({
     RevalidationModal,
     userMenuItems: [
       // if a user is in a stake enabled community without membership, show user addresses that
-      // match active chain base in the dropdown. This address should show be set to user.activeAccount of useUserStore().
+      // match active chain base in the dropdown. This address should show be set to
+      // user.activeAccount of useUserStore().
       ...(shouldShowAddressesSwitcherForNonMember
         ? ([
             {
