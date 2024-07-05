@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { SIWESigner } from '@canvas-js/chain-ethereum';
-import { SolanaSigner } from '@canvas-js/chain-solana';
 import type {
   Action,
   Message,
@@ -11,70 +8,43 @@ import { ed25519 } from '@canvas-js/signatures';
 
 import assert from 'assert';
 
-import { CosmosSignerCW, SubstrateSignerCW } from './sessionSigners';
+import { topic } from './runtime/contract';
+import { getSessionSignerForAddress } from './signers';
 import { CanvasSignedData } from './types';
-import { CANVAS_TOPIC, assertMatches, caip2AddressEquals } from './utils';
-
-export const getSessionSigners = () => {
-  return [
-    new SIWESigner(),
-    new CosmosSignerCW(),
-    new SubstrateSignerCW(),
-    new SolanaSigner(),
-  ];
-};
-
-export const getSessionSignerForAddress = (address: string) => {
-  const sessionSigners = getSessionSigners();
-  for (const signer of sessionSigners) {
-    if (signer.match(address)) {
-      return signer;
-    }
-  }
-};
+import { assertMatches } from './utils';
 
 export const verifySession = async (session: Session) => {
   const signer = getSessionSignerForAddress(session.address);
-
   if (!signer) {
-    throw new Error(
-      `No signer found for session with address ${session.address}`,
-    );
+    throw new Error(`No signer for session ${session.address}`);
   }
-
-  await signer.verifySession(CANVAS_TOPIC, session);
+  await signer.verifySession(topic, session);
 };
 
-type VerifyArgs = {
-  actionMessage: Message<Action>;
-  actionMessageSignature: Signature;
-  sessionMessage: Message<Session>;
-  sessionMessageSignature: Signature;
-};
 export const verify = async ({
   actionMessage,
   actionMessageSignature,
   sessionMessage,
   sessionMessageSignature,
-}: VerifyArgs) => {
+}: {
+  actionMessage: Message<Action>;
+  actionMessageSignature: Signature;
+  sessionMessage: Message<Session>;
+  sessionMessageSignature: Signature;
+}) => {
   // verify the session
   await verifySession(sessionMessage.payload);
 
-  // assert address matches
   assert(
-    caip2AddressEquals(
-      actionMessage.payload.address,
-      sessionMessage.payload.address,
-    ),
+    actionMessage.payload.address === sessionMessage.payload.address,
     'Action message must be signed by wallet address',
   );
 
-  // verify the action message and session message
   ed25519.verify(actionMessageSignature, actionMessage);
   ed25519.verify(sessionMessageSignature, sessionMessage);
 
+  // if the session has an expiry, assert that the session is not expired
   if (sessionMessage.payload.duration !== null) {
-    // if the session has an expiry, assert that the session is not expired
     const sessionExpirationTime =
       sessionMessage.payload.timestamp + sessionMessage.payload.duration;
     assert(

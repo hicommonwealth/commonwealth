@@ -1,7 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
 import { CommentInstance } from '@hicommonwealth/model';
+
+import { canvas } from 'server';
 import {
   addressSwapper,
+  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyComment,
@@ -70,7 +73,7 @@ export const createThreadCommentHandler = async (
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      await verifyComment(canvasSignedData, {
+      const canvasComment = {
         thread_id: parseInt(threadId, 10) || undefined,
         text,
         address:
@@ -84,17 +87,27 @@ export const createThreadCommentHandler = async (
             : // @ts-expect-error <StrictNullChecks>
               address.address,
         parent_comment_id: parentId,
-      });
+      };
+      await verifyComment(canvasSignedData, canvasComment);
     }
   }
 
+  // create thread comment
   const [comment, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadComment(threadCommentFields);
 
+  // publish signed data
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    await applyCanvasSignedData(canvas, canvasSignedData);
+  }
+
+  // emit notifications
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
   }
 
+  // track analytics events
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, comment);

@@ -195,6 +195,7 @@ async function sign(
 }
 
 // Public signer methods
+// TODO: rename all these to `createSignThreadAction()` or similar
 export async function signThread(
   address: string,
   { community, title, body, link, topic },

@@ -2,10 +2,12 @@ import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
+  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyReaction,
 } from '@hicommonwealth/shared';
+import { canvas } from 'server';
 import { CreateThreadReactionOptions } from 'server/controllers/server_threads_methods/create_thread_reaction';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -61,7 +63,7 @@ export const createThreadReactionHandler = async (
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-      await verifyReaction(canvasSignedData, {
+      const canvasThreadReaction = {
         thread_id: threadId,
         address:
           canvasSignedData.actionMessage.payload.address.split(':')[0] ==
@@ -74,13 +76,20 @@ export const createThreadReactionHandler = async (
             : // @ts-expect-error <StrictNullChecks>
               address.address,
         value: reaction,
-      });
+      };
+      await verifyReaction(canvasSignedData, canvasThreadReaction);
     }
   }
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadReaction(reactionFields);
+
+  // publish signed data
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    await applyCanvasSignedData(canvas, canvasSignedData);
+  }
 
   // update address last active
   // @ts-expect-error StrictNullChecks

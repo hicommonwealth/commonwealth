@@ -1,10 +1,12 @@
 import { IDiscordMeta, ThreadAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
+  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyThread,
 } from '@hicommonwealth/shared';
+import { canvas } from 'server';
 import { CreateThreadOptions } from 'server/controllers/server_threads_methods/create_thread';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -65,7 +67,7 @@ export const createThreadHandler = async (
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
 
-      await verifyThread(canvasSignedData, {
+      const canvasComment = {
         title,
         body,
         address:
@@ -81,16 +83,26 @@ export const createThreadHandler = async (
         // @ts-expect-error <StrictNullChecks>
         community: community.id,
         topic: topicId ? parseInt(topicId, 10) : null,
-      });
+      };
+      await verifyThread(canvasSignedData, canvasComment);
     }
   }
+  // create thread
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread(threadFields);
 
+  // publish signed data
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    await applyCanvasSignedData(canvas, canvasSignedData);
+  }
+
+  // emit notifications
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
   }
 
+  // track analytics events
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, thread);

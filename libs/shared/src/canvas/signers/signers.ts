@@ -1,8 +1,26 @@
 import { CosmosSigner } from '@canvas-js/chain-cosmos';
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SolanaSigner } from '@canvas-js/chain-solana';
 import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import { AbstractSessionData, Session } from '@canvas-js/interfaces';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { addressSwapper } from '@hicommonwealth/shared';
+
+export const getSessionSigners = () => {
+  return [
+    new SIWESigner(),
+    new CosmosSignerCW(),
+    new SubstrateSignerCW(),
+    new SolanaSigner(),
+  ];
+};
+
+export const getSessionSignerForAddress = (address: string) => {
+  const sessionSigners = getSessionSigners();
+  for (const signer of sessionSigners) {
+    if (signer.match(address)) return signer;
+  }
+};
 
 /**
  * In Canvas, the default behaviour is that a SessionSigner saves a session key in localStorage for

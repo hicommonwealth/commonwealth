@@ -2,10 +2,12 @@ import { AppError } from '@hicommonwealth/core';
 import { ReactionAttributes } from '@hicommonwealth/model';
 import {
   addressSwapper,
+  applyCanvasSignedData,
   fromCanvasSignedDataApiArgs,
   hasCanvasSignedDataApiArgs,
   verifyReaction,
 } from '@hicommonwealth/shared';
+import { canvas } from 'server';
 import { CreateCommentReactionOptions } from 'server/controllers/server_comments_methods/create_comment_reaction';
 import { config } from '../../config';
 import { ServerControllers } from '../../routing/router';
@@ -58,8 +60,7 @@ export const createCommentReactionHandler = async (
 
     if (config.ENFORCE_SESSION_KEYS) {
       const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
-
-      await verifyReaction(canvasSignedData, {
+      const canvasReaction = {
         comment_id: commentId,
         address:
           canvasSignedData.actionMessage.payload.address.split(':')[0] ==
@@ -72,13 +73,20 @@ export const createCommentReactionHandler = async (
             : // @ts-expect-error <StrictNullChecks>
               address.address,
         value: reaction,
-      });
+      };
+      await verifyReaction(canvasSignedData, canvasReaction);
     }
   }
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction(commentReactionFields);
+
+  // publish signed data
+  if (hasCanvasSignedDataApiArgs(req.body)) {
+    const { canvasSignedData } = fromCanvasSignedDataApiArgs(req.body);
+    await applyCanvasSignedData(canvas, canvasSignedData);
+  }
 
   // emit notifications
   for (const n of notificationOptions) {
