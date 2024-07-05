@@ -173,7 +173,7 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(session: Session, shouldRedraw = true) {
+  public async validate(session: Session) {
     const params = {
       address: this.address,
       community_id: this.community.id,
@@ -183,40 +183,7 @@ class Account {
       wallet_sso_source: this.walletSsoSource,
     };
 
-    const res = await axios.post(`${app.serverUrl()}/verifyAddress`, params);
-
-    if (res.data.result.status === 'Success') {
-      // update ghost address for discourse users
-      const hasGhostAddress = userStore
-        .getState()
-        .addresses.some(
-          ({ address, ghostAddress, community }) =>
-            ghostAddress &&
-            this.community.id === community.id &&
-            userStore.getState().accounts.some(
-              (account) => account.address === address,
-            ),
-        );
-
-      if (hasGhostAddress) {
-        const response = await axios.post(
-          `${app.serverUrl()}/updateAddress`,
-          params,
-        );
-
-        if (response.data.success && response.data.ghostAddressId) {
-          // remove ghost address from addresses
-          userStore.getState().setData({
-            addresses: userStore
-              .getState()
-              .addresses.filter(({ ghostAddress }) => {
-                return !ghostAddress;
-              }),
-            accounts: [],
-          });
-        }
-      }
-    }
+    return await axios.post(`${app.serverUrl()}/verifyAddress`, params);
   }
 }
 

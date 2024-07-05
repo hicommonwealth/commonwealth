@@ -1,4 +1,5 @@
-import { ChainNetwork, ProposalType } from '@hicommonwealth/shared';
+import { ProposalType } from '@hicommonwealth/shared';
+import { userStore } from 'client/scripts/state/ui/user';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import {
@@ -14,11 +15,7 @@ import { PageLoading } from 'views/pages/loading';
 import type ProposalModule from '../../../models/ProposalModule';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
-import { AaveProposalForm } from './aave_proposal_form';
-import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
-import { SputnikProposalForm } from './sputnik_proposal_form';
-import { userStore } from 'client/scripts/state/ui/user';
 
 type NewProposalPageProps = {
   type: ProposalType;
@@ -87,14 +84,8 @@ const NewProposalPage = (props: NewProposalPageProps) => {
 
   const getForm = (typeEnum) => {
     switch (typeEnum) {
-      case ProposalType.AaveProposal:
-        return <AaveProposalForm />;
-      case ProposalType.CompoundProposal:
-        return <CompoundProposalForm />;
       case ProposalType.CosmosProposal:
         return <CosmosProposalForm />;
-      case ProposalType.SputnikProposal:
-        return <SputnikProposalForm />;
       default:
         return <CWText>Invalid proposal type</CWText>;
     }
@@ -103,8 +94,6 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   const getBody = () => {
     if (!userStore.getState().activeAccount) {
       return <CWText>Must be signed in</CWText>;
-    } else if (app.chain?.network === ChainNetwork.Plasm) {
-      return <CWText>Feature not supported yet for this community</CWText>;
     } else {
       return getForm(internalType);
     }

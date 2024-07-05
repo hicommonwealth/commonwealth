@@ -77,6 +77,7 @@ const NotificationSettingsPage = () => {
     return <PageLoading />;
   }
 
+  // TODO Jake 6/4/24: ALLOW UPDATING EMAIL ONCE VERIFIED
   return (
     <CWPageLayout>
       <div className="NotificationSettingsPage">

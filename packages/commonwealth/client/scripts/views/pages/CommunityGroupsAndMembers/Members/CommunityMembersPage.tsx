@@ -144,8 +144,8 @@ const CommunityMembersPage = () => {
         `${searchFilters.groupFilter}`,
       ) &&
         searchFilters.groupFilter && {
-        memberships: `in-group:${searchFilters.groupFilter}`,
-      }),
+          memberships: `in-group:${searchFilters.groupFilter}`,
+        }),
       ...(searchFilters.groupFilter === 'Ungrouped' && {
         memberships: 'not-in-group',
       }),
@@ -161,7 +161,7 @@ const CommunityMembersPage = () => {
     },
   );
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
     enabled: user.activeAccount?.address ? !!memberships : true,
@@ -218,10 +218,10 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-            // @ts-expect-error <StrictNullChecks/>
-            g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-          ) ||
-          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+              // @ts-expect-error <StrictNullChecks/>
+              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
+            ) ||
+            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
           : true,
       );
 
@@ -241,8 +241,8 @@ const CommunityMembersPage = () => {
       .filter((group) =>
         searchFilters.searchText
           ? group.name
-            .toLowerCase()
-            .includes(searchFilters.searchText.toLowerCase())
+              .toLowerCase()
+              .includes(searchFilters.searchText.toLowerCase())
           : true,
       )
       .filter((group) => {
@@ -283,8 +283,8 @@ const CommunityMembersPage = () => {
   useEffect(() => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
+    refetch().catch((e) => console.log(e));
+  }, [refetch]);
 
   useEffect(() => {
     // Set the active tab based on URL
@@ -362,8 +362,8 @@ const CommunityMembersPage = () => {
 
         {/* Filter section */}
         {selectedTab === TABS[1].value &&
-          groups?.length === 0 &&
-          !allowlistEnabled ? (
+        groups?.length === 0 &&
+        !allowlistEnabled ? (
           <></>
         ) : (
           <section
@@ -381,8 +381,9 @@ const CommunityMembersPage = () => {
             <CWTextInput
               size="large"
               fullWidth
-              placeholder={`Search ${selectedTab === TABS[0].value ? 'members' : 'groups'
-                }`}
+              placeholder={`Search ${
+                selectedTab === TABS[0].value ? 'members' : 'groups'
+              }`}
               containerClassName="search-input-container"
               inputClassName="search-input"
               iconLeft={<CWIcon iconName="search" className="search-icon" />}

@@ -1,4 +1,5 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
@@ -25,28 +26,37 @@ export const validateNamespace = async (
   address: string,
   community: CommunityAttributes,
 ): Promise<string> => {
-  // const community = await model.Community.findOne({
-  //   where: {
-  //     id: communityId,
-  //   },
-  //   include: [
-  //     {
-  //       model: model.ChainNode,
-  //       attributes: ['url', 'eth_chain_id'],
-  //     },
-  //   ],
-  //   attributes: ['chain_node_id'],
-  // });
-  if (!community.ChainNode?.eth_chain_id) {
+  if (!community.chain_node_id) {
+    throw new AppError('Invalid community');
+  }
+
+  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      id: community.chain_node_id,
+    },
+  });
+
+  if (!chainNode) {
+    throw new AppError('Invalid chain');
+  }
+
+  if (!chainNode.eth_chain_id) {
     throw new AppError('Namespace not supported on selected chain');
   }
-  const chain_id = community.ChainNode.eth_chain_id;
+
+  if (!chainNode.private_url) {
+    throw new ServerError(
+      `Chain Node private url not found for chain node id ${chainNode.id}`,
+    );
+  }
+
+  const chain_id = chainNode.eth_chain_id;
   const factoryData =
     commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
   if (!factoryData) {
     throw new AppError('Namespace not supported on selected chain');
   }
-  const web3 = new Web3(community.ChainNode.url);
+  const web3 = new Web3(chainNode.private_url);
 
   //tx data validation
   const txReceipt = await web3.eth.getTransactionReceipt(txHash);
@@ -59,7 +69,7 @@ export const validateNamespace = async (
 
   //validate contract data
   const activeNamespace = await getNamespace(
-    community.ChainNode.url,
+    chainNode.private_url,
     namespace,
     factoryData.factory,
   );
@@ -74,7 +84,7 @@ export const validateNamespace = async (
     addresses: [address],
     sourceOptions: {
       contractAddress: activeNamespace,
-      evmChainId: community.ChainNode.eth_chain_id,
+      evmChainId: chainNode.eth_chain_id,
       tokenId: 0,
     },
     cacheRefresh: true,

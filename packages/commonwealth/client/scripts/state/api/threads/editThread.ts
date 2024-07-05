@@ -6,12 +6,12 @@ import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
+import { userStore } from '../../ui/user';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
 } from './helpers/cache';
 import { updateThreadCountsByStageChange } from './helpers/counts';
-import { userStore } from '../../ui/user';
 
 interface EditThreadProps {
   address: string;
@@ -100,6 +100,8 @@ const editThread = async ({
     ...(collaborators !== undefined && { collaborators }),
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
+
+  console.log(response.data.result);
 
   return new Thread(response.data.result);
 };

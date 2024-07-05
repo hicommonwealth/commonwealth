@@ -1,9 +1,4 @@
-import {
-  ChainBase,
-  ChainNetwork,
-  ProposalType,
-  slugify,
-} from '@hicommonwealth/shared';
+import { ChainBase, ProposalType, slugify } from '@hicommonwealth/shared';
 import type { ProposalStore } from 'stores';
 import type ChainInfo from './models/ChainInfo';
 import type NotificationSubscription from './models/NotificationSubscription';
@@ -45,9 +40,6 @@ export const getNotificationUrlPath = (
 
 export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
   if (c.base === ChainBase.CosmosSDK) return ProposalType.CosmosProposal;
-  if (c.network === ChainNetwork.Sputnik) return ProposalType.SputnikProposal;
-  if (c.network === ChainNetwork.Compound) return ProposalType.CompoundProposal;
-  if (c.network === ChainNetwork.Aave) return ProposalType.AaveProposal;
   throw new Error(`Cannot determine proposal slug from chain ${c.id}.`);
 };
 
@@ -62,15 +54,6 @@ export const proposalSlugToClass = () => {
   if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set(ProposalType.CosmosProposal, (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Compound) {
-    mmap.set(ProposalType.CompoundProposal, (app.chain as any).governance);
-  }
-  if (app.chain.network === ChainNetwork.Aave) {
-    mmap.set(ProposalType.AaveProposal, (app.chain as any).governance);
-  }
-  if (app.chain.network === ChainNetwork.Sputnik) {
-    mmap.set(ProposalType.SputnikProposal, (app.chain as any).dao);
-  }
   return mmap;
 };
 
@@ -84,10 +67,7 @@ export const proposalSlugToStore = (slug: string): ProposalStore<any> => {
 
 export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
   [ProposalType.Thread, 'Discussion Thread'],
-  [ProposalType.CompoundProposal, 'Proposal'],
   [ProposalType.CosmosProposal, 'Proposal'],
-  [ProposalType.AaveProposal, 'Proposal'],
-  [ProposalType.SputnikProposal, 'Proposal'],
 ]);
 
 export const idToProposal = (slug: string, id: string | number) => {
@@ -101,15 +81,6 @@ export const idToProposal = (slug: string, id: string | number) => {
 };
 
 export const chainEntityTypeToProposalSlug = (): ProposalType => {
-  if (app.chain.network === ChainNetwork.Sputnik) {
-    return ProposalType.SputnikProposal;
-  }
-  if (app.chain.network === ChainNetwork.Compound) {
-    return ProposalType.CompoundProposal;
-  }
-  if (app.chain.network === ChainNetwork.Aave) {
-    return ProposalType.AaveProposal;
-  }
   if (app.chain.base === ChainBase.CosmosSDK) {
     return ProposalType.CosmosProposal;
   }
@@ -117,15 +88,6 @@ export const chainEntityTypeToProposalSlug = (): ProposalType => {
 };
 
 export const chainEntityTypeToProposalName = (): string => {
-  if (app.chain.network === ChainNetwork.Sputnik) {
-    return 'Sputnik Proposal';
-  }
-  if (app.chain.network === ChainNetwork.Compound) {
-    return 'On-Chain Proposal';
-  }
-  if (app.chain.network === ChainNetwork.Aave) {
-    return 'On-Chain Proposal';
-  }
   if (app.chain.base === ChainBase.CosmosSDK) {
     return 'Proposal';
   }

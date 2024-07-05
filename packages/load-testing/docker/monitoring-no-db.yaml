@@ -1,0 +1,29 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    user: '${UID}:${GID}'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - '2000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=ministar
+    user: '${UID}:${GID}'
+    volumes:
+      - ./grafana:/var/lib/grafana
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - 9187:9187
+    environment:
+      - DATA_SOURCE_NAME=${DATABASE_URL}
+    user: '${UID}:${GID}'
+    links:
+      - prometheus

@@ -26,8 +26,8 @@ import {
 } from '../../types';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import './SignTransactionsStep.scss';
 import useUserStore from 'client/scripts/state/ui/user';
+import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
@@ -36,7 +36,7 @@ interface SignTransactionsStepProps {
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
-const FIVE_MINS_IN_SECONDS = 60 * 5;
+const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -68,14 +68,14 @@ const SignTransactionsStep = ({
     const chainRpc = app?.chain?.meta?.ChainNode?.url;
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
-      ? FIVE_MINS_IN_SECONDS
+      ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = stakeData?.vote_weight;
     const contestInterval = devContest
-      ? FIVE_MINS_IN_SECONDS
+      ? ONE_HOUR_IN_SECONDS
       : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = user.activeAccount?.address;
@@ -137,7 +137,7 @@ const SignTransactionsStep = ({
           ? contestFormData?.prizePercentage
           : 0,
         payout_structure: contestFormData?.payoutStructure,
-        interval: isContestRecurring ? SEVEN_DAYS_IN_SECONDS : 0,
+        interval: isContestRecurring ? contestInterval : 0,
         topic_ids: contestFormData?.toggledTopicList
           .filter((t) => t.checked)
           .map((t) => t.id),

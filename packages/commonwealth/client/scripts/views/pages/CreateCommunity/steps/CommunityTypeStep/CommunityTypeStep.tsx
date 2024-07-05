@@ -99,7 +99,7 @@ const CommunityTypeStep = ({
       <div className="advanced-options-container">
         <CWCommunitySelector
           key={baseOption.type}
-          type={baseOption.type}
+          img={baseOption.img}
           title={baseOption.title}
           description={baseOption.description}
           isRecommended={baseOption.isRecommended}
@@ -112,7 +112,7 @@ const CommunityTypeStep = ({
         />
         <CWCommunitySelector
           key={blastOption.type}
-          type={blastOption.type}
+          img={blastOption.img}
           title={blastOption.title}
           description={blastOption.description}
           isRecommended={blastOption.isRecommended}
@@ -126,7 +126,7 @@ const CommunityTypeStep = ({
 
         <CWCommunitySelector
           key={ethereumOption.type}
-          type={ethereumOption.type}
+          img={ethereumOption.img}
           title={ethereumOption.title}
           description={ethereumOption.description}
           isRecommended={ethereumOption.isRecommended}
@@ -143,10 +143,10 @@ const CommunityTypeStep = ({
 
         {advancedOptions
           .filter(({ isHidden }) => !isHidden)
-          .map(({ type, chainBase, title, description }) => (
+          .map(({ type, chainBase, title, description, img }) => (
             <CWCommunitySelector
               key={type}
-              type={type}
+              img={img}
               title={title}
               description={description}
               onClick={() => handleCommunitySelection({ type, chainBase })}

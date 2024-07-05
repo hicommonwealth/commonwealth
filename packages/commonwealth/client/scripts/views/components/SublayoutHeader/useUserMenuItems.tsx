@@ -134,52 +134,50 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const addresses: PopoverMenuItem[] = userData.accounts.map(
-    (account) => {
-      const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
-      const communityIdOrPrefix =
-        account.community.base === ChainBase.CosmosSDK
-          ? account.community.ChainNode?.bech32
-          : account.community.ChainNode?.ethChainId;
-      const communityCanvasChainId = chainBaseToCanvasChainId(
-        account.community.base,
-        // @ts-expect-error StrictNullChecks
-        communityIdOrPrefix,
-      );
-      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+  const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
+    const communityCaip2Prefix = chainBaseToCaip2(account.community.base);
+    const communityIdOrPrefix =
+      account.community.base === ChainBase.CosmosSDK
+        ? account.community.ChainNode?.bech32
+        : account.community.ChainNode?.ethChainId;
+    const communityCanvasChainId = chainBaseToCanvasChainId(
+      account.community.base,
+      // @ts-expect-error StrictNullChecks
+      communityIdOrPrefix,
+    );
+    const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-      const signed = authenticatedAddresses[caip2Address];
-      const isActive = userData.activeAccount?.address === account.address;
-      const walletSsoSource = userData.addresses.find(
-        (address) => address.address === account.address,
-      )?.walletSsoSource;
+    const signed = authenticatedAddresses[caip2Address];
+    const isActive = userData.activeAccount?.address === account.address;
+    const walletSsoSource = userData.addresses.find(
+      (address) => address.address === account.address,
+    )?.walletSsoSource;
 
-      return {
-        type: 'default',
-        label: (
-          <UserMenuItem
-            isSignedIn={signed}
-            hasJoinedCommunity={isActive}
-            address={account.address}
-          />
-        ),
-        onClick: async () => {
-          if (!app.config.enforceSessionKeys || signed) {
-            onAddressItemClick?.();
-            return await setActiveAccount(account);
-          }
-
+    return {
+      type: 'default',
+      label: (
+        <UserMenuItem
+          isSignedIn={!app.config.enforceSessionKeys || signed}
+          hasJoinedCommunity={isActive}
+          address={account.address}
+        />
+      ),
+      onClick: async () => {
+        if (!app.config.enforceSessionKeys || signed) {
           onAddressItemClick?.();
+          return await setActiveAccount(account);
+        }
 
-          onRevalidationModalData({
-            // @ts-expect-error <StrictNullChecks/>
-            walletSsoSource: walletSsoSource,
-            walletAddress: account.address,
-          });
-        },
-      };
-    },
-  );
+        onAddressItemClick?.();
+
+        onRevalidationModalData({
+          // @ts-expect-error <StrictNullChecks/>
+          walletSsoSource: walletSsoSource,
+          walletAddress: account.address,
+        });
+      },
+    };
+  });
 
   const uniqueChainAddressOptions: PopoverMenuItem[] = uniqueChainAddresses.map(
     (address) => {

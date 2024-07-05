@@ -35,95 +35,46 @@ const resetSidebarState = () => {
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
-    userStore.getState().activeAccount && !!app.chain?.meta.snapshot.length;
-
-  const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
+    userStore.getState() && !!app.chain?.meta.snapshot.length;
 
   const showOnChainProposalItem =
-    (app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain?.network !== ChainNetwork.Terra &&
-      app.chain?.network !== ChainNetwork.Kava) ||
-    (app.chain?.base === ChainBase.Ethereum &&
-      app.chain?.network === ChainNetwork.Aave) ||
-    app.chain?.network === ChainNetwork.Compound;
-
-  const getTemplateItems = (): PopoverMenuItem[] => {
-    const contracts = app.contracts.getCommunityContracts();
-
-    const items = [];
-
-    contracts.forEach((contract) => {
-      if (contract.ccts) {
-        for (const cct of contract.ccts) {
-          if (
-            cct.cctmd.display_options === '2' ||
-            cct.cctmd.display_options === '3'
-          ) {
-            const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
-            // @ts-expect-error <StrictNullChecks/>
-            items.push({
-              label: `New ${cct.cctmd.nickname}`,
-              iconLeft: 'star',
-              onClick: () => {
-                resetSidebarState();
-                navigate(`/${contract.address}/${slugWithSlashRemoved}`);
-              },
-            });
-          }
-        }
-      }
-    });
-
-    return items;
-  };
+    app.chain?.base === ChainBase.CosmosSDK &&
+    app.chain?.network !== ChainNetwork.Terra &&
+    app.chain?.network !== ChainNetwork.Kava;
 
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
       ? [
-        {
-          label: 'New On-Chain Proposal',
-          onClick: () => {
-            resetSidebarState();
-            navigate('/new/proposal');
+          {
+            label: 'New On-Chain Proposal',
+            onClick: () => {
+              resetSidebarState();
+              navigate('/new/proposal');
+            },
+            iconLeft: 'star',
           },
-          iconLeft: 'star',
-        },
-      ]
-      : [];
-
-  const getSputnikProposalItem = (): PopoverMenuItem[] =>
-    showSputnikProposalItem
-      ? [
-        {
-          label: 'New Sputnik proposal',
-          onClick: () => {
-            resetSidebarState();
-            navigate('/new/proposal');
-          },
-          iconLeft: 'democraticProposal',
-        },
-      ]
+        ]
       : [];
 
   const getSnapshotProposalItem = (): PopoverMenuItem[] =>
     showSnapshotOptions
       ? [
-        {
-          label: 'New Snapshot Proposal',
-          iconLeft: 'democraticProposal',
-          onClick: () => {
-            resetSidebarState();
-            const snapshotSpaces = app.chain.meta.snapshot;
-            if (snapshotSpaces.length > 1) {
-              navigate('/multiple-snapshots', {
-                action: 'create-proposal',
-              });
-            } else {
-              navigate(`/new/snapshot/${snapshotSpaces}`);
-            }
+          {
+            label: 'New Snapshot Proposal',
+            iconLeft: 'democraticProposal',
+            onClick: () => {
+              resetSidebarState();
+              const snapshotSpaces = app.chain.meta.snapshot;
+              if (snapshotSpaces.length > 1) {
+                navigate('/multiple-snapshots', {
+                  action: 'create-proposal',
+                });
+              } else {
+                navigate(`/new/snapshot/${snapshotSpaces}`);
+              }
+            },
           },
-        },
-      ]
+        ]
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
@@ -157,11 +108,13 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               const isCustomDomain = app.isCustomDomain();
 
               window.open(
-                `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID
+                `https://discord.com/oauth2/authorize?client_id=${
+                  process.env.DISCORD_CLIENT_ID
                 }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-                  `${!isCustomDomain
-                    ? window.location.origin
-                    : 'https://commonwealth.im'
+                  `${
+                    !isCustomDomain
+                      ? window.location.origin
+                      : 'https://commonwealth.im'
                   }`,
                 )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                   JSON.stringify({
@@ -188,24 +141,22 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   return [
     ...(app.activeChainId()
       ? [
-        {
-          type: 'header',
-          label: 'Create Within Community',
-        } as PopoverMenuItem,
-        {
-          label: 'New Thread',
-          onClick: () => {
-            resetSidebarState();
-            navigate('/new/discussion');
-          },
-          iconLeft: 'pencil',
-        } as PopoverMenuItem,
-        ...getOnChainProposalItem(),
-        ...getSputnikProposalItem(),
-        ...getSnapshotProposalItem(),
-        ...getTemplateItems(),
-        ...getDiscordBotConnectionItems(),
-      ]
+          {
+            type: 'header',
+            label: 'Create Within Community',
+          } as PopoverMenuItem,
+          {
+            label: 'New Thread',
+            onClick: () => {
+              resetSidebarState();
+              navigate('/new/discussion');
+            },
+            iconLeft: 'pencil',
+          } as PopoverMenuItem,
+          ...getOnChainProposalItem(),
+          ...getSnapshotProposalItem(),
+          ...getDiscordBotConnectionItems(),
+        ]
       : []),
     {
       type: 'header',
