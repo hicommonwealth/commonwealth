@@ -2,15 +2,42 @@ import 'components/social_accounts.scss';
 import React from 'react';
 import type NewProfile from '../../models/NewProfile';
 import { SocialAccount } from './SocialAccount';
+import type { CategorizedSocialLinks } from '../../models/ChainInfo';
 
 type SocialAccountsProps = {
-  profile: NewProfile;
+  profile?: NewProfile;
+  socialLinks?: CategorizedSocialLinks;
 };
 
-export const SocialAccounts = (props: SocialAccountsProps) => {
-  const { profile } = props;
+export const SocialAccounts = ({ profile, socialLinks }: SocialAccountsProps) => {
+  if (socialLinks) {
+    const { discords, githubs, telegrams, twitters, elements, remainingLinks } = socialLinks;
 
-  if (!profile) return;
+    return (
+      <div className="SocialAccounts">
+        {discords.map((link, i) => (
+          <SocialAccount link={link} iconName="discord" key={`discord-${i}`} />
+        ))}
+        {githubs.map((link, i) => (
+          <SocialAccount link={link} iconName="github" key={`github-${i}`} />
+        ))}
+        {telegrams.map((link, i) => (
+          <SocialAccount link={link} iconName="telegram" key={`telegram-${i}`} />
+        ))}
+        {twitters.map((link, i) => (
+          <SocialAccount link={link} iconName="twitterX" key={`twitter-${i}`} />
+        ))}
+        {elements.map((link, i) => (
+          <SocialAccount link={link} iconName="element" key={`element-${i}`} />
+        ))}
+        {remainingLinks.map((link, i) => (
+          <SocialAccount link={link} iconName="website" key={`other-${i}`} />
+        ))}
+      </div>
+    );
+  }
+
+  if (!profile) return null;
 
   const { email, socials } = profile;
 

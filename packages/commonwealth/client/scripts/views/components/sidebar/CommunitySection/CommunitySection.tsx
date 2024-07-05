@@ -69,7 +69,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
-  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
+  const onHomeRoute = pathname === `/${app.activeChainId()}/home`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
@@ -107,7 +107,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         {communityHomepageEnabled && app.chain?.meta.hasHomepage && (
           <div
             className={onHomeRoute ? 'home-button active' : 'home-button'}
-            onClick={() => navigate('/feed')}
+            onClick={() => navigate('/home')}
           >
             <CWIcon iconName="home" iconSize="small" />
             <CWText>Home</CWText>

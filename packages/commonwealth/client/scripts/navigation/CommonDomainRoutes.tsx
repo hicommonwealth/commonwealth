@@ -101,6 +101,9 @@ const NewSnapshotProposalPage = lazy(
 const AdminPanelPage = lazy(() => import('views/pages/AdminPanel'));
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
+
+const CommunityHomePage = lazy(() => import('views/pages/community_home'));
+
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
@@ -214,6 +217,16 @@ const CommonDomainRoutes = ({
     element={<Navigate to="/notification-settings" />}
   />,
   // NOTIFICATIONS END
+
+  // COMMUNITY HOME
+  <Route
+    key="/:scope/home"
+    path="/:scope/home"
+    element={withLayout(CommunityHomePage, {
+      scoped: true,
+    })}
+  />,
+  // COMMUNITY HOME END
 
   // GOVERNANCE
   <Route

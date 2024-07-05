@@ -36,7 +36,7 @@ export default function DiscussionsRedirect() {
         navigate('/discussions', dontAddHistory);
         break;
       case DefaultPage.Homepage:
-        navigate('/feed', dontAddHistory);
+        navigate('/home', dontAddHistory);
         break;
       default:
         navigate('/discussions', dontAddHistory);
