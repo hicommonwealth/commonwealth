@@ -50,8 +50,6 @@
 
 ## Observability
 
-- [Observability Overview](./Observability-Overview.md): Introduction to observability metrics.
-
 - [Datadog](./Datadog.md)
 - [Mixpanel](./Mixpanel.md)
 - [Rollbar](./Rollbar.md)
@@ -60,7 +58,6 @@
 
 - [Caching](./Caching.md)
 - [Database Optimization](./Database-Optimization.md)
-- [Over-Fetching](./Over-Fetching.md)
 - [Pagination](./Pagination.md)
 - [Performance Benchmarks](./Performance-Benchmarks.md)
 - [Request Handler Optimization](./Request-Handler-Optimization.md)
@@ -68,9 +65,9 @@
 ## Platform Guidelines
 
 - [Complex Functions](./Complex-Functions.md): Mitigating code complexity.
-- [Over-Fetching](./Over-Fetching.md): Retrieving more data than is required.
 - [Pagination](./Pagination.md): Best practices for paginating API routes.
 - [Platform Coding Guidelines](./Platform-Coding-Guidelines.md): Best practices on the backend.
+- [Request Handler Optimization](./Request-Handler-Optimization.md)
 
 ## Product (PENG) Guidelines
 
@@ -96,6 +93,7 @@ _These entries should be assessed for relevance, and be either transformed into 
 
 ## Tools & Integrations
 
+- [Cloudflare](./CDN-Cloudflare.md)
 - [Datadog](./Datadog.md)
 - [ESLint](./Linting.md)
 - [Heroku](./Heroku.md)

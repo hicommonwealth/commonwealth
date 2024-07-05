@@ -1,5 +1,7 @@
 # Query Optimization
 
+_See also [Request Handler Optimization](./Request-Handler-Optimization.md) entry._
+
 ## Limit Columns and Data Pulled by Sequelize
 
 When using Sequelize for database queries, it's important to limit the columns and data pulled from the database. This can improve query performance and reduce the amount of data transferred over the network. For example, in the `/viewSubscriptions` endpoint, consider fetching only the necessary columns and data required for the response. This can be achieved by specifying the attributes in the Sequelize query. Refer to the [GitHub issue comment](https://github.com/hicommonwealth/commonwealth/issues/3429#issuecomment-1552327071) for more details.
