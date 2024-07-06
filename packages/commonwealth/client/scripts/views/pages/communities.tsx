@@ -26,10 +26,9 @@ import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
-import CreateCommunityButton from '../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { CommunityLaunchCard } from '../components/CommunityLaunchCard';
-import useCreateCommunity from './CreateCommunity/useCreateCommunity';
+import useQuickCreateCommunity from 'client/scripts/hooks/useQuickCreateCommunity';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -50,21 +49,15 @@ const communityBases = Object.keys(ChainBase);
 //   createdCommunityName,
 // } = useCreateCommunity();
 
-const handleLaunchIdea = async (name: string, image?: File) => {
-  // TODO: Implement OpenAI call to generate missing fields
-  // const generatedFields = await generateMissingFields(name);
-
-  // const communityData = {
-  //   name,
-  //   base: 'ethereum', // Default to Ethereum base
-  //   ...generatedFields,
-  //   icon_url: image ? await uploadImage(image) : generatedFields.icon_url,
-  // };
-
-  // await handleCompleteBasicInformationStep(communityData);
-
-  console.log('clicked')
-  // TODO: Handle success, maybe redirect to the new community page
+const handleLaunchIdea = async (name: string) => {
+  try {
+    const { createCommunity } = useQuickCreateCommunity();
+    await createCommunity(name);
+    // TODO: Handle success, maybe redirect to the new community page
+    console.log('Community created successfully');
+  } catch (err) {
+    console.error('Failed to create community:', err);
+  }
 };
 
 const generateMissingFields = async (name: string) => {
@@ -261,8 +254,7 @@ const CommunitiesPage = () => {
     <CWPageLayout>
       <div className="CommunitiesPage">
         <div className="header-section">
-          <CommunityLaunchCard onLaunch={handleLaunchIdea} />
-          {/* <div className="filters">
+            <CommunityLaunchCard onLaunch={(name) => console.log('Community launched:', name)} />          {/* <div className="filters">
             <CWIcon iconName="funnelSimple" />
             <CWButton
               label={STAKE_FILTER_KEY}

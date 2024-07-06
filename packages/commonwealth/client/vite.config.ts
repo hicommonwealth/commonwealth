@@ -70,6 +70,7 @@ export default defineConfig(({ mode }) => {
       'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
       'process.env.NODE_ENV': JSON.stringify('development'),
       'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
+      'process.env.OPENAI_API_KEY': JSON.stringify(env.OPENAI_API_KEY),
       'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
         env.KNOCK_PUBLIC_API_KEY,
       ),
