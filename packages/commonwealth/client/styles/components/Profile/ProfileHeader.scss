@@ -8,6 +8,10 @@
   flex: 1;
   background-color: $white;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 
   @include smallInclusive {
     margin-bottom: 16px;
@@ -15,14 +19,20 @@
   }
 
   .edit {
+    position: absolute;
+    top: 24px;
+    right: 12px;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .gear-icon {
+    margin-top: 8px; // Additional spacing for the gear icon, adjust as needed
+    margin-right: 20px;
   }
 
   .profile-image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin-bottom: 16px;
 
     img {
@@ -34,39 +44,15 @@
   }
 
   .profile-name-and-bio {
-    .bio {
-      margin-top: 16px;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-
-      &.hasMargin {
-        margin-bottom: 24px;
-      }
-
-      > :not(last-child) {
-        margin-right: 8px;
-      }
-    }
+    text-align: center;
 
     .name {
-      justify-content: center;
-      word-break: break-word;
-      text-align: center;
-
-      &.hasMargin {
-        margin-bottom: 24px;
-      }
+      margin-bottom: 16px;
+      font-weight: bold;
     }
 
-    .read-more {
-      margin: 8px 0;
-      color: $primary-500;
-      &:hover {
-        cursor: pointer;
-      }
+    .bio {
+      margin-top: 16px;
     }
   }
 }
