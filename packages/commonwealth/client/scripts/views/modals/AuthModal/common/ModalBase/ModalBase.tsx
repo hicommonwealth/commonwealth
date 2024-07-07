@@ -28,6 +28,7 @@ import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
+import { SMSForm } from './SMSForm';
 
 const MODAL_COPY = {
   [AuthModalType.AccountTypeGuidance]: {
@@ -91,6 +92,7 @@ const ModalBase = ({
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
+  const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
 
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
@@ -129,6 +131,7 @@ const ModalBase = ({
     onEmailLogin,
     onWalletSelect,
     onSocialLogin,
+    onSMSLogin,
     onVerifyMobileWalletSignature,
   } = useAuthentication({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -217,8 +220,8 @@ const ModalBase = ({
       options: getWalletNames() as AuthWallets[],
     },
     {
-      name: 'Email or Social',
-      options: ['google', 'discord', 'x', 'apple', 'github', 'email'],
+      name: 'Email, Phone, Social',
+      options: ['google', 'discord', 'x', 'apple', 'github', 'phone', 'email'],
     },
   ];
 
@@ -245,6 +248,14 @@ const ModalBase = ({
       }
 
       setIsAuthenticatingWithEmail(true);
+      return;
+    }
+
+    if (option === 'phone') {
+      if (layoutType === AuthModalType.SignIn && userOnboardingEnabled) {
+        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
+      }
+      setIsAuthenticatingWithSMS(true);
       return;
     }
 
@@ -325,11 +336,13 @@ const ModalBase = ({
                   )}
 
                 {/*
-                  If email option is selected don't render SSO's list,
+                  If email or SMS option is selected don't render SSO's list,
                   else render wallets/SSO's list based on activeTabIndex
                 */}
                 {(activeTabIndex === 0 ||
-                  (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
+                  (activeTabIndex === 1 &&
+                    !isAuthenticatingWithEmail &&
+                    !isAuthenticatingWithSMS)) &&
                   tabsList[activeTabIndex].options.map((option, key) => (
                     <AuthButton
                       key={key}
@@ -346,6 +359,16 @@ const ModalBase = ({
                     onCancel={() => setIsAuthenticatingWithEmail(false)}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onSubmit={async ({ email }) => await onEmailLogin(email)}
+                  />
+                )}
+
+                {activeTabIndex === 1 && isAuthenticatingWithSMS && (
+                  <SMSForm
+                    isLoading={isMagicLoading}
+                    onCancel={() => setIsAuthenticatingWithSMS(false)}
+                    onSubmit={async ({ phoneNumber }) =>
+                      await onSMSLogin(phoneNumber)
+                    }
                   />
                 )}
               </section>

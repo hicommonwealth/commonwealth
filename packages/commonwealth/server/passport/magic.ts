@@ -123,23 +123,35 @@ async function createNewMagicUser({
   profileMetadata,
   walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
+  console.log(
+    'Creating new Magic user with metadata:',
+    JSON.stringify(magicUserMetadata),
+  );
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
-    // @ts-expect-error StrictNullChecks
-    const newUser = await models.User.createWithProfile(
-      {
-        // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
-        // so it is safe to set emails from magic as part of User data, even though they may be unverified.
-        // although not usable for login, this email (used for outreach) is still considered sensitive user data.
-        email: magicUserMetadata.email,
+    const newUserData: Partial<UserAttributes> = {};
 
-        // we mark email verified so that we are OK to send update emails, but we should note that
-        // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
-        // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
-        emailVerified: !!magicUserMetadata.email,
-      },
-      { transaction },
-    );
+    if (
+      magicUserMetadata.oauthProvider === 'email' &&
+      magicUserMetadata.email
+    ) {
+      console.log('Using email authentication:', magicUserMetadata.email);
+      newUserData.email = magicUserMetadata.email;
+      newUserData.emailVerified = true;
+    } else if (
+      magicUserMetadata.oauthProvider === 'sms' &&
+      magicUserMetadata.phoneNumber
+    ) {
+      console.log('Using SMS authentication:', magicUserMetadata.phoneNumber);
+      newUserData.phoneNumber = magicUserMetadata.phoneNumber;
+      newUserData.phoneNumberVerified = true;
+    }
+
+    console.log('Creating user with data:', JSON.stringify(newUserData));
+    // @ts-expect-error StrictNullChecks
+    const newUser = await models.User.createWithProfile(newUserData, {
+      transaction,
+    });
 
     // update profile with metadata if exists
     // @ts-expect-error StrictNullChecks
@@ -152,6 +164,7 @@ async function createNewMagicUser({
     }
     if (profileMetadata?.username || profileMetadata?.avatarUrl) {
       await newProfile.save({ transaction });
+      console.log('Updated profile:', newProfile.id);
     }
 
     const addressInstances: AddressAttributes[] =
@@ -471,6 +484,8 @@ async function magicLoginRoute(
   // canonical address is always ethereum
   const canonicalAddress = decodedMagicToken.publicAddress;
 
+  console.log(canonicalAddress);
+
   // replay attack check
   const didTokenId = decodedMagicToken.claim.tid; // single-use token id
 
@@ -618,45 +633,69 @@ async function magicLoginRoute(
     },
   );
 
+  // Also, add this log in the existing user check:
+  if (existingUserInstance) {
+    console.log('Existing user found:', existingUserInstance.id);
+  } else {
+    console.log('No existing user found for:', canonicalAddress);
+  }
+
   if (
     !existingUserInstance &&
     (!magicUserMetadata.oauthProvider ||
-      magicUserMetadata.oauthProvider === 'email') &&
-    magicUserMetadata.email
+      magicUserMetadata.oauthProvider === 'email' ||
+      magicUserMetadata.oauthProvider === 'sms')
   ) {
-    // if unable to locate a magic user by address, attempt to locate by email.
-    // the ONLY time this should trigger is for claiming ghost addresses on discourse communities,
-    // which requires the email-specific magic login, as the email usage on social providers
-    // is insecure.
-    existingUserInstance = await models.User.scope('withPrivateData').findOne({
-      where: { email: magicUserMetadata.email },
-      include: [
-        {
-          model: models.Profile,
-        },
-        {
-          // guarantee that we only access ghost addresses as part of this query
-          model: models.Address,
-          where: {
-            ghost_address: true,
-          } as WhereOptions<AddressAttributes>,
-          required: true,
-        },
-      ],
-    });
+    // if unable to locate a magic user by address, attempt to locate by email or phone number.
+    // this should only trigger for claiming ghost addresses on discourse communities,
+    // which requires the email-specific or sms-specific magic login.
+    let whereClause: WhereOptions<UserAttributes> = {};
 
-    // generate replacement magic addresses for all ghost addresses, which will be deleted in `loginExistingMagicUser`
-    if (existingUserInstance?.Addresses) {
-      for (const ghost of existingUserInstance.Addresses as AddressAttributes[]) {
-        const needsReplacementAddress = !generatedAddresses.some(
-          ({ community_id }) => community_id === ghost.community_id,
-        );
-        if (needsReplacementAddress) {
-          // note that discourse imports not supported on cosmos
-          generatedAddresses.push({
-            address: canonicalAddress,
-            community_id: ghost.community_id,
-          });
+    if (
+      magicUserMetadata.oauthProvider === 'email' &&
+      magicUserMetadata.email
+    ) {
+      whereClause = { email: magicUserMetadata.email };
+    } else if (
+      magicUserMetadata.oauthProvider === 'sms' &&
+      magicUserMetadata.phoneNumber
+    ) {
+      whereClause = { phoneNumber: magicUserMetadata.phoneNumber };
+    }
+
+    if (Object.keys(whereClause).length > 0) {
+      existingUserInstance = await models.User.scope('withPrivateData').findOne(
+        {
+          where: whereClause,
+          include: [
+            {
+              model: models.Profile,
+            },
+            {
+              // guarantee that we only access ghost addresses as part of this query
+              model: models.Address,
+              where: {
+                ghost_address: true,
+              } as WhereOptions<AddressAttributes>,
+              required: true,
+            },
+          ],
+        },
+      );
+
+      // generate replacement magic addresses for all ghost addresses, which will be deleted in `loginExistingMagicUser`
+      if (existingUserInstance?.Addresses) {
+        for (const ghost of existingUserInstance.Addresses as AddressAttributes[]) {
+          const needsReplacementAddress = !generatedAddresses.some(
+            ({ community_id }) => community_id === ghost.community_id,
+          );
+          if (needsReplacementAddress) {
+            // note that discourse imports not supported on cosmos
+            generatedAddresses.push({
+              address: canonicalAddress,
+              community_id: ghost.community_id,
+            });
+          }
         }
       }
     }

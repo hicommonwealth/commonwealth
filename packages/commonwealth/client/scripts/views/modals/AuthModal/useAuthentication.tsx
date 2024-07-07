@@ -69,6 +69,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -132,6 +133,45 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isMobile,
       isPWA: isAddedToHomeScreen,
     });
+  };
+
+  const onSMSLogin = async (phoneNumberToUse = '') => {
+    const tempPhoneNumberToUse = phoneNumberToUse || phoneNumber;
+    setPhoneNumber(tempPhoneNumberToUse);
+
+    setIsMagicLoading(true);
+
+    if (!tempPhoneNumberToUse) {
+      notifyError('Please enter a valid phone number.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      const { address: magicAddress, isAddressNew } =
+        await startLoginWithMagicLink({
+          phoneNumber: tempPhoneNumberToUse,
+          isCosmos,
+          redirectTo: document.location.pathname + document.location.search,
+          chain: app.chain?.id,
+        });
+      setIsMagicLoading(false);
+
+      // Similar logic as email login for handling new addresses and onboarding
+      // ...
+
+      props?.onSuccess?.(magicAddress, isNewlyCreated);
+      props?.onModalClose?.();
+
+      trackLoginEvent('sms', true);
+    } catch (e) {
+      notifyError(`Error authenticating with SMS`);
+      console.error(`Error authenticating with SMS: ${e}`);
+      setIsMagicLoading(false);
+    }
   };
 
   // Handles Magic Link Login
@@ -607,6 +647,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onSocialLogin,
     setEmail,
     onVerifyMobileWalletSignature,
+    onSMSLogin,
+    setPhoneNumber,
   };
 };
 

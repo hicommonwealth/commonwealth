@@ -63,6 +63,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
         type: Sequelize.BOOLEAN,
         allowNull: true,
       },
+      phoneNumber: { type: Sequelize.STRING, allowNull: true },
+      phoneNumberVerified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
       emailNotificationInterval: {
         type: Sequelize.STRING,
         defaultValue: 'never',

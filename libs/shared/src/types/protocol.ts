@@ -93,6 +93,7 @@ export enum WalletSsoSource {
   Twitter = 'twitter',
   Apple = 'apple',
   Email = 'email',
+  SMS = 'sms',
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 

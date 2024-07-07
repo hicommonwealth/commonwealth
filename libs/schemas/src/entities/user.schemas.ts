@@ -7,6 +7,8 @@ export const User = z.object({
   isAdmin: z.boolean().default(false).optional(),
   disableRichText: z.boolean().default(false).optional(),
   emailVerified: z.boolean().default(false).optional(),
+  phoneNumber: z.string().max(255).email().nullish(),
+  phoneNumberVerified: z.boolean().default(false).optional(),
   selected_community_id: z.string().max(255).optional().nullish(),
   emailNotificationInterval: z
     .enum(['weekly', 'never'])

@@ -260,6 +260,10 @@ export function updateActiveUser(data) {
     // @ts-expect-error StrictNullChecks
     app.user.setEmailVerified(null);
     // @ts-expect-error StrictNullChecks
+    app.user.setPhoneNumber(null);
+    // @ts-expect-error StrictNullChecks
+    app.user.setPhoneNumberVerified(null);
+    // @ts-expect-error StrictNullChecks
     app.user.setPromotionalEmailsEnabled(null);
     app.user.setIsWelcomeOnboardFlowComplete(false);
     // @ts-expect-error StrictNullChecks
@@ -373,18 +377,20 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
 
 export async function startLoginWithMagicLink({
   email,
+  phoneNumber,
   provider,
   redirectTo,
   chain,
   isCosmos,
 }: {
   email?: string;
+  phoneNumber?: string;
   provider?: WalletSsoSource;
   redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
 }) {
-  if (!email && !provider)
+  if (!email && !phoneNumber && !provider)
     throw new Error('Must provide email or SSO provider');
   const magic = await constructMagic(isCosmos, chain);
 
@@ -395,6 +401,18 @@ export async function startLoginWithMagicLink({
     const { address, isAddressNew } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
+      returnEarlyIfNewAddress:
+        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
+    });
+
+    return { bearer, address, isAddressNew };
+  } else if (phoneNumber) {
+    const authModalState = authModal.getState();
+    // SMS-based login
+    const bearer = await magic.auth.loginWithSMS({ phoneNumber });
+    const { address, isAddressNew } = await handleSocialLoginCallback({
+      bearer,
+      walletSsoSource: WalletSsoSource.SMS,
       returnEarlyIfNewAddress:
         authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
     });
@@ -467,11 +485,22 @@ export async function handleSocialLoginCallback({
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
   const isEmail = walletSsoSource === WalletSsoSource.Email;
+  const isSMS = walletSsoSource === WalletSsoSource.SMS;
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
   let profileMetadata, magicAddress;
   if (isEmail) {
+    const metadata = await magic.user.getMetadata();
+    profileMetadata = { username: null };
+
+    if (isCosmos) {
+      magicAddress = metadata.publicAddress;
+    } else {
+      const { utils } = await import('ethers');
+      magicAddress = utils.getAddress(metadata.publicAddress);
+    }
+  } else if (isSMS) {
     const metadata = await magic.user.getMetadata();
     profileMetadata = { username: null };
 

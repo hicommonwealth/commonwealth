@@ -62,6 +62,32 @@ export class UserController {
     this._emailVerified = emailVerified;
   }
 
+  private _phoneNumber: string;
+  public get phoneNumber(): string {
+    return this._phoneNumber;
+  }
+
+  private _setPhoneNumber(phoneNumber: string): void {
+    this._phoneNumber = phoneNumber;
+  }
+
+  private _phoneNumberVerified: boolean;
+  public get phoneNumberVerified(): boolean {
+    return this._phoneNumberVerified;
+  }
+
+  private _setPhoneNumberVerified(phoneNumberVerified: boolean): void {
+    this._phoneNumberVerified = phoneNumberVerified;
+  }
+
+  public setPhoneNumber(phoneNumber: string): void {
+    this._setPhoneNumber(phoneNumber);
+  }
+
+  public setPhoneNumberVerified(verified: boolean): void {
+    this._setPhoneNumberVerified(verified);
+  }
+
   private _promotionalEmailsEnabled: boolean;
   public get promotionalEmailsEnabled(): boolean {
     return this._promotionalEmailsEnabled;
@@ -206,6 +232,25 @@ export class UserController {
       }
     }
   }
+
+  // public async updatePhoneNumber(
+  //   phoneNumber: string,
+  //   shouldNotifyFailure = true,
+  // ): Promise<void> {
+  //   this._setPhoneNumber(phoneNumber);
+
+  //   try {
+  //     await axios.post(`${app.serverUrl()}/updatePhoneNumber`, {
+  //       phoneNumber: phoneNumber,
+  //       jwt: app.user.jwt,
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //     if (shouldNotifyFailure) {
+  //       notifyError('Unable to update phone number');
+  //     }
+  //   }
+  // }
 
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
