@@ -49,7 +49,8 @@ const MobileHeader = ({
   const { menuVisible } = useSidebarStore();
   const user = app?.user?.addresses?.[0];
   const navigate = useCommonNavigate();
-  const profileId = user?.profileId;
+
+  const profileId = !user?.profile ? user?.profile : user.profile.id;
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity

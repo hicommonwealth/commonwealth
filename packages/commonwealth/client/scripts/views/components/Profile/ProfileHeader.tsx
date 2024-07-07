@@ -62,62 +62,67 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
 
   return (
     <div className="ProfileHeader">
-      <div className="edit">
-        {isCurrentUser && (
-          <CWButton
-            buttonHeight="sm"
-            label="Edit"
-            buttonType="tertiary"
-            iconLeft="write"
-            onClick={() => navigate(`/profile/edit`)}
-          />
-        )}
-        <CWIconButton
-          iconName="gear"
-          onClick={() => setIsUserDrawerOpen(true)}
-        />
-      </div>
-      <div className="profile-image">
-        {profile?.avatarUrl ? (
-          <img src={profile.avatarUrl} />
-        ) : (
-          <img
-            src={`data:image/svg+xml;utf8,${encodeURIComponent(
-              jdenticon.toSvg(profile.id, 90),
-            )}`}
-          />
-        )}
-      </div>
-      <div className="profile-name-and-bio">
-        <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-          {name || 'Anonymous user'}
-        </CWText>
-        <SocialAccounts profile={profile} />
-        {hasBio() && (
-          <div>
-            <CWText type="h4">Bio</CWText>
-            <CWText className="bio">
-              <QuillRenderer doc={bio} />
-            </CWText>
-          </div>
-        )}
-      </div>
-
-      <CWDrawer
-        open={isUserDrawerOpen}
-        onClose={() => setIsUserDrawerOpen(false)}
-      >
-        <div className="UserDrawer">
-          <div className="header">
-            <CWIconButton
-              iconName="close"
-              onClick={() => setIsUserDrawerOpen(false)}
+      <div className="profile-content">
+        <div className="profile-image">
+          {profile?.avatarUrl ? (
+            <img src={profile.avatarUrl} />
+          ) : (
+            <img
+              src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                jdenticon.toSvg(profile.id, 90),
+              )}`}
             />
-          </div>
-
-          <MenuContent menuItems={mobileItems} />
+          )}
         </div>
-      </CWDrawer>
+        <div className="edit">
+          {isCurrentUser && (
+            <>
+              <CWButton
+                buttonHeight="sm"
+                label="Edit"
+                buttonType="tertiary"
+                iconLeft="write"
+                onClick={() => navigate(`/profile/edit`)}
+              />
+              <CWIconButton
+                iconName="gear"
+                onClick={() => setIsUserDrawerOpen(true)}
+                className="gear-icon"
+              />
+            </>
+          )}
+        </div>
+        <div className="profile-name-and-bio">
+          <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
+            {name || 'Anonymous user'}
+          </CWText>
+          <SocialAccounts profile={profile} />
+          {hasBio() && (
+            <div>
+              <CWText type="h4">Bio</CWText>
+              <CWText className="bio">
+                <QuillRenderer doc={bio} />
+              </CWText>
+            </div>
+          )}
+        </div>
+
+        <CWDrawer
+          open={isUserDrawerOpen}
+          onClose={() => setIsUserDrawerOpen(false)}
+        >
+          <div className="UserDrawer">
+            <div className="header">
+              <CWIconButton
+                iconName="close"
+                onClick={() => setIsUserDrawerOpen(false)}
+              />
+            </div>
+
+            <MenuContent menuItems={mobileItems} />
+          </div>
+        </CWDrawer>
+      </div>
     </div>
   );
 };
