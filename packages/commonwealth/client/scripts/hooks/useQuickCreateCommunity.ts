@@ -88,18 +88,18 @@ const useQuickCreateCommunity = () => {
       const LPBondingCurveAddress =
         '0x0000000000000000000000000000000000000000';
 
-      await launchpad.launchTokenWithLiquidity(
-        name,
-        symbol,
-        [10, 20, 70], // Example shares, adjust as needed
-        [airdropAddress, govAddress, LPBondingCurveAddress], // Example holders, adjust as needed
-        totalSupply,
-        curveId,
-        scalar,
-        LPhook,
-        launchAction,
-        address,
-      );
+      // await launchpad.launchTokenWithLiquidity(
+      //   name,
+      //   symbol,
+      //   [10, 20, 70], // Example shares, adjust as needed
+      //   [airdropAddress, govAddress, LPBondingCurveAddress], // Example holders, adjust as needed
+      //   totalSupply,
+      //   curveId,
+      //   scalar,
+      //   LPhook,
+      //   launchAction,
+      //   address,
+      // );
 
       // Reserve namespace
       //   await namespaceFactory.deployNamespace(
