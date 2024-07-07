@@ -29,7 +29,7 @@ const NoTransactionHistory = () => {
         <CWButton
           label="Explore communities"
           buttonWidth="full"
-          onClick={() => navigate('/communities')}
+          onClick={() => navigate('/')}
         />
       </div>
     </section>

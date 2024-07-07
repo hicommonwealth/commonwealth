@@ -62,7 +62,7 @@ export const UserTrainingSlider = () => {
     pageName === UserTrainingCardTypes.FinishProfile &&
       navigate(`/profile/edit`, {}, null);
     pageName === UserTrainingCardTypes.ExploreCommunities &&
-      navigate(`/communities`, {}, null);
+      navigate(`/`, {}, null);
   };
 
   const handleModalClose = () => {
