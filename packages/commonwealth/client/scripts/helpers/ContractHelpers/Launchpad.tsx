@@ -17,11 +17,24 @@ class Launchpad extends ContractBase {
     LPhook: string,
     launchAction: string,
     walletAddress: string,
-    value: string,
   ): Promise<any> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
     }
+
+    const totalPrice = await this.contract.methods
+      .launchTokenWithLiquidity(
+        name,
+        symbol,
+        shares,
+        holders,
+        totalSupply,
+        curveId,
+        scalar,
+        LPhook,
+        launchAction,
+      )
+      .call();
 
     let txReceipt;
     try {
@@ -39,7 +52,7 @@ class Launchpad extends ContractBase {
         )
         .send({
           from: walletAddress,
-          value: value,
+          value: totalPrice,
           maxPriorityFeePerGas: null,
           maxFeePerGas: null,
         });
