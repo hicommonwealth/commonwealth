@@ -1,6 +1,5 @@
-import { ChainNetwork, slugify } from '@hicommonwealth/shared';
+import { slugify } from '@hicommonwealth/shared';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
@@ -15,8 +14,6 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { usePoolParamsQuery } from 'state/api/chainParams';
 import {
-  useAaveProposalsQuery,
-  useCompoundProposalsQuery,
   useCosmosProposalDepositsQuery,
   useCosmosProposalMetadataQuery,
   useCosmosProposalQuery,
@@ -33,9 +30,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { AaveViewProposalDetail } from './aave_summary';
-import { JSONDisplay } from './json_display';
-import type { SubheaderProposalType } from './proposal_components';
+import { JSONDisplay } from './JSONDisplay';
 import { ProposalSubheader } from './proposal_components';
 
 type ViewProposalPageAttrs = {
@@ -105,59 +100,8 @@ const ViewProposalPage = ({
     return idToProposal(resolvedType, proposalId);
   };
 
-  const onAave = app.chain?.network === ChainNetwork.Aave;
-  const fetchAaveData = onAave && isAdapterLoaded;
-  const { data: cachedAaveProposals, isLoading: aaveProposalsLoading } =
-    useAaveProposalsQuery({
-      moduleReady: fetchAaveData,
-      communityId: app.chain?.id,
-    });
-
-  const onCompound = app.chain?.network === ChainNetwork.Compound;
-  const fetchCompoundData = onCompound && isAdapterLoaded;
-  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
-    useCompoundProposalsQuery({
-      moduleReady: fetchCompoundData,
-      communityId: app.chain?.id,
-    });
-
-  useEffect(() => {
-    if (!aaveProposalsLoading && fetchAaveData && !proposal) {
-      const foundProposal = cachedAaveProposals?.find(
-        (p) => p.identifier === proposalId,
-      );
-
-      if (!foundProposal?.ipfsData) {
-        // @ts-expect-error <StrictNullChecks/>
-        foundProposal.ipfsDataReady.once('ready', () =>
-          // @ts-expect-error <StrictNullChecks/>
-          setProposal(foundProposal),
-        );
-      } else {
-        setProposal(foundProposal);
-      }
-    } else if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
-      const foundProposal = cachedCompoundProposals?.find(
-        (p) => p.identifier === proposalId,
-      );
-      // @ts-expect-error <StrictNullChecks/>
-      setProposal(foundProposal);
-    }
-  }, [
-    cachedAaveProposals,
-    cachedCompoundProposals,
-    isAdapterLoaded,
-    aaveProposalsLoading,
-    compoundProposalsLoading,
-    fetchAaveData,
-    fetchCompoundData,
-    proposal,
-    proposalId,
-  ]);
-
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave || onCompound) return;
       try {
         const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);
@@ -218,13 +162,7 @@ const ViewProposalPage = ({
         createdAt={proposal?.createdAt}
         // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
-        subHeader={
-          <ProposalSubheader
-            proposal={proposal as SubheaderProposalType}
-            toggleVotingModal={toggleVotingModal}
-            votingModalOpen={votingModalOpen}
-          />
-        }
+        subHeader={<ProposalSubheader proposal={proposal} />}
         body={() =>
           proposalDescription && (
             <CollapsibleProposalBody doc={proposalDescription} />
@@ -232,9 +170,6 @@ const ViewProposalPage = ({
         }
         subBody={
           <>
-            {proposal instanceof AaveProposal && (
-              <AaveViewProposalDetail proposal={proposal} />
-            )}
             {isFetchingMetadata ? (
               <Skeleton height={94.4} />
             ) : (

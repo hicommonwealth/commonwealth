@@ -5,8 +5,6 @@ import type {
   CosmosProposal,
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
@@ -127,66 +125,6 @@ export const SimpleYesApprovalVotingResult = (
           {`Approved ${approvedCount}`}
         </CWText>
         <VoteListing proposal={proposal} votes={votes} />
-      </div>
-    </div>
-  );
-};
-
-type AaveVotingResultProps = {
-  noBalanceString: string;
-  noVotesCount: number;
-  proposal: AaveProposal;
-  votes: Array<AaveProposalVote>;
-  yesBalanceString: string;
-  yesVotesCount: number;
-};
-
-// eslint-disable-next-line react/no-multi-comp
-export const AaveVotingResult = (props: AaveVotingResultProps) => {
-  const {
-    noBalanceString,
-    noVotesCount,
-    proposal,
-    votes,
-    yesBalanceString,
-    yesVotesCount,
-  } = props;
-
-  return (
-    <div className="VotingResult">
-      <div className="results-column-yes">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Yes (${yesBalanceString} ${yesVotesCount}) voters`}
-        </CWText>
-        <div className="results-subheader">
-          <CWText type="h5" fontWeight="medium">
-            User
-          </CWText>
-          <CWText type="h5" fontWeight="medium">
-            Power
-          </CWText>
-        </div>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => !!v.choice)}
-        />
-      </div>
-      <div className="results-column-no">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`No (${noBalanceString} ${noVotesCount}) voters`}
-        </CWText>
-        <div className="results-subheader">
-          <CWText type="h5" fontWeight="medium">
-            User
-          </CWText>
-          <CWText type="h5" fontWeight="medium">
-            Power
-          </CWText>
-        </div>
-        <VoteListing
-          proposal={proposal}
-          votes={votes.filter((v) => !v.choice)}
-        />
       </div>
     </div>
   );

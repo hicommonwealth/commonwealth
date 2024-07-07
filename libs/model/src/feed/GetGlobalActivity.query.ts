@@ -7,6 +7,7 @@ export function GetGlobalActivity(): Query<typeof schemas.ThreadFeed> {
   return {
     ...schemas.ThreadFeed,
     auth: [],
+    secure: false,
     body: async () => {
       return await GlobalActivityCache.getInstance(models).getGlobalActivity();
     },

@@ -49,7 +49,6 @@ class ContractsController {
               id: cct.id,
               communityContractId: cct.community_contract_id,
               templateId: cct.template_id,
-              cctmd: cct.CommunityContractTemplateMetadatum,
             };
           });
         }
