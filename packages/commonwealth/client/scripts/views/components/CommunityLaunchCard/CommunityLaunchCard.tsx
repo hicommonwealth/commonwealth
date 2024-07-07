@@ -11,6 +11,7 @@ import OpenAI from 'openai';
 import axios from 'axios';
 import app from 'client/scripts/state';
 import { ChainBase } from '@hicommonwealth/shared';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 
 interface CommunityLaunchCardProps {
   onLaunch: (name: string, image?: File) => void;
@@ -90,6 +91,8 @@ export const CommunityLaunchCard: React.FC<CommunityLaunchCardProps> = ({ onLaun
     };
   };
 
+  const navigate = useCommonNavigate();
+
   const handleLaunch = useCallback(async () => {
     const ethereumAddress = app.user.addresses.find(addr => 
       addr.community.base === ChainBase.Ethereum
@@ -109,6 +112,7 @@ export const CommunityLaunchCard: React.FC<CommunityLaunchCardProps> = ({ onLaun
       };
       await createCommunity(communityData);
       onLaunch(communityData.name, image || undefined);
+      navigateToCommunity({ navigate, path: '', chain: communityData.name.toLowerCase() });
     } catch (err) {
       console.error('Failed to create community:', err);
     }

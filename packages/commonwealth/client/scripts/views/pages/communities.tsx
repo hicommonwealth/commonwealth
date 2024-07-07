@@ -43,39 +43,6 @@ const communityNetworks = Object.keys(ChainNetwork).filter(
 ); // We only are allowing ERC20 for now
 const communityBases = Object.keys(ChainBase);
 
-// const {
-//   handleCompleteBasicInformationStep,
-//   createdCommunityId,
-//   createdCommunityName,
-// } = useCreateCommunity();
-
-const handleLaunchIdea = async (name: string) => {
-  try {
-    const { createCommunity } = useQuickCreateCommunity();
-    await createCommunity(name);
-    // TODO: Handle success, maybe redirect to the new community page
-    console.log('Community created successfully');
-  } catch (err) {
-    console.error('Failed to create community:', err);
-  }
-};
-
-const generateMissingFields = async (name: string) => {
-  // TODO: Implement OpenAI API call to generate missing fields
-  // This is a placeholder implementation
-  return {
-    description: `A community for ${name}`,
-    icon_url: 'https://example.com/default-icon.png',
-    // Add other required fields here
-  };
-};
-
-const uploadImage = async (file: File): Promise<string> => {
-  // TODO: Implement image upload logic
-  // This is a placeholder implementation
-  return 'https://example.com/uploaded-image.png';
-};
-
 const getInitialFilterMap = (): Record<string, unknown> => {
   const filterMapCommunityCategories = communityCategories.map((c) => ({
     [c]: false,
@@ -239,6 +206,59 @@ const CommunitiesPage = () => {
 
     return res;
   };
+
+  // const sortNewCommunities = (list: CommunityInfo[]) => {
+  //   let filteredList = list;
+  
+  //   if (Object.values(filterMap).includes(true)) {
+  //     // Handle Overlaps
+  //     if (communityBases.filter((val) => filterMap[val]).length > 1) {
+  //       filteredList = [];
+  //     }
+  
+  //     if (communityNetworks.filter((val) => filterMap[val]).length > 1) {
+  //       filteredList = [];
+  //     }
+  
+  //     // Filter for ChainBase
+  //     if (communityBases.filter((base) => filterMap[base]).length > 0) {
+  //       filteredList = chainBaseFilter(filteredList);
+  //     }
+  
+  //     // Filter for ChainNetwork
+  //     if (communityNetworks.filter((network) => filterMap[network]).length > 0) {
+  //       filteredList = communityNetworkFilter(filteredList);
+  //     }
+  
+  //     // Filter for ChainCategory
+  //     if (communityCategories.filter((cat) => filterMap[cat]).length > 0) {
+  //       filteredList = communityCategoryFilter(filteredList);
+  //     }
+  //   }
+  
+  //   // Sort by creation date, newest first
+  //   return filteredList
+  //     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  //     .map((community: CommunityInfo, i) => {
+  //       const canBuyStake = !!app?.user?.addresses?.find?.(
+  //         (address) => address?.community?.base === community?.base,
+  //       );
+  
+  //       return (
+  //         <CWRelatedCommunityCard
+  //           key={i}
+  //           community={community}
+  //           memberCount={community.addressCount}
+  //           threadCount={community.threadCount}
+  //           canBuyStake={canBuyStake}
+  //           onStakeBtnClick={() => setSelectedCommunity(community)}
+  //           ethUsdRate={ethUsdRate}
+  //           historicalPrice={historicalPrices?.get(community.id)}
+  //           onlyShowIfStakeEnabled={!!filterMap[STAKE_FILTER_KEY]}
+  //         />
+  //       );
+  //     });
+  // };
 
   const { data: activeCommunities, isLoading } =
     useFetchActiveCommunitiesQuery();
