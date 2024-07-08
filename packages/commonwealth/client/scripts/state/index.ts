@@ -55,9 +55,6 @@ export interface IApp {
   // Polls
   polls: PollsController;
 
-  // Proposals
-  proposalEmitter: EventEmitter;
-
   // Discord
   discord: DiscordController;
 
@@ -129,9 +126,6 @@ const app: IApp = {
 
   // Polls
   polls: new PollsController(),
-
-  // Proposals
-  proposalEmitter: new EventEmitter(),
 
   // Discord
   discord: new DiscordController(),
