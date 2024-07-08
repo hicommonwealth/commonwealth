@@ -11,7 +11,6 @@ import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import { userStore } from '../state/ui/user';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import ProposalModule from './ProposalModule';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -61,13 +60,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         : setDarkMode(true);
     }
 
-    const {
-      admins,
-      numVotingThreads,
-      numTotalThreads,
-      communityBanner,
-      contractsWithTemplatesData,
-    } = response.data.result;
+    const { admins, numVotingThreads, numTotalThreads, communityBanner } =
+      response.data.result;
     // Update community level thread counters variables (Store in state instead of react query here is an
     // exception case, view the threadCountersStore code for more details)
     EXCEPTION_CASE_threadCountersStore.setState({
@@ -76,7 +70,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     });
     this.meta.setAdmins(admins);
     this.meta.setBanner(communityBanner);
-    this.app.contracts.initialize(contractsWithTemplatesData, true);
 
     this._serverLoaded = true;
     return true;
@@ -115,19 +108,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       !localStorage.getItem('user-dark-mode-state')
     ) {
       setDarkMode(false);
-    }
-  }
-
-  public async loadModules(modules: ProposalModule<any, any, any>[]) {
-    if (!this.loaded) {
-      throw new Error('secondary loading cmd called before chain load');
-    }
-    // TODO: does this need debouncing?
-    if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
-      await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts)),
-      );
-      this.app.chainModuleReady.emit('ready');
     }
   }
 
