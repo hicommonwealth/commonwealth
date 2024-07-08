@@ -24,6 +24,8 @@ const authCallback = async (
   req: TypedRequestQuery<AuthCallbackReq>,
   res: TypedResponse<AuthCallbackResp>,
 ) => {
+  console.log('***********************authCallback', req.user);
+
   // 1. fetch addresses associated with selected profile
   if (!req.user?.id) {
     throw new AppError('User must be signed in');
