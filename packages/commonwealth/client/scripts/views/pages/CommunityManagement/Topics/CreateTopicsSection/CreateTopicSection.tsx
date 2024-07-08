@@ -131,7 +131,9 @@ export const CreateTopicSection = () => {
             setContentDelta={setDescriptionDelta}
           />
           <div className="description-char-count">
-            <CWText type="caption">Character count: {characterCount}</CWText>
+            <CWText type="caption">
+              Character count: {characterCount}/250
+            </CWText>
           </div>
           <CWText type="caption">
             Choose whether topic is featured in sidebar.
