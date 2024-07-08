@@ -60,10 +60,9 @@ export const Address = z.object({
 });
 
 export const SsoToken = z.object({
-  id: PG_INT.optional(),
+  address_id: PG_INT,
   issued_at: PG_INT,
   issuer: z.string(),
-  address_id: PG_INT.nullish(),
   state_id: z.string().nullish(),
   created_at: z.date(),
   updated_at: z.date(),

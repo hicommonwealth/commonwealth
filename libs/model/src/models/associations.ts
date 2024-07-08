@@ -27,7 +27,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     })
     .withMany(db.Reaction)
-    .withMany(db.SsoToken, {
+    .withOne(db.SsoToken, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });

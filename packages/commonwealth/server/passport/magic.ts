@@ -355,7 +355,7 @@ async function loginExistingMagicUser({
           { where: { address_id: ghost.id }, transaction },
         );
         await models.SsoToken.destroy({
-          where: { id: ghost.id },
+          where: { address_id: ghost.id },
           transaction,
         });
         await models.Address.destroy({
