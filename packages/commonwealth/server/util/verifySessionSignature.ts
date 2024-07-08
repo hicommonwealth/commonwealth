@@ -59,6 +59,7 @@ const verifySessionSignature = async (
       } else {
         const user = await models.User.createWithProfile?.({
           email: null,
+          profile: {},
         });
         if (!user || !user.id) throw new Error('Failed to create user');
         addressModel.profile_id = (user!.Profiles?.[0] as ProfileAttributes).id;

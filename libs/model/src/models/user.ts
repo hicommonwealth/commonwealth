@@ -81,6 +81,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic => {
         allowNull: false,
       },
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
+      profile: { type: Sequelize.JSONB, allowNull: false },
     },
     {
       timestamps: true,
