@@ -141,7 +141,7 @@ const getNewProfile = async (
 
   const profileTags = await models.ProfileTags.findAll({
     where: {
-      profile_id: profileId || profile.id,
+      user_id: profile.user_id,
     },
     include: [
       {
