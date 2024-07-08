@@ -47,22 +47,23 @@ const chainIdsWithStakeEnabled = Object.values(
 ).map((c) => c.chainId);
 
 // Get chain id's from the app.config.chains for all eth and cosmos chains
-export const chainTypes = fetchCachedNodes()
-  ?.filter(particularChainNodes)
-  ?.map((chain) => ({
-    chainBase: chain.ethChainId
-      ? 'ethereum'
-      : chain.cosmosChainId
-      ? 'cosmos'
-      : 'solana',
-    altWalletUrl: chain.altWalletUrl,
-    nodeUrl: chain.url,
-    value: chain.ethChainId || chain.cosmosChainId || 'solana',
-    label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-    bech32Prefix: chain.bech32,
-    // @ts-expect-error StrictNullChecks
-    hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
-  }));
+export const chainTypes =
+  fetchCachedNodes()
+    ?.filter(particularChainNodes)
+    ?.map((chain) => ({
+      chainBase: chain.ethChainId
+        ? 'ethereum'
+        : chain.cosmosChainId
+        ? 'cosmos'
+        : 'solana',
+      altWalletUrl: chain.altWalletUrl,
+      nodeUrl: chain.url,
+      value: chain.ethChainId || chain.cosmosChainId || 'solana',
+      label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+      bech32Prefix: chain.bech32,
+      // @ts-expect-error StrictNullChecks
+      hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
+    })) || [];
 
 // Sort chains alphabetically by labels
 export const alphabeticallySortedChains = [...(chainTypes || [])].sort((a, b) =>

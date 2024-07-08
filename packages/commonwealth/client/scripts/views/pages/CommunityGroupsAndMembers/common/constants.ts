@@ -49,17 +49,20 @@ export const conditionTypes = [
 ];
 
 // Get chain id's from the app.config.chains for all eth and cosmos chains
-export const chainTypes = fetchCachedNodes()
-  ?.filter(
-    (chain) =>
-      chain.ethChainId || chain.cosmosChainId || chain.balanceType === 'solana',
-  )
-  ?.map((chain) => ({
-    chainBase: chain.ethChainId
-      ? 'ethereum'
-      : chain.balanceType === 'solana'
-      ? 'solana'
-      : 'cosmos',
-    value: chain.ethChainId || chain.cosmosChainId || 0,
-    label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-  }));
+export const chainTypes =
+  fetchCachedNodes()
+    ?.filter(
+      (chain) =>
+        chain.ethChainId ||
+        chain.cosmosChainId ||
+        chain.balanceType === 'solana',
+    )
+    ?.map((chain) => ({
+      chainBase: chain.ethChainId
+        ? 'ethereum'
+        : chain.balanceType === 'solana'
+        ? 'solana'
+        : 'cosmos',
+      value: chain.ethChainId || chain.cosmosChainId || 0,
+      label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+    })) || [];
