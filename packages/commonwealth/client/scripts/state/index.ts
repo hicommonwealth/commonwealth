@@ -8,7 +8,6 @@ import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
@@ -55,12 +54,6 @@ export interface IApp {
 
   // Polls
   polls: PollsController;
-
-  // Proposals
-  proposalEmitter: EventEmitter;
-
-  // Contracts
-  contracts: ContractsController;
 
   // Discord
   discord: DiscordController;
@@ -133,12 +126,6 @@ const app: IApp = {
 
   // Polls
   polls: new PollsController(),
-
-  // Proposals
-  proposalEmitter: new EventEmitter(),
-
-  // Contracts
-  contracts: new ContractsController(),
 
   // Discord
   discord: new DiscordController(),
