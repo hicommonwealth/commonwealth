@@ -34,10 +34,21 @@ remote database is not specified, a Postgres container will be created.
 
 ### test-load
 
-Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file>`
+Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file> <environment>`
 
-Description: Creates a k6 binary (`load-test/k6`) containing the `xk6-sql` and `xk6-ts` extensions if it does not exist 
-and then executes the k6 binary with the provided test file.
+Description: Executes the specified Typescript k6 load test using Docker against the specified environment. The
+environment argument is optional (defaults to local) but can be set to frick, frack, or beta.
+
+Considerations: Executing load tests with Docker is less performant than executing them with a native k6 installation
+(see [test-load-native](#test-load-native)). Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. 
+See [start](#start).
+
+### test-load-native
+
+Definition: `chmod u+x scripts/k6.sh && NATIVE_K6=true ./scripts/k6.sh <path-to-test-file> <environment>`
+
+Description: Executes the specified Typescript k6 load test using a native/local k6 installation against the specified 
+environment. The environment argument is optional (defaults to local) but can be set to frick, frack, or beta.
 
 Considerations: Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. See [start](#start).
 

@@ -29,9 +29,22 @@ if [[ "$ENVIRONMENT" != "local" && "$ENVIRONMENT" != "frick" && "$ENVIRONMENT" !
 fi
 
 if [ "$ENVIRONMENT" == "local" ]; then
+  if [ "$NATIVE_K6" ]; then
+    SERVER_URL='http://localhost:8080'
+  else
     SERVER_URL='http://host.docker.internal:8080'
+  fi
 else
     SERVER_URL=$(heroku config:get SERVER_URL -a commonwealth-"$ENVIRONMENT")
 fi
 
-docker run --rm -v "${PWD}"/test:/test -i grafana/k6:0.52.0-with-browser run -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
+if [ "$NATIVE_K6" ]; then
+  K6_VERSION=$(k6 --version 2>&1)
+  echo "Running tests using native $K6_VERSION"
+  k6 run -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
+else
+  echo "Running load tests using Docker k6 v0.52.0"
+  docker run --rm -v "${PWD}"/test:/test -i grafana/k6:0.52.0-with-browser run -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
+fi
+
+exit 0
