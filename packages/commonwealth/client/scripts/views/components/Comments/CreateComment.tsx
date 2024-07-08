@@ -89,21 +89,24 @@ export const CreateComment = ({
   });
 
   const handleSubmitComment = async () => {
+    if (!user.activeAccount) return;
+
     setErrorMsg(null);
     setSendingComment(true);
 
     const communityId = app.activeChainId();
 
     try {
+      const { address = '', profile: userProfile } = user.activeAccount;
       const newComment: any = await createComment({
         threadId: rootThread.id,
         communityId,
         profile: {
-          id: user.activeAccount?.profile?.id || 0,
-          address: user.activeAccount?.address || '',
-          avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
-          name: user.activeAccount?.profile?.name || '',
-          lastActive: user.activeAccount?.profile?.lastActive?.toString() || '',
+          address,
+          id: userProfile?.id || 0,
+          avatarUrl: userProfile?.avatarUrl || '',
+          name: userProfile?.name || '',
+          lastActive: userProfile?.lastActive?.toString() || '',
         },
         // @ts-expect-error <StrictNullChecks/>
         parentCommentId: parentCommentId,

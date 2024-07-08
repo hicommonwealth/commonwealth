@@ -1,6 +1,6 @@
 import axios from 'axios';
 import 'components/Avatar/AvatarUpload.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -101,12 +101,6 @@ export const AvatarUpload = ({
       }
     },
   });
-
-  useEffect(() => {
-    // @ts-expect-error StrictNullChecks
-    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const avatarSize = size === 'small' ? 60 : 108;
   const forUser = scope === 'user';

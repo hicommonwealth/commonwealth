@@ -18,7 +18,7 @@ const updateUserEmailSettings = async ({
   emailNotificationInterval,
   promotionalEmailsEnabled,
 }: UseUpdateUserEmailSettingsProps) => {
-  // TODO: api endpoint for this should be cleaned up
+  // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8393
   const key = emailNotificationInterval
     ? 'updateEmailInterval'
     : 'promotional_emails_enabled';

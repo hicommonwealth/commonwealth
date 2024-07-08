@@ -16,6 +16,7 @@ export const updateEmail = async ({ email }: { email: string }) => {
 
 export const onUpdateEmailSuccess = (email: string) =>
   userStore.getState().setData({ email });
+
 export const onUpdateEmailError = (shouldNotifyFailure: boolean) =>
   shouldNotifyFailure && notifyError('Unable to update email');
 

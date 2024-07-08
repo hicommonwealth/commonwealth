@@ -267,14 +267,14 @@ export function updateActiveUser(data) {
       addresses: [],
       starredCommunities: [],
       joinedCommunitiesWithNewContent: [],
+      accounts: [],
+      activeAccount: null,
       jwt: null,
       isSiteAdmin: false,
       isEmailVerified: false,
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
     });
-
-    userStore.getState().setData({ accounts: [], activeAccount: null });
   } else {
     const addresses = data.addresses.map(
       (a) =>
@@ -295,7 +295,7 @@ export function updateActiveUser(data) {
 
       const communityIds: string[] = [];
 
-      // TODO: cleanup this unseenposts extra stuff on api
+      // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8391
       Object.keys(data.unseenPosts).map(
         (c) =>
           (data?.unseenPosts?.[c]?.activePosts || 0) > 0 &&
