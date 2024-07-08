@@ -1,6 +1,5 @@
 export { default as AccountsStore } from './AccountsStore';
 export { default as ChainStore } from './ChainStore';
-export { default as ContractsStore } from './ContractsStore';
 export { default as IdStore } from './IdStore';
 export { default as NewProfileStore } from './NewProfileStore';
 export { default as NotificationStore } from './NotificationStore';

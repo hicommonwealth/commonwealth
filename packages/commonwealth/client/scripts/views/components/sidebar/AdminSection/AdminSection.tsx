@@ -10,7 +10,6 @@ import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';
 import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
-  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const contestsEnabled = useFlag('contest');
 
   const navigate = useCommonNavigate();
@@ -47,10 +46,6 @@ const AdminSection = () => {
   );
   const matchesAnalyticsRoute = matchRoutes(
     [{ path: '/analytics' }, { path: ':scope/analytics' }],
-    location,
-  );
-  const matchesContractsRoute = matchRoutes(
-    [{ path: '/contracts' }, { path: ':scope/contracts' }],
     location,
   );
 
@@ -213,32 +208,6 @@ const AdminSection = () => {
         );
       },
     },
-    ...(proposalTemplatesEnabled
-      ? [
-          {
-            title: 'Contract Templates',
-            containsChildren: false,
-            displayData: null,
-            hasDefaultToggle: false,
-            isActive: !!matchesContractsRoute,
-            isVisible: true,
-            isUpdated: false,
-            onClick: (e, toggle: boolean) => {
-              e.preventDefault();
-              resetSidebarState();
-              handleRedirectClicks(
-                navigate,
-                e,
-                `/contracts`,
-                app.activeChainId(),
-                () => {
-                  setToggleTree(`children.contracts.toggledState`, toggle);
-                },
-              );
-            },
-          },
-        ]
-      : []),
   ];
 
   const sidebarSectionData: SidebarSectionAttrs = {

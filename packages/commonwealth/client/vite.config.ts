@@ -122,6 +122,11 @@ export default defineConfig(({ mode }) => {
         env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
       ),
       'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
+      'process.env.ETH_ALCHEMY_API_KEY':
+        (env.ETH_RPC || '').trim() === 'e2e-test' &&
+        (env.NODE_ENV || '').trim() === 'test'
+          ? JSON.stringify(env.ETH_ALCHEMY_API_KEY)
+          : undefined,
     },
   };
 });

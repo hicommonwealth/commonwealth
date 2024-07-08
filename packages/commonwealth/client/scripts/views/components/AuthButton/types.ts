@@ -15,7 +15,6 @@ export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom';
 export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase';
 export type CommunitySpecificWallets =
-  | 'near'
   | 'terrastation'
   | 'terra-walletconnect'
   | 'cosm-metamask'

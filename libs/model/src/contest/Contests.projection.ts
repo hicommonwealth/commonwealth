@@ -55,7 +55,7 @@ async function updateOrCreateWithAlert(
       required: false,
     },
   });
-  const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
+  const url = community?.ChainNode?.private_url;
   if (!url)
     throw new InvalidState(
       `Chain node url not found on namespace ${namespace}`,

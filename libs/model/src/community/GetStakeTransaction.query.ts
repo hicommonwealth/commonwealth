@@ -9,6 +9,7 @@ export function GetStakeTransaction(): Query<
   return {
     ...schemas.GetStakeTransaction,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const { addresses } = payload;
 
