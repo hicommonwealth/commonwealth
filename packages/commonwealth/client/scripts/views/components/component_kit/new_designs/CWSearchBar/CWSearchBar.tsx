@@ -44,8 +44,6 @@ const goToSearchPage = (
     return;
   }
 
-  app.search.addToHistory(query);
-
   setRoute(`/search?${query.toUrlParams()}`);
 };
 

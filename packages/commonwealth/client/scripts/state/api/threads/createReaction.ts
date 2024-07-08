@@ -15,27 +15,37 @@ interface IuseCreateThreadReactionMutation {
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
+  isPWA?: boolean;
 }
 
 const createReaction = async ({
   address,
   reactionType = 'like',
   threadId,
+  isPWA,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
     thread_id: threadId,
     like: reactionType === 'like',
   });
 
-  return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
-    author_community_id: app.user.activeAccount.community.id,
-    thread_id: threadId,
-    community_id: app.chain.id,
-    address,
-    reaction: reactionType,
-    jwt: app.user.jwt,
-    ...toCanvasSignedDataApiArgs(canvasSignedData),
-  });
+  return await axios.post(
+    `${app.serverUrl()}/threads/${threadId}/reactions`,
+    {
+      author_community_id: app.user.activeAccount.community.id,
+      thread_id: threadId,
+      community_id: app.chain.id,
+      address,
+      reaction: reactionType,
+      jwt: app.user.jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
+    },
+  );
 };
 
 const useCreateThreadReactionMutation = ({

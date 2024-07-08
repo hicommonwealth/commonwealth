@@ -30,12 +30,9 @@ import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
 import { fileURLToPath } from 'url';
-import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
-import { createRole } from '../util/roles';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -66,9 +63,9 @@ async function createMagicAddressInstances(
   const user_id = user.id;
   // @ts-expect-error StrictNullChecks
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
-  const serverAnalyticsController = new ServerAnalyticsController();
 
   for (const { community_id, address } of generatedAddresses) {
+    log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
@@ -97,24 +94,7 @@ async function createMagicAddressInstances(
       throw new ServerError('Address owned by somebody else!');
     }
 
-    // xx: ?
-    if (created) {
-      await createRole(
-        models,
-        // @ts-expect-error StrictNullChecks
-        addressInstance.id,
-        community_id,
-        'member',
-        false,
-        t,
-      );
-
-      serverAnalyticsController.track({
-        community: community_id,
-        userId: user_id,
-        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
-      });
-    } else {
+    if (!created) {
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
 
@@ -148,10 +128,15 @@ async function createNewMagicUser({
     // @ts-expect-error StrictNullChecks
     const newUser = await models.User.createWithProfile(
       {
-        // never use emails from magic, even for "email" login -- magic maintains the mapping
-        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
-        // of login information.
-        email: null,
+        // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
+        // so it is safe to set emails from magic as part of User data, even though they may be unverified.
+        // although not usable for login, this email (used for outreach) is still considered sensitive user data.
+        email: magicUserMetadata.email,
+
+        // we mark email verified so that we are OK to send update emails, but we should note that
+        // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
+        // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
+        emailVerified: !!magicUserMetadata.email,
       },
       { transaction },
     );
@@ -221,7 +206,7 @@ async function createNewMagicUser({
   });
 }
 
-// User is logged out + selects magic, and provides an existing email. Log them in.
+// User is logged out + selects magic, and provides an existing magic account. Log them in.
 async function loginExistingMagicUser({
   models,
   existingUserInstance,
@@ -339,10 +324,51 @@ async function loginExistingMagicUser({
       );
     }
 
-    // TODO: we should also remove ghost addresses her, per code in /updateAddress...
-    // or we can leave it alone, although it wont migrate address ownership, most parameters
-    // are by profile anyway.
+    // remove ghost addresses once replacements have been generated
+    const ghostAddresses =
+      existingUserInstance?.Addresses?.filter(
+        ({ ghost_address }: AddressAttributes) => !!ghost_address,
+      ) || [];
+    for (const ghost of ghostAddresses as AddressAttributes[]) {
+      const replacementAddress = addressInstances.find(
+        ({ community_id, ghost_address }: AddressAttributes) =>
+          !ghost_address && community_id === ghost.community_id,
+      );
 
+      // should always exist, but check for it to avoid null check error
+      if (replacementAddress) {
+        // update data objects and delete ghost address
+        await models.Collaboration.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Comment.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Reaction.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Thread.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        // should be no memberships or SsoTokens, but handle case for completeness sake
+        await models.Membership.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.SsoToken.destroy({
+          where: { id: ghost.id },
+          transaction,
+        });
+        await models.Address.destroy({
+          where: { id: ghost.id },
+          transaction,
+        });
+      }
+    }
     return existingUserInstance;
   });
 }
@@ -478,7 +504,6 @@ async function magicLoginRoute(
         config.AUTH.JWT_SECRET,
       ) as {
         id: number;
-        email: string | null;
       };
       // @ts-expect-error StrictNullChecks
       loggedInUser = await models.User.findOne({
@@ -609,8 +634,32 @@ async function magicLoginRoute(
         {
           model: models.Profile,
         },
+        {
+          // guarantee that we only access ghost addresses as part of this query
+          model: models.Address,
+          where: {
+            ghost_address: true,
+          } as WhereOptions<AddressAttributes>,
+          required: true,
+        },
       ],
     });
+
+    // generate replacement magic addresses for all ghost addresses, which will be deleted in `loginExistingMagicUser`
+    if (existingUserInstance?.Addresses) {
+      for (const ghost of existingUserInstance.Addresses as AddressAttributes[]) {
+        const needsReplacementAddress = !generatedAddresses.some(
+          ({ community_id }) => community_id === ghost.community_id,
+        );
+        if (needsReplacementAddress) {
+          // note that discourse imports not supported on cosmos
+          generatedAddresses.push({
+            address: canonicalAddress,
+            community_id: ghost.community_id,
+          });
+        }
+      }
+    }
   }
 
   log.trace(

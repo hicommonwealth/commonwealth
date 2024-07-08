@@ -16,7 +16,6 @@ import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
@@ -35,7 +34,8 @@ import {
 } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { setDarkMode } from '../../../helpers/darkMode';
-import { getAddressFromWallet, loginToNear } from '../../../helpers/wallet';
+import { getAddressFromWallet } from '../../../helpers/wallet';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import { useFlag } from '../../../hooks/useFlag';
 import Account from '../../../models/Account';
@@ -73,6 +73,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const isWalletConnectEnabled = _.some(
     wallets,
     (w) =>
@@ -94,7 +96,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           );
         })
@@ -109,7 +111,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const sortedChainBases = [
         ChainBase.CosmosSDK,
         ChainBase.Ethereum,
-        // ChainBase.NEAR,
         ChainBase.Substrate,
         ChainBase.Solana,
       ];
@@ -132,6 +133,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isSocialLogin: isSocialLogin,
       loginPageLocation: app.activeChainId() ? 'community' : 'homepage',
       isMobile,
+      isPWA: isAddedToHomeScreen,
     });
   };
 
@@ -314,7 +316,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
         // Create the account with default values
         // await onCreateNewAccount(walletToUse, session, account);
-        await onCreateNewAccount(walletToUse, session, account);
+        await onCreateNewAccount(session, account);
         await onSaveProfileInfo(account, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -324,21 +326,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handle Logic for creating a new account, including validating signature
-  const onCreateNewAccount = async (
-    wallet?: Wallet,
-    session?: Session,
-    account?: Account,
-  ) => {
-    const walletToUse = wallet || selectedWallet;
-
+  const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      // @ts-expect-error <StrictNullChecks>
-      if (walletToUse.chain !== 'near') {
-        // @ts-expect-error StrictNullChecks
-        await account.validate(session, false);
-        // @ts-expect-error StrictNullChecks
-        await verifySession(session);
-      }
+      // @ts-expect-error StrictNullChecks
+      await account.validate(session);
+      // @ts-expect-error StrictNullChecks
+      await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true, false);
       // Important: when we first create an account and verify it, the user id
@@ -415,47 +408,43 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     await wallet.enable();
     setSelectedWallet(wallet);
 
-    if (wallet.chain === 'near') {
-      await loginToNear(app.chain as Near, app.isCustomDomain());
+    const selectedAddress = getAddressFromWallet(wallet);
+
+    if (userOnboardingEnabled) {
+      // check if address exists
+      const profileAddresses = await fetchProfilesByAddress({
+        currentChainId: '',
+        profileAddresses: [
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address: selectedAddress,
+                currentPrefix: parseInt(
+                  (app.chain as Substrate)?.meta.ss58Prefix,
+                  10,
+                ),
+              })
+            : selectedAddress,
+        ],
+        profileChainIds: [app.activeChainId() ?? wallet.chain],
+        initiateProfilesAfterFetch: false,
+      });
+      const addressExists = profileAddresses?.length > 0;
+      const isAttemptingToConnectAddressToCommunity =
+        app.isLoggedIn() && app.activeChainId();
+      if (
+        !addressExists &&
+        !isAttemptingToConnectAddressToCommunity &&
+        props.onUnrecognizedAddressReceived
+      ) {
+        const shouldContinue = props.onUnrecognizedAddressReceived();
+        if (!shouldContinue) return;
+      }
+    }
+
+    if (props.useSessionKeyLoginFlow) {
+      await onSessionKeyRevalidation(wallet, selectedAddress);
     } else {
-      const selectedAddress = getAddressFromWallet(wallet);
-
-      if (userOnboardingEnabled) {
-        // check if address exists
-        const profileAddresses = await fetchProfilesByAddress({
-          currentChainId: '',
-          profileAddresses: [
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: selectedAddress,
-                  currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
-                    10,
-                  ),
-                })
-              : selectedAddress,
-          ],
-          profileChainIds: [app.activeChainId() ?? wallet.chain],
-          initiateProfilesAfterFetch: false,
-        });
-        const addressExists = profileAddresses?.length > 0;
-        const isAttemptingToConnectAddressToCommunity =
-          app.isLoggedIn() && app.activeChainId();
-        if (
-          !addressExists &&
-          !isAttemptingToConnectAddressToCommunity &&
-          props.onUnrecognizedAddressReceived
-        ) {
-          const shouldContinue = props.onUnrecognizedAddressReceived();
-          if (!shouldContinue) return;
-        }
-      }
-
-      if (props.useSessionKeyLoginFlow) {
-        await onSessionKeyRevalidation(wallet, selectedAddress);
-      } else {
-        await onNormalWalletLogin(wallet, selectedAddress);
-      }
+      await onNormalWalletLogin(wallet, selectedAddress);
     }
   };
 
@@ -548,6 +537,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (joinedCommunity) {
         trackAnalytics({
           event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+          isPWA: isAddedToHomeScreen,
         });
       }
 

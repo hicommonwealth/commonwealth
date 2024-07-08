@@ -10,7 +10,6 @@ import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import ProposalModule from './ProposalModule';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
@@ -114,19 +113,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       !localStorage.getItem('user-dark-mode-state')
     ) {
       setDarkMode(false);
-    }
-  }
-
-  public async loadModules(modules: ProposalModule<any, any, any>[]) {
-    if (!this.loaded) {
-      throw new Error('secondary loading cmd called before chain load');
-    }
-    // TODO: does this need debouncing?
-    if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
-      await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts)),
-      );
-      this.app.chainModuleReady.emit('ready');
     }
   }
 

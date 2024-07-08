@@ -155,7 +155,7 @@ const useUserMenuItems = ({
         type: 'default',
         label: (
           <UserMenuItem
-            isSignedIn={signed}
+            isSignedIn={!app.config.enforceSessionKeys || signed}
             hasJoinedCommunity={isActive}
             address={account.address}
           />

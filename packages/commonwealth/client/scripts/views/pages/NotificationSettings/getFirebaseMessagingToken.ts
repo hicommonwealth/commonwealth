@@ -28,7 +28,7 @@ const messaging = getMessaging(app);
 
 export async function getFirebaseMessagingToken() {
   const reg = await navigator.serviceWorker.register(
-    '/build/firebase-messaging-sw.js',
+    '/firebase-messaging-sw.js',
   );
   await navigator.serviceWorker.ready;
   return await getToken(messaging, {

@@ -91,7 +91,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
           message: string,
         ) => this._web3.eth.personal.sign(message, signerAddress, ''),
         getAddress: () => this._ethAccounts[0],
-        getChainId: () => this._chainId,
+        getChainId: () => this._chainId || 'injective-1',
       },
     });
   }

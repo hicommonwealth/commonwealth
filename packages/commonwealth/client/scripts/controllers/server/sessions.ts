@@ -1,14 +1,14 @@
 import type { Action, Message, Session } from '@canvas-js/interfaces';
-import { CANVAS_TOPIC } from '@hicommonwealth/shared';
 import {
-  addressSwapper,
+  CANVAS_TOPIC,
   CanvasSignResult,
   ChainBase,
+  CosmosSignerCW,
+  WalletSsoSource,
+  addressSwapper,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
-  CosmosSignerCW,
   getSessionSigners,
-  WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { encode } from '@ipld/dag-json';
 import { sha256 } from '@noble/hashes/sha256';
@@ -100,7 +100,7 @@ async function sign(
   call: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any,
-): Promise<CanvasSignResult> {
+): Promise<CanvasSignResult | null> {
   const address = getCaip2Address(address_);
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
@@ -123,6 +123,9 @@ async function sign(
         address: lookupAddress,
       });
       if (!savedSessionMessage) {
+        if (!app.config.enforceSessionKeys) {
+          return null;
+        }
         throw new SessionKeyError({
           name: 'Authentication Error',
           message: `No session found for address ${address}`,
@@ -136,6 +139,9 @@ async function sign(
       if (session.duration !== null) {
         const sessionExpirationTime = session.timestamp + session.duration;
         if (Date.now() > sessionExpirationTime) {
+          if (!app.config.enforceSessionKeys) {
+            return null;
+          }
           throw new SessionKeyError({
             name: 'Authentication Error',
             message: `Session expired for address ${address}`,

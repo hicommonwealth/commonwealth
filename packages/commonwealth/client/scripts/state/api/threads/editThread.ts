@@ -100,6 +100,8 @@ const editThread = async ({
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   });
 
+  console.log(response.data.result);
+
   return new Thread(response.data.result);
 };
 

@@ -19,6 +19,7 @@ interface CreateCommentProps {
   unescapedText: string;
   parentCommentId: number;
   existingNumberOfComments: number;
+  isPWA?: boolean;
 }
 
 const createComment = async ({
@@ -28,6 +29,7 @@ const createComment = async ({
   unescapedText,
   // @ts-expect-error StrictNullChecks
   parentCommentId = null,
+  isPWA,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(profile.address, {
     thread_id: threadId,
@@ -45,6 +47,11 @@ const createComment = async ({
       text: encodeURIComponent(unescapedText),
       jwt: app.user.jwt,
       ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
     },
   );
 
