@@ -50,7 +50,7 @@ export const updateTags = async (
         : // @ts-expect-error StrictNullChecks
           await models.CommunityTags.bulkCreate(createParams);
 
-    if (!status || !newRows) {
+    if (!(status || newRows)) {
       throw new AppError('Failed');
     }
   }
