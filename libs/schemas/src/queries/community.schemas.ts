@@ -56,8 +56,8 @@ export const GetStakeTransaction = {
       stake_direction: z.string(),
       community: z.object({
         id: z.string(),
-        default_symbol: z.string(),
-        icon_url: z.string(),
+        default_symbol: z.string().nullable(),
+        icon_url: z.string().nullable(),
         name: z.string(),
         chain_node_id: PG_INT.nullable(),
       }),
