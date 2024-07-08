@@ -1,22 +1,6 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
-export const Image = z.object({
-  url: z.string(),
-  imageBehavior: z.string(),
-});
-
-export const UserProfile = z.object({
-  name: z.string().max(255).nullish(),
-  email: z.string().max(255).nullish(),
-  website: z.string().max(255).nullish(),
-  bio: z.string().nullish(),
-  avatar_url: z.string().max(255).nullish(),
-  slug: z.string().max(255).nullish(),
-  socials: z.array(z.string()).nullish(),
-  background_image: Image.nullish(),
-});
-
 export const User = z.object({
   id: PG_INT.optional(),
   email: z.string().max(255).email().nullish(),
@@ -30,7 +14,6 @@ export const User = z.object({
     .optional(),
   promotional_emails_enabled: z.boolean().optional(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
-  profile: UserProfile,
   created_at: z.any().optional(),
   updated_at: z.any().optional(),
 });

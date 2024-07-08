@@ -137,7 +137,6 @@ async function createNewMagicUser({
         // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
         // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
         emailVerified: !!magicUserMetadata.email,
-        profile: {},
       },
       { transaction },
     );
