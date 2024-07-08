@@ -5,6 +5,7 @@ import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 const NODES_STALE_TIME = 3 * 60 * 1_000; // 3 min
+const NODES_CACHE_TIME = Infinity;
 
 const fetchNodes = async (): Promise<NodeInfo[]> => {
   const response = await axios.get(
@@ -25,6 +26,7 @@ export const fetchNodesQuery = async () => {
     queryKey: [ApiEndpoints.FETCH_NODES],
     queryFn: fetchNodes,
     staleTime: NODES_STALE_TIME,
+    cacheTime: NODES_CACHE_TIME,
   });
 };
 
@@ -34,6 +36,7 @@ const useFetchNodesQuery = () => {
     queryKey: [ApiEndpoints.FETCH_NODES],
     queryFn: fetchNodes,
     staleTime: NODES_STALE_TIME,
+    cacheTime: NODES_CACHE_TIME,
   });
 };
 

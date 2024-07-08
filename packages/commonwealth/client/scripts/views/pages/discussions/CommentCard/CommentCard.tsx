@@ -12,6 +12,7 @@ import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import { verify } from 'shared/canvas';
 import { CanvasSignedData, deserializeCanvas } from 'shared/canvas/types';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -108,6 +109,8 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
+  const { data: config } = useFetchConfigurationQuery();
+
   const doVerify = useCallback(async () => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
@@ -121,10 +124,10 @@ export const CommentCard = ({
   }, [comment.canvasSignedData]);
 
   useEffect(() => {
-    if (!app.config.enforceSessionKeys) return;
+    if (!config?.enforceSessionKeys) return;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     doVerify();
-  }, [doVerify]);
+  }, [config?.enforceSessionKeys, doVerify]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);

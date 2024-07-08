@@ -12,7 +12,7 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
-import { fetchConfiguration } from 'state/api/configuration';
+import { fetchCachedConfiguration } from 'state/api/configuration';
 import { Web3BaseProvider } from 'web3';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
@@ -130,7 +130,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
-        const config = await fetchConfiguration();
+        const config = fetchCachedConfiguration();
 
         if (config?.evmTestEnv !== 'test') {
           await this._web3.givenProvider.request({

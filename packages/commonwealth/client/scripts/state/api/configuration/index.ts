@@ -1,8 +1,8 @@
 import useFetchConfigurationQuery, {
-  fetchConfiguration,
+  fetchCachedConfiguration,
 } from './fetchConfiguration';
 
 import type { Configuration } from './fetchConfiguration';
 
-export { fetchConfiguration, useFetchConfigurationQuery };
+export { fetchCachedConfiguration, useFetchConfigurationQuery };
 export type { Configuration };
