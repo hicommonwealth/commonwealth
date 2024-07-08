@@ -20,6 +20,7 @@ export const ApiEndpoints = {
   FETCH_THREADS: '/threads',
   FETCH_PROFILES_BY_ADDRESS: '/getAddressProfile',
   FETCH_PROFILES_BY_ID: '/profile/v2',
+  FETCH_NODES: '/nodes',
   DISCORD_CHANNELS: '/getDiscordChannels',
   SET_DISCORD_CONFIG: '/setDiscordBotConfig',
   FETCH_PROPOSALS: '/proposals',
@@ -42,6 +43,11 @@ export const ContractMethods = {
   GET_SELL_PRICE: 'getSellPrice',
   GET_CONTEST_BALANCE: 'getContestBalance',
   GET_FEE_MANAGER_BALANCE: 'getFeeManagerBalance',
+};
+
+// keys that are not (yet) associated with API routes
+export const QueryKeys = {
+  CONFIGURATION: 'configuration',
 };
 
 export const ExternalEndpoints = {
