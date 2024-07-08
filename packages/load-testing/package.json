@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/k6": "^0.51.0"
+    "@types/k6": "^0.52.0"
   },
   "dependencies": {
     "moment": "^2.23.0"
