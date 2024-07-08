@@ -49,7 +49,7 @@ const ViewProposalPage = ({
 
   // @ts-expect-error <StrictNullChecks/>
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [, redrawProposals] = useState<{}>({});
+  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [title, setTitle] = useState<string>(proposal?.title);
   const [description, setDescription] = useState<string>(proposal?.description);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
@@ -200,6 +200,7 @@ const ViewProposalPage = ({
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={votingModalOpen}
               redrawProposals={redrawProposals}
+              proposalRedrawState={proposalRedrawState}
             />
           </>
         }
