@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 
 class DiscordController {
   public async createConfig(verification_token: string) {

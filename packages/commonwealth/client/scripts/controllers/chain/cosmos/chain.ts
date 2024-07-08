@@ -15,12 +15,12 @@ import {
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 
-import { userStore } from 'client/scripts/state/ui/user';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { userStore } from 'state/ui/user';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,

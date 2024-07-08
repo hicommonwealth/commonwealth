@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-globals */
 import axios from 'axios';
-import { userStore } from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import app from 'state';
 import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
+import { userStore } from 'state/ui/user';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import app from 'state';
 
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import useUserStore from 'client/scripts/state/ui/user';
-import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
+import { getUniqueUserAddresses } from 'helpers/user';
+import ChainInfo from 'models/ChainInfo';
+import useUserStore from 'state/ui/user';
+import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 import {
   getAvailableAddressesForStakeExchange,
   getInitialAccountValue,

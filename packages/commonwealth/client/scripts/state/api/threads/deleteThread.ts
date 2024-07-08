@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signDeleteThread } from 'client/scripts/controllers/server/sessions';
+import { signDeleteThread } from 'controllers/server/sessions';
 import { ThreadStage } from 'models/types';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';

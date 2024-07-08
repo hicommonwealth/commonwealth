@@ -1,10 +1,8 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import useUserStore from 'client/scripts/state/ui/user';
-import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
@@ -16,9 +14,11 @@ import {
   useBuyStakeMutation,
   useSellStakeMutation,
 } from 'state/api/communityStake';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import NumberSelector from 'views/components/NumberSelector';
 import { Skeleton } from 'views/components/Skeleton';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';

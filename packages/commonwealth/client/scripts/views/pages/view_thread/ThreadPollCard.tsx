@@ -1,9 +1,9 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import type Poll from '../../../models/Poll';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PollCard } from '../../components/poll_card';

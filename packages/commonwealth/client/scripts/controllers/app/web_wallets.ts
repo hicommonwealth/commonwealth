@@ -1,7 +1,7 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';

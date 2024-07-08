@@ -17,7 +17,7 @@ import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyti
 import { communityTypeOptions } from './helpers';
 
 import { ChainBase } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
 import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CommunityTypeStep.scss';

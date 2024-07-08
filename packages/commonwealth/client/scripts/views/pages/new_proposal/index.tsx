@@ -1,10 +1,10 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { userStore } from 'client/scripts/state/ui/user';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/new_proposal/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageLoading } from 'views/pages/loading';
 import { CWText } from '../../components/component_kit/cw_text';

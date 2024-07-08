@@ -1,15 +1,15 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
-import {
-  useUpdateUserEmailMutation,
-  useUpdateUserEmailSettingsMutation,
-} from 'client/scripts/state/api/user';
-import useUserStore from 'client/scripts/state/ui/user';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWCard } from '../../components/component_kit/cw_card';

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import {
   getPower,
@@ -17,6 +16,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import AddressInfo from '../../../models/AddressInfo';

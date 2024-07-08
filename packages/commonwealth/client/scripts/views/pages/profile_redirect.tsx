@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 

@@ -2,12 +2,12 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
+import { getUniqueUserAddresses } from 'helpers/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
@@ -28,7 +28,7 @@ import { getSessionSigners } from 'shared/canvas/verify';
 
 import { useCommunityStake } from '../CommunityStake';
 
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 

@@ -4,7 +4,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
-import { userStore } from 'client/scripts/state/ui/user';
+import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';

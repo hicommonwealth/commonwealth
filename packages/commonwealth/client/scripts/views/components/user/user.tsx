@@ -1,11 +1,11 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
-import useUserStore from 'client/scripts/state/ui/user';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,

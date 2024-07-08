@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import useUserStore from 'client/scripts/state/ui/user';
 import { formatAddressShort } from 'helpers';
 import _ from 'lodash';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';

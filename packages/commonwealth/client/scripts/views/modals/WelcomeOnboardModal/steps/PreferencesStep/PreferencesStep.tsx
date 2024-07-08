@@ -1,12 +1,12 @@
-import { useUpdateProfileByAddressMutation } from 'client/scripts/state/api/profiles';
-import useUserStore from 'client/scripts/state/ui/user';
+import React from 'react';
+import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import {
   PreferenceTags,
   usePreferenceTags,
-} from 'client/scripts/views/components/PreferenceTags';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import React from 'react';
+} from 'views/components/PreferenceTags';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './PreferencesStep.scss';
 
 type PreferencesStepProps = {

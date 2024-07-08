@@ -1,5 +1,3 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
@@ -9,11 +7,13 @@ import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import NewProfile from 'models/NewProfile';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import {
   useFetchProfileByIdQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';

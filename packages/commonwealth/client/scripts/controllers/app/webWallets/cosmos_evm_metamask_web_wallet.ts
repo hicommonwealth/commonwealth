@@ -5,8 +5,8 @@ import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import type Web3 from 'web3';
 
-import { userStore } from 'client/scripts/state/ui/user';
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
+import { userStore } from 'state/ui/user';
 import { Transaction, Web3BaseProvider } from 'web3';
 import IWebWallet from '../../../models/IWebWallet';
 import { getCosmosChains } from './utils';

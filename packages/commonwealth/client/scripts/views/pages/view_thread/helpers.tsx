@@ -1,10 +1,10 @@
 import moment from 'moment';
 import type Poll from '../../../models/Poll';
 
-import { userStore } from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import React from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 export const handlePollVote = async (

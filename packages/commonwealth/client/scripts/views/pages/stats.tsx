@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { userStore } from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/stats.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';

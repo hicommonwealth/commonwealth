@@ -1,5 +1,5 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { useEffect, useMemo, useState } from 'react';
+import useUserStore from 'state/ui/user';
 
 const useUserAddressesForFundForm = () => {
   const user = useUserStore();

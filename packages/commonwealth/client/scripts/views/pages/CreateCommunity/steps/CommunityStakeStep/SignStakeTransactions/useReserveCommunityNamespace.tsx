@@ -1,4 +1,3 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
@@ -6,6 +5,7 @@ import {
   MixpanelCommunityStakeEvent,
 } from 'shared/analytics/types';
 import { useUpdateCommunityMutation } from 'state/api/communities';
+import useUserStore from 'state/ui/user';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';

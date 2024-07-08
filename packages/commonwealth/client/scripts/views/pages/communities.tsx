@@ -3,15 +3,15 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
-import useUserStore from 'client/scripts/state/ui/user';
 import { findDenominationString } from 'helpers/findDenomination';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   default as ChainInfo,

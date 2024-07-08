@@ -1,7 +1,7 @@
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import clsx from 'clsx';
 import React from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { AuthModalType } from '../../types';
 import './Option.scss';
 

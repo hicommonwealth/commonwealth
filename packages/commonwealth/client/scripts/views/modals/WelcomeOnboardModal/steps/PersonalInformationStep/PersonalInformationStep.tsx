@@ -1,13 +1,5 @@
 import { WalletId } from '@hicommonwealth/shared';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'client/scripts/helpers/constants';
-import {
-  useUpdateUserEmailMutation,
-  useUpdateUserEmailSettingsMutation,
-} from 'client/scripts/state/api/user';
-import useUserStore from 'client/scripts/state/ui/user';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -16,6 +8,11 @@ import {
   useSearchProfilesQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { generateUsername } from 'unique-username-generator';
 import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';

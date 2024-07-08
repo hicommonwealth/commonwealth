@@ -1,5 +1,4 @@
 import { ContentType } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import 'pages/view_thread/edit_body.scss';
@@ -7,6 +6,7 @@ import type { DeltaStatic } from 'quill';
 import React from 'react';
 import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';

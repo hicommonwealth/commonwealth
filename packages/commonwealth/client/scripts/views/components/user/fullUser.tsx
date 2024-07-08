@@ -1,11 +1,11 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
-import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {

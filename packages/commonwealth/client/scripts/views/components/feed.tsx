@@ -10,17 +10,17 @@ import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
-import Thread from 'client/scripts/models/Thread';
-import Topic from 'client/scripts/models/Topic';
-import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import app from 'client/scripts/state';
-import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
-import useUserStore from 'client/scripts/state/ui/user';
-import Permissions from 'client/scripts/utils/Permissions';
+import { getThreadActionTooltipText } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { getProposalUrlPath } from 'identifiers';
+import Thread from 'models/Thread';
+import Topic from 'models/Topic';
+import { ThreadKind, ThreadStage } from 'models/types';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
 type ActivityResponse = {

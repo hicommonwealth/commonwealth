@@ -1,24 +1,21 @@
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import app from 'client/scripts/state';
-import {
-  useCreateTopicMutation,
-  useFetchTopicsQuery,
-} from 'client/scripts/state/api/topics';
-import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { ValidationStatus } from 'client/scripts/views/components/component_kit/cw_validation_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
-import { MessageRow } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useCommonNavigate } from 'navigation/helpers';
+import { DeltaStatic } from 'quill';
+import React, { useMemo, useState } from 'react';
+import app from 'state';
+import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import {
   ReactQuillEditor,
   createDeltaFromText,
   getTextFromDelta,
-} from 'client/scripts/views/components/react_quill_editor';
-import { DeltaStatic } from 'quill';
-import React, { useMemo, useState } from 'react';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+} from 'views/components/react_quill_editor';
 import useAppStatus from '../../../../../hooks/useAppStatus';
 import './CreateTopicSection.scss';
 import { FormSubmitValues } from './types';

@@ -10,9 +10,9 @@ import CWPopover, {
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
-import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
-import useUserStore from 'client/scripts/state/ui/user';
+import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './VoteWeightModule.scss';
 

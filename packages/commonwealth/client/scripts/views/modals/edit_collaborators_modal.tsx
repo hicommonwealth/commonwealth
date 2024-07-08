@@ -23,7 +23,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
 
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import '../../../styles/modals/edit_collaborators_modal.scss';
 
 type EditCollaboratorsModalProps = {

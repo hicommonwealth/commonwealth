@@ -1,5 +1,3 @@
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -9,6 +7,7 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
@@ -17,6 +16,7 @@ import {
   useDepositParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
+import useUserStore from 'state/ui/user';
 import { MixpanelGovernanceEvents } from '../../../../../shared/analytics/types';
 import {
   minimalToNaturalDenom,

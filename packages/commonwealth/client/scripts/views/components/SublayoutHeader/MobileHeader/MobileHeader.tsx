@@ -17,9 +17,9 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import useUserStore from 'client/scripts/state/ui/user';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import { useFlag } from 'hooks/useFlag';
+import useUserStore from 'state/ui/user';
+import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {

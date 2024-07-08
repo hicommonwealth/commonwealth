@@ -1,9 +1,9 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';

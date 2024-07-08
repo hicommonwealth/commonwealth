@@ -1,6 +1,5 @@
 import { ContentType, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -25,6 +24,7 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';

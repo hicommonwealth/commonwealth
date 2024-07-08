@@ -5,8 +5,8 @@ import {
   NotificationIconButton,
 } from '@knocklabs/react';
 import '@knocklabs/react-notification-feed/dist/index.css';
-import useUserStore from 'client/scripts/state/ui/user';
 import React, { useRef, useState } from 'react';
+import useUserStore from 'state/ui/user';
 import './KnockNotifications.scss';
 
 const KNOCK_PUBLIC_API_KEY =

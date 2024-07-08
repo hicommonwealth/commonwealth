@@ -1,10 +1,10 @@
 import { NotificationCategories } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
 import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import 'pages/notification_settings/index.scss';
 import { useEffect, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
 

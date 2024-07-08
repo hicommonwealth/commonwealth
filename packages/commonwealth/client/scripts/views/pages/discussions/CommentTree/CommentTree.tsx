@@ -1,8 +1,7 @@
 import { ContentType } from '@hicommonwealth/shared';
-import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
-import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
@@ -14,6 +13,7 @@ import {
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
+import useUserStore from 'state/ui/user';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import {
   deserializeDelta,

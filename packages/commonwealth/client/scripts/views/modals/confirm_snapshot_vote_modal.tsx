@@ -2,9 +2,9 @@ import React from 'react';
 
 import { formatNumberShort } from 'adapters/currency';
 import { MixpanelSnapshotEvents } from 'analytics/types';
-import useUserStore from 'client/scripts/state/ui/user';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useUserStore from 'state/ui/user';
 import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';

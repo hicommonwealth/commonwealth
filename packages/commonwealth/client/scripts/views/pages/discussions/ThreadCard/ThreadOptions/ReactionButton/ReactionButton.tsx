@@ -1,4 +1,3 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
@@ -8,6 +7,7 @@ import {
   useCreateThreadReactionMutation,
   useDeleteThreadReactionMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import CWPopover, {
   usePopover,

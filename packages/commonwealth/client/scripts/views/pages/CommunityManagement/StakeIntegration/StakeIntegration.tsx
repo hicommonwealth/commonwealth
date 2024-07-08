@@ -1,8 +1,8 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';

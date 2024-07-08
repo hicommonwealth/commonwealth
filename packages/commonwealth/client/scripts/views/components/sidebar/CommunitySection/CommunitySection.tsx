@@ -1,4 +1,3 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -6,6 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import {
   VoteWeightModule,
   useCommunityStake,

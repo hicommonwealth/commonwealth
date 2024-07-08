@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signComment } from 'client/scripts/controllers/server/sessions';
+import { signComment } from 'controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';

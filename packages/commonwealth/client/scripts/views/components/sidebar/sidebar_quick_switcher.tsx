@@ -4,12 +4,12 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import ChainInfo from '../../../models/ChainInfo';
 
-import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';

@@ -1,10 +1,10 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import useUserStore from 'client/scripts/state/ui/user';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import { Select } from 'views/components/Select';
 import { CWText } from 'views/components/component_kit/cw_text';

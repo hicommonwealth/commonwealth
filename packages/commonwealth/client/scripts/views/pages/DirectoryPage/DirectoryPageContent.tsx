@@ -1,8 +1,8 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import useUserStore from 'client/scripts/state/ui/user';
+import { APIOrderDirection } from 'helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';

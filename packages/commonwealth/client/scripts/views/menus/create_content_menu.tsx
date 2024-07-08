@@ -1,6 +1,5 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import useUserStore, { userStore } from 'client/scripts/state/ui/user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -8,6 +7,7 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore, { userStore } from 'state/ui/user';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';

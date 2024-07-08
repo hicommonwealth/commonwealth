@@ -20,16 +20,16 @@ import { CANVAS_TOPIC } from 'shared/canvas';
 import { serializeCanvas } from 'shared/canvas/types';
 
 import axios from 'axios';
-import { fetchProfilesByAddress } from 'client/scripts/state/api/profiles/fetchProfilesByAddress';
+import app from 'state';
+import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import {
   onUpdateEmailError,
   onUpdateEmailSuccess,
   updateEmail,
-} from 'client/scripts/state/api/user/updateEmail';
-import { authModal } from 'client/scripts/state/ui/modals/authModal';
-import { welcomeOnboardModal } from 'client/scripts/state/ui/modals/welcomeOnboardModal';
-import { userStore } from 'client/scripts/state/ui/user';
-import app from 'state';
+} from 'state/api/user/updateEmail';
+import { authModal } from 'state/ui/modals/authModal';
+import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
+import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';

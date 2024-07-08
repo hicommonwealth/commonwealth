@@ -1,9 +1,9 @@
 import { ChainNetwork } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
-import Permissions from 'client/scripts/utils/Permissions';
 import ChainInfo from 'models/ChainInfo';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';

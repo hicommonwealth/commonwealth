@@ -3,9 +3,9 @@ import 'components/Avatar/AvatarUpload.scss';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { Avatar } from 'views/components/Avatar/Avatar';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';

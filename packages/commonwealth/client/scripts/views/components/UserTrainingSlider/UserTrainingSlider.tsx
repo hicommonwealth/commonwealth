@@ -1,9 +1,9 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
-import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useAdminActionCardsStore from 'state/ui/adminOnboardingCards';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';

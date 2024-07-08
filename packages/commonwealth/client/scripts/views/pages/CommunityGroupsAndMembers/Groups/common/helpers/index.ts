@@ -1,5 +1,5 @@
-import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,

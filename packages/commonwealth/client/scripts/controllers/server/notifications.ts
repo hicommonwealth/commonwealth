@@ -10,8 +10,8 @@ import app from 'state';
 
 import { Subscription } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
-import { userStore } from 'client/scripts/state/ui/user';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+import { userStore } from 'state/ui/user';
 import { NotificationStore } from 'stores';
 import { z } from 'zod';
 import Notification from '../../models/Notification';

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { signDeleteComment } from 'client/scripts/controllers/server/sessions';
+import { signDeleteComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';

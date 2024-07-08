@@ -1,6 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
-import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
+import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import { User } from 'views/components/user/user';

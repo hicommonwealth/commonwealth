@@ -27,10 +27,10 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
-import useUserStore from 'client/scripts/state/ui/user';
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useCommunityStakeStore from 'state/ui/communityStake';
+import useUserStore from 'state/ui/user';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 

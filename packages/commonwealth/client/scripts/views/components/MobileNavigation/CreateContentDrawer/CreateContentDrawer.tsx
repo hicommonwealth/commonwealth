@@ -7,7 +7,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import './CreateContentDrawer.scss';
 
 interface CreateContentDrawerProps {

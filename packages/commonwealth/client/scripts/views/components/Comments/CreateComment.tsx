@@ -1,13 +1,13 @@
 import { ContentType } from '@hicommonwealth/shared';
-import Account from 'client/scripts/models/Account';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
+import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
+import useUserStore from 'state/ui/user';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';

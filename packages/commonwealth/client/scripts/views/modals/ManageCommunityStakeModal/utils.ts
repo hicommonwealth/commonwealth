@@ -1,9 +1,9 @@
 import { WalletId } from '@hicommonwealth/shared';
-import { userStore } from 'client/scripts/state/ui/user';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 
 export const convertEthToUsd = (
   ethAmount: string | number,

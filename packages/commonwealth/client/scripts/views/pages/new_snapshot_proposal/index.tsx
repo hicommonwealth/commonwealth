@@ -1,4 +1,3 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
@@ -11,6 +10,7 @@ import 'pages/new_snapshot_proposal.scss';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';

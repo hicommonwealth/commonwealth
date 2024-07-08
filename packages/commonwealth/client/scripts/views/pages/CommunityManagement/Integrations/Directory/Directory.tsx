@@ -1,5 +1,5 @@
-import useAppStatus from 'client/scripts/hooks/useAppStatus';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import useAppStatus from 'hooks/useAppStatus';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';

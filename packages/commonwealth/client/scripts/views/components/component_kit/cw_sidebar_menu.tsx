@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
-import useUserStore from 'client/scripts/state/ui/user';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';

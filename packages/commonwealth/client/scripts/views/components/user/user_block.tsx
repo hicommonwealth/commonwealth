@@ -1,12 +1,12 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable no-script-url */
 import { WalletId } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
 import 'components/user/user.scss';
 import _ from 'lodash';
 import React from 'react';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';

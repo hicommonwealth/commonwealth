@@ -15,7 +15,7 @@ import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../component_kit/cw_text';

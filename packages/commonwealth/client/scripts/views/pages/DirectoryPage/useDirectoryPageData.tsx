@@ -1,9 +1,9 @@
-import app from 'client/scripts/state';
 import { isCommandClick } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import ChainInfo from 'models/ChainInfo';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useMemo } from 'react';
+import app from 'state';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';

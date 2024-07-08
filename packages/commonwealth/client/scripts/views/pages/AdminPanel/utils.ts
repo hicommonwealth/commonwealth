@@ -1,7 +1,7 @@
 import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { userStore } from 'client/scripts/state/ui/user';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 
 export const createChainNode = async ({
   url,

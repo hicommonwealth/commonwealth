@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { userStore } from 'client/scripts/state/ui/user';
 import { extractDomain } from 'helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
@@ -8,6 +7,7 @@ import type { AnyProposal } from 'models/types';
 import 'pages/view_proposal/proposal_components.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import {
   getStatusClass,

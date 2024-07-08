@@ -1,8 +1,8 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import 'components/sidebar/explore_sidebar.scss';
 import React from 'react';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore from 'state/ui/user';
 import ChainInfo from '../../../models/ChainInfo';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import { getClasses } from '../component_kit/helpers';

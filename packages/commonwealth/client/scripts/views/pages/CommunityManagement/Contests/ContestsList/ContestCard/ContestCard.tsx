@@ -20,7 +20,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import './ContestCard.scss';
 
 const noFundsProps = {

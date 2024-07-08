@@ -7,9 +7,9 @@ import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/CWButton';
 
 import axios from 'axios';
-import useUserStore from 'client/scripts/state/ui/user';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';

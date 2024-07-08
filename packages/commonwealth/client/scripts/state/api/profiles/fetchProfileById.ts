@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import AddressInfo from 'client/scripts/models/AddressInfo';
+import AddressInfo from 'models/AddressInfo';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserStore, { userStore } from '../../ui/user';

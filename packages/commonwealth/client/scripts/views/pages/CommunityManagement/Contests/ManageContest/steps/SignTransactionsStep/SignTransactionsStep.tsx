@@ -25,8 +25,8 @@ import {
   LaunchContestStep,
 } from '../../types';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import useUserStore from 'client/scripts/state/ui/user';
+import { useFlag } from 'hooks/useFlag';
+import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {

@@ -1,7 +1,6 @@
 import type { Session } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
 import axios from 'axios';
-import useUserStore from 'client/scripts/state/ui/user';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -23,6 +22,7 @@ import { isMobile } from 'react-device-detect';
 import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { addressSwapper } from 'utils';
 import {
   BaseMixpanelPayload,

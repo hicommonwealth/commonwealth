@@ -10,9 +10,9 @@ import { hexToNumber } from 'web3-utils';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import { userStore } from 'client/scripts/state/ui/user';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 
 class MetamaskWebWalletController implements IWebWallet<string> {

@@ -1,7 +1,7 @@
 import { AccessLevel } from '@hicommonwealth/shared';
-import { userStore } from 'client/scripts/state/ui/user';
-import Permissions from 'client/scripts/utils/Permissions';
 import app from 'state';
+import { userStore } from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import RoleInfo from '../../models/RoleInfo';

@@ -1,7 +1,7 @@
-import Permissions from 'client/scripts/utils/Permissions';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/AdminPanel.scss';
 import React, { useEffect } from 'react';
+import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import UpdateCommunityIdTask from 'views/pages/AdminPanel/UpdateCommunityIdTask';
 import UpdateCustomDomainTask from 'views/pages/AdminPanel/UpdateCustomDomainTask';

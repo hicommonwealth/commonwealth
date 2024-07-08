@@ -11,7 +11,6 @@ import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
 import { ChainBase } from '@hicommonwealth/shared';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
@@ -23,6 +22,7 @@ import {
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,

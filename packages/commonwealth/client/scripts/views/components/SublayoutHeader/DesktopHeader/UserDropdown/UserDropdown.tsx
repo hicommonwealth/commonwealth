@@ -8,7 +8,7 @@ import { User } from 'views/components/user/user';
 
 import useUserMenuItems from '../../useUserMenuItems';
 
-import useUserStore from 'client/scripts/state/ui/user';
+import useUserStore from 'state/ui/user';
 import './UserDropdown.scss';
 
 interface UserDropdownProps {

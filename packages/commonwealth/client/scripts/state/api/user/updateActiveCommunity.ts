@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import ChainInfo from 'client/scripts/models/ChainInfo';
+import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import useUserStore, { userStore } from '../../ui/user';
 import { ApiEndpoints } from '../config';

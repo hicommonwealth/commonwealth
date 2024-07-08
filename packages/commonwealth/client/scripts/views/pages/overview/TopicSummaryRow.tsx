@@ -1,13 +1,13 @@
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import app from 'client/scripts/state';
-import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
-import useUserStore from 'client/scripts/state/ui/user';
-import Permissions from 'client/scripts/utils/Permissions';
+import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
 import { CWText } from '../../components/component_kit/cw_text';

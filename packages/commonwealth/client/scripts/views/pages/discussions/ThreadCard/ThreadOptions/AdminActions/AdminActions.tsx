@@ -1,4 +1,3 @@
-import useUserStore from 'client/scripts/state/ui/user';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -7,6 +6,7 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';

@@ -1,10 +1,10 @@
-import useTransactionHistory from 'client/scripts/hooks/useTransactionHistory';
-import useUserStore from 'client/scripts/state/ui/user';
 import { formatAddressShort } from 'helpers';
 import { getCommunityStakeSymbol } from 'helpers/stakes';
+import useTransactionHistory from 'hooks/useTransactionHistory';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
