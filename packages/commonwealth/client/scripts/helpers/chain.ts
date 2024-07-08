@@ -31,8 +31,10 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
     if (app.user.selectedCommunity) {
+      // eslint-disable-next-line no-param-reassign
       chain = app.user.selectedCommunity;
     } else {
+      // eslint-disable-next-line no-param-reassign
       chain = app.config.chains.getById(DEFAULT_CHAIN);
     }
 
