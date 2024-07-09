@@ -11,9 +11,10 @@ services:
     container_name: grafana
     image: grafana/grafana:latest
     ports:
-      - '2000:3000'
+      - '2000:2000'
     user: '${UID}:${GID}'
     environment:
+      GF_SERVER_HTTP_PORT: 2000
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: 'true'
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
