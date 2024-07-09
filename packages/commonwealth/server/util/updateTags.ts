@@ -46,7 +46,7 @@ export const updateTags = async (
         : await models.CommunityTags.bulkCreate(
             tag_ids.map((tag_id) => ({
               tag_id,
-              community_id: `{'id'}`,
+              community_id: `${id}`,
               created_at: new Date(),
               updated_at: new Date(),
             })),

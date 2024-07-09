@@ -90,7 +90,7 @@ const updateNewProfile = async (
   );
 
   // @ts-expect-error StrictNullChecks
-  await updateTags(tag_ids, models, profile.id, 'user_id');
+  await updateTags(tag_ids, models, profile.user_id, 'user_id');
 
   if (process.env.FLAG_USER_ONBOARDING_ENABLED === 'true') {
     const DEFAULT_NAME = 'Anonymous';
