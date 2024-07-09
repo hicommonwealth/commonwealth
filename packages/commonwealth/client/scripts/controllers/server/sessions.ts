@@ -122,8 +122,11 @@ async function sign(
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
         address: lookupAddress,
       });
+
+      const config = fetchCachedConfiguration();
+
       if (!savedSessionMessage) {
-        if (!app.config.enforceSessionKeys) {
+        if (!config?.enforceSessionKeys) {
           return null;
         }
         throw new SessionKeyError({
@@ -139,7 +142,7 @@ async function sign(
       if (session.duration !== null) {
         const sessionExpirationTime = session.timestamp + session.duration;
         if (Date.now() > sessionExpirationTime) {
-          if (!app.config.enforceSessionKeys) {
+          if (!config?.enforceSessionKeys) {
             return null;
           }
           throw new SessionKeyError({

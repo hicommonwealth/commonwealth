@@ -435,9 +435,6 @@ importers:
       '@ethersproject/constants':
         specifier: ^5.7.0
         version: 5.7.0
-      '@ethersproject/contracts':
-        specifier: ^5.7.0
-        version: 5.7.0
       '@ethersproject/hash':
         specifier: ^5.7.0
         version: 5.7.0
@@ -856,9 +853,6 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       '@ethersproject/constants':
-        specifier: ^5.7.0
-        version: 5.7.0
-      '@ethersproject/contracts':
         specifier: ^5.7.0
         version: 5.7.0
       '@ethersproject/hash':

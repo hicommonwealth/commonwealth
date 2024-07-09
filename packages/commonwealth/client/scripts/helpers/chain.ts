@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
+import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
 
@@ -30,9 +31,11 @@ export const selectCommunity = async (chain?: ChainInfo): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
     if (app.user.selectedCommunity) {
+      // eslint-disable-next-line no-param-reassign
       chain = app.user.selectedCommunity;
     } else {
-      chain = app.config.chains.getById(app.config.defaultChain);
+      // eslint-disable-next-line no-param-reassign
+      chain = app.config.chains.getById(DEFAULT_CHAIN);
     }
 
     if (!chain) {

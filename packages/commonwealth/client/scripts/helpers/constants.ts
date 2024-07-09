@@ -12,3 +12,5 @@ export enum APIOrderBy {
   CreatedAt = 'created_at',
   ProfileName = 'profile_name',
 }
+
+export const DEFAULT_CHAIN = 'edgeware';
