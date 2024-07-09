@@ -15,6 +15,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import app from 'client/scripts/state';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
+import { fetchCachedConfiguration } from '../../state/api/configuration/index';
 
 export class SessionKeyError extends Error {
   readonly address: string;
