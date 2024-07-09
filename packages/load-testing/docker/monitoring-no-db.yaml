@@ -1,4 +1,13 @@
 services:
+  influxdb:
+    image: influxdb:1.8
+    #    entrypoint: /bin/sh
+    #    user: root
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_DB=k6
+
   prometheus:
     image: prom/prometheus
     ports:

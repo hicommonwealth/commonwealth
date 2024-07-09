@@ -68,7 +68,7 @@ if [ "$NATIVE_K6" ]; then
   if [ "$CLOUD" = "cloud" ]; then
     K6_CLOUD_PROJECT_ID=$K6_PROJECT_ID k6 cloud -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
   else
-    k6 run -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
+    K6_OUT=influxdb=http://localhost:8086/k6 k6 run -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
   fi
 
 else
@@ -82,7 +82,7 @@ else
       K6_CLOUD_PROJECT_ID=$K6_PROJECT_ID k6 cloud -e SERVER_URL='$SERVER_URL' --compatibility-mode=experimental_enhanced '/$1'
     "
   else
-    run_docker_command run --rm -v "${PWD}"/test:/test -i grafana/k6:0.52.0-with-browser run -e SERVER_URL="$SERVER_URL" --compatibility-mode=experimental_enhanced "$1"
+    run_docker_command run --rm -v "${PWD}"/test:/test -i grafana/k6:0.52.0-with-browser run -e SERVER_URL="$SERVER_URL" -o influxdb=http://host.docker.internal:8086 --compatibility-mode=experimental_enhanced "/$1"
   fi
 fi
 

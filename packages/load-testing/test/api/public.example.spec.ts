@@ -11,19 +11,19 @@ export const options = {
       executor: 'constant-vus',
       exec: 'threads',
       vus: 3,
-      duration: '30s',
+      duration: '1m',
     },
     communities: {
       executor: 'constant-vus',
       exec: 'communities',
       vus: 3,
-      duration: '30s',
+      duration: '1m',
     },
     groups: {
       executor: 'constant-vus',
       exec: 'groups',
       vus: 3,
-      duration: '30s',
+      duration: '1m',
     },
     status: {
       executor: 'constant-vus',
@@ -35,7 +35,7 @@ export const options = {
       executor: 'constant-vus',
       exec: 'nodes',
       vus: 3,
-      duration: '30s',
+      duration: '1m',
     },
   },
 };
