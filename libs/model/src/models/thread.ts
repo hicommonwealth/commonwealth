@@ -1,7 +1,8 @@
-import { EventNames } from '@hicommonwealth/core';
+import { Actor, EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
-import Sequelize, { QueryTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { GetThreadContestManagers } from '../contest/GetThreadContestManagers.query';
 import { emitEvent } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
@@ -143,27 +144,13 @@ export default (
           const { topic_id, community_id } = thread.get({
             plain: true,
           });
-          const contestManagers = await sequelize.query<{
-            contest_address: string;
-          }>(
-            `
-            SELECT
-              cm.contest_address
-            FROM "Communities" c
-            JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-            WHERE ct.topic_id = :topic_id
-            AND cm.community_id = :community_id
-            AND cm.cancelled = false
-          `,
-            {
-              type: QueryTypes.SELECT,
-              replacements: {
-                topic_id,
-                community_id,
-              },
+          const contestManagers = (await GetThreadContestManagers().body({
+            actor: {} as Actor,
+            payload: {
+              topic_id,
+              community_id,
             },
-          );
+          })) as { contest_address: string }[];
 
           await emitEvent(
             Outbox,
