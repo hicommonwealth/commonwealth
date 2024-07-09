@@ -1,7 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../database';
+import { models } from '../database';
 
 export function GetThreadContestManagers(): Query<
   typeof schemas.GetThreadContestManagers
@@ -11,7 +11,7 @@ export function GetThreadContestManagers(): Query<
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const contestManagers = await sequelize.query<{
+      const contestManagers = await models.sequelize.query<{
         contest_address: string;
       }>(
         `
