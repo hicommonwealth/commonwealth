@@ -174,13 +174,8 @@ export async function main(
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
-
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
-  });
-
-  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
   app.use(
