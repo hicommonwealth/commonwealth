@@ -12,11 +12,16 @@ services:
     image: grafana/grafana:latest
     ports:
       - '2000:3000'
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=ministar
     user: '${UID}:${GID}'
+    environment:
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: 'true'
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
+      GF_AUTH_DISABLE_SIGNOUT_MENU: 'true'
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
     volumes:
       - ./grafana:/var/lib/grafana
+      - ./dashboards:/etc/grafana/provisioning/dashboards/
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter
