@@ -18,7 +18,9 @@ To use native k6 on the cloud you must first execute `k6 login cloud -token [K6_
 cloud via Docker you must set the K6_CLOUD_PERSONAL_TOKEN in your root `.env` file. Starting the Docker services is not
 necessary since all the metrics will be hosted on the k6 cloud.
 
-1. Execute `pnpm test test/<path_to_test_file>.ts <frick | frack | beta> cloud`
+1. Execute `pnpm start <frick | frack | beta>` to start up the required services in Docker and connect them to the
+   desired Heroku app.
+2. Execute `pnpm test test/<path_to_test_file>.ts <frick | frack | beta> cloud`
 
 # Adding Remote Modules
 K6 supports loading some compatible remote modules. A list of compatible modules can be found [here][3]. These modules
