@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
-    "typeRoots": ["test/types.d.ts"]
+    "typeRoots": ["test/types.d.ts"],
+    "allowImportingTsExtensions": true
   },
   "include": ["test", "src"]
 }
