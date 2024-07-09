@@ -1,10 +1,10 @@
-import { ChainNetwork, CommunityCategoryType } from '@hicommonwealth/shared';
+import { ChainBase, CommunityCategoryType } from '@hicommonwealth/shared';
 import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import { getCommunityTags } from 'views/pages/CommunityManagement/CommunityProfile/CommunityProfileForm/helpers';
 
 type FindSuggestedCommunitiesProps = {
-  userChainNetwork: ChainNetwork;
+  userChainBase: ChainBase;
   userPreferenceTags: string[];
   maxCommunitiesToFind: number;
 };
@@ -29,7 +29,7 @@ const getAllCommunityTags = (community: ChainInfo): string[] => {
 };
 
 export const findSuggestedCommunities = ({
-  userChainNetwork,
+  userChainBase,
   userPreferenceTags,
   maxCommunitiesToFind,
 }: FindSuggestedCommunitiesProps): ChainInfo[] => {
@@ -41,12 +41,12 @@ export const findSuggestedCommunities = ({
     communitiesNotMatchingUserPreferences: [],
   };
 
-  // 1. filter communities that match user wallet chain network
+  // 1. filter communities that match user wallet chain base
   // 2. then sort them by the count of members (from higher to lower)
   // 3. then sort them by the count of threads (from higher to lower)
   // 4. then seperate them into 2 groups, communities that match user preferences and those that don't
   [...app.config.chains.getAll()]
-    .filter((community) => community.network === userChainNetwork)
+    .filter((community) => community.base === userChainBase)
     .sort((a, b) => b.addressCount - a.addressCount)
     .sort((a, b) => b.threadCount - a.threadCount)
     .map((community) => {

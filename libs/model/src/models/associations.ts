@@ -6,6 +6,7 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.Profile, { onUpdate: 'CASCADE' })
+    .withMany(db.ProfileTags)
     .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
     .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
@@ -13,9 +14,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.Profile.withMany(db.Address)
-    .withMany(db.SsoToken)
-    .withMany(db.ProfileTags, { onDelete: 'CASCADE' });
+  db.Profile.withMany(db.Address).withMany(db.SsoToken);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
