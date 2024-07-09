@@ -21,6 +21,7 @@ services:
       GF_AUTH_DISABLE_LOGIN_FORM: 'true'
     volumes:
       - ./grafana:/var/lib/grafana
+      - ./datasources:/etc/grafana/provisioning/datasources/
       - ./dashboards:/etc/grafana/provisioning/dashboards/
 
   postgres-exporter:
