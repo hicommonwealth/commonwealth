@@ -23,6 +23,7 @@ export function GetThreadContestManagers(): Query<
             WHERE ct.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
+            AND cm.ended = false
           `,
         {
           type: QueryTypes.SELECT,
