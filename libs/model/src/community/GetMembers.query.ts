@@ -104,7 +104,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       ${membershipsWhere}
       GROUP BY "Profiles".id
 
-      UNION ALL
+      UNION
 
       SELECT
       "Profiles".id,

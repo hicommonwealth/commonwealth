@@ -12,6 +12,7 @@ import {
 import { CosmosSignerCW } from 'shared/canvas/sessionSigners';
 import { CanvasSignResult } from 'shared/canvas/types';
 import { getSessionSigners } from 'shared/canvas/verify';
+import { fetchCachedConfiguration } from 'state/api/configuration';
 import { addressSwapper } from '../../../../shared/utils';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -122,8 +123,11 @@ async function sign(
       const savedSessionMessage = await signer.getSession(CANVAS_TOPIC, {
         address: lookupAddress,
       });
+
+      const config = fetchCachedConfiguration();
+
       if (!savedSessionMessage) {
-        if (!app.config.enforceSessionKeys) {
+        if (!config?.enforceSessionKeys) {
           return null;
         }
         throw new SessionKeyError({
@@ -139,7 +143,7 @@ async function sign(
       if (session.duration !== null) {
         const sessionExpirationTime = session.timestamp + session.duration;
         if (Date.now() > sessionExpirationTime) {
-          if (!app.config.enforceSessionKeys) {
+          if (!config?.enforceSessionKeys) {
             return null;
           }
           throw new SessionKeyError({

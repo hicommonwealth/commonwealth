@@ -51,7 +51,7 @@ export async function __getRelatedCommunities(
         FROM "ChainNodes" as cn 
         JOIN "Communities" as c on c.chain_node_id = cn.id 
         LEFT JOIN "Threads" as t on t.community_id = c.id 
-        WHERE cn.id = :chainNodeId and t.deleted_at IS NULL
+        WHERE cn.id = :chainNodeId and t.deleted_at IS NULL and c.active = true
         GROUP BY c.id) as popular_communities 
     LEFT JOIN "Addresses" as a on a.community_id = popular_communities.id 
     GROUP BY popular_communities.id, popular_communities.icon_url, popular_communities.name,
