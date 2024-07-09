@@ -1,4 +1,13 @@
 services:
+  influxdb:
+    image: influxdb:1.8
+    #    entrypoint: /bin/sh
+    #    user: root
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_DB=k6
+
   postgres:
     container_name: psql
     image: postgres:16-alpine
@@ -24,9 +33,10 @@ services:
     container_name: grafana
     image: grafana/grafana:latest
     ports:
-      - '2000:3000'
+      - '2000:2000'
     user: '${UID}:${GID}'
     environment:
+      GF_SERVER_HTTP_PORT: 2000
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: 'true'
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
