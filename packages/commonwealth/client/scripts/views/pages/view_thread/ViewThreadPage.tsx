@@ -595,7 +595,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           hasPendingEdits={!!editsToSave}
           setThreadBody={setThreadBody}
           body={(threadOptionsComp) => (
-            <div className="thread-content foobar">
+            <div className="thread-content">
               {isEditingBody ? (
                 <>
                   {/*// TODO editing thread */}
