@@ -126,10 +126,6 @@ const ContestCard = ({
     navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
-  const handleWinnersClick = () => {
-    navigate(`/discussions?contest=${address}`);
-  };
-
   const handleFundClick = () => {
     onFund();
   };
@@ -205,11 +201,6 @@ const ContestCard = ({
             label="Leaderboard"
             action="leaderboard"
             onClick={handleLeaderboardClick}
-          />
-          <CWThreadAction
-            label="Winners"
-            action="winners"
-            onClick={handleWinnersClick}
           />
 
           <SharePopoverOld
