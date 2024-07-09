@@ -77,14 +77,15 @@ export default (
                   const { topic_id, community_id } = thread.get({
                     plain: true,
                   });
-                  const contestManagers =
-                    (await GetThreadContestManagers().body({
+                  const contestManagers = await GetThreadContestManagers().body(
+                    {
                       actor: {} as Actor,
                       payload: {
                         topic_id,
                         community_id,
                       },
-                    })) as { contest_address: string }[];
+                    },
+                  );
 
                   await emitEvent(
                     Outbox,

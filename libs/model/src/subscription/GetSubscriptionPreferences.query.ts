@@ -16,7 +16,7 @@ export function GetSubscriptionPreferences(): Query<
       });
 
       if (!shouldExist('Subscription preferences', subPreferences)) {
-        return {};
+        return;
       }
 
       return subPreferences!.get({ plain: true });
