@@ -33,8 +33,8 @@ import {
 const { expect, assert } = chai;
 
 const idV1 = 'csdk-v1-local'; // V1 CI devnet
-const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
-const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${idV1}`;
+const rpcUrl = `http://localhost:8080/cosmosProxy/${idV1}`;
+const lcdUrl = `http://localhost:8080/cosmosProxy/v1/${idV1}`;
 
 describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1-local)', () => {
   let lcd: LCD;

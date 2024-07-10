@@ -33,7 +33,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
   let signer: string;
   // v1beta1 CI devnet
   const betaId = 'csdk-beta-local';
-  const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
+  const rpcUrlBeta = `http://localhost:8080/cosmosProxy/${betaId}`;
 
   beforeAll(async () => {
     await tester.seedDb();
@@ -188,7 +188,7 @@ describe('Cosmos Governance v1beta1 util Tests', () => {
     test('should fetch active proposals (csdk-beta-local)', async () => {
       const id = 'csdk-beta-local'; // CI devnet for v1beta1
       const tmClient = await getTMClient(
-        `http://localhost:8080/cosmosAPI/${id}`,
+        `http://localhost:8080/cosmosProxy/${id}`,
       );
       const rpc = await getRPCClient(tmClient);
 

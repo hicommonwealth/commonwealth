@@ -85,8 +85,8 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
   const id = 'evmos-dev-local';
   let rpc: CosmosApiType;
   let signerAddr: string;
-  const rpcUrl = `http://localhost:8080/cosmosAPI/${id}`;
-  const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${id}`;
+  const rpcUrl = `http://localhost:8080/cosmosProxy/${id}`;
+  const lcdUrl = `http://localhost:8080/cosmosProxy/v1/${id}`;
 
   beforeAll(async () => {
     await tester.seedDb();
@@ -185,7 +185,7 @@ describe('Ethermint Governance v1beta1 util Tests', () => {
     test('should fetch active proposals (evmos-dev-local)', async () => {
       const id = 'evmos-dev-local'; // CI devnet
       const tmClient = await getTMClient(
-        `http://localhost:8080/cosmosAPI/${id}`,
+        `http://localhost:8080/cosmosProxy/${id}`,
       );
       const rpc = await getRPCClient(tmClient);
 
