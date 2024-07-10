@@ -163,7 +163,7 @@ export const ViewUpvotesDrawer = ({
                         userAddress={reactor.avatars.name.address}
                         userCommunityId={app?.chain?.id}
                         shouldShowAsDeleted={
-                          !reactor.avatars.name.address && !app?.chain?.id
+                          !reactor?.avatars?.name?.address && !app?.chain?.id
                         }
                         shouldLinkProfile
                       />
