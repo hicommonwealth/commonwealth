@@ -32,14 +32,14 @@ export type CommunityData = {
   iconUrl: string;
   id: string;
   namespace: string;
-  ChainNode: NodeInfo;
+  ChainNode?: NodeInfo;
 };
 
 interface DirectoryPageContentProps {
   isLoading: boolean;
   noFilteredCommunities: boolean;
   noCommunitiesInChain: boolean;
-  chainName: string;
+  chainName?: string;
   communitySearch: string;
   selectedViewType: ViewType;
   tableData: RowType[];

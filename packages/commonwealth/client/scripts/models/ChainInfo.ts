@@ -222,7 +222,7 @@ class ChainInfo {
       substrateSpec: substrate_spec,
       tokenName: token_name,
       chain_node_id,
-      ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
+      ChainNode: ChainNode,
       CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
       CommunityTags: CommunityTags?.map((t) => new Tag(t)) ?? [],
       adminOnlyPolling: admin_only_polling,

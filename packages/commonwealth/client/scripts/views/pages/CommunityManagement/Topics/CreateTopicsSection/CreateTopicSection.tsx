@@ -1,7 +1,7 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -36,6 +36,7 @@ export const CreateTopicSection = () => {
   const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
     createDeltaFromText(''),
   );
+  const [characterCount, setCharacterCount] = useState(0);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -57,6 +58,24 @@ export const CreateTopicSection = () => {
       setIsSaving(false);
     }
   };
+
+  const getCharacterCount = (delta) => {
+    if (!delta || !delta.ops) {
+      return 0;
+    }
+    return delta.ops.reduce((count, op) => {
+      if (typeof op.insert === 'string') {
+        const cleanedText = op.insert.replace(/\n$/, '');
+        return count + cleanedText.length;
+      }
+      return count;
+    }, 0);
+  };
+
+  useEffect(() => {
+    const count = getCharacterCount(descriptionDelta);
+    setCharacterCount(count);
+  }, [descriptionDelta]);
 
   const handleInputValidation = (text: string): [ValidationStatus, string] => {
     // @ts-expect-error <StrictNullChecks/>
@@ -110,7 +129,7 @@ export const CreateTopicSection = () => {
           />
           <div className="description-char-count">
             <CWText type="caption">
-              {descriptionDelta?.ops?.[0].insert.length / 250 || 0}
+              Character count: {characterCount}/250
             </CWText>
           </div>
           <CWText type="caption">

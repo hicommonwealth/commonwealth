@@ -10,6 +10,8 @@ import 'pages/communities.scss';
 import React, { useRef } from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import { useFetchNodesQuery } from 'state/api/nodes';
+import { getNodeById } from 'state/api/nodes/utils';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -70,6 +72,8 @@ const CommunitiesPage = () => {
     setModeOfManageCommunityStakeModal,
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
+
+  const { data: nodes } = useFetchNodesQuery();
 
   const [selectedCommunity, setSelectedCommunity] =
     // @ts-expect-error <StrictNullChecks/>
@@ -214,7 +218,10 @@ const CommunitiesPage = () => {
   const sortedCommunities = activeCommunities
     ? sortCommunities(
         activeCommunities.communities.map((c: any) =>
-          CommunityInfo.fromJSON(c),
+          CommunityInfo.fromJSON({
+            ...c,
+            ChainNode: getNodeById(c.chain_node_id, nodes),
+          }),
         ),
       )
     : [];

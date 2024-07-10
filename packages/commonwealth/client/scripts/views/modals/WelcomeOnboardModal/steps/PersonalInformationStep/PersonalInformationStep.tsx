@@ -61,7 +61,7 @@ const PersonalInformationStep = ({
         : '';
 
     if (formMethodsRef.current) {
-      if (defaultSSOUsername) {
+      if (defaultSSOUsername && defaultSSOUsername !== 'Anonymous') {
         formMethodsRef.current.setValue('username', defaultSSOUsername, {
           shouldDirty: true,
         });
@@ -217,11 +217,7 @@ const PersonalInformationStep = ({
               name="enableProductUpdates"
               hookToForm
               label="Send me product updates and news"
-              disabled={
-                watch('email')?.trim() === '' ||
-                !formState.isDirty ||
-                isCheckingUsernameUniqueness
-              }
+              disabled={watch('email')?.trim() === '' || !formState.isDirty}
             />
           </div>
 
@@ -231,6 +227,7 @@ const PersonalInformationStep = ({
             type="submit"
             disabled={
               isUpdatingProfile ||
+              isCheckingUsernameUniqueness ||
               !formState.isDirty ||
               watch('username')?.trim() === ''
             }

@@ -2,12 +2,12 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
-import { getUniqueUserAddresses } from 'helpers/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
@@ -25,6 +25,7 @@ import {
   chainBaseToCanvasChainId,
 } from 'shared/canvas/chainMappings';
 import { getSessionSigners } from 'shared/canvas/verify';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
 
 import { useCommunityStake } from '../CommunityStake';
 
@@ -98,6 +99,7 @@ const useUserMenuItems = ({
   });
 
   const userData = useUserStore();
+  const { data: configurationData } = useFetchConfigurationQuery();
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -157,13 +159,13 @@ const useUserMenuItems = ({
       type: 'default',
       label: (
         <UserMenuItem
-          isSignedIn={!app.config.enforceSessionKeys || signed}
+          isSignedIn={!configurationData?.enforceSessionKeys || signed}
           hasJoinedCommunity={isActive}
           address={account.address}
         />
       ),
       onClick: async () => {
-        if (!app.config.enforceSessionKeys || signed) {
+        if (!configurationData?.enforceSessionKeys || signed) {
           onAddressItemClick?.();
           return await setActiveAccount(account);
         }

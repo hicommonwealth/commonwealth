@@ -1,4 +1,4 @@
-import { ContentType, slugify } from '@hicommonwealth/shared';
+import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -14,6 +14,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -494,6 +495,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
         ]}
       />
+
+      <Helmet>
+        <link
+          rel="canonical"
+          href={getThreadUrl({
+            chain: thread?.communityId || '',
+            id: threadId,
+            title: thread?.title,
+          })}
+        />
+      </Helmet>
+
       <CWPageLayout>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}

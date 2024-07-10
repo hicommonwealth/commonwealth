@@ -44,7 +44,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true },
+      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
     }) as UserInstance;
 
     let response = await controller.updateCommunity({
@@ -78,7 +78,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: false },
+      userAttributes: { email: '', id: 2, isAdmin: false, profile: {} },
     }) as UserInstance;
 
     try {
@@ -98,7 +98,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: false },
+      userAttributes: { email: '', id: 2, isAdmin: false, profile: {} },
     }) as UserInstance;
 
     const incorrectChainNode = await models.ChainNode.findOne({
@@ -131,7 +131,7 @@ describe('UpdateChain Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 2, isAdmin: false },
+      userAttributes: { email: '', id: 2, isAdmin: false, profile: {} },
     }) as UserInstance;
 
     // change chain node to one that supports namespace

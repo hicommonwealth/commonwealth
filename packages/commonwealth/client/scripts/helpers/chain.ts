@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
+import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import ChainInfo from '../models/ChainInfo';
 import { userStore } from '../state/ui/user';
@@ -38,7 +39,7 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      tempChain = app.config.chains.getById(app.config.defaultChain);
+      tempChain = app.config.chains.getById(DEFAULT_CHAIN);
     }
 
     if (!tempChain) {

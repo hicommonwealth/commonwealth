@@ -975,9 +975,6 @@ importers:
       '@trpc/react-query':
         specifier: ^10.45.1
         version: 10.45.2(@tanstack/react-query@4.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@types/react-helmet':
-        specifier: ^6.1.11
-        version: 6.1.11
       '@types/react-helmet-async':
         specifier: ^1.0.3
         version: 1.0.3(react@18.3.1)
@@ -1218,9 +1215,6 @@ importers:
       react-error-boundary:
         specifier: ^3.1.4
         version: 3.1.4(react@18.3.1)
-      react-helmet:
-        specifier: ^6.1.0
-        version: 6.1.0(react@18.3.1)
       react-helmet-async:
         specifier: ^2.0.4
         version: 2.0.5(react@18.3.1)
@@ -1410,8 +1404,8 @@ importers:
         version: 2.30.1
     devDependencies:
       '@types/k6':
-        specifier: ^0.51.0
-        version: 0.51.0
+        specifier: ^0.52.0
+        version: 0.52.0
 
   packages/scripts:
     dependencies:
@@ -6714,10 +6708,10 @@ packages:
         integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==,
       }
 
-  '@types/k6@0.51.0':
+  '@types/k6@0.52.0':
     resolution:
       {
-        integrity: sha512-xelcvFGPI4VYrV5ozADmRuFQBKmDqDRzxfHVuCDD1/firZiSQvTP0pntxHuYUSkRyL8I83kvABXUlnLYNT2VuA==,
+        integrity: sha512-yaw2wg61nKQtToDML+nngzgXVjZ6wNA4R0Q3jKDTeadG5EqfZgis5a1Q2hwY7kjuGuXmu8eM6gHg3tgnOj4vNw==,
       }
 
   '@types/lodash@4.17.1':
@@ -6949,12 +6943,6 @@ packages:
         integrity: sha512-DqbSuZPSHiH1l3XI/y8LbhrAGNh+Bpc9QY4MsYRM1yD4+qhax8bN4DInUMpv/tNyIdjsa+1V8XXmbRx8W5dB0w==,
       }
     deprecated: This is a stub types definition. react-helmet-async provides its own type definitions, so you do not need this installed.
-
-  '@types/react-helmet@6.1.11':
-    resolution:
-      {
-        integrity: sha512-0QcdGLddTERotCXo3VFlUSWO3ztraw8nZ6e3zJSgG7apwV5xt+pJUS8ewPBqT4NYB1optGLprNQzFleIY84u/g==,
-      }
 
   '@types/react-redux@7.1.33':
     resolution:
@@ -7675,10 +7663,25 @@ packages:
       }
     engines: { node: '>=0.4.0' }
 
+  acorn-walk@8.3.3:
+    resolution:
+      {
+        integrity: sha512-MxXdReSRhGO7VlFe1bRG/oI7/mdLV9B9JJT0N8vZOhF7gFRR5l3M8W9G8JxmKV+JC5mGqJ0QvqfSOLsCPa4nUw==,
+      }
+    engines: { node: '>=0.4.0' }
+
   acorn@8.11.3:
     resolution:
       {
         integrity: sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==,
+      }
+    engines: { node: '>=0.4.0' }
+    hasBin: true
+
+  acorn@8.12.1:
+    resolution:
+      {
+        integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==,
       }
     engines: { node: '>=0.4.0' }
     hasBin: true
@@ -9476,6 +9479,18 @@ packages:
     resolution:
       {
         integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==,
+      }
+    engines: { node: '>=6.0' }
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
+  debug@4.3.5:
+    resolution:
+      {
+        integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==,
       }
     engines: { node: '>=6.0' }
     peerDependencies:
@@ -11844,10 +11859,10 @@ packages:
       }
     engines: { node: '>= 6' }
 
-  https-proxy-agent@7.0.4:
+  https-proxy-agent@7.0.5:
     resolution:
       {
-        integrity: sha512-wlwpilI7YdjSkWaQ/7omYBMTliDcmCN8OLihO6I9B86g06lMyAoqgoDpV0XqoaPOKj+0DIdAvnsWfyAAhmimcg==,
+        integrity: sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==,
       }
     engines: { node: '>= 14' }
 
@@ -15701,14 +15716,6 @@ packages:
     peerDependencies:
       react: ^16.6.0 || ^17.0.0 || ^18.0.0
 
-  react-helmet@6.1.0:
-    resolution:
-      {
-        integrity: sha512-4uMzEY9nlDlgxr61NL3XbKRy1hEkXmKNXhjbAIOVw5vcFrsdYbH2FEwcNyWvWinl103nXgzYNlns9ca+8kFiWw==,
-      }
-    peerDependencies:
-      react: '>=16.3.0'
-
   react-hook-form@7.51.4:
     resolution:
       {
@@ -15883,14 +15890,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  react-side-effect@2.1.2:
-    resolution:
-      {
-        integrity: sha512-PVjOcvVOyIILrYoyGEpDN3vmYNLdy1CajSFNt4TDsVQC5KpTijDvWVoR+/7Rz2xT978D8/ZtFceXxzsPwZEDvw==,
-      }
-    peerDependencies:
-      react: ^16.3.0 || ^17.0.0 || ^18.0.0
 
   react-style-singleton@2.2.1:
     resolution:
@@ -19136,6 +19135,21 @@ packages:
     resolution:
       {
         integrity: sha512-uJq6108EgZMAl20KagGkzCKfMEjxmKvZHG7Tlq0Z6nOky7YF7aq4mOx6xK8TJ/i1LeK4Qus7INktacctDgY8Ow==,
+      }
+    engines: { node: '>=10.0.0' }
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
+  ws@8.18.0:
+    resolution:
+      {
+        integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==,
       }
     engines: { node: '>=10.0.0' }
     peerDependencies:
@@ -23829,7 +23843,7 @@ snapshots:
     dependencies:
       '@types/node': 20.12.10
 
-  '@types/k6@0.51.0': {}
+  '@types/k6@0.52.0': {}
 
   '@types/lodash@4.17.1': {}
 
@@ -23954,10 +23968,6 @@ snapshots:
       react-helmet-async: 2.0.5(react@18.3.1)
     transitivePeerDependencies:
       - react
-
-  '@types/react-helmet@6.1.11':
-    dependencies:
-      '@types/react': 18.3.1
 
   '@types/react-redux@7.1.33':
     dependencies:
@@ -24741,7 +24751,13 @@ snapshots:
 
   acorn-walk@8.3.2: {}
 
+  acorn-walk@8.3.3:
+    dependencies:
+      acorn: 8.12.1
+
   acorn@8.11.3: {}
+
+  acorn@8.12.1: {}
 
   adm-zip@0.4.16: {}
 
@@ -24759,7 +24775,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
@@ -25867,6 +25883,10 @@ snapshots:
       ms: 2.1.2
     optionalDependencies:
       supports-color: 8.1.1
+
+  debug@4.3.5:
+    dependencies:
+      ms: 2.1.2
 
   decache@3.1.0:
     dependencies:
@@ -27639,7 +27659,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
@@ -27679,10 +27699,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@7.0.4:
+  https-proxy-agent@7.0.5:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.5
     transitivePeerDependencies:
       - supports-color
 
@@ -28231,35 +28251,6 @@ snapshots:
     dependencies:
       jsdom: 24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
-  jsdom@24.0.0:
-    dependencies:
-      cssstyle: 4.0.1
-      data-urls: 5.0.0
-      decimal.js: 10.4.3
-      form-data: 4.0.0
-      html-encoding-sniffer: 4.0.0
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.4
-      is-potential-custom-element-name: 1.0.1
-      nwsapi: 2.2.10
-      parse5: 7.1.2
-      rrweb-cssom: 0.6.0
-      saxes: 6.0.0
-      symbol-tree: 3.2.4
-      tough-cookie: 4.1.4
-      w3c-xmlserializer: 5.0.0
-      webidl-conversions: 7.0.0
-      whatwg-encoding: 3.1.1
-      whatwg-mimetype: 4.0.0
-      whatwg-url: 14.0.0
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
-      xml-name-validator: 5.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    optional: true
-
   jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       cssstyle: 4.0.1
@@ -28268,7 +28259,7 @@ snapshots:
       form-data: 4.0.0
       html-encoding-sniffer: 4.0.0
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.4
+      https-proxy-agent: 7.0.5
       is-potential-custom-element-name: 1.0.1
       nwsapi: 2.2.10
       parse5: 7.1.2
@@ -28281,7 +28272,7 @@ snapshots:
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.0.0
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -30072,14 +30063,6 @@ snapshots:
       react-fast-compare: 3.2.2
       shallowequal: 1.1.0
 
-  react-helmet@6.1.0(react@18.3.1):
-    dependencies:
-      object-assign: 4.1.1
-      prop-types: 15.8.1
-      react: 18.3.1
-      react-fast-compare: 3.2.2
-      react-side-effect: 2.1.2(react@18.3.1)
-
   react-hook-form@7.51.4(react@18.3.1):
     dependencies:
       react: 18.3.1
@@ -30206,10 +30189,6 @@ snapshots:
       use-isomorphic-layout-effect: 1.1.2(@types/react@18.3.1)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
-
-  react-side-effect@2.1.2(react@18.3.1):
-    dependencies:
-      react: 18.3.1
 
   react-style-singleton@2.2.1(@types/react@18.3.1)(react@18.3.1):
     dependencies:
@@ -31512,8 +31491,8 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.12.10
-      acorn: 8.11.3
-      acorn-walk: 8.3.2
+      acorn: 8.12.1
+      acorn-walk: 8.3.3
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
@@ -32044,7 +32023,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.12.10
-      jsdom: 24.0.0
+      jsdom: 24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - less
       - lightningcss
@@ -32686,6 +32665,11 @@ snapshots:
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 6.0.3
+
+  ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 5.0.10
 
   ws@8.5.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     optionalDependencies:

@@ -65,11 +65,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () => {
               resetSidebarState();
               const snapshotSpaces = app.chain.meta.snapshot;
-              if (snapshotSpaces.length > 1) {
-                navigate('/multiple-snapshots');
-              } else {
-                navigate(`/new/snapshot/${snapshotSpaces}`);
-              }
+              navigate(`/new/snapshot/${snapshotSpaces}`, {
+                action: 'create-proposal',
+              });
             },
           },
         ]
