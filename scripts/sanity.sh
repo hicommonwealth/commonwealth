@@ -25,7 +25,7 @@ pnpm -r test
 
 step 'Integration testing'
 pnpm -F commonwealth test-api
-pnpm -F commonwealth test-integration-util
+pnpm -F commonwealth test-integration
 
 # we are aiming for a devx without builds
 step 'Final cleaning'
