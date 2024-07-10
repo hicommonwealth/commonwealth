@@ -7,9 +7,9 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         ALTER TABLE public."Users" ADD COLUMN "profile" JSONB NOT NULL DEFAULT '{}'::jsonb;
-        WITH FirstProfile AS (
-            SELECT DISTINCT ON (user_id) 
-                  user_id, 
+
+        WITH P AS (
+            SELECT user_id, 
                   jsonb_build_object(
                       'name', profile_name,
                       'email', email,
@@ -21,12 +21,10 @@ module.exports = {
                       'background_image', background_image
                   ) AS profile_json
             FROM "Profiles"
-            ORDER BY user_id, created_at
         )
-        UPDATE "Users"
-        SET profile = COALESCE(FirstProfile.profile_json, '{}'::jsonb)
-        FROM FirstProfile
-        WHERE "Users".id = FirstProfile.user_id;
+        UPDATE "Users" SET profile = COALESCE(P.profile_json, '{}'::jsonb)
+        FROM P WHERE "Users".id = P.user_id;
+
         CREATE OR REPLACE FUNCTION update_user_profile() RETURNS TRIGGER AS $$
         BEGIN
             IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -46,10 +44,9 @@ module.exports = {
             RETURN NULL;
         END;
         $$ LANGUAGE plpgsql;
-        CREATE TRIGGER profile_sync_trigger
-        AFTER INSERT OR UPDATE ON "Profiles"
-        FOR EACH ROW
-        EXECUTE FUNCTION update_user_profile();
+
+        CREATE TRIGGER profile_sync_trigger AFTER INSERT OR UPDATE ON "Profiles"
+        FOR EACH ROW EXECUTE FUNCTION update_user_profile();
         `,
         {
           transaction: t,
