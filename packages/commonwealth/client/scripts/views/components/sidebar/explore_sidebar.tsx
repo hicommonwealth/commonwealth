@@ -44,24 +44,14 @@ export const ExploreCommunitiesSidebar = ({
     );
   });
 
-  const joinedCommunities = allCommunities.filter(
-    (c) =>
-      isInCommunity(c) &&
-      !user.starredCommunities.find(
-        (starCommunity) => starCommunity.community_id === c.id,
-      ),
-  );
+  const joinedCommunities = [...allCommunities]
+    .filter(isInCommunity)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const communityList: MenuItem[] = [
     ...(app.isLoggedIn()
       ? [
           { type: 'header', label: 'Your communities' } as MenuItem,
-          ...(starredCommunities.map((c: ChainInfo) => {
-            return {
-              community: c,
-              type: 'community',
-            };
-          }) as MenuItem[]),
           ...(joinedCommunities.map((c: ChainInfo) => {
             return {
               community: c,
