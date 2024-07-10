@@ -30,30 +30,20 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         ?.split(',')
         .map((a) => a.trim());
       const replacements: any = {
-        searchTerm: `%${payload.search || ''}%`,
+        searchTerm: payload.search ? `%${payload.search}%` : '',
         addressBinding,
       };
       if (community) {
         replacements.community_id = community.id;
       }
 
-      const communityWhere = replacements.community_id
-        ? `"Addresses".community_id = :community_id AND`
-        : '';
-
       const groupIdFromMemberships = parseInt(
         ((payload.memberships || '').match(/in-group:(\d+)/) || [`0`, `0`])[1],
       );
       let membershipsWhere = payload.memberships
-        ? `SELECT 1 FROM "Memberships"
-    JOIN "Groups" ON "Groups".id = "Memberships".group_id
-    WHERE "Memberships".address_id = "Addresses".id
-    AND "Groups".community_id = :community_id
-    ${
-      groupIdFromMemberships
-        ? `AND "Groups".id = ${groupIdFromMemberships}`
-        : ''
-    }
+        ? `SELECT 1 FROM "Memberships" M 
+        JOIN "Groups" G ON G.id = M.group_id WHERE M.address_id = A.id AND G.community_id = :community_id
+    ${groupIdFromMemberships ? `AND G.id = ${groupIdFromMemberships}` : ''}
     `
         : '';
 
@@ -61,21 +51,21 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         switch (payload.memberships) {
           case 'in-group':
           case `in-group:${groupIdFromMemberships}`:
-            membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
+            membershipsWhere = `AND EXISTS (${membershipsWhere} AND M.reject_reason IS NULL)`;
             break;
           case 'not-in-group':
-            membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
+            membershipsWhere = `AND NOT EXISTS (${membershipsWhere} AND M.reject_reason IS NULL)`;
             break;
           case 'allow-specified-addresses':
             membershipsWhere =
               addressBinding && addressBinding.length > 0
-                ? `AND "Addresses".address IN(:addressBinding)`
+                ? `AND A.address IN(:addressBinding)`
                 : '';
             break;
           case 'not-allow-specified-addresses':
             membershipsWhere =
               addressBinding && addressBinding.length > 0
-                ? `AND "Addresses".address NOT IN(:addressBinding)`
+                ? `AND A.address NOT IN(:addressBinding)`
                 : '';
             break;
           default:
@@ -88,37 +78,24 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       // This query is overly complex in order to entice the query planner to use the trigram indices
       const sqlWithoutPagination = `
     SELECT
-      U.user_id,
+      U.id AS user_id,
       U.profile->>'name' AS profile_name,
       U.profile->>'avatar_url' AS avatar_url,
       U.created_at,
       array_agg(A.id) as address_ids,
       array_agg(A.community_id) as community_ids,
       array_agg(A.address) as addresses,
-      MAX(A.last_active) as last_active
+      MAX(COALESCE(A.last_active, U.created_at)) as last_active
       FROM "Users" U
       JOIN "Addresses" A ON U.id = A.user_id
-      WHERE ${communityWhere} 
-      (U.profile->>'name' ILIKE '%' || :searchTerm || '%')
-      ${membershipsWhere}
-      GROUP BY U.id
-
-      UNION
-
-      SELECT
-      U.user_id,
-      U.profile->>'name' AS profile_name,
-      U.profile->>'avatar_url' AS avatar_url,
-      U.created_at,
-      array_agg(A.id) as address_ids,
-      array_agg(A.community_id) as community_ids,
-      array_agg(A.address) as addresses,
-      MAX(A.last_active) as last_active
-      FROM "Users" U
-      JOIN "Addresses" A ON U.user_id = A.user_id
-      WHERE ${communityWhere} 
-      (A.address ILIKE '%' || :searchTerm || '%')
-      ${membershipsWhere}
+      WHERE 
+        ${replacements.community_id ? 'A.community_id = :community_id' : ''} 
+        ${
+          replacements.searchTerm
+            ? "AND ((U.profile->>'name' ILIKE '%' || :searchTerm || '%') OR (A.address ILIKE '%' || :searchTerm || '%'))"
+            : ''
+        }
+        ${membershipsWhere} 
       GROUP BY U.id
   `;
 
