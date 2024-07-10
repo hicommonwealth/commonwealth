@@ -24,6 +24,7 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
+import moment from 'moment';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
@@ -154,6 +155,18 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   useManageDocumentTitle('Discussions');
 
+  const activeContestsInTopic = contestsData?.filter((contest) => {
+    const isContestInTopic = (contest.topics || []).find(
+      (topic) => topic.id === topicId,
+    );
+    // @ts-expect-error <StrictNullChecks/>
+    const { end_time } = contest.contests[contest.contests?.length - 1] || {};
+    const hasEnded = moment(end_time) < moment();
+    const isContestActive = contest.cancelled ? false : !hasEnded;
+
+    return isContestInTopic && isContestActive;
+  });
+
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
@@ -193,7 +206,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadTopicGated: isRestrictedMembership,
           });
 
-          const isTopicInContest = checkIsTopicInContest(
+          const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
             thread?.topic?.id,
           );
@@ -220,7 +233,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               }
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideRecentComments
-              editingDisabled={isTopicInContest}
+              editingDisabled={isThreadTopicInContest}
             />
           );
         }}
@@ -261,6 +274,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 isIncludingArchivedThreads={includeArchivedThreads}
                 onIncludeArchivedThreads={setIncludeArchivedThreads}
                 isOnArchivePage={isOnArchivePage}
+                activeContests={activeContestsInTopic}
               />
             </>
           ),

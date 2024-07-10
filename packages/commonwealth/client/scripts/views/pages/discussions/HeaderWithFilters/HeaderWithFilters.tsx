@@ -30,7 +30,10 @@ import {
 
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import moment from 'moment/moment';
 import useCommunityStakeStore from 'state/ui/communityStake';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 
@@ -45,6 +48,7 @@ type HeaderWithFiltersProps = {
   isIncludingArchivedThreads: boolean;
   onIncludeArchivedThreads: (includeArchived: boolean) => any;
   isOnArchivePage?: boolean;
+  activeContests: Contest[];
 };
 
 export const HeaderWithFilters = ({
@@ -58,6 +62,7 @@ export const HeaderWithFilters = ({
   isIncludingArchivedThreads,
   onIncludeArchivedThreads,
   isOnArchivePage,
+  activeContests,
 }: HeaderWithFiltersProps) => {
   const communityStakeEnabled = useFlag('communityStake');
   const contestsEnabled = useFlag('contest');
@@ -513,6 +518,35 @@ export const HeaderWithFilters = ({
           />
         )}
       </div>
+
+      {activeContests.map((contest) => {
+        const { end_time, score } =
+          // @ts-expect-error <StrictNullChecks/>
+          contest?.contests[contest?.contests?.length - 1] || {};
+
+        return (
+          <ContestCard
+            key={contest.contest_address}
+            isAdmin={false}
+            // @ts-expect-error <StrictNullChecks/>
+            address={contest.contest_address}
+            // @ts-expect-error <StrictNullChecks/>
+            name={contest.name}
+            imageUrl={contest.image_url}
+            // @ts-expect-error <StrictNullChecks/>
+            topics={contest.topics}
+            // @ts-expect-error <StrictNullChecks/>
+            score={score}
+            decimals={contest.decimals}
+            ticker={contest.ticker}
+            finishDate={end_time ? moment(end_time).toISOString() : ''}
+            isCancelled={contest.cancelled}
+            isRecurring={!contest.funding_token_address}
+            isHorizontal
+            showShareButton={false}
+          />
+        );
+      })}
 
       <CWModal
         size="medium"
