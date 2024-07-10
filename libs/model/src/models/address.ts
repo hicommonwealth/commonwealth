@@ -3,7 +3,7 @@ import Sequelize from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
+import type { SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';
 import type { UserAttributes, UserInstance } from './user';
 
@@ -36,7 +36,6 @@ export type AddressAttributes = {
   Community?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  SsoToken?: SsoTokenAttributes;
   Memberships?: MembershipAttributes[];
 };
 
