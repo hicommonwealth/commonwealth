@@ -182,6 +182,30 @@ const fetchBulkThreads = (props) => {
       },
     );
 
+    /**
+     * TODO: When we fix the content_id issue for 'added' contests, we should remove this if statement and body
+     **/
+    if (res.data.result) {
+      // Filters out unique contests for each associated contest array.
+      const uniqueContestIds = new Set<string>();
+
+      res.data.result.threads = res.data.result.threads.map((thread) => {
+        const filteredContests = thread.associatedContests?.filter((ac) => {
+          const key = `${ac.contest_id}:${ac.content_id}`;
+          if (!uniqueContestIds.has(key)) {
+            uniqueContestIds.add(key);
+            return true;
+          }
+          return false;
+        });
+
+        return {
+          ...thread,
+          associatedContests: filteredContests,
+        };
+      });
+    }
+
     // transform the response
     const transformedData = {
       ...res.data.result,
