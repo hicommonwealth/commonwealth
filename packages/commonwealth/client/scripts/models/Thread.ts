@@ -29,7 +29,21 @@ function processAssociatedContests(
   contestActions?: ContestActionT[] | null,
 ): AssociatedContest[] | [] {
   if (associatedContests) {
-    return associatedContests;
+    /**
+     * TODO: When we fix the content_id issue for 'added' contests, we should remove this deduplication logic
+     **/
+    const uniqueContestIds = new Set<string>();
+
+    const deduplicatedContests = associatedContests.filter((ac) => {
+      const key = `${ac.contest_id}:${ac.content_id}`;
+      if (!uniqueContestIds.has(key)) {
+        uniqueContestIds.add(key);
+        return true;
+      }
+      return false;
+    });
+
+    return deduplicatedContests;
   }
 
   if (contestActions) {
