@@ -88,40 +88,38 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       // This query is overly complex in order to entice the query planner to use the trigram indices
       const sqlWithoutPagination = `
     SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
-      array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as community_ids,
-      array_agg("Addresses".address) as addresses,
-      MAX("Addresses".last_active) as last_active
-      FROM "Profiles"
-      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      U.user_id,
+      U.profile->>'name' AS profile_name,
+      U.profile->>'avatar_url' AS avatar_url,
+      U.created_at,
+      array_agg(A.id) as address_ids,
+      array_agg(A.community_id) as community_ids,
+      array_agg(A.address) as addresses,
+      MAX(A.last_active) as last_active
+      FROM "Users" U
+      JOIN "Addresses" A ON U.id = A.user_id
       WHERE ${communityWhere} 
-      ("Profiles".profile_name ILIKE '%' || :searchTerm || '%')
+      (U.profile->>'name' ILIKE '%' || :searchTerm || '%')
       ${membershipsWhere}
-      GROUP BY "Profiles".id
+      GROUP BY U.id
 
       UNION
 
       SELECT
-      "Profiles".id,
-      "Profiles".user_id,
-      "Profiles".profile_name,
-      "Profiles".avatar_url,
-      "Profiles".created_at,
-      array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".community_id) as community_ids,
-      array_agg("Addresses".address) as addresses,
-      MAX("Addresses".last_active) as last_active
-      FROM "Profiles"
-      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      U.user_id,
+      U.profile->>'name' AS profile_name,
+      U.profile->>'avatar_url' AS avatar_url,
+      U.created_at,
+      array_agg(A.id) as address_ids,
+      array_agg(A.community_id) as community_ids,
+      array_agg(A.address) as addresses,
+      MAX(A.last_active) as last_active
+      FROM "Users" U
+      JOIN "Addresses" A ON U.user_id = A.user_id
       WHERE ${communityWhere} 
-      ("Addresses".address ILIKE '%' || :searchTerm || '%')
+      (A.address ILIKE '%' || :searchTerm || '%')
       ${membershipsWhere}
-      GROUP BY "Profiles".id
+      GROUP BY U.id
   `;
 
       const allCommunityProfiles = await models.sequelize.query<{
