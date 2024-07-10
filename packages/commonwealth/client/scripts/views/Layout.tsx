@@ -5,6 +5,7 @@ import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
@@ -39,11 +40,13 @@ const LayoutComponent = ({
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
+  const { data: configurationData } = useFetchConfigurationQuery();
+
   // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
-    const redirectTo = app.config.redirects[selectedScope];
+    const redirectTo = configurationData?.redirects?.[selectedScope];
     // @ts-expect-error <StrictNullChecks/>
     if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
       // @ts-expect-error <StrictNullChecks/>

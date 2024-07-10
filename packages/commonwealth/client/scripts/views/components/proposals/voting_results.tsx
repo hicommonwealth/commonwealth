@@ -7,7 +7,6 @@ import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
 import {
   CompletedProposalVotingResult,
@@ -19,7 +18,6 @@ type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
-  const forceRerender = useForceRerender();
   const [, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
   );
@@ -32,14 +30,6 @@ export const VotingResults = (props: VotingResultsProps) => {
       app.chainAdapterReady.off('ready', listener);
     };
   }, []);
-
-  useEffect(() => {
-    app.proposalEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.proposalEmitter.removeAllListeners();
-    };
-  }, [forceRerender]);
 
   const votes = proposal.getVotes();
 

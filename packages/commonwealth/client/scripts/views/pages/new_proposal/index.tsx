@@ -1,29 +1,20 @@
-import { ProposalType } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import {
-  chainToProposalSlug,
-  proposalSlugToClass,
-  proposalSlugToFriendlyName,
-} from 'identifiers';
 import 'pages/new_proposal/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageLoading } from 'views/pages/loading';
-import type ProposalModule from '../../../models/ProposalModule';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 
-type NewProposalPageProps = {
-  type: ProposalType;
-};
+/// NOTE: THIS PAGE IS ONLY ACCESSIBLE FOR COSMOS CHAINS, FOLLOWING
+/// DEPRECATION OF OTHER GOVERNANCE FORMS, AND IS CONSIDERED LEGACY.
 
-const NewProposalPage = (props: NewProposalPageProps) => {
-  const { type } = props;
+const NewProposalPage = () => {
   const forceRerender = useForceRerender();
-  const [internalType, setInternalType] = useState<ProposalType>(type);
   const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
   useInitChainIfNeeded(app);
 
@@ -55,46 +46,28 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     return <PageLoading />;
   }
 
-  // infer proposal type if possible
-  if (!internalType) {
-    try {
-      setInternalType(chainToProposalSlug(app.chain.meta));
-    } catch (e) {
-      return (
-        <PageNotFound
-          title="Invalid Page"
-          message="Cannot determine proposal type."
-        />
-      );
+  // special case for initializing cosmos governance
+  const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
+  if (onCosmos) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const governance = (app.chain as any)?.governance;
+    if (governance && !governance.ready) {
+      if (!governance.initializing) {
+        governance.init(app.chain.chain, app.chain.accounts).then(() => {
+          app.chainModuleReady.emit('ready');
+        });
+      }
+      return <PageLoading />;
     }
+  } else {
+    return <PageNotFound />;
   }
-
-  // check if module is still initializing
-  const c = proposalSlugToClass()?.get(internalType) as ProposalModule<
-    any,
-    any,
-    any
-  >;
-
-  if (!c || !c.ready) {
-    app.chain.loadModules([c]);
-    return <PageLoading />;
-  }
-
-  const getForm = (typeEnum) => {
-    switch (typeEnum) {
-      case ProposalType.CosmosProposal:
-        return <CosmosProposalForm />;
-      default:
-        return <CWText>Invalid proposal type</CWText>;
-    }
-  };
 
   const getBody = () => {
     if (!app.user.activeAccount) {
       return <CWText>Must be signed in</CWText>;
     } else {
-      return getForm(internalType);
+      return <CosmosProposalForm />;
     }
   };
 
@@ -102,7 +75,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     <CWPageLayout>
       <div className="NewProposalPage">
         <CWText type="h3" fontWeight="medium">
-          New {proposalSlugToFriendlyName.get(internalType)}
+          New Proposal
         </CWText>
         {getBody()}
       </div>
