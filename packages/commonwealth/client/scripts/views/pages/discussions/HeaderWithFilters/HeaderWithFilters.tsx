@@ -7,6 +7,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import moment from 'moment/moment';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { Select } from 'views/components/Select';
@@ -24,11 +25,11 @@ import {
 } from '../../../../models/types';
 
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import moment from 'moment/moment';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
