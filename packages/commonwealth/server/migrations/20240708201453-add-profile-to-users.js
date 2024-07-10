@@ -8,21 +8,6 @@ module.exports = {
         `
         ALTER TABLE public."Users" ADD COLUMN "profile" JSONB NOT NULL DEFAULT '{}'::jsonb;
 
-        UPDATE "Users"
-        SET profile = COALESCE(
-            jsonb_build_object(
-                'name', P.profile_name,
-                'email', P.email,
-                'website', P.website,
-                'bio', P.bio,
-                'avatar_url', P.avatar_url,
-                'slug', P.slug,
-                'socials', P.socials,
-                'background_image', P.background_image
-            ), '{}'::jsonb)
-        FROM "Profiles" P
-        WHERE "Users".id = P.user_id;
-
         CREATE OR REPLACE FUNCTION update_user_profile() RETURNS TRIGGER AS $$
         BEGIN
             IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
