@@ -38,9 +38,7 @@ export const DeleteAddressModal = ({
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
-  const onDeleteAddress = async (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  const onDeleteAddress = async () => {
     if (addresses.length === 1) {
       notifyError(
         'You must have at least one address linked to a profile. Please add another address before removing this one.',
@@ -69,6 +67,14 @@ export const DeleteAddressModal = ({
     }
 
     closeModal();
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    onDeleteAddress()
+      .then(() => undefined)
+      .catch(console.error);
   };
 
   const { name } = profile;
@@ -112,11 +118,7 @@ export const DeleteAddressModal = ({
         <CWButton
           label="Delete"
           buttonType="destructive"
-          onClick={async (e) =>
-            await onDeleteAddress(e)
-              .then(() => undefined)
-              .catch(console.error)
-          }
+          onClick={handleDelete}
           buttonHeight="sm"
         />
       </CWModalFooter>
