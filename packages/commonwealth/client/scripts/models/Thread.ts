@@ -30,7 +30,8 @@ function processAssociatedContests(
 ): AssociatedContest[] | [] {
   if (associatedContests) {
     /**
-     * TODO: When we fix the content_id issue for 'added' contests, we should remove this deduplication logic
+     * TODO: Ticket 8423, When we fix the content_id issue for 'added' contests, we should remove this deduplication
+     * logic
      **/
     const uniqueContestIds = new Set<string>();
 
