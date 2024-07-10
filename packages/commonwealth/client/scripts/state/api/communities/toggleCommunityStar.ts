@@ -46,9 +46,7 @@ const useToggleCommunityStarMutation = () => {
 
         user.setData({
           starredCommunities: [...user.starredCommunities].filter(
-            (s) =>
-              s.user_id !== star.user_id &&
-              s.community_id !== star.community_id,
+            (s) => s.community_id !== star.community_id,
           ),
         });
       }
