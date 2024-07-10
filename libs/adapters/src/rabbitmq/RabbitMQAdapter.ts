@@ -226,7 +226,7 @@ export class RabbitMQAdapter implements Broker {
             beforeHandleEvent?.(topic, content, context);
           } catch (err) {
             this._log.error(
-              `afterHandleEvent failed on topic ${topic}`,
+              `beforeHandleEvent failed on topic ${topic}`,
               err as Error,
             );
           }
