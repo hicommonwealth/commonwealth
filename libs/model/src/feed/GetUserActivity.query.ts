@@ -42,7 +42,7 @@ export function GetUserActivity(): Query<typeof schemas.ThreadFeed> {
     JOIN "Threads" thr ON thr.id = rtn.thread_id
     LEFT JOIN "Comments" C ON C.id = (nts.notification_data::JSONB ->> 'comment_id')::INTEGER
     LEFT JOIN LATERAL (
-        SELECT A.id, A.address, A.community_id, A.profile_id
+        SELECT A.id, A.address, A.community_id
         FROM "Addresses" A
         JOIN "Comments" C ON A.id = C.address_id AND C.thread_id = thr.id
         WHERE C.deleted_at IS NULL
