@@ -28,6 +28,22 @@ generally will not have types, but it may be worth looking for some in the @type
 is recommended to declare the module types in `test/types.d.ts`. If declaring custom types is too complex you can add
 `//@ts-ignore` above the import to ignore the type error. More information can be found in the [K6 documentation][4].
 
+# Test Organization
+To keep tests organized/robust and help with visualizing, sorting, and filtering test results in Grafana use the 
+following patterns/strategies when creating load tests:
+- Define API request functions in `test/util/apiRequests` and then use those functions to create a test.
+- Use [k6 stages][5] and [stage tagging][6] to simulate ramping up of load and to enable filtering metrics over stages.
+- Use [k6 Groups][1] to tag related requests (e.g. a group for all requests originating from a single browser page).
+  - Don't use a Group for a single request. See the [docs][2] for reasoning.
+- Use [k6 user-defined tags][7] to tag related requests even if they are in different groups e.g. Thread creation <> Comment creation.
+- Use [k6 scenarios][8] to simulate different workloads for the same test.
+
+# Generating Tests from OpenAPI Spec
+Execute the `generate-load-tests` command from the root of the repository to generate a javascript load test in
+`/packages/load-testing/generated-load-test`. Note that this Javascript test must be converted to Typescript and
+thoroughly updated to fit the desired testing scenarios. Indeed, this generator script should only be used to generate
+the general outline of utility request functions in `load-testing/test/apiRequests/`. This script has limited utility.
+
 # Package Scripts
 
 ### start
@@ -86,7 +102,11 @@ Description: Checks the types of `/test` and `/src`.
 - Explicitly `async` test lifecycle functions are not supported by k6. To implement k6 async functionality use callback
 syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment-1443462207.
 
-
+[1]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#groups
+[2]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#discouraged-one-group-per-request
 [3]: https://jslib.k6.io/
 [4]: https://k6.io/docs/using-k6/modules/#remote-http-s-modules
-
+[5]: https://k6.io/docs/get-started/running-k6/#stages-ramping-up-down-vus
+[6]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#tagging-stages
+[7]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#user-defined-tags
+[8]: https://grafana.com/docs/k6/latest/using-k6/scenarios/
