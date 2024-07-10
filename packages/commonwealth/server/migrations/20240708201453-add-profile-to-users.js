@@ -8,22 +8,20 @@ module.exports = {
         `
         ALTER TABLE public."Users" ADD COLUMN "profile" JSONB NOT NULL DEFAULT '{}'::jsonb;
 
-        WITH P AS (
-            SELECT user_id, 
-                  jsonb_build_object(
-                      'name', profile_name,
-                      'email', email,
-                      'website', website,
-                      'bio', bio,
-                      'avatar_url', avatar_url,
-                      'slug', slug,
-                      'socials', socials,
-                      'background_image', background_image
-                  ) AS profile_json
-            FROM "Profiles"
-        )
-        UPDATE "Users" SET profile = COALESCE(P.profile_json, '{}'::jsonb)
-        FROM P WHERE "Users".id = P.user_id;
+        UPDATE "Users"
+        SET profile = COALESCE(
+            jsonb_build_object(
+                'name', P.profile_name,
+                'email', P.email,
+                'website', P.website,
+                'bio', P.bio,
+                'avatar_url', P.avatar_url,
+                'slug', P.slug,
+                'socials', P.socials,
+                'background_image', P.background_image
+            ), '{}'::jsonb)
+        FROM "Profiles" P
+        WHERE "Users".id = P.user_id;
 
         CREATE OR REPLACE FUNCTION update_user_profile() RETURNS TRIGGER AS $$
         BEGIN
