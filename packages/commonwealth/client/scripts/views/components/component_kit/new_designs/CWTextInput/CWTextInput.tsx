@@ -232,7 +232,7 @@ const CWTextInput = (props: TextInputProps) => {
           validationStatus={validationProps.validationStatus}
         />
       )}
-      {(label || customError) && (
+      {(label || customError || formFieldErrorMessage) && (
         <MessageRow
           hasFeedback={
             !!inputValidationFn || !!formFieldErrorMessage || !!customError

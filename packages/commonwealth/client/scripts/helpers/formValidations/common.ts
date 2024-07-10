@@ -21,12 +21,25 @@ export const emailValidationSchema = z.union([
 export const quillValidationSchema = z.object({
   ops: z
     .array(
-      z.object({
-        insert: z
-          .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-          .default(''),
-      }),
+      z.object(
+        {
+          insert: z
+            .string({
+              invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+              required_error: VALIDATION_MESSAGES.NO_INPUT,
+            })
+            .default(''),
+        },
+        {
+          invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+          required_error: VALIDATION_MESSAGES.NO_INPUT,
+        },
+      ),
+      {
+        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+        required_error: VALIDATION_MESSAGES.NO_INPUT,
+      },
     )
-    .length(1),
+    .length(1, { message: VALIDATION_MESSAGES.NO_INPUT }),
   ___isMarkdown: z.boolean(),
 });
