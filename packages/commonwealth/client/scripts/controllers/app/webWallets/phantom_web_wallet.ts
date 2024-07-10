@@ -68,6 +68,11 @@ class PhantomWebWalletController implements IWebWallet<string> {
       this._enabled = true;
     } catch (err) {
       this._enabling = false;
+      if (!window.solana.isConnected) {
+        throw new Error(
+          'No Phantom accounts found! Please setup your Phantom wallet and try again.',
+        );
+      }
       throw new Error('Could not connect to Phantom wallet!');
     }
   }
