@@ -7,7 +7,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
-import moment from 'moment/moment';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { Select } from 'views/components/Select';
@@ -26,10 +25,11 @@ import {
 
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import moment from 'moment/moment';
+import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
+import { useCommunityStake } from 'views/components/CommunityStake';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
@@ -70,10 +70,22 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
+  const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
+  const { stakeData } = useCommunityStake();
+  const namespace = stakeData?.Community?.namespace;
+
+  const { isContestAvailable, contestsData, stakeEnabled } =
+    useCommunityContests();
+
+  const { data: feeManagerBalance } = useGetFeeManagerBalanceQuery({
+    ethChainId: ethChainId!,
+    namespace,
+    apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
+  });
+
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
-  const { isContestAvailable, contestsData } = useCommunityContests();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -487,7 +499,7 @@ export const HeaderWithFilters = ({
       {activeContests.map((contest) => {
         const { end_time, score } =
           // @ts-expect-error <StrictNullChecks/>
-          contest?.contests[contest?.contests?.length - 1] || {};
+          contest?.contests[0] || {};
 
         return (
           <ContestCard
@@ -509,6 +521,7 @@ export const HeaderWithFilters = ({
             isRecurring={!contest.funding_token_address}
             isHorizontal
             showShareButton={false}
+            feeManagerBalance={feeManagerBalance}
           />
         );
       })}

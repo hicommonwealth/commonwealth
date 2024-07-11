@@ -160,7 +160,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       (topic) => topic.id === topicId,
     );
     // @ts-expect-error <StrictNullChecks/>
-    const { end_time } = contest.contests[contest.contests?.length - 1] || {};
+    const { end_time } = contest.contests[0] || {};
     const hasEnded = moment(end_time) < moment();
     const isContestActive = contest.cancelled ? false : !hasEnded;
 
