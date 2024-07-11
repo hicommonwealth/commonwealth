@@ -3,13 +3,10 @@ import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
 
-import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
-
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
-import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
@@ -56,7 +53,6 @@ type FeedProps = {
   fetchData: () => Promise<any>;
   noFeedMessage: string;
   defaultCount?: number;
-  onFetchedDataCallback?: (data: any) => DashboardActivityNotification;
   customScrollParent?: HTMLElement;
   isChainEventsRow?: boolean;
 };
@@ -139,16 +135,11 @@ export const Feed = ({
   defaultCount,
   fetchData,
   noFeedMessage,
-  onFetchedDataCallback,
   customScrollParent,
-  isChainEventsRow,
 }: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const [data, setData] = useState<
-    DashboardActivityNotification[] | Thread[]
-  >();
-  const [labels, setLabels] = useState<(IEventLabel | undefined)[]>();
+  const [data, setData] = useState<Thread[]>();
   const [currentCount, setCurrentCount] = useState<number>(
     defaultCount || DEFAULT_COUNT,
   );
@@ -166,83 +157,48 @@ export const Feed = ({
     const getData = async () => {
       try {
         const response = await fetchData();
-
-        if (isChainEventsRow) {
-          const notifications: DashboardActivityNotification[] =
-            onFetchedDataCallback
-              ? response.result.map((activity) =>
-                  onFetchedDataCallback(activity),
-                )
-              : response.result;
-          const filteredNotifs: DashboardActivityNotification[] = [];
-          const labelsArr: (IEventLabel | undefined)[] = [];
-
-          for (const notif of notifications) {
-            if (notif.categoryId === 'chain-event') {
-              try {
-                const chainEvent = {
-                  network: notif.eventNetwork,
-                  data: notif.eventData,
-                };
-                // @ts-expect-error <StrictNullChecks/>
-                const label = ChainEventLabel(notif.communityId, chainEvent);
-                filteredNotifs.push(notif);
-                labelsArr.push(label);
-              } catch (e) {
-                console.warn(e);
-              }
-            } else {
-              filteredNotifs.push(notif);
-              labelsArr.push(undefined);
-            }
-          }
-
-          setData(filteredNotifs);
-          setLabels(labelsArr);
-        } else {
-          const threads = (response?.result || []).map(
-            (x: ActivityResponse) =>
-              new Thread({
-                id: x.thread.id,
-                profile_id: x.thread.profile_id,
-                // @ts-expect-error <StrictNullChecks/>
-                avatar_url: x.thread.profile_avatar_url,
-                profile_name: x.thread.profile_name,
+        const threads = (response?.result || []).map(
+          (x: ActivityResponse) =>
+            new Thread({
+              id: x.thread.id,
+              profile_id: x.thread.profile_id,
+              // @ts-expect-error <StrictNullChecks/>
+              avatar_url: x.thread.profile_avatar_url,
+              profile_name: x.thread.profile_name,
+              community_id: x.thread.community_id,
+              kind: x.thread.kind,
+              last_edited: x.thread.updated_at,
+              // @ts-expect-error <StrictNullChecks/>
+              marked_as_spam_at: x.thread.marked_as_spam_at,
+              // @ts-expect-error <StrictNullChecks/>
+              recentComments: x.recentcomments,
+              stage: x.thread.stage,
+              title: x.thread.title,
+              created_at: x.thread.created_at,
+              updated_at: x.thread.updated_at,
+              body: x.thread.body,
+              discord_meta: x.thread.discord_meta,
+              numberOfComments: x.thread.numberOfComments,
+              plaintext: x.thread.plaintext,
+              read_only: x.thread.read_only,
+              archived_at: x.thread.archived_at,
+              // @ts-expect-error <StrictNullChecks/>
+              locked_at: x.thread.locked_at,
+              has_poll: x.thread.has_poll,
+              Address: {
+                address: x.thread.user_address,
                 community_id: x.thread.community_id,
-                kind: x.thread.kind,
-                last_edited: x.thread.updated_at,
-                // @ts-expect-error <StrictNullChecks/>
-                marked_as_spam_at: x.thread.marked_as_spam_at,
-                // @ts-expect-error <StrictNullChecks/>
-                recentComments: x.recentcomments,
-                stage: x.thread.stage,
-                title: x.thread.title,
-                created_at: x.thread.created_at,
-                updated_at: x.thread.updated_at,
-                body: x.thread.body,
-                discord_meta: x.thread.discord_meta,
-                numberOfComments: x.thread.numberOfComments,
-                plaintext: x.thread.plaintext,
-                read_only: x.thread.read_only,
-                archived_at: x.thread.archived_at,
-                // @ts-expect-error <StrictNullChecks/>
-                locked_at: x.thread.locked_at,
-                has_poll: x.thread.has_poll,
-                Address: {
-                  address: x.thread.user_address,
-                  community_id: x.thread.community_id,
-                },
-                topic: x?.thread?.topic,
-                // filler values
-                // @ts-expect-error <StrictNullChecks/>
-                version_history: null,
-                last_commented_on: '',
-                address_last_active: '',
-                reaction_weights_sum: 0,
-              }),
-          );
-          setData(threads);
-        }
+              },
+              topic: x?.thread?.topic,
+              // filler values
+              // @ts-expect-error <StrictNullChecks/>
+              version_history: null,
+              last_commented_on: '',
+              address_last_active: '',
+              reaction_weights_sum: 0,
+            }),
+        );
+        setData(threads);
       } catch (err) {
         setError(true);
       }
@@ -260,13 +216,7 @@ export const Feed = ({
           customScrollParent={customScrollParent}
           totalCount={4}
           style={{ height: '100%' }}
-          itemContent={(i) => (
-            <UserDashboardRow
-              key={i}
-              isChainEventsRow={isChainEventsRow}
-              showSkeleton
-            />
-          )}
+          itemContent={(i) => <UserDashboardRow key={i} showSkeleton />}
         />
       </div>
     );
@@ -294,18 +244,6 @@ export const Feed = ({
         endReached={loadMore}
         style={{ height: '100%' }}
         itemContent={(i) => {
-          if (isChainEventsRow) {
-            return (
-              <UserDashboardRow
-                key={i}
-                notification={data[i]}
-                // @ts-expect-error <StrictNullChecks/>
-                label={labels[i]}
-                isLoggedIn={isLoggedIn}
-              />
-            );
-          }
-
           return <FeedThread key={1} thread={data[i] as Thread} />;
         }}
       />

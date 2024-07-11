@@ -13,7 +13,6 @@ import { UserDashboardRowTop } from './user_dashboard_row_top';
 type UserDashboardRowProps = {
   notification?: DashboardActivityNotification;
   showSkeleton?: boolean;
-  isChainEventsRow?: boolean;
   label?: IEventLabel;
   isLoggedIn?: boolean;
 };
@@ -21,22 +20,10 @@ type UserDashboardRowProps = {
 export const UserDashboardRow = ({
   notification,
   showSkeleton,
-  isChainEventsRow,
   label,
   isLoggedIn,
 }: UserDashboardRowProps) => {
   if (showSkeleton) {
-    if (isChainEventsRow) {
-      return (
-        <UserDashboardChainEventRow
-          blockNumber={0}
-          community={{} as any}
-          label={{} as any}
-          showSkeleton
-        />
-      );
-    }
-
     return (
       <div className="UserDashboardRow">
         <UserDashboardRowTop activityData="" category="" showSkeleton />

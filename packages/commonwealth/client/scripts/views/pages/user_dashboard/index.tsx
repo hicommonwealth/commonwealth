@@ -14,7 +14,6 @@ import {
   MixpanelPWAEvent,
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
-import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
@@ -130,7 +129,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                 <Feed
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="Join some communities to see Activity!"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
@@ -139,7 +137,6 @@ const UserDashboard = (props: UserDashboardProps) => {
                 <Feed
                   fetchData={() => fetchActivity(activePage)}
                   noFeedMessage="No Activity"
-                  onFetchedDataCallback={DashboardActivityNotification.fromJSON}
                   // @ts-expect-error <StrictNullChecks/>
                   customScrollParent={scrollElement}
                 />
