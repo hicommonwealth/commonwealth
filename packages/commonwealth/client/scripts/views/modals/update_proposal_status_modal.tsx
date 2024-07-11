@@ -305,6 +305,12 @@ export const UpdateProposalStatusModal = ({
       </CWModalBody>
       <CWModalFooter>
         <CWButton
+          label="Remove proposal"
+          buttonType="destructive"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
           label="Cancel"
           buttonType="secondary"
           buttonHeight="sm"
