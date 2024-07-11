@@ -1,5 +1,6 @@
 import { Role, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
+import { decrementProfileCount } from '../utils';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -158,6 +159,13 @@ export default (
             where: { id: address.community_id },
             transaction: options.transaction,
           });
+
+          await decrementProfileCount(
+            sequelize.models,
+            address.community_id,
+            address.user_id!,
+            options.transaction!,
+          );
         },
       },
     },
