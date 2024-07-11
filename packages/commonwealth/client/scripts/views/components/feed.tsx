@@ -8,7 +8,6 @@ import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
@@ -143,7 +142,6 @@ export const Feed = ({
   const [currentCount, setCurrentCount] = useState<number>(
     defaultCount || DEFAULT_COUNT,
   );
-  const { isLoggedIn } = useUserLoggedIn();
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
