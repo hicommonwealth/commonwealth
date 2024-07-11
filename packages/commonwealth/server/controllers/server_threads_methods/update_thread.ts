@@ -254,6 +254,18 @@ export async function __updateThread(
           transaction,
         },
       );
+
+      await this.models.ThreadVersionHistory.create(
+        {
+          thread_id: threadId,
+          address: address.address,
+          body,
+          timestamp: new Date(),
+        },
+        {
+          transaction,
+        },
+      );
     }
 
     await updateThreadCollaborators(

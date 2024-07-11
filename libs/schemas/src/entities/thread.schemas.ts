@@ -85,7 +85,9 @@ export const Comment = z.object({
 export const ThreadVersionHistory = z.object({
   id: PG_INT.optional(),
   thread_id: PG_INT,
-  address: z.string(),
+  address: z
+    .string()
+    .describe('Address of the creator of the post or the collaborator'),
   body: z.string(),
   timestamp: z.date().optional(),
 });

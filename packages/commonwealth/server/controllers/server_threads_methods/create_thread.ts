@@ -181,7 +181,7 @@ export async function __createThread(
       await this.models.ThreadVersionHistory.create(
         {
           thread_id: thread.id!,
-          body: thread.body!,
+          body,
           address: address.address!,
           timestamp: thread.created_at!,
         },
