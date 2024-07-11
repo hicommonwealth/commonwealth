@@ -1,8 +1,7 @@
 import { Transaction } from 'sequelize';
-import Model, { ModelStatic } from 'sequelize/types/model';
 
 export const incrementProfileCount = async (
-  models: ModelStatic<Model>,
+  models: any,
   community_id: string,
   user_id: number,
   transaction: Transaction,
@@ -26,7 +25,7 @@ export const incrementProfileCount = async (
 };
 
 export const decrementProfileCount = async (
-  models: ModelStatic<Model>,
+  models: any,
   community_id: string,
   user_id: number,
   transaction: Transaction,
