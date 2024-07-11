@@ -8,7 +8,7 @@ For a list of PENG-specific guidelines, see [React Best Practices](./React-Best-
 
 For a list of platform-specific guidelines, see [Platform Coding Guidelines](./Platform-Coding-Guidelines.md).
 
-For a list of database-specific guidelines, see [Database Migrations Best Practices](./Database-Migrations.md) and [Database Optimization](./Database-Optimization.md).
+For a list of database-specific guidelines, see [Database Migrations Best Practices](./Database-Migrations.md) entry.
 
 ## Contents
 

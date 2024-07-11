@@ -19,7 +19,9 @@ To connect to the PSQL schema, use the following command:
 heroku pg:psql postgresql-clear-46785 -a commonwealth-staging
 ```
 
-As of 230413, the current database being used is Postgres 13.10. You can retrieve general information and uptime using the following SQL queries:
+As of 240711, the current database being used is Postgres 15.7. Major versions will not progress without a manual update, but minor versions may be updated automatically by Heroku.
+
+You can retrieve general information and uptime using the following SQL queries:
 
 General Info:
 

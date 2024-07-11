@@ -39,7 +39,6 @@
 - [Database ERD](./Database-ERD.md)
 - [Database Monitoring](./Database-Monitoring.md)
 - [Database Migrations](./Database-Migrations.md): Best practices.
-- [Database Optimization](./Database-Optimization.md): Best practices.
 - [Enabling Community Governance](./Enabling-Community-Governance.md): Migrating a community from offchain to chain-integrated.
 - [Sequelize](./Sequelize.md)
 
@@ -59,7 +58,6 @@
 ## Performance
 
 - [Caching](./Caching.md)
-- [Database Optimization](./Database-Optimization.md)
 - [Over-Fetching](./Over-Fetching.md)
 - [Pagination](./Pagination.md)
 - [Performance Benchmarks](./Performance-Benchmarks.md)

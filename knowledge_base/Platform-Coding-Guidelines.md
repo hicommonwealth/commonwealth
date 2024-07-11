@@ -2,7 +2,7 @@
 
 Recommendations, solutions, and best practices for working on Common's backend API.
 
-_See also [Database Migrations: Best Practices](./Database-Migrations.md) and [Database Optimization](./Database-Optimization.md) entries._
+_See also [Database Migrations: Best Practices](./Database-Migrations.md) entry._
 
 ## Contents
 
