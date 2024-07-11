@@ -14,7 +14,8 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.Profile.withMany(db.Address).withMany(db.SsoToken);
+  // TODO: to be deprecated by #5564
+  db.Profile.withMany(db.Address);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -26,7 +27,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     })
     .withMany(db.Reaction)
-    .withMany(db.SsoToken, {
+    .withOne(db.SsoToken, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });
