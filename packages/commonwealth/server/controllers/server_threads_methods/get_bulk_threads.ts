@@ -151,6 +151,7 @@ export async function __getBulkThreads(
                 'address', A.address,
                 'community_id', A.community_id
             ) as "Address",
+            A.profile_id, -- TO BE REMOVED
             A.last_active as address_last_active,
             U.profile->>'avatar_url' as avatar_url, 
             U.profile->>'name' as profile_name
@@ -167,7 +168,7 @@ export async function __getBulkThreads(
                     'community_id', A.community_id,
                     'User', json_build_object(
                         'Profiles', json_build_array(json_build_object(
-                            'id', editor_profiles.id,
+                            'id', A.profile_id, -- TO BE REMOVED OR REPLACED BY user_id
                             'name', editor_profiles.profile->>'name',
                             'address', A.address,
                             'lastActive', A.last_active::text,
@@ -239,7 +240,7 @@ export async function __getBulkThreads(
               'deleted_at', COM.deleted_at::text,
               'marked_as_spam_at', COM.marked_as_spam_at::text,
               'discord_meta', COM.discord_meta,
-              'profile_id', U.id,
+              'profile_id', A.profile_id, -- TO BE REMOVED
               'profile_name', U.profile->>'name',
               'profile_avatar_url', U.profile->>'avatar_url',
               'user_id', U.id
@@ -290,6 +291,7 @@ export async function __getBulkThreads(
       responseThreadsQuery,
       numVotingThreadsQuery,
     ]);
+    console.log(threads);
 
     return {
       limit: replacements.limit,
