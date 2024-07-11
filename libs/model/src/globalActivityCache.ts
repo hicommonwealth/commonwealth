@@ -14,7 +14,7 @@ export async function getActivityFeed(models: DB, id = 0) {
       ranked_threads AS (
         SELECT 
           T.id AS thread_id,
-          T.updated_at as updated_at,
+          T.activity_rank_date,
           json_build_object(
             'id', T.id,
             'body', T.body,
@@ -49,8 +49,8 @@ export async function getActivityFeed(models: DB, id = 0) {
                 ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
                 : ''
             }
-        WHERE T.deleted_at IS NULL
-        ORDER BY T.updated_at DESC
+        WHERE T.deleted_at IS NULL ${id > 0 ? 'AND U.id != :id' : ''}
+        ORDER BY T.activity_rank_date DESC NULLS LAST
         LIMIT 50),
       recent_comments AS ( -- get the recent comments data associated with the thread
         SELECT 
@@ -87,7 +87,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         ranked_threads RTS
         LEFT JOIN recent_comments RC ON RTS.thread_id = RC.thread_id
       ORDER BY
-        RTS.updated_at DESC;
+        RTS.activity_rank_date DESC NULLS LAST;
   `;
 
   const threads: any = await models.sequelize.query(query, {
