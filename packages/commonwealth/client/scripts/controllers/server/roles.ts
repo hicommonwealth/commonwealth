@@ -7,13 +7,6 @@ import AddressInfo from '../../models/AddressInfo';
 import RoleInfo from '../../models/RoleInfo';
 import type { UserController } from './user';
 
-const getPermissionLevel = (permission: AccessLevel | undefined) => {
-  if (permission === undefined) {
-    return AccessLevel.Everyone;
-  }
-  return permission;
-};
-
 export class RolesController {
   constructor(public readonly User: UserController) {}
 
@@ -158,50 +151,6 @@ export class RolesController {
   }
 
   /**
-   * Grabs all joinable addresses for a potential community
-   * @param options A community ID
-   */
-  public getJoinableAddresses(options: { community?: string }): AddressInfo[] {
-    return options.community
-      ? userStore
-          .getState()
-          .addresses.filter((a) => a.community.id === options.community)
-      : userStore.getState().addresses;
-  }
-
-  public getActiveAccountsByRole(): [Account, RoleInfo][] {
-    const activeAccountsByRole = userStore
-      .getState()
-      .accounts.map((account) => {
-        const role = this.getRoleInCommunity({
-          account,
-          community: app.activeChainId(),
-        });
-        return [account, role];
-      });
-    const filteredActiveAccountsByRole = activeAccountsByRole.reduce(
-      (arr: [Account, RoleInfo][], current: [Account, RoleInfo]) => {
-        const index = arr.findIndex(
-          (item) => item[0].address === current[0].address,
-        );
-        if (index < 0) {
-          return [...arr, current];
-        }
-        if (
-          getPermissionLevel(arr[index][1]?.permission) <
-          getPermissionLevel(current[1]?.permission)
-        ) {
-          return [...arr.splice(0, index), current, ...arr.splice(index + 1)];
-        }
-        return arr;
-      },
-      [],
-    );
-
-    return filteredActiveAccountsByRole;
-  }
-
-  /**
    * Given a community ID, determines if the
    * active account is an admin of the specified community.
    * @param options A community or a community ID
@@ -250,15 +199,5 @@ export class RolesController {
     } else {
       return false;
     }
-  }
-
-  public getDefaultAddressInCommunity(options: { community?: string }) {
-    const role = this.roles.find((r) => {
-      const communityMatches = r.community_id === options.community;
-      return communityMatches && r.is_user_default;
-    });
-
-    if (!role) return;
-    return userStore.getState().addresses.find((a) => a.id === role.address_id);
   }
 }

@@ -14,7 +14,7 @@ module.exports = {
         ALTER TABLE public."ProfileTags" DROP COLUMN "profile_id";
 
         ALTER TABLE public."ProfileTags" ADD CONSTRAINT "ProfileTags_pkey" PRIMARY KEY (user_id, tag_id);
-        ALTER TABLE public."ProfileTags" ADD CONSTRAINT "fk_ProfileTags_user_id" 
+        ALTER TABLE public."ProfileTags" ADD CONSTRAINT "fk_ProfileTags_user_id"
         FOREIGN KEY (user_id) REFERENCES public."Users"(id);
         `,
         {

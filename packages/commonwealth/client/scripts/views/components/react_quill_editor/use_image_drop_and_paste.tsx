@@ -57,10 +57,6 @@ export const useImageDropAndPaste = ({
           }
           return true;
         });
-        setContentDelta({
-          ops: opsWithoutBase64Images,
-          ___isMarkdown: true,
-        } as SerializableDeltaStatic);
 
         const file = base64ToFile(imageDataUrl, imageType);
 
@@ -76,6 +72,7 @@ export const useImageDropAndPaste = ({
         editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
 
         setContentDelta({
+          ops: opsWithoutBase64Images,
           ...editor.getContents(),
           ___isMarkdown: true,
         } as SerializableDeltaStatic); // sync state with editor content
