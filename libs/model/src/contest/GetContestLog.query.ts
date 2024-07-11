@@ -8,6 +8,7 @@ export function GetContestLog(): Query<typeof schemas.GetContestLog> {
   return {
     ...schemas.GetContestLog,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestLogEntry>

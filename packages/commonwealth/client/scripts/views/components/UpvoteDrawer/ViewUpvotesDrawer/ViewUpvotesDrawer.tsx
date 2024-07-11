@@ -11,6 +11,8 @@ import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import app from 'state';
+import { User } from 'views/components/user/user';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 import './ViewUpvotesDrawer.scss';
@@ -144,14 +146,30 @@ export const ViewUpvotesDrawer = ({
               <QuillRenderer doc={contentBody} cutoffLines={10} />
             </div>
           </div>
-          {reactorData?.length > 0 ? (
+          {reactorData?.length > 0 && isOpen ? (
             <>
               <CWTable
                 columnInfo={tableState.columns}
                 sortingState={tableState.sorting}
                 setSortingState={tableState.setSorting}
                 // @ts-expect-error <StrictNullChecks/>
-                rowData={getRowData(reactorData)}
+                rowData={getRowData(reactorData).map((reactor) => ({
+                  ...reactor,
+                  name: {
+                    sortValue: reactor.name,
+                    customElement: (
+                      <User
+                        avatarSize={20}
+                        userAddress={reactor.avatars.name.address}
+                        userCommunityId={app?.chain?.id}
+                        shouldShowAsDeleted={
+                          !reactor?.avatars?.name?.address && !app?.chain?.id
+                        }
+                        shouldLinkProfile
+                      />
+                    ),
+                  },
+                }))}
               />
               <div className="upvote-totals">
                 <div className="upvotes">

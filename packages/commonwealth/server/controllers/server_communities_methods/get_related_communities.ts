@@ -39,7 +39,7 @@ export async function __getRelatedCommunities(
       c.thread_count, c.address_count, c.namespace, c.chain_node_id
       FROM "ChainNodes" as cn 
       JOIN "Communities" as c on c.chain_node_id = cn.id
-      WHERE cn.id = :chainNodeId
+      WHERE cn.id = :chainNodeId AND t.deleted_at IS NULL and c.active = true
       GROUP BY c.id
       ORDER BY c.address_count DESC;
     `,

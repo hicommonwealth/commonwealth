@@ -1,4 +1,4 @@
-import { ContentType, slugify } from '@hicommonwealth/shared';
+import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -15,6 +15,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -34,10 +35,9 @@ import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { useFlag } from '../../../hooks/useFlag';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
-import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
+import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -58,12 +58,9 @@ import { getTextFromDelta } from '../../components/react_quill_editor/';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import ViewTemplate from '../view_template/view_template';
 import { LinkedUrlCard } from './LinkedUrlCard';
-import { TemplateActionCard } from './TemplateActionCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
-import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -75,7 +72,6 @@ type ViewThreadPageProps = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
@@ -311,8 +307,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   // @ts-expect-error <StrictNullChecks/>
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
-  // @ts-expect-error <StrictNullChecks/>
-  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -326,11 +320,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
-
-  const showTemplateOptions =
-    proposalTemplatesEnabled && (isAuthor || isAdminOrMod);
-  const showLinkedTemplateOptions =
-    proposalTemplatesEnabled && linkedTemplates.length > 0;
 
   // @ts-expect-error <StrictNullChecks/>
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
@@ -505,6 +494,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
         ]}
       />
+
+      <Helmet>
+        <link
+          rel="canonical"
+          href={getThreadUrl({
+            chain: thread?.communityId || '',
+            id: threadId,
+            title: thread?.title,
+          })}
+        />
+      </Helmet>
+
       <CWPageLayout>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -622,18 +623,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     doc={threadBody ?? thread?.body}
                     cutoffLines={50}
                   />
-                  {showLinkedTemplateOptions &&
-                    linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
-                      <ViewTemplate
-                        contract_address={
-                          linkedTemplates[0]?.identifier.split('/')[1]
-                        }
-                        slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                        // @ts-expect-error <StrictNullChecks/>
-                        setTemplateNickname={null}
-                        isForm
-                      />
-                    )}
                   {/* @ts-expect-error StrictNullChecks*/}
                   {thread.readOnly || fromDiscordBot ? (
                     <>
@@ -849,37 +838,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 onPollCreate={() => setInitializedPolls(false)}
                               />
                             )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(showLinkedTemplateOptions &&
-              linkedTemplates[0]?.display !== LinkDisplay.inline
-                ? [
-                    {
-                      label: 'View Template',
-                      item: (
-                        <div className="cards-column">
-                          <ViewTemplateFormCard
-                            address={
-                              linkedTemplates[0]?.identifier.split('/')[1]
-                            }
-                            slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(showTemplateOptions
-                ? [
-                    {
-                      label: 'Template',
-                      item: (
-                        <div className="cards-column">
-                          {/* @ts-expect-error StrictNullChecks*/}
-                          <TemplateActionCard thread={thread} />
                         </div>
                       ),
                     },

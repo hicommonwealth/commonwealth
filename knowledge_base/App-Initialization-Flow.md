@@ -37,7 +37,7 @@ The goal of this document is to describe the current state of the app initializa
         5. If, _at render time_, the `selectedScope` differs from `app.activeChainId()`, the `isLoading` and `scopeToLoad` global state variables are updated (to `true` and `selectedScope`, respectively). `selectChain()` is fired, receiving new scope's chain as argument; on completion, the `isLoading` state variable is set to `false`.
         6. If none of these conditions apply, the routed-to page is rendered.
 9. If `selectChain()` (`/helpers/chain.ts`) is fired, per step #8:
-    1. If no `chain` argument is passed, the function defaults to a `chain` value set my `app.user.selectedChain`, or else `app.config.defaultChain`.
+    1. If no `chain` argument is passed, the function defaults to a `chain` value set my `app.user.selectedChain`, or else 'edgeware'.
     2. If we do not need to initialize a new chain (i.e. the chain we are switching to has already been initialized and selected), exit the function immediately.
     3. Globally deinit other active communities via `deinitChainOrCommunity`.
         - This method triggers a cascade of “deinit” calls, which set various statuses to false, destroy connections to blockchain endpoints, and eentually sets `app.chain` to `null`.

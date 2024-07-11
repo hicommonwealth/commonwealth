@@ -9,6 +9,7 @@ export function GetStakeHistoricalPrice(): Query<
   return {
     ...schemas.GetStakeHistoricalPrice,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const { past_date_epoch, community_id, stake_id } = payload;
 

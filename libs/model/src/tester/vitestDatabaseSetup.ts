@@ -3,7 +3,7 @@ import { config } from '../config';
 /**
  * A global database setup function for Vitest. This function is executed once before all Vitest test suites.
  */
-export default async function setup(): Promise<void> {
+export async function setup(): Promise<void> {
   if (config.NODE_ENV !== 'test')
     throw new Error('Seeds only work when testing!');
 
@@ -34,3 +34,5 @@ export default async function setup(): Promise<void> {
     throw error;
   }
 }
+
+export default setup;

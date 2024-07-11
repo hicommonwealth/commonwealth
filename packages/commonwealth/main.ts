@@ -174,13 +174,27 @@ export async function main(
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
   app.use(
     '/assets',
     express.static(path.join(__dirname, 'assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
+
+  app.use(
+    '/brand_assets',
+    express.static(path.join(__dirname, 'brand_assets'), {
       setHeaders: (res) => {
         res.setHeader('Cache-Control', 'public');
       },

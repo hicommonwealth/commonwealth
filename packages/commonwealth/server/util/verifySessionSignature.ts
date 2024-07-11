@@ -63,6 +63,7 @@ const verifySessionSignature = async (
           const userEntity = await models.User.createWithProfile?.(
             {
               email: null,
+              profile: {},
             },
             { transaction },
           );

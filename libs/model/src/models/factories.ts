@@ -11,8 +11,6 @@ import Community from './community';
 import CommunityAlert from './community_alerts';
 import CommunityBanner from './community_banner';
 import CommunityContract from './community_contract';
-import CommunityContractTemplate from './community_contract_template';
-import CommunityContractTemplateMetadata from './community_contract_template_metadata';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
@@ -42,7 +40,6 @@ import StarredCommunity from './starred_community';
 import Subscription from './subscription';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
-import Template from './template';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
 import Topic from './topic';
@@ -61,8 +58,6 @@ export const Factories = {
   CommunityAlert,
   CommunityBanner,
   CommunityContract,
-  CommunityContractTemplate,
-  CommunityContractTemplateMetadata,
   CommunityStake,
   CommunityTags,
   Contest,
@@ -92,7 +87,6 @@ export const Factories = {
   Subscription,
   Tags,
   SubscriptionPreference,
-  Template,
   Thread,
   ThreadSubscription,
   Topic,

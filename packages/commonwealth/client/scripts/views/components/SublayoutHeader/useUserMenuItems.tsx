@@ -25,6 +25,7 @@ import {
   chainBaseToCanvasChainId,
 } from 'shared/canvas/chainMappings';
 import { getSessionSigners } from 'shared/canvas/verify';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
 
 import { useCommunityStake } from '../CommunityStake';
 
@@ -96,6 +97,8 @@ const useUserMenuItems = ({
     error: sessionKeyRevalidationError,
   });
 
+  const { data: configurationData } = useFetchConfigurationQuery();
+
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
   const { selectedAddress, setSelectedAddress } =
@@ -155,13 +158,13 @@ const useUserMenuItems = ({
         type: 'default',
         label: (
           <UserMenuItem
-            isSignedIn={!app.config.enforceSessionKeys || signed}
+            isSignedIn={!configurationData?.enforceSessionKeys || signed}
             hasJoinedCommunity={isActive}
             address={account.address}
           />
         ),
         onClick: async () => {
-          if (!app.config.enforceSessionKeys || signed) {
+          if (!configurationData?.enforceSessionKeys || signed) {
             onAddressItemClick?.();
             return await setActiveAccount(account);
           }

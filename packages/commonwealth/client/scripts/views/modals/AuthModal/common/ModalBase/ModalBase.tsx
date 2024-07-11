@@ -150,14 +150,12 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-  const nearWallet = findWalletById(WalletId.NearWallet)?.name;
 
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
-    // 2. On communities based on `Ethereum`, `Cosmos`, `Solana`, `Substrate`, or `Near` chains:
+    // 2. On communities based on `Ethereum`, `Cosmos`, `Solana`, or `Substrate`chains:
     //    - Display wallets specific to the respective community chain.
-    //    - `Near` is the only community where `Near` wallet is shown
     // 3. On non-community pages, show `Ethereum`, `Cosmos`, `Solana`, and `Substrate` based wallets
     // 4. On specific communities, show specific wallets
     //    a. On `terra` community, only show `terrastation` and `terra-walletconnect` (wallet connect for terra) wallets
@@ -175,8 +173,6 @@ const ModalBase = ({
           return solanaWallets;
         case ChainBase.Substrate:
           return substrateWallets;
-        case ChainBase.NEAR:
-          return nearWallet ? [nearWallet] : [];
         default:
           return [];
       }
