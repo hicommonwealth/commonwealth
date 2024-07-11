@@ -192,6 +192,10 @@ export class RabbitMQAdapter implements Broker {
     topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<EventSchemas>,
     retryStrategy?: RetryStrategyFn,
+    hooks?: {
+      beforeHandleEvent: (topic: string, event: any, context: any) => void;
+      afterHandleEvent: (topic: string, event: any, context: any) => void;
+    },
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
@@ -216,6 +220,16 @@ export class RabbitMQAdapter implements Broker {
       subscription.on(
         'message',
         (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
+          const { beforeHandleEvent, afterHandleEvent } = hooks || {};
+          const context: any = {};
+          try {
+            beforeHandleEvent?.(topic, content, context);
+          } catch (err) {
+            this._log.error(
+              `beforeHandleEvent failed on topic ${topic}`,
+              err as Error,
+            );
+          }
           handleEvent(handler, content, true)
             .then(() => {
               this._log.debug('Message Acked', {
@@ -235,6 +249,16 @@ export class RabbitMQAdapter implements Broker {
                   ackOrNackFn,
                   this._log,
                 );
+            })
+            .finally(async () => {
+              try {
+                afterHandleEvent?.(topic, content, context);
+              } catch (err) {
+                this._log.error(
+                  `afterHandleEvent failed on topic ${topic}`,
+                  err as Error,
+                );
+              }
             });
         },
       );
