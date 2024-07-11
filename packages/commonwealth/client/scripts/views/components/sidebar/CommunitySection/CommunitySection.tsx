@@ -12,7 +12,7 @@ import {
 } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { getUniqueTopicIdsIncludedInContest } from 'views/components/sidebar/helpers';
+import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sidebar/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -64,7 +64,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     useCommunityContests();
 
   const topicIdsIncludedInContest =
-    getUniqueTopicIdsIncludedInContest(contestsData);
+    getUniqueTopicIdsIncludedInActiveContest(contestsData);
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;

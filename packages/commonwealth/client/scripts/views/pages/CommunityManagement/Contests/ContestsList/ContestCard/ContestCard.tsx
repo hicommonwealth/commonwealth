@@ -21,6 +21,7 @@ import { SharePopoverOld } from 'views/components/share_popover_old';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import { isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
@@ -84,8 +85,12 @@ const ContestCard = ({
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
 
-  const hasEnded = moment(finishDate) < moment();
-  const isActive = isCancelled ? false : !hasEnded;
+  const isActive = isContestActive({
+    contest: {
+      cancelled: isCancelled,
+      contests: [{ end_time: new Date(finishDate) }],
+    },
+  });
 
   useRerender({ isActive, interval: 6000 });
 

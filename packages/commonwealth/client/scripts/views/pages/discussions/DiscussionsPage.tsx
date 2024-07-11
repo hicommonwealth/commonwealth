@@ -24,13 +24,13 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
-import moment from 'moment';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
@@ -159,12 +159,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     const isContestInTopic = (contest.topics || []).find(
       (topic) => topic.id === topicId,
     );
-    // @ts-expect-error <StrictNullChecks/>
-    const { end_time } = contest.contests[0] || {};
-    const hasEnded = moment(end_time) < moment();
-    const isContestActive = contest.cancelled ? false : !hasEnded;
-
-    return isContestInTopic && isContestActive;
+    const isActive = isContestActive({ contest });
+    return isContestInTopic && isActive;
   });
 
   return (
