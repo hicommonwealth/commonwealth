@@ -1,7 +1,7 @@
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check } from 'k6';
 import http from 'k6/http';
-import { TRPC_API_URL } from '../../src/config';
+import { TRPC_API_URL } from '../util/config.ts';
 
 const JWT_token = '';
 

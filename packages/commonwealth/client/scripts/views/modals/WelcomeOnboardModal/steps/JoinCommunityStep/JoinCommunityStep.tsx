@@ -1,4 +1,4 @@
-import { ChainNetwork } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import Permissions from 'client/scripts/utils/Permissions';
 import ChainInfo from 'models/ChainInfo';
 import React, { useEffect, useRef, useState } from 'react';
@@ -33,7 +33,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
     if (!isLoadingProfile && profile && !areCommunitiesSuggested.current) {
       const suggestions = findSuggestedCommunities({
         maxCommunitiesToFind: 4,
-        userChainNetwork: userAddress?.current?.profile?.chain as ChainNetwork,
+        userChainBase: userAddress?.current?.community?.base as ChainBase,
         userPreferenceTags: (profile?.tags || []).map((t) => t.name),
       });
       setSuggestedCommunities(

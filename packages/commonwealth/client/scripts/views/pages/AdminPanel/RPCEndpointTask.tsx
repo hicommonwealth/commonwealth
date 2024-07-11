@@ -7,6 +7,8 @@ import NodeInfo from 'models/NodeInfo';
 import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { getNodeByCosmosChainId, getNodeByUrl } from 'state/api/nodes/utils';
+import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
 import {
   CWDropdown,
   DropdownItemType,
@@ -56,6 +58,8 @@ const RPCEndpointTask = () => {
   const [ethChainIdValueValidated, setEthChainIdValueValidated] =
     useState<boolean>(false);
 
+  const { data: nodes } = useFetchNodesQuery();
+
   useEffect(() => {
     if (balanceType === BalanceType.Cosmos) {
       getCosmosChainIds().then((res) => {
@@ -95,7 +99,7 @@ const RPCEndpointTask = () => {
 
     setErrorMsg(null);
 
-    const nodeInfo = app.config.nodes.getByUrl(value);
+    const nodeInfo = getNodeByUrl(value, nodes);
 
     if (nodeInfo) {
       setCommunityChainNode(nodeInfo);
@@ -110,9 +114,7 @@ const RPCEndpointTask = () => {
   const checkIfCosmosChainNodeExists = (
     selectedCosmosChainId: string,
   ): void => {
-    const cosmosNodeInfo = app.config.nodes.getByCosmosChainId(
-      selectedCosmosChainId,
-    );
+    const cosmosNodeInfo = getNodeByCosmosChainId(selectedCosmosChainId);
 
     if (cosmosNodeInfo) {
       setCommunityChainNode(cosmosNodeInfo);

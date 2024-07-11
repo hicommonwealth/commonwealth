@@ -10,6 +10,8 @@ import {
   type DB,
   type ProfileAttributes,
 } from '@hicommonwealth/model';
+
+import { incrementProfileCount } from '@hicommonwealth/model';
 import { CANVAS_TOPIC } from '../../shared/canvas';
 
 /**
@@ -57,8 +59,23 @@ const verifySessionSignature = async (
         addressModel.user_id = existingAddress.user_id;
         addressModel.profile_id = existingAddress.profile_id;
       } else {
-        const user = await models.User.createWithProfile?.({
-          email: null,
+        const user = await models.sequelize.transaction(async (transaction) => {
+          const userEntity = await models.User.createWithProfile?.(
+            {
+              email: null,
+              profile: {},
+            },
+            { transaction },
+          );
+
+          await incrementProfileCount(
+            models,
+            addressModel.community_id,
+            userEntity!.id!,
+            transaction,
+          );
+
+          return userEntity;
         });
         if (!user || !user.id) throw new Error('Failed to create user');
         addressModel.profile_id = (user!.Profiles?.[0] as ProfileAttributes).id;

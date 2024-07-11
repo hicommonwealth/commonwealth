@@ -1,20 +1,9 @@
+import { SsoToken } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import type { AddressAttributes } from './address';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type SsoTokenAttributes = {
-  id?: number;
-  issued_at?: number;
-  issuer?: string;
-  address_id?: number;
-  profile_id?: number;
-  state_id?: string;
-  created_at?: Date;
-  updated_at?: Date;
-  Address?: AddressAttributes;
-};
-
-export type SsoTokenInstance = ModelInstance<SsoTokenAttributes>;
+export type SsoTokenInstance = ModelInstance<z.infer<typeof SsoToken>>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -22,12 +11,10 @@ export default (
   sequelize.define<SsoTokenInstance>(
     'SsoToken',
     {
-      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      issued_at: { type: Sequelize.INTEGER, allowNull: true },
-      issuer: { type: Sequelize.STRING, allowNull: true },
-      address_id: { type: Sequelize.INTEGER, allowNull: true },
-      profile_id: { type: Sequelize.INTEGER, allowNull: true },
-      state_id: { type: Sequelize.STRING, allowNull: true },
+      address_id: { type: Sequelize.INTEGER, primaryKey: true },
+      issued_at: { type: Sequelize.INTEGER, allowNull: false },
+      issuer: { type: Sequelize.STRING, allowNull: false },
+      state_id: { type: Sequelize.STRING },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
@@ -35,7 +22,7 @@ export default (
       tableName: 'SsoTokens',
       underscored: true,
       timestamps: true,
-      indexes: [{ fields: ['id'] }, { fields: ['issuer', 'address_id'] }],
+      indexes: [{ fields: ['issuer', 'address_id'] }],
       defaultScope: {
         attributes: {
           exclude: [
