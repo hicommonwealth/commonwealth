@@ -6,7 +6,6 @@
 - [Essential Performance Tools](#essential-performance-tools)
   * [Browser Network Tab: Chrome/Firefox/Safari](#browser-network-tab-chromefirefoxsafari)
     + [Geographic Performance Assessment: WebPageTest.org](#geographic-performance-assessment-webpagetestorg)
-  * [Load Testing: Artillery](#load-testing-artillery)
   * [Datadog Dashboards](#datadog-dashboards)
 - [Change Log](#change-log)
 
@@ -33,21 +32,6 @@ Refer to the [Chrome DevTools Network Reference Guide](https://developer.chrome.
 #### Geographic Performance Assessment: WebPageTest.org
 
 This tool enables performance testing from multiple global locations, providing insights into performance discrepancies based on geography. Key features include HAR file exports, result history storage, result sharing, and CDN setup and caching verification across various edge servers.
-
-### Load Testing: Artillery
-
-Load testing assesses system behavior under certain loads in terms of concurrent users or transactions. It assists in identifying an application's maximum operating capacity, bottlenecks, and elements contributing to performance degradation.
-
-Artillery allows the creation of load tests, like simulating 5 new users every second for 10 seconds:
-
-```yaml
-phases:
-    - name: "Warm up"
-      duration: 10
-      arrivalRate: 5
-```
-
-Artillery supports defining scenarios for both POST and GET endpoints and capturing responses for use in subsequent requests. It also accommodates various plugins for metrics export in different formats and direct event transmission to Datadog or local statsd servers.
 
 ### Datadog Dashboards
 
