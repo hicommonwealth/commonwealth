@@ -402,10 +402,21 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onWalletSelect = async (wallet: Wallet) => {
-    await wallet.enable();
+    try {
+      await wallet.enable();
+    } catch (error) {
+      notifyError(error?.message || error);
+      return;
+    }
     setSelectedWallet(wallet);
 
     const selectedAddress = getAddressFromWallet(wallet);
+    if (!selectedAddress) {
+      notifyError(
+        `We couldn't fetch an address from your wallet! Please make sure your wallet account is setup and try again`,
+      );
+      return;
+    }
 
     if (userOnboardingEnabled) {
       // check if address exists
