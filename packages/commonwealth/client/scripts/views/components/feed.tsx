@@ -4,7 +4,7 @@ import { Virtuoso } from 'react-virtuoso';
 import 'components/feed.scss';
 
 import { PageNotFound } from '../pages/404';
-import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
+import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
@@ -214,7 +214,7 @@ export const Feed = ({
           customScrollParent={customScrollParent}
           totalCount={4}
           style={{ height: '100%' }}
-          itemContent={(i) => <UserDashboardRow key={i} showSkeleton />}
+          itemContent={(i) => <UserDashboardRowSkeleton key={i} />}
         />
       </div>
     );
