@@ -9,9 +9,13 @@ module.exports = {
         allowNull: true,
         transaction,
       });
-      await queryInterface.addIndex('Threads', ['activity_rank_date'], {
-        transaction,
-      });
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE INDEX IF NOT EXISTS threads_activity_rank_date ON "Threads" (activity_rank_date DESC NULLS LAST);
+      `,
+        { transaction },
+      );
     });
   },
 
