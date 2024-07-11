@@ -1,7 +1,8 @@
-import { models } from '@hicommonwealth/model';
 import { Transaction } from 'sequelize';
+import { DB } from '../models';
 
 export const incrementProfileCount = async (
+  models: DB,
   community_id: string,
   user_id: number,
   transaction: Transaction,
@@ -25,6 +26,7 @@ export const incrementProfileCount = async (
 };
 
 export const decrementProfileCount = async (
+  models: DB,
   community_id: string,
   user_id: number,
   transaction: Transaction,

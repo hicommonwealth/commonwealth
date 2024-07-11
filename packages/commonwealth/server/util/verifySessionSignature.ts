@@ -69,6 +69,7 @@ const verifySessionSignature = async (
           );
 
           await incrementProfileCount(
+            models,
             addressModel.community_id,
             userEntity!.id!,
             transaction,
