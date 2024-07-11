@@ -74,14 +74,14 @@ export function generateDiscussionData(
     typeof EnrichedUserMentionedNotification
   > = {
     ...userMentionedNotification,
-    author_avatar_url: authorProfile.avatar_url!,
+    author_avatar_url: authorUser.profile.avatar_url!,
   };
 
   const enrichedCommentCreatedNotification: z.infer<
     typeof EnrichedCommentCreatedNotification
   > = {
     ...commentCreatedNotification,
-    author_avatar_url: authorProfile.avatar_url!,
+    author_avatar_url: authorUser.profile.avatar_url!,
   };
 
   const date = new Date();
