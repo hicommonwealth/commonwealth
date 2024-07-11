@@ -23,7 +23,7 @@ const ThreadContestTagContainer = ({
     <>
       {showContestWinnerTag &&
         contestWinners.map((winner, index) => {
-          if (!winner) {
+          if (!winner || winner?.prize === 0) {
             return null;
           }
 

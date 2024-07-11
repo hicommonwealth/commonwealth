@@ -23,8 +23,8 @@ export const Thread = z.object({
 
   has_poll: z.boolean().nullish(),
 
-  canvas_signed_data: z.string(),
-  canvas_hash: z.string(),
+  canvas_signed_data: z.string().nullish(),
+  canvas_hash: z.string().nullish(),
 
   created_at: zDate.nullish(),
   updated_at: zDate.nullish(),

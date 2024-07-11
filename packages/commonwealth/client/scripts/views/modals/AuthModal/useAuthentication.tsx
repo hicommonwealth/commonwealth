@@ -93,7 +93,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           );
         })
@@ -402,10 +402,21 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onWalletSelect = async (wallet: Wallet) => {
-    await wallet.enable();
+    try {
+      await wallet.enable();
+    } catch (error) {
+      notifyError(error?.message || error);
+      return;
+    }
     setSelectedWallet(wallet);
 
     const selectedAddress = getAddressFromWallet(wallet);
+    if (!selectedAddress) {
+      notifyError(
+        `We couldn't fetch an address from your wallet! Please make sure your wallet account is setup and try again`,
+      );
+      return;
+    }
 
     if (userOnboardingEnabled) {
       // check if address exists

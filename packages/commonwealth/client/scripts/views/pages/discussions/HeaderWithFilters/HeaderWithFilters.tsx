@@ -9,11 +9,6 @@ import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import {
-  CommunityStakeBanner,
-  useCommunityStake,
-} from 'views/components/CommunityStake';
-import DismissStakeBannerModal from 'views/components/CommunityStake/DismissStakeBannerModal';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -29,8 +24,6 @@ import {
 } from '../../../../models/types';
 
 import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useCommunityStakeStore from 'state/ui/communityStake';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 
@@ -59,25 +52,20 @@ export const HeaderWithFilters = ({
   onIncludeArchivedThreads,
   isOnArchivePage,
 }: HeaderWithFiltersProps) => {
-  const communityStakeEnabled = useFlag('communityStake');
   const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
   // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
-  const [isDismissStakeBannerModalOpen, setIsDismissStakeBannerModalOpen] =
-    useState(false);
+
   const forceRerender = useForceRerender();
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const { isLoggedIn } = useUserLoggedIn();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
-  const { stakeEnabled } = useCommunityStake();
-  const { dismissBanner, isBannerVisible } = useCommunityStakeStore();
   const { isContestAvailable, contestsData } = useCommunityContests();
 
   const onFilterResize = () => {
@@ -207,35 +195,10 @@ export const HeaderWithFilters = ({
     }
   };
 
-  const handleDismissStakeBannerModal = (
-    dismissForThisCommunity: boolean,
-    dismissForAnyCommunity: boolean,
-  ) => {
-    setIsDismissStakeBannerModalOpen(false);
-
-    dismissBanner({
-      communityId: app.activeChainId(),
-      communityDismissal: dismissForThisCommunity,
-      allCommunitiesDismissal: dismissForAnyCommunity,
-    });
-  };
-
-  const stakeBannerEnabled =
-    isLoggedIn &&
-    communityStakeEnabled &&
-    stakeEnabled &&
-    isBannerVisible(app.activeChainId());
-
   const contestFiltersVisible = contestsEnabled && isContestAvailable;
 
   return (
     <div className="HeaderWithFilters">
-      {stakeBannerEnabled && (
-        <CommunityStakeBanner
-          onClose={() => setIsDismissStakeBannerModalOpen(true)}
-        />
-      )}
-
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic)
@@ -526,17 +489,6 @@ export const HeaderWithFilters = ({
         // @ts-expect-error <StrictNullChecks/>
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
-      />
-      <CWModal
-        size="small"
-        content={
-          <DismissStakeBannerModal
-            onModalClose={() => setIsDismissStakeBannerModalOpen(false)}
-            onDismiss={handleDismissStakeBannerModal}
-          />
-        }
-        onClose={() => setIsDismissStakeBannerModalOpen(false)}
-        open={isDismissStakeBannerModalOpen}
       />
     </div>
   );

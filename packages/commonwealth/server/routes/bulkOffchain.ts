@@ -7,7 +7,6 @@ import { ServerError } from '@hicommonwealth/core';
 //
 import type {
   CommunityBannerInstance,
-  CommunityContractTemplateInstance,
   ContractInstance,
   DB,
 } from '@hicommonwealth/model';
@@ -38,7 +37,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
-          ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
         }>,
       ]
@@ -82,19 +80,8 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
         });
         const contractsWithTemplates: Array<{
           contract: ContractInstance;
-          ccts: Array<CommunityContractTemplateInstance>;
-          hasGlobalTemplate: boolean;
         }> = [];
         for (const cc of communityContracts) {
-          const ccts = await models.CommunityContractTemplate.findAll({
-            where: {
-              community_contract_id: cc.id,
-            },
-            include: {
-              model: models.CommunityContractTemplateMetadata,
-              required: false,
-            },
-          });
           const contract = await models.Contract.findOne({
             where: {
               id: cc.contract_id,
@@ -107,17 +94,8 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
             ],
           });
 
-          const globalTemplate = await models.Template.findOne({
-            where: {
-              // @ts-expect-error StrictNullChecks
-              abi_id: contract.abi_id,
-            },
-          });
-
-          const hasGlobalTemplate = !!globalTemplate;
-
           // @ts-expect-error StrictNullChecks
-          contractsWithTemplates.push({ contract, ccts, hasGlobalTemplate });
+          contractsWithTemplates.push({ contract });
         }
         resolve(contractsWithTemplates);
       } catch (e) {
@@ -136,7 +114,6 @@ const bulkOffchain = async (models: DB, req: TypedRequest, res: Response) => {
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
         return {
           contract: c.contract.toJSON(),
-          ccts: c.ccts,
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),

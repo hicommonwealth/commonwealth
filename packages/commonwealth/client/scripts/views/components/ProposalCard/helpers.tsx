@@ -1,11 +1,5 @@
-import React from 'react';
-
-import { ProposalState as AaveProposalState } from '../../../../../shared/chain/types/aave';
-import { ProposalState as CompoundProposalState } from '../../../../../shared/chain/types/compound';
-
 import 'components/ProposalCard/ProposalCard.scss';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
+import React from 'react';
 
 import {
   blocknumToDuration,
@@ -33,18 +27,7 @@ export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
 
 export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
   if (isLoading) return 'loading...';
-  if (proposal.completed && proposal instanceof AaveProposal) {
-    if (proposal.state === AaveProposalState.CANCELED) return 'Cancelled';
-    if (proposal.state === AaveProposalState.EXECUTED) return 'Executed';
-    if (proposal.state === AaveProposalState.EXPIRED) return 'Expired';
-    if (proposal.state === AaveProposalState.FAILED) return 'Did not pass';
-  } else if (proposal.completed && proposal instanceof CompoundProposal) {
-    if (proposal.state === CompoundProposalState.Canceled) return 'Cancelled';
-    if (proposal.state === CompoundProposalState.Executed) return 'Executed';
-    if (proposal.state === CompoundProposalState.Expired) return 'Expired';
-    if (proposal.state === CompoundProposalState.Defeated)
-      return 'Did not pass';
-  } else if (proposal.completed) {
+  if (proposal.completed) {
     if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
     if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
     return 'Completed';
@@ -90,39 +73,6 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
       : proposal.endTime.kind === 'unavailable'
       ? ''
       : '';
-
-  if (proposal instanceof AaveProposal) {
-    if (proposal.state === AaveProposalState.ACTIVE)
-      return [
-        proposal.isPassing === ProposalStatus.Passing
-          ? 'Passing, '
-          : 'Not passing, ',
-        countdown,
-      ];
-    if (proposal.state === AaveProposalState.PENDING)
-      return ['Pending, ', countdown];
-    if (proposal.state === AaveProposalState.QUEUED)
-      return ['Queued, ', countdown];
-    if (proposal.state === AaveProposalState.SUCCEEDED) return 'Ready to queue';
-    if (proposal.state === AaveProposalState.EXPIRED) return 'Expired';
-  }
-
-  if (proposal instanceof CompoundProposal) {
-    if (proposal.state === CompoundProposalState.Active)
-      return [
-        proposal.isPassing === ProposalStatus.Passing
-          ? 'Passing, '
-          : 'Not passing, ',
-        countdown,
-      ];
-    if (proposal.state === CompoundProposalState.Pending)
-      return ['Pending, ', countdown];
-    if (proposal.state === CompoundProposalState.Queued)
-      return ['Queued, ', countdown];
-    if (proposal.state === CompoundProposalState.Succeeded)
-      return 'Ready to queue';
-    if (proposal.state === CompoundProposalState.Expired) return 'Expired';
-  }
 
   if (proposal.isPassing === ProposalStatus.Passed)
     return [

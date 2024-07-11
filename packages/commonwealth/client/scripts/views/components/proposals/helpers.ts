@@ -1,103 +1,6 @@
-import { formatCoin } from 'adapters/currency';
-import { notifyError } from 'controllers/app/notifications';
-import {
-  CosmosProposal,
-  CosmosVote,
-} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
-import CompoundProposal, {
-  BravoVote,
-  CompoundProposalVote,
-} from 'controllers/chain/ethereum/compound/proposal';
-import { ProposalState } from '../../../../../shared/chain/types/compound';
-import type { IVote } from '../../../models/interfaces';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { AnyProposal } from '../../../models/types';
-import { ProposalStatus, VotingUnit } from '../../../models/types';
-
-import app from 'state';
-
-export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
-  const balancesCache = {};
-  const balancesCacheInitialized = {};
-
-  const balanceWeighted =
-    proposal.votingUnit === VotingUnit.CoinVote ||
-    proposal.votingUnit === VotingUnit.ConvictionCoinVote ||
-    proposal.votingUnit === VotingUnit.PowerVote;
-
-  let balance;
-
-  if (balanceWeighted && !(vote instanceof CosmosVote)) {
-    // fetch and display balances
-    if (balancesCache[vote.account.address]) {
-      balance = balancesCache[vote.account.address];
-    } else if (balancesCacheInitialized[vote.account.address]) {
-      // do nothing, fetch already in progress
-      balance = '--';
-    } else {
-      // fetch balance and store in cache
-      balancesCacheInitialized[vote.account.address] = true;
-
-      if (vote instanceof AaveProposalVote) {
-        balance = vote.power;
-        balancesCache[vote.account.address] = vote.format();
-      } else if (vote instanceof CompoundProposalVote) {
-        balance = formatCoin(app.chain.chain.coins(vote.power), true);
-        balancesCache[vote.account.address] = balance;
-      } else {
-        vote.account.balance.then((b) => {
-          balance = b;
-          balancesCache[vote.account.address] = formatCoin(b, true);
-        });
-        balance = '--';
-      }
-    }
-  }
-
-  return balance;
-};
-
-export const cancelProposal = (
-  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  toggleVotingModal: (newModalState: boolean) => void,
-  proposal: AnyProposal,
-  onModalClose?: () => void,
-) => {
-  e.preventDefault();
-  toggleVotingModal(true);
-
-  if (proposal instanceof CompoundProposal) {
-    proposal
-      .cancelTx()
-      .then(() => {
-        // @ts-expect-error StrictNullChecks
-        onModalClose();
-      })
-      .catch((err) => {
-        // @ts-expect-error StrictNullChecks
-        onModalClose();
-        console.error(err.toString());
-      });
-  } else if (proposal instanceof AaveProposal) {
-    proposal
-      .cancelTx()
-      .then(() => {
-        // @ts-expect-error StrictNullChecks
-        onModalClose();
-      })
-      .catch((err) => {
-        // @ts-expect-error StrictNullChecks
-        onModalClose();
-        console.error(err.toString());
-      });
-  } else {
-    // @ts-expect-error StrictNullChecks
-    onModalClose();
-    return notifyError('Invalid proposal type');
-  }
-};
+import { ProposalStatus } from '../../../models/types';
 
 export const getCanVote = (
   proposal: AnyProposal,
@@ -110,11 +13,6 @@ export const getCanVote = (
   } else if (
     proposal.isPassing !== ProposalStatus.Passing &&
     proposal.isPassing !== ProposalStatus.Failing
-  ) {
-    canVote = false;
-  } else if (
-    proposal instanceof CompoundProposal &&
-    proposal.state !== ProposalState.Active
   ) {
     canVote = false;
   } else if (hasVotedForAnyChoice) {
@@ -130,7 +28,6 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
   let hasVotedAbstain;
   let hasVotedVeto;
   let hasVotedForAnyChoice;
-  let hasVotedRemove;
 
   if (proposal instanceof CosmosProposal) {
     hasVotedYes =
@@ -169,49 +66,9 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
             vote.choice === 'NoWithVeto' &&
             vote.account.address === user.address,
         ).length > 0;
-  } else if (proposal instanceof CompoundProposal) {
-    hasVotedYes =
-      user &&
-      proposal
-        .getVotes()
-        .filter(
-          (vote) =>
-            vote.choice === BravoVote.YES &&
-            vote.account.address === user.address,
-        ).length > 0;
 
-    hasVotedNo =
-      user &&
-      proposal
-        .getVotes()
-        .filter(
-          (vote) =>
-            vote.choice === BravoVote.NO &&
-            vote.account.address === user.address,
-        ).length > 0;
-
-    hasVotedAbstain =
-      user &&
-      proposal
-        .getVotes()
-        .filter(
-          (vote) =>
-            vote.choice === BravoVote.ABSTAIN &&
-            vote.account.address === user.address,
-        ).length > 0;
-  } else if (proposal instanceof AaveProposal) {
-    hasVotedYes =
-      user &&
-      proposal
-        .getVotes()
-        .find((vote) => vote.choice && vote.account.address === user.address);
-
-    hasVotedNo =
-      user &&
-      proposal
-        .getVotes()
-        .find((vote) => !vote.choice && vote.account.address === user.address);
-    hasVotedForAnyChoice = hasVotedYes || hasVotedNo;
+    hasVotedForAnyChoice =
+      hasVotedYes || hasVotedNo || hasVotedAbstain || hasVotedVeto;
   }
 
   return {
@@ -220,6 +77,5 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
     hasVotedAbstain,
     hasVotedVeto,
     hasVotedForAnyChoice,
-    hasVotedRemove,
   };
 };
