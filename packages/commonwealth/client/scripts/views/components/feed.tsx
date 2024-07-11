@@ -126,7 +126,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
-      customStages={chain.customStages}
+      customStages={chain?.customStages}
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
