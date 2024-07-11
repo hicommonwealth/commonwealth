@@ -4,6 +4,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
@@ -137,9 +138,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find(
-        (addr) => addr.address === accounts[0],
-      );
+      const updatedAddress = userStore
+        .getState()
+        .accounts.find((addr) => addr.address === accounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
     });

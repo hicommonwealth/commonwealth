@@ -1,10 +1,11 @@
 import axios from 'axios';
 import 'components/Avatar/AvatarUpload.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { Avatar } from 'views/components/Avatar/Avatar';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
@@ -49,6 +50,7 @@ export const AvatarUpload = ({
   uploadStartedCallback,
 }: AvatarUploadProps) => {
   const [files, setFiles] = useState([]);
+  const user = useUserStore();
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 10000000,
@@ -77,7 +79,7 @@ export const AvatarUpload = ({
             name: acceptedFiles[0].name, // imageName.png
             mimetype: acceptedFiles[0].type, // image/png
             auth: true,
-            jwt: app.user.jwt,
+            jwt: user.jwt,
           },
         );
         if (response.data.status !== 'Success') throw new Error();
@@ -99,11 +101,6 @@ export const AvatarUpload = ({
       }
     },
   });
-
-  useEffect(() => {
-    // @ts-expect-error StrictNullChecks
-    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
-  }, []);
 
   const avatarSize = size === 'small' ? 60 : 108;
   const forUser = scope === 'user';

@@ -11,6 +11,7 @@ import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
 import { fetchCachedConfiguration } from 'state/api/configuration';
+import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 import { hexToNumber } from 'web3-utils';
 
@@ -184,9 +185,9 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === accounts[0],
-        );
+        const updatedAddress = userStore
+          .getState()
+          .accounts.find((addr) => addr.address === accounts[0]);
         if (!updatedAddress) return;
         await setActiveAccount(updatedAddress);
       },

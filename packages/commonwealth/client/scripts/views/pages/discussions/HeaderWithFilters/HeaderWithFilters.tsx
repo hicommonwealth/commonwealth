@@ -2,7 +2,6 @@ import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -23,7 +22,8 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
+import useUserStore from 'state/ui/user';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 
@@ -63,10 +63,11 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
   const { isContestAvailable, contestsData } = useCommunityContests();
+
+  const user = useUserStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -228,7 +229,7 @@ export const HeaderWithFilters = ({
                   }`,
                 );
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>

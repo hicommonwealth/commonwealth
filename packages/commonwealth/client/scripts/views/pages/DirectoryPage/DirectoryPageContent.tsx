@@ -1,7 +1,8 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { APIOrderDirection } from 'helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -83,6 +84,8 @@ const DirectoryPageContent = ({
   tableData,
   filteredRelatedCommunitiesData,
 }: DirectoryPageContentProps) => {
+  const user = useUserStore();
+
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'members',
@@ -126,7 +129,7 @@ const DirectoryPageContent = ({
         const chain = app.config.chains.getById(community.id);
 
         // allow user to buy stake if they have a connected address that matches active community base chain
-        const canBuyStake = !!app?.user?.addresses?.find?.(
+        const canBuyStake = !!user.addresses.find?.(
           (address) => address?.community?.base === chain?.base,
         );
 
