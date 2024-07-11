@@ -257,7 +257,7 @@ export async function __updateThread(
 
       await this.models.ThreadVersionHistory.create(
         {
-          thread_id: threadId,
+          thread_id: threadId!,
           address: address.address,
           body,
           timestamp: new Date(),
