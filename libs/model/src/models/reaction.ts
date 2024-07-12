@@ -1,8 +1,7 @@
-import { Actor, EventNames, logger, stats } from '@hicommonwealth/core';
+import { EventNames, logger, stats } from '@hicommonwealth/core';
 import Sequelize from 'sequelize';
 import { fileURLToPath } from 'url';
-import { Contest } from '..';
-import { emitEvent } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
@@ -77,14 +76,13 @@ export default (
                   const { topic_id, community_id } = thread.get({
                     plain: true,
                   });
-                  const contestManagers =
-                    await Contest.GetThreadContestManagers().body({
-                      actor: {} as Actor,
-                      payload: {
+                  const contestManagers = !topic_id
+                    ? []
+                    : await getThreadContestManagers(
+                        sequelize,
                         topic_id,
                         community_id,
-                      },
-                    });
+                      );
 
                   await emitEvent(
                     Outbox,

@@ -1,9 +1,8 @@
-import { Actor, EventNames } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { GetThreadContestManagers } from '../contest/GetThreadContestManagers.query';
-import { emitEvent } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { NotificationAttributes } from './notification';
@@ -144,13 +143,9 @@ export default (
           const { topic_id, community_id } = thread.get({
             plain: true,
           });
-          const contestManagers = await GetThreadContestManagers().body({
-            actor: {} as Actor,
-            payload: {
-              topic_id,
-              community_id,
-            },
-          });
+          const contestManagers = !topic_id
+            ? []
+            : await getThreadContestManagers(sequelize, topic_id, community_id);
 
           await emitEvent(
             Outbox,
