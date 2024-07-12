@@ -56,10 +56,10 @@ export const GetStakeTransaction = {
       stake_direction: z.string(),
       community: z.object({
         id: z.string(),
-        default_symbol: z.string().nullable(),
-        icon_url: z.string().nullable(),
+        default_symbol: z.string().nullish(),
+        icon_url: z.string().nullish(),
         name: z.string(),
-        chain_node_id: PG_INT.nullable(),
+        chain_node_id: PG_INT.nullish(),
       }),
     })
     .array(),
@@ -74,7 +74,7 @@ export const GetStakeHistoricalPrice = {
   output: z
     .object({
       community_id: z.string(),
-      old_price: z.string().nullable(),
+      old_price: z.string().nullish(),
     })
     .array(),
 };
