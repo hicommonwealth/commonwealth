@@ -52,7 +52,7 @@ export const updateTags = async (
             })),
           );
 
-    if (!status || !newRows) {
+    if (!(status || newRows)) {
       throw new AppError('Failed');
     }
   }

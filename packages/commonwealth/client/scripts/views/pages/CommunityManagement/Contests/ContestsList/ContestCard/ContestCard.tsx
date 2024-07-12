@@ -4,11 +4,11 @@ import React from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -59,7 +59,6 @@ interface ContestCardProps {
   feeManagerBalance?: string;
   isRecurring: boolean;
   showShareButton?: boolean;
-  showFundButton?: boolean;
   isHorizontal?: boolean;
 }
 
@@ -81,7 +80,7 @@ const ContestCard = ({
   isHorizontal = false,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
 
@@ -244,7 +243,7 @@ const ContestCard = ({
             />
           )}
 
-          {onFund && isActive && hasJoinedCommunity && (
+          {onFund && isActive && user.activeAccount && (
             <CWThreadAction
               label="Fund"
               action="fund"

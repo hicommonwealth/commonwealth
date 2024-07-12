@@ -1,7 +1,7 @@
 import React from 'react';
 
-import FeatureHint from 'client/scripts/views/components/FeatureHint';
 import AddressInfo from 'models/AddressInfo';
+import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import BasicInformationForm from './BasicInformationForm/BasicInformationForm';

@@ -1,4 +1,3 @@
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -26,6 +25,7 @@ import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -74,15 +74,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
+  const user = useUserStore();
+
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: communityId,
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   const { contestsData } = useCommunityContests();
-
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -196,7 +196,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!hasJoinedCommunity,
+            isCommunityMember: !!user.activeAccount,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,

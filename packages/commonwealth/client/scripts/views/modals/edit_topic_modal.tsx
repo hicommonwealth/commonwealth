@@ -18,7 +18,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import { notifySuccess } from 'controllers/app/notifications';
 import '../../../styles/modals/edit_topic_modal.scss';
 import useAppStatus from '../../hooks/useAppStatus';
 

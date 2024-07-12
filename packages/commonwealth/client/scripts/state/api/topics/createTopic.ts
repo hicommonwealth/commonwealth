@@ -3,6 +3,7 @@ import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface CreateTopicProps {
   name: string;
@@ -32,7 +33,7 @@ const createTopic = async ({
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
       default_offchain_template: defaultOffchainTemplate,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       community_id: app.activeChainId(),
     },
     {

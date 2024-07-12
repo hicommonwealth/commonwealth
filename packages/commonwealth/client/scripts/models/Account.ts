@@ -8,6 +8,7 @@ import type momentType from 'moment';
 import moment from 'moment';
 import { serializeCanvas } from 'shared/canvas/types';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import { userStore } from '../state/ui/user';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
@@ -176,7 +177,7 @@ class Account {
     const params = {
       address: this.address,
       community_id: this.community.id,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
       session: serializeCanvas(session),
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,

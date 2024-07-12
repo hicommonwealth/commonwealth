@@ -2,19 +2,26 @@ import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import useUserStore from 'state/ui/user';
+import { useCommunityStake } from 'views/components/CommunityStake';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
+import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { useFlag } from '../../../../hooks/useFlag';
 import type Topic from '../../../../models/Topic';
 import {
@@ -23,13 +30,6 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
-import moment from 'moment/moment';
-import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
-import { useCommunityStake } from 'views/components/CommunityStake';
-import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
-import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import './HeaderWithFilters.scss';
 
 type HeaderWithFiltersProps = {
@@ -73,7 +73,6 @@ export const HeaderWithFilters = ({
   const ethChainId = app?.chain?.meta?.ChainNode?.ethChainId;
   const { stakeData } = useCommunityStake();
   const namespace = stakeData?.Community?.namespace;
-
   const { isContestAvailable, contestsData, stakeEnabled } =
     useCommunityContests();
 
@@ -83,9 +82,10 @@ export const HeaderWithFilters = ({
     apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
   });
 
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const { totalThreadsInCommunityForVoting } =
     useEXCEPTION_CASE_threadCountersStore();
+
+  const user = useUserStore();
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -247,7 +247,7 @@ export const HeaderWithFilters = ({
                   }`,
                 );
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>
