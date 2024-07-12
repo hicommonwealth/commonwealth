@@ -216,6 +216,10 @@ export interface Broker extends Disposable {
     topic: BrokerSubscriptions,
     handler: EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
+    hooks?: {
+      beforeHandleEvent: (topic: string, content: any, context: any) => void;
+      afterHandleEvent: (topic: string, content: any, context: any) => void;
+    },
   ): Promise<boolean>;
 }
 
@@ -368,4 +372,9 @@ export interface NotificationsProvider extends Disposable {
    * @returns A set containing the ids of the schedules that were successfully deleted
    */
   deleteSchedules(options: { schedule_ids: string[] }): Promise<Set<string>>;
+
+  registerClientRegistrationToken(
+    userId: number,
+    token: string,
+  ): Promise<boolean>;
 }

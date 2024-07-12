@@ -1,13 +1,15 @@
 import 'Layout.scss';
-import { deinitChainOrCommunity, selectCommunity } from 'helpers/chain';
+import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
+import { useFetchConfigurationQuery } from 'state/api/configuration';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
+import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
@@ -39,17 +41,25 @@ const LayoutComponent = ({
   const [scopeToLoad, setScopeToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
+  const { mutateAsync: updateActiveCommunity } =
+    useUpdateUserActiveCommunityMutation();
+  const { data: configurationData } = useFetchConfigurationQuery();
+
   // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
-    const redirectTo = app.config.redirects[selectedScope];
+    // @ts-expect-error <StrictNullChecks/>
+    const redirectTo = configurationData?.redirects?.[selectedScope];
+    // @ts-expect-error <StrictNullChecks/>
     if (redirectTo && redirectTo !== selectedScope.toLowerCase()) {
+      // @ts-expect-error <StrictNullChecks/>
       const path = window.location.href.split(selectedScope);
       navigate(`/${redirectTo}${path.length > 1 ? path[1] : ''}`);
       return;
     }
   }, [selectedScope]);
 
+  // @ts-expect-error <StrictNullChecks/>
   const scopeMatchesCommunity = app.config.chains.getById(selectedScope);
 
   // If the navigated-to community scope differs from the active chain id at render time,
@@ -66,7 +76,14 @@ const LayoutComponent = ({
       if (shouldSelectChain) {
         setIsLoading(true);
         setScopeToLoad(selectedScope);
-        await selectCommunity(scopeMatchesCommunity);
+        if (await loadCommunityChainInfo(scopeMatchesCommunity)) {
+          // Update default community on server if logged in
+          if (app.isLoggedIn()) {
+            await updateActiveCommunity({
+              communityId: scopeMatchesCommunity.id,
+            });
+          }
+        }
         setIsLoading(false);
       }
     })();
@@ -82,6 +99,7 @@ const LayoutComponent = ({
       if (shouldDeInitChain) {
         setIsLoading(true);
         await deinitChainOrCommunity();
+        // @ts-expect-error <StrictNullChecks/>
         setScopeToLoad(null);
         setIsLoading(false);
       }

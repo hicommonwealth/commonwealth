@@ -3,6 +3,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import RoleInfo from '../../../../../models/RoleInfo';
@@ -22,14 +23,16 @@ export const ManageRoles = ({
   roledata,
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const removeRole = async (role: RoleInfo) => {
     try {
       const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
         community_id: app.activeChainId(),
         new_role: 'member',
+        // @ts-expect-error <StrictNullChecks/>
         address: role.Address.address,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
 
       if (res.data.status !== 'Success') {
@@ -57,10 +60,12 @@ export const ManageRoles = ({
 
   const handleDeleteRole = async (role: RoleInfo) => {
     const isSelf =
-      role.Address.address === app.user.activeAccount?.address &&
-      role.community_id === app.user.activeAccount?.community.id;
+      // @ts-expect-error <StrictNullChecks/>
+      role.Address.address === user.activeAccount?.address &&
+      role.community_id === user.activeAccount?.community.id;
 
-    const roleBelongsToUser = !!app.user.addresses.filter(
+    const roleBelongsToUser = !!user.addresses.filter(
+      // @ts-expect-error <StrictNullChecks/>
       (addr_) => addr_.id === (role.address_id || role.Address.id),
     ).length;
 
@@ -73,7 +78,7 @@ export const ManageRoles = ({
     const adminsAndMods = res.data.result;
 
     const userAdminsAndMods = adminsAndMods.filter((role_) => {
-      const belongsToUser = !!app.user.addresses.filter(
+      const belongsToUser = !!user.addresses.filter(
         (addr_) => addr_.id === role_.address_id,
       ).length;
       return belongsToUser;
@@ -139,8 +144,10 @@ export const ManageRoles = ({
           const addr = role.Address;
 
           return (
+            // @ts-expect-error <StrictNullChecks/>
             <div className="role-row" key={addr.id}>
               <User
+                // @ts-expect-error <StrictNullChecks/>
                 userAddress={addr?.address}
                 userCommunityId={role?.community_id}
                 shouldShowAsDeleted={!addr?.address && !role?.community_id}

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { userStore } from '../../ui/user';
 
 interface EditCommunityTagsProps {
   communityId: string;
@@ -20,7 +21,7 @@ const editCommunityTags = async ({
       selected_tags: selectedTags,
       tag_ids: tagIds,
       auth: true,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
   );
 
@@ -31,6 +32,7 @@ const useEditCommunityTagsMutation = () => {
   return useMutation({
     mutationFn: editCommunityTags,
     onSuccess: async ({ tags, community_id }) => {
+      // @ts-expect-error StrictNullChecks
       app.config.chainCategoryMap[community_id] = tags;
     },
   });

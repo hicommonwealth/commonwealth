@@ -1,4 +1,4 @@
-import { ContentType, slugify } from '@hicommonwealth/shared';
+import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -8,13 +8,13 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -25,16 +25,19 @@ import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
+import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import { useFlag } from '../../../hooks/useFlag';
+import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
-import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
+import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -55,12 +58,9 @@ import { getTextFromDelta } from '../../components/react_quill_editor/';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import ViewTemplate from '../view_template/view_template';
 import { LinkedUrlCard } from './LinkedUrlCard';
-import { TemplateActionCard } from './TemplateActionCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
-import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -72,7 +72,6 @@ type ViewThreadPageProps = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const proposalTemplatesEnabled = useFlag('proposalTemplates');
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
@@ -84,6 +83,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
+  // @ts-expect-error <StrictNullChecks/>
   const [viewCount, setViewCount] = useState<number>(null);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
@@ -91,6 +91,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [commentSortType, setCommentSortType] =
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
+  // @ts-expect-error <StrictNullChecks/>
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
@@ -99,7 +100,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const user = useUserStore();
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -121,6 +125,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
+  const { contestsData } = useCommunityContests();
+  const isTopicInContest = checkIsTopicInContest(
+    contestsData,
+    thread?.topic?.id,
+  );
+
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
       communityId: app.activeChainId(),
@@ -134,16 +144,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
+    // @ts-expect-error <StrictNullChecks/>
     membership.topicIds.includes(thread?.topic?.id),
   );
 
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
+      // @ts-expect-error <StrictNullChecks/>
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
@@ -191,6 +203,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
     },
   });
 
@@ -277,20 +290,24 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
+    // @ts-expect-error <StrictNullChecks/>
     thread.communityId !== app.activeChainId()
   ) {
-    return <PageNotFound />;
+    return <PageNotFound message="Thread not found" />;
   }
 
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
+  // @ts-expect-error <StrictNullChecks/>
   const isAuthor = Permissions.isThreadAuthor(thread);
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
+  // @ts-expect-error <StrictNullChecks/>
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  // @ts-expect-error <StrictNullChecks/>
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  // @ts-expect-error <StrictNullChecks/>
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
-  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -305,16 +322,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
-  const showTemplateOptions =
-    proposalTemplatesEnabled && (isAuthor || isAdminOrMod);
-  const showLinkedTemplateOptions =
-    proposalTemplatesEnabled && linkedTemplates.length > 0;
-
+  // @ts-expect-error <StrictNullChecks/>
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
+  // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!hasJoinedCommunity && !isRestrictedMembership;
+  const canComment = !!user.activeAccount && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -334,6 +348,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       try {
         await addThreadLinks({
           communityId: app.activeChainId(),
+          // @ts-expect-error <StrictNullChecks/>
           threadId: thread.id,
           links: toAdd,
         });
@@ -345,8 +360,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const editsToSave = localStorage.getItem(
+    // @ts-expect-error <StrictNullChecks/>
     `${app.activeChainId()}-edit-thread-${thread.id}-storedText`,
   );
+  // @ts-expect-error <StrictNullChecks/>
   const isStageDefault = isDefaultStage(thread.stage);
 
   const tabsShouldBePresent =
@@ -356,11 +373,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     .filter((c) => !c.parentComment)
     .sort((a, b) => commentsByDate(a, b, commentSortType));
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
+    // @ts-expect-error <StrictNullChecks/>
     thread.discord_meta !== null && thread.discord_meta !== undefined;
 
   const showLocked =
+    // @ts-expect-error <StrictNullChecks/>
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
   const canUpdateThread =
@@ -368,7 +387,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     (Permissions.isSiteAdmin() ||
       Permissions.isCommunityAdmin() ||
       Permissions.isCommunityModerator() ||
+      // @ts-expect-error <StrictNullChecks/>
       Permissions.isThreadAuthor(thread) ||
+      // @ts-expect-error <StrictNullChecks/>
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
@@ -377,7 +398,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
@@ -397,10 +418,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const ogTitle =
+    // @ts-expect-error <StrictNullChecks/>
     thread?.title?.length > 60
       ? `${thread?.title?.slice?.(0, 52)}...`
       : thread?.title;
   const ogDescription =
+    // @ts-expect-error <StrictNullChecks/>
     getMetaDescription(thread?.body || '')?.length > 155
       ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
       : getMetaDescription(thread?.body || '');
@@ -413,14 +436,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         customMeta={[
           {
             name: 'title',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogTitle,
           },
           {
             name: 'description',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogDescription,
           },
           {
             name: 'author',
+            // @ts-expect-error <StrictNullChecks/>
             content: thread?.author,
           },
           {
@@ -429,10 +455,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'twitter:title',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogTitle,
           },
           {
             name: 'twitter:description',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogDescription,
           },
           {
@@ -445,10 +473,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'og:title',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogTitle,
           },
           {
             name: 'og:description',
+            // @ts-expect-error <StrictNullChecks/>
             content: ogDescription,
           },
           {
@@ -465,6 +495,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
         ]}
       />
+
+      <Helmet>
+        <link
+          rel="canonical"
+          href={getThreadUrl({
+            chain: thread?.communityId || '',
+            id: threadId,
+            title: thread?.title,
+          })}
+        />
+      </Helmet>
+
       <CWPageLayout>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -476,6 +518,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
+          // @ts-expect-error <StrictNullChecks/>
           isSpamThread={!!thread.markedAsSpamAt}
           title={
             isEditingBody ? (
@@ -483,27 +526,39 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 onInput={(e) => {
                   setDraftTitle(e.target.value);
                 }}
+                // @ts-expect-error <StrictNullChecks/>
                 value={draftTitle || thread.title}
               />
             ) : (
+              // @ts-expect-error <StrictNullChecks/>
               thread.title
             )
           }
           isEditing={isEditingBody}
+          // @ts-expect-error <StrictNullChecks/>
           author={
             thread?.author ? app.chain.accounts.get(thread?.author) : null
           }
+          // @ts-expect-error <StrictNullChecks/>
           discord_meta={thread.discord_meta}
+          // @ts-expect-error <StrictNullChecks/>
           collaborators={thread.collaborators}
+          // @ts-expect-error <StrictNullChecks/>
           createdAt={thread.createdAt}
+          // @ts-expect-error <StrictNullChecks/>
           updatedAt={thread.updatedAt}
+          // @ts-expect-error <StrictNullChecks/>
           lastEdited={thread.lastEdited}
           viewCount={viewCount}
           canUpdateThread={canUpdateThread}
+          // @ts-expect-error <StrictNullChecks/>
           stageLabel={!isStageDefault && thread.stage}
           subHeader={
+            // @ts-expect-error <StrictNullChecks/>
             !!thread.url && (
+              // @ts-expect-error <StrictNullChecks/>
               <ExternalLink url={thread.url}>
+                {/* @ts-expect-error StrictNullChecks*/}
                 {extractDomain(thread.url)}
               </ExternalLink>
             )
@@ -525,6 +580,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           }}
           onEditStart={() => {
             if (editsToSave) {
+              // @ts-expect-error <StrictNullChecks/>
               clearEditingLocalStorage(thread.id, ContentType.Thread);
 
               setSavedEdits(editsToSave || '');
@@ -546,6 +602,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   {/*// TODO editing thread */}
                   <EditBody
                     title={draftTitle}
+                    // @ts-expect-error <StrictNullChecks/>
                     thread={thread}
                     savedEdits={savedEdits}
                     shouldRestoreEdits={shouldRestoreEdits}
@@ -563,23 +620,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               ) : (
                 <>
                   <QuillRenderer
+                    // @ts-expect-error <StrictNullChecks/>
                     doc={threadBody ?? thread?.body}
                     cutoffLines={50}
                   />
-                  {showLinkedTemplateOptions &&
-                    linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
-                      <ViewTemplate
-                        contract_address={
-                          linkedTemplates[0]?.identifier.split('/')[1]
-                        }
-                        slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                        setTemplateNickname={null}
-                        isForm
-                      />
-                    )}
+                  {/* @ts-expect-error StrictNullChecks*/}
                   {thread.readOnly || fromDiscordBot ? (
                     <>
                       {threadOptionsComp}
+                      {/* @ts-expect-error StrictNullChecks*/}
                       {!thread.readOnly && thread.markedAsSpamAt && (
                         <div className="callout-text">
                           <CWIcon
@@ -589,6 +638,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                           <CWText type="h5">
                             This thread was flagged as spam on{' '}
+                            {/* @ts-expect-error StrictNullChecks*/}
                             {moment(thread.createdAt).format('DD/MM/YYYY')},
                             meaning it can no longer be edited or commented on.
                           </CWText>
@@ -596,7 +646,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       )}
                       {showLocked && (
                         <LockMessage
+                          // @ts-expect-error <StrictNullChecks/>
                           lockedAt={thread.lockedAt}
+                          // @ts-expect-error <StrictNullChecks/>
                           updatedAt={thread.updatedAt}
                           fromDiscordBot={fromDiscordBot}
                         />
@@ -606,6 +658,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <>
                       {threadOptionsComp}
                       <CreateComment
+                        // @ts-expect-error <StrictNullChecks/>
                         rootThread={thread}
                         canComment={canComment}
                         tooltipText={
@@ -665,6 +718,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   <CWCheckbox
                     checked={includeSpamThreads}
                     label="Include comments flagged as spam"
+                    // @ts-expect-error <StrictNullChecks/>
                     onChange={(e) => setIncludeSpamThreads(e.target.checked)}
                   />
                 </div>
@@ -672,6 +726,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <CommentTree
                 comments={sortedComments}
                 includeSpams={includeSpamThreads}
+                // @ts-expect-error <StrictNullChecks/>
                 thread={thread}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isReplying={isReplying}
@@ -687,6 +742,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               />
             </>
           }
+          editingDisabled={isTopicInContest}
           sidebarComponents={
             [
               ...(showLinkedProposalOptions || showLinkedThreadOptions
@@ -697,12 +753,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <div className="cards-column">
                           {showLinkedProposalOptions && (
                             <LinkedProposalsCard
+                              // @ts-expect-error <StrictNullChecks/>
                               thread={thread}
                               showAddProposalButton={isAuthor || isAdminOrMod}
                             />
                           )}
                           {showLinkedThreadOptions && (
                             <LinkedThreadsCard
+                              // @ts-expect-error <StrictNullChecks/>
                               thread={thread}
                               allowLinking={isAuthor || isAdminOrMod}
                             />
@@ -719,6 +777,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       item: (
                         <div className="cards-column">
                           <LinkedUrlCard
+                            // @ts-expect-error <StrictNullChecks/>
                             thread={thread}
                             allowLinking={isAuthor || isAdminOrMod}
                           />
@@ -734,6 +793,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       item: (
                         <div className="cards-column">
                           <SnapshotCreationCard
+                            // @ts-expect-error <StrictNullChecks/>
                             thread={thread}
                             allowSnapshotCreation={isAuthor || isAdminOrMod}
                             onChangeHandler={handleNewSnapshotChange}
@@ -773,41 +833,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           {isAuthor &&
                             (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
                               <ThreadPollEditorCard
+                                // @ts-expect-error <StrictNullChecks/>
                                 thread={thread}
                                 threadAlreadyHasPolling={!polls?.length}
                                 onPollCreate={() => setInitializedPolls(false)}
                               />
                             )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(showLinkedTemplateOptions &&
-              linkedTemplates[0]?.display !== LinkDisplay.inline
-                ? [
-                    {
-                      label: 'View Template',
-                      item: (
-                        <div className="cards-column">
-                          <ViewTemplateFormCard
-                            address={
-                              linkedTemplates[0]?.identifier.split('/')[1]
-                            }
-                            slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(showTemplateOptions
-                ? [
-                    {
-                      label: 'Template',
-                      item: (
-                        <div className="cards-column">
-                          <TemplateActionCard thread={thread} />
                         </div>
                       ),
                     },

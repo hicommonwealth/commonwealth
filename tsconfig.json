@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
   "files": [],
   "references": [
     { "path": "libs/adapters/tsconfig.build.json" },
@@ -11,6 +14,7 @@
     { "path": "packages/commonwealth/tsconfig.build.json" },
     { "path": "packages/discord-bot/tsconfig.build.json" },
     { "path": "packages/scripts/tsconfig.json" },
-    { "path": "packages/snapshot-listener/tsconfig.build.json" }
+    { "path": "packages/snapshot-listener/tsconfig.build.json" },
+    { "path": "packages/load-testing/tsconfig.json" }
   ]
 }

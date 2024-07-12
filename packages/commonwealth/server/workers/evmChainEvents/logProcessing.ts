@@ -200,6 +200,7 @@ export async function migrateEvents(
           };
         }
         contracts[contractAddress].sources.push(source);
+        // @ts-expect-error StrictNullChecks
         if (!oldestBlock || oldestBlock > source.created_at_block) {
           oldestBlock = source.created_at_block;
         }
@@ -214,10 +215,12 @@ export async function migrateEvents(
         maxBlockRange: evmSource.maxBlockRange,
         contracts,
       },
+      // @ts-expect-error StrictNullChecks
       oldestBlock,
       endingBlockNum,
     );
     logger.info('Events migrated', {
+      // @ts-expect-error StrictNullChecks
       startingBlockNum: oldestBlock,
       endingBlockNum,
     });

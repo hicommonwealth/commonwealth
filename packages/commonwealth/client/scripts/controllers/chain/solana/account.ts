@@ -12,6 +12,7 @@ export default class SolanaAccount extends Account {
 
   private _balance: SolanaToken;
   public get balance() {
+    // @ts-expect-error StrictNullChecks
     return this.updateBalance().then(() => this._balance);
   }
 
@@ -23,7 +24,7 @@ export default class SolanaAccount extends Account {
   private updateBalance = _.throttle(async () => {
     try {
       const bal = await this._Chain.connection.getBalance(
-        await this.publicKey()
+        await this.publicKey(),
       );
       console.log(`Fetched balance: ${bal}`);
       this._balance = this._Chain.coins(bal);
@@ -38,7 +39,7 @@ export default class SolanaAccount extends Account {
     app: IApp,
     ChainInfo: SolanaChain,
     Accounts: SolanaAccounts,
-    address: string
+    address: string,
   ) {
     super({ community: app.chain.meta, address });
     if (!app.isModuleReady) {

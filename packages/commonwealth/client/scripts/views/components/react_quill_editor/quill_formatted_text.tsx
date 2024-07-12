@@ -41,6 +41,7 @@ export const QuillFormattedText = ({
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
+  // @ts-expect-error <StrictNullChecks/>
   const isTruncated: boolean = useMemo(() => {
     if (userExpand) {
       return false;
@@ -51,7 +52,7 @@ export const QuillFormattedText = ({
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
       return {
-        ops: [...doc.ops.slice(0, cutoffLines)],
+        ops: [...(doc?.ops || []).slice(0, cutoffLines)],
       } as DeltaStatic;
     }
     return doc;
@@ -134,6 +135,7 @@ export const QuillFormattedText = ({
           const processedChildren = processElements(
             child.props.children as TextWithHighlightsArray,
           );
+          // @ts-expect-error <StrictNullChecks/>
           return React.cloneElement(child, null, processedChildren);
         }
       }

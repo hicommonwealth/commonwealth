@@ -1,6 +1,7 @@
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { Memberships } from 'state/api/groups/refreshMembership';
+import useUserStore from 'state/ui/user';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import useGetMembersQuery from '../../../../state/api/members/getMembers';
 
@@ -23,17 +24,21 @@ export const useMemberData = ({
   page,
   allowedAddresses,
 }: UseMemberDataProps) => {
+  const user = useUserStore();
   const parseMembership = !isNaN(groupFilter as unknown as number)
     ? `in-group:${groupFilter}`
     : groupFilter;
 
+  // @ts-expect-error StrictNullChecks
   const membershipsFilter = ['all-community'].includes(groupFilter?.toString())
     ? undefined
     : parseMembership;
 
   const { data: members, isLoading: isLoadingMembers } = useGetMembersQuery({
     limit: membersPerPage,
+    // @ts-expect-error StrictNullChecks
     order_by: tableState.orderBy,
+    // @ts-expect-error StrictNullChecks
     order_direction: tableState.orderDirection as 'ASC' | 'DESC',
     search: debouncedSearchTerm,
     community_id: app.activeChainId(),
@@ -50,7 +55,7 @@ export const useMemberData = ({
   const { data: groups } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled: user.activeAccount?.address ? !!memberships : true,
   });
 
   return {

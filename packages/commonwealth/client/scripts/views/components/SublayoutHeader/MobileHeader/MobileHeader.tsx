@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
@@ -18,8 +17,9 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import { useFlag } from 'hooks/useFlag';
+import useUserStore from 'state/ui/user';
+import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
@@ -33,7 +33,6 @@ interface MobileHeaderProps {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }) => void;
-  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const MobileHeader = ({
@@ -41,21 +40,21 @@ const MobileHeader = ({
   onAuthModalOpen,
   isInsideCommunity,
   onRevalidationModalData,
-  onFeedbackModalOpen,
 }: MobileHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
-  const user = app?.user?.addresses?.[0];
+  const userData = useUserStore();
+  const user = userData.addresses?.[0];
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
     ? !menuVisible
     : true;
 
-  const userMenuItems = useUserMenuItems({
+  const { RevalidationModal, userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     onRevalidationModalData,
     isMenuOpen: isUserDrawerOpen,
@@ -72,13 +71,6 @@ const MobileHeader = ({
     {
       label: 'Help documentation',
       onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-    },
-    {
-      label: 'Send feedback',
-      onClick: () => {
-        onFeedbackModalOpen(true);
-        setIsUserDrawerOpen(false);
-      },
     },
   ] as PopoverMenuItem[];
 
@@ -160,6 +152,7 @@ const MobileHeader = ({
         onClose={() => isSetModalOpen(false)}
         open={isModalOpen}
       />
+      {RevalidationModal}
     </>
   );
 };

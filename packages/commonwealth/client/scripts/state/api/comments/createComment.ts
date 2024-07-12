@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signComment } from 'controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import Comment from 'models/Comment';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { UserProfile } from '../../../models/MinimumProfile';
+import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
 
@@ -17,6 +20,7 @@ interface CreateCommentProps {
   unescapedText: string;
   parentCommentId: number;
   existingNumberOfComments: number;
+  isPWA?: boolean;
 }
 
 const createComment = async ({
@@ -24,13 +28,11 @@ const createComment = async ({
   profile,
   threadId,
   unescapedText,
+  // @ts-expect-error StrictNullChecks
   parentCommentId = null,
+  isPWA,
 }: CreateCommentProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signComment(profile.address, {
+  const canvasSignedData = await signComment(profile.address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -44,10 +46,13 @@ const createComment = async ({
       address: profile.address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
-      jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
     },
   );
 
@@ -66,9 +71,13 @@ const useCreateCommentMutation = ({
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
+    // @ts-expect-error StrictNullChecks
     communityId,
+    // @ts-expect-error StrictNullChecks
     threadId,
   });
+
+  const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
@@ -82,10 +91,12 @@ const useCreateCommentMutation = ({
       queryClient.setQueryData(key, () => {
         return [...comments, newComment];
       });
+      // @ts-expect-error StrictNullChecks
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
       updateThreadInAllCaches(
+        // @ts-expect-error StrictNullChecks
         communityId,
         threadId,
         { recentComments: [newComment] },
@@ -93,11 +104,12 @@ const useCreateCommentMutation = ({
       );
 
       if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.CreateContent,
-          profileId,
-        );
+        const profileId = user.addresses?.[0]?.profile?.id;
+        profileId &&
+          markTrainingActionAsComplete(
+            UserTrainingCardTypes.CreateContent,
+            profileId,
+          );
       }
 
       return newComment;

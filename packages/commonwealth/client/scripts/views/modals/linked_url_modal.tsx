@@ -14,6 +14,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
+import useAppStatus from '../../hooks/useAppStatus';
 import type Thread from '../../models/Thread';
 import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
 import { CWText } from '../components/component_kit/cw_text';
@@ -32,7 +33,9 @@ export const LinkedUrlModal = ({
   onModalClose,
   onSave,
 }: LinkedUrlModalProps) => {
+  // @ts-expect-error <StrictNullChecks/>
   const [newTitle, setNewTitle] = useState<string>(null);
+  // @ts-expect-error <StrictNullChecks/>
   const [newUrl, setNewUrl] = useState<string>(null);
   const [tempLinkedUrls, setTempLinkedUrls] =
     useState<Array<Link>>(initialUrlLinks);
@@ -46,6 +49,8 @@ export const LinkedUrlModal = ({
     communityId: app.activeChainId(),
     threadId: thread.id,
   });
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
@@ -65,6 +70,7 @@ export const LinkedUrlModal = ({
             identifier: String(el.identifier),
             title: el.title,
           })),
+          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
@@ -84,6 +90,7 @@ export const LinkedUrlModal = ({
 
       onModalClose();
 
+      // @ts-expect-error <StrictNullChecks/>
       if (links && onSave) {
         onSave(links);
       }

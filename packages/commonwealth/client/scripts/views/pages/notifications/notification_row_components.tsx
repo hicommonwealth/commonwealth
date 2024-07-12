@@ -40,6 +40,7 @@ export const ChainEventNotificationRow = (
   }
 
   const chainEvent: CWEvent = {
+    // @ts-expect-error <StrictNullChecks/>
     blockNumber: notification.chainEvent.blockNumber,
     network: notification.chainEvent.network,
     data: notification.chainEvent.data,
@@ -75,12 +76,9 @@ export const ChainEventNotificationRow = (
   let proposalType: ProposalType;
   if (chainEvent.network === SupportedNetwork.Cosmos) {
     proposalType = ProposalType.CosmosProposal;
-  } else if (chainEvent.network === SupportedNetwork.Aave) {
-    proposalType = ProposalType.AaveProposal;
-  } else if (chainEvent.network === SupportedNetwork.Compound) {
-    proposalType = ProposalType.CompoundProposal;
   }
 
+  // @ts-expect-error <StrictNullChecks/>
   if (!proposalType) {
     return;
   }

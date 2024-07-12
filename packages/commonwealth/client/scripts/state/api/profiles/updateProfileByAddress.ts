@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface UpdateProfileByAddressProps {
   address: string;
@@ -41,16 +43,16 @@ const updateProfileByAddress = async ({
     ...(tagIds && {
       tag_ids: tagIds,
     }),
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   const responseProfile = response.data.result.profile;
   const updatedProfile = new MinimumProfile(address, chain);
   updatedProfile.initialize(
-    responseProfile.name,
+    responseProfile.name || responseProfile.profile_name,
     address,
     responseProfile.avatarUrl,
-    profileId,
+    profileId || responseProfile.id,
     chain,
     responseProfile.lastActive,
   );
@@ -69,6 +71,9 @@ interface UseUpdateProfileByAddressMutation {
 const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
 }: UseUpdateProfileByAddressMutation = {}) => {
+  const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: updateProfileByAddress,
     onSuccess: async (updatedProfile) => {
@@ -83,11 +88,11 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
-      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const userProfileId = user.addresses?.[0]?.profile?.id;
       const doesProfileIdMatch =
         userProfileId && userProfileId === updatedProfile?.id;
       if (doesProfileIdMatch) {
+        // if `profileId` matches auth user's profile id, refetch profile-by-id query for auth user.
         const keys = [
           [ApiEndpoints.FETCH_PROFILES_BY_ID, undefined],
           [ApiEndpoints.FETCH_PROFILES_BY_ID, updatedProfile.id.toString()],
@@ -96,6 +101,17 @@ const useUpdateProfileByAddressMutation = ({
           queryClient.cancelQueries(key).catch(console.error);
           queryClient.refetchQueries(key).catch(console.error);
         });
+
+        // if `profileId` matches auth user's profile id, and user profile has a defined name, then
+        // set welcome onboard step as complete
+        if (
+          userOnboardingEnabled &&
+          updatedProfile.name &&
+          updatedProfile.name !== 'Anonymous' &&
+          !user.isWelcomeOnboardFlowComplete
+        ) {
+          user.setData({ isWelcomeOnboardFlowComplete: true });
+        }
       }
 
       return updatedProfile;

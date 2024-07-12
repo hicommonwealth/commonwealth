@@ -1,8 +1,5 @@
-import { APIOrderDirection } from 'client/scripts/helpers/constants';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -19,6 +16,7 @@ import {
 } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
+import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { trpc } from 'utils/trpcClient';
@@ -29,11 +27,14 @@ import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import { useFlag } from '../../../../hooks/useFlag';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
@@ -52,15 +53,17 @@ const GROUP_AND_MEMBER_FILTERS = [
 
 const CommunityMembersPage = () => {
   const allowlistEnabled = useFlag('allowlist');
-  useUserActiveAccount();
   const location = useLocation();
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
+
+  const { isAddedToHomeScreen } = useAppStatus();
 
   const {
     shouldShowGroupMutationBannerForCommunities,
@@ -74,8 +77,8 @@ const CommunityMembersPage = () => {
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user?.activeAccount?.address || '',
+    apiEnabled: !!user?.activeAccount?.address,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -132,6 +135,7 @@ const CommunityMembersPage = () => {
     {
       limit: 30,
       order_by: tableState.orderBy,
+      // @ts-expect-error <StrictNullChecks/>
       order_direction: tableState.orderDirection,
       search: debouncedSearchTerm,
       community_id: app.activeChainId(),
@@ -153,14 +157,14 @@ const CommunityMembersPage = () => {
     {
       initialCursor: 1,
       getNextPageParam: (lastPage) => lastPage.page + 1,
-      enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+      enabled: user.activeAccount?.address ? !!memberships : true,
     },
   );
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled: user.activeAccount?.address ? !!memberships : true,
   });
 
   const filterOptions = useMemo(
@@ -198,6 +202,7 @@ const CommunityMembersPage = () => {
         id: p.id,
         avatarUrl: p.avatar_url,
         name: p.profile_name || 'Anonymous',
+        // @ts-expect-error <StrictNullChecks/>
         role: p.roles[0],
         groups: (p.group_ids || [])
           .map(
@@ -205,6 +210,7 @@ const CommunityMembersPage = () => {
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
+          // @ts-expect-error <StrictNullChecks/>
           .sort((a, b) => a.localeCompare(b)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
@@ -212,6 +218,7 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
+              // @ts-expect-error <StrictNullChecks/>
               g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
@@ -269,14 +276,15 @@ const CommunityMembersPage = () => {
 
     trackAnalytics({
       event: eventType,
+      isPWA: isAddedToHomeScreen,
     });
   };
 
   useEffect(() => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
-    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
-  }, []);
+    refetch().catch((e) => console.log(e));
+  }, [refetch]);
 
   useEffect(() => {
     // Set the active tab based on URL
@@ -386,7 +394,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {app.user.activeAccount && (
+            {user.activeAccount && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter
@@ -404,6 +412,7 @@ const CommunityMembersPage = () => {
                   onChange={(option) => {
                     setSearchFilters((g) => ({
                       ...g,
+                      // @ts-expect-error <StrictNullChecks/>
                       groupFilter: option.value as string,
                     }));
                   }}
@@ -430,8 +439,10 @@ const CommunityMembersPage = () => {
           />
         ) : (
           <MembersSection
+            // @ts-expect-error <StrictNullChecks/>
             filteredMembers={formattedMembers}
             onLoadMoreMembers={() => {
+              // @ts-expect-error <StrictNullChecks/>
               if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
                 fetchNextPage?.().catch(console.error);
               }

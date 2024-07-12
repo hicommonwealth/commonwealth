@@ -40,6 +40,7 @@ export const createCommunityStakeHandler = async (
   const user = req.user;
   const isAdmin = await validateOwner({
     models,
+    // @ts-expect-error StrictNullChecks
     user,
     communityId: community_id,
     allowMod: false,
@@ -57,13 +58,11 @@ export const createCommunityStakeHandler = async (
     where: {
       id: community_id,
     },
-    include: [
-      {
-        model: models.ChainNode,
-        attributes: ['eth_chain_id', 'url'],
-      },
-    ],
   });
+
+  if (!community) {
+    throw new AppError('Invalid Community');
+  }
 
   await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
     community,
@@ -77,6 +76,7 @@ export const createCommunityStakeHandler = async (
   }
 
   const results = await controllers.communities.createCommunityStake({
+    // @ts-expect-error StrictNullChecks
     user,
     communityStake: {
       ...paramsValidationResult.data,
@@ -89,6 +89,7 @@ export const createCommunityStakeHandler = async (
   await command(Community.GenerateStakeholderGroups(), {
     id: community.id,
     actor: {
+      // @ts-expect-error StrictNullChecks
       user: undefined,
     },
     payload: {},

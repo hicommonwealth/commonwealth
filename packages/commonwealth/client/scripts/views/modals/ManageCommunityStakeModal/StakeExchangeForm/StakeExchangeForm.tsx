@@ -2,6 +2,7 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import ChainInfo from 'models/ChainInfo';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
@@ -13,9 +14,11 @@ import {
   useBuyStakeMutation,
   useSellStakeMutation,
 } from 'state/api/communityStake';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import NumberSelector from 'views/components/NumberSelector';
 import { Skeleton } from 'views/components/Skeleton';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -29,6 +32,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
 import {
@@ -40,9 +44,6 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from './CustomAddressOption';
-
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import './StakeExchangeForm.scss';
 
 type OptionDropdown = {
@@ -75,14 +76,15 @@ const StakeExchangeForm = ({
   denomination,
   community,
 }: StakeExchangeFormProps) => {
+  const user = useUserStore();
+
   const chainRpc =
     community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
   const ethChainId =
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
   // Use the `selectedAddress.value` if buying stake in a non active community (i.e app.activeChainId() != community.id)
-  const activeAccountAddress = community
-    ? selectedAddress?.value
-    : app?.user?.activeAccount?.address;
+  const activeAccountAddress =
+    (community ? selectedAddress?.value : user.activeAccount?.address) || '';
 
   const {
     buyPriceData,
@@ -119,6 +121,8 @@ const StakeExchangeForm = ({
 
   const communityId = community?.id || app.activeChainId();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
   });
@@ -133,6 +137,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
+        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
         ...(community?.ChainNode?.ethChainId && {
           chainId: `${community.ChainNode.ethChainId}`,
@@ -149,7 +154,7 @@ const StakeExchangeForm = ({
       onSetModalState(ManageCommunityStakeModalState.Success);
 
       // join user to community if not already a member
-      const isMemberOfCommunity = app.user.addresses.find(
+      const isMemberOfCommunity = user.addresses.find(
         (x) => x.community.id === communityId,
       );
       if (!isMemberOfCommunity) {
@@ -164,8 +169,9 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_BOUGHT,
         community: communityId,
-        userId: app?.user?.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.id || 0,
         userAddress: selectedAddress?.value,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log('Error buying: ', err);
@@ -183,6 +189,7 @@ const StakeExchangeForm = ({
         namespace: stakeData?.Community?.namespace,
         chainRpc,
         walletAddress: selectedAddress?.value,
+        // @ts-expect-error <StrictNullChecks/>
         ethChainId,
       });
 
@@ -198,8 +205,9 @@ const StakeExchangeForm = ({
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.STAKE_SOLD,
         community: communityId,
-        userId: app?.user?.activeAccount?.profile?.id,
+        userId: user.activeAccount?.profile?.id || 0,
         userAddress: selectedAddress?.value,
+        isPWA: isAddedToHomeScreen,
       });
     } catch (err) {
       console.log('Error selling: ', err);
@@ -234,7 +242,8 @@ const StakeExchangeForm = ({
   };
 
   const insufficientFunds = isBuyMode
-    ? parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
+    ? // @ts-expect-error <StrictNullChecks/>
+      parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
     : numberOfStakeToExchange > stakeBalance;
 
   const ctaDisabled = isBuyMode
@@ -250,24 +259,31 @@ const StakeExchangeForm = ({
     : sellPriceData?.price;
 
   const pricePerUnitUsd = isBuyMode
-    ? convertEthToUsd(buyPriceData?.price, ethUsdRate)
-    : convertEthToUsd(sellPriceData?.price, ethUsdRate);
+    ? // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(buyPriceData?.price, ethUsdRate)
+    : // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(sellPriceData?.price, ethUsdRate);
 
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
-    : String(Math.abs(parseFloat(sellPriceData?.fees)));
+    : // @ts-expect-error <StrictNullChecks/>
+      String(Math.abs(parseFloat(sellPriceData?.fees)));
 
   const feesPriceUsd = isBuyMode
-    ? convertEthToUsd(buyPriceData?.fees, ethUsdRate)
-    : convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
+    ? // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(buyPriceData?.fees, ethUsdRate)
+    : // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
 
   const totalPriceEth = isBuyMode
     ? buyPriceData?.totalPrice
     : sellPriceData?.totalPrice;
 
   const totalPriceUsd = isBuyMode
-    ? convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
-    : convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
+    ? // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
+    : // @ts-expect-error <StrictNullChecks/>
+      convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
 
   const minusDisabled = numberOfStakeToExchange <= 1;
 
@@ -314,6 +330,7 @@ const StakeExchangeForm = ({
               fontWeight="medium"
               className={clsx({ error: insufficientFunds })}
             >
+              {/* @ts-expect-error StrictNullChecks*/}
               {capDecimals(userEthBalance)} {denomination}
             </CWText>
           )}
@@ -366,6 +383,7 @@ const StakeExchangeForm = ({
               <Skeleton className="price-skeleton" />
             ) : (
               <CWText type="caption" fontWeight="medium">
+                {/* @ts-expect-error StrictNullChecks*/}
                 {capDecimals(pricePerUnitEth)} {denomination}• ~$
                 {pricePerUnitUsd} USD
               </CWText>
@@ -439,6 +457,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
+              {/* @ts-expect-error StrictNullChecks*/}
               {capDecimals(feesPriceEth)} {denomination}• ~$
               {feesPriceUsd} USD
             </CWText>
@@ -453,6 +472,7 @@ const StakeExchangeForm = ({
             <Skeleton className="price-skeleton" />
           ) : (
             <CWText type="caption" fontWeight="medium">
+              {/* @ts-expect-error StrictNullChecks*/}
               {capDecimals(totalPriceEth)} {denomination}• ~$
               {totalPriceUsd} USD
             </CWText>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import useUserStore from 'state/ui/user';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from '../../state';
@@ -26,9 +27,11 @@ export const ChangeThreadTopicModal = ({
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+  const user = useUserStore();
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
+      // @ts-expect-error <StrictNullChecks/>
       acc.enabledTopics.push(t);
       return acc;
     },
@@ -46,7 +49,7 @@ export const ChangeThreadTopicModal = ({
     try {
       await editThread({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address || '',
         threadId: thread.id,
         topicId: activeTopic.id,
       });
@@ -65,7 +68,9 @@ export const ChangeThreadTopicModal = ({
       <CWModalHeader label="Change topic" onModalClose={onModalClose} />
       <CWModalBody>
         <TopicSelector
+          // @ts-expect-error <StrictNullChecks/>
           enabledTopics={topicsForSelector.enabledTopics}
+          // @ts-expect-error <StrictNullChecks/>
           disabledTopics={topicsForSelector.disabledTopics}
           value={activeTopic}
           onChange={setActiveTopic}

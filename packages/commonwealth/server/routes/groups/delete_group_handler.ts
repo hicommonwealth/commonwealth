@@ -16,7 +16,9 @@ export const deleteGroupHandler = async (
 
   const { id } = req.params;
   const result = await controllers.groups.deleteGroup({
+    // @ts-expect-error StrictNullChecks
     user,
+    // @ts-expect-error StrictNullChecks
     address,
     groupId: parseInt(id, 10),
   });

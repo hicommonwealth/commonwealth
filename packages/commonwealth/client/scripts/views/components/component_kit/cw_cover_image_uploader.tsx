@@ -9,15 +9,16 @@ import { CWButton } from './new_designs/CWButton';
 import axios from 'axios';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
+import useUserStore from 'state/ui/user';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
-import { CWRadioGroup } from './cw_radio_group';
 import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
 import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
 import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
+import { CWRadioButton } from './new_designs/cw_radio_button';
 
 // TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
 // pick it up like the rest of CWForm hooked components do. Add suport for it when needed.
@@ -32,11 +33,11 @@ type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   enableGenerativeAI?: boolean;
   generatedImageCallback?: CallableFunction;
   defaultImageUrl?: string;
-  defaultImageBehavior?: string;
   uploadCompleteCallback?: CallableFunction;
   canSelectImageBehaviour?: boolean;
   defaultImageBehaviour?: ImageBehavior;
   showUploadAndGenerateText?: boolean;
+  onImageBehaviourChange?: (behaviour: ImageBehavior) => void;
   onImageProcessStatusChange?: (isProcessing: boolean) => any;
 };
 
@@ -61,18 +62,20 @@ export const CWCoverImageUploader = ({
   generatedImageCallback,
   uploadCompleteCallback,
   defaultImageUrl,
-  defaultImageBehavior,
   canSelectImageBehaviour = true,
   showUploadAndGenerateText,
   defaultImageBehaviour,
+  onImageBehaviourChange,
   onImageProcessStatusChange = () => {},
 }: CoverImageUploaderProps) => {
+  const user = useUserStore();
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
   const [uploadStatus, setUploadStatus] = React.useState<
     ValidationStatus | undefined
   >();
   const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>(
+    // @ts-expect-error <StrictNullChecks/>
     defaultImageBehaviour,
   );
   const [prompt, setPrompt] = React.useState<string>();
@@ -100,6 +103,7 @@ export const CWCoverImageUploader = ({
   useNecessaryEffect(() => {
     if (defaultFormContext.value && !defaultFormContext.isSet) {
       canResetValue.current = false;
+      // @ts-expect-error <StrictNullChecks/>
       attachButton.current.style.display = 'flex';
 
       setImageURL(defaultFormContext.value);
@@ -109,7 +113,9 @@ export const CWCoverImageUploader = ({
         value: defaultFormContext.value,
       });
 
+      // @ts-expect-error <StrictNullChecks/>
       formContext.setValue(name, defaultFormContext.value);
+      // @ts-expect-error <StrictNullChecks/>
       formContext.setError(name, null);
       setTimeout(() => {
         canResetValue.current = true;
@@ -118,6 +124,7 @@ export const CWCoverImageUploader = ({
   }, [defaultFormContext, imageBehavior, formContext]);
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     onImageProcessStatusChange(isUploading || isGenerating);
   }, [isUploading, isGenerating, onImageProcessStatusChange]);
 
@@ -137,7 +144,7 @@ export const CWCoverImageUploader = ({
           name: file.name,
           mimetype: file.type,
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       );
       if (signatureResponse.data.status !== 'Success') throw new Error();
@@ -155,6 +162,7 @@ export const CWCoverImageUploader = ({
 
       return [replaceBucketWithCDN(trimmedImageURL), 'success'];
     } catch (e) {
+      // @ts-expect-error <StrictNullChecks/>
       return [null, 'failure'];
     }
   };
@@ -164,7 +172,7 @@ export const CWCoverImageUploader = ({
       setImageURL('');
       const res = await axios.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
-        jwt: app.user.jwt,
+        jwt: user.jwt,
       });
 
       const generatedImageURL = res.data.result.imageUrl;
@@ -173,6 +181,7 @@ export const CWCoverImageUploader = ({
         setImageURL(generatedImageURL);
         if (hookToForm && name && formContext) {
           formContext.setValue(name, generatedImageURL);
+          // @ts-expect-error <StrictNullChecks/>
           formContext.setError(name, null);
         }
         const currentImageBehavior = !imageBehavior
@@ -181,6 +190,7 @@ export const CWCoverImageUploader = ({
         setImageBehavior(currentImageBehavior);
         setUploadStatus('success');
         if (defaultImageBehaviour !== ImageBehavior.Circle) {
+          // @ts-expect-error <StrictNullChecks/>
           attachButton.current.style.display = 'none';
         }
 
@@ -209,6 +219,7 @@ export const CWCoverImageUploader = ({
 
     if (isUploading) return;
 
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.classList[hoverAttachZone ? 'add' : 'remove']('hovered');
   };
 
@@ -225,6 +236,7 @@ export const CWCoverImageUploader = ({
       setImageURL(_imageURL);
       if (hookToForm && name && formContext) {
         formContext.setValue(name, _imageURL);
+        // @ts-expect-error <StrictNullChecks/>
         formContext.setError(name, null);
       }
       const currentImageBehavior = !imageBehavior
@@ -232,6 +244,7 @@ export const CWCoverImageUploader = ({
         : imageBehavior;
       setImageBehavior(currentImageBehavior);
       if (defaultImageBehaviour !== ImageBehavior.Circle) {
+        // @ts-expect-error <StrictNullChecks/>
         attachButton.current.style.display = 'none';
       }
       uploadCompleteCallback?.(_imageURL, currentImageBehavior);
@@ -258,12 +271,14 @@ export const CWCoverImageUploader = ({
 
     setUploadStatus(undefined);
 
+    // @ts-expect-error <StrictNullChecks/>
     const { files } = dropEvent.dataTransfer;
     handleUpload(files[0]);
   };
 
   // On-click support
   const pseudoInputHandler = (inputEvent: InputEvent) => {
+    // @ts-expect-error <StrictNullChecks/>
     handleUpload((inputEvent.target as HTMLInputElement).files[0]);
   };
 
@@ -275,18 +290,23 @@ export const CWCoverImageUploader = ({
 
   React.useEffect(() => {
     setImageURL(defaultImageUrl);
-    setImageBehavior(defaultImageBehavior as ImageBehavior);
     setIsPrompting(false);
 
+    // @ts-expect-error <StrictNullChecks/>
     pseudoInput.current.addEventListener('change', pseudoInputHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('click', (e: any) => {
       if (e.target.classList.contains('attach-btn')) clickHandler(e);
       if (e.target.classList.contains('attach-zone')) clickHandler(e);
     });
 
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('dragenter', dragEnterHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('dragleave', dragLeaveHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('dragover', dragOverHandler);
+    // @ts-expect-error <StrictNullChecks/>
     attachZone.current.addEventListener('drop', dropHandler);
 
     return () => {
@@ -327,6 +347,7 @@ export const CWCoverImageUploader = ({
       <MessageRow
         label={subheaderText || 'Accepts JPG and PNG files.'}
         hasFeedback={true}
+        // @ts-expect-error <StrictNullChecks/>
         statusMessage={
           uploadStatus === 'success'
             ? 'Image upload succeeded.'
@@ -343,7 +364,9 @@ export const CWCoverImageUploader = ({
           validationStatus: 'failure' | undefined;
         }>(
           {
+            // @ts-expect-error <StrictNullChecks/>
             isUploading,
+            // @ts-expect-error <StrictNullChecks/>
             uploadStatus,
             validationStatus: formFieldErrorMessage ? 'failure' : undefined,
           },
@@ -406,6 +429,7 @@ export const CWCoverImageUploader = ({
                   buttonHeight="sm"
                   className="generate-btn"
                   onClick={async () => {
+                    // @ts-expect-error <StrictNullChecks/>
                     if (prompt.length < 1) return;
                     setIsGenerating(true);
                     try {
@@ -466,6 +490,7 @@ export const CWCoverImageUploader = ({
       </div>
       <NewMessageRow
         hasFeedback={!!formFieldErrorMessage}
+        // @ts-expect-error <StrictNullChecks/>
         statusMessage={formFieldErrorMessage}
         validationStatus={formFieldErrorMessage ? 'failure' : undefined}
       />
@@ -478,24 +503,21 @@ export const CWCoverImageUploader = ({
           >
             Choose image behavior
           </CWText>
-          <CWRadioGroup
-            name="image-behaviour"
-            onChange={(e) => {
-              setImageBehavior(e.target.value);
-              uploadCompleteCallback?.(imageURL, e.target.value);
-            }}
-            toggledOption={imageBehavior}
-            options={[
-              {
-                label: 'Fill',
-                value: ImageBehavior.Fill,
-              },
-              {
-                label: 'Tile',
-                value: ImageBehavior.Tiled,
-              },
-            ]}
-          />
+          {['Fill', 'Tiled'].map((option) => (
+            <CWRadioButton
+              key={option}
+              value={ImageBehavior[option]}
+              label={option}
+              groupName="image-behaviour"
+              checked={imageBehavior === ImageBehavior[option]}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setImageBehavior(ImageBehavior[option]);
+                  onImageBehaviourChange?.(ImageBehavior[option]);
+                }
+              }}
+            />
+          ))}
         </div>
       )}
     </div>

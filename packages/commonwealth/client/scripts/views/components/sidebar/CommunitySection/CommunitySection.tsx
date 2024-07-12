@@ -1,11 +1,11 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import {
   VoteWeightModule,
   useCommunityStake,
@@ -40,7 +40,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount } = useUserActiveAccount();
+  const user = useUserStore();
   const {
     selectedAddress,
     selectedCommunity,
@@ -57,7 +57,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   } = useCommunityStake({
     // if user is not a community member but logged in, use an address that matches community chain base
     ...(selectedAddress &&
-      !app?.user?.activeAccount && { walletAddress: selectedAddress }),
+      !user.activeAccount && { walletAddress: selectedAddress }),
   });
   const { isContestAvailable, isContestDataLoading, contestsData } =
     useCommunityContests();
@@ -71,7 +71,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
-  const showAdmin = app.user && (isAdmin || isMod);
+  const showAdmin = isAdmin || isMod;
 
   return (
     <>
@@ -79,8 +79,8 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         {app.isLoggedIn() && (
           <>
             <AccountConnectionIndicator
-              connected={!!activeAccount}
-              address={activeAccount?.address}
+              connected={!!user.activeAccount}
+              address={user.activeAccount?.address || ''}
             />
 
             {communityStakeEnabled && stakeEnabled && (
@@ -116,6 +116,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         <CWDivider />
         <DiscussionSection
           isContestAvailable={stakeEnabled && isContestAvailable}
+          // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
@@ -146,11 +147,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         content={
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
+            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
             {...(selectedCommunity && { community: selectedCommunity })}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setModeOfManageCommunityStakeModal(null)}
         open={!!modeOfManageCommunityStakeModal}
       />

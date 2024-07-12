@@ -4,6 +4,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
@@ -25,7 +26,7 @@ type Stats = {
 const Analytics = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [lastMonthNewCommunties, setLastMonthNewCommunities] = useState<
-    string[]
+    { id: string; created_at: string }[]
   >([]);
   const [globalStats, setGlobalStats] = useState<Stats>();
   const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
@@ -34,13 +35,14 @@ const Analytics = () => {
   const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
   const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
+  const user = useUserStore();
 
   const getCommunityAnalytics = async (communityId: string) => {
     axios
       .get(`${app.serverUrl()}/admin/analytics?community_id=${communityId}`, {
         params: {
           auth: true,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         },
       })
       .then((response) => {
@@ -60,7 +62,7 @@ const Analytics = () => {
         .get(`${app.serverUrl()}/admin/analytics`, {
           params: {
             auth: true,
-            jwt: app.user.jwt,
+            jwt: user.jwt,
           },
         })
         .then((response) => {
@@ -159,6 +161,7 @@ const Analytics = () => {
                   Average Addresses Per Community
                 </CWText>
                 <CWText className="StatValue">
+                  {/*@ts-expect-error StrictNullChecks*/}
                   {Math.round(globalStats?.averageAddressesPerCommunity)}
                 </CWText>
               </div>
@@ -167,6 +170,7 @@ const Analytics = () => {
                   {'Total Communities with > 2 addresses'}
                 </CWText>
                 <CWText className="StatValue">
+                  {/* @ts-expect-error StrictNullChecks*/}
                   {Math.round(globalStats?.populatedCommunities)}
                 </CWText>
               </div>
@@ -246,17 +250,24 @@ const Analytics = () => {
               The ids of all communities created in the last month
             </CWText>
             <div className="AnalyticsList">
+              <CWText className="CommunityName no-hover">
+                <CWText className="CommunityName no-hover">Name</CWText>
+                <CWText className="RightSide no-hover">Created At</CWText>
+              </CWText>
               {lastMonthNewCommunties &&
                 lastMonthNewCommunties?.map((community) => {
                   return (
                     <CWText
                       onClick={() => {
-                        window.open(`/${community}`, '_blank');
+                        window.open(`/${community.id}`, '_blank');
                       }}
                       className="CommunityName"
-                      key={community}
+                      key={community.id}
                     >
-                      {community}
+                      <CWText className="CommunityName">{community.id}</CWText>
+                      <CWText className="RightSide">
+                        {new Date(community.created_at).toLocaleString()}
+                      </CWText>
                     </CWText>
                   );
                 })}

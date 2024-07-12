@@ -1,6 +1,7 @@
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
@@ -108,31 +109,39 @@ const Profile = ({ profileId }: ProfileProps) => {
     }
 
     return (
-      <CWPageLayout>
-        <div
-          className="Profile"
-          style={
-            profile.backgroundImage
-              ? {
-                  backgroundImage: `url(${backgroundUrl})`,
-                  backgroundRepeat: `${
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'no-repeat'
-                      : 'repeat'
-                  }`,
-                  backgroundSize:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'cover'
-                      : '100px',
-                  backgroundPosition:
-                    backgroundImageBehavior === ImageBehavior.Fill
-                      ? 'center'
-                      : '56px 56px',
-                  backgroundAttachment: 'fixed',
-                }
-              : {}
-          }
-        >
+      <div
+        className="Profile"
+        style={
+          profile.backgroundImage
+            ? {
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
+                }`,
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
+            : {}
+        }
+      >
+        <div className="fixed-slug-header"></div>
+        <CWPageLayout>
+          <Helmet>
+            <link
+              rel="canonical"
+              href={`https://commonwealth.im/profile/id/${profileId}`}
+            />
+          </Helmet>
+
           <div className="header">
             <CWText type="h2" fontWeight="medium">
               {profile.name
@@ -147,25 +156,29 @@ const Profile = ({ profileId }: ProfileProps) => {
                 : 'ProfilePageContainer smaller-margins'
             }
           >
+            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
+              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>
-        </div>
-      </CWPageLayout>
+        </CWPageLayout>
+      </div>
     );
   } else {
     return (
       <CWPageLayout>
         <div className="Profile">
           <div className="ProfilePageContainer">
+            {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
             <ProfileActivity
               threads={threads}
               comments={comments}
+              // @ts-expect-error <StrictNullChecks/>
               addresses={addresses}
             />
           </div>

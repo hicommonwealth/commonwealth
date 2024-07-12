@@ -1,9 +1,11 @@
 import {
   AddressAttributes,
   DB,
+  GroupInstance,
   MembershipRejectReason,
 } from '@hicommonwealth/model';
-import { Op } from 'sequelize';
+import { GroupPermissionAction } from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 /**
@@ -13,6 +15,7 @@ import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
  * @param topicId ID of the topic
  * @param communityId ID of the community of the groups
  * @param address Address to check against requirements
+ * @param action The type of permission allowed_action it is checking for
  * @returns validity with optional error message
  */
 export async function validateTopicGroupsMembership(
@@ -20,6 +23,7 @@ export async function validateTopicGroupsMembership(
   topicId: number,
   communityId: string,
   address: AddressAttributes,
+  action: GroupPermissionAction,
 ): Promise<{ isValid: boolean; message?: string }> {
   // check via new TBC with groups
 
@@ -33,13 +37,37 @@ export async function validateTopicGroupsMembership(
   if (!topic) {
     return { isValid: false, message: 'Topic not found' };
   }
-  const groups = await models.Group.findAll({
-    where: {
-      id: { [Op.in]: topic.group_ids },
-    },
-  });
-  if (groups.length === 0) {
+
+  if (topic?.group_ids?.length === 0) {
     return { isValid: true };
+  }
+
+  const groups: (GroupInstance & {
+    allowed_actions?: GroupPermissionAction[];
+  })[] = await models.sequelize.query(
+    `
+        SELECT g.*, gp.allowed_actions FROM "Groups" as g LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
+        WHERE g.community_id = :communityId AND g.id IN(:groupIds);
+      `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { communityId, groupIds: topic.group_ids },
+    },
+  );
+
+  // There are 2 cases here. We either have the old group permission system where the group doesn't have
+  // any allowed_actions, or we have the new fine-grained permission system where the action must be in
+  // the allowed_actions list.
+  const permissionedGroups = groups.filter(
+    (g) => !g.allowed_actions || g.allowed_actions.includes(action),
+  );
+
+  if (permissionedGroups.length === 0) {
+    return {
+      isValid: false,
+      message: `User does not have permission to perform action ${action}`,
+    };
   }
 
   // check membership for all groups of topic
@@ -49,7 +77,7 @@ export async function validateTopicGroupsMembership(
   const memberships = await refreshMembershipsForAddress(
     models,
     address,
-    groups,
+    permissionedGroups,
     false, // use cached balances
   );
 

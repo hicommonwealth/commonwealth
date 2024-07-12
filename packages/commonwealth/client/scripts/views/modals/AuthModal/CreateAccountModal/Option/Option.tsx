@@ -1,7 +1,7 @@
-import { CWCustomIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_custom_icon';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import clsx from 'clsx';
 import React from 'react';
+import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
 import './Option.scss';
 
 const OPTION_COPY = {

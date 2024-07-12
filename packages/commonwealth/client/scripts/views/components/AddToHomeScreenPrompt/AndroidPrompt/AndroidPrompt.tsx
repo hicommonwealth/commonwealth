@@ -1,3 +1,4 @@
+import commonUrl from 'assets/img/branding/common.svg';
 import { useAnimation } from 'hooks/useAnimation';
 import React, { useState } from 'react';
 import { CWCheckbox } from '../../component_kit/cw_checkbox';
@@ -20,19 +21,23 @@ export const AndroidPrompt = ({
   const { animationStyles } = useAnimation({ transitionDuration: '.5s' });
   let installPromptEvent = null;
   const [checkboxChecked, setCheckboxChecked] = useState(false);
+  const [showInstallButton, setShowInstallButton] = useState(true);
 
   window.addEventListener('beforeinstallprompt', (event) => {
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     event.preventDefault();
 
+    // @ts-expect-error StrictNullChecks
     installPromptEvent = event;
   });
 
   const handleInstallClick = () => {
-    try {
+    if (installPromptEvent) {
+      // @ts-expect-error StrictNullChecks
       installPromptEvent.prompt();
 
       // Wait for the user to respond to the prompt
+      // @ts-expect-error StrictNullChecks
       installPromptEvent.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
           // Hide after install prompt is accepted
@@ -45,15 +50,15 @@ export const AndroidPrompt = ({
           setShowPrompt(false);
         }
       });
-    } catch (e) {
-      console.error(e);
+    } else {
       const manualStepsInstructionsEle =
         document.getElementById('manual-install');
       if (manualStepsInstructionsEle) {
         setTimeout(() => {
           manualStepsInstructionsEle.style.display = 'flex';
-        }, 1000);
+        }, 500);
       }
+      setShowInstallButton(false);
     }
   };
 
@@ -77,7 +82,7 @@ export const AndroidPrompt = ({
         <CWText className="title">Install App</CWText>
         <div className="header">
           <div className="icon">
-            <img src="/static/img/branding/common.svg" alt="Commonwealth" />
+            <img src={commonUrl} alt="Commonwealth" />
           </div>
           <div className="app">
             <CWText className="app-name">Common</CWText>
@@ -116,12 +121,14 @@ export const AndroidPrompt = ({
             label="Cancel"
             onClick={handleCancelClick}
           />
-          <CWButton
-            buttonType="tertiary"
-            className="prompt-button"
-            label="Install"
-            onClick={handleInstallClick}
-          />
+          {showInstallButton && (
+            <CWButton
+              buttonType="tertiary"
+              className="prompt-button"
+              label="Install"
+              onClick={handleInstallClick}
+            />
+          )}
         </div>
       </div>
     </div>

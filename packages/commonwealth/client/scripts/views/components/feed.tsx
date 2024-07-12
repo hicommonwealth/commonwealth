@@ -10,21 +10,20 @@ import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
-import Thread from 'client/scripts/models/Thread';
-import Topic from 'client/scripts/models/Topic';
-import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import app from 'client/scripts/state';
-import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
-import Permissions from 'client/scripts/utils/Permissions';
+import { getThreadActionTooltipText } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { getProposalUrlPath } from 'identifiers';
+import Thread from 'models/Thread';
+import Topic from 'models/Topic';
+import { ThreadKind, ThreadStage } from 'models/types';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
 type ActivityResponse = {
-  notification_id: number;
   thread: {
     id: number;
     body: string;
@@ -48,10 +47,9 @@ type ActivityResponse = {
     user_id: number;
     user_address: string;
     topic: Topic;
+    community_id: string;
   };
   recentcomments?: [];
-  category_id: string;
-  community_id: string;
 };
 
 type FeedProps = {
@@ -67,6 +65,7 @@ const DEFAULT_COUNT = 10;
 
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
@@ -79,14 +78,15 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin(null, thread.communityId);
+    Permissions.isCommunityAdmin(undefined, thread.communityId);
 
-  const account = app?.user?.addresses?.find(
+  const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
   );
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: thread.communityId,
+    // @ts-expect-error <StrictNullChecks/>
     address: account?.address,
     apiEnabled: !!account?.address,
   });
@@ -124,9 +124,9 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
         );
       }}
       threadHref={discussionLink}
-      onCommentBtnClick={() => navigate(`${discussionLink}?focusEditor=true`)}
+      onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
-      customStages={chain.customStages}
+      customStages={chain?.customStages}
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
@@ -143,7 +143,6 @@ export const Feed = ({
   customScrollParent,
   isChainEventsRow,
 }: FeedProps) => {
-  useUserActiveAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<
@@ -185,6 +184,7 @@ export const Feed = ({
                   network: notif.eventNetwork,
                   data: notif.eventData,
                 };
+                // @ts-expect-error <StrictNullChecks/>
                 const label = ChainEventLabel(notif.communityId, chainEvent);
                 filteredNotifs.push(notif);
                 labelsArr.push(label);
@@ -205,12 +205,15 @@ export const Feed = ({
               new Thread({
                 id: x.thread.id,
                 profile_id: x.thread.profile_id,
+                // @ts-expect-error <StrictNullChecks/>
                 avatar_url: x.thread.profile_avatar_url,
                 profile_name: x.thread.profile_name,
-                community_id: x.community_id,
+                community_id: x.thread.community_id,
                 kind: x.thread.kind,
                 last_edited: x.thread.updated_at,
+                // @ts-expect-error <StrictNullChecks/>
                 marked_as_spam_at: x.thread.marked_as_spam_at,
+                // @ts-expect-error <StrictNullChecks/>
                 recentComments: x.recentcomments,
                 stage: x.thread.stage,
                 title: x.thread.title,
@@ -222,14 +225,16 @@ export const Feed = ({
                 plaintext: x.thread.plaintext,
                 read_only: x.thread.read_only,
                 archived_at: x.thread.archived_at,
+                // @ts-expect-error <StrictNullChecks/>
                 locked_at: x.thread.locked_at,
                 has_poll: x.thread.has_poll,
                 Address: {
                   address: x.thread.user_address,
-                  community_id: x.community_id,
+                  community_id: x.thread.community_id,
                 },
                 topic: x?.thread?.topic,
                 // filler values
+                // @ts-expect-error <StrictNullChecks/>
                 version_history: null,
                 last_commented_on: '',
                 address_last_active: '',
@@ -294,6 +299,7 @@ export const Feed = ({
               <UserDashboardRow
                 key={i}
                 notification={data[i]}
+                // @ts-expect-error <StrictNullChecks/>
                 label={labels[i]}
                 isLoggedIn={isLoggedIn}
               />

@@ -2,10 +2,11 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors } from '../../../server/routes/upgradeMember';
-import { post } from './external/appHook.spec';
+import { post } from '../../util/httpUtils';
 
 chai.use(chaiHttp);
 
@@ -13,11 +14,11 @@ describe('upgradeMember Integration Tests', () => {
   let jwtToken;
   let server: TestServer;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await testServer();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await dispose()();
   });
 
@@ -31,7 +32,7 @@ describe('upgradeMember Integration Tests', () => {
     );
   });
 
-  it('should return an error response if there is an invalid role specified', async () => {
+  test('should return an error response if there is an invalid role specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -47,11 +48,11 @@ describe('upgradeMember Integration Tests', () => {
       server.app,
     );
 
-    response.should.have.status(400);
+    chai.assert.equal(response.status, 400);
     chai.assert.equal(response.error, Errors.InvalidRole);
   });
 
-  it('should return an error response if an invalid address is specified', async () => {
+  test('should return an error response if an invalid address is specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
       author_chain: server.e2eTestEntities.testAddresses[0].community_id,
@@ -67,11 +68,11 @@ describe('upgradeMember Integration Tests', () => {
       server.app,
     );
 
-    response.should.have.status(400);
+    chai.assert.equal(response.status, 400);
     chai.assert.equal(response.error, Errors.InvalidAddress);
   });
 
-  it('should upgrade member and return a success response', async () => {
+  test('should upgrade member and return a success response', async () => {
     await server.models.Address.update(
       {
         role: 'admin',
@@ -102,6 +103,7 @@ describe('upgradeMember Integration Tests', () => {
       where: { id: server.e2eTestEntities.testAddresses[1].id },
     });
 
+    // @ts-expect-error StrictNullChecks
     chai.assert.equal(address.role, 'admin');
   });
 });

@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { signCommentReaction } from 'controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import Reaction from 'models/Reaction';
+import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
+import useUserStore, { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
@@ -22,11 +25,7 @@ const createReaction = async ({
   communityId,
   commentId,
 }: CreateReactionProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signCommentReaction(address, {
+  const canvasSignedData = await signCommentReaction(address, {
     comment_id: commentId,
     like: reactionType === 'like',
   });
@@ -34,14 +33,12 @@ const createReaction = async ({
   return await axios.post(
     `${app.serverUrl()}/comments/${commentId}/reactions`,
     {
-      author_community_id: app.user.activeAccount.community.id,
+      author_community_id: userStore.getState().activeAccount?.community?.id,
       community_id: communityId,
       address,
       reaction: reactionType,
-      jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
       comment_id: commentId,
     },
   );
@@ -55,9 +52,12 @@ const useCreateCommentReactionMutation = ({
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
+    // @ts-expect-error StrictNullChecks
     communityId,
+    // @ts-expect-error StrictNullChecks
     threadId,
   });
+  const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
@@ -81,11 +81,12 @@ const useCreateCommentReactionMutation = ({
       });
 
       if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          profileId,
-        );
+        const profileId = user.addresses?.[0]?.profile?.id;
+        profileId &&
+          markTrainingActionAsComplete(
+            UserTrainingCardTypes.GiveUpvote,
+            profileId,
+          );
       }
 
       return reaction;

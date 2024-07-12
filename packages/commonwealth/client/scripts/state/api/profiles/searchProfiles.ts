@@ -1,11 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'client/scripts/helpers/constants';
-import { MemberResult } from 'client/scripts/views/pages/search/helpers';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import app from 'state';
+import { MemberResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
@@ -22,8 +19,8 @@ interface SearchProfilesProps {
   communityId: string;
   searchTerm: string;
   limit: number;
-  orderBy: APIOrderBy;
-  orderDirection: APIOrderDirection;
+  orderBy?: APIOrderBy;
+  orderDirection?: APIOrderDirection;
   includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
   includeGroupIds?: boolean;

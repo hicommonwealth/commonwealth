@@ -42,7 +42,7 @@ export async function getEventSources(models: DB): Promise<EvmSources> {
     { raw: true, type: QueryTypes.SELECT },
   );
 
-  if (result.length > 0) {
+  if (result.length > 0 && result[0].aggregate) {
     return result[0].aggregate;
   }
 

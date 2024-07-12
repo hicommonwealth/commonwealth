@@ -2,6 +2,7 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -15,6 +16,7 @@ import Status from './Status';
 
 const StakeIntegration = () => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
   const { stakeEnabled, refetchStakeQuery } = useCommunityStake();
 
   const handleStepChange = () => {
@@ -24,6 +26,7 @@ const StakeIntegration = () => {
   };
 
   const contractInfo =
+    // @ts-expect-error <StrictNullChecks/>
     commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.ethChainId];
 
   if (!contractInfo) {
@@ -34,9 +37,9 @@ const StakeIntegration = () => {
   const communityChainId = `${
     community.ChainNode?.ethChainId || community.ChainNode?.cosmosChainId
   }`;
-  const selectedAddress = app.user.addresses.find(
+  const selectedAddress = user.addresses.find(
     (x) =>
-      x.address === app.user.activeAccount.address &&
+      x.address === user.activeAccount?.address &&
       x.community.id === community.id,
   );
 
@@ -61,6 +64,7 @@ const StakeIntegration = () => {
             goToSuccessStep={handleStepChange}
             createdCommunityName={community?.name}
             createdCommunityId={community?.id}
+            // @ts-expect-error <StrictNullChecks/>
             selectedAddress={selectedAddress}
             chainId={communityChainId}
           />

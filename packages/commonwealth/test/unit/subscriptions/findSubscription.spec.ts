@@ -6,6 +6,7 @@ import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import Comment from 'models/Comment';
 import NotificationSubscription from 'models/NotificationSubscription';
 import Thread from 'models/Thread';
+import { describe, test } from 'vitest';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -56,6 +57,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     null,
     null,
@@ -67,6 +69,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     null,
     null,
@@ -78,6 +81,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     <Comment<any>>{
       id: 2,
@@ -90,6 +94,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     <Comment<any>>{
       id: commentId,
@@ -102,6 +107,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     null,
     <Thread>{
@@ -114,6 +120,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     null,
     <Thread>{
@@ -126,6 +133,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     <Comment<any>>{
       id: 2,
@@ -138,6 +146,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     <Comment<any>>{
       id: commentId,
@@ -150,6 +159,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     null,
     <Thread>{
@@ -162,6 +172,7 @@ const notifSubscriptions: NotificationSubscription[] = [
     true,
     new Date(),
     false,
+    // @ts-expect-error StrictNullChecks
     null,
     null,
     <Thread>{
@@ -200,7 +211,7 @@ const notifSubscriptions: NotificationSubscription[] = [
 
 describe('findSubscription tests', () => {
   describe(`${NotificationCategories.ChainEvent} subscriptions`, () => {
-    it(`should return null if no chainId is provided`, () => {
+    test(`should return null if no chainId is provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.ChainEvent,
         options: {},
@@ -214,7 +225,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it('should return the correct subscription if a chainId is provided', () => {
+    test('should return the correct subscription if a chainId is provided', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.ChainEvent,
         options: { communityId },
@@ -229,7 +240,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`${NotificationCategories.NewThread} subscriptions`, () => {
-    it(`should return null if no chainId is provided`, () => {
+    test(`should return null if no chainId is provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.NewThread,
         options: {},
@@ -243,7 +254,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it('should return the correct subscription if a chainId', () => {
+    test('should return the correct subscription if a chainId', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewThread,
         options: { communityId },
@@ -258,7 +269,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`${NotificationCategories.SnapshotProposal} subscriptions`, () => {
-    it(`should return null if no snapshotId is provided`, () => {
+    test(`should return null if no snapshotId is provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.SnapshotProposal,
         options: {},
@@ -272,7 +283,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it('should return the correct subscription if a chainId', () => {
+    test('should return the correct subscription if a chainId', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.SnapshotProposal,
         options: { snapshotId },
@@ -287,7 +298,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`${NotificationCategories.NewComment} subscriptions`, () => {
-    it(`should return null if no threadId or commentId is provided`, () => {
+    test(`should return null if no threadId or commentId is provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.NewComment,
         options: {},
@@ -301,7 +312,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it(`should return null if both a threadId and commentId are provided`, () => {
+    test(`should return null if both a threadId and commentId are provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.NewComment,
         options: { threadId, commentId },
@@ -315,7 +326,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it('should return the correct subscription if a threadId is provided', () => {
+    test('should return the correct subscription if a threadId is provided', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewComment,
         options: { threadId },
@@ -329,7 +340,7 @@ describe('findSubscription tests', () => {
       expect(result.id).to.equal(10);
     });
 
-    it('should return the correct subscription if a commentId is provided', () => {
+    test('should return the correct subscription if a commentId is provided', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewComment,
         options: { commentId },
@@ -345,7 +356,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`${NotificationCategories.NewReaction} subscriptions`, () => {
-    it(`should return null if no threadId or commentId is provided`, () => {
+    test(`should return null if no threadId or commentId is provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.NewReaction,
         options: {},
@@ -359,7 +370,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it(`should return null if both a threadId and commentId are provided`, () => {
+    test(`should return null if both a threadId and commentId are provided`, () => {
       const findOptions = {
         categoryId: NotificationCategories.NewReaction,
         options: { threadId, commentId },
@@ -373,7 +384,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it('should return the correct subscription if a threadId is provided', () => {
+    test('should return the correct subscription if a threadId is provided', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewReaction,
         options: { threadId },
@@ -387,7 +398,7 @@ describe('findSubscription tests', () => {
       expect(result.id).to.equal(14);
     });
 
-    it('should return the correct subscription if a commentId is provided', () => {
+    test('should return the correct subscription if a commentId is provided', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewReaction,
         options: { commentId },
@@ -403,7 +414,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`${NotificationCategories.NewMention} subscriptions`, () => {
-    it('should return the subscription if it exists', () => {
+    test('should return the subscription if it exists', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewMention,
         options: {},
@@ -416,7 +427,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`${NotificationCategories.NewCollaboration} subscriptions`, () => {
-    it('should return the subscription if it exists', () => {
+    test('should return the subscription if it exists', () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.NewCollaboration,
         options: {},
@@ -429,7 +440,7 @@ describe('findSubscription tests', () => {
   });
 
   describe(`Unsupported subscription categories`, () => {
-    it(`should return null for ${NotificationCategories.ThreadEdit} subscriptions`, () => {
+    test(`should return null for ${NotificationCategories.ThreadEdit} subscriptions`, () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.ThreadEdit,
         options: {},
@@ -439,7 +450,7 @@ describe('findSubscription tests', () => {
       expect(result).to.be.undefined;
     });
 
-    it(`should return null for ${NotificationCategories.CommentEdit} subscriptions`, () => {
+    test(`should return null for ${NotificationCategories.CommentEdit} subscriptions`, () => {
       const findOptions: SubUniqueData = {
         categoryId: NotificationCategories.CommentEdit,
         options: {},

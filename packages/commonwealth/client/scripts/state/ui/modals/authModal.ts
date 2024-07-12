@@ -1,5 +1,5 @@
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal/types';
 import { createBoundedUseStore } from 'state/ui/utils';
+import { AuthModalType } from 'views/modals/AuthModal/types';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
@@ -26,6 +26,7 @@ export const authModal = createStore<AuthModalStore>()(
             };
           });
         },
+        // @ts-expect-error StrictNullChecks
         triggerOpenModalType: null,
         setTriggerOpenModalType: (modalType) => {
           set((state) => {

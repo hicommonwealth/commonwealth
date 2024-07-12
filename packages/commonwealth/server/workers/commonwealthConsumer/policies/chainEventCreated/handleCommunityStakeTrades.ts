@@ -42,7 +42,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const chainNode = await models.ChainNode.findOne({
+  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       id: event.eventSource.chainNodeId,
     },
@@ -52,6 +52,13 @@ export async function handleCommunityStakeTrades(
       event,
     });
     return;
+  }
+
+  if (!chainNode.private_url) {
+    log.error('ChainNode is missing a private url', undefined, {
+      event,
+      chainNode: chainNode.toJSON(),
+    });
   }
 
   if (community.chain_node_id != chainNode.id) {
@@ -65,7 +72,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const web3 = new Web3(chainNode.private_url || chainNode.url);
+  const web3 = new Web3(chainNode.private_url);
 
   const [tradeTxReceipt, block] = await Promise.all([
     web3.eth.getTransactionReceipt(event.rawLog.transactionHash),
@@ -79,6 +86,7 @@ export async function handleCommunityStakeTrades(
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,
+    // @ts-expect-error StrictNullChecks
     community_id: community.id,
     stake_id: parseInt(stakeId as string),
     stake_amount: parseInt(stakeAmount as string),

@@ -92,10 +92,13 @@ export async function getWebhookData(
       previewImageUrl: previewImage.previewImageUrl,
       previewImageAltText: previewImage.previewAltText,
 
+      // @ts-expect-error StrictNullChecks
       profileName: profile?.profile_name,
+      // @ts-expect-error StrictNullChecks
       profileUrl: profile
         ? `${config.SERVER_URL}/profile/id/${profile.id}`
         : null,
+      // @ts-expect-error StrictNullChecks
       profileAvatarUrl: profile?.avatar_url,
 
       objectTitle: title,

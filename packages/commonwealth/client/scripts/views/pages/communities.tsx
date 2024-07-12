@@ -3,14 +3,17 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import { findDenominationString } from 'helpers/findDenomination';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import { useFetchNodesQuery } from 'state/api/nodes';
+import { getNodeById } from 'state/api/nodes/utils';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   default as ChainInfo,
@@ -70,10 +73,15 @@ const CommunitiesPage = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
+  const { data: nodes } = useFetchNodesQuery();
+
   const [selectedCommunity, setSelectedCommunity] =
+    // @ts-expect-error <StrictNullChecks/>
     React.useState<ChainInfo>(null);
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
+
+  const user = useUserStore();
 
   const { data: historicalPrices, isLoading: historicalPriceLoading } =
     trpc.community.getStakeHistoricalPrice.useQuery({
@@ -116,7 +124,9 @@ const CommunitiesPage = () => {
       for (const cat of communityCategories) {
         if (
           filterMap[cat] &&
+          // @ts-expect-error <StrictNullChecks/>
           (!communityToCategoriesMap[data.id] ||
+            // @ts-expect-error <StrictNullChecks/>
             !communityToCategoriesMap[data.id].includes(
               cat as CommunityCategoryType,
             ))
@@ -159,16 +169,18 @@ const CommunitiesPage = () => {
       }
     }
 
-    const historicalPriceMap: Map<string, string> = historicalPriceLoading
-      ? null
-      : new Map(
-          Object.entries(
-            historicalPrices?.reduce((acc, { community_id, old_price }) => {
-              acc[community_id] = old_price;
-              return acc;
-            }, {}),
-          ),
-        );
+    // @ts-expect-error <StrictNullChecks/>
+    const historicalPriceMap: Map<string, string> =
+      historicalPriceLoading || !historicalPrices
+        ? null
+        : new Map(
+            Object.entries(
+              historicalPrices?.reduce((acc, { community_id, old_price }) => {
+                acc[community_id] = old_price;
+                return acc;
+              }, {}),
+            ),
+          );
 
     // Filter by recent thread activity
     const res = filteredList
@@ -179,7 +191,7 @@ const CommunitiesPage = () => {
       })
       .map((community: CommunityInfo, i) => {
         // allow user to buy stake if they have a connected address that matches this community's base chain
-        const canBuyStake = !!app?.user?.addresses?.find?.(
+        const canBuyStake = !!user.addresses.find?.(
           (address) => address?.community?.base === community?.base,
         );
 
@@ -206,7 +218,10 @@ const CommunitiesPage = () => {
   const sortedCommunities = activeCommunities
     ? sortCommunities(
         activeCommunities.communities.map((c: any) =>
-          CommunityInfo.fromJSON(c),
+          CommunityInfo.fromJSON({
+            ...c,
+            ChainNode: getNodeById(c.chain_node_id, nodes),
+          }),
         ),
       )
     : [];
@@ -293,6 +308,7 @@ const CommunitiesPage = () => {
           content={
             <ManageCommunityStakeModal
               mode={modeOfManageCommunityStakeModal}
+              // @ts-expect-error <StrictNullChecks/>
               onModalClose={() => setModeOfManageCommunityStakeModal(null)}
               community={selectedCommunity}
               denomination={
@@ -300,6 +316,7 @@ const CommunitiesPage = () => {
               }
             />
           }
+          // @ts-expect-error <StrictNullChecks/>
           onClose={() => setModeOfManageCommunityStakeModal(null)}
           open={!!modeOfManageCommunityStakeModal}
         />

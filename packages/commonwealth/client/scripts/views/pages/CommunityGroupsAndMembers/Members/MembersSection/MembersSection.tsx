@@ -1,10 +1,10 @@
-import { CWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
 
@@ -51,7 +51,9 @@ const MembersSection = ({
               <div className="table-cell">
                 {handleCheckboxChange && (
                   <CWCheckbox
+                    // @ts-expect-error <StrictNullChecks/>
                     checked={selectedAccounts.includes(member.address)}
+                    // @ts-expect-error <StrictNullChecks/>
                     onChange={() => handleCheckboxChange(member.address)}
                   />
                 )}
@@ -91,6 +93,7 @@ const MembersSection = ({
               <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
+          // @ts-expect-error <StrictNullChecks/>
           ...extraColumns(member),
         }))}
         onScrollEnd={onLoadMoreMembers}

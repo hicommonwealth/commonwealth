@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import app from 'state';
 
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import { CommunityData } from 'client/scripts/views/pages/DirectoryPage/DirectoryPageContent';
+import { getUniqueUserAddresses } from 'helpers/user';
+import ChainInfo from 'models/ChainInfo';
+import useUserStore from 'state/ui/user';
+import { CommunityData } from 'views/pages/DirectoryPage/DirectoryPageContent';
 import {
   getAvailableAddressesForStakeExchange,
   getInitialAccountValue,
@@ -14,14 +15,16 @@ interface UseStakeAddressesProps {
 }
 
 const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
+  const user = useUserStore();
+
   const communityAddresses = (() => {
     if (community) {
       // get all the addresses of the user that matches base chain of selected `community`
-      const userAddresses = (app?.user?.addresses || [])
-        ?.filter(
+      const userAddresses = user.addresses
+        .filter(
           (addr) => addr.community.base === (community as ChainInfo)?.base,
         )
-        ?.map((addr) => addr.address);
+        .map((addr) => addr.address);
 
       // return all the unique addresses
       return [...new Set(userAddresses)];
@@ -31,19 +34,21 @@ const useStakeAddresses = ({ community }: UseStakeAddressesProps = {}) => {
   })();
 
   const activeAccountAddress =
-    communityAddresses?.[0] || app?.user?.activeAccount?.address;
+    communityAddresses?.[0] || user.activeAccount?.address || '';
 
   const availableAddresses = (() => {
     // if filtering addresses for a specific community
+    // @ts-expect-error StrictNullChecks
     if (communityAddresses?.length > 0) {
+      // @ts-expect-error StrictNullChecks
       return communityAddresses.map((addr) => ({ address: addr }));
     }
 
     // if user is a community member, we show active accounts connected to community
-    if (app?.user?.activeAccount) {
+    if (user.activeAccount) {
       return getAvailableAddressesForStakeExchange(
-        app.user.activeAccounts,
-        app.user.addresses,
+        user.accounts,
+        user.addresses,
       );
     }
 

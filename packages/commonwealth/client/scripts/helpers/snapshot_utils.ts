@@ -1,5 +1,5 @@
+import module from '@snapshot-labs/snapshot.js';
 import { notifyError } from '../controllers/app/notifications';
-
 let apolloClient = null;
 
 class SnapshotLazyLoader {
@@ -8,9 +8,10 @@ class SnapshotLazyLoader {
 
   private static async init() {
     if (!this.snapshot) {
-      this.snapshot = await import('@snapshot-labs/snapshot.js');
+      const { Client712 } = module;
       const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-      this.client = new this.snapshot.Client712(hub);
+      this.client = new Client712(hub);
+      this.snapshot = module;
     }
   }
 
@@ -199,6 +200,7 @@ async function getApolloClient() {
     }/graphql`,
   });
   // Create the apollo client
+  // @ts-expect-error StrictNullChecks
   apolloClient = new ApolloClient({
     link: httpLink,
     cache: new InMemoryCache(),
@@ -276,6 +278,7 @@ export async function getVersion(): Promise<string> {
 
 export async function getSpace(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
+  // @ts-expect-error StrictNullChecks
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.SPACE_QUERY(),
     variables: {
@@ -287,6 +290,7 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 
 export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
+  // @ts-expect-error StrictNullChecks
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.SPACE_QUERY(),
     variables: {
@@ -301,6 +305,7 @@ export async function getMultipleSpacesById(
   id_in: Array<string>,
 ): Promise<Array<SnapshotSpace>> {
   await getApolloClient();
+  // @ts-expect-error StrictNullChecks
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
     variables: {
@@ -315,6 +320,7 @@ export async function getProposal(
   id: string,
 ): Promise<{ title: string; space: string }> {
   await getApolloClient();
+  // @ts-expect-error StrictNullChecks
   const proposalObj = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSAL_QUERY(),
     variables: {
@@ -326,6 +332,7 @@ export async function getProposal(
 
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
   await getApolloClient();
+  // @ts-expect-error StrictNullChecks
   const proposalsObj = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSALS_QUERY(),
     variables: {
@@ -343,6 +350,7 @@ export async function getVotes(
   proposalHash: string,
 ): Promise<SnapshotProposalVote[]> {
   await getApolloClient();
+  // @ts-expect-error StrictNullChecks
   const response = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSAL_VOTES_QUERY(),
     variables: {
@@ -376,9 +384,9 @@ export async function getSpaceBlockNumber(network: string): Promise<number> {
 export async function getScore(space: SnapshotSpace, address: string) {
   const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getScores(
-    space.id,
-    space.strategies,
-    space.network,
+    space?.id,
+    space?.strategies,
+    space?.network,
     [address],
     // Snapshot.utils.getProvider(space.network),
   );
@@ -410,10 +418,10 @@ export async function getResults(
       while (attempts <= 3) {
         try {
           const snapshot = await SnapshotLazyLoader.getSnapshot();
-          const scores = await snapshot.utils.getScores(
-            space.id,
+          const scores = await snapshot?.utils?.getScores(
+            space?.id,
             strategies,
-            space.network,
+            space?.network,
             votes.map((vote) => vote.voter),
             parseInt(proposal.snapshot, 10),
             // provider,
@@ -478,9 +486,9 @@ export async function getPower(
     +proposal.snapshot > blockNumber ? 'latest' : +proposal.snapshot;
   const scores: Array<{ [who: string]: number }> =
     await snapshot.utils.getScores(
-      space.id,
-      proposal.strategies,
-      space.network,
+      space?.id,
+      proposal?.strategies,
+      space?.network,
       [address],
       blockTag,
       // Snapshot.utils.getProvider(space.network),

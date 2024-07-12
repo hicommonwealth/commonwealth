@@ -6,6 +6,7 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.Profile, { onUpdate: 'CASCADE' })
+    .withMany(db.ProfileTags)
     .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
     .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
@@ -13,9 +14,8 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.Profile.withMany(db.Address)
-    .withMany(db.SsoToken)
-    .withMany(db.ProfileTags, { onDelete: 'CASCADE' });
+  // TODO: to be deprecated by #5564
+  db.Profile.withMany(db.Address);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -27,7 +27,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     })
     .withMany(db.Reaction)
-    .withMany(db.SsoToken, {
+    .withOne(db.SsoToken, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });
@@ -37,9 +37,10 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock);
 
-  db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' })
-    .withMany(db.EvmEventSource, { foreignKey: 'abi_id' })
-    .withMany(db.Template, { foreignKey: 'abi_id', onUpdate: 'CASCADE' });
+  db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
+    db.EvmEventSource,
+    { foreignKey: 'abi_id' },
+  );
 
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {
@@ -65,7 +66,6 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Webhook)
     .withMany(db.Ban)
     .withMany(db.CommunityBanner)
-    .withMany(db.Template, { foreignKey: 'created_for_community' })
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
@@ -135,6 +135,8 @@ export const buildAssociations = (db: DB) => {
   db.NotificationCategory.withMany(db.Subscription, {
     foreignKey: 'category_id',
   }).withMany(db.Notification, { foreignKey: 'category_id' });
+
+  db.Group.withMany(db.GroupPermission);
 
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
@@ -207,17 +209,6 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
-  // 3-way x-ref table
-  db.CommunityContractTemplate.belongsTo(db.CommunityContract, {
-    foreignKey: 'community_contract_id',
-  });
-  db.CommunityContractTemplate.belongsTo(db.Template, {
-    foreignKey: 'template_id',
-  });
-  db.CommunityContractTemplate.belongsTo(db.CommunityContractTemplateMetadata, {
-    foreignKey: 'cctmd_id',
-  });
-
   // "loose" FKs
   db.Comment.belongsTo(db.Community, {
     foreignKey: 'community_id',
@@ -233,5 +224,8 @@ export const buildAssociations = (db: DB) => {
   });
   db.Subscription.belongsTo(db.Comment, {
     foreignKey: 'comment_id',
+  });
+  db.ContestManager.belongsTo(db.ContestManager, {
+    foreignKey: 'community_id',
   });
 };

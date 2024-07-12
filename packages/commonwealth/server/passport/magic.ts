@@ -25,15 +25,14 @@ import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
+import { CANVAS_TOPIC } from 'shared/canvas';
+import { deserializeCanvas } from 'shared/canvas/types';
 import { fileURLToPath } from 'url';
-import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { verify as verifyCanvas } from '../../shared/canvas/verify';
+import { getSessionSignerForAddress } from '../../shared/canvas/verify';
 import { config } from '../config';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
-import { createRole } from '../util/roles';
 
 const __filename = fileURLToPath(import.meta.url);
 const log = logger(__filename);
@@ -62,10 +61,11 @@ async function createMagicAddressInstances(
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
+  // @ts-expect-error StrictNullChecks
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
-  const serverAnalyticsController = new ServerAnalyticsController();
 
   for (const { community_id, address } of generatedAddresses) {
+    log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
@@ -76,6 +76,7 @@ async function createMagicAddressInstances(
         user_id,
         profile_id,
         verification_token: decodedMagicToken.claim.tid, // to prevent re-use
+        // @ts-expect-error StrictNullChecks
         verification_token_expires: null,
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
@@ -93,23 +94,7 @@ async function createMagicAddressInstances(
       throw new ServerError('Address owned by somebody else!');
     }
 
-    // xx: ?
-    if (created) {
-      await createRole(
-        models,
-        addressInstance.id,
-        community_id,
-        'member',
-        false,
-        t,
-      );
-
-      serverAnalyticsController.track({
-        community: community_id,
-        userId: user_id,
-        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
-      });
-    } else {
+    if (!created) {
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
 
@@ -140,17 +125,25 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
+    // @ts-expect-error StrictNullChecks
     const newUser = await models.User.createWithProfile(
       {
-        // never use emails from magic, even for "email" login -- magic maintains the mapping
-        // of emails/socials -> addresses, and we rely ONLY on the address as a canonical piece
-        // of login information.
-        email: null,
+        // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
+        // so it is safe to set emails from magic as part of User data, even though they may be unverified.
+        // although not usable for login, this email (used for outreach) is still considered sensitive user data.
+        email: magicUserMetadata.email,
+
+        // we mark email verified so that we are OK to send update emails, but we should note that
+        // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
+        // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
+        emailVerified: !!magicUserMetadata.email,
+        profile: {},
       },
       { transaction },
     );
 
     // update profile with metadata if exists
+    // @ts-expect-error StrictNullChecks
     const newProfile = newUser.Profiles[0] as ProfileInstance;
     if (profileMetadata?.username) {
       newProfile.profile_name = profileMetadata.username;
@@ -175,6 +168,7 @@ async function createNewMagicUser({
     // Automatically create subscription to their own mentions
     await models.Subscription.create(
       {
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
         is_active: true,
@@ -185,6 +179,7 @@ async function createNewMagicUser({
     // Automatically create a subscription to collaborations
     await models.Subscription.create(
       {
+        // @ts-expect-error StrictNullChecks
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
         is_active: true,
@@ -200,6 +195,7 @@ async function createNewMagicUser({
       {
         issuer: decodedMagicToken.issuer,
         issued_at: decodedMagicToken.claim.iat,
+        // @ts-expect-error StrictNullChecks
         address_id: canonicalAddressInstance.id, // always ethereum address
         created_at: new Date(),
         updated_at: new Date(),
@@ -211,7 +207,7 @@ async function createNewMagicUser({
   });
 }
 
-// User is logged out + selects magic, and provides an existing email. Log them in.
+// User is logged out + selects magic, and provides an existing magic account. Log them in.
 async function loginExistingMagicUser({
   models,
   existingUserInstance,
@@ -261,6 +257,7 @@ async function loginExistingMagicUser({
         'withPrivateData',
       ).findOne({
         where: {
+          // @ts-expect-error StrictNullChecks
           profile_id: existingUserInstance.Profiles[0].id,
         },
         transaction,
@@ -273,7 +270,6 @@ async function loginExistingMagicUser({
             `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
           );
         }
-        malformedSsoToken.profile_id = null;
         (malformedSsoToken.issuer = decodedMagicToken.issuer),
           (malformedSsoToken.issued_at = decodedMagicToken.claim.iat);
         malformedSsoToken.updated_at = new Date();
@@ -298,17 +294,21 @@ async function loginExistingMagicUser({
     const canonicalAddressInstance = addressInstances.find(
       (a) => a.community_id === DEFAULT_ETH_COMMUNITY_ID,
     );
+    // @ts-expect-error StrictNullChecks
     if (malformedSsoToken) {
+      // @ts-expect-error StrictNullChecks
       malformedSsoToken.address_id = canonicalAddressInstance.id;
       await malformedSsoToken.save({ transaction });
       log.info(
         `Finished migration of SsoToken for user ${existingUserInstance.id}!`,
       );
+      // @ts-expect-error StrictNullChecks
     } else if (!ssoToken && !malformedSsoToken) {
       await models.SsoToken.create(
         {
           issuer: decodedMagicToken.issuer,
           issued_at: decodedMagicToken.claim.iat,
+          // @ts-expect-error StrictNullChecks
           address_id: canonicalAddressInstance.id, // always ethereum address
           created_at: new Date(),
           updated_at: new Date(),
@@ -320,10 +320,51 @@ async function loginExistingMagicUser({
       );
     }
 
-    // TODO: we should also remove ghost addresses her, per code in /updateAddress...
-    // or we can leave it alone, although it wont migrate address ownership, most parameters
-    // are by profile anyway.
+    // remove ghost addresses once replacements have been generated
+    const ghostAddresses =
+      existingUserInstance?.Addresses?.filter(
+        ({ ghost_address }: AddressAttributes) => !!ghost_address,
+      ) || [];
+    for (const ghost of ghostAddresses as AddressAttributes[]) {
+      const replacementAddress = addressInstances.find(
+        ({ community_id, ghost_address }: AddressAttributes) =>
+          !ghost_address && community_id === ghost.community_id,
+      );
 
+      // should always exist, but check for it to avoid null check error
+      if (replacementAddress) {
+        // update data objects and delete ghost address
+        await models.Collaboration.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Comment.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Reaction.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.Thread.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        // should be no memberships or SsoTokens, but handle case for completeness sake
+        await models.Membership.update(
+          { address_id: replacementAddress.id },
+          { where: { address_id: ghost.id }, transaction },
+        );
+        await models.SsoToken.destroy({
+          where: { address_id: ghost.id },
+          transaction,
+        });
+        await models.Address.destroy({
+          where: { id: ghost.id },
+          transaction,
+        });
+      }
+    }
     return existingUserInstance;
   });
 }
@@ -339,13 +380,16 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
   // to be owned by currently logged in user
   await models.Address.update(
     {
+      // @ts-expect-error StrictNullChecks
       user_id: loggedInUser.id,
+      // @ts-expect-error StrictNullChecks
       profile_id: loggedInUser.Profiles[0].id,
       verification_token: ctx.decodedMagicToken.claim.tid,
     },
     {
       where: {
         wallet_id: WalletId.Magic,
+        // @ts-expect-error StrictNullChecks
         user_id: existingUserInstance.id,
       },
     },
@@ -353,6 +397,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
 
   // TODO: send move email
 
+  // @ts-expect-error StrictNullChecks
   return loggedInUser;
 }
 
@@ -369,6 +414,7 @@ async function addMagicToUser({
   const addressInstances = await createMagicAddressInstances(
     models,
     generatedAddresses,
+    // @ts-expect-error StrictNullChecks
     loggedInUser,
     walletSsoSource,
     decodedMagicToken,
@@ -381,10 +427,12 @@ async function addMagicToUser({
   await models.SsoToken.create({
     issuer: decodedMagicToken.issuer,
     issued_at: decodedMagicToken.claim.iat,
+    // @ts-expect-error StrictNullChecks
     address_id: canonicalAddressInstance.id,
     created_at: new Date(),
     updated_at: new Date(),
   });
+  // @ts-expect-error StrictNullChecks
   return loggedInUser;
 }
 
@@ -398,7 +446,7 @@ async function magicLoginRoute(
     username?: string;
     avatarUrl?: string;
     signature: string;
-    sessionPayload?: string; // optional because session keys are feature-flagged
+    session?: string;
     magicAddress?: string; // optional because session keys are feature-flagged
     walletSsoSource: WalletSsoSource;
   }>,
@@ -452,8 +500,8 @@ async function magicLoginRoute(
         config.AUTH.JWT_SECRET,
       ) as {
         id: number;
-        email: string | null;
       };
+      // @ts-expect-error StrictNullChecks
       loggedInUser = await models.User.findOne({
         where: { id },
         include: [
@@ -473,6 +521,7 @@ async function magicLoginRoute(
     }
   }
 
+  // @ts-expect-error StrictNullChecks
   const isCosmos = communityToJoin?.base === ChainBase.CosmosSDK;
 
   const magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
@@ -487,14 +536,10 @@ async function magicLoginRoute(
   // the user should have signed a sessionPayload with the client-side
   // magic address. validate the signature and add that address
   try {
-    const session: Session = {
-      type: 'session',
-      signature: req.body.signature,
-      payload: req.body.sessionPayload
-        ? JSON.parse(req.body.sessionPayload)
-        : undefined,
-    };
+    // @ts-expect-error <StrictNullChecks>
+    const session: Session = deserializeCanvas(req.body.session);
 
+    // @ts-expect-error StrictNullChecks
     if (communityToJoin) {
       if (isCosmos) {
         // (magic bug?): magic typing doesn't match data, so we need to cast as any
@@ -510,15 +555,19 @@ async function magicLoginRoute(
         }
 
         generatedAddresses.push({
+          // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
+          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else if (
         communityToJoin.base === ChainBase.Ethereum &&
-        session.payload.chain.startsWith('eip155:')
+        session.address.startsWith('eip155:')
       ) {
         generatedAddresses.push({
+          // @ts-expect-error StrictNullChecks
           address: req.body.magicAddress,
+          // @ts-expect-error StrictNullChecks
           community_id: communityToJoin.id,
         });
       } else {
@@ -530,18 +579,12 @@ async function magicLoginRoute(
     }
 
     if (config.ENFORCE_SESSION_KEYS) {
-      if (
-        !session.payload?.from ||
-        req.body.magicAddress !== session.payload.from
-      ) {
-        throw new Error(
-          'sessionPayload address did not match user-provided magicAddress',
-        );
+      // verify the session signature using session signer
+      const sessionSigner = getSessionSignerForAddress(session.address);
+      if (!sessionSigner) {
+        throw new Error('No session signer found for address');
       }
-      const valid = await verifyCanvas({ session });
-      if (!valid) {
-        throw new Error('sessionPayload signed with invalid signature');
-      }
+      await sessionSigner.verifySession(CANVAS_TOPIC, session);
     }
   } catch (err) {
     log.warn(
@@ -587,14 +630,39 @@ async function magicLoginRoute(
         {
           model: models.Profile,
         },
+        {
+          // guarantee that we only access ghost addresses as part of this query
+          model: models.Address,
+          where: {
+            ghost_address: true,
+          } as WhereOptions<AddressAttributes>,
+          required: true,
+        },
       ],
     });
+
+    // generate replacement magic addresses for all ghost addresses, which will be deleted in `loginExistingMagicUser`
+    if (existingUserInstance?.Addresses) {
+      for (const ghost of existingUserInstance.Addresses as AddressAttributes[]) {
+        const needsReplacementAddress = !generatedAddresses.some(
+          ({ community_id }) => community_id === ghost.community_id,
+        );
+        if (needsReplacementAddress) {
+          // note that discourse imports not supported on cosmos
+          generatedAddresses.push({
+            address: canonicalAddress,
+            community_id: ghost.community_id,
+          });
+        }
+      }
+    }
   }
 
   log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );
 
+  // @ts-expect-error StrictNullChecks
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
     // already logged in as existing user, just ensure generated addresses are all linked
     // we don't need to setup a canonical address/SsoToken, that should already be done
@@ -615,7 +683,9 @@ async function magicLoginRoute(
     decodedMagicToken,
     magicUserMetadata,
     generatedAddresses,
+    // @ts-expect-error StrictNullChecks
     existingUserInstance,
+    // @ts-expect-error StrictNullChecks
     loggedInUser,
     profileMetadata: {
       username: req.body.username,
@@ -624,15 +694,18 @@ async function magicLoginRoute(
     walletSsoSource,
   };
   try {
+    // @ts-expect-error StrictNullChecks
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
       // merge the existing magic user with the logged in user
       log.trace('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
       finalUser = await mergeLogins(magicContext);
+      // @ts-expect-error StrictNullChecks
     } else if (!loggedInUser && existingUserInstance) {
       // user is logging in with an existing magic account
       log.trace('CASE 2: LOGGING INTO EXISTING MAGIC USER');
       finalUser = await loginExistingMagicUser(magicContext);
+      // @ts-expect-error StrictNullChecks
     } else if (loggedInUser && !existingUserInstance) {
       // user is already logged in and is linking a new magic login to their account
       log.trace('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');

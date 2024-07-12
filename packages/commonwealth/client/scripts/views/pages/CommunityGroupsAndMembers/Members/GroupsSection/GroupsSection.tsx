@@ -25,7 +25,6 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
-  console.log(filteredGroups);
   const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 
@@ -76,6 +75,7 @@ const GroupsSection = ({
               key={index}
               groupName={group.name}
               groupDescription={group.description}
+              // @ts-expect-error <StrictNullChecks/>
               requirements={group.requirements
                 .filter((r) => r?.data?.source) // filter erc groups
                 .map((r) => ({
@@ -84,7 +84,7 @@ const GroupsSection = ({
                   )?.label,
                   requirementChain:
                     chainTypes
-                      .find(
+                      ?.find(
                         (x) =>
                           `${x.value}` ===
                           `${

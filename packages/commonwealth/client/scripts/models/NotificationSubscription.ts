@@ -70,8 +70,11 @@ class NotificationSubscription {
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.communityId = communityId;
+    // @ts-expect-error StrictNullChecks
     this.Comment = comment;
+    // @ts-expect-error StrictNullChecks
     this.Thread = thread;
+    // @ts-expect-error StrictNullChecks
     this.snapshotId = snapshotId;
   }
 }
@@ -99,7 +102,7 @@ export const modelFromServer = (
   if (Thread) {
     try {
       // The `Thread` var here uses /server/models/thread.ts as its type
-      // and we are modeling it to /client/scripts/models/Thread.ts so
+      // and we are modeling it to /models/Thread.ts so
       // using any here to avoid lint error.
       modeledThread = new ThreadT(Thread as any);
     } catch (e) {
@@ -123,8 +126,11 @@ export const modelFromServer = (
     is_active,
     created_at,
     immediate_email,
+    // @ts-expect-error StrictNullChecks
     community_id,
+    // @ts-expect-error StrictNullChecks
     modeledComment,
+    // @ts-expect-error StrictNullChecks
     modeledThread,
     snapshot_id,
   );

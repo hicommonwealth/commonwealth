@@ -5,10 +5,11 @@ import {
   UpdateThreadPermissions,
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
+import { describe, test } from 'vitest';
 
 describe('ServerThreadsController', () => {
   describe('#validatePermissions', () => {
-    it('should fail if no permissions satisfied', () => {
+    test('should fail if no permissions satisfied', () => {
       const permissions: UpdateThreadPermissions = {
         isThreadOwner: false,
         isMod: false,
@@ -26,7 +27,7 @@ describe('ServerThreadsController', () => {
       ).to.throw('Unauthorized');
     });
 
-    it('should fail for all flags except for isAdmin', () => {
+    test('should fail for all flags except for isAdmin', () => {
       const permissions: UpdateThreadPermissions = {
         isThreadOwner: false,
         isMod: false,
@@ -76,7 +77,7 @@ describe('ServerThreadsController', () => {
   });
 
   describe('#updateThread', () => {
-    it('should patch update thread attributes', async () => {
+    test('should patch update thread attributes', async () => {
       const address = {
         id: 1,
         address: '0x1234',
@@ -124,6 +125,7 @@ describe('ServerThreadsController', () => {
             rollback: async () => ({}),
             commit: async () => ({}),
           }),
+          query: () => new Promise((resolve) => resolve([])),
         },
       };
       const banCache: any = {

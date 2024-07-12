@@ -1,17 +1,18 @@
 import { WalletId } from '@hicommonwealth/shared';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'client/scripts/helpers/constants';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import app from 'state';
 import {
   useFetchProfileByIdQuery,
   useSearchProfilesQuery,
   useUpdateProfileByAddressMutation,
 } from 'state/api/profiles';
+import {
+  useUpdateUserEmailMutation,
+  useUpdateUserEmailSettingsMutation,
+} from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { generateUsername } from 'unique-username-generator';
 import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -22,7 +23,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import useNotificationSettings from 'views/pages/notification_settings/useNotificationSettings';
+import useNotificationSettings from 'views/pages/NotificationSettingsOld/useNotificationSettings';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
@@ -42,6 +43,10 @@ const PersonalInformationStep = ({
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
 
+  const user = useUserStore();
+  const { mutateAsync: updateEmail } = useUpdateUserEmailMutation({});
+  const { mutateAsync: updateEmailSettings } =
+    useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
     shouldFetchSelfProfile: true,
@@ -49,22 +54,22 @@ const PersonalInformationStep = ({
 
   useNecessaryEffect(() => {
     // if user authenticated with SSO, by default we show username granted by the SSO service
-    const addresses = app?.user?.addresses;
+    const addresses = user.addresses;
     const defaultSSOUsername =
       addresses?.length === 1 && addresses?.[0]?.walletId === WalletId.Magic
         ? addresses?.[0]?.profile?.name
         : '';
 
     if (formMethodsRef.current) {
-      if (defaultSSOUsername) {
+      if (defaultSSOUsername && defaultSSOUsername !== 'Anonymous') {
         formMethodsRef.current.setValue('username', defaultSSOUsername, {
           shouldDirty: true,
         });
         formMethodsRef.current.trigger('username').catch(console.error);
       }
 
-      if (app?.user?.email) {
-        formMethodsRef.current.setValue('email', app.user.email, {
+      if (user.email) {
+        formMethodsRef.current.setValue('email', user.email, {
           shouldDirty: true,
         });
         formMethodsRef.current.trigger('email').catch(console.error);
@@ -85,8 +90,8 @@ const PersonalInformationStep = ({
       orderDirection: APIOrderDirection.Desc,
     });
 
-  const existingUsernames = (profiles?.pages?.[0]?.results || []).map((user) =>
-    user?.profile_name?.trim?.().toLowerCase(),
+  const existingUsernames = (profiles?.pages?.[0]?.results || []).map(
+    (userResult) => userResult?.profile_name?.trim?.().toLowerCase(),
   );
   const isUsernameTaken = existingUsernames.includes(
     currentUsername.toLowerCase(),
@@ -94,9 +99,11 @@ const PersonalInformationStep = ({
 
   const handleGenerateUsername = () => {
     const randomUsername = generateUsername('', 2);
+    // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.setValue('username', randomUsername, {
       shouldDirty: true,
     });
+    // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
   };
@@ -115,8 +122,8 @@ const PersonalInformationStep = ({
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
     await updateProfile({
-      address: app.user.activeAccount?.profile?.address,
-      chain: app.user.activeAccount?.profile?.chain,
+      address: user.activeAccount?.profile?.address || '',
+      chain: user.activeAccount?.profile?.chain || '',
       name: values.username,
       ...(values.email && {
         email: values.email,
@@ -125,13 +132,15 @@ const PersonalInformationStep = ({
 
     // set email for notifications
     if (values.email) {
-      await app.user.updateEmail(values.email);
+      await updateEmail({ email: values.email });
     }
 
     // enable/disable all in-app notifications for user
     await toggleAllInAppNotifications(values.enableAccountNotifications);
     // enable/disable promotional emails flag for user
-    await app.user.writeEmailSettings('', values.enableProductUpdates);
+    await updateEmailSettings({
+      promotionalEmailsEnabled: values.enableProductUpdates,
+    });
 
     // refetch profile data
     await refetchProfileData().catch(console.error);
@@ -141,6 +150,7 @@ const PersonalInformationStep = ({
 
   return (
     <CWForm
+      // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}
@@ -207,11 +217,7 @@ const PersonalInformationStep = ({
               name="enableProductUpdates"
               hookToForm
               label="Send me product updates and news"
-              disabled={
-                watch('email')?.trim() === '' ||
-                !formState.isDirty ||
-                isCheckingUsernameUniqueness
-              }
+              disabled={watch('email')?.trim() === '' || !formState.isDirty}
             />
           </div>
 
@@ -221,6 +227,7 @@ const PersonalInformationStep = ({
             type="submit"
             disabled={
               isUpdatingProfile ||
+              isCheckingUsernameUniqueness ||
               !formState.isDirty ||
               watch('username')?.trim() === ''
             }

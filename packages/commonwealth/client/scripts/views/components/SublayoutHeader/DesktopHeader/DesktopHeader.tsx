@@ -20,8 +20,8 @@ import { NotificationsMenuPopover } from 'views/menus/notifications_menu';
 
 import UserDropdown from './UserDropdown';
 
-import AuthButtons from 'client/scripts/views/components/SublayoutHeader/AuthButtons';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
+import { AuthModalType } from 'views/modals/AuthModal';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -34,14 +34,12 @@ interface DesktopHeaderProps {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }) => void;
-  onFeedbackModalOpen: (open: boolean) => void;
 }
 
 const DesktopHeader = ({
   onMobile,
   onAuthModalOpen,
   onRevalidationModalData,
-  onFeedbackModalOpen,
 }: DesktopHeaderProps) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
   const navigate = useCommonNavigate();
@@ -116,7 +114,7 @@ const DesktopHeader = ({
               )}
             />
 
-            <HelpMenuPopover onFeedbackModalOpen={onFeedbackModalOpen} />
+            <HelpMenuPopover />
 
             {isLoggedIn && !enableKnockInAppNotifications && (
               <NotificationsMenuPopover />

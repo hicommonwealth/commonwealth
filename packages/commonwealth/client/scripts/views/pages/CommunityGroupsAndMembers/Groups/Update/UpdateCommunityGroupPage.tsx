@@ -7,6 +7,7 @@ import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../../hooks/useAppStatus';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
@@ -31,6 +32,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     communityId: app.activeChainId(),
     includeTopics: true,
   });
+  // @ts-expect-error <StrictNullChecks/>
   const foundGroup: Group = groups.find(
     (group) => group.id === parseInt(`${groupId}`),
   );
@@ -45,6 +47,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     initialAllowlist ?? [],
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   useEffect(() => {
     if (initialAllowlist) {
       setAllowedAddresses(initialAllowlist);
@@ -52,7 +56,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   }, [initialAllowlist]);
 
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
+    },
   });
 
   if (
@@ -73,6 +80,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
+          // @ts-expect-error <StrictNullChecks/>
           requirements: foundGroup.requirements
             .filter((r) => r?.data?.source) // filter erc groups
             .map((requirement) => ({
@@ -95,7 +103,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   requirement.data.source.evm_chain_id ||
                   0
                 }`,
-                label: chainTypes.find(
+                label: chainTypes?.find(
                   (chain) =>
                     chain.value ==
                     (requirement.data.source.cosmos_chain_id ||
@@ -119,7 +127,11 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
+          const payload = makeGroupDataBaseAPIPayload(
+            values,
+            isAddedToHomeScreen,
+            allowedAddresses,
+          );
           const finalPayload = {
             ...payload,
             groupId: groupId,

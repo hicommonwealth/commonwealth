@@ -22,7 +22,7 @@ module.exports = {
             collapsed_on_homepage: false,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -33,7 +33,7 @@ module.exports = {
             url: 'wss://cc1.darwinia.network/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -43,37 +43,37 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainEventTypes',
         { chain: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['darwinia'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

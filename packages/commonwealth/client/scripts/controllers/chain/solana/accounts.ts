@@ -1,10 +1,9 @@
-import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type { IAccountsModule } from '../../../models/interfaces';
 
 import SolanaAccount from './account';
 import type SolanaChain from './chain';
-import type { SolanaToken } from './types';
 
 export default class SolanaAccounts implements IAccountsModule<SolanaAccount> {
   private _initialized = false;

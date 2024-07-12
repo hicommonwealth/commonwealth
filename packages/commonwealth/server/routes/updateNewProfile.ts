@@ -39,6 +39,7 @@ const updateNewProfile = async (
 ) => {
   const profile = await models.Profile.findOne({
     where: {
+      // @ts-expect-error StrictNullChecks
       user_id: req.user.id,
     },
   });
@@ -60,6 +61,7 @@ const updateNewProfile = async (
   let { bio } = req.body;
   bio = sanitizeQuillText(bio);
 
+  // @ts-expect-error StrictNullChecks
   if (profile.user_id !== req.user.id) {
     return next(new Error(Errors.NotAuthorized));
   }
@@ -80,13 +82,32 @@ const updateNewProfile = async (
     },
     {
       where: {
+        // @ts-expect-error StrictNullChecks
         user_id: req.user.id,
       },
       returning: true,
     },
   );
 
-  await updateTags(tag_ids, models, profile.id, 'profile_id');
+  // @ts-expect-error StrictNullChecks
+  await updateTags(tag_ids, models, profile.user_id, 'user_id');
+
+  if (process.env.FLAG_USER_ONBOARDING_ENABLED === 'true') {
+    const DEFAULT_NAME = 'Anonymous';
+    const isProfileNameUnset =
+      !profile.profile_name || profile.profile_name === DEFAULT_NAME;
+
+    if (
+      name &&
+      name !== DEFAULT_NAME &&
+      isProfileNameUnset &&
+      req.user &&
+      !req.user.is_welcome_onboard_flow_complete
+    ) {
+      req.user.is_welcome_onboard_flow_complete = true;
+      await req.user.save();
+    }
+  }
 
   if (!updateStatus || !rows) {
     return failure(res.status(400), {

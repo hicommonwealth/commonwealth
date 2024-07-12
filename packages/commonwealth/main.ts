@@ -15,10 +15,9 @@ import express, {
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import passport from 'passport';
-import { dirname } from 'path';
+import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
-import favicon from 'serve-favicon';
 import expressStatsInit from 'server/scripts/setupExpressStats';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
@@ -28,8 +27,6 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
-import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,14 +43,12 @@ export async function main(
     noGlobalActivityCache = true,
     withLoggingMiddleware = false,
     withStatsMiddleware = false,
-    withFrontendBuild = false,
     withPrerender = false,
   }: {
     port: number;
     noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
     withStatsMiddleware?: boolean;
-    withFrontendBuild?: boolean;
     withPrerender?: boolean;
   },
 ) {
@@ -114,33 +109,12 @@ export async function main(
     // dynamic compression settings used
     app.use(compression());
 
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
       res.set('Content-Security-Policy', "frame-ancestors 'none';");
       next();
     });
-
-    // serve static files
-    app.use(favicon(`${__dirname}/favicon.ico`));
-    app.use('/robots.txt', express.static('robots.txt'));
-    app.use('/static', express.static('static'));
 
     withLoggingMiddleware &&
       app.use(
@@ -194,32 +168,40 @@ export async function main(
     banCache,
     globalActivityCache,
     dbValidationService,
+    cacheDecorator,
   );
 
-  setupCosmosProxies(app, cacheDecorator);
-  setupIpfsProxy(app, cacheDecorator);
+  app.use('/robots.txt', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/robots.txt`);
+  });
 
-  if (withFrontendBuild) {
-    if (config.NODE_ENV !== 'production') {
-      // lazy import because we want to keep all of webpacks dependencies in devDependencies
-      const setupWebpackDevServer = (
-        await import('./server/scripts/setupWebpackDevServer')
-      ).default;
-      await setupWebpackDevServer(app);
-    } else {
-      app.use(
-        '/build',
-        express.static('build', {
-          setHeaders: (res) => {
-            res.setHeader('Cache-Control', 'public');
-          },
-        }),
-      );
-    }
-  }
+  app.use('/manifest.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
+  });
+
+  app.use(
+    '/assets',
+    express.static(path.join(__dirname, 'assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
+
+  app.use(
+    '/brand_assets',
+    express.static(path.join(__dirname, 'brand_assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
 
   app.get('*', (req: Request, res: Response) => {
-    log.info(`setupAppRoutes sendFiles ${req.path}`);
     res.sendFile(`${__dirname}/index.html`);
   });
 

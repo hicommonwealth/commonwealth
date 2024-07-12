@@ -1,21 +1,18 @@
-import {
-  notifyError,
-  notifySuccess,
-} from 'client/scripts/controllers/app/notifications';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import type Topic from 'client/scripts/models/Topic';
-import app from 'client/scripts/state';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import type Topic from 'models/Topic';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
 import {
   useFetchTopicsQuery,
   useUpdateFeaturedTopicsOrderMutation,
-} from 'client/scripts/state/api/topics';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import CWIconButton from 'client/scripts/views/components/component_kit/new_designs/CWIconButton';
-import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
-import { EditTopicModal } from 'client/scripts/views/modals/edit_topic_modal';
-import DraggableTopicsList from 'client/scripts/views/modals/order_topics_modal/draggable_topics_list';
-import React, { useEffect, useState } from 'react';
+} from 'state/api/topics';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import DraggableTopicsList from 'views/modals/order_topics_modal/draggable_topics_list';
 import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
@@ -33,6 +30,7 @@ export const ManageTopicsSection = () => {
           return [...acc, { ...curr, order: index + 1 }];
         }, []);
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       return [...topics].sort((a, b) => a.order - b.order);
     }
   };
@@ -51,6 +49,7 @@ export const ManageTopicsSection = () => {
           return [...acc, { ...curr, order: index + 1 }];
         }, []);
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       return [...topics].sort((a, b) => a.order - b.order);
     }
   };
@@ -65,15 +64,19 @@ export const ManageTopicsSection = () => {
     useUpdateFeaturedTopicsOrderMutation();
 
   const [featuredTopics, setFeaturedTopics] = useState<Topic[]>(() =>
+    // @ts-expect-error <StrictNullChecks/>
     getFeaturedTopics(rawTopics),
   );
 
   const [regularTopics, setRegularTopics] = useState<Topic[]>(() =>
+    // @ts-expect-error <StrictNullChecks/>
     getRegularTopics(rawTopics),
   );
 
+  // @ts-expect-error <StrictNullChecks/>
   const initialFeaturedTopics = getFeaturedTopics(rawTopics);
 
+  // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const handleSave = async () => {
@@ -90,7 +93,9 @@ export const ManageTopicsSection = () => {
   };
 
   useEffect(() => {
+    // @ts-expect-error <StrictNullChecks/>
     setFeaturedTopics(getFeaturedTopics(rawTopics));
+    // @ts-expect-error <StrictNullChecks/>
     setRegularTopics(getRegularTopics(rawTopics));
   }, [rawTopics]);
 
@@ -173,11 +178,13 @@ export const ManageTopicsSection = () => {
           <EditTopicModal
             topic={topicSelectedToEdit}
             onModalClose={() => {
+              // @ts-expect-error <StrictNullChecks/>
               setTopicSelectedToEdit(null);
             }}
             noRedirect={true}
           />
         }
+        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setTopicSelectedToEdit(null)}
         open={!!topicSelectedToEdit}
       />

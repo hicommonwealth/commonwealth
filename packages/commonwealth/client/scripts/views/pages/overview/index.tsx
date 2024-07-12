@@ -1,6 +1,5 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
@@ -8,6 +7,7 @@ import React, { useEffect } from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import type Thread from '../../../models/Thread';
@@ -21,7 +21,7 @@ const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
@@ -50,7 +50,8 @@ const OverviewPage = () => {
     : topics;
 
   const topicsSorted = anyTopicsFeatured
-    ? topicsFiltered.sort((a, b) => a.order - b.order)
+    ? // @ts-expect-error <StrictNullChecks/>
+      topicsFiltered.sort((a, b) => a.order - b.order)
     : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
   const topicSummaryRows: Array<{
@@ -104,7 +105,7 @@ const OverviewPage = () => {
               onClick={() => {
                 navigate('/new/discussion');
               }}
-              disabled={!hasJoinedCommunity}
+              disabled={!user.activeAccount}
             />
           )}
         </div>

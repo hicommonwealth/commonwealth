@@ -1,8 +1,8 @@
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import type Comment from '../../../models/Comment';
@@ -27,7 +27,7 @@ export const CommentReactionButton = ({
   onReaction,
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const {
     mutateAsync: createCommentReaction,
@@ -57,7 +57,7 @@ export const CommentReactionButton = ({
     error: createCommentReactionError || deleteCommentReactionError,
   });
 
-  const activeAddress = app.user.activeAccount?.address;
+  const activeAddress = user.activeAccount?.address || '';
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
@@ -70,11 +70,12 @@ export const CommentReactionButton = ({
     e.stopPropagation();
     e.preventDefault();
 
-    if (!app.isLoggedIn() || !app.user.activeAccount) {
+    if (!app.isLoggedIn() || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }
 
+    // @ts-expect-error <StrictNullChecks/>
     onReaction();
 
     if (hasReacted) {
@@ -83,8 +84,10 @@ export const CommentReactionButton = ({
       });
       deleteCommentReaction({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address,
+        // @ts-expect-error <StrictNullChecks/>
         canvasHash: foundReaction.canvasHash,
+        // @ts-expect-error <StrictNullChecks/>
         reactionId: foundReaction.id,
       }).catch((err) => {
         if (err instanceof SessionKeyError) {
@@ -118,7 +121,7 @@ export const CommentReactionButton = ({
       {RevalidationModal}
       <CWUpvoteSmall
         voteCount={reactionWeightsSum}
-        disabled={!hasJoinedCommunity || disabled}
+        disabled={!user.activeAccount || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}
         popoverContent={getDisplayedReactorsForPopup({

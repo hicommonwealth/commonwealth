@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { notifyError } from '../../controllers/app/notifications';
 import { getAddedAndDeleted } from '../../helpers/threads';
+import useAppStatus from '../../hooks/useAppStatus';
 import type Thread from '../../models/Thread';
 import { LinkSource } from '../../models/Thread';
 import app from '../../state';
@@ -43,6 +44,8 @@ export const LinkedThreadModal = ({
     threadId: thread.id,
   });
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
       tempLinkedThreads,
@@ -59,6 +62,7 @@ export const LinkedThreadModal = ({
             identifier: String(el.id),
             title: el.title,
           })),
+          isPWA: isAddedToHomeScreen,
         });
         links = updatedThread.links;
       }
@@ -74,6 +78,7 @@ export const LinkedThreadModal = ({
         links = updatedThread.links;
       }
       onModalClose();
+      // @ts-expect-error <StrictNullChecks/>
       if (links && onSave) {
         onSave(links);
       }

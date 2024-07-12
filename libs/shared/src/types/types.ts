@@ -40,21 +40,11 @@ export enum AccessLevel {
   Admin = 'admin',
   Moderator = 'moderator',
   Member = 'member',
-  Everyone = 'everyone',
 }
 
 export enum ContentType {
   Thread = 'thread',
   Comment = 'comment',
-  // Proposal = 'proposal',
-}
-
-export enum SearchContentType {
-  Thread = 'thread',
-  Comment = 'comment',
-  Chain = 'chain',
-  Token = 'token',
-  Member = 'member',
 }
 
 export const DynamicTemplate = {
@@ -65,12 +55,6 @@ export const DynamicTemplate = {
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
   EmailDigest: 'd-a4f27421ce5a41d29dca7625d2136cc3',
-};
-
-export type RoleObject = {
-  permission: AccessLevel;
-  allow: number;
-  deny: number;
 };
 
 export enum LinkSource {

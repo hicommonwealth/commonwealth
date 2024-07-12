@@ -56,12 +56,7 @@ export const GovernanceSection = () => {
   // Conditional Render Details
   const hasProposals =
     app.chain &&
-    (app.chain.base === ChainBase.CosmosSDK ||
-      app.chain.network === ChainNetwork.Sputnik ||
-      app.chain.network === ChainNetwork.Compound ||
-      app.chain.network === ChainNetwork.Aave ||
-      // app.chain.network === ChainNetwork.CommonProtocol ||
-      app.chain.meta.snapshot?.length);
+    (app.chain.base === ChainBase.CosmosSDK || app.chain.meta.snapshot?.length);
 
   const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
@@ -70,12 +65,9 @@ export const GovernanceSection = () => {
     !!app.chain?.meta.snapshot?.length;
 
   const showProposals =
-    (isNotOffchain &&
-      app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain.network !== ChainNetwork.Terra) ||
-    app.chain?.network === ChainNetwork.Sputnik ||
-    app.chain?.network === ChainNetwork.Compound ||
-    app.chain?.network === ChainNetwork.Aave;
+    isNotOffchain &&
+    app.chain?.base === ChainBase.CosmosSDK &&
+    app.chain.network !== ChainNetwork.Terra;
 
   // ---------- Build Toggle Tree ---------- //
   const governanceDefaultToggleTree: ToggleTree = {
@@ -172,6 +164,7 @@ export const GovernanceSection = () => {
           e,
           '/multiple-snapshots?action=select-space',
           app.activeChainId(),
+          // @ts-expect-error <StrictNullChecks/>
           null,
         );
       } else {
@@ -183,6 +176,7 @@ export const GovernanceSection = () => {
               .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
               .trim()}`,
             app.activeChainId(),
+            // @ts-expect-error <StrictNullChecks/>
             null,
           );
         } else {
@@ -191,6 +185,7 @@ export const GovernanceSection = () => {
             e,
             `/snapshot/${snapshotSpaces}`,
             app.activeChainId(),
+            // @ts-expect-error <StrictNullChecks/>
             null,
           );
         }

@@ -6,7 +6,7 @@ import { ApiEndpoints } from 'state/api/config';
 const RELATED_COMMUNITIES_STALE_TIME = 60 * 5 * 1_000; // 5 min
 
 interface FetchRelatedCommunitiesProps {
-  chainNodeId: number;
+  chainNodeId?: number;
 }
 
 interface FetchRelatedCommunitiesResponse {
@@ -42,6 +42,7 @@ const useFetchRelatedCommunitiesQuery = ({
     queryKey: [ApiEndpoints.FETCH_RELATED_COMMUNITIES, chainNodeId],
     queryFn: () => fetchRelatedCommunities({ chainNodeId }),
     staleTime: RELATED_COMMUNITIES_STALE_TIME,
+    enabled: !!chainNodeId,
   });
 };
 

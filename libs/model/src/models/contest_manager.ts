@@ -39,6 +39,7 @@ export default (
       decimals: { type: Sequelize.INTEGER },
       created_at: { type: Sequelize.DATE, allowNull: false },
       cancelled: { type: Sequelize.BOOLEAN },
+      ended: { type: Sequelize.BOOLEAN },
     },
     {
       tableName: 'ContestManagers',

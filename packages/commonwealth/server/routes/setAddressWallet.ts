@@ -23,11 +23,14 @@ const setAddressWallet = async (
   res: TypedResponse<Record<string, never>>,
 ) => {
   const author = req.address;
+  // @ts-expect-error StrictNullChecks
   if (author.wallet_id) throw new AppError(Errors.AddressAlreadyHasWalletId);
   if (!Object.values(WalletId).includes(req.body.wallet_id)) {
     throw new AppError(Errors.InvalidWalletId);
   }
+  // @ts-expect-error StrictNullChecks
   author.wallet_id = req.body.wallet_id;
+  // @ts-expect-error StrictNullChecks
   await author.save();
   return success(res, {});
 };

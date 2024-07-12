@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import StarredCommunity from 'models/StarredCommunity';
 import app from 'state';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface ToggleCommunityStarProps {
   community: string;
@@ -13,7 +14,7 @@ const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
   const response = await axios.post(`${app.serverUrl()}/starCommunity`, {
     chain: community,
     auth: true,
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   return {
@@ -23,6 +24,8 @@ const toggleCommunityStar = async ({ community }: ToggleCommunityStarProps) => {
 };
 
 const useToggleCommunityStarMutation = () => {
+  const user = useUserStore();
+
   return useMutation({
     mutationFn: toggleCommunityStar,
     onSuccess: async ({ response, community }) => {
@@ -30,12 +33,22 @@ const useToggleCommunityStarMutation = () => {
       const starredCommunity = response.data.result;
 
       if (starredCommunity) {
-        app.user.addStarredCommunity(new StarredCommunity(starredCommunity));
-      } else {
-        const star = app.user.starredCommunities.find((c) => {
-          return c.community_id === community;
+        user.setData({
+          starredCommunities: [
+            ...user.starredCommunities,
+            new StarredCommunity(starredCommunity),
+          ],
         });
-        app.user.removeStarredCommunity(star.community_id, star.user_id);
+      } else {
+        const star = user.starredCommunities.find((c) => {
+          return c.community_id === community;
+        }) as StarredCommunity;
+
+        user.setData({
+          starredCommunities: [...user.starredCommunities].filter(
+            (s) => s.community_id !== star.community_id,
+          ),
+        });
       }
     },
   });

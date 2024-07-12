@@ -1,21 +1,38 @@
 import moment from 'moment';
 import React from 'react';
 
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import useRerender from 'hooks/useRerender';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
+import useUserStore from 'state/ui/user';
 import './ContestCard.scss';
+
+const noFundsProps = {
+  title: 'There are no funds for this contest',
+  iconName: 'coins' as IconName,
+};
+
+const noUpvotesProps = {
+  title: 'There are no upvotes on this contest',
+  description: 'Upvote contest entries to display prizes',
+  iconName: 'upvote' as IconName,
+};
 
 interface ContestCardProps {
   address: string;
@@ -30,9 +47,13 @@ interface ContestCardProps {
     prize?: string;
     tickerPrize?: number;
   }[];
+  decimals?: number;
+  ticker?: string;
   isAdmin: boolean;
-  isActive: boolean;
+  isCancelled?: boolean;
   onFund: () => void;
+  feeManagerBalance?: string;
+  isRecurring: boolean;
 }
 
 const ContestCard = ({
@@ -42,14 +63,30 @@ const ContestCard = ({
   finishDate,
   topics,
   score,
+  decimals,
+  ticker,
   isAdmin,
-  isActive,
+  isCancelled,
   onFund,
+  feeManagerBalance,
+  isRecurring,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
+
+  const hasEnded = moment(finishDate) < moment();
+  const isActive = isCancelled ? false : !hasEnded;
+
+  useRerender({ isActive, interval: 6000 });
+
+  const { data: oneOffContestBalance } = useGetContestBalanceQuery({
+    contestAddress: address,
+    chainRpc: app.chain.meta.ChainNode.url,
+    ethChainId: app.chain.meta.ChainNode.ethChainId!,
+    apiEnabled: !isRecurring,
+  });
 
   const handleCancel = () => {
     cancelContest({
@@ -89,13 +126,16 @@ const ContestCard = ({
     navigate(`/discussions?featured=mostLikes&contest=${address}`);
   };
 
-  const handleWinnersClick = () => {
-    navigate(`/discussions?contest=${address}`);
-  };
-
   const handleFundClick = () => {
     onFund();
   };
+
+  const balance = isRecurring
+    ? feeManagerBalance
+    : String(oneOffContestBalance);
+
+  const showNoFundsInfo = isActive && parseFloat(balance!) <= 0;
+  const showNoUpvotesInfo = isActive && (!score || score.length === 0);
 
   return (
     <CWCard className="ContestCard">
@@ -105,34 +145,62 @@ const ContestCard = ({
       <div className="contest-body">
         <div className="header-row">
           <CWText type="h3">{name}</CWText>
-          <ContestCountdown finishTime={finishDate} isActive={isActive} />
+          {finishDate ? (
+            <ContestCountdown finishTime={finishDate} isActive={isActive} />
+          ) : (
+            <Skeleton width="70px" />
+          )}
         </div>
         <CWText className="topics">
           Topics: {topics.map(({ name: topicName }) => topicName).join(', ')}
         </CWText>
-        <CWText className="prizes-header" fontWeight="bold">
-          Current Prizes
-        </CWText>
-        <div className="prizes">
-          {score?.map((s, index) => (
-            <div className="prize-row" key={s.content_id}>
-              <CWText className="label">
-                {moment.localeData().ordinal(index + 1)} Prize
+
+        <>
+          {showNoFundsInfo ? (
+            <ContestAlert
+              {...noFundsProps}
+              description={
+                isRecurring
+                  ? 'Purchase Community Stake to fund this contest'
+                  : 'Fund this contest to display prizes'
+              }
+            />
+          ) : showNoUpvotesInfo ? (
+            <ContestAlert {...noUpvotesProps} />
+          ) : (
+            <>
+              <CWText className="prizes-header" fontWeight="bold">
+                Current Prizes
               </CWText>
-              <CWText fontWeight="bold">{s.tickerPrize} ETH</CWText>
-            </div>
-          ))}
-        </div>
+              <div className="prizes">
+                {score ? (
+                  score?.map((s, index) => (
+                    <div className="prize-row" key={s.content_id}>
+                      <CWText className="label">
+                        {moment.localeData().ordinal(index + 1)} Prize
+                      </CWText>
+                      <CWText fontWeight="bold">
+                        {capDecimals(
+                          s.tickerPrize
+                            ? s.tickerPrize?.toFixed(decimals || 18)
+                            : '',
+                        )}
+                        {ticker}
+                      </CWText>
+                    </div>
+                  ))
+                ) : (
+                  <CWText>No prizes available</CWText>
+                )}
+              </div>
+            </>
+          )}
+        </>
         <div className="actions">
           <CWThreadAction
             label="Leaderboard"
             action="leaderboard"
             onClick={handleLeaderboardClick}
-          />
-          <CWThreadAction
-            label="Winners"
-            action="winners"
-            onClick={handleWinnersClick}
           />
 
           <SharePopoverOld
@@ -146,7 +214,7 @@ const ContestCard = ({
             )}
           />
 
-          {isActive && hasJoinedCommunity && (
+          {isActive && user.activeAccount && (
             <CWThreadAction
               label="Fund"
               action="fund"

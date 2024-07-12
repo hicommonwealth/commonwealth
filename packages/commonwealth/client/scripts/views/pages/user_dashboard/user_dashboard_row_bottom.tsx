@@ -98,6 +98,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
       <SharePopoverOld
         // if share endpoint is present it will be used, else the current url will be used
         discussionLink={
+          // @ts-expect-error <StrictNullChecks/>
           discussionLink.startsWith('/') ? discussionLink : `/${discussionLink}`
         }
       />

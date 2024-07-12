@@ -1,9 +1,6 @@
 import { DefaultPage } from '@hicommonwealth/shared';
-import {
-  PreferenceTags,
-  usePreferenceTags,
-} from 'client/scripts/views/components/PreferenceTags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { linkValidationSchema } from 'helpers/formValidations/common';
 import getLinkType from 'helpers/linkType';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -13,6 +10,10 @@ import {
   useEditCommunityTagsMutation,
 } from 'state/api/communities';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
+import {
+  PreferenceTags,
+  usePreferenceTags,
+} from 'views/components/PreferenceTags';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -30,10 +31,7 @@ import { useFlag } from '../../../../../hooks/useFlag';
 import './CommunityProfileForm.scss';
 import { getCommunityTags } from './helpers';
 import { CommunityTags, FormSubmitValues } from './types';
-import {
-  communityProfileValidationSchema,
-  linkValidationSchema,
-} from './validation';
+import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
@@ -140,7 +138,7 @@ const CommunityProfileForm = () => {
     areLinksValid,
   } = useLinksArray({
     initialLinks: initialLinks,
-    linkValidation: linkValidationSchema,
+    linkValidation: linkValidationSchema.required,
   });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
@@ -191,6 +189,7 @@ const CommunityProfileForm = () => {
 
       await editBanner({
         communityId: community.id,
+        // @ts-expect-error <StrictNullChecks/>
         bannerText: values.communityBanner,
       });
 

@@ -1,16 +1,12 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import app from 'client/scripts/state';
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
-import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useAdminActionCardsStore from 'state/ui/adminOnboardingCards';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { ActionCard } from '../ActionCard';
-import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
+import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';
-import { DismissModal } from './DismissModal';
 import './UserTrainingSlider.scss';
 import { CARD_TYPES } from './constants';
 import { UserTrainingCardTypes } from './types';
@@ -18,7 +14,8 @@ import { UserTrainingCardTypes } from './types';
 export const UserTrainingSlider = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+  const user = useUserStore();
+  const profileId = user.addresses?.[0]?.profile?.id;
 
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
@@ -46,12 +43,14 @@ export const UserTrainingSlider = () => {
       UserTrainingCardTypes.CreateContent,
       UserTrainingCardTypes.FinishProfile,
       UserTrainingCardTypes.ExploreCommunities,
+      // @ts-expect-error <StrictNullChecks/>
     ].map((card) => markTrainingActionAsPermanentlyHidden(card, profileId));
   };
 
   const isCardVisible = (cardName: UserTrainingCardTypes) => {
     return (
       completedActions.includes(cardName) ||
+      // @ts-expect-error <StrictNullChecks/>
       !trainingActionPermanentlyHidden?.[profileId]?.includes(cardName)
     );
   };
@@ -75,6 +74,7 @@ export const UserTrainingSlider = () => {
     if (cardToDismiss === 'all') {
       hideAllCards();
     } else {
+      // @ts-expect-error <StrictNullChecks/>
       markTrainingActionAsPermanentlyHidden(cardToDismiss, profileId);
     }
     setCardToDismiss(undefined);
@@ -107,7 +107,7 @@ export const UserTrainingSlider = () => {
           (link) => link.trim().length > 0,
         )?.length > 0;
       if (
-        (hasSocialLinks || app?.user?.email) &&
+        (hasSocialLinks || user.email) &&
         !trainingActionPermanentlyHidden?.[profileId]?.includes(
           UserTrainingCardTypes.FinishProfile,
         )
@@ -132,6 +132,7 @@ export const UserTrainingSlider = () => {
       }
     }
   }, [
+    user.email,
     isLoggedIn,
     isLoadingProfile,
     profile,
@@ -141,6 +142,7 @@ export const UserTrainingSlider = () => {
   ]);
 
   if (
+    !profileId ||
     !isLoggedIn ||
     isLoadingProfile ||
     (trainingActionPermanentlyHidden?.[profileId]?.length === 4 &&
@@ -152,140 +154,111 @@ export const UserTrainingSlider = () => {
 
   return (
     <>
-      <CWPageLayout className="UserTrainingSliderPageLayout">
-        <section className="UserTrainingSlider">
-          <div className="header">
-            <div className="left-section">
-              <CWText type="h4" fontWeight="semiBold">
-                Welcome to Common!
-              </CWText>
-              <CWText type="b1">
-                Get the most out of your experience by completing these steps
-              </CWText>
-            </div>
+      <CardsSlider
+        containerClassName="UserTrainingSliderPageLayout"
+        className="UserTrainingSlider"
+        headerText="Welcome to Common!"
+        subHeaderText="Get the most out of your experience by completing these steps"
+        dismissBtnLabel="Dismiss all"
+        onDismiss={() => setCardToDismiss('all')}
+      >
+        {isCardVisible(UserTrainingCardTypes.GiveUpvote) && (
+          <ActionCard
+            ctaText={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].ctaText}
+            title={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].title}
+            description={
+              CARD_TYPES[UserTrainingCardTypes.GiveUpvote].description
+            }
+            iconURL={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].iconURL}
+            iconAlt="give-upvote-icon"
+            canClose
+            onClose={() => setCardToDismiss(UserTrainingCardTypes.GiveUpvote)}
+            isActionCompleted={completedActions.includes(
+              UserTrainingCardTypes.GiveUpvote,
+            )}
+            onCTAClick={() => redirectToPage(UserTrainingCardTypes.GiveUpvote)}
+          />
+        )}
+        {isCardVisible(UserTrainingCardTypes.CreateContent) && (
+          <ActionCard
+            ctaText={CARD_TYPES[UserTrainingCardTypes.CreateContent].ctaText}
+            title={CARD_TYPES[UserTrainingCardTypes.CreateContent].title}
+            description={
+              CARD_TYPES[UserTrainingCardTypes.CreateContent].description
+            }
+            iconURL={CARD_TYPES[UserTrainingCardTypes.CreateContent].iconURL}
+            iconAlt="create-content-icon"
+            canClose
+            onClose={() =>
+              setCardToDismiss(UserTrainingCardTypes.CreateContent)
+            }
+            isActionCompleted={completedActions.includes(
+              UserTrainingCardTypes.CreateContent,
+            )}
+            onCTAClick={() =>
+              redirectToPage(UserTrainingCardTypes.CreateContent)
+            }
+          />
+        )}
+        {isCardVisible(UserTrainingCardTypes.FinishProfile) && (
+          <ActionCard
+            ctaText={CARD_TYPES[UserTrainingCardTypes.FinishProfile].ctaText}
+            title={CARD_TYPES[UserTrainingCardTypes.FinishProfile].title}
+            description={
+              CARD_TYPES[UserTrainingCardTypes.FinishProfile].description
+            }
+            iconURL={CARD_TYPES[UserTrainingCardTypes.FinishProfile].iconURL}
+            iconAlt="finish-profile-icon"
+            canClose
+            onClose={() =>
+              setCardToDismiss(UserTrainingCardTypes.FinishProfile)
+            }
+            isActionCompleted={completedActions.includes(
+              UserTrainingCardTypes.FinishProfile,
+            )}
+            onCTAClick={() =>
+              redirectToPage(UserTrainingCardTypes.FinishProfile)
+            }
+          />
+        )}
+        {isCardVisible(UserTrainingCardTypes.ExploreCommunities) && (
+          <ActionCard
+            ctaText={
+              CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].ctaText
+            }
+            title={CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].title}
+            description={
+              CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].description
+            }
+            iconURL={
+              CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].iconURL
+            }
+            iconAlt="explore-communities-icon"
+            canClose
+            onClose={() =>
+              setCardToDismiss(UserTrainingCardTypes.ExploreCommunities)
+            }
+            isActionCompleted={completedActions.includes(
+              UserTrainingCardTypes.ExploreCommunities,
+            )}
+            onCTAClick={() => {
+              redirectToPage(UserTrainingCardTypes.ExploreCommunities);
 
-            <CWButton
-              containerClassName="dismissBtn"
-              buttonType="tertiary"
-              buttonWidth="narrow"
-              buttonHeight="sm"
-              onClick={() => setCardToDismiss('all')}
-              label="Dismiss all"
-            />
-          </div>
-          <div className="cards">
-            {isCardVisible(UserTrainingCardTypes.GiveUpvote) && (
-              <ActionCard
-                ctaText={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].ctaText}
-                title={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].title}
-                description={
-                  CARD_TYPES[UserTrainingCardTypes.GiveUpvote].description
-                }
-                iconURL={CARD_TYPES[UserTrainingCardTypes.GiveUpvote].iconURL}
-                iconAlt="give-upvote-icon"
-                canClose
-                onClose={() =>
-                  setCardToDismiss(UserTrainingCardTypes.GiveUpvote)
-                }
-                isActionCompleted={completedActions.includes(
-                  UserTrainingCardTypes.GiveUpvote,
-                )}
-                onCTAClick={() =>
-                  redirectToPage(UserTrainingCardTypes.GiveUpvote)
-                }
-              />
-            )}
-            {isCardVisible(UserTrainingCardTypes.CreateContent) && (
-              <ActionCard
-                ctaText={
-                  CARD_TYPES[UserTrainingCardTypes.CreateContent].ctaText
-                }
-                title={CARD_TYPES[UserTrainingCardTypes.CreateContent].title}
-                description={
-                  CARD_TYPES[UserTrainingCardTypes.CreateContent].description
-                }
-                iconURL={
-                  CARD_TYPES[UserTrainingCardTypes.CreateContent].iconURL
-                }
-                iconAlt="create-content-icon"
-                canClose
-                onClose={() =>
-                  setCardToDismiss(UserTrainingCardTypes.CreateContent)
-                }
-                isActionCompleted={completedActions.includes(
-                  UserTrainingCardTypes.CreateContent,
-                )}
-                onCTAClick={() =>
-                  redirectToPage(UserTrainingCardTypes.CreateContent)
-                }
-              />
-            )}
-            {isCardVisible(UserTrainingCardTypes.FinishProfile) && (
-              <ActionCard
-                ctaText={
-                  CARD_TYPES[UserTrainingCardTypes.FinishProfile].ctaText
-                }
-                title={CARD_TYPES[UserTrainingCardTypes.FinishProfile].title}
-                description={
-                  CARD_TYPES[UserTrainingCardTypes.FinishProfile].description
-                }
-                iconURL={
-                  CARD_TYPES[UserTrainingCardTypes.FinishProfile].iconURL
-                }
-                iconAlt="finish-profile-icon"
-                canClose
-                onClose={() =>
-                  setCardToDismiss(UserTrainingCardTypes.FinishProfile)
-                }
-                isActionCompleted={completedActions.includes(
-                  UserTrainingCardTypes.FinishProfile,
-                )}
-                onCTAClick={() =>
-                  redirectToPage(UserTrainingCardTypes.FinishProfile)
-                }
-              />
-            )}
-            {isCardVisible(UserTrainingCardTypes.ExploreCommunities) && (
-              <ActionCard
-                ctaText={
-                  CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].ctaText
-                }
-                title={
-                  CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].title
-                }
-                description={
-                  CARD_TYPES[UserTrainingCardTypes.ExploreCommunities]
-                    .description
-                }
-                iconURL={
-                  CARD_TYPES[UserTrainingCardTypes.ExploreCommunities].iconURL
-                }
-                iconAlt="explore-communities-icon"
-                canClose
-                onClose={() =>
-                  setCardToDismiss(UserTrainingCardTypes.ExploreCommunities)
-                }
-                isActionCompleted={completedActions.includes(
-                  UserTrainingCardTypes.ExploreCommunities,
-                )}
-                onCTAClick={() => {
-                  redirectToPage(UserTrainingCardTypes.ExploreCommunities);
-
-                  markTrainingActionAsComplete(
-                    UserTrainingCardTypes.ExploreCommunities,
-                    profileId,
-                  );
-                }}
-              />
-            )}
-          </div>
-        </section>
-      </CWPageLayout>
+              markTrainingActionAsComplete(
+                UserTrainingCardTypes.ExploreCommunities,
+                profileId,
+              );
+            }}
+          />
+        )}
+      </CardsSlider>
       <CWModal
         size="small"
         visibleOverflow
         content={
           <DismissModal
+            label="Dismiss item"
+            description="Are you sure you'd like to dismiss?"
             onModalClose={handleModalClose}
             onDismiss={handleModalDismiss}
           />

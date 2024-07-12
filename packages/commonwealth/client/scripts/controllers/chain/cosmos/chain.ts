@@ -20,6 +20,7 @@ import moment from 'moment';
 import { LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { userStore } from 'state/ui/user';
 import ChainInfo from '../../../models/ChainInfo';
 import {
   IChainModule,
@@ -60,9 +61,11 @@ export type CosmosApiType = QueryClient &
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
   private _lcd: LCD;
+
   public get api() {
     return this._api;
   }
+
   public get lcd() {
     return this._lcd;
   }
@@ -95,7 +98,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _tmClient: Tendermint34Client;
 
   public async init(chain: ChainInfo, reset = false) {
-    const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
+    const url = `${window.location.origin}${this.app.serverUrl()}/cosmosProxy/${
+      chain.id
+    }`;
 
     // TODO: configure broadcast mode
     try {
@@ -123,7 +128,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         CosmosGovernanceVersion.v1beta1Failed
     ) {
       try {
-        const lcdUrl = `${window.location.origin}/cosmosAPI/v1/${chain.id}`;
+        const lcdUrl = `${
+          window.location.origin
+        }${this.app.serverUrl()}/cosmosProxy/v1/${chain.id}`;
         console.log(`Starting LCD API at ${lcdUrl}...`);
         const lcd = await getLCDClient(lcdUrl);
         this._lcd = lcd;
@@ -154,6 +161,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async fetchPoolParams(): Promise<CosmosToken> {
     const {
+      // @ts-expect-error StrictNullChecks
       pool: { bondedTokens },
     } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
@@ -162,6 +170,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async fetchStakingParams(): Promise<string> {
     const {
+      // @ts-expect-error StrictNullChecks
       params: { bondDenom },
     } = await this._api.staking.params();
     this._denom = bondDenom;
@@ -183,10 +192,12 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       throw new Error('Tx not yet supported on Terra');
     }
 
-    const activeAddress = this._app.user.activeAccount?.address;
-    const walletId = this._app.user.addresses?.find(
-      (a) => a.address === activeAddress && a.community?.id === chain.id,
-    )?.walletId;
+    const activeAddress = userStore.getState().activeAccount?.address;
+    const walletId = userStore
+      .getState()
+      .addresses.find(
+        (a) => a.address === activeAddress && a.community?.id === chain.id,
+      )?.walletId;
     const isKeplr = walletId === WalletId.Keplr;
     const isKeplrEvm = walletId === WalletId.KeplrEthereum;
     const isLeap = walletId === WalletId.Leap;
@@ -225,9 +236,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (cosmosEvmChains.some((c) => c === dbId)) {
       const chainId = wallet.getChainId();
 
-      client = await EthSigningClient(
+      client = EthSigningClient(
         {
-          restUrl: `${window.location.origin}/cosmosAPI/v1/${dbId}`,
+          restUrl: `${
+            window.location.origin
+          }${this.app.serverUrl()}/cosmosProxy/v1/${dbId}`,
           chainId,
           path: dbId,
         },

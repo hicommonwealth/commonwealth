@@ -7,9 +7,9 @@ import type {
 } from 'helpers/snapshot_utils';
 import moment from 'moment';
 
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;
@@ -44,7 +44,7 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
 }
 
 export const SnapshotPollCardContainer = (
-  props: SnapshotProposalCardsProps
+  props: SnapshotProposalCardsProps,
 ) => {
   const {
     activeUserAddress,
@@ -70,10 +70,11 @@ export const SnapshotPollCardContainer = (
 
   const [userVote, setUserVote] = useState(
     proposal.choices[
+      // @ts-expect-error <StrictNullChecks/>
       votes.find((vote) => {
         return vote.voter === activeUserAddress;
       })?.choice - 1
-    ]
+    ],
   );
   const [hasVoted, setHasVoted] = useState(userVote !== undefined);
 
@@ -97,6 +98,7 @@ export const SnapshotPollCardContainer = (
       const totalVotes = votes
         .filter((vote) => vote.choice === i + 1)
         .reduce((sum, vote) => sum + vote.balance, 0);
+      // @ts-expect-error <StrictNullChecks/>
       voteInfo.push({
         label: choices[i],
         value: choices[i],
@@ -131,6 +133,7 @@ export const SnapshotPollCardContainer = (
           setIsModalOpen(false);
         }}
         incrementalVoteCast={totalScore}
+        // @ts-expect-error <StrictNullChecks/>
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
       />
@@ -141,6 +144,7 @@ export const SnapshotPollCardContainer = (
             space={space}
             proposal={proposal}
             id={identifier}
+            // @ts-expect-error <StrictNullChecks/>
             selectedChoice={proposal?.choices.indexOf(choice).toString()}
             totalScore={totalScore}
             scores={scores}
@@ -148,6 +152,7 @@ export const SnapshotPollCardContainer = (
             successCallback={async () => {
               await loadVotes();
               setHasVoted(true);
+              // @ts-expect-error <StrictNullChecks/>
               setUserVote(choice);
             }}
             onModalClose={() => setIsModalOpen(false)}

@@ -1,6 +1,7 @@
 import { EventNames } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import ethers from 'ethers';
+import { describe, test } from 'vitest';
 import {
   ContestContentAdded,
   ContestContentUpvoted,
@@ -13,7 +14,7 @@ import { parseEvmEventToContestEvent } from '../../src/integration/events.utils'
 const contestAddress = '0x888';
 
 describe('parseEvmEventToContestEvent', () => {
-  it('should map NewContest chain event to RecurringContestManagerDeployed outbox shape', () => {
+  test('should map NewContest chain event to RecurringContestManagerDeployed outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewContest',
       null,
@@ -32,7 +33,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.interval).to.eq(7); // prop of RecurringContestManagerDeployed
   });
 
-  it('should map NewContest chain event to OneOffContestManagerDeployed outbox shape', () => {
+  test('should map NewContest chain event to OneOffContestManagerDeployed outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewContest',
       null,
@@ -51,7 +52,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.length).to.eq(7);
   });
 
-  it('should map NewRecurringContestStarted raw evm result to ContestStarted outbox shape', () => {
+  test('should map NewRecurringContestStarted raw evm result to ContestStarted outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'NewRecurringContestStarted',
       contestAddress,
@@ -74,7 +75,7 @@ describe('parseEvmEventToContestEvent', () => {
     );
   });
 
-  it('should map ContentAdded raw evm result to ContestContentAdded outbox shape', () => {
+  test('should map ContentAdded raw evm result to ContestContentAdded outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'ContentAdded',
       contestAddress,
@@ -93,7 +94,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.content_url).to.eq('/threads/1');
   });
 
-  it('should map VoterVotedRecurring raw evm result to ContestContentUpvoted outbox shape', () => {
+  test('should map VoterVotedRecurring raw evm result to ContestContentUpvoted outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'VoterVotedRecurring',
       contestAddress,
@@ -114,7 +115,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.voting_power).to.eq(9000);
   });
 
-  it('should map VoterVotedOneOff raw evm result to ContestContentUpvoted outbox shape', () => {
+  test('should map VoterVotedOneOff raw evm result to ContestContentUpvoted outbox shape', () => {
     const { event_name, event_payload } = parseEvmEventToContestEvent(
       'VoterVotedOneOff',
       contestAddress,
@@ -133,7 +134,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.voting_power).to.eq(9000);
   });
 
-  it('should throw if the wrong number of args are used outbox shape', () => {
+  test('should throw if the wrong number of args are used outbox shape', () => {
     expect(() => {
       parseEvmEventToContestEvent('VoterVotedRecurring', contestAddress, [
         '0x2', // voterAddress

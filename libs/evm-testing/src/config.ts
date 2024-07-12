@@ -4,7 +4,6 @@ import { z } from 'zod';
 const {
   ETH_ALCHEMY_API_KEY,
   PROVIDER_URL,
-  ETHERSCAN_JS_API_KEY,
   ETH_RPC,
   COSMOS_GOV_V1,
   COSMOS_REGISTRY_API,
@@ -18,7 +17,6 @@ export const config = configure(
       // URL of the local Ganache, Anvil, or Hardhat chain
       PROVIDER_URL: PROVIDER_URL ?? 'http://127.0.0.1:8545',
       ETH_ALCHEMY_API_KEY,
-      ETHERSCAN_JS_API_KEY,
     },
     COSMOS: {
       COSMOS_GOV_V1_CHAIN_IDS: COSMOS_GOV_V1 ? COSMOS_GOV_V1.split(',') : [],
@@ -31,7 +29,7 @@ export const config = configure(
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
       ETH_ALCHEMY_API_KEY: z.string().optional(),
-      ETHERSCAN_JS_API_KEY: z.string().optional(),
+      BASESEP_ALCHEMY_API_KEY: z.string().optional(),
     }),
     COSMOS: z.object({
       COSMOS_GOV_V1_CHAIN_IDS: z.array(z.string()),

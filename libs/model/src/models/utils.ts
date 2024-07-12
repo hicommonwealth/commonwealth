@@ -111,8 +111,9 @@ export function oneToMany<Parent extends State, Child extends State>(
   // map fk when child has composite pk,
   // or when fk = pk (sequelize is not creating fk when fk = pk)
   else if (
-    child.primaryKeyAttributes.length > 1 &&
-    this.primaryKeyAttributes.length === 1
+    (child.primaryKeyAttributes.length > 1 &&
+      this.primaryKeyAttributes.length === 1) ||
+    foreignKey === child.primaryKeyAttribute
   )
     mapFk(
       child,

@@ -1,5 +1,4 @@
 import { WalletId } from '@hicommonwealth/shared';
-import Near from '../controllers/chain/near/adapter';
 import IWebWallet from '../models/IWebWallet';
 
 // getWalletName() fetches friendly names for wallets. It is assumed
@@ -26,7 +25,6 @@ const getWalletName = (walletId: WalletId) => {
     [WalletId.KeplrEthereum]: 'Keplr',
     [WalletId.Keplr]: 'Keplr',
     [WalletId.Leap]: 'Leap',
-    [WalletId.NearWallet]: 'NEAR Wallet',
     [WalletId.TerraStation]: 'Terra Station',
     [WalletId.TerraWalletConnect]: 'Terra WalletConnect',
     [WalletId.CosmosEvmMetamask]: 'Metamask',
@@ -65,30 +63,4 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
   return selectedAddress;
 };
 
-const loginToNear = async (activeChain: Near, isCustomDomain: boolean) => {
-  const WalletAccount = (await import('near-api-js')).WalletAccount;
-  if (!activeChain.apiInitialized) {
-    await activeChain.initApi();
-  }
-  const nearWallet = new WalletAccount(
-    (activeChain as Near).chain.api,
-    'commonwealth_near',
-  );
-  if (nearWallet.isSignedIn()) {
-    nearWallet.signOut();
-  }
-
-  const redirectUrl = !isCustomDomain
-    ? `${window.location.origin}/${activeChain.id}/finishNearLogin`
-    : `${window.location.origin}/finishNearLogin`;
-
-  nearWallet.requestSignIn({
-    contractId: (activeChain as Near).chain.isMainnet
-      ? 'commonwealth-login.near'
-      : 'commonwealth-login.testnet',
-    successUrl: redirectUrl,
-    failureUrl: redirectUrl,
-  });
-};
-
-export { getAddressFromWallet, getWalletName, loginToNear };
+export { getAddressFromWallet, getWalletName };
