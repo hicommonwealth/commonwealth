@@ -32,6 +32,7 @@ type ActivityResponse = {
   recentcomments?: [];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function formatActivityResponse(response: AxiosResponse<any, any>) {
   return (response?.data?.result || []).map(
     (x: ActivityResponse) =>
