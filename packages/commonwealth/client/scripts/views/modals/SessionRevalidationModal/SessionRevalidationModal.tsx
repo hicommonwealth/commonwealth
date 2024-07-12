@@ -7,6 +7,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import WebWalletController from 'controllers/app/web_wallets';
 import { addressSwapper } from 'shared/utils';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import _ from 'underscore';
 import { CWAuthButton } from 'views/components/component_kit/CWAuthButtonOld';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -34,6 +35,7 @@ const SessionRevalidationModal = ({
   walletAddress,
 }: SessionRevalidationModalProps) => {
   const [connectWithEmail, setConnectWithEmail] = useState(false);
+  const user = useUserStore();
 
   const {
     onWalletAddressSelect,
@@ -55,7 +57,7 @@ const SessionRevalidationModal = ({
       // expected for session key revalidation
 
       // @ts-expect-error StrictNullChecks
-      const isSubstrate = app.user.activeAccounts.find(
+      const isSubstrate = user.accounts.find(
         (addr) => addr.address === walletAddress,
       ).community.ss58Prefix;
       if (
@@ -64,12 +66,12 @@ const SessionRevalidationModal = ({
           addressSwapper({ address: walletAddress, currentPrefix: 42 }) ===
             signedAddress)
       ) {
-        const signedAddressAccount = app.user.activeAccounts.find(
+        const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === walletAddress,
         );
         await setActiveAccount(signedAddressAccount!);
       } else {
-        const signedAddressAccount = app.user.activeAccounts.find(
+        const signedAddressAccount = user.accounts.find(
           (addr) => addr.address === signedAddress,
         );
         await setActiveAccount(signedAddressAccount!);

@@ -8,6 +8,7 @@ import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
+import { userStore } from '../state/ui/user';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
@@ -47,7 +48,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         params: {
           chain: this.id,
           community: null,
-          jwt: this.app.user.jwt,
+          jwt: userStore.getState().jwt,
         },
       }),
     ]);

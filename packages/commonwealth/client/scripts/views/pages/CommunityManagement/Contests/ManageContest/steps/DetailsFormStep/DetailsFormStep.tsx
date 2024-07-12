@@ -443,6 +443,7 @@ const DetailsFormStep = ({
                       <div key={topic.id} className="list-row">
                         <CWText>{topic.name}</CWText>
                         <CWToggle
+                          disabled={editMode}
                           checked={
                             toggledTopicList.find((t) => t.id === topic.id)
                               ?.checked
@@ -455,6 +456,7 @@ const DetailsFormStep = ({
                   <div className="list-footer">
                     <CWText>All</CWText>
                     <CWToggle
+                      disabled={editMode}
                       checked={allTopicsToggled}
                       size="small"
                       onChange={handleToggleAllTopics}

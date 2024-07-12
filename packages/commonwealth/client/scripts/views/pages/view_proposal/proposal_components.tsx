@@ -6,6 +6,7 @@ import type { AnyProposal } from 'models/types';
 import 'pages/view_proposal/proposal_components.scss';
 import React, { useState } from 'react';
 import app from 'state';
+import { userStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import {
   getStatusClass,
@@ -32,7 +33,7 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
             source: LinkSource.Proposal,
             identifier: proposal.identifier,
           },
-          jwt: app.user.jwt,
+          jwt: userStore.getState().jwt,
         })
         .then((response) => {
           setLinkedThreads(response.data.result.threads);

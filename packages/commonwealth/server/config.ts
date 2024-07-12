@@ -113,7 +113,7 @@ export const config = configure(
         10,
       ),
       MESSAGE_RELAYER_PREFETCH: parseInt(MESSAGE_RELAYER_PREFETCH ?? '50', 10),
-      EVM_CE_POLL_INTERVAL_MS: parseInt(EVM_CE_POLL_INTERVAL ?? '120_000', 10),
+      EVM_CE_POLL_INTERVAL_MS: parseInt(EVM_CE_POLL_INTERVAL ?? '120000', 10),
     },
   },
   z.object({

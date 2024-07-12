@@ -1,12 +1,13 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import ChainInfo from 'client/scripts/models/ChainInfo';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import ChainInfo from 'models/ChainInfo';
 import app from 'state';
 import {
   useFetchCommunityStakeQuery,
   useGetBuyPriceQuery,
   useGetUserStakeBalanceQuery,
 } from 'state/api/communityStake';
+import useUserStore from 'state/ui/user';
 import { useFlag } from '../../../hooks/useFlag';
 import { CommunityData } from '../../pages/DirectoryPage/DirectoryPageContent';
 
@@ -26,6 +27,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const communityStakeEnabled = useFlag('communityStake');
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
   const { isLoggedIn } = useUserLoggedIn();
+  const user = useUserStore();
 
   const activeCommunityId = community?.id || app?.chain?.id;
   const activeCommunityNamespace =
@@ -34,7 +36,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
   const ethChainId =
     community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
-  const activeAccountAddress = app?.user?.activeAccount?.address;
+  const activeAccountAddress = user.activeAccount?.address || '';
   const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
 
   const {

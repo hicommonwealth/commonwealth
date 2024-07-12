@@ -4,6 +4,7 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
+import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
@@ -326,7 +327,7 @@ class ChainInfo {
         directory_page_enabled,
         directory_page_chain_node_id,
         type,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
       {
         headers: {

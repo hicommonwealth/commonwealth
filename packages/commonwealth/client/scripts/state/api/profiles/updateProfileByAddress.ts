@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useFlag } from 'hooks/useFlag';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import useUserStore, { userStore } from '../../ui/user';
 
 interface UpdateProfileByAddressProps {
   address: string;
@@ -42,7 +43,7 @@ const updateProfileByAddress = async ({
     ...(tagIds && {
       tag_ids: tagIds,
     }),
-    jwt: app.user.jwt,
+    jwt: userStore.getState().jwt,
   });
 
   const responseProfile = response.data.result.profile;
@@ -71,6 +72,7 @@ const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
 }: UseUpdateProfileByAddressMutation = {}) => {
   const userOnboardingEnabled = useFlag('userOnboardingEnabled');
+  const user = useUserStore();
 
   return useMutation({
     mutationFn: updateProfileByAddress,
@@ -86,7 +88,7 @@ const useUpdateProfileByAddressMutation = ({
         }
       });
 
-      const userProfileId = app?.user?.addresses?.[0]?.profile?.id;
+      const userProfileId = user.addresses?.[0]?.profile?.id;
       const doesProfileIdMatch =
         userProfileId && userProfileId === updatedProfile?.id;
       if (doesProfileIdMatch) {
@@ -106,9 +108,9 @@ const useUpdateProfileByAddressMutation = ({
           userOnboardingEnabled &&
           updatedProfile.name &&
           updatedProfile.name !== 'Anonymous' &&
-          !app.user.isWelcomeOnboardFlowComplete
+          !user.isWelcomeOnboardFlowComplete
         ) {
-          app.user.setIsWelcomeOnboardFlowComplete(true);
+          user.setData({ isWelcomeOnboardFlowComplete: true });
         }
       }
 

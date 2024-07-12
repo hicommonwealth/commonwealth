@@ -98,7 +98,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
       FROM "Profiles"
-      JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
+      RIGHT JOIN "Addresses" ON "Profiles".user_id = "Addresses".user_id
       WHERE ${communityWhere} 
       ("Profiles".profile_name ILIKE '%' || :searchTerm || '%')
       ${membershipsWhere}

@@ -52,6 +52,7 @@ export const e2eTestEntities = async function (
                   email: `test${i - 1}@gmail.com`,
                   emailVerified: true,
                   isAdmin: true,
+                  profile: {},
                 },
               })
             )[0],

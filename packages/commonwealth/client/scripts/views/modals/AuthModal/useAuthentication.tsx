@@ -22,6 +22,7 @@ import { isMobile } from 'react-device-detect';
 import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import { addressSwapper } from 'utils';
 import {
   BaseMixpanelPayload,
@@ -71,6 +72,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const user = useUserStore();
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -238,11 +241,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
       if (app.chain) {
         const community =
-          app.user.selectedCommunity ||
+          user.activeCommunity ||
           app.config.chains.getById(app.activeChainId());
         await updateActiveAddresses({
           chain: community,
-          shouldRedraw: shouldRedrawApp,
         });
       }
     }
@@ -326,11 +328,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
       // @ts-expect-error StrictNullChecks
-      await account.validate(session);
+      await account.validate(session); // TODO: test if this ready does need to block user
+      // app.user.activeAccounts aka `user.accounts` refresh
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
-      await onLogInWithAccount(account, false, true, false);
+      await onLogInWithAccount(account, false, true, false); // TODO: test if this ready
+      // does need to block user app.user.activeAccounts aka `user.accounts` refresh
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
@@ -402,10 +406,21 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onWalletSelect = async (wallet: Wallet) => {
-    await wallet.enable();
+    try {
+      await wallet.enable();
+    } catch (error) {
+      notifyError(error?.message || error);
+      return;
+    }
     setSelectedWallet(wallet);
 
     const selectedAddress = getAddressFromWallet(wallet);
+    if (!selectedAddress) {
+      notifyError(
+        `We couldn't fetch an address from your wallet! Please make sure your wallet account is setup and try again`,
+      );
+      return;
+    }
 
     if (userOnboardingEnabled) {
       // check if address exists
@@ -481,7 +496,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
                 })
               : address,
           community_id: app.activeChainId() ?? wallet.chain,
-          jwt: app.user.jwt,
+          jwt: user.jwt,
         });
 
         if (res.data.result.exists && res.data.result.belongsToUser) {

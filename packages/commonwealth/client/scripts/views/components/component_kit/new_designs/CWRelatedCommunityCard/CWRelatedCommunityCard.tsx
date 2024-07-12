@@ -1,6 +1,6 @@
-import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
+import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type ChainInfo from 'models/ChainInfo';

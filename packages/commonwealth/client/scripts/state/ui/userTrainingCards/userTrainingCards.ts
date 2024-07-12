@@ -1,5 +1,5 @@
-import { UserTrainingCardTypes } from 'client/scripts/views/components/UserTrainingSlider/types';
 import { createBoundedUseStore } from 'state/ui/utils';
+import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 

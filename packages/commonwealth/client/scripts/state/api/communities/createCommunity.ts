@@ -5,6 +5,7 @@ import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { baseToNetwork } from 'helpers';
 import app, { initAppState } from 'state';
 import { updateAdminOnCreateCommunity } from 'views/pages/create_community/community_input_rows';
+import { userStore } from '../../ui/user';
 
 interface CreateCommunityProps {
   id: string;
@@ -61,7 +62,7 @@ const createCommunity = async ({
       network: communityNetwork,
       default_symbol: nameToSymbol,
       bech32_prefix: bech32Prefix,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
     {
       headers: {
