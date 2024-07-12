@@ -496,7 +496,7 @@ export const HeaderWithFilters = ({
         )}
       </div>
 
-      {activeContests.map((contest) => {
+      {(activeContests || []).map((contest) => {
         const { end_time, score } =
           // @ts-expect-error <StrictNullChecks/>
           contest?.contests[0] || {};
