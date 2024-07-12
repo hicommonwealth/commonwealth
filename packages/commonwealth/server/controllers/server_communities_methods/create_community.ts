@@ -370,7 +370,6 @@ export async function __createCommunity(
     id,
     name,
     default_symbol,
-    // @ts-expect-error StrictNullChecks
     icon_url,
     description,
     network: network as ChainNetwork,
