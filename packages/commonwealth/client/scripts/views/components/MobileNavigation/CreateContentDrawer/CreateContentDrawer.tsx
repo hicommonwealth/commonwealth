@@ -2,12 +2,12 @@ import clsx from 'clsx';
 import React from 'react';
 import app from 'state';
 
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 
+import useUserStore from 'state/ui/user';
 import './CreateContentDrawer.scss';
 
 interface CreateContentDrawerProps {
@@ -16,7 +16,7 @@ interface CreateContentDrawerProps {
 
 const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
   const navigate = useCommonNavigate();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
   const scopedPage = app.activeChainId();
 
   const handleCreateThread = () => {
@@ -36,7 +36,7 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
               Create within Community
             </CWText>
             <div
-              className={clsx('item', { disabled: !hasJoinedCommunity })}
+              className={clsx('item', { disabled: !user.activeAccount })}
               onClick={handleCreateThread}
             >
               <CWIcon iconName="pencil" />

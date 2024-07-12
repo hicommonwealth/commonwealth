@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
 import { WalletSsoSource } from '@hicommonwealth/shared';
@@ -18,10 +17,11 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
-import './MobileHeader.scss';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import { useFlag } from 'hooks/useFlag';
+import useUserStore from 'state/ui/user';
+import { AuthModalType } from 'views/modals/AuthModal';
+import './MobileHeader.scss';
 
 interface MobileHeaderProps {
   onMobile: boolean;
@@ -47,10 +47,12 @@ const MobileHeader = ({
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
-  const user = app?.user?.addresses?.[0];
   const navigate = useCommonNavigate();
 
-  const profileId = !user?.profile ? user?.profile : user.profile.id;
+  const userData = useUserStore();
+
+  const user = userData.addresses?.[0];
+  const profileId = userData.addresses?.[0].profileId;
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
@@ -63,7 +65,7 @@ const MobileHeader = ({
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
   });
-  
+
   const mobileItems = [
     ...userMenuItems,
     { type: 'divider' },
@@ -98,7 +100,7 @@ const MobileHeader = ({
 
           {isLoggedIn ? (
             <div onClick={() => navigate(`/profile/id/${profileId}`, {}, null)}>
-            <User
+              <User
                 shouldShowAvatarOnly
                 avatarSize={24}
                 userAddress={user?.address}

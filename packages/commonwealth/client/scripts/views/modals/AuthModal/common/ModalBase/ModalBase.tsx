@@ -1,21 +1,21 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import app from 'client/scripts/state';
-import useAuthModalStore from 'client/scripts/state/ui/modals/authModal';
-import AuthButton from 'client/scripts/views/components/AuthButton';
+import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import app from 'state';
+import useAuthModalStore from 'state/ui/modals/authModal';
+import AuthButton from 'views/components/AuthButton';
 import {
   AuthTypes,
   AuthWallets,
   EVMWallets,
-} from 'client/scripts/views/components/AuthButton/types';
+} from 'views/components/AuthButton/types';
 import {
   CWTab,
   CWTabsRow,
-} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
-import clsx from 'clsx';
-import React, { Fragment, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+} from 'views/components/component_kit/new_designs/CWTabs';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {

@@ -84,7 +84,7 @@ const GroupsSection = ({
                   )?.label,
                   requirementChain:
                     chainTypes
-                      .find(
+                      ?.find(
                         (x) =>
                           `${x.value}` ===
                           `${

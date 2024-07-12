@@ -6,6 +6,7 @@ import type { DB } from './factories';
 export const buildAssociations = (db: DB) => {
   db.User.withMany(db.Address)
     .withMany(db.Profile, { onUpdate: 'CASCADE' })
+    .withMany(db.ProfileTags)
     .withMany(db.Subscription, { foreignKey: 'subscriber_id' })
     .withMany(db.NotificationsRead)
     .withMany(db.SubscriptionPreference, {
@@ -13,9 +14,8 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.Profile.withMany(db.Address)
-    .withMany(db.SsoToken)
-    .withMany(db.ProfileTags, { onDelete: 'CASCADE' });
+  // TODO: to be deprecated by #5564
+  db.Profile.withMany(db.Address);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -27,7 +27,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     })
     .withMany(db.Reaction)
-    .withMany(db.SsoToken, {
+    .withOne(db.SsoToken, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });

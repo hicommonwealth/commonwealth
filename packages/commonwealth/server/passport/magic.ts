@@ -129,29 +129,24 @@ async function createNewMagicUser({
   );
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
-    const newUserData: Partial<UserAttributes> = {};
-
-    if (
-      magicUserMetadata.oauthProvider === 'email' &&
-      magicUserMetadata.email
-    ) {
-      console.log('Using email authentication:', magicUserMetadata.email);
-      newUserData.email = magicUserMetadata.email;
-      newUserData.emailVerified = true;
-    } else if (
-      magicUserMetadata.oauthProvider === 'sms' &&
-      magicUserMetadata.phoneNumber
-    ) {
-      console.log('Using SMS authentication:', magicUserMetadata.phoneNumber);
-      newUserData.phoneNumber = magicUserMetadata.phoneNumber;
-      newUserData.phoneNumberVerified = true;
-    }
-
-    console.log('Creating user with data:', JSON.stringify(newUserData));
     // @ts-expect-error StrictNullChecks
-    const newUser = await models.User.createWithProfile(newUserData, {
-      transaction,
-    });
+    const newUser = await models.User.createWithProfile(
+      {
+        // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
+        // so it is safe to set emails from magic as part of User data, even though they may be unverified.
+        // although not usable for login, this email (used for outreach) is still considered sensitive user data.
+        email: magicUserMetadata.email,
+        phoneNumber: magicUserMetadata.phoneNumber,
+
+        // we mark email verified so that we are OK to send update emails, but we should note that
+        // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
+        // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
+        emailVerified: !!magicUserMetadata.email,
+        phoneNumberVerified: !!magicUserMetadata.phoneNumber,
+        profile: {},
+      },
+      { transaction },
+    );
 
     // update profile with metadata if exists
     // @ts-expect-error StrictNullChecks
@@ -250,7 +245,6 @@ async function loginExistingMagicUser({
     let malformedSsoToken: SsoTokenInstance;
     if (ssoToken) {
       // login user if they registered via magic
-      // @ts-expect-error StrictNullChecks
       if (decodedMagicToken.claim.iat <= ssoToken.issued_at) {
         log.warn('Replay attack detected.');
         throw new Error(
@@ -266,7 +260,6 @@ async function loginExistingMagicUser({
       // - they only have profile_id set, no issuer or address_id
       // we will locate an existing SsoToken by profile_id, and migrate it to use addresses instead.
       // if none exists, we will create it
-      // @ts-expect-error StrictNullChecks
       malformedSsoToken = await models.SsoToken.scope(
         'withPrivateData',
       ).findOne({
@@ -278,15 +271,12 @@ async function loginExistingMagicUser({
       });
       if (malformedSsoToken) {
         log.trace('DETECTED LEGACY / MALFORMED SSO TOKEN');
-        // @ts-expect-error StrictNullChecks
         if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
           log.warn('Replay attack detected.');
           throw new Error(
             `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
           );
         }
-        // @ts-expect-error StrictNullChecks
-        malformedSsoToken.profile_id = null;
         (malformedSsoToken.issuer = decodedMagicToken.issuer),
           (malformedSsoToken.issued_at = decodedMagicToken.claim.iat);
         malformedSsoToken.updated_at = new Date();
@@ -373,7 +363,7 @@ async function loginExistingMagicUser({
           { where: { address_id: ghost.id }, transaction },
         );
         await models.SsoToken.destroy({
-          where: { id: ghost.id },
+          where: { address_id: ghost.id },
           transaction,
         });
         await models.Address.destroy({

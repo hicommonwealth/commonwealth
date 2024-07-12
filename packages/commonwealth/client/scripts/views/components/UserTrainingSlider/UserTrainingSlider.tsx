@@ -1,9 +1,9 @@
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import app from 'client/scripts/state';
-import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
-import useAdminActionCardsStore from 'client/scripts/state/ui/adminOnboardingCards';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
+import useAdminActionCardsStore from 'state/ui/adminOnboardingCards';
+import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -14,7 +14,8 @@ import { UserTrainingCardTypes } from './types';
 export const UserTrainingSlider = () => {
   const { isLoggedIn } = useUserLoggedIn();
   const navigate = useCommonNavigate();
-  const profileId = app?.user?.addresses?.[0]?.profile?.id;
+  const user = useUserStore();
+  const profileId = user.addresses?.[0]?.profile?.id;
 
   const [cardToDismiss, setCardToDismiss] = useState<
     UserTrainingCardTypes | 'all'
@@ -106,7 +107,7 @@ export const UserTrainingSlider = () => {
           (link) => link.trim().length > 0,
         )?.length > 0;
       if (
-        (hasSocialLinks || app?.user?.email) &&
+        (hasSocialLinks || user.email) &&
         !trainingActionPermanentlyHidden?.[profileId]?.includes(
           UserTrainingCardTypes.FinishProfile,
         )
@@ -131,6 +132,7 @@ export const UserTrainingSlider = () => {
       }
     }
   }, [
+    user.email,
     isLoggedIn,
     isLoadingProfile,
     profile,

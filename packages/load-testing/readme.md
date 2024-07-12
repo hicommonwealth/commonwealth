@@ -11,10 +11,16 @@
 ### Remote API
 1. Execute `pnpm start <frick | frack | beta>` to start up the required services in Docker and connect them to the
 desired Heroku app.
-2. Execute `pnpm test test/<path_to_test_file>.ts`
+2. Execute `pnpm test test/<path_to_test_file>.ts <frick | frack | beta>`
 
-## Testing from K6 Cloud
-WIP
+## Testing Remote API from K6 Cloud
+To use native k6 on the cloud you must first execute `k6 login cloud -token [K6_CLOUD_PERSONAL_TOKEN]`. To use k6 on the
+cloud via Docker you must set the K6_CLOUD_PERSONAL_TOKEN in your root `.env` file. Starting the Docker services is not
+necessary since all the metrics will be hosted on the k6 cloud.
+
+1. Execute `pnpm start <frick | frack | beta>` to start up the required services in Docker and connect them to the
+   desired Heroku app.
+2. Execute `pnpm test test/<path_to_test_file>.ts <frick | frack | beta> cloud`
 
 # Adding Remote Modules
 K6 supports loading some compatible remote modules. A list of compatible modules can be found [here][3]. These modules
@@ -34,10 +40,21 @@ remote database is not specified, a Postgres container will be created.
 
 ### test-load
 
-Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file>`
+Definition: `chmod u+x scripts/k6.sh && ./scripts/k6.sh <path-to-test-file> <environment> <cloud | null>`
 
-Description: Creates a k6 binary (`load-test/k6`) containing the `xk6-sql` and `xk6-ts` extensions if it does not exist 
-and then executes the k6 binary with the provided test file.
+Description: Executes the specified Typescript k6 load test using Docker against the specified environment. The
+environment argument is optional (defaults to local) but can be set to frick, frack, or beta.
+
+Considerations: Executing load tests with Docker is less performant than executing them with a native k6 installation
+(see [test-load-native](#test-load-native)). Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. 
+See [start](#start).
+
+### test-load-native
+
+Definition: `chmod u+x scripts/k6.sh && NATIVE_K6=true ./scripts/k6.sh <path-to-test-file> <environment> <cloud | null>`
+
+Description: Executes the specified Typescript k6 load test using a native/local k6 installation against the specified 
+environment. The environment argument is optional (defaults to local) but can be set to frick, frack, or beta.
 
 Considerations: Requires Grafana, Prometheus, Postgres, and the Commonwealth app to be running. See [start](#start).
 
@@ -68,13 +85,8 @@ Description: Checks the types of `/test` and `/src`.
 
 - Explicitly `async` test lifecycle functions are not supported by k6. To implement k6 async functionality use callback
 syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment-1443462207.
-- There exists an [experimental mode][1] that would allow us to execute Typescript files without using the `xk6-ts`
-extension, but the `grafana/xk6:latest` Docker image currently uses version v0.5.0 of `k6` and Typescript support is
-only available in [v0.5.2][2] and upwards.
 
 
-[1]: https://grafana.com/docs/k6/latest/using-k6/javascript-typescript-compatibility-mode/#experimental-enhanced-mode
-[2]: https://github.com/grafana/k6/releases/tag/v0.52.0
 [3]: https://jslib.k6.io/
 [4]: https://k6.io/docs/using-k6/modules/#remote-http-s-modules
 

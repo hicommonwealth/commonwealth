@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "clean": "sudo rm -rf docker/db && rm -rf docker/grafana && rm -rf k6",
+    "clean": "sudo rm -rf docker/db && rm -rf docker/grafana",
     "check-types": "tsc --noEmit",
     "test-load": "chmod u+x scripts/k6.sh && ./scripts/k6.sh",
+    "test-load-native": "chmod u+x scripts/k6.sh && NATIVE_K6=true ./scripts/k6.sh",
     "start": "chmod u+x scripts/start.sh && ./scripts/start.sh",
     "stop": "docker compose -p load-testing down"
   },
@@ -17,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/k6": "^0.51.0"
+    "@types/k6": "^0.52.0"
   },
   "dependencies": {
     "moment": "^2.23.0"

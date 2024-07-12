@@ -1,6 +1,7 @@
-import { disabledStakeButtonTooltipText } from 'client/scripts/helpers/tooltipTexts';
+import { truncate } from 'client/scripts/helpers/truncate';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
+import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type ChainInfo from 'models/ChainInfo';
@@ -16,13 +17,12 @@ import { useCommunityCardPrice } from '../../../../../hooks/useCommunityCardPric
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
+import { isWindowExtraSmall } from '../../helpers';
 import { ComponentType } from '../../types';
 import { CWButton } from '../CWButton';
 import { CWTooltip } from '../CWTooltip';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
-import { isWindowExtraSmall } from '../../helpers';
-import { truncate } from 'client/scripts/helpers/truncate';
 
 type CWRelatedCommunityCardProps = {
   community: ChainInfo;
@@ -123,7 +123,7 @@ export const CWRelatedCommunityCard = ({
                 </CWText>
               </div>
 
-              {(
+              {
                 <div className="stake-info">
                   <CWText type="h5" className="stake-value">
                     ${stakeValue}
@@ -140,7 +140,7 @@ export const CWRelatedCommunityCard = ({
                     <CWText className="hours">24h</CWText>
                   </CWText>
                 </div>
-              )}
+              }
             </div>
             {community.description && (
               <CWText className="description" type="b2">

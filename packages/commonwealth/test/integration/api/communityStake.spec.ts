@@ -45,7 +45,7 @@ describe('POST communityStakes Tests', () => {
     const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
       models: server.models,
-      userAttributes: { email: '', id: 1, isAdmin: true },
+      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
     }) as UserInstance;
 
     const createResponse = await controller.createCommunityStake({

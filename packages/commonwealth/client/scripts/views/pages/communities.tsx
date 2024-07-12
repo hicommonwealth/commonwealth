@@ -3,14 +3,17 @@ import {
   ChainNetwork,
   CommunityCategoryType,
 } from '@hicommonwealth/shared';
-import useUserLoggedIn from 'client/scripts/hooks/useUserLoggedIn';
-import { useManageCommunityStakeModalStore } from 'client/scripts/state/ui/modals';
 import { findDenominationString } from 'helpers/findDenomination';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import numeral from 'numeral';
 import 'pages/communities.scss';
 import React, { useRef } from 'react';
 import app from 'state';
 import useFetchActiveCommunitiesQuery from 'state/api/communities/fetchActiveCommunities';
+import { useFetchNodesQuery } from 'state/api/nodes';
+import { getNodeById } from 'state/api/nodes/utils';
+import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   default as ChainInfo,
@@ -19,16 +22,13 @@ import {
 import { useFetchEthUsdRateQuery } from '../../state/api/communityStake/index';
 import { trpc } from '../../utils/trpcClient';
 import { NewCommunityCard } from '../components/CommunityCard';
-import { CWDivider } from '../components/component_kit/cw_divider';
+import { CommunityLaunchCard } from '../components/CommunityLaunchCard';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWRelatedCommunityCard } from '../components/component_kit/new_designs/CWRelatedCommunityCard';
 import ManageCommunityStakeModal from '../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import { CommunityLaunchCard } from '../components/CommunityLaunchCard';
-import useQuickCreateCommunity from 'client/scripts/hooks/useQuickCreateCommunity';
 
 const buildCommunityString = (numCommunities: number) =>
   numCommunities >= 1000
@@ -71,11 +71,15 @@ const CommunitiesPage = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
+  const { data: nodes } = useFetchNodesQuery();
+
   const [selectedCommunity, setSelectedCommunity] =
     // @ts-expect-error <StrictNullChecks/>
     React.useState<ChainInfo>(null);
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
+
+  const user = useUserStore();
 
   const { data: historicalPrices, isLoading: historicalPriceLoading } =
     trpc.community.getStakeHistoricalPrice.useQuery({
@@ -185,7 +189,7 @@ const CommunitiesPage = () => {
       })
       .map((community: CommunityInfo, i) => {
         // allow user to buy stake if they have a connected address that matches this community's base chain
-        const canBuyStake = !!app?.user?.addresses?.find?.(
+        const canBuyStake = !!user.addresses.find?.(
           (address) => address?.community?.base === community?.base,
         );
 
@@ -209,33 +213,33 @@ const CommunitiesPage = () => {
 
   // const sortNewCommunities = (list: CommunityInfo[]) => {
   //   let filteredList = list;
-  
+
   //   if (Object.values(filterMap).includes(true)) {
   //     // Handle Overlaps
   //     if (communityBases.filter((val) => filterMap[val]).length > 1) {
   //       filteredList = [];
   //     }
-  
+
   //     if (communityNetworks.filter((val) => filterMap[val]).length > 1) {
   //       filteredList = [];
   //     }
-  
+
   //     // Filter for ChainBase
   //     if (communityBases.filter((base) => filterMap[base]).length > 0) {
   //       filteredList = chainBaseFilter(filteredList);
   //     }
-  
+
   //     // Filter for ChainNetwork
   //     if (communityNetworks.filter((network) => filterMap[network]).length > 0) {
   //       filteredList = communityNetworkFilter(filteredList);
   //     }
-  
+
   //     // Filter for ChainCategory
   //     if (communityCategories.filter((cat) => filterMap[cat]).length > 0) {
   //       filteredList = communityCategoryFilter(filteredList);
   //     }
   //   }
-  
+
   //   // Sort by creation date, newest first
   //   return filteredList
   //     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -243,7 +247,7 @@ const CommunitiesPage = () => {
   //       const canBuyStake = !!app?.user?.addresses?.find?.(
   //         (address) => address?.community?.base === community?.base,
   //       );
-  
+
   //       return (
   //         <CWRelatedCommunityCard
   //           key={i}
@@ -265,7 +269,10 @@ const CommunitiesPage = () => {
   const sortedCommunities = activeCommunities
     ? sortCommunities(
         activeCommunities.communities.map((c: any) =>
-          CommunityInfo.fromJSON(c),
+          CommunityInfo.fromJSON({
+            ...c,
+            ChainNode: getNodeById(c.chain_node_id, nodes),
+          }),
         ),
       )
     : [];
@@ -274,7 +281,10 @@ const CommunitiesPage = () => {
     <CWPageLayout>
       <div className="CommunitiesPage">
         <div className="header-section">
-            <CommunityLaunchCard onLaunch={(name) => console.log('Community launched:', name)} />          {/* <div className="filters">
+          <CommunityLaunchCard
+            onLaunch={(name) => console.log('Community launched:', name)}
+          />{' '}
+          {/* <div className="filters">
             <CWIcon iconName="funnelSimple" />
             <CWButton
               label={STAKE_FILTER_KEY}

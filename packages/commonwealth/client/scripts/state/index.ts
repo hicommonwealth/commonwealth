@@ -8,7 +8,6 @@ import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
@@ -16,10 +15,12 @@ import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
-import NodeInfo from 'models/NodeInfo';
-import NotificationCategory from 'models/NotificationCategory';
 import StarredCommunity from 'models/StarredCommunity';
-import { ChainStore, NodeStore } from 'stores';
+import { queryClient, QueryKeys } from 'state/api/config';
+import { Configuration } from 'state/api/configuration';
+import { fetchNodesQuery } from 'state/api/nodes';
+import { ChainStore } from 'stores';
+import { userStore } from './ui/user';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -56,12 +57,6 @@ export interface IApp {
   // Polls
   polls: PollsController;
 
-  // Proposals
-  proposalEmitter: EventEmitter;
-
-  // Contracts
-  contracts: ContractsController;
-
   // Discord
   discord: DiscordController;
 
@@ -81,12 +76,7 @@ export interface IApp {
   // stored on server-side
   config: {
     chains: ChainStore;
-    redirects: Record<string, string>;
-    nodes: NodeStore;
-    notificationCategories?: NotificationCategory[];
-    defaultChain: string;
-    evmTestEnv?: string;
-    enforceSessionKeys?: boolean;
+    // blocked by https://github.com/hicommonwealth/commonwealth/pull/7971#issuecomment-2199934867
     chainCategoryMap?: { [chain: string]: CommunityCategoryType[] };
   };
 
@@ -134,12 +124,6 @@ const app: IApp = {
   // Polls
   polls: new PollsController(),
 
-  // Proposals
-  proposalEmitter: new EventEmitter(),
-
-  // Contracts
-  contracts: new ContractsController(),
-
   // Discord
   discord: new DiscordController(),
 
@@ -158,9 +142,6 @@ const app: IApp = {
 
   config: {
     chains: new ChainStore(),
-    redirects: {},
-    nodes: new NodeStore(),
-    defaultChain: 'edgeware',
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
@@ -192,44 +173,47 @@ export async function initAppState(
   shouldRedraw = true,
 ): Promise<void> {
   try {
-    const [{ data: statusRes }, { data: communities }, { data: nodesRes }] =
-      await Promise.all([
-        axios.get(`${app.serverUrl()}/status`),
-        axios.get(`${app.serverUrl()}/communities`),
-        axios.get(`${app.serverUrl()}/nodes`),
-      ]);
+    const [{ data: statusRes }, { data: communities }] = await Promise.all([
+      axios.get(`${app.serverUrl()}/status`),
+      axios.get(`${app.serverUrl()}/communities`),
+    ]);
+
+    const nodesData = await fetchNodesQuery();
 
     app.config.chains.clear();
-    app.config.nodes.clear();
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
-    app.config.evmTestEnv = statusRes.result.evmTestEnv;
-    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
-    nodesRes.result
-      .sort((a, b) => a.id - b.id)
-      .forEach((node) => {
-        app.config.nodes.add(NodeInfo.fromJSON(node));
-      });
+    queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+      enforceSessionKeys: statusRes.result.enforceSessionKeys,
+      evmTestEnv: statusRes.result.evmTestEnv,
+    });
 
     communities.result
       .filter((c) => c.community.active)
       .forEach((c) => {
         const chainInfo = ChainInfo.fromJSON({
-          ChainNode: app.config.nodes.getById(c.community.chain_node_id),
+          ChainNode: nodesData.find((n) => n.id === c.community.chain_node_id),
           ...c.community,
         });
         app.config.chains.add(chainInfo);
+
         if (chainInfo.redirect) {
-          app.config.redirects[chainInfo.redirect] = chainInfo.id;
+          const cachedConfig = queryClient.getQueryData<Configuration>([
+            QueryKeys.CONFIGURATION,
+          ]);
+
+          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+            ...cachedConfig,
+            redirects: {
+              ...cachedConfig?.redirects,
+              [chainInfo.redirect]: chainInfo.id,
+            },
+          });
         }
       });
 
     app.roles.setRoles(statusRes.result.roles);
-    app.config.notificationCategories =
-      statusRes.result.notificationCategories.map((json) =>
-        NotificationCategory.fromJSON(json),
-      );
     app.config.chainCategoryMap = statusRes.result.communityCategoryMap;
 
     // add recentActivity
@@ -253,13 +237,11 @@ export async function initAppState(
       app.loginStateEmitter.emit('redraw');
     }
 
-    app.user.setStarredCommunities(
-      statusRes.result.user?.starredCommunities
-        ? statusRes.result.user?.starredCommunities.map(
-            (c) => new StarredCommunity(c),
-          )
-        : [],
-    );
+    userStore.getState().setData({
+      starredCommunities: (statusRes.result.user?.starredCommunities || []).map(
+        (c) => new StarredCommunity(c),
+      ),
+    });
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (
@@ -267,9 +249,11 @@ export async function initAppState(
       statusRes.result.user &&
       statusRes.result.user.selectedCommunity
     ) {
-      app.user.setSelectedCommunity(
-        ChainInfo.fromJSON(statusRes.result.user.selectedCommunity),
-      );
+      userStore.getState().setData({
+        activeCommunity: ChainInfo.fromJSON(
+          statusRes.result.user.selectedCommunity,
+        ),
+      });
     }
 
     if (statusRes.result.user) {

@@ -18,7 +18,7 @@ export const EXCEPTION_CASE_threadCountersStore =
         set({ totalThreadsInCommunity: count }),
       setTotalThreadsInCommunityForVoting: (count) =>
         set({ totalThreadsInCommunityForVoting: count }),
-    }))
+    })),
   );
 
 // IMPORTANT: as the name suggests, this zustand store is an exception.
@@ -34,7 +34,7 @@ export const EXCEPTION_CASE_threadCountersStore =
 // --
 // -- THANKS :) --
 const useEXCEPTION_CASE_threadCountersStore = createBoundedUseStore(
-  EXCEPTION_CASE_threadCountersStore
+  EXCEPTION_CASE_threadCountersStore,
 );
 
 export default useEXCEPTION_CASE_threadCountersStore;

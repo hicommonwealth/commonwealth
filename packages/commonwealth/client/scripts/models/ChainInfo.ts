@@ -4,6 +4,7 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import app from 'state';
 import { getCosmosChains } from '../controllers/app/webWallets/utils';
+import { userStore } from '../state/ui/user';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 import StakeInfo from './StakeInfo';
@@ -221,7 +222,7 @@ class ChainInfo {
       substrateSpec: substrate_spec,
       tokenName: token_name,
       chain_node_id,
-      ChainNode: app.config.nodes.getById(chain_node_id) || ChainNode,
+      ChainNode: ChainNode,
       CommunityStakes: CommunityStakes?.map((c) => new StakeInfo(c)) ?? [],
       CommunityTags: CommunityTags?.map((t) => new Tag(t)) ?? [],
       adminOnlyPolling: admin_only_polling,
@@ -326,7 +327,7 @@ class ChainInfo {
         directory_page_enabled,
         directory_page_chain_node_id,
         type,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
       },
       {
         headers: {

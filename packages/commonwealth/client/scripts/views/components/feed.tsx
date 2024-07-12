@@ -10,17 +10,17 @@ import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 import { slugify } from '@hicommonwealth/shared';
 import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import useUserActiveAccount from 'client/scripts/hooks/useUserActiveAccount';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
-import Thread from 'client/scripts/models/Thread';
-import Topic from 'client/scripts/models/Topic';
-import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import app from 'client/scripts/state';
-import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
-import Permissions from 'client/scripts/utils/Permissions';
+import { getThreadActionTooltipText } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { getProposalUrlPath } from 'identifiers';
+import Thread from 'models/Thread';
+import Topic from 'models/Topic';
+import { ThreadKind, ThreadStage } from 'models/types';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
+import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 
 type ActivityResponse = {
@@ -65,6 +65,7 @@ const DEFAULT_COUNT = 10;
 
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
@@ -77,10 +78,9 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
-    // @ts-expect-error <StrictNullChecks/>
-    Permissions.isCommunityAdmin(null, thread.communityId);
+    Permissions.isCommunityAdmin(undefined, thread.communityId);
 
-  const account = app?.user?.addresses?.find(
+  const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
   );
 
@@ -126,7 +126,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={disabledActionsTooltipText}
-      customStages={chain.customStages}
+      customStages={chain?.customStages}
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
@@ -143,7 +143,6 @@ export const Feed = ({
   customScrollParent,
   isChainEventsRow,
 }: FeedProps) => {
-  useUserActiveAccount();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<

@@ -1,9 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'client/scripts/helpers/constants';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import app from 'state';
 import { ThreadResult } from 'views/pages/search/helpers';
 import { ApiEndpoints } from '../config';
