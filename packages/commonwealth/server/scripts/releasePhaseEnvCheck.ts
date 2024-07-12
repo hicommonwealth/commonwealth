@@ -5,7 +5,7 @@ const log = logger(__filename);
 
 if (import.meta.url.endsWith(process.argv[1])) {
   import('../config')
-    .then((config) => {
+    .then(() => {
       log.info('Environment variables are properly configured');
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispose()('EXIT', true);
