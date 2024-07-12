@@ -24,6 +24,7 @@ export type ContractSources = {
 
 export type EvmSource = {
   rpc: string;
+  maxBlockRange: number;
   contracts: ContractSources;
 };
 
