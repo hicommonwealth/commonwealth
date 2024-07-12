@@ -19,10 +19,10 @@ export const UserDashboardRowSkeleton = () => {
           </CWText>
         </div>
         <div className="comment-thread-info">
-          <Skeleton width={'90%'} />
+          <Skeleton width="90%" />
         </div>
         <div className="comment-preview">
-          <Skeleton width={'70%'} />
+          <Skeleton width="70%" />
         </div>
       </div>
       <div className="UserDashboardRowBottom">
