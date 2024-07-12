@@ -78,6 +78,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       // This query is overly complex in order to entice the query planner to use the trigram indices
       const sqlWithoutPagination = `
     SELECT
+      A.profile_id AS id,
       U.id AS user_id,
       U.profile->>'name' AS profile_name,
       U.profile->>'avatar_url' AS avatar_url,
@@ -86,17 +87,39 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       array_agg(A.community_id) as community_ids,
       array_agg(A.address) as addresses,
       MAX(COALESCE(A.last_active, U.created_at)) as last_active
-      FROM "Users" U
+    FROM 
+      "Users" U
       JOIN "Addresses" A ON U.id = A.user_id
-      WHERE 
+    WHERE 
+      ${replacements.community_id ? 'A.community_id = :community_id' : ''} 
+      ${
+        replacements.searchTerm
+          ? "AND U.profile->>'name' ILIKE :searchTerm"
+          : ''
+      }
+      ${membershipsWhere} 
+    GROUP BY A.profile_id, U.id
+
+    UNION
+     
+    SELECT
+      A.profile_id AS id,
+      U.id AS user_id,
+      U.profile->>'name' AS profile_name,
+      U.profile->>'avatar_url' AS avatar_url,
+      U.created_at,
+      array_agg(A.id) as address_ids,
+      array_agg(A.community_id) as community_ids,
+      array_agg(A.address) as addresses,
+      MAX(COALESCE(A.last_active, U.created_at)) as last_active
+    FROM
+      "Users" U
+      JOIN "Addresses" A ON U.id = A.user_id
+    WHERE 
         ${replacements.community_id ? 'A.community_id = :community_id' : ''} 
-        ${
-          replacements.searchTerm
-            ? "AND ((U.profile->>'name' ILIKE '%' || :searchTerm || '%') OR (A.address ILIKE '%' || :searchTerm || '%'))"
-            : ''
-        }
+        ${replacements.searchTerm ? 'AND A.address ILIKE :searchTerm' : ''}
         ${membershipsWhere} 
-      GROUP BY U.id
+    GROUP BY A.profile_id, U.id
   `;
 
       const allCommunityProfiles = await models.sequelize.query<{
@@ -113,7 +136,9 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       }>(`${sqlWithoutPagination}`, {
         replacements,
         type: QueryTypes.SELECT,
+        logging: true,
       });
+      console.log(allCommunityProfiles);
       const totalResults = allCommunityProfiles.length;
 
       if (payload.include_stake_balances) {
@@ -194,6 +219,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         return {
           id: profile.id,
           user_id: profile.user_id,
+          profile_id: profile.id,
           profile_name: profile.profile_name,
           avatar_url: profile.avatar_url,
           addresses: profile.address_ids.map((_, i) => {
@@ -272,6 +298,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           );
         }
       }
+
       return schemas.buildPaginatedResponse(
         profilesWithAddresses,
         totalResults,
