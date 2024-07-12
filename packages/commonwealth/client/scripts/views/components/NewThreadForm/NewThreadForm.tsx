@@ -81,7 +81,11 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const isTopicInContest = checkIsTopicInContest(contestsData, threadTopic?.id);
+  const isTopicInContest = checkIsTopicInContest(
+    contestsData,
+    threadTopic?.id,
+    true,
+  );
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
