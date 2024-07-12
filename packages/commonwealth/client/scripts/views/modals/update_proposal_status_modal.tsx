@@ -53,12 +53,16 @@ type UpdateProposalStatusModalProps = {
   onChangeHandler?: (stage: string, links?: Link[]) => void;
   onModalClose: () => void;
   thread: Thread;
+  snapshotProposalConnected?: boolean;
+  initialSnapshotLinks?: Link[];
 };
 
 export const UpdateProposalStatusModal = ({
   onChangeHandler,
   onModalClose,
   thread,
+  snapshotProposalConnected,
+  initialSnapshotLinks,
 }: UpdateProposalStatusModalProps) => {
   const { customStages } = app.chain.meta;
   const stages = parseCustomStages(customStages);
@@ -177,7 +181,6 @@ export const UpdateProposalStatusModal = ({
             identifier: String(sn.id),
           })),
         });
-
         links = updatedThread.links;
       }
     } catch (err) {
@@ -231,6 +234,25 @@ export const UpdateProposalStatusModal = ({
     // @ts-expect-error <StrictNullChecks/>
     onChangeHandler?.(tempStage, links);
     onModalClose();
+  };
+
+  const handleRemoveProposal = async () => {
+    try {
+      await deleteThreadLinks({
+        communityId: app.activeChainId(),
+        threadId: thread.id,
+        links: [
+          {
+            source: LinkSource.Snapshot,
+            identifier: initialSnapshotLinks?.[0]?.identifier ?? '',
+          },
+        ],
+      });
+      onModalClose();
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to remove linked proposal');
+    }
   };
 
   const setVotingStage = () => {
@@ -303,25 +325,32 @@ export const UpdateProposalStatusModal = ({
           />
         )}
       </CWModalBody>
-      <CWModalFooter>
-        <CWButton
-          label="Remove proposal"
-          buttonType="destructive"
-          buttonHeight="sm"
-          onClick={onModalClose}
-        />
-        <CWButton
-          label="Cancel"
-          buttonType="secondary"
-          buttonHeight="sm"
-          onClick={onModalClose}
-        />
-        <CWButton
-          buttonType="primary"
-          buttonHeight="sm"
-          label="Save changes"
-          onClick={handleSaveChanges}
-        />
+      <CWModalFooter className="proposal-modal">
+        <div className="left-button">
+          {snapshotProposalConnected && (
+            <CWButton
+              label="Remove proposal"
+              buttonType="destructive"
+              buttonHeight="sm"
+              className="test"
+              onClick={handleRemoveProposal}
+            />
+          )}
+        </div>
+        <div className="right-buttons">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary"
+            buttonHeight="sm"
+            onClick={onModalClose}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonHeight="sm"
+            label="Save changes"
+            onClick={handleSaveChanges}
+          />
+        </div>
       </CWModalFooter>
     </div>
   );
