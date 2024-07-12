@@ -28,7 +28,7 @@ generally will not have types, but it may be worth looking for some in the @type
 is recommended to declare the module types in `test/types.d.ts`. If declaring custom types is too complex you can add
 `//@ts-ignore` above the import to ignore the type error. More information can be found in the [K6 documentation][4].
 
-# Test Organization
+# Test Organization and Best Practices
 To keep tests organized/robust and help with visualizing, sorting, and filtering test results in Grafana use the 
 following patterns/strategies when creating load tests:
 - Define API request functions in `test/util/apiRequests` and then use those functions to create a test.
@@ -37,6 +37,9 @@ following patterns/strategies when creating load tests:
   - Don't use a Group for a single request. See the [docs][2] for reasoning.
 - Use [k6 user-defined tags][7] to tag related requests even if they are in different groups e.g. Thread creation <> Comment creation.
 - Use [k6 scenarios][8] to simulate different workloads for the same test.
+- Use [k6 SharedArrays][9] to store different JWTs for every virtual user. This ensures that each VU test cycle triggers 
+queries to different data in the database thus simulating a real world scenario. If all virtual users use the same JWT,
+performance results will be biased since the database can cache the specific data that is queried repeatedly.
 
 # Generating Tests from OpenAPI Spec
 Execute the `generate-load-tests` command from the root of the repository to generate a javascript load test in
@@ -110,3 +113,4 @@ syntax as described here: https://github.com/grafana/k6/issues/2935#issuecomment
 [6]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#tagging-stages
 [7]: https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/#user-defined-tags
 [8]: https://grafana.com/docs/k6/latest/using-k6/scenarios/
+[9]: https://grafana.com/docs/k6/latest/javascript-api/k6-data/sharedarray/
