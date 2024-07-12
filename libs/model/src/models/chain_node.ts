@@ -32,6 +32,7 @@ export default (
       cosmos_gov_version: { type: Sequelize.STRING(64), allowNull: true },
       block_explorer: { type: Sequelize.STRING, allowNull: true },
       slip44: { type: Sequelize.INTEGER, allowNull: true },
+      max_ce_block_range: { type: Sequelize.INTEGER, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
@@ -43,7 +44,7 @@ export default (
       underscored: true,
       defaultScope: {
         attributes: {
-          exclude: ['private_url'],
+          exclude: ['private_url', 'max_ce_block_range'],
         },
       },
       scopes: {
