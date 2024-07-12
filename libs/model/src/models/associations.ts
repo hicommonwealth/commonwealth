@@ -101,11 +101,12 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.Notification);
+    .withMany(db.Notification)
+    .withMany(db.ThreadVersionHistory);
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
-  });
+  }).withMany(db.CommentVersionHistory);
 
   db.ContestManager.withMany(db.Contest, {
     foreignKey: 'contest_address',
