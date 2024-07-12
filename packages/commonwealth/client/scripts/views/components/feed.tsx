@@ -117,7 +117,6 @@ export const Feed = ({
   });
 
   const queryData = (() => {
-    console.log('>>>>>>>>>>>>>>>', dashboardView);
     if (DashboardViews.Global === dashboardView) return globalActivityRes;
     else return userActivityRes;
   })();
