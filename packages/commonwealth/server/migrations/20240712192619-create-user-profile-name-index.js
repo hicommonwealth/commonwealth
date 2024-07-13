@@ -5,7 +5,7 @@ module.exports = {
   async up(queryInterface) {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
-        `CREATE INDEX idx_users_profile_name ON "Users" ((profile->>'name'));`,
+        `CREATE INDEX idx_users_profile_name ON "Users" USING GIN ((profile->>'name') gin_trgm_ops);`,
         { transaction: t },
       );
     });
