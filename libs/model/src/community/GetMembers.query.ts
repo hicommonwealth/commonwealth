@@ -1,6 +1,5 @@
 import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -43,6 +42,17 @@ const buildMembershipFilter = (memberships: string, addresses: string[]) => {
   }
 };
 
+const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
+  switch (by) {
+    case 'name':
+      return `ORDER BY profile_name ${direction}`;
+
+    case 'stakeBalance':
+      return `ORDER BY addresses[0].stake_balance ${direction}`;
+  }
+  return `ORDER BY last_active ${direction}`;
+};
+
 export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
   return {
     ...schemas.GetCommunityMembers,
@@ -73,7 +83,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
 
       const queryBody = `
       SELECT
-        A.profile_id AS id,
         U.id AS user_id,
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
@@ -83,8 +92,9 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
           'id', A.id,
           'address', A.address,
           'community_id', A.community_id,
-          'stake_balance', 0 -- TODO: project stake balance here
-        )) AS addresses,q
+          'stake_balance', 0, -- TODO: project stake balance here
+          'profile_id', A.profile_id -- TO BE REMOVED
+        )) AS addresses,
         ARRAY_AGG(A.role) AS roles,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
       FROM 
@@ -92,28 +102,41 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         JOIN "Addresses" A ON U.id = A.user_id
         LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
       WHERE 
-        A.community_id = :community_id ${membershipsWhere}`;
+        A.community_id = :community_id 
+        AND A.profile_id IS NOT NULL
+        ${membershipsWhere}`;
+
+      const groupBy = `
+        GROUP BY U.id
+     `;
+      console.log(payload);
+      const orderBy = buildOrderBy(
+        order_by ?? 'name',
+        order_direction ?? 'DESC',
+      );
 
       // UNION instead of OR when combining search terms uses trigram indexes in profile->>name and Addresses.address
-      const sqlWithoutPagination = search
+      const sql = search
         ? `
           ${queryBody} AND U.profile->>'name' ILIKE :search
-          GROUP BY A.profile_id, U.id
+          ${groupBy}
           UNION
           ${queryBody} AND A.address ILIKE :search
-          GROUP BY A.profile_id, U.id;
+          ${groupBy}
+          ${orderBy};
           `
         : `
           ${queryBody}
-          GROUP BY A.profile_id, U.id
+          ${groupBy}
+          ${orderBy};
         `;
 
-      const allCommunityProfiles = await models.sequelize.query<
+      const profiles = await models.sequelize.query<
         z.infer<typeof schemas.CommunityMember>
-      >(sqlWithoutPagination, {
+      >(sql, {
         replacements,
         type: QueryTypes.SELECT,
-        // logging: true,
+        logging: true,
       });
 
       // TODO: do this async from the client or project stake balances to addresses table
@@ -153,51 +176,20 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       //   }
       // }
 
-      // TODO: paginate in sql
-      const paginatedResults = allCommunityProfiles
-        .slice()
-        .sort((a, b) => {
-          let comparison = 0;
-          switch (order_by) {
-            case 'name':
-              {
-                const nameA = a.profile_name || '';
-                const nameB = b.profile_name || '';
-                comparison = nameA.localeCompare(nameB);
-              }
-              break;
-            // case 'stakeBalance':
-            //   {
-            //     const balanceA = a.stake_balances?.[0] || 0;
-            //     const balanceB = b.stake_balances?.[0] || 0;
-            //     comparison =
-            //       balanceA === balanceB ? 0 : balanceA < balanceB ? 1 : -1;
-            //   }
-            //   break;
-            case 'lastActive':
-            default: {
-              const lastActiveA = moment(a.last_active);
-              const lastActiveB = moment(b.last_active);
-              comparison = lastActiveA.isSame(lastActiveB)
-                ? 0
-                : lastActiveA.isAfter(lastActiveB)
-                ? 1
-                : -1;
-            }
-          }
-          return order_direction === 'ASC' ? -comparison : comparison;
-        })
-        .slice((cursor - 1) * limit, cursor * limit);
-
-      // console.log(paginatedResults);
-      return schemas.buildPaginatedResponse(
-        paginatedResults,
-        allCommunityProfiles.length,
-        {
-          limit,
-          offset: limit * (cursor - 1),
-        },
-      );
+      const offset = limit * (cursor - 1);
+      const page = profiles.slice(offset, cursor * limit);
+      console.log(page, offset, cursor * limit);
+      return schemas.buildPaginatedResponse(page, profiles.length, {
+        limit,
+        offset,
+      });
     },
   };
 }
+
+// TODO:
+// - Fix page result ordering issue in table view
+// - Create query plans
+// - Remove comments and logging (logging:true, console.log)
+// - Add stake balance to address migration (stake_balance, updated_date)
+// - Project stake balances in separate process

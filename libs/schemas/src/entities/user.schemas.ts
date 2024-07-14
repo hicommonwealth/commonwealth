@@ -77,7 +77,6 @@ export const Address = z.object({
 });
 
 export const CommunityMember = z.object({
-  id: PG_INT,
   user_id: PG_INT,
   profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
@@ -87,6 +86,7 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
+      profile_id: z.number(),
     }),
   ),
   roles: z.array(z.string()).nullish(),
