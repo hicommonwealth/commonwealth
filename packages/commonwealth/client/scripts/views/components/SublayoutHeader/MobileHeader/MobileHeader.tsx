@@ -51,8 +51,8 @@ const MobileHeader = ({
 
   const userData = useUserStore();
 
-  const user = userData.addresses?.[0];
-  const profileId = userData.addresses?.[0].profileId;
+  const user = isLoggedIn ? userData.addresses?.[0] : null;
+  const profileId = isLoggedIn ? userData.addresses?.[0]?.profileId : null;
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
