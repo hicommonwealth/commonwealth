@@ -1005,7 +1005,7 @@ function setupRouter(
       routerNamespace: 'generateImage',
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
-    passport.authenticate('jwt', { session: false }),
+    // passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
   );
 
