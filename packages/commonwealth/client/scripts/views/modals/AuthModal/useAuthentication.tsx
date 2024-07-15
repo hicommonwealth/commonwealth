@@ -1,5 +1,10 @@
 import type { Session } from '@canvas-js/interfaces';
-import { ChainBase, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  addressSwapper,
+  ChainBase,
+  verifySession,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   completeClientLogin,
@@ -8,9 +13,9 @@ import {
   updateActiveAddresses,
 } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import WebWalletController from 'controllers/app/web_wallets';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
@@ -19,11 +24,9 @@ import {
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { verifySession } from 'shared/canvas/verify';
 import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
-import { addressSwapper } from 'utils';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
