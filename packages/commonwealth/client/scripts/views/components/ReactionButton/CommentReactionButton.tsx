@@ -1,8 +1,8 @@
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import type Comment from '../../../models/Comment';
 import {
@@ -26,7 +26,7 @@ export const CommentReactionButton = ({
   onReaction,
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { mutateAsync: createCommentReaction } =
     useCreateCommentReactionMutation({
@@ -42,7 +42,7 @@ export const CommentReactionButton = ({
       threadId: comment.threadId,
     });
 
-  const activeAddress = app.user.activeAccount?.address;
+  const activeAddress = user.activeAccount?.address || '';
   const hasReacted = !!(comment.reactions || []).find(
     (x) => x?.author === activeAddress,
   );
@@ -55,7 +55,7 @@ export const CommentReactionButton = ({
     e.stopPropagation();
     e.preventDefault();
 
-    if (!app.isLoggedIn() || !app.user.activeAccount) {
+    if (!app.isLoggedIn() || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }
@@ -69,7 +69,7 @@ export const CommentReactionButton = ({
       });
       deleteCommentReaction({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address,
         // @ts-expect-error <StrictNullChecks/>
         canvasHash: foundReaction.canvasHash,
         // @ts-expect-error <StrictNullChecks/>
@@ -105,7 +105,7 @@ export const CommentReactionButton = ({
       />
       <CWUpvoteSmall
         voteCount={reactionWeightsSum}
-        disabled={!hasJoinedCommunity || disabled}
+        disabled={!user.activeAccount || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}
         popoverContent={getDisplayedReactorsForPopup({

@@ -1,4 +1,3 @@
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { ReactNode } from 'react';
 import app from 'state';
 import Permissions from 'utils/Permissions';
@@ -26,8 +25,6 @@ const CommunityManagementLayout = ({
   featureHint,
   className,
 }: CommunityManagementLayout) => {
-  useUserActiveAccount();
-
   if (
     !app.isLoggedIn() ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())

@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import type {
   AddressAttributes,
   CommentAttributes,
@@ -42,9 +43,15 @@ const getNewProfile = async (
   next: NextFunction,
 ) => {
   const { profileId } = req.query;
+
   let profile: ProfileInstance;
 
   if (profileId) {
+    const parsedInt = parseInt(profileId);
+    if (isNaN(parsedInt) || parsedInt !== parseFloat(profileId)) {
+      throw new AppError('Invalid profile id');
+    }
+
     // @ts-expect-error StrictNullChecks
     profile = await models.Profile.findOne({
       where: {
@@ -134,13 +141,14 @@ const getNewProfile = async (
 
   const profileTags = await models.ProfileTags.findAll({
     where: {
-      profile_id: profileId || profile.id,
+      user_id: profile.user_id,
     },
     include: [
       {
         model: models.Tags,
       },
     ],
+    logging: true,
   });
 
   return success(res, {

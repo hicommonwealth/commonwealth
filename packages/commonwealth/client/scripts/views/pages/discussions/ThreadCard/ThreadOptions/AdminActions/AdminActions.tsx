@@ -6,6 +6,7 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -70,6 +71,7 @@ export const AdminActions = ({
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
+  const user = useUserStore();
 
   const { mutateAsync: deleteThread } = useDeleteThreadMutation({
     communityId: app.activeChainId(),
@@ -98,7 +100,7 @@ export const AdminActions = ({
               await deleteThread({
                 threadId: thread.id,
                 communityId: app.activeChainId(),
-                address: app.user.activeAccount.address,
+                address: user.activeAccount?.address || '',
               });
               onDelete?.();
             } catch (err) {
@@ -169,7 +171,7 @@ export const AdminActions = ({
                 communityId: app.activeChainId(),
                 threadId: thread.id,
                 spam: isSpam,
-                address: app.user?.activeAccount?.address,
+                address: user.activeAccount?.address || '',
               })
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
@@ -188,7 +190,7 @@ export const AdminActions = ({
 
   const handleThreadLockToggle = () => {
     editThread({
-      address: app.user.activeAccount.address,
+      address: user.activeAccount?.address || '',
       threadId: thread.id,
       readOnly: !thread.readOnly,
       communityId: app.activeChainId(),
@@ -205,7 +207,7 @@ export const AdminActions = ({
 
   const handleThreadPinToggle = () => {
     editThread({
-      address: app.user.activeAccount.address,
+      address: user.activeAccount?.address || '',
       threadId: thread.id,
       communityId: app.activeChainId(),
       pinned: !thread.pinned,
@@ -266,7 +268,7 @@ export const AdminActions = ({
         threadId: thread.id,
         communityId: app.activeChainId(),
         archived: !thread.archivedAt,
-        address: app.user?.activeAccount?.address,
+        address: user.activeAccount?.address || '',
       })
         .then(() => {
           notifySuccess(

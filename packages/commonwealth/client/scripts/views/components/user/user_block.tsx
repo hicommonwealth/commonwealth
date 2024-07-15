@@ -6,6 +6,7 @@ import _ from 'lodash';
 import React from 'react';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import useUserStore from 'state/ui/user';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -129,15 +130,17 @@ export const UserBlock = ({
 const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
   const [address, setAddress] = React.useState<AddressInfo>();
 
+  const loggedInUser = useUserStore();
+
   React.useEffect(() => {
-    const matchingAddress = app.user.addresses.find(
+    const matchingAddress = loggedInUser.addresses.find(
       (a) =>
         a.community.id === user.community?.id && a.address === user.address,
     );
     if (matchingAddress) {
       setAddress(matchingAddress);
     }
-  }, [user.address, user.community?.id]);
+  }, [user.address, user.community?.id, loggedInUser.addresses]);
 
   return (
     <>

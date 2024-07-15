@@ -1,6 +1,6 @@
-import { SessionKeyError } from 'client/scripts/controllers/server/sessions';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal/types';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { createBoundedUseStore } from 'state/ui/utils';
+import { AuthModalType } from 'views/modals/AuthModal/types';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 

@@ -4,7 +4,6 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
-const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
@@ -24,15 +23,17 @@ const UpdateMembersGroupPage = lazy(
   () => import('views/pages/CommunityGroupsAndMembers/Groups/Update'),
 );
 const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
-const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
-const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
-const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings'),
+
+const NotificationSettingsOld = lazy(
+  () => import('views/pages/NotificationSettingsOld'),
+);
+const NotificationSettings = lazy(
+  () => import('views/pages/NotificationSettings'),
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
@@ -53,14 +54,6 @@ const DiscussionsRedirectPage = lazy(
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect'),
 );
-
-const ContractsPage = lazy(() => import('views/pages/contracts'));
-const NewContractPage = lazy(() => import('views/pages/new_contract'));
-const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
-const NewContractTemplatePage = lazy(
-  () => import('views/pages/new_contract_template'),
-);
-const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const DiscordCallbackPage = lazy(
   () =>
@@ -112,8 +105,8 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CommonDomainRoutes = ({
-  proposalTemplatesEnabled,
   contestEnabled,
+  knockInAppNotifications,
 }: RouteFeatureFlags) => [
   <Route
     key="/"
@@ -124,13 +117,6 @@ const CommonDomainRoutes = ({
     key="/createCommunity"
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
-  />,
-  <Route
-    key="/whyCommonwealth"
-    path="/whyCommonwealth"
-    element={withLayout(WhyCommonwealthPage, {
-      type: 'common',
-    })}
   />,
   <Route
     key="/dashboard"
@@ -201,20 +187,6 @@ const CommonDomainRoutes = ({
     element={withLayout(DirectoryPage, { scoped: true })}
   />,
   <Route
-    key="/:scope/sputnik-daos"
-    path="/:scope/sputnik-daos"
-    element={withLayout(SputnikDaosPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
-    key="/:scope/finishNearLogin"
-    path="/:scope/finishNearLogin"
-    element={withLayout(FinishNearLoginPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
     key="/finishsociallogin"
     path="/finishsociallogin"
     element={withLayout(FinishSocialLoginPage, { type: 'common' })}
@@ -238,7 +210,10 @@ const CommonDomainRoutes = ({
   <Route
     key="/notification-settings"
     path="/notification-settings"
-    element={withLayout(NotificationSettingsPage, { type: 'common' })}
+    element={withLayout(
+      knockInAppNotifications ? NotificationSettings : NotificationSettingsOld,
+      { type: 'common' },
+    )}
   />,
   <Route
     key="/:scope/notification-settings"
@@ -355,48 +330,6 @@ const CommonDomainRoutes = ({
     })}
   />,
   // DISCUSSIONS END
-
-  // CONTRACTS
-  ...(proposalTemplatesEnabled
-    ? [
-        <Route
-          key="/:scope/contracts"
-          path="/:scope/contracts"
-          element={withLayout(ContractsPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/new/contract"
-          path="/:scope/new/contract"
-          element={withLayout(NewContractPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/new/contract_template/:contract_id"
-          path="/:scope/new/contract_template/:contract_id"
-          element={withLayout(NewContractTemplatePage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/contract/:contractAddress"
-          path="/:scope/contract/:contractAddress"
-          element={withLayout(GeneralContractPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/:contract_address/:slug"
-          path="/:scope/:contract_address/:slug"
-          element={withLayout(ViewTemplatePage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
-  // CONTRACTS END
 
   // SITE ADMIN
   <Route

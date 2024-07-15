@@ -55,7 +55,7 @@ async function updateOrCreateWithAlert(
       required: false,
     },
   });
-  const url = community?.ChainNode?.private_url || community?.ChainNode?.url;
+  const url = community?.ChainNode?.private_url;
   if (!url)
     throw new InvalidState(
       `Chain node url not found on namespace ${namespace}`,
@@ -289,7 +289,6 @@ export function Contests(): Projection<typeof inputs> {
         const add_action = await models.ContestAction.findOne({
           where: {
             contest_address: payload.contest_address,
-            contest_id,
             content_id: payload.content_id,
             action: 'added',
           },
@@ -301,7 +300,7 @@ export function Contests(): Projection<typeof inputs> {
           contest_id,
           actor_address: payload.voter_address,
           action: 'upvoted',
-          thread_id: add_action?.thread_id,
+          thread_id: add_action!.thread_id,
           created_at: new Date(),
         });
         setImmediate(() => updateScore(payload.contest_address, contest_id));

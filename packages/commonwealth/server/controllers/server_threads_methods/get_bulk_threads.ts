@@ -191,7 +191,7 @@ export async function __getBulkThreads(
             'type', R.reaction,
             'address', A.address,
             'updated_at', R.updated_at::text,
-            'vote_weight', R.calculated_voting_weight,
+            'voting_weight', R.calculated_voting_weight,
             'profile_name', P.profile_name,
             'avatar_url', P.avatar_url,
             'last_active', A.last_active::text
@@ -205,20 +205,26 @@ export async function __getBulkThreads(
         GROUP BY TT.id
     ), contest_data AS (
       -- get the contest data associated with the thread
-          SELECT
-              TT.id as thread_id,
-              json_agg(json_strip_nulls(json_build_object(
-              'contest_id', CON.contest_id,
-              'contest_address', CON.contest_address,
-              'thread_id', TT.id,
-              'content_id', CA.content_id,
-              'start_time', CON.start_time,
-              'end_time', CON.end_time
-          ))) as "associatedContests"
-          FROM "Contests" CON
-          JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id AND CON.contest_address = CA.contest_address
-          JOIN top_threads TT ON TT.id = CA.thread_id
-          GROUP BY TT.id
+        SELECT
+            TT.id as thread_id,
+            json_agg(json_strip_nulls(json_build_object(
+            'contest_id', CON.contest_id,
+            'contest_name', CM.name,
+            'contest_cancelled', CM.cancelled,
+            'contest_interval', CM.interval,
+            'contest_address', CON.contest_address,
+            'score', CON.score,
+            'thread_id', TT.id,
+            'content_id', CA.content_id,
+            'start_time', CON.start_time,
+            'end_time', CON.end_time
+        ))) as "associatedContests"
+        FROM "Contests" CON
+        JOIN "ContestManagers" CM ON CM.contest_address = CON.contest_address
+        JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
+        AND CON.contest_address = CA.contest_address AND CA.action = 'upvoted'
+        JOIN top_threads TT ON TT.id = CA.thread_id
+        GROUP BY TT.id
     )${
       withXRecentComments
         ? `, recent_comments AS (

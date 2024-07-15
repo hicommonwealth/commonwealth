@@ -1,7 +1,9 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import useAppStatus from 'hooks/useAppStatus';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
@@ -11,12 +13,13 @@ import { CWTypeaheadSelectList } from 'views/components/component_kit/new_design
 import './Directory.scss';
 
 const Directory = () => {
-  const chainNodes = app.config.nodes.getAll() || [];
-  const chainNodeOptions = chainNodes.map((chain) => ({
+  const { data: chainNodes } = useFetchNodesQuery();
+
+  const chainNodeOptions = chainNodes?.map((chain) => ({
     value: String(chain.id),
     label: chain.name,
   }));
-  const chainNodeOptionsSorted = chainNodeOptions.sort((a, b) =>
+  const chainNodeOptionsSorted = (chainNodeOptions || []).sort((a, b) =>
     a.label.localeCompare(b.label),
   );
   const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
@@ -29,8 +32,10 @@ const Directory = () => {
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const defaultChainNodeId = chainNodeId ?? communityDefaultChainNodeId;
-  const defaultOption = chainNodeOptionsSorted.find(
+  const defaultOption = chainNodeOptionsSorted?.find(
     (option) => option.value === String(defaultChainNodeId),
   );
 
@@ -47,6 +52,7 @@ const Directory = () => {
       await community.updateChainData({
         directory_page_enabled: isEnabled,
         directory_page_chain_node_id: chainNodeId,
+        isPWA: isAddedToHomeScreen,
       });
 
       notifySuccess('Updated community directory');
@@ -56,7 +62,7 @@ const Directory = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [community, isEnabled, chainNodeId, isSaving]);
+  }, [community, isEnabled, chainNodeId, isSaving, isAddedToHomeScreen]);
 
   return (
     <section className="Directory">

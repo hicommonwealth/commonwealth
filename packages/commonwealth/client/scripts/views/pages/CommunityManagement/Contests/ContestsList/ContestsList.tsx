@@ -44,6 +44,7 @@ interface ContestsListProps {
   isLoading: boolean;
   stakeEnabled: boolean;
   isContestAvailable: boolean;
+  feeManagerBalance?: string;
 }
 const ContestsList = ({
   contests,
@@ -51,6 +52,7 @@ const ContestsList = ({
   isLoading,
   stakeEnabled,
   isContestAvailable,
+  feeManagerBalance,
 }: ContestsListProps) => {
   const [fundDrawerAddress, setFundDrawerAddress] = useState('');
 
@@ -101,6 +103,8 @@ const ContestsList = ({
                 isCancelled={contest.cancelled}
                 // @ts-expect-error <StrictNullChecks/>
                 onFund={() => setFundDrawerAddress(contest.contest_address)}
+                feeManagerBalance={feeManagerBalance}
+                isRecurring={!contest.funding_token_address}
               />
             );
           })

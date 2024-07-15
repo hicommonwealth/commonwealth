@@ -125,7 +125,7 @@ const RequirementSubForm = ({
               defaultValue: [defaultValues.requirementChain],
             })}
             options={chainTypes
-              .filter(
+              ?.filter(
                 (x) =>
                   x.chainBase ===
                   (isCosmosRequirement
@@ -134,7 +134,7 @@ const RequirementSubForm = ({
                     ? 'solana'
                     : 'ethereum'),
               )
-              .map((chainType) => ({
+              ?.map((chainType) => ({
                 label: chainType.label,
                 value: `${chainType.value}`,
               }))}

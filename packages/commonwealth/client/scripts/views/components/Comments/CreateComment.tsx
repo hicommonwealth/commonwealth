@@ -2,10 +2,13 @@ import { ContentType } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
+import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
+import useUserStore from 'state/ui/user';
+import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -35,6 +38,9 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
+  const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
+
   // get restored draft on init
   const restoredDraft = useMemo(() => {
     return restoreDraft() || createDeltaFromText('');
@@ -51,16 +57,20 @@ export const CreateComment = ({
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
   const { data: profile } = useFetchProfilesByAddressesQuery({
-    profileChainIds: [app.user.activeAccount?.community?.id],
-    profileAddresses: [app.user.activeAccount?.address],
+    profileChainIds: user.activeAccount?.community?.id
+      ? [user.activeAccount?.community?.id]
+      : [],
+    profileAddresses: user.activeAccount?.address
+      ? [user.activeAccount?.address]
+      : [],
     currentChainId: app.activeChainId(),
-    apiCallEnabled: !!app.user.activeAccount?.profile,
+    apiCallEnabled: !!user.activeAccount?.profile,
   });
 
-  if (app.user.activeAccount) {
-    app.user.activeAccount.profile = profile?.[0];
+  if (user.activeAccount) {
+    user.activeAccount.profile = profile?.[0];
   }
-  const author = app.user.activeAccount;
+  const author = user.activeAccount;
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
@@ -69,30 +79,30 @@ export const CreateComment = ({
   });
 
   const handleSubmitComment = async () => {
+    if (!user.activeAccount) return;
+
     setErrorMsg(null);
     setSendingComment(true);
 
     const communityId = app.activeChainId();
 
     try {
+      const { address = '', profile: userProfile } = user.activeAccount;
       const newComment: any = await createComment({
         threadId: rootThread.id,
         communityId,
         profile: {
-          // @ts-expect-error <StrictNullChecks/>
-          id: app.user.activeAccount.profile.id,
-          address: app.user.activeAccount.address,
-          // @ts-expect-error <StrictNullChecks/>
-          avatarUrl: app.user.activeAccount.profile.avatarUrl,
-          // @ts-expect-error <StrictNullChecks/>
-          name: app.user.activeAccount.profile.name,
-          // @ts-expect-error <StrictNullChecks/>
-          lastActive: app.user.activeAccount.profile.lastActive?.toString(),
+          address,
+          id: userProfile?.id || 0,
+          avatarUrl: userProfile?.avatarUrl || '',
+          name: userProfile?.name || '',
+          lastActive: userProfile?.lastActive?.toString() || '',
         },
         // @ts-expect-error <StrictNullChecks/>
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
+        isPWA: isAddedToHomeScreen,
       });
 
       setErrorMsg(null);
@@ -152,7 +162,7 @@ export const CreateComment = ({
       setContentDelta={setContentDelta}
       disabled={disabled}
       onCancel={handleCancel}
-      author={author}
+      author={author as Account}
       editorValue={editorValue}
       tooltipText={tooltipText}
     />

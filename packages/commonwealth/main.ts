@@ -27,8 +27,6 @@ import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
-import { setupCosmosProxies } from './server/util/comsosProxy/setupCosmosProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -170,21 +168,33 @@ export async function main(
     banCache,
     globalActivityCache,
     dbValidationService,
+    cacheDecorator,
   );
-
-  setupCosmosProxies(app, cacheDecorator);
-  setupIpfsProxy(app, cacheDecorator);
 
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
   app.use(
     '/assets',
     express.static(path.join(__dirname, 'assets'), {
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public');
+      },
+    }),
+  );
+
+  app.use(
+    '/brand_assets',
+    express.static(path.join(__dirname, 'brand_assets'), {
       setHeaders: (res) => {
         res.setHeader('Cache-Control', 'public');
       },

@@ -1,5 +1,4 @@
 import 'Sublayout.scss';
-import ideacoinSurveyGrowlImage from 'assets/img/ideacoinSurveyGrowlImage.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
@@ -15,12 +14,12 @@ import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import useUserLoggedIn from '../hooks/useUserLoggedIn';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import useUserStore, { userStore } from '../state/ui/user';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -38,7 +37,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const [authModalType, setAuthModalType] = useState<AuthModalType>();
-  const [profileId, setProfileId] = useState(null);
+  const [profileId, setProfileId] = useState<null | number>(null);
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: userOnboardingEnabled,
@@ -49,6 +48,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     resizeListenerUpdateDeps: [resizing],
   });
   const { triggerOpenModalType, setTriggerOpenModalType } = useAuthModalStore();
+  const user = useUserStore();
 
   useEffect(() => {
     if (triggerOpenModalType) {
@@ -62,12 +62,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     useWelcomeOnboardModal();
 
   useEffect(() => {
-    let timeout = null;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
     if (isLoggedIn) {
-      // @ts-expect-error StrictNullChecks
       timeout = setTimeout(() => {
-        // @ts-expect-error StrictNullChecks
-        setProfileId(app?.user?.addresses?.[0]?.profile?.id);
+        user.addresses?.[0]?.profile?.id &&
+          setProfileId(user.addresses?.[0]?.profile?.id);
       }, 100);
     } else {
       setProfileId(null);
@@ -76,6 +75,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     return () => {
       if (timeout !== null) clearTimeout(timeout);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn]);
 
   useNecessaryEffect(() => {
@@ -84,7 +84,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       userOnboardingEnabled &&
       !isWelcomeOnboardModalOpen &&
       profileId &&
-      !app.user.isWelcomeOnboardFlowComplete
+      !userStore.getState().isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
     }
@@ -221,13 +221,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            headerText="Shape the Future of Crypto with Ideacoin!"
-            bodyText="Degen? Want an NFT? Share your thoughts in our survey and influence our upcoming features."
-            buttonText="Take the Survey for an NFT"
-            buttonLink="https://kgqkthedh35.typeform.com/to/ONwG4vaI"
-            growlImage={ideacoinSurveyGrowlImage}
-          />
         </div>
         {userOnboardingEnabled && (
           <WelcomeOnboardModal

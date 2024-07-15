@@ -10,10 +10,6 @@ import {
 import Sequelize, { QueryTypes } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { config } from '../config';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail,
-} from '../scripts/emails';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
@@ -143,20 +139,6 @@ export default async function emitNotifications(
     }
   }
 
-  let msg;
-  try {
-    if (category_id !== 'snapshot-proposal') {
-      msg = await createImmediateNotificationEmailObject(
-        notification_data,
-        category_id,
-        models,
-      );
-    }
-  } catch (e) {
-    console.log('Error generating immediate notification email!');
-    console.trace(e);
-  }
-
   let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
@@ -194,19 +176,6 @@ export default async function emitNotifications(
   }
 
   if (config.SEND_WEBHOOKS_EMAILS) {
-    // emails
-    for (const subscription of subscriptions) {
-      // @ts-expect-error StrictNullChecks
-      if (msg && isChainEventData && chainEvent.community_id) {
-        // @ts-expect-error StrictNullChecks
-        msg.dynamic_template_data.notification.path = `${config.SERVER_URL}/${chainEvent.community_id}/notifications?id=${notification.id}`;
-      }
-      if (msg && subscription?.immediate_email && subscription?.User) {
-        // kick off async call and immediately return
-        sendImmediateNotificationEmail(subscription.User, msg);
-      }
-    }
-
     // webhooks
     try {
       await dispatchWebhooks(notification_data_and_category);

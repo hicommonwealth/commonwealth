@@ -10,7 +10,13 @@ import {
 } from '@hicommonwealth/model';
 import { NotificationCategories, ProposalType } from '@hicommonwealth/shared';
 import _ from 'lodash';
-import { Op, Sequelize, Transaction, WhereOptions } from 'sequelize';
+import {
+  Op,
+  QueryTypes,
+  Sequelize,
+  Transaction,
+  WhereOptions,
+} from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import {
@@ -40,6 +46,7 @@ export const Errors = {
   MissingCollaborators: 'Failed to find all provided collaborators',
   CollaboratorsOverlap:
     'Cannot overlap addresses when adding/removing collaborators',
+  ContestLock: 'Cannot edit thread that is in a contest',
 };
 
 export type UpdateThreadOptions = {
@@ -113,6 +120,23 @@ export async function __updateThread(
   if (!thread) {
     throw new AppError(Errors.ThreadNotFound);
   }
+
+  // check if thread is part of a contest topic
+  const contestManagers = await this.models.sequelize.query(
+    `
+    SELECT cm.contest_address FROM "Threads" t
+    JOIN "ContestTopics" ct on ct.topic_id = t.topic_id
+    JOIN "ContestManagers" cm on cm.contest_address = ct.contest_address
+    WHERE t.id = :thread_id
+  `,
+    {
+      type: QueryTypes.SELECT,
+      replacements: {
+        thread_id: thread!.id,
+      },
+    },
+  );
+  const isContestThread = contestManagers.length > 0;
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
@@ -200,6 +224,7 @@ export async function __updateThread(
         canvasHash,
         canvasSignedData,
       },
+      isContestThread,
       toUpdate,
     );
 
@@ -230,6 +255,7 @@ export async function __updateThread(
       community,
       topicId,
       this.models,
+      isContestThread,
       toUpdate,
     );
 
@@ -259,6 +285,7 @@ export async function __updateThread(
       permissions,
       thread,
       collaborators,
+      isContestThread,
       this.models,
       transaction,
     );
@@ -509,6 +536,7 @@ async function setThreadAttributes(
   permissions: UpdateThreadPermissions,
   thread: ThreadInstance,
   { title, body, url, canvasSignedData, canvasHash }: UpdatableThreadAttributes,
+  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
@@ -516,6 +544,9 @@ async function setThreadAttributes(
     typeof body !== 'undefined' ||
     typeof url !== 'undefined'
   ) {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
@@ -713,9 +744,13 @@ async function setThreadTopic(
   community: CommunityInstance,
   topicId: number,
   models: DB,
+  isContestThread: boolean,
   toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof topicId !== 'undefined') {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
     validatePermissions(permissions, {
       isThreadOwner: true,
       isMod: true,
@@ -748,11 +783,16 @@ async function updateThreadCollaborators(
         toRemove?: number[];
       }
     | undefined,
+  isContestThread: boolean,
   models: DB,
   transaction: Transaction,
 ) {
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
+    if (isContestThread) {
+      throw new AppError(Errors.ContestLock);
+    }
+
     validatePermissions(permissions, {
       isThreadOwner: true,
       isSuperAdmin: true,

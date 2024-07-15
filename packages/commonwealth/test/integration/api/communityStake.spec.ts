@@ -45,7 +45,7 @@ describe('POST communityStakes Tests', () => {
     const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
       models: server.models,
-      userAttributes: { email: '', id: 1, isAdmin: true },
+      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
     }) as UserInstance;
 
     const createResponse = await controller.createCommunityStake({
@@ -146,17 +146,10 @@ describe('POST communityStakes Tests', () => {
       where: {
         id: 'common-protocol',
       },
-      include: [
-        {
-          model: server.models.ChainNode,
-          attributes: ['eth_chain_id', 'url'],
-        },
-      ],
-      attributes: ['namespace', 'namespace_address'],
     });
+    assert.isNotNull(community);
     await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
-      // @ts-expect-error StrictNullChecks
-      community,
+      community!,
       2,
     );
   });

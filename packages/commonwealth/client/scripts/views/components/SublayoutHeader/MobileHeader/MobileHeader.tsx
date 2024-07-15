@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
@@ -17,8 +16,9 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import { useFlag } from 'hooks/useFlag';
+import useUserStore from 'state/ui/user';
+import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
@@ -37,7 +37,8 @@ const MobileHeader = ({
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { isLoggedIn } = useUserLoggedIn();
   const { menuVisible } = useSidebarStore();
-  const user = app?.user?.addresses?.[0];
+  const userData = useUserStore();
+  const user = userData.addresses?.[0];
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity

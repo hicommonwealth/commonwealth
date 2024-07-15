@@ -25,7 +25,6 @@ const GroupsSection = ({
   canManageGroups,
   hasNoGroups,
 }: GroupSectionProps) => {
-  console.log(filteredGroups);
   const allowlistEnabled = useFlag('allowlist');
   const navigate = useCommonNavigate();
 
@@ -85,7 +84,7 @@ const GroupsSection = ({
                   )?.label,
                   requirementChain:
                     chainTypes
-                      .find(
+                      ?.find(
                         (x) =>
                           `${x.value}` ===
                           `${

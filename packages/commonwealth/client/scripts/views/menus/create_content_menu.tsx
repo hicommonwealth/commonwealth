@@ -1,6 +1,5 @@
 /* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -8,6 +7,7 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserStore, { userStore } from 'state/ui/user';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -35,47 +35,12 @@ const resetSidebarState = () => {
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
-    app.user.activeAccount && !!app.chain?.meta.snapshot.length;
-
-  const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
+    userStore.getState() && !!app.chain?.meta.snapshot.length;
 
   const showOnChainProposalItem =
-    (app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain?.network !== ChainNetwork.Terra &&
-      app.chain?.network !== ChainNetwork.Kava) ||
-    (app.chain?.base === ChainBase.Ethereum &&
-      app.chain?.network === ChainNetwork.Aave) ||
-    app.chain?.network === ChainNetwork.Compound;
-
-  const getTemplateItems = (): PopoverMenuItem[] => {
-    const contracts = app.contracts.getCommunityContracts();
-
-    const items = [];
-
-    contracts.forEach((contract) => {
-      if (contract.ccts) {
-        for (const cct of contract.ccts) {
-          if (
-            cct.cctmd.display_options === '2' ||
-            cct.cctmd.display_options === '3'
-          ) {
-            const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
-            // @ts-expect-error <StrictNullChecks/>
-            items.push({
-              label: `New ${cct.cctmd.nickname}`,
-              iconLeft: 'star',
-              onClick: () => {
-                resetSidebarState();
-                navigate(`/${contract.address}/${slugWithSlashRemoved}`);
-              },
-            });
-          }
-        }
-      }
-    });
-
-    return items;
-  };
+    app.chain?.base === ChainBase.CosmosSDK &&
+    app.chain?.network !== ChainNetwork.Terra &&
+    app.chain?.network !== ChainNetwork.Kava;
 
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
@@ -91,20 +56,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         ]
       : [];
 
-  const getSputnikProposalItem = (): PopoverMenuItem[] =>
-    showSputnikProposalItem
-      ? [
-          {
-            label: 'New Sputnik proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal');
-            },
-            iconLeft: 'democraticProposal',
-          },
-        ]
-      : [];
-
   const getSnapshotProposalItem = (): PopoverMenuItem[] =>
     showSnapshotOptions
       ? [
@@ -114,13 +65,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () => {
               resetSidebarState();
               const snapshotSpaces = app.chain.meta.snapshot;
-              if (snapshotSpaces.length > 1) {
-                navigate('/multiple-snapshots', {
-                  action: 'create-proposal',
-                });
-              } else {
-                navigate(`/new/snapshot/${snapshotSpaces}`);
-              }
+              navigate(`/new/snapshot/${snapshotSpaces}`, {
+                action: 'create-proposal',
+              });
             },
           },
         ]
@@ -203,9 +150,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             iconLeft: 'pencil',
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
-          ...getSputnikProposalItem(),
           ...getSnapshotProposalItem(),
-          ...getTemplateItems(),
           ...getDiscordBotConnectionItems(),
         ]
       : []),
@@ -257,13 +202,13 @@ export const CreateContentSidebar = ({
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   if (
     !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
-    !hasJoinedCommunity
+    !user.activeAccount
   ) {
     return;
   }

@@ -1,4 +1,4 @@
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';

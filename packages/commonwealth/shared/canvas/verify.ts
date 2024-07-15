@@ -33,17 +33,17 @@ export const getSessionSignerForAddress = (address: string) => {
   }
 };
 
-export async function verifySession(session: Session) {
-  for (const signer of getSessionSigners()) {
-    if (signer.match(session.address)) {
-      await signer.verifySession(CANVAS_TOPIC, session);
-      return;
-    }
+export const verifySession = async (session: Session) => {
+  const signer = getSessionSignerForAddress(session.address);
+
+  if (!signer) {
+    throw new Error(
+      `No signer found for session with address ${session.address}`,
+    );
   }
-  throw new Error(
-    `No signer found for session with address ${session.address}`,
-  );
-}
+
+  await signer.verifySession(CANVAS_TOPIC, session);
+};
 
 type VerifyArgs = {
   actionMessage: Message<Action>;

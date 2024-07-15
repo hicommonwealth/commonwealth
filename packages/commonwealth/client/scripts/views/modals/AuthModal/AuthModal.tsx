@@ -1,11 +1,8 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
-import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import {
-  useAuthModalStore,
-  useWelcomeOnboardModal,
-} from 'client/scripts/state/ui/modals';
+import { getUniqueUserAddresses } from 'helpers/user';
+import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
+import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
 import { AuthTypes } from '../../components/AuthButton/types';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';

@@ -1,7 +1,7 @@
 import { commentsByDate } from 'helpers/dates';
 import type { IUniqueId } from 'models/interfaces';
 import { CommentsFeaturedFilterTypes } from 'models/types';
-import app from 'state';
+import useUserStore from 'state/ui/user';
 import type { Comment as CommentType } from '../../../../models/Comment';
 
 const MAX_THREAD_LEVEL = 8;
@@ -38,6 +38,8 @@ const usePrepareCommentsList = ({
   fromDiscordBot,
   isLoggedIn,
 }: UsePrepareCommentsListProps) => {
+  const user = useUserStore();
+
   const isLivingCommentTree = (
     comment: CommentType<any>,
     children: Array<CommentType<any>>,
@@ -104,7 +106,7 @@ const usePrepareCommentsList = ({
           if (isLivingCommentTree(comment, children)) {
             const maxReplyLimitReached = threadLevel >= MAX_THREAD_LEVEL;
             const isCommentAuthor =
-              comment.author === app.user.activeAccount?.address;
+              comment.author === user.activeAccount?.address;
             const replyBtnVisible = !!(
               !isLocked &&
               !fromDiscordBot &&

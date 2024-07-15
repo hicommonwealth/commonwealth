@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
-import app from 'state';
 
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -8,6 +7,7 @@ import { User } from 'views/components/user/user';
 
 import useUserMenuItems from '../../useUserMenuItems';
 
+import useUserStore from 'state/ui/user';
 import './UserDropdown.scss';
 
 interface UserDropdownProps {
@@ -22,7 +22,9 @@ const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
     isMenuOpen: isOpen,
   });
 
-  const user = app.user?.addresses?.[0];
+  const userData = useUserStore();
+
+  const user = userData.addresses?.[0];
 
   return (
     <PopoverMenu

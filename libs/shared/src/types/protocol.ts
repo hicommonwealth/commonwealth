@@ -63,6 +63,9 @@ export type ThresholdData = {
 
 export type AbiType = Record<string, unknown>[];
 
+// For detailed documentation of wallet types and support,
+// see Web-Wallets.md entry in the knowledge base
+
 export enum WalletId {
   Magic = 'magic',
   Polkadot = 'polkadot',
@@ -79,13 +82,16 @@ export enum WalletId {
   Coinbase = 'coinbase',
 }
 
-// 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
+// Passed directly to Magic login.
+// For detailed documentation of wallet types and support,
+// see Web-Wallets.md entry in the knowledge base
+
 export enum WalletSsoSource {
   Google = 'google',
   Github = 'github',
   Discord = 'discord',
   Twitter = 'twitter',
-  apple = 'apple',
+  Apple = 'apple',
   Email = 'email',
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }

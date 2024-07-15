@@ -4,7 +4,7 @@ import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -15,12 +15,14 @@ import {
 } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -47,17 +49,19 @@ export const NewThreadForm = () => {
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
 
   const { contestsData, isContestAvailable } = useCommunityContests();
 
+  const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
   const communityId = app.chain.id;
-  const hasTopics = topics?.length;
+  const hasTopics = sortedTopics?.length;
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
-
-  const topicsForSelector = hasTopics ? topics : [];
+  const topicsForSelector = hasTopics ? sortedTopics : [];
 
   const {
     threadTitle,
@@ -76,11 +80,15 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const isTopicInContest = checkIsTopicInContest(contestsData, threadTopic?.id);
+  const isTopicInContest = checkIsTopicInContest(
+    contestsData,
+    threadTopic?.id,
+    true,
+  );
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const user = useUserStore();
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
@@ -88,8 +96,8 @@ export const NewThreadForm = () => {
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
     communityId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
-    apiEnabled: !!app?.user?.activeAccount?.address,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
@@ -140,7 +148,7 @@ export const NewThreadForm = () => {
 
     try {
       const thread = await createThread({
-        address: app.user.activeAccount.address,
+        address: user.activeAccount?.address || '',
         kind: threadKind,
         stage: app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]
@@ -150,8 +158,8 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        // @ts-expect-error <StrictNullChecks/>
-        authorProfile: app.user.activeAccount.profile,
+        authorProfile: user.activeAccount?.profile as MinimumProfile,
+        isPWA: isAddedToHomeScreen,
       });
 
       setThreadContentDelta(createDeltaFromText(''));
@@ -178,9 +186,9 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const showBanner = !user.activeAccount && isBannerVisible;
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!hasJoinedCommunity,
+    isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
   });
 
@@ -209,7 +217,7 @@ export const NewThreadForm = () => {
 
               {!!hasTopics && (
                 <CWSelectList
-                  options={topics.map((topic) => ({
+                  options={sortedTopics.map((topic) => ({
                     label: topic?.name,
                     value: `${topic?.id}`,
                   }))}
@@ -244,7 +252,7 @@ export const NewThreadForm = () => {
               <ReactQuillEditor
                 contentDelta={threadContentDelta}
                 setContentDelta={setThreadContentDelta}
-                isDisabled={isRestrictedMembership || !hasJoinedCommunity}
+                isDisabled={isRestrictedMembership || !user.activeAccount}
                 tooltipLabel={
                   typeof disabledActionsTooltipText === 'function'
                     ? disabledActionsTooltipText?.('submit')
@@ -261,7 +269,7 @@ export const NewThreadForm = () => {
               )}
 
               <div className="buttons-row">
-                {isPopulated && hasJoinedCommunity && (
+                {isPopulated && user.activeAccount && (
                   <CWButton
                     buttonType="tertiary"
                     onClick={handleCancel}
@@ -274,7 +282,7 @@ export const NewThreadForm = () => {
                   label="Create thread"
                   disabled={
                     isDisabled ||
-                    !hasJoinedCommunity ||
+                    !user.activeAccount ||
                     isDisabledBecauseOfContestsConsent
                   }
                   onClick={handleNewThreadCreation}

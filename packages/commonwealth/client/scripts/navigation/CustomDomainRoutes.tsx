@@ -21,15 +21,17 @@ const CreateMembersGroupPage = lazy(
 const UpdateMembersGroupPage = lazy(
   () => import('views/pages/CommunityGroupsAndMembers/Groups/Update'),
 );
-const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
-const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishSocialLoginPage = lazy(
   () => import('views/pages/finish_social_login'),
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
-const NotificationSettingsPage = lazy(
-  () => import('views/pages/notification_settings'),
+
+const NotificationSettingsOld = lazy(
+  () => import('views/pages/NotificationSettingsOld'),
+);
+const NotificationSettings = lazy(
+  () => import('views/pages/NotificationSettings'),
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
@@ -49,14 +51,6 @@ const DiscussionsRedirectPage = lazy(
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect'),
 );
-
-const ContractsPage = lazy(() => import('views/pages/contracts'));
-const NewContractPage = lazy(() => import('views/pages/new_contract'));
-const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
-const NewContractTemplatePage = lazy(
-  () => import('views/pages/new_contract_template'),
-);
-const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const DiscordCallbackPage = lazy(
   () =>
@@ -107,8 +101,8 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
-  proposalTemplatesEnabled,
   contestEnabled,
+  knockInAppNotifications,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -164,21 +158,6 @@ const CustomDomainRoutes = ({
       element={withLayout(DirectoryPage, { scoped: true })}
     />,
     <Route
-      key="/sputnik-daos"
-      path="/sputnik-daos"
-      element={withLayout(SputnikDaosPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
-      key="/finishNearLogin"
-      path="/finishNearLogin"
-      element={withLayout(FinishNearLoginPage, {
-        scoped: true,
-        type: 'common',
-      })}
-    />,
-    <Route
       key="/finishsociallogin"
       path="/finishsociallogin"
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
@@ -202,10 +181,12 @@ const CustomDomainRoutes = ({
     <Route
       key="/notification-settings"
       path="/notification-settings"
-      element={withLayout(NotificationSettingsPage, {
-        scoped: true,
-        type: 'common',
-      })}
+      element={withLayout(
+        knockInAppNotifications
+          ? NotificationSettings
+          : NotificationSettingsOld,
+        { type: 'common' },
+      )}
     />,
     // NOTIFICATIONS END
 
@@ -292,48 +273,6 @@ const CustomDomainRoutes = ({
       })}
     />,
     // DISCUSSIONS END
-
-    // CONTRACTS
-    ...(proposalTemplatesEnabled
-      ? [
-          <Route
-            key="/contracts"
-            path="/contracts"
-            element={withLayout(ContractsPage, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/new/contract"
-            path="/new/contract"
-            element={withLayout(NewContractPage, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/new/contract_template/:contract_id"
-            path="/new/contract_template/:contract_id"
-            element={withLayout(NewContractTemplatePage, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/contract/:contractAddress"
-            path="/contract/:contractAddress"
-            element={withLayout(GeneralContractPage, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/:contract_address/:slug"
-            path="/:contract_address/:slug"
-            element={withLayout(ViewTemplatePage, {
-              scoped: true,
-            })}
-          />,
-        ]
-      : []),
-    // CONTRACTS END
 
     // ADMIN
     <Route
@@ -504,16 +443,6 @@ const CustomDomainRoutes = ({
       element={<Navigate to="/members" />}
     />,
     <Route
-      key="/:scope/sputnik-daos"
-      path="/:scope/sputnik-daos"
-      element={<Navigate to="/sputnik-daos" />}
-    />,
-    <Route
-      key="/:scope/finishNearLogin"
-      path="/:scope/finishNearLogin"
-      element={<Navigate to="/finishNearLogin" />}
-    />,
-    <Route
       key="/:scope/finishsociallogin"
       path="/:scope/finishsociallogin"
       element={<Navigate to="/finishsociallogin" />}
@@ -610,23 +539,6 @@ const CustomDomainRoutes = ({
       }
     />,
     // DISCUSSIONS END
-
-    // CONTRACTS
-    <Route
-      key="/:scope/new/contract"
-      path="/:scope/new/contract"
-      element={<Navigate to="/new/contract" />}
-    />,
-    <Route
-      key="/:scope/contract/:contractAddress"
-      path="/:scope/contract/:contractAddress"
-      element={
-        <Navigate
-          to={(parameters) => `/contract/${parameters.contractAddress}`}
-        />
-      }
-    />,
-    // CONTRACTS END
 
     // TREASURY
     <Route

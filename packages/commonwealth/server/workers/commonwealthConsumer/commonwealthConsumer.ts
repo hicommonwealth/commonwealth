@@ -74,6 +74,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     BrokerSubscriptions.ContestWorkerPolicy,
     ContestWorker(),
     buildRetryStrategy(undefined, 20_000),
+    {
+      beforeHandleEvent: (topic, event, context) => {
+        context.start = Date.now();
+      },
+      afterHandleEvent: (topic, event, context) => {
+        const duration = Date.now() - context.start;
+        const handler = `${topic}.${event.name}`;
+        stats().histogram(`cw.handlerExecutionTime`, duration, { handler });
+      },
+    },
   );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(

@@ -75,14 +75,17 @@ export const enum MixpanelSnapshotEvents {
 }
 
 export const enum MixpanelGovernanceEvents {
-  SPUTNIK_PROPOSAL_CREATED = 'Sputnik Proposal Created',
   AAVE_PROPOSAL_CREATED = 'Aave Proposal Created',
   COMPOUND_PROPOSAL_CREATED = 'Compound Proposal Created',
   COSMOS_PROPOSAL_CREATED = 'Cosmos Proposal Created',
-  SPUTNIK_VOTE_OCCURRED = 'Sputnik Vote Occurred',
   AAVE_VOTE_OCCURRED = 'Aave Vote Occurred',
   COMPOUND_VOTE_OCCURRED = 'Compund Vote Occurred',
   COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
+}
+
+export const enum MixpanelPWAEvent {
+  PWA_USED = 'PWA in use',
+  PWA_NOT_USED = 'PWA NOT in use',
 }
 
 export type MixpanelEvents =
@@ -95,12 +98,15 @@ export type MixpanelEvents =
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent
   | MixpanelClickthroughEvent
-  | MixpanelGovernanceEvents;
+  | MixpanelGovernanceEvents
+  | MixpanelPWAEvent;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 
 export interface AnalyticsPayload {
   event: AnalyticsEvent; // base event type
+  isPWA?: boolean;
+  test?: boolean;
 }
 
 export interface BaseMixpanelPayload extends AnalyticsPayload {
@@ -112,6 +118,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   communitySelected?: string;
   proposalType?: string;
   chainBase?: ChainBase;
+  isPWA?: boolean;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {

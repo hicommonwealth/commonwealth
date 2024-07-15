@@ -1,0 +1,50 @@
+@import '../../../../styles/shared';
+
+.NotificationSettings {
+  .page-header-text.Text {
+    margin-bottom: 8px;
+  }
+
+  .section-header.Text {
+    margin-top: 16px;
+  }
+
+  .page-subheader-text {
+    color: $neutral-500;
+  }
+
+  .SubscriptionEntry {
+    border-bottom: 1px solid $neutral-300;
+    margin-bottom: 16px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .SubscriptionHeader {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: $neutral-500;
+    gap: 8px;
+  }
+
+  .User a.user-display-name,
+  .SubscriptionHeader * {
+    color: $neutral-500;
+  }
+
+  .SubscriptionFooter {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    row-gap: 8px;
+    font-size: 14px;
+  }
+
+  .CommunityEntry .toggle {
+    margin-left: auto;
+  }
+}

@@ -1,5 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import useAppStatus from 'hooks/useAppStatus';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -7,6 +8,7 @@ import {
   useCreateThreadReactionMutation,
   useDeleteThreadReactionMutation,
 } from 'state/api/threads';
+import useUserStore from 'state/ui/user';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import CWPopover, {
   usePopover,
@@ -36,12 +38,16 @@ export const ReactionButton = ({
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
+
+  const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
+
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
       (acc, curr) => acc + (curr.voting_weight || 1),
       0,
     ) || 0;
-  const activeAddress = app.user.activeAccount?.address;
+  const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
   );
@@ -58,7 +64,7 @@ export const ReactionButton = ({
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId: app.activeChainId(),
-      address: app.user.activeAccount?.address,
+      address: user.activeAccount?.address || '',
       threadId: thread.id,
     });
 
@@ -70,7 +76,7 @@ export const ReactionButton = ({
     event.preventDefault();
     if (isLoading || disabled) return;
 
-    if (!app.isLoggedIn() || !app.user?.activeAccount) {
+    if (!app.isLoggedIn() || !user.activeAccount) {
       setIsAuthModalOpen(true);
       return;
     }
@@ -82,7 +88,7 @@ export const ReactionButton = ({
 
       deleteThreadReaction({
         communityId: app.activeChainId(),
-        address: app.user.activeAccount?.address,
+        address: user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
@@ -94,9 +100,10 @@ export const ReactionButton = ({
     } else {
       createThreadReaction({
         communityId: app.activeChainId(),
-        address: activeAddress,
+        address: activeAddress || '',
         threadId: thread.id,
         reactionType: 'like',
+        isPWA: isAddedToHomeScreen,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;

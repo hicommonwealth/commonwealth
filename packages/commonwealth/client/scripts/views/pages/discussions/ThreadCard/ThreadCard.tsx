@@ -1,7 +1,3 @@
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import { ViewThreadUpvotesDrawer } from 'client/scripts/views/components/UpvoteDrawer';
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
-import { QuillRenderer } from 'client/scripts/views/components/react_quill_editor/quill_renderer';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import {
@@ -10,13 +6,17 @@ import {
 } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { LinkSource } from 'models/Thread';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ThreadContestTag from 'views/components/ThreadContestTag';
+import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
@@ -111,18 +111,6 @@ export const ThreadCard = ({
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
 
-  const contestWinners = [
-    { date: '03/09/2024', round: 7, isRecurring: true },
-    { date: '03/10/2024', isRecurring: false },
-    {
-      date: '03/10/2024',
-      round: 8,
-      isRecurring: true,
-    },
-  ];
-  const showContestWinnerTag = false;
-  // const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
-
   return (
     <>
       <Link
@@ -180,10 +168,9 @@ export const ThreadCard = ({
             {thread.markedAsSpamAt && <CWTag label="SPAM" type="disabled" />}
             <div className="content-title">
               <CWText type="h5" fontWeight="semiBold">
-                {showContestWinnerTag &&
-                  contestWinners?.map((winner, index) => (
-                    <ThreadContestTag key={index} {...winner} />
-                  ))}
+                <ThreadContestTagContainer
+                  associatedContests={thread.associatedContests}
+                />
                 {thread.title}
               </CWText>
             </div>

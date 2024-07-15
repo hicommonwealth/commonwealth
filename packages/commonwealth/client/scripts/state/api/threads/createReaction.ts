@@ -1,12 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signThreadReaction } from 'client/scripts/controllers/server/sessions';
+import { signThreadReaction } from 'controllers/server/sessions';
 import { useFlag } from 'hooks/useFlag';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
+import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IuseCreateThreadReactionMutation {
@@ -16,27 +17,37 @@ interface IuseCreateThreadReactionMutation {
 interface CreateReactionProps extends IuseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
+  isPWA?: boolean;
 }
 
 const createReaction = async ({
   address,
   reactionType = 'like',
   threadId,
+  isPWA,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
     thread_id: threadId,
     like: reactionType === 'like',
   });
 
-  return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
-    author_community_id: app.user.activeAccount.community.id,
-    thread_id: threadId,
-    community_id: app.chain.id,
-    address,
-    reaction: reactionType,
-    jwt: app.user.jwt,
-    ...toCanvasSignedDataApiArgs(canvasSignedData),
-  });
+  return await axios.post(
+    `${app.serverUrl()}/threads/${threadId}/reactions`,
+    {
+      author_community_id: userStore.getState().activeAccount?.community?.id,
+      thread_id: threadId,
+      community_id: app.chain.id,
+      address,
+      reaction: reactionType,
+      jwt: userStore.getState().jwt,
+      ...toCanvasSignedDataApiArgs(canvasSignedData),
+    },
+    {
+      headers: {
+        isPWA: isPWA?.toString(),
+      },
+    },
+  );
 };
 
 const useCreateThreadReactionMutation = ({
@@ -49,6 +60,8 @@ const useCreateThreadReactionMutation = ({
     useUserOnboardingSliderMutationStore();
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  const user = useUserStore();
 
   return useMutation({
     mutationFn: createReaction,
@@ -68,12 +81,12 @@ const useCreateThreadReactionMutation = ({
       );
 
       if (userOnboardingEnabled) {
-        const profileId = app?.user?.addresses?.[0]?.profile?.id;
-        markTrainingActionAsComplete(
-          UserTrainingCardTypes.GiveUpvote,
-          // @ts-expect-error StrictNullChecks
-          profileId,
-        );
+        const profileId = user.addresses?.[0]?.profile?.id;
+        profileId &&
+          markTrainingActionAsComplete(
+            UserTrainingCardTypes.GiveUpvote,
+            profileId,
+          );
       }
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),

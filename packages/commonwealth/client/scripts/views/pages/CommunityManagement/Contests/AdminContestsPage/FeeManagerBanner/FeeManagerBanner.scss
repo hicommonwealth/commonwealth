@@ -1,0 +1,56 @@
+@import '../../../../../../../styles/shared';
+
+.FeeManagerBannerSkeleton {
+  max-width: 600px;
+  margin-bottom: 16px;
+  height: 93px;
+}
+
+.FeeManagerBanner {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid $primary-200;
+  background: $primary-25;
+  display: flex;
+  justify-content: space-between;
+  max-width: 600px;
+  margin-bottom: 16px;
+
+  .header {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 6px;
+    background-color: $yellow-100;
+    padding-right: 4px;
+
+    .Text {
+      color: $yellow-800;
+    }
+
+    svg {
+      padding: 4px;
+      border-radius: 6px;
+      background-color: $yellow-400;
+      fill: $yellow-800;
+    }
+  }
+
+  .popover-row {
+    display: flex;
+
+    .info-stake {
+      color: $neutral-600;
+      display: inline;
+
+      .CWIconButton {
+        vertical-align: bottom;
+      }
+    }
+  }
+
+  .right-side {
+    display: flex;
+    align-items: center;
+  }
+}

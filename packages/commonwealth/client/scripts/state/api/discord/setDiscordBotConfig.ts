@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import { userStore } from '../../ui/user';
 
 interface SetDiscordBotConfigProps {
   communityId: string;
@@ -20,7 +21,7 @@ const setDiscordBotConfig = async ({
       community_id: communityId,
       guild_id: guildId,
       verification_token: verificationToken,
-      jwt: app.user.jwt,
+      jwt: userStore.getState().jwt,
     },
     {
       headers: { 'Content-Type': 'application/json' },

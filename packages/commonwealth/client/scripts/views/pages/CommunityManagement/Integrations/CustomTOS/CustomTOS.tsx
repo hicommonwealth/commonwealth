@@ -1,4 +1,4 @@
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import { notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import React, { useCallback, useState } from 'react';
 import app from 'state';

@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { signDeleteThreadReaction } from 'client/scripts/controllers/server/sessions';
+import { signDeleteThreadReaction } from 'controllers/server/sessions';
 import { toCanvasSignedDataApiArgs } from 'shared/canvas/types';
 import app from 'state';
 import { useAuthModalStore } from '../../ui/modals';
+import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
@@ -33,7 +34,7 @@ const deleteReaction = async ({
         author_community_id: communityId,
         address: address,
         community_id: app.chain.id,
-        jwt: app.user.jwt,
+        jwt: userStore.getState().jwt,
         ...toCanvasSignedDataApiArgs(canvasSignedData),
       },
     },
